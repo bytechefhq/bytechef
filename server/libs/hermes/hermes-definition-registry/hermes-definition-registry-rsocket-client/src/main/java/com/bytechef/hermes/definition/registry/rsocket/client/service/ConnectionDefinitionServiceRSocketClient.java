@@ -152,15 +152,14 @@ public class ConnectionDefinitionServiceRSocketClient extends AbstractRSocketCli
     }
 
     @Override
-    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName) {
 
-        return MonoUtils.get(
-            getRSocketRequester(componentName)
-                .route("ConnectionDefinitionService.getOAuth2Parameters")
-                .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
-                .retrieveMono(OAuth2AuthorizationParametersDTO.class));
+        return getRSocketRequester(componentName)
+            .route("ConnectionDefinitionService.getOAuth2Parameters")
+            .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
+            .retrieveMono(OAuth2AuthorizationParametersDTO.class);
     }
 
     @SuppressWarnings("unchecked")
