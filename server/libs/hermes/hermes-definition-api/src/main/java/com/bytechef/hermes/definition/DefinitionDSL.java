@@ -196,11 +196,11 @@ public class DefinitionDSL {
             .properties(properties);
     }
 
-    protected static class ModifiablePropertiesDataSource implements PropertiesDataSource {
+    protected static class ModifiableDynamicPropertiesDataSource implements DynamicPropertiesDataSource {
 
         private final List<String> loadPropertiesDependsOn;
 
-        protected ModifiablePropertiesDataSource(List<String> loadPropertiesDependOnPropertyNames) {
+        protected ModifiableDynamicPropertiesDataSource(List<String> loadPropertiesDependOnPropertyNames) {
             this.loadPropertiesDependsOn = loadPropertiesDependOnPropertyNames;
         }
 
@@ -1103,19 +1103,19 @@ public class DefinitionDSL {
             implements Property.DynamicPropertiesProperty {
 
             @JsonIgnore
-            private PropertiesDataSource propertiesDataSource;
+            private DynamicPropertiesDataSource dynamicPropertiesDataSource;
 
-            public ModifiableDynamicPropertiesProperty propertiesDataSource(
-                PropertiesDataSource propertiesDataSource) {
+            public ModifiableDynamicPropertiesProperty dynamicPropertiesDataSource(
+                DynamicPropertiesDataSource dynamicPropertiesDataSource) {
 
-                this.propertiesDataSource = propertiesDataSource;
+                this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
 
                 return this;
             }
 
             @Override
-            public PropertiesDataSource getPropertiesDataSource() {
-                return propertiesDataSource;
+            public DynamicPropertiesDataSource getDynamicPropertiesDataSource() {
+                return dynamicPropertiesDataSource;
             }
 
             @Override

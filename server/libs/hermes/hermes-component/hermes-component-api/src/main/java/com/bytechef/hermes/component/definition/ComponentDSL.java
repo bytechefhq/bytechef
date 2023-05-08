@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
@@ -109,11 +111,11 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableOutputSchemaDataSource(outputSchemaFunction);
     }
 
-    public static ModifiableComponentPropertiesDataSource propertiesDataSource(
-        ComponentPropertiesDataSource.PropertiesFunction propertiesFunction,
+    public static ModifiableComponentDynamicPropertiesDataSource propertiesDataSource(
+        ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction dynamicPropertiesFunction,
         String... propertiesDependOnPropertyNames) {
 
-        return new ModifiableComponentPropertiesDataSource(propertiesFunction,
+        return new ModifiableComponentDynamicPropertiesDataSource(dynamicPropertiesFunction,
             List.of(propertiesDependOnPropertyNames));
     }
 
@@ -133,7 +135,10 @@ public final class ComponentDSL extends DefinitionDSL {
         private ExecuteFunction execute;
 
         @JsonIgnore
-        private EditorDescriptionFunction editorDescription;
+        private EditorDescriptionFunction editorDescription =
+            (Connection connection, InputParameters inputParameters) -> {
+                return null;
+            };
 
         private Help help;
 
@@ -141,7 +146,6 @@ public final class ComponentDSL extends DefinitionDSL {
         private Map<String, Object> metadata;
         private String name;
         private List<? extends Property<?>> outputSchema;
-        private String outputSchemaProperty;
         private List<? extends Property<?>> properties;
 
         @JsonIgnore
@@ -222,12 +226,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableActionDefinition outputSchemaDataSource(OutputSchemaDataSource outputSchemaDataSource) {
             this.outputSchemaDataSource = outputSchemaDataSource;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition outputSchemaProperty(String outputSchemaProperty) {
-            this.outputSchemaProperty = outputSchemaProperty;
 
             return this;
         }
@@ -315,11 +313,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
             return Optional.ofNullable(outputSchemaDataSource);
-        }
-
-        @Override
-        public Optional<String> getOutputSchemaProperty() {
-            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override
@@ -454,10 +447,10 @@ public final class ComponentDSL extends DefinitionDSL {
         private ScopesFunction scopes = connectionParameters -> {
             Object scopes = connectionParameters.getString(Authorization.SCOPES);
 
-            if (scopes instanceof List<?>) {
-                return (List<String>) scopes;
-            } else if (scopes == null) {
+            if (scopes == null) {
                 return Collections.emptyList();
+            } else if (scopes instanceof List<?>) {
+                return (List<String>) scopes;
             } else {
                 return Arrays.stream(((String) scopes).split(","))
                     .filter(Objects::nonNull)
@@ -993,23 +986,23 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    public static final class ModifiableComponentPropertiesDataSource
-        extends DefinitionDSL.ModifiablePropertiesDataSource implements ComponentPropertiesDataSource {
+    public static final class ModifiableComponentDynamicPropertiesDataSource
+        extends ModifiableDynamicPropertiesDataSource implements ComponentDynamicPropertiesDataSource {
 
         @JsonIgnore
-        private PropertiesFunction properties;
+        private DynamicPropertiesFunction dynamicProperties;
 
-        private ModifiableComponentPropertiesDataSource(
-            PropertiesFunction properties, List<String> loadPropertiesDependOnPropertyNames) {
+        private ModifiableComponentDynamicPropertiesDataSource(
+            DynamicPropertiesFunction dynamicProperties, List<String> loadPropertiesDependOnPropertyNames) {
 
             super(loadPropertiesDependOnPropertyNames);
 
-            this.properties = properties;
+            this.dynamicProperties = dynamicProperties;
         }
 
         @Override
-        public PropertiesFunction getProperties() {
-            return properties;
+        public DynamicPropertiesFunction getDynamicProperties() {
+            return dynamicProperties;
         }
     }
 
@@ -1560,12 +1553,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<Boolean> getBatch() {
             return Optional.ofNullable(batch);
-        }
-
-        @Override
-        @JsonIgnore
-        public String getComponentName() {
-            return componentName;
         }
 
         @Override

@@ -169,17 +169,16 @@ public class CustomAction {
                 .placeholder("text/plain"),
 
             //
-            //
+            // TODO Add support for using it in the editor
             //
 
             string(OUTPUT_SCHEMA)
-                .label("Output")
+                .label("Output Schema")
                 .description(
                     "Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
                 .controlType(ControlType.SCHEMA_DESIGNER)
                 .sampleDataType(SampleDataType.JSON))
         .outputSchema(oneOf())
-        .outputSchemaProperty(OUTPUT_SCHEMA)
         .execute(CustomAction::execute);
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {

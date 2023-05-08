@@ -26,19 +26,53 @@ import java.util.Optional;
  */
 public sealed interface JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
 
+    /**
+     *
+     * @return
+     */
     String getDatabaseJdbcName();
 
+    /**
+     *
+     * @return
+     */
     String getJdbcDriverClassName();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getDescription();
 
+    /**
+     *
+     * @return
+     */
     String getIcon();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     Optional<Resources> getResources();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     String getTitle();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     int getVersion();
 }
