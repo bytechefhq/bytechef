@@ -45,11 +45,11 @@ export interface TriggerDefinitionModel {
      */
     description?: string;
     /**
-     * The example value of the action's output.
+     * The sample value of the action's output.
      * @type {object}
      * @memberof TriggerDefinitionModel
      */
-    exampleOutput?: object;
+    sampleOutput?: object;
     /**
      * 
      * @type {HelpModel}
@@ -110,7 +110,7 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
     return {
         
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'exampleOutput': !exists(json, 'exampleOutput') ? undefined : json['exampleOutput'],
+        'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
@@ -130,7 +130,7 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
     return {
         
         'description': value.description,
-        'exampleOutput': value.exampleOutput,
+        'sampleOutput': value.sampleOutput,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),

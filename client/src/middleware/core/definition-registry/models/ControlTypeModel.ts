@@ -31,6 +31,7 @@ export const ControlTypeModel = {
     InputUrl: 'INPUT_URL',
     JsonBuilder: 'JSON_BUILDER',
     MultiSelect: 'MULTI_SELECT',
+    SchemaDesigner: 'SCHEMA_DESIGNER',
     Select: 'SELECT',
     TextArea: 'TEXT_AREA',
     Time: 'TIME'

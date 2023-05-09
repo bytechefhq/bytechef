@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './CategoryModel';
+export * from './ComponentDefinitionModel';
 export * from './ConnectionModel';
 export * from './CreateProjectInstanceJob200ResponseModel';
 export * from './CreateProjectInstanceJobRequestModel';
@@ -13,8 +14,6 @@ export * from './OAuth2AuthorizationParametersModel';
 export * from './OutputModel';
 export * from './PageModel';
 export * from './ProjectBasicModel';
-export * from './ProjectExecutionBasicModel';
-export * from './ProjectExecutionModel';
 export * from './ProjectInstanceBasicModel';
 export * from './ProjectInstanceModel';
 export * from './ProjectInstanceProjectModel';
@@ -28,6 +27,8 @@ export * from './WebhookModel';
 export * from './WebhookRetryModel';
 export * from './WorkflowBasicModel';
 export * from './WorkflowConnectionModel';
+export * from './WorkflowExecutionBasicModel';
+export * from './WorkflowExecutionModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
 export * from './WorkflowTaskModel';

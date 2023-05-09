@@ -47,61 +47,61 @@ import {
 /**
  * Contains information about execution of one of project workflows.
  * @export
- * @interface ProjectExecutionModel
+ * @interface WorkflowExecutionModel
  */
-export interface ProjectExecutionModel {
+export interface WorkflowExecutionModel {
     /**
-     * The id of a project execution.
+     * The id of a workflow execution.
      * @type {number}
-     * @memberof ProjectExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     readonly id?: number;
     /**
      * 
      * @type {ProjectInstanceModel}
-     * @memberof ProjectExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     instance?: ProjectInstanceModel;
     /**
      * 
      * @type {JobModel}
-     * @memberof ProjectExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     job?: JobModel;
     /**
      * 
      * @type {ProjectModel}
-     * @memberof ProjectExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     project?: ProjectModel;
     /**
      * 
      * @type {Array<TaskExecutionModel>}
-     * @memberof ProjectExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     taskExecutions?: Array<TaskExecutionModel>;
     /**
      * 
      * @type {WorkflowModel}
-     * @memberof ProjectExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     workflow?: WorkflowModel;
 }
 
 /**
- * Check if a given object implements the ProjectExecutionModel interface.
+ * Check if a given object implements the WorkflowExecutionModel interface.
  */
-export function instanceOfProjectExecutionModel(value: object): boolean {
+export function instanceOfWorkflowExecutionModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ProjectExecutionModelFromJSON(json: any): ProjectExecutionModel {
-    return ProjectExecutionModelFromJSONTyped(json, false);
+export function WorkflowExecutionModelFromJSON(json: any): WorkflowExecutionModel {
+    return WorkflowExecutionModelFromJSONTyped(json, false);
 }
 
-export function ProjectExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectExecutionModel {
+export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowExecutionModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -116,7 +116,7 @@ export function ProjectExecutionModelFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ProjectExecutionModelToJSON(value?: ProjectExecutionModel | null): any {
+export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | null): any {
     if (value === undefined) {
         return undefined;
     }
