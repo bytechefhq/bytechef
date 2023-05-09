@@ -18,6 +18,7 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
+    "sampleDataType": null,
     "expressionDisabled": null
   } ],
   "resources": null,

@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Add a new pet to the store",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "addPet",
     "outputSchema": [ {
@@ -55,6 +56,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -106,6 +108,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -137,6 +140,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -206,6 +210,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -246,6 +251,7 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
@@ -301,6 +307,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -352,6 +359,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -383,6 +391,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -452,6 +461,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -492,17 +502,20 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Add a new pet to the store"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Update an existing pet by Id",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "updatePet",
     "outputSchema": [ {
@@ -555,6 +568,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -606,6 +620,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -637,6 +652,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -706,6 +722,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -746,6 +763,7 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
@@ -801,6 +819,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -852,6 +871,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -883,6 +903,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -952,6 +973,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -992,17 +1014,20 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Update an existing pet"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "findPetsByStatus",
     "outputSchema": [ {
@@ -1067,6 +1092,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1118,6 +1144,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -1149,6 +1176,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "multipleValues": true,
@@ -1218,6 +1246,7 @@
               "controlType": "INPUT_TEXT",
               "options": null,
               "optionsDataSource": null,
+              "sampleDataType": null,
               "expressionDisabled": null
             } ],
             "controlType": "JSON_BUILDER",
@@ -1258,6 +1287,7 @@
             "value": "sold"
           } ],
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -1299,14 +1329,17 @@
         "value": "sold"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Finds Pets by status"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "findPetsByTags",
     "outputSchema": [ {
@@ -1371,6 +1404,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1422,6 +1456,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -1453,6 +1488,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "multipleValues": true,
@@ -1522,6 +1558,7 @@
               "controlType": "INPUT_TEXT",
               "options": null,
               "optionsDataSource": null,
+              "sampleDataType": null,
               "expressionDisabled": null
             } ],
             "controlType": "JSON_BUILDER",
@@ -1562,6 +1599,7 @@
             "value": "sold"
           } ],
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -1600,6 +1638,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -1608,12 +1647,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Finds Pets by tags"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "delete a pet",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "deletePet",
     "outputSchema": null,
@@ -1632,6 +1673,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1652,12 +1694,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Deletes a pet"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Returns a single pet",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getPetById",
     "outputSchema": [ {
@@ -1710,6 +1754,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1761,6 +1806,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -1792,6 +1838,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -1861,6 +1908,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -1901,6 +1949,7 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
@@ -1925,12 +1974,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Find pet by ID"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "updatePetWithForm",
     "outputSchema": null,
@@ -1967,6 +2018,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1983,14 +2035,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Updates a pet in the store with form data"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "uploadFile",
     "outputSchema": [ {
@@ -2043,6 +2098,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2059,6 +2115,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
@@ -2097,6 +2154,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -2130,6 +2188,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2146,6 +2205,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2162,6 +2222,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2178,17 +2239,20 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "uploads an image"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Returns a map of status codes to quantities",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getInventory",
     "outputSchema": [ {
@@ -2231,12 +2295,14 @@
       "expressionDisabled": null
     } ],
     "properties": [ ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Returns pet inventories by status"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Place a new order in the store",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "placeOrder",
     "outputSchema": [ {
@@ -2356,6 +2422,7 @@
           "value": "delivered"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2492,6 +2559,7 @@
           "value": "delivered"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2511,12 +2579,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Place an order for a pet"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "deleteOrder",
     "outputSchema": null,
@@ -2539,12 +2609,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Delete purchase order by ID"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getOrderById",
     "outputSchema": [ {
@@ -2664,6 +2736,7 @@
           "value": "delivered"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2702,12 +2775,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Find purchase order by ID"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "createUser",
     "outputSchema": [ {
@@ -2760,6 +2835,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2776,6 +2852,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2792,6 +2869,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2808,6 +2886,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2824,6 +2903,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2840,6 +2920,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2913,6 +2994,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2929,6 +3011,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2945,6 +3028,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2961,6 +3045,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2977,6 +3062,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2993,6 +3079,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3016,12 +3103,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Create user"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Creates list of users with given input array",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "createUsersWithListInput",
     "outputSchema": [ {
@@ -3086,6 +3175,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3102,6 +3192,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3118,6 +3209,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3134,6 +3226,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3150,6 +3243,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3166,6 +3260,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3257,6 +3352,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3273,6 +3369,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3289,6 +3386,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3305,6 +3403,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3321,6 +3420,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3337,6 +3437,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3366,12 +3467,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Creates list of users with given input array"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "deleteUser",
     "outputSchema": null,
@@ -3390,14 +3493,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Delete user"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getUserByName",
     "outputSchema": [ {
@@ -3450,6 +3556,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3466,6 +3573,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3482,6 +3590,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3498,6 +3607,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3514,6 +3624,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3530,6 +3641,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3568,14 +3680,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Get user by user name"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "updateUser",
     "outputSchema": [ {
@@ -3628,6 +3743,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3644,6 +3760,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3660,6 +3777,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3676,6 +3794,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3692,6 +3811,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3708,6 +3828,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3746,6 +3867,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -3797,6 +3919,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3813,6 +3936,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3829,6 +3953,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3845,6 +3970,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3861,6 +3987,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3877,6 +4004,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3900,6 +4028,7 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Update user"
   } ],
@@ -3924,6 +4053,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3940,6 +4070,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "OAuth2 Implicit",
@@ -3962,6 +4093,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3978,6 +4110,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "API Key",
@@ -3989,6 +4122,8 @@
     "title": "Petstore",
     "version": 1
   },
+  "customAction": null,
+  "customActionHelp": null,
   "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
   "icon": "path:assets/petstore.svg",
   "tags": null,

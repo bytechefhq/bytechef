@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.task.dispatcher;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,8 +32,10 @@ public class TaskDispatcherDefinitionRegistryImpl implements TaskDispatcherDefin
 
     private final List<TaskDispatcherDefinition> taskDispatcherDefinitions;
 
+    @SuppressFBWarnings("EI")
     public TaskDispatcherDefinitionRegistryImpl(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
+
         this.taskDispatcherDefinitions = taskDispatcherDefinitionFactories.stream()
             .map(TaskDispatcherDefinitionFactory::getDefinition)
             .sorted((o1, o2) -> {
@@ -52,6 +55,7 @@ public class TaskDispatcherDefinitionRegistryImpl implements TaskDispatcherDefin
     }
 
     @Override
+    @SuppressFBWarnings("EI")
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
         return taskDispatcherDefinitions;
     }

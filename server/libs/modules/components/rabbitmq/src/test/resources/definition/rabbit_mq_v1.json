@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Send a new RabbitMQ message.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "sendMessage",
     "outputSchema": null,
@@ -21,6 +22,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -168,10 +170,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Send Message"
   } ],
@@ -196,6 +200,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -230,6 +235,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -246,11 +252,14 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "title": "RabbitMQ",
     "version": 1
   },
+  "customAction": null,
+  "customActionHelp": null,
   "description": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
   "icon": "path:assets/rabbitmq.svg",
   "tags": null,
@@ -261,18 +270,11 @@
   "triggers": [ {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Triggers on new RabbitMQ messages.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "newMessage",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -295,7 +297,6 @@
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -311,13 +312,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "New Message",
     "type": "LISTENER",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   } ]
 }

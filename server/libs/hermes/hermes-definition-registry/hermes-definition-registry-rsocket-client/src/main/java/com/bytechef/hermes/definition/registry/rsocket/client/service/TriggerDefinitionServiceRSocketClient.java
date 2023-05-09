@@ -30,7 +30,7 @@ import org.springframework.messaging.rsocket.RSocketRequester;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.hermes.component.definition.TriggerDefinition.*;
+import static com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 
 /**
  * @author Ivica Cardic

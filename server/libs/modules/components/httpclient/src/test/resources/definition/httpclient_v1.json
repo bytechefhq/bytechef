@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "The request method to use.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "get",
     "outputSchema": [ {
@@ -70,6 +71,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -103,6 +105,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -119,6 +122,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -135,6 +139,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -151,6 +156,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -171,6 +177,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -221,6 +228,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -237,16 +245,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
-      "description": "Header parameters to send.",
+      "description": "Headers to send.",
       "displayCondition": null,
       "hidden": null,
-      "label": "Header Parameters",
-      "placeholder": "Add Parameter",
+      "label": "Headers",
+      "placeholder": "Add header",
       "required": null,
-      "name": "headerParameters",
+      "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -265,6 +274,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -280,7 +290,7 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Query Parameters",
-      "placeholder": "Add Parameter",
+      "placeholder": "Add parameter",
       "required": null,
       "name": "queryParameters",
       "type": "OBJECT",
@@ -301,6 +311,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -311,12 +322,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "GET"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The request method to use.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "post",
     "outputSchema": [ {
@@ -384,6 +397,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -417,6 +431,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -433,6 +448,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -449,6 +465,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -465,6 +482,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -485,6 +503,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -535,6 +554,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -551,16 +571,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
-      "description": "Header parameters to send.",
+      "description": "Headers to send.",
       "displayCondition": null,
       "hidden": null,
-      "label": "Header Parameters",
-      "placeholder": "Add Parameter",
+      "label": "Headers",
+      "placeholder": "Add header",
       "required": null,
-      "name": "headerParameters",
+      "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -579,6 +600,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -594,7 +616,7 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Query Parameters",
-      "placeholder": "Add Parameter",
+      "placeholder": "Add parameter",
       "required": null,
       "name": "queryParameters",
       "type": "OBJECT",
@@ -615,6 +637,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -629,7 +652,7 @@
       "description": "Body Parameters to send.",
       "displayCondition": "bodyContentType === 'JSON'",
       "hidden": null,
-      "label": "JSON",
+      "label": "Body Content - JSON",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -782,6 +805,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -798,163 +822,14 @@
       "description": "XML content to send.",
       "displayCondition": "bodyContentType === 'XML'",
       "hidden": null,
-      "label": "XML",
+      "label": "Body Content - XML",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
-      "additionalProperties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "hidden": null,
-        "label": null,
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "ONE_OF",
-        "types": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "items": null,
-          "multipleValues": true,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "BOOLEAN",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "CHECKBOX",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "DATE",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "DATE_TIME",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "NUMBER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "maxValue": null,
-          "minValue": null,
-          "numberPrecision": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "additionalProperties": null,
-          "multipleValues": true,
-          "objectType": null,
-          "options": null,
-          "optionsDataSource": null,
-          "properties": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "INPUT_TEXT",
-          "options": null,
-          "optionsDataSource": null,
-          "expressionDisabled": null
-        } ],
-        "expressionDisabled": null
-      } ],
+      "additionalProperties": null,
       "multipleValues": true,
       "objectType": null,
       "options": null,
@@ -967,7 +842,7 @@
       "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_DATA'",
       "hidden": null,
-      "label": "Form Data",
+      "label": "Body Content - Form Data",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -999,6 +874,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1032,6 +908,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1048,6 +925,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1064,6 +942,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1080,6 +959,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "INPUT_TEXT",
@@ -1099,7 +979,7 @@
       "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
       "hidden": null,
-      "label": "Form URL-Encoded",
+      "label": "Body Content - Form URL-Encoded",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -1121,6 +1001,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -1135,7 +1016,7 @@
       "description": "The raw text to send.",
       "displayCondition": "bodyContentType === 'RAW'",
       "hidden": null,
-      "label": "Raw",
+      "label": "Body Content - Raw",
       "placeholder": null,
       "required": null,
       "name": "bodyContent",
@@ -1145,13 +1026,14 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
       "displayCondition": "bodyContentType === 'BINARY'",
       "hidden": null,
-      "label": "Binary",
+      "label": "Body Content - Binary",
       "placeholder": null,
       "required": null,
       "name": "bodyContent",
@@ -1178,6 +1060,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1194,6 +1077,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1210,6 +1094,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1226,6 +1111,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -1240,7 +1126,7 @@
       "required": null,
       "name": "bodyContentType",
       "type": "STRING",
-      "defaultValue": "NONE",
+      "defaultValue": "",
       "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
@@ -1275,6 +1161,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -1291,6 +1178,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -1363,6 +1251,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -1383,18 +1272,20 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "POST"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The request method to use.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "put",
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === false",
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === false",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1502,7 +1393,85 @@
     }, {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === true",
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === false",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "body",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "headers",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "status",
+        "type": "INTEGER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
+      } ],
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === true",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1552,6 +1521,26 @@
     }, {
       "advancedOption": null,
       "description": null,
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === true",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": null,
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
       "displayCondition": "responseFormat === 'TEXT' && fullResponse === true",
       "hidden": null,
       "label": null,
@@ -1564,6 +1553,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1597,6 +1587,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1671,6 +1662,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1687,6 +1679,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1703,6 +1696,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1719,6 +1713,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -1772,6 +1767,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1788,6 +1784,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1804,6 +1801,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1820,6 +1818,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "INPUT_TEXT",
@@ -1881,6 +1880,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1931,6 +1931,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1947,16 +1948,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
-      "description": "Header parameters to send.",
+      "description": "Headers to send.",
       "displayCondition": null,
       "hidden": null,
-      "label": "Header Parameters",
-      "placeholder": "Add Parameter",
+      "label": "Headers",
+      "placeholder": "Add header",
       "required": null,
-      "name": "headerParameters",
+      "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -1975,6 +1977,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -1990,7 +1993,7 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Query Parameters",
-      "placeholder": "Add Parameter",
+      "placeholder": "Add parameter",
       "required": null,
       "name": "queryParameters",
       "type": "OBJECT",
@@ -2011,6 +2014,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -2025,7 +2029,7 @@
       "description": "Body Parameters to send.",
       "displayCondition": "bodyContentType === 'JSON'",
       "hidden": null,
-      "label": "JSON",
+      "label": "Body Content - JSON",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -2178,6 +2182,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -2194,163 +2199,14 @@
       "description": "XML content to send.",
       "displayCondition": "bodyContentType === 'XML'",
       "hidden": null,
-      "label": "XML",
+      "label": "Body Content - XML",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
-      "additionalProperties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "hidden": null,
-        "label": null,
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "ONE_OF",
-        "types": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "items": null,
-          "multipleValues": true,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "BOOLEAN",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "CHECKBOX",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "DATE",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "DATE_TIME",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "NUMBER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "maxValue": null,
-          "minValue": null,
-          "numberPrecision": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "additionalProperties": null,
-          "multipleValues": true,
-          "objectType": null,
-          "options": null,
-          "optionsDataSource": null,
-          "properties": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "INPUT_TEXT",
-          "options": null,
-          "optionsDataSource": null,
-          "expressionDisabled": null
-        } ],
-        "expressionDisabled": null
-      } ],
+      "additionalProperties": null,
       "multipleValues": true,
       "objectType": null,
       "options": null,
@@ -2363,7 +2219,7 @@
       "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_DATA'",
       "hidden": null,
-      "label": "Form Data",
+      "label": "Body Content - Form Data",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -2395,6 +2251,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -2428,6 +2285,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -2444,6 +2302,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -2460,6 +2319,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -2476,6 +2336,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "INPUT_TEXT",
@@ -2495,7 +2356,7 @@
       "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
       "hidden": null,
-      "label": "Form URL-Encoded",
+      "label": "Body Content - Form URL-Encoded",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -2517,6 +2378,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -2531,7 +2393,7 @@
       "description": "The raw text to send.",
       "displayCondition": "bodyContentType === 'RAW'",
       "hidden": null,
-      "label": "Raw",
+      "label": "Body Content - Raw",
       "placeholder": null,
       "required": null,
       "name": "bodyContent",
@@ -2541,13 +2403,14 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
       "displayCondition": "bodyContentType === 'BINARY'",
       "hidden": null,
-      "label": "Binary",
+      "label": "Body Content - Binary",
       "placeholder": null,
       "required": null,
       "name": "bodyContent",
@@ -2574,6 +2437,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2590,6 +2454,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2606,6 +2471,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -2622,6 +2488,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -2636,7 +2503,7 @@
       "required": null,
       "name": "bodyContentType",
       "type": "STRING",
-      "defaultValue": "NONE",
+      "defaultValue": "",
       "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
@@ -2671,6 +2538,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -2687,6 +2555,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -2759,6 +2628,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -2779,18 +2649,20 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "PUT"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The request method to use.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "patch",
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === false",
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === false",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2898,7 +2770,85 @@
     }, {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === true",
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === false",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "body",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "headers",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "status",
+        "type": "INTEGER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
+      } ],
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === true",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2948,6 +2898,26 @@
     }, {
       "advancedOption": null,
       "description": null,
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === true",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": null,
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
       "displayCondition": "responseFormat === 'TEXT' && fullResponse === true",
       "hidden": null,
       "label": null,
@@ -2960,6 +2930,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -2993,6 +2964,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3067,6 +3039,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3083,6 +3056,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3099,6 +3073,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3115,6 +3090,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -3168,6 +3144,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3184,6 +3161,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3200,6 +3178,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3216,6 +3195,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "INPUT_TEXT",
@@ -3277,6 +3257,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -3327,6 +3308,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -3343,16 +3325,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
-      "description": "Header parameters to send.",
+      "description": "Headers to send.",
       "displayCondition": null,
       "hidden": null,
-      "label": "Header Parameters",
-      "placeholder": "Add Parameter",
+      "label": "Headers",
+      "placeholder": "Add header",
       "required": null,
-      "name": "headerParameters",
+      "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -3371,6 +3354,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -3386,7 +3370,7 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Query Parameters",
-      "placeholder": "Add Parameter",
+      "placeholder": "Add parameter",
       "required": null,
       "name": "queryParameters",
       "type": "OBJECT",
@@ -3407,6 +3391,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -3421,7 +3406,7 @@
       "description": "Body Parameters to send.",
       "displayCondition": "bodyContentType === 'JSON'",
       "hidden": null,
-      "label": "JSON",
+      "label": "Body Content - JSON",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -3574,6 +3559,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -3590,163 +3576,14 @@
       "description": "XML content to send.",
       "displayCondition": "bodyContentType === 'XML'",
       "hidden": null,
-      "label": "XML",
+      "label": "Body Content - XML",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
-      "additionalProperties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "hidden": null,
-        "label": null,
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "ONE_OF",
-        "types": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "items": null,
-          "multipleValues": true,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "BOOLEAN",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "CHECKBOX",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "DATE",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "DATE_TIME",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "NUMBER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "maxValue": null,
-          "minValue": null,
-          "numberPrecision": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "additionalProperties": null,
-          "multipleValues": true,
-          "objectType": null,
-          "options": null,
-          "optionsDataSource": null,
-          "properties": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "hidden": null,
-          "label": null,
-          "placeholder": null,
-          "required": null,
-          "name": null,
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "INPUT_TEXT",
-          "options": null,
-          "optionsDataSource": null,
-          "expressionDisabled": null
-        } ],
-        "expressionDisabled": null
-      } ],
+      "additionalProperties": null,
       "multipleValues": true,
       "objectType": null,
       "options": null,
@@ -3759,7 +3596,7 @@
       "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_DATA'",
       "hidden": null,
-      "label": "Form Data",
+      "label": "Body Content - Form Data",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -3791,6 +3628,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -3824,6 +3662,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -3840,6 +3679,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -3856,6 +3696,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -3872,6 +3713,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "INPUT_TEXT",
@@ -3891,7 +3733,7 @@
       "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
       "hidden": null,
-      "label": "Form URL-Encoded",
+      "label": "Body Content - Form URL-Encoded",
       "placeholder": "Add Parameter",
       "required": null,
       "name": "bodyContent",
@@ -3913,6 +3755,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -3927,7 +3770,7 @@
       "description": "The raw text to send.",
       "displayCondition": "bodyContentType === 'RAW'",
       "hidden": null,
-      "label": "Raw",
+      "label": "Body Content - Raw",
       "placeholder": null,
       "required": null,
       "name": "bodyContent",
@@ -3937,13 +3780,14 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
       "displayCondition": "bodyContentType === 'BINARY'",
       "hidden": null,
-      "label": "Binary",
+      "label": "Body Content - Binary",
       "placeholder": null,
       "required": null,
       "name": "bodyContent",
@@ -3970,6 +3814,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -3986,6 +3831,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -4002,6 +3848,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -4018,6 +3865,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -4032,7 +3880,7 @@
       "required": null,
       "name": "bodyContentType",
       "type": "STRING",
-      "defaultValue": "NONE",
+      "defaultValue": "",
       "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
@@ -4067,6 +3915,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -4083,6 +3932,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -4155,6 +4005,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -4175,18 +4026,20 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "PATCH"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The request method to use.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "delete",
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === false",
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === false",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -4294,7 +4147,85 @@
     }, {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === true",
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === false",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "body",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "headers",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "status",
+        "type": "INTEGER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
+      } ],
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === true",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -4344,6 +4275,26 @@
     }, {
       "advancedOption": null,
       "description": null,
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === true",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": null,
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
       "displayCondition": "responseFormat === 'TEXT' && fullResponse === true",
       "hidden": null,
       "label": null,
@@ -4356,6 +4307,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -4389,6 +4341,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -4463,6 +4416,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -4479,6 +4433,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -4495,6 +4450,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -4511,6 +4467,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -4564,6 +4521,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -4580,6 +4538,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -4596,6 +4555,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -4612,6 +4572,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "INPUT_TEXT",
@@ -4673,6 +4634,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -4723,6 +4685,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -4739,16 +4702,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
-      "description": "Header parameters to send.",
+      "description": "Headers to send.",
       "displayCondition": null,
       "hidden": null,
-      "label": "Header Parameters",
-      "placeholder": "Add Parameter",
+      "label": "Headers",
+      "placeholder": "Add header",
       "required": null,
-      "name": "headerParameters",
+      "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -4767,6 +4731,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -4782,7 +4747,7 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Query Parameters",
-      "placeholder": "Add Parameter",
+      "placeholder": "Add parameter",
       "required": null,
       "name": "queryParameters",
       "type": "OBJECT",
@@ -4803,6 +4768,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -4883,6 +4849,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -4903,18 +4870,20 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "DELETE"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The request method to use.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "head",
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === false",
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === false",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -5022,7 +4991,85 @@
     }, {
       "advancedOption": null,
       "description": null,
-      "displayCondition": "['JSON', 'XML'].includes('responseFormat') && fullResponse === true",
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === false",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "body",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "headers",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "placeholder": null,
+        "required": null,
+        "name": "status",
+        "type": "INTEGER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
+      } ],
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": "['JSON'].includes('responseFormat') && fullResponse === true",
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -5072,6 +5119,26 @@
     }, {
       "advancedOption": null,
       "description": null,
+      "displayCondition": "['XML'].includes('responseFormat') && fullResponse === true",
+      "hidden": null,
+      "label": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": null,
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    }, {
+      "advancedOption": null,
+      "description": null,
       "displayCondition": "responseFormat === 'TEXT' && fullResponse === true",
       "hidden": null,
       "label": null,
@@ -5084,6 +5151,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -5117,6 +5185,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5191,6 +5260,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5207,6 +5277,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5223,6 +5294,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5239,6 +5311,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -5292,6 +5365,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -5308,6 +5382,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -5324,6 +5399,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -5340,6 +5416,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "INPUT_TEXT",
@@ -5401,6 +5478,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -5451,6 +5529,7 @@
         "value": "BINARY"
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -5467,16 +5546,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
-      "description": "Header parameters to send.",
+      "description": "Headers to send.",
       "displayCondition": null,
       "hidden": null,
-      "label": "Header Parameters",
-      "placeholder": "Add Parameter",
+      "label": "Headers",
+      "placeholder": "Add header",
       "required": null,
-      "name": "headerParameters",
+      "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -5495,6 +5575,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -5510,7 +5591,7 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Query Parameters",
-      "placeholder": "Add Parameter",
+      "placeholder": "Add parameter",
       "required": null,
       "name": "queryParameters",
       "type": "OBJECT",
@@ -5531,6 +5612,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -5611,6 +5693,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": true,
@@ -5631,6 +5714,7 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "HEAD"
   } ],
@@ -5655,6 +5739,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5671,6 +5756,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5697,6 +5783,7 @@
           "value": "QUERY_PARAMETERS"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "API Key",
@@ -5719,6 +5806,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "Bearer Token",
@@ -5741,6 +5829,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5757,6 +5846,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "Basic Auth",
@@ -5779,6 +5869,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5795,6 +5886,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "Digest Auth",
@@ -5817,6 +5909,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5833,6 +5926,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5849,6 +5943,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5865,6 +5960,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5881,6 +5977,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5897,6 +5994,7 @@
         "controlType": "TEXT_AREA",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "OAuth2 Authorization Code",
@@ -5919,6 +6017,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5935,6 +6034,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5951,6 +6051,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5967,6 +6068,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -5983,6 +6085,7 @@
         "controlType": "TEXT_AREA",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "OAuth2 Implicit Code",
@@ -6005,6 +6108,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -6021,6 +6125,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -6037,6 +6142,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -6053,6 +6159,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -6069,6 +6176,7 @@
         "controlType": "TEXT_AREA",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "OAuth2 Client Credentials",
@@ -6091,11 +6199,14 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "title": "HTTP Client",
     "version": 1
   },
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Makes an HTTP request and returns the response data.",
   "icon": "path:assets/httpclient.svg",
   "tags": null,
