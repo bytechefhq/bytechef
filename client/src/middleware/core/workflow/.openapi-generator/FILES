@@ -3,6 +3,7 @@ apis/TaskExecutionsApi.ts
 apis/WorkflowsApi.ts
 apis/index.ts
 index.ts
+models/ComponentDefinitionModel.ts
 models/CreateJob200ResponseModel.ts
 models/ExecutionErrorModel.ts
 models/InputModel.ts

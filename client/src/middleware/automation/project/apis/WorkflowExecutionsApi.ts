@@ -16,21 +16,21 @@
 import * as runtime from '../runtime';
 import type {
   PageModel,
-  ProjectExecutionModel,
+  WorkflowExecutionModel,
 } from '../models';
 import {
     PageModelFromJSON,
     PageModelToJSON,
-    ProjectExecutionModelFromJSON,
-    ProjectExecutionModelToJSON,
+    WorkflowExecutionModelFromJSON,
+    WorkflowExecutionModelToJSON,
 } from '../models';
 
-export interface GetProjectExecutionRequest {
+export interface GetWorkflowExecutionRequest {
     id: number;
 }
 
-export interface GetProjectExecutionsRequest {
-    jobStatus?: GetProjectExecutionsJobStatusEnum;
+export interface GetWorkflowExecutionsRequest {
+    jobStatus?: GetWorkflowExecutionsJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
     projectId?: number;
@@ -42,15 +42,15 @@ export interface GetProjectExecutionsRequest {
 /**
  * 
  */
-export class ProjectExecutionsApi extends runtime.BaseAPI {
+export class WorkflowExecutionsApi extends runtime.BaseAPI {
 
     /**
-     * Get project execution by id.
-     * Get project executions by id.
+     * Get workflow execution by id.
+     * Get workflow executions by id.
      */
-    async getProjectExecutionRaw(requestParameters: GetProjectExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectExecutionModel>> {
+    async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectExecution.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowExecution.');
         }
 
         const queryParameters: any = {};
@@ -58,29 +58,29 @@ export class ProjectExecutionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectExecutionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionModelFromJSON(jsonValue));
     }
 
     /**
-     * Get project execution by id.
-     * Get project executions by id.
+     * Get workflow execution by id.
+     * Get workflow executions by id.
      */
-    async getProjectExecution(requestParameters: GetProjectExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectExecutionModel> {
-        const response = await this.getProjectExecutionRaw(requestParameters, initOverrides);
+    async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
+        const response = await this.getWorkflowExecutionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Get project executions.
-     * Get project executions.
+     * Get workflow executions.
+     * Get workflow executions.
      */
-    async getProjectExecutionsRaw(requestParameters: GetProjectExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
+    async getWorkflowExecutionsRaw(requestParameters: GetWorkflowExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.jobStatus !== undefined) {
@@ -114,7 +114,7 @@ export class ProjectExecutionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-executions`,
+            path: `/workflow-executions`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -124,11 +124,11 @@ export class ProjectExecutionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get project executions.
-     * Get project executions.
+     * Get workflow executions.
+     * Get workflow executions.
      */
-    async getProjectExecutions(requestParameters: GetProjectExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
-        const response = await this.getProjectExecutionsRaw(requestParameters, initOverrides);
+    async getWorkflowExecutions(requestParameters: GetWorkflowExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
+        const response = await this.getWorkflowExecutionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -137,11 +137,11 @@ export class ProjectExecutionsApi extends runtime.BaseAPI {
 /**
  * @export
  */
-export const GetProjectExecutionsJobStatusEnum = {
+export const GetWorkflowExecutionsJobStatusEnum = {
     Created: 'CREATED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
     Completed: 'COMPLETED'
 } as const;
-export type GetProjectExecutionsJobStatusEnum = typeof GetProjectExecutionsJobStatusEnum[keyof typeof GetProjectExecutionsJobStatusEnum];
+export type GetWorkflowExecutionsJobStatusEnum = typeof GetWorkflowExecutionsJobStatusEnum[keyof typeof GetWorkflowExecutionsJobStatusEnum];
