@@ -38,7 +38,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -73,10 +72,8 @@ public class ComponentDefinitionControllerIntTest {
 
     @Test
     public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionFacade.getComponentDefinitionsMono(null, null, null, null))
-            .thenReturn(
-                Mono.just(
-                    List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2"))));
+        Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null, null, null))
+            .thenReturn(List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2")));
 
         try {
             webTestClient

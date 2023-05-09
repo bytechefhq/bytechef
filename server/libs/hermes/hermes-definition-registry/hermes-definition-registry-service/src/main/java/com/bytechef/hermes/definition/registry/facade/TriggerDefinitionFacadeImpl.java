@@ -22,7 +22,6 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -43,67 +42,62 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public Mono<List<? extends Property<?>>> executeDynamicProperties(
+    public List<? extends Property<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            triggerDefinitionService.executeDynamicProperties(
-                propertyName, triggerName, componentName, componentVersion, triggerParameters,
-                connection.getAuthorizationName(), connection.getParameters()));
+        return triggerDefinitionService.executeDynamicProperties(
+            propertyName, triggerName, componentName, componentVersion, triggerParameters,
+            connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
-    public Mono<String> executeEditorDescription(
+    public String executeEditorDescription(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            triggerDefinitionService.executeEditorDescription(
-                triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
-                connection.getParameters()));
+        return triggerDefinitionService.executeEditorDescription(
+            triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
+            connection.getParameters());
     }
 
     @Override
-    public Mono<List<Option<?>>> executeOptions(
+    public List<Option<?>> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            triggerDefinitionService.executeOptions(
-                propertyName, triggerName, componentName, componentVersion, triggerParameters,
-                connection.getAuthorizationName(), connection.getParameters()));
+        return triggerDefinitionService.executeOptions(
+            propertyName, triggerName, componentName, componentVersion, triggerParameters,
+            connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
-    public Mono<List<? extends Property<?>>> executeOutputSchema(
+    public List<? extends Property<?>> executeOutputSchema(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            triggerDefinitionService.executeOutputSchema(
-                triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
-                connection.getParameters()));
+        return triggerDefinitionService.executeOutputSchema(
+            triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
+            connection.getParameters());
     }
 
     @Override
-    public Mono<Object> executeSampleOutput(
+    public Object executeSampleOutput(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            triggerDefinitionService.executeSampleOutput(
-                triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
-                connection.getParameters()));
+        return triggerDefinitionService.executeSampleOutput(
+            triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
+            connection.getParameters());
     }
 }

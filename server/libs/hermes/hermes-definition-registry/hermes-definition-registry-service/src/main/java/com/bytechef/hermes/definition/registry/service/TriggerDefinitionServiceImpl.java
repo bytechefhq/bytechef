@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource;
 import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
@@ -43,7 +42,6 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnable
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
@@ -249,20 +247,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(
-        String triggerName, String componentName, int componentVersion) {
-
-        return Mono.just(getTriggerDefinition(triggerName, componentName, componentVersion));
-    }
-
-    @Override
-    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitions(
+    public List<TriggerDefinitionDTO> getTriggerDefinitions(
         String componentName, int componentVersion) {
 
-        return Mono.just(
-            CollectionUtils.map(
-                componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion),
-                this::toTriggerDefinitionDTO));
+        return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
+            .stream()
+            .map(this::toTriggerDefinitionDTO)
+            .toList();
     }
 
     private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {

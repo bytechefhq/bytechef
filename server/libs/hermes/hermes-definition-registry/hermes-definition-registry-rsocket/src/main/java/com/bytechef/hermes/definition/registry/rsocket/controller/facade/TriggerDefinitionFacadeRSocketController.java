@@ -43,37 +43,42 @@ public class TriggerDefinitionFacadeRSocketController {
 
     @MessageMapping("TriggerDefinitionFacade.executeEditorDescription")
     public Mono<String> executeEditorDescription(EditorDescription editorDescription) {
-        return triggerDefinitionFacade.executeEditorDescription(
-            editorDescription.triggerName, editorDescription.componentName, editorDescription.componentVersion,
-            editorDescription.triggerParameters, editorDescription.connectionId);
+        return Mono.just(
+            triggerDefinitionFacade.executeEditorDescription(
+                editorDescription.triggerName, editorDescription.componentName, editorDescription.componentVersion,
+                editorDescription.triggerParameters, editorDescription.connectionId));
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeOptions")
     public Mono<List<Option<?>>> executeOptions(Options options) {
-        return triggerDefinitionFacade.executeOptions(
-            options.propertyName, options.triggerName, options.componentName, options.componentVersion,
-            options.triggerParameters, options.connectionId);
+        return Mono.just(
+            triggerDefinitionFacade.executeOptions(
+                options.propertyName, options.triggerName, options.componentName, options.componentVersion,
+                options.triggerParameters, options.connectionId));
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeProperties")
     public Mono<List<? extends Property<?>>> executeProperties(Properties properties) {
-        return triggerDefinitionFacade.executeDynamicProperties(
-            properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
-            properties.triggerParameters, properties.connectionId);
+        return Mono.just(
+            triggerDefinitionFacade.executeDynamicProperties(
+                properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
+                properties.triggerParameters, properties.connectionId));
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeOutputSchema")
     public Mono<List<? extends Property<?>>> executeOutputSchema(OutputSchema outputSchema) {
-        return triggerDefinitionFacade.executeOutputSchema(
-            outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,
-            outputSchema.triggerParameters, outputSchema.connectionId);
+        return Mono.just(
+            triggerDefinitionFacade.executeOutputSchema(
+                outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,
+                outputSchema.triggerParameters, outputSchema.connectionId));
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeSampleOutput")
     public Mono<Object> executeSampleOutput(SampleOutput sampleOutput) {
-        return triggerDefinitionFacade.executeSampleOutput(
-            sampleOutput.triggerName, sampleOutput.componentName, sampleOutput.componentVersion,
-            sampleOutput.triggerParameters, sampleOutput.connectionId);
+        return Mono.just(
+            triggerDefinitionFacade.executeSampleOutput(
+                sampleOutput.triggerName, sampleOutput.componentName, sampleOutput.componentVersion,
+                sampleOutput.triggerParameters, sampleOutput.connectionId));
     }
 
     private record EditorDescription(

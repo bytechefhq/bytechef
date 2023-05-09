@@ -42,13 +42,16 @@ public class ActionDefinitionServiceRSocketController {
 
     @MessageMapping("ActionDefinitionService.getComponentActionDefinition")
     public Mono<ActionDefinitionDTO> getComponentActionDefinition(Map<String, Object> map) {
-        return actionDefinitionService.getComponentActionDefinitionMono(
-            (String) map.get("actionName"), (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+        return Mono.just(
+            actionDefinitionService.getComponentActionDefinition(
+                (String) map.get("actionName"), (String) map.get("componentName"),
+                (Integer) map.get("componentVersion")));
     }
 
     @MessageMapping("ActionDefinitionService.getComponentActionDefinitions")
     public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitions(Map<String, Object> map) {
-        return actionDefinitionService.getComponentActionDefinitionsMono(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+        return Mono.just(
+            actionDefinitionService.getComponentActionDefinitions(
+                (String) map.get("componentName"), (Integer) map.get("componentVersion")));
     }
 }
