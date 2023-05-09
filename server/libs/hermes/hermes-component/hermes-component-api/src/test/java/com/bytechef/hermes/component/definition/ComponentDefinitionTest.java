@@ -50,7 +50,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"batch":null,"description":"description","exampleOutput":null,"help":null,"name":"name","outputSchema":null,"properties":null,"outputSchemaDataSource":null,"title":"title"}
+                {"batch":null,"deprecated":null,"description":"description","sampleOutput":null,"help":null,"name":"name","outputSchema":null,"properties":null,"sampleOutputDataSource":null,"outputSchemaDataSource":null,"title":"title"}
                 """,
             action);
     }
@@ -67,7 +67,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"expressionDisabled":null}],"multipleValues":true,"options":null,"optionsDataSource":null,"controlType":"JSON_BUILDER","expressionDisabled":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"sampleDataType":null,"expressionDisabled":null}],"multipleValues":true,"options":null,"optionsDataSource":null,"controlType":"JSON_BUILDER","expressionDisabled":null}
                 """,
             property);
     }
@@ -86,6 +86,21 @@ public class ComponentDefinitionTest {
                 {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"controlType":"CHECKBOX","expressionDisabled":null}
                 """,
             property);
+    }
+
+    @Test
+    public void testComponentDefinition() throws JSONException, JsonProcessingException {
+        ComponentDefinition componentDefinition = ComponentDSL.component("name")
+            .title("title")
+            .description("description")
+            .icon("icon")
+            .version(1);
+
+        jsonAssertEquals(
+            """
+                {"actions":null,"category":null,"connection":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
+                  """,
+            componentDefinition);
     }
 
     @Test
@@ -180,7 +195,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"ONE_OF","types":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"expressionDisabled":null}],"expressionDisabled":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"ONE_OF","types":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"sampleDataType":null,"expressionDisabled":null}],"expressionDisabled":null}
                 """,
             property);
     }
@@ -196,25 +211,9 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"expressionDisabled":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"sampleDataType":null,"expressionDisabled":null}
                 """,
             property);
-    }
-
-    @Test
-    public void testTaskHandlerDescription() throws JSONException, JsonProcessingException {
-        ComponentDefinition componentDefinition;
-        componentDefinition = ComponentDSL.component("name")
-            .title("title")
-            .description("description")
-            .icon("icon")
-            .version(1);
-
-        jsonAssertEquals(
-            """
-                {"actions":null,"category":null,"connection":null,"description":"description","icon":"icon","tags":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
-                """,
-            componentDefinition);
     }
 
     @Test

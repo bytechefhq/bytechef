@@ -85,6 +85,7 @@
           "value": "NOT_EQUALS"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -161,6 +162,7 @@
           "value": "BEFORE"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -267,6 +269,7 @@
           "value": "EMPTY"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -322,6 +325,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -378,6 +382,7 @@
           "value": "EMPTY"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -394,6 +399,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -410,6 +416,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
@@ -445,6 +452,7 @@
       "value": "ANY"
     } ],
     "optionsDataSource": null,
+    "sampleDataType": null,
     "expressionDisabled": null
   }, {
     "advancedOption": null,
@@ -461,6 +469,7 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
+    "sampleDataType": null,
     "expressionDisabled": null
   } ],
   "resources": null,

@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "The action maps values of a given object to fresh keys and returns a new object containing those newly mapped keys.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapKeys",
     "outputSchema": null,
@@ -70,6 +71,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -86,6 +88,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -97,12 +100,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map Keys"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Map an array of key value objects to a single object.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapListToObject",
     "outputSchema": null,
@@ -139,6 +144,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -155,14 +161,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map list to object"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Transform object properties by assigning new values and generate a new object with updated properties.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapMultipleValuesBetweenObjects",
     "outputSchema": null,
@@ -250,6 +259,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -266,6 +276,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -277,12 +288,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map multiple values between objects\n"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Map object fields to new keys.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapObjects",
     "outputSchema": null,
@@ -395,6 +408,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -403,12 +417,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map objects"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Transform an object or an array of objects into an array of key-value pairs.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapObjectsToList",
     "outputSchema": null,
@@ -447,6 +463,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -463,14 +480,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map objects to list"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The action maps a given value by matching it with the defined mappings, and it returns the outcome of the mapping. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapOneValue",
     "outputSchema": null,
@@ -570,6 +590,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -680,6 +701,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -738,6 +760,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -754,6 +777,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -765,12 +789,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map one value"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and updated values.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mapValues",
     "outputSchema": null,
@@ -868,6 +894,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -884,6 +911,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -895,11 +923,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Map values"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "The Data Mapper enables you to configure data mappings.",
   "icon": "path:assets/datamapper.svg",
   "tags": null,

@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
-    "description": "map: map",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Map: null",
+    "sampleOutput": null,
     "help": null,
     "name": "map",
     "outputSchema": null,
@@ -39,6 +40,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -55,13 +57,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "map"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
   "icon": "path:assets/map.svg",
   "tags": null,

@@ -18,5 +18,6 @@ dependencies {
     testImplementation project(":server:libs:core:tag:tag-service")
     testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     testImplementation project(":server:libs:test:test-int-support")
 }

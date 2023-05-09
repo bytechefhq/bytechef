@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Reads data from the file.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "read",
     "outputSchema": [ {
@@ -20,6 +21,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -54,6 +56,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -70,6 +73,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -86,6 +90,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -102,17 +107,20 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Read from file"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Writes the data to the file.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "write",
     "outputSchema": [ {
@@ -147,6 +155,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -163,6 +172,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -179,6 +189,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -195,6 +206,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -215,6 +227,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -231,14 +244,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Write to file"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Download a file from the URL.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "download",
     "outputSchema": [ {
@@ -273,6 +289,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -289,6 +306,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -305,6 +323,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -321,6 +340,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -341,6 +361,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -357,13 +378,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Download file"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Reads and writes data from a file.",
   "icon": "path:assets/filestorage.svg",
   "tags": null,

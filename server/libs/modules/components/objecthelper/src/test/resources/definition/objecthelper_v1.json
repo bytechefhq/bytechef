@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Converts the JSON string to object/array.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "parse",
     "outputSchema": [ {
@@ -151,6 +152,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -170,14 +172,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Convert from JSON string"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Writes the object/array to a JSON string.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "stringify",
     "outputSchema": [ {
@@ -195,6 +200,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -343,15 +349,19 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Convert to JSON string"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Object Helper allows you to do various operations on objects.",
   "icon": "path:assets/objecthelper.svg",
   "tags": null,

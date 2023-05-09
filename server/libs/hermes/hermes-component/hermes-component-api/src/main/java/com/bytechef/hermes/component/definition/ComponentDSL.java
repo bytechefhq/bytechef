@@ -144,11 +144,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String name;
         private List<? extends Property<?>> outputSchema;
         private List<? extends Property<?>> properties;
-
-        @JsonIgnore
         private SampleOutputDataSource sampleOutputDataSource;
-
-        @JsonIgnore
         private OutputSchemaDataSource outputSchemaDataSource;
 
         private String title;
@@ -345,6 +341,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return Optional.ofNullable(deprecated);
         }
 
+        @SuppressWarnings("PMD")
         private ModifiableActionDefinition component(ComponentDefinition component) {
             this.component = component;
 
@@ -1187,6 +1184,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableSampleOutputDataSource implements SampleOutputDataSource {
 
+        @JsonIgnore
         private final SampleOutputFunction sampleOutput;
 
         public ModifiableSampleOutputDataSource(SampleOutputFunction sampleOutput) {
@@ -1300,6 +1298,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableOutputSchemaDataSource implements OutputSchemaDataSource {
 
+        @JsonIgnore
         private final OutputSchemaFunction outputSchema;
 
         public ModifiableOutputSchemaDataSource(OutputSchemaFunction outputSchema) {
@@ -1347,16 +1346,12 @@ public final class ComponentDSL extends DefinitionDSL {
         private String name;
 
         private List<? extends Property<?>> outputSchema;
-
-        @JsonIgnore
         private OutputSchemaDataSource outputSchemaDataSource;
 
         @JsonIgnore
         private PollFunction poll;
 
         private List<? extends Property<?>> properties;
-
-        @JsonIgnore
         private SampleOutputDataSource sampleOutputDataSource;
 
         @JsonIgnore
@@ -1679,6 +1674,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return Optional.ofNullable(webhookBodyRaw);
         }
 
+        @SuppressWarnings("PMD")
         private ModifiableTriggerDefinition component(ComponentDefinition component) {
             this.component = component;
 

@@ -80,6 +80,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ComponentDefinitionModel>> getComponentDefinition(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
@@ -91,6 +92,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ActionDefinitionModel>> getComponentActionDefinition(
         String componentName, Integer componentVersion, String actionName, ServerWebExchange exchange) {
 
@@ -186,6 +188,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ConnectionDefinitionModel>> getComponentConnectionDefinition(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
@@ -241,6 +244,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<TriggerDefinitionModel>> getComponentTriggerDefinition(
         String componentName, Integer componentVersion, String triggerName, ServerWebExchange exchange) {
 

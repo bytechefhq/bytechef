@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "appendValueToList",
     "outputSchema": null,
@@ -21,6 +22,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -57,6 +59,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -172,6 +175,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -215,12 +219,14 @@
       "controlType": "CHECKBOX",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Append Value to List"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "atomicIncrement",
     "outputSchema": null,
@@ -239,6 +245,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -275,6 +282,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -295,12 +303,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Atomic Increment"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "awaitGetValue",
     "outputSchema": null,
@@ -319,6 +329,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -355,6 +366,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -375,12 +387,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Await Get Value"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "deleteValue",
     "outputSchema": null,
@@ -399,6 +413,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -435,14 +450,17 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Delete Value"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Delete a value from the given index in a list.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "deleteValueFromlist",
     "outputSchema": null,
@@ -461,6 +479,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -497,6 +516,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -517,12 +537,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Delete Value from List"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getAllKeys",
     "outputSchema": null,
@@ -561,14 +583,17 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Get All Keys"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getValue",
     "outputSchema": null,
@@ -587,6 +612,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -623,6 +649,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -738,6 +765,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -753,12 +781,14 @@
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Get Value"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "setValue",
     "outputSchema": null,
@@ -777,6 +807,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -813,6 +844,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -928,6 +960,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -943,12 +976,14 @@
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Set Value"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Set value under a specified index in a list.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "setValueInList",
     "outputSchema": null,
@@ -967,6 +1002,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1003,6 +1039,7 @@
         "value": 4
       } ],
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1136,6 +1173,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1151,11 +1189,14 @@
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Set Value in List"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
   "icon": "path:assets/datastorage.svg",
   "tags": null,

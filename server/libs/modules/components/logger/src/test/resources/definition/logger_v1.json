@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
-    "description": "logger: debug",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Logger: Debug",
+    "sampleOutput": null,
     "help": null,
     "name": "debug",
     "outputSchema": null,
@@ -21,14 +22,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Debug"
   }, {
     "batch": null,
-    "description": "logger: error",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Logger: Error",
+    "sampleOutput": null,
     "help": null,
     "name": "error",
     "outputSchema": null,
@@ -47,14 +51,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Error"
   }, {
     "batch": null,
-    "description": "logger: info",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Logger: Info",
+    "sampleOutput": null,
     "help": null,
     "name": "info",
     "outputSchema": null,
@@ -73,14 +80,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Info"
   }, {
     "batch": null,
-    "description": "logger: warn",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Logger: Warn",
+    "sampleOutput": null,
     "help": null,
     "name": "warn",
     "outputSchema": null,
@@ -99,13 +109,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Warn"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Logs a value to the system log.",
   "icon": "path:assets/logger.svg",
   "tags": null,
