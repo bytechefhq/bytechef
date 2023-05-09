@@ -10,14 +10,14 @@ import PageLoader from 'components/PageLoader/PageLoader';
 import Pagination from 'components/Pagination/Pagination';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
-    ProjectExecutionModel,
-    ProjectExecutionModelFromJSON,
+    WorkflowExecutionModel,
+    WorkflowExecutionModelFromJSON,
 } from 'middleware/automation/project';
-import {GetProjectExecutionsJobStatusEnum} from 'middleware/automation/project/apis/ProjectExecutionsApi';
+import {GetWorkflowExecutionsJobStatusEnum} from 'middleware/automation/project/apis/WorkflowExecutionsApi';
 import {
-    useGetProjectExecutionsQuery,
     useGetProjectInstancesQuery,
     useGetProjectsQuery,
+    useGetWorkflowExecutionsQuery,
 } from 'queries/projects.queries';
 import {useGetWorkflowsQuery} from 'queries/workflows.queries';
 import {useState} from 'react';
@@ -30,30 +30,30 @@ import ExecutionsTable from './components/ExecutionsTable';
 
 const jobStatusOptions = [
     {
-        label: GetProjectExecutionsJobStatusEnum.Started,
-        value: GetProjectExecutionsJobStatusEnum.Started,
+        label: GetWorkflowExecutionsJobStatusEnum.Started,
+        value: GetWorkflowExecutionsJobStatusEnum.Started,
     },
     {
-        label: GetProjectExecutionsJobStatusEnum.Completed,
-        value: GetProjectExecutionsJobStatusEnum.Completed,
+        label: GetWorkflowExecutionsJobStatusEnum.Completed,
+        value: GetWorkflowExecutionsJobStatusEnum.Completed,
     },
     {
-        label: GetProjectExecutionsJobStatusEnum.Created,
-        value: GetProjectExecutionsJobStatusEnum.Created,
+        label: GetWorkflowExecutionsJobStatusEnum.Created,
+        value: GetWorkflowExecutionsJobStatusEnum.Created,
     },
     {
-        label: GetProjectExecutionsJobStatusEnum.Stopped,
-        value: GetProjectExecutionsJobStatusEnum.Stopped,
+        label: GetWorkflowExecutionsJobStatusEnum.Stopped,
+        value: GetWorkflowExecutionsJobStatusEnum.Stopped,
     },
     {
-        label: GetProjectExecutionsJobStatusEnum.Failed,
-        value: GetProjectExecutionsJobStatusEnum.Failed,
+        label: GetWorkflowExecutionsJobStatusEnum.Failed,
+        value: GetWorkflowExecutionsJobStatusEnum.Failed,
     },
 ];
 
 export const Executions = () => {
     const [filterStatus, setFilterStatus] =
-        useState<GetProjectExecutionsJobStatusEnum>();
+        useState<GetWorkflowExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
         undefined
     );
@@ -74,10 +74,10 @@ export const Executions = () => {
     } = useGetProjectsQuery({});
 
     const {
-        data: projectExecutionsPage,
-        error: projectExecutionsError,
-        isLoading: projectExecutionsLoading,
-    } = useGetProjectExecutionsQuery({
+        data: WorkflowExecutionsPage,
+        error: WorkflowExecutionsError,
+        isLoading: WorkflowExecutionsLoading,
+    } = useGetWorkflowExecutionsQuery({
         jobStatus: filterStatus,
         projectId: filterProjectId,
         workflowId: filterWorkflowId,
@@ -102,9 +102,9 @@ export const Executions = () => {
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const tableData = projectExecutionsPage?.content?.map(
-        (projectExecution: ProjectExecutionModel) =>
-            ProjectExecutionModelFromJSON(projectExecution)
+    const tableData = WorkflowExecutionsPage?.content?.map(
+        (WorkflowExecution: WorkflowExecutionModel) =>
+            WorkflowExecutionModelFromJSON(WorkflowExecution)
     );
 
     return (
@@ -115,16 +115,16 @@ export const Executions = () => {
             <LayoutContainer
                 bodyClassName="bg-white"
                 footer={
-                    projectExecutionsPage?.content &&
-                    projectExecutionsPage.content.length > 0 && (
+                    WorkflowExecutionsPage?.content &&
+                    WorkflowExecutionsPage.content.length > 0 && (
                         <PageFooter position="main">
                             <Pagination
-                                pageNumber={projectExecutionsPage.number!}
-                                pageSize={projectExecutionsPage.size!}
+                                pageNumber={WorkflowExecutionsPage.number!}
+                                pageSize={WorkflowExecutionsPage.size!}
                                 totalElements={
-                                    projectExecutionsPage.totalElements!
+                                    WorkflowExecutionsPage.totalElements!
                                 }
-                                totalPages={projectExecutionsPage.totalPages!}
+                                totalPages={WorkflowExecutionsPage.totalPages!}
                                 onClick={setFilterPageNumber}
                             />
                         </PageFooter>
@@ -146,7 +146,7 @@ export const Executions = () => {
                                 ) => {
                                     if (value) {
                                         setFilterStatus(
-                                            value.value as GetProjectExecutionsJobStatusEnum
+                                            value.value as GetWorkflowExecutionsJobStatusEnum
                                         );
                                     } else {
                                         setFilterStatus(undefined);
@@ -251,13 +251,13 @@ export const Executions = () => {
                     </>
                 }
             >
-                {!projectExecutionsLoading &&
-                    !projectExecutionsError &&
-                    projectExecutionsPage?.content && (
+                {!WorkflowExecutionsLoading &&
+                    !WorkflowExecutionsError &&
+                    WorkflowExecutionsPage?.content && (
                         <div
                             className={twMerge(
                                 'w-full px-4 2xl:mx-auto 2xl:w-4/5',
-                                !projectExecutionsPage.content.length &&
+                                !WorkflowExecutionsPage.content.length &&
                                     'place-self-center'
                             )}
                         >
