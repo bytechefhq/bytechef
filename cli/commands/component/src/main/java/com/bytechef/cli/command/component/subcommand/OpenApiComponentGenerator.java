@@ -406,10 +406,10 @@ public class OpenApiComponentGenerator {
             builder.add(".outputSchema($L)", codeBlock);
         }
 
-        Object exampleOutput = outputEntry == null ? null : outputEntry.exampleOutput();
+        Object sampleOutput = outputEntry == null ? null : outputEntry.sampleOutput();
 
-        if (exampleOutput != null) {
-            builder.add(".exampleOutput($S)", exampleOutput);
+        if (sampleOutput != null) {
+            builder.add(".sampleOutput($S)", sampleOutput);
         }
 
         return builder.build();
@@ -1749,7 +1749,7 @@ public class OpenApiComponentGenerator {
         }
     }
 
-    private record OutputEntry(CodeBlock outputCodeBlock, Object exampleOutput) {
+    private record OutputEntry(CodeBlock outputCodeBlock, Object sampleOutput) {
     }
 
     private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {

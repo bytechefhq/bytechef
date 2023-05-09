@@ -45,7 +45,7 @@ public class FilesystemGetFilePathAction {
             .required(true))
         .execute(FilesystemGetFilePathAction::executeGetFilePath)
         .outputSchema(string())
-        .exampleOutput("/data");
+        .sampleOutput("/data");
 
     /**
      * Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory
