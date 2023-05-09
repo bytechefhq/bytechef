@@ -29,6 +29,6 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record TriggerDefinitionDTO(
-    Boolean batch, String description, Object sampleOutput, Help help, String name,
+    boolean batch, String description, Object sampleOutput, Help help, String name,
     List<? extends Property<?>> outputSchema, List<? extends Property<?>> properties, String title, TriggerType type) {
 }
