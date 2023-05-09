@@ -17,14 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -41,25 +39,25 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionMono(String name, Integer version) {
-        return Mono.just(
-            toTaskDispatcherDefinitionDTO(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version)));
+    public TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version) {
+        return toTaskDispatcherDefinitionDTO(
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version));
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono() {
-        return Mono.just(
-            CollectionUtils.map(
-                taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions(),
-                this::toTaskDispatcherDefinitionDTO));
+    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
+        return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions()
+            .stream()
+            .map(this::toTaskDispatcherDefinitionDTO)
+            .toList();
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono(String name) {
-        return Mono.just(
-            CollectionUtils.map(
-                taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions(name),
-                this::toTaskDispatcherDefinitionDTO));
+    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(String name) {
+        return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions(name)
+            .stream()
+            .map(this::toTaskDispatcherDefinitionDTO)
+            .toList();
     }
 
     private TaskDispatcherDefinitionDTO toTaskDispatcherDefinitionDTO(

@@ -50,10 +50,10 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     public Mono<ResponseEntity<TaskDispatcherDefinitionModel>> getTaskDispatcherDefinition(
         String taskDispatcherName, Integer taskDispatcherVersion, ServerWebExchange exchange) {
 
-        return taskDispatcherDefinitionService
-            .getTaskDispatcherDefinitionMono(taskDispatcherName, taskDispatcherVersion)
-            .map(taskDispatcherDefinition -> conversionService.convert(
-                taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+        return Mono.just(
+            conversionService.convert(
+                taskDispatcherDefinitionService.getTaskDispatcherDefinition(taskDispatcherName, taskDispatcherVersion),
+                TaskDispatcherDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -62,13 +62,12 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
         @Parameter(hidden = true) ServerWebExchange exchange) {
 
         return Mono.just(
-            taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
-                .map(taskDispatcherDefinitions -> taskDispatcherDefinitions
-                    .stream()
-                    .map(taskDispatcherDefinition -> conversionService.convert(
-                        taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
-                    .toList())
-                .flatMapMany(Flux::fromIterable))
+            taskDispatcherDefinitionService.getTaskDispatcherDefinitions()
+                .stream()
+                .map(taskDispatcherDefinition -> conversionService.convert(
+                    taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+                .toList())
+            .map(Flux::fromIterable)
             .map(ResponseEntity::ok);
     }
 
@@ -77,14 +76,12 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
         String taskDispatcherName, ServerWebExchange exchange) {
 
         return Mono.just(
-            taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(taskDispatcherName)
-                .map(taskDispatcherDefinitions -> taskDispatcherDefinitions
-                    .stream()
-                    .map(
-                        taskDispatcherDefinition -> conversionService.convert(
-                            taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
-                    .toList())
-                .flatMapMany(Flux::fromIterable))
+            taskDispatcherDefinitionService.getTaskDispatcherDefinitions(taskDispatcherName)
+                .stream()
+                .map(taskDispatcherDefinition -> conversionService.convert(
+                    taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
+                .toList())
+            .map(Flux::fromIterable)
             .map(ResponseEntity::ok);
     }
 }

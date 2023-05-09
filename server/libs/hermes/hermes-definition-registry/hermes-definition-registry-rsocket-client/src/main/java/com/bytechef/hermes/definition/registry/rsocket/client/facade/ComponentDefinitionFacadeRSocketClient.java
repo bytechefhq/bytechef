@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 
 import com.bytechef.commons.discovery.util.DiscoveryUtils;
+import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
@@ -47,26 +48,27 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
     }
 
     @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(
+    public List<ComponentDefinitionDTO> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 
-        return Mono.zip(
-            DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances("worker-service-app"))
-                .stream()
-                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
-                    .route("ComponentDefinitionFacade.getComponentDefinitions")
-                    .data(new HashMap<>() {
-                        {
-                            put("actionDefinitions", actionDefinitions);
-                            put("connectionDefinitions", connectionDefinitions);
-                            put("connectionInstances", connectionInstances);
-                            put("triggerDefinitions", triggerDefinitions);
-                        }
-                    })
-                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                .toList(),
-            this::toComponentDefinitions);
+        return MonoUtils.get(
+            Mono.zip(
+                DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances("worker-service-app"))
+                    .stream()
+                    .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
+                        .route("ComponentDefinitionFacade.getComponentDefinitions")
+                        .data(new HashMap<>() {
+                            {
+                                put("actionDefinitions", actionDefinitions);
+                                put("connectionDefinitions", connectionDefinitions);
+                                put("connectionInstances", connectionInstances);
+                                put("triggerDefinitions", triggerDefinitions);
+                            }
+                        })
+                        .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    .toList(),
+                this::toComponentDefinitions));
     }
 
     @SuppressWarnings("unchecked")

@@ -55,7 +55,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -254,27 +253,22 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(
-            String componentName, int componentVersion) {
-
-            return connectionDefinitionService.getConnectionDefinitionMono(
-                componentName, componentVersion);
+        public ConnectionDefinitionDTO getConnectionDefinition(String componentName, int componentVersion) {
+            return connectionDefinitionService.getConnectionDefinition(componentName, componentVersion);
         }
 
         @Override
-        public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(
-            String componentName, int version) {
-
-            return connectionDefinitionService.getConnectionDefinitionsMono(componentName, version);
+        public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int version) {
+            return connectionDefinitionService.getConnectionDefinitions(componentName, version);
         }
 
         @Override
-        public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
-            return connectionDefinitionService.getConnectionDefinitionsMono();
+        public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
+            return connectionDefinitionService.getConnectionDefinitions();
         }
 
         @Override
-        public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
+        public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
             String componentName, int connectionVersion, Map<String, Object> connectionParameters,
             String authorizationName) {
 

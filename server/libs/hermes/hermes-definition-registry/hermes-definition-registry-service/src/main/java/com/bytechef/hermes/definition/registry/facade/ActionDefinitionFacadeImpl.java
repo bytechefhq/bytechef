@@ -22,7 +22,6 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -43,67 +42,62 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public Mono<List<? extends Property<?>>> executeDynamicProperties(
+    public List<? extends Property<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            actionDefinitionService.executeDynamicProperties(
-                propertyName, actionName, componentName, componentVersion, actionParameters,
-                connection.getAuthorizationName(), connection.getParameters()));
+        return actionDefinitionService.executeDynamicProperties(
+            propertyName, actionName, componentName, componentVersion, actionParameters,
+            connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
-    public Mono<String> executeEditorDescription(
+    public String executeEditorDescription(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            actionDefinitionService.executeEditorDescription(
-                actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
-                connection.getParameters()));
+        return actionDefinitionService.executeEditorDescription(
+            actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
+            connection.getParameters());
     }
 
     @Override
-    public Mono<List<Option<?>>> executeOptions(
+    public List<Option<?>> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            actionDefinitionService.executeOptions(
-                propertyName, actionName, componentName, componentVersion, actionParameters,
-                connection.getAuthorizationName(), connection.getParameters()));
+        return actionDefinitionService.executeOptions(
+            propertyName, actionName, componentName, componentVersion, actionParameters,
+            connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
-    public Mono<List<? extends Property<?>>> executeOutputSchema(
+    public List<? extends Property<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            actionDefinitionService.executeOutputSchema(
-                actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
-                connection.getParameters()));
+        return actionDefinitionService.executeOutputSchema(
+            actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
+            connection.getParameters());
     }
 
     @Override
-    public Mono<Object> executeSampleOutput(
+    public Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return Mono.just(
-            actionDefinitionService.executeSampleOutput(
-                actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
-                connection.getParameters()));
+        return actionDefinitionService.executeSampleOutput(
+            actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
+            connection.getParameters());
     }
 }
