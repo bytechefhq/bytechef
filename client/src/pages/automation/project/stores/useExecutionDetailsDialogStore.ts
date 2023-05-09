@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 
-interface ProjectExecutionDetailsState {
+interface WorkflowExecutionDetailsState {
     executionDetailsDialogOpen: boolean;
     setExecutionDetailsDialogOpen: (
         executionDetailsDialogOpen: boolean
@@ -11,7 +11,7 @@ interface ProjectExecutionDetailsState {
 }
 
 export const useExecutionDetailsDialogStore =
-    create<ProjectExecutionDetailsState>()((set) => ({
+    create<WorkflowExecutionDetailsState>()((set) => ({
         currentExecutionId: 0,
         setCurrentExecutionId: (currentExecutionId) =>
             set((state) => ({...state, currentExecutionId})),
