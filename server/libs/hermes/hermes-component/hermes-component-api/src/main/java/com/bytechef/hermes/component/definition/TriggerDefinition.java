@@ -119,13 +119,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Object getExampleOutput();
+    Object getSampleOutput();
 
     /**
      *
      * @return
      */
-    Optional<ExampleOutputDataSource> getExampleOutputDataSource();
+    Optional<SampleOutputDataSource> getExampleOutputDataSource();
 
     /**
      *

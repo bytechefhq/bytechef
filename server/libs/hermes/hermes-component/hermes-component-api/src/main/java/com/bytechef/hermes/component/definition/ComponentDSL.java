@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
@@ -64,10 +65,9 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableConnectionDefinition();
     }
 
-    public static ModifiableExampleOutputDataSource exampleOutputDataSource(
-        ExampleOutputDataSource.ExampleOutputFunction exampleOutputFunction) {
+    public static ModifiableSampleOutputDataSource sampleOutputDataSource(SampleOutputFunction sampleOutputFunction) {
 
-        return new ModifiableExampleOutputDataSource(exampleOutputFunction);
+        return new ModifiableSampleOutputDataSource(sampleOutputFunction);
     }
 
     public static ModifiableProperty.ModifiableObjectProperty fileEntry() {
@@ -127,13 +127,13 @@ public final class ComponentDSL extends DefinitionDSL {
         private String componentName;
         private Boolean deprecated;
         private String description;
-        private String exampleOutput;
+        private String sampleOutput;
 
         @JsonIgnore
         private ExecuteFunction execute;
 
         @JsonIgnore
-        private ExampleOutputDataSource exampleOutputDataSource;
+        private SampleOutputDataSource sampleOutputDataSource;
 
         private Help help;
 
@@ -171,14 +171,14 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition exampleOutput(String exampleOutput) {
-            this.exampleOutput = exampleOutput;
+        public ModifiableActionDefinition sampleOutput(String sampleOutput) {
+            this.sampleOutput = sampleOutput;
 
             return this;
         }
 
-        public ModifiableActionDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
-            this.exampleOutputDataSource = exampleOutputDataSource;
+        public ModifiableActionDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
+            this.sampleOutputDataSource = sampleOutputDataSource;
 
             return this;
         }
@@ -271,8 +271,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<String> getExampleOutput() {
-            return Optional.ofNullable(exampleOutput);
+        public Optional<String> getSampleOutput() {
+            return Optional.ofNullable(sampleOutput);
         }
 
         @Override
@@ -281,8 +281,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<ExampleOutputDataSource> getExampleOutputDataSource() {
-            return Optional.ofNullable(exampleOutputDataSource);
+        public Optional<SampleOutputDataSource> getExampleOutputDataSource() {
+            return Optional.ofNullable(sampleOutputDataSource);
         }
 
         @Override
@@ -1190,17 +1190,17 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    public static final class ModifiableExampleOutputDataSource implements ExampleOutputDataSource {
+    public static final class ModifiableSampleOutputDataSource implements SampleOutputDataSource {
 
-        private final ExampleOutputFunction exampleOutput;
+        private final SampleOutputFunction sampleOutput;
 
-        public ModifiableExampleOutputDataSource(ExampleOutputFunction exampleOutput) {
-            this.exampleOutput = exampleOutput;
+        public ModifiableSampleOutputDataSource(SampleOutputFunction sampleOutput) {
+            this.sampleOutput = sampleOutput;
         }
 
         @Override
-        public ExampleOutputFunction getExampleOutput() {
-            return exampleOutput;
+        public SampleOutputFunction getSampleOutput() {
+            return sampleOutput;
         }
     }
 
@@ -1328,8 +1328,8 @@ public final class ComponentDSL extends DefinitionDSL {
         private DynamicWebhookEnableFunction dynamicWebhookEnable;
         private DynamicWebhookRefreshFunction dynamicWebhookRefresh;
         private DynamicWebhookRequestFunction dynamicWebhookRequest;
-        private Object exampleOutput;
-        private ExampleOutputDataSource exampleOutputDataSource;
+        private Object sampleOutput;
+        private SampleOutputDataSource sampleOutputDataSource;
         private Help help;
         private ListenerEnableConsumer listenerEnable;
         private ListenerDisableConsumer listenerDisable;
@@ -1378,14 +1378,14 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition exampleOutput(Object exampleOutput) {
-            this.exampleOutput = exampleOutput;
+        public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
+            this.sampleOutput = sampleOutput;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
-            this.exampleOutputDataSource = exampleOutputDataSource;
+        public ModifiableTriggerDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
+            this.sampleOutputDataSource = sampleOutputDataSource;
 
             return this;
         }
@@ -1573,13 +1573,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Object getExampleOutput() {
-            return exampleOutput;
+        public Object getSampleOutput() {
+            return sampleOutput;
         }
 
         @Override
-        public Optional<ExampleOutputDataSource> getExampleOutputDataSource() {
-            return Optional.ofNullable(exampleOutputDataSource);
+        public Optional<SampleOutputDataSource> getExampleOutputDataSource() {
+            return Optional.ofNullable(sampleOutputDataSource);
         }
 
         @Override

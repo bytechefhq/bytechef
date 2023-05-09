@@ -139,7 +139,7 @@ public class PipedriveUpdatedDealTrigger {
                     string("cc_email"),
                     string("org_hidden"),
                     bool("person_hidden")))
-        .exampleOutput("""
+        .sampleOutput("""
             {
                 "id": 1,
                 "creator_user_id":

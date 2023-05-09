@@ -57,5 +57,5 @@ public class PipedriveDeleteLeadAction {
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))
-        .exampleOutput("{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\"}}");
+        .sampleOutput("{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\"}}");
 }
