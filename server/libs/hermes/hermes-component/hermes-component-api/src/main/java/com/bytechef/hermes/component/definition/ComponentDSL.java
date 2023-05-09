@@ -126,19 +126,16 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
-        private String componentName;
+
+        @JsonIgnore
+        private ComponentDefinition component;
+
         private Boolean deprecated;
         private String description;
         private Object sampleOutput;
 
         @JsonIgnore
         private ExecuteFunction execute;
-
-        @JsonIgnore
-        private EditorDescriptionFunction editorDescription =
-            (Connection connection, InputParameters inputParameters) -> {
-                return null;
-            };
 
         private Help help;
 
@@ -155,6 +152,10 @@ public final class ComponentDSL extends DefinitionDSL {
         private OutputSchemaDataSource outputSchemaDataSource;
 
         private String title;
+
+        @JsonIgnore
+        private EditorDescriptionFunction editorDescription =
+            (Connection connection, InputParameters inputParameters) -> component.getTitle() + ": " + title;
 
         private ModifiableActionDefinition() {
         }
@@ -276,8 +277,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public String getDescription() {
-            return Objects.requireNonNullElseGet(description, () -> componentName + ": " + name);
-
+            return Objects.requireNonNullElseGet(description, () -> component.getTitle() + ": " + title);
         }
 
         @Override
@@ -345,8 +345,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return Optional.ofNullable(deprecated);
         }
 
-        private ModifiableActionDefinition componentName(String componentName) {
-            this.componentName = componentName;
+        private ModifiableActionDefinition component(ComponentDefinition component) {
+            this.component = component;
 
             return this;
         }
@@ -722,7 +722,7 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition actions(ActionDefinition... actionDefinitions) {
             if (actionDefinitions != null) {
                 this.actions = Stream.of(actionDefinitions)
-                    .map(actionDefinition -> ((ModifiableActionDefinition) actionDefinition).componentName(this.name))
+                    .map(actionDefinition -> ((ModifiableActionDefinition) actionDefinition).component(this))
                     .toList();
             }
 
@@ -732,7 +732,7 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition actions(ModifiableActionDefinition... actionDefinitions) {
             if (actionDefinitions != null) {
                 this.actions = Stream.of(actionDefinitions)
-                    .map(actionDefinition -> actionDefinition.componentName(this.name))
+                    .map(actionDefinition -> actionDefinition.component(this))
                     .toList();
             }
 
@@ -835,7 +835,7 @@ public final class ComponentDSL extends DefinitionDSL {
                 this.triggers = Stream.of(triggerDefinitions)
                     .map(
                         triggerDefinition -> ((ModifiableTriggerDefinition) triggerDefinition)
-                            .componentName(this.name))
+                            .component(this))
                     .toList();
             }
 
@@ -845,7 +845,7 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition triggers(ModifiableTriggerDefinition... triggerDefinitions) {
             if (triggerDefinitions != null) {
                 this.triggers = Stream.of(triggerDefinitions)
-                    .map(triggerDefinition -> triggerDefinition.componentName(this.name))
+                    .map(triggerDefinition -> triggerDefinition.component(this))
                     .toList();
             }
 
@@ -856,7 +856,7 @@ public final class ComponentDSL extends DefinitionDSL {
             if (triggerDefinitions != null) {
                 this.triggers = triggerDefinitions.stream()
                     .map(
-                        triggerDefinition -> ((ModifiableTriggerDefinition) triggerDefinition).componentName(this.name))
+                        triggerDefinition -> ((ModifiableTriggerDefinition) triggerDefinition).component(this))
                     .toList();
             }
 
@@ -1315,7 +1315,10 @@ public final class ComponentDSL extends DefinitionDSL {
     public static class ModifiableTriggerDefinition implements TriggerDefinition {
 
         private Boolean batch;
-        private String componentName;
+
+        @JsonIgnore
+        private ComponentDefinition component;
+
         private DeduplicateFunction deduplicate;
         private Boolean deprecated;
         private String description;
@@ -1343,9 +1346,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         private String name;
 
-        @JsonIgnore
-        private EditorDescriptionFunction editorDescription;
-
         private List<? extends Property<?>> outputSchema;
 
         @JsonIgnore
@@ -1370,6 +1370,10 @@ public final class ComponentDSL extends DefinitionDSL {
         private WebhookValidateFunction webhookValidate;
 
         private Boolean workflowSyncExecution;
+
+        @JsonIgnore
+        private EditorDescriptionFunction editorDescription =
+            (Connection connection, InputParameters inputParameters) -> component.getTitle() + ": " + title;
 
         private ModifiableTriggerDefinition() {
         }
@@ -1562,7 +1566,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public String getDescription() {
-            return Objects.requireNonNullElseGet(description, () -> componentName + ": " + name);
+            return Objects.requireNonNullElseGet(description, () -> component + ": " + name);
         }
 
         @Override
@@ -1675,8 +1679,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return Optional.ofNullable(webhookBodyRaw);
         }
 
-        private ModifiableTriggerDefinition componentName(String componentName) {
-            this.componentName = componentName;
+        private ModifiableTriggerDefinition component(ComponentDefinition component) {
+            this.component = component;
 
             return this;
         }
