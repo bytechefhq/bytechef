@@ -9,6 +9,7 @@ models/ExecutionErrorModel.ts
 models/InputModel.ts
 models/JobModel.ts
 models/JobParametersModel.ts
+models/JobWorkflowConnectionModel.ts
 models/OutputModel.ts
 models/PageModel.ts
 models/TaskExecutionModel.ts

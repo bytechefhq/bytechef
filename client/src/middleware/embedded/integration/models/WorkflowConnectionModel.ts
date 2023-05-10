@@ -30,7 +30,7 @@ export interface WorkflowConnectionModel {
      * @type {number}
      * @memberof WorkflowConnectionModel
      */
-    connectionVersion: number;
+    componentVersion: number;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface WorkflowConnectionModel {
 export function instanceOfWorkflowConnectionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "connectionVersion" in value;
+    isInstance = isInstance && "componentVersion" in value;
 
     return isInstance;
 }
@@ -55,7 +55,7 @@ export function WorkflowConnectionModelFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'componentName': json['componentName'],
-        'connectionVersion': json['connectionVersion'],
+        'componentVersion': json['componentVersion'],
     };
 }
 
@@ -69,7 +69,7 @@ export function WorkflowConnectionModelToJSON(value?: WorkflowConnectionModel | 
     return {
         
         'componentName': value.componentName,
-        'connectionVersion': value.connectionVersion,
+        'componentVersion': value.componentVersion,
     };
 }
 
