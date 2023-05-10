@@ -1,4 +1,4 @@
-package com.bytechef.helios.project.web.rest.model;
+package com.bytechef.hermes.workflow.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -19,38 +19,38 @@ import jakarta.annotation.Generated;
  * The connection used in a particular task.
  */
 
-@Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular task.")
-@JsonTypeName("ProjectInstanceWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-11T07:08:55.581872+02:00[Europe/Zagreb]")
-public class ProjectInstanceWorkflowConnectionModel {
+@Schema(name = "JobWorkflowConnection", description = "The connection used in a particular task.")
+@JsonTypeName("JobWorkflowConnection")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-10T20:32:26.667648+02:00[Europe/Zagreb]")
+public class JobWorkflowConnectionModel {
 
-  private Long connectionId;
+  private Long id;
 
   private String key;
 
   private String taskName;
 
-  public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
-    this.connectionId = connectionId;
+  public JobWorkflowConnectionModel id(Long id) {
+    this.id = id;
     return this;
   }
 
   /**
    * The connection id
-   * @return connectionId
+   * @return id
   */
   
-  @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionId")
-  public Long getConnectionId() {
-    return connectionId;
+  @Schema(name = "id", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
+  public Long getId() {
+    return id;
   }
 
-  public void setConnectionId(Long connectionId) {
-    this.connectionId = connectionId;
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public ProjectInstanceWorkflowConnectionModel key(String key) {
+  public JobWorkflowConnectionModel key(String key) {
     this.key = key;
     return this;
   }
@@ -70,7 +70,7 @@ public class ProjectInstanceWorkflowConnectionModel {
     this.key = key;
   }
 
-  public ProjectInstanceWorkflowConnectionModel taskName(String taskName) {
+  public JobWorkflowConnectionModel taskName(String taskName) {
     this.taskName = taskName;
     return this;
   }
@@ -98,22 +98,22 @@ public class ProjectInstanceWorkflowConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectInstanceWorkflowConnectionModel projectInstanceWorkflowConnection = (ProjectInstanceWorkflowConnectionModel) o;
-    return Objects.equals(this.connectionId, projectInstanceWorkflowConnection.connectionId) &&
-        Objects.equals(this.key, projectInstanceWorkflowConnection.key) &&
-        Objects.equals(this.taskName, projectInstanceWorkflowConnection.taskName);
+    JobWorkflowConnectionModel jobWorkflowConnection = (JobWorkflowConnectionModel) o;
+    return Objects.equals(this.id, jobWorkflowConnection.id) &&
+        Objects.equals(this.key, jobWorkflowConnection.key) &&
+        Objects.equals(this.taskName, jobWorkflowConnection.taskName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, key, taskName);
+    return Objects.hash(id, key, taskName);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectInstanceWorkflowConnectionModel {\n");
-    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+    sb.append("class JobWorkflowConnectionModel {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    taskName: ").append(toIndentedString(taskName)).append("\n");
     sb.append("}");

@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:37:26.723856+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-11T07:08:56.547274+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integration-categories", description = "The Embedded Integrations Categories API")
 public interface IntegrationCategoriesApi {
