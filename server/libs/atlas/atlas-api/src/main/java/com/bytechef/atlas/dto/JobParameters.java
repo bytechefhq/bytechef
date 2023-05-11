@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.dto;
 
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.Job.Webhook;
 import com.bytechef.message.Prioritizable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -35,10 +35,11 @@ public class JobParameters {
 
     private Map<String, Object> inputs = Collections.emptyMap();
     private String label;
+    private Map<String, Object> metadata = Collections.emptyMap();
     private Long parentTaskExecutionId;
     private int priority = Prioritizable.DEFAULT_PRIORITY;
     private String workflowId;
-    private List<Job.Webhook> webhooks = Collections.emptyList();
+    private List<Webhook> webhooks = Collections.emptyList();
 
     private JobParameters() {
     }
@@ -58,14 +59,18 @@ public class JobParameters {
 
     @Default
     public JobParameters(
-        Map<String, Object> inputs, String label, Long parentTaskExecutionId, Integer priority, String workflowId,
-        List<Job.Webhook> webhooks) {
+        Map<String, Object> inputs, String label, Map<String, Object> metadata, Long parentTaskExecutionId,
+        Integer priority, String workflowId, List<Webhook> webhooks) {
 
         if (inputs != null) {
             this.inputs = new HashMap<>(inputs);
         }
 
         this.label = label;
+
+        if (metadata != null) {
+            this.metadata = new HashMap<>(metadata);
+        }
 
         this.parentTaskExecutionId = parentTaskExecutionId;
 
@@ -88,6 +93,10 @@ public class JobParameters {
         return label;
     }
 
+    public Map<String, Object> getMetadata() {
+        return Collections.unmodifiableMap(metadata);
+    }
+
     public Long getParentTaskExecutionId() {
         return parentTaskExecutionId;
     }
@@ -100,7 +109,7 @@ public class JobParameters {
         return workflowId;
     }
 
-    public List<Job.Webhook> getWebhooks() {
+    public List<Webhook> getWebhooks() {
         return Collections.unmodifiableList(webhooks);
     }
 
@@ -144,5 +153,8 @@ public class JobParameters {
      * Used by MapStruct.
      */
     public @interface Default {
+    }
+
+    public record JobWorkflowConnection(long connectionId, String key, String taskName) {
     }
 }

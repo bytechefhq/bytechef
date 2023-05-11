@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS job (
     outputs                  TEXT             NULL,
     webhooks                 TEXT             NULL,
     error                    TEXT             NULL,
+    metadata                 TEXT             NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
     last_modified_date       TIMESTAMP    NOT NULL,

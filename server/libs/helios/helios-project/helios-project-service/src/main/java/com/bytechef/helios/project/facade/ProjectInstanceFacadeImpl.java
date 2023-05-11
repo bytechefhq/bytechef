@@ -20,7 +20,6 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
@@ -301,8 +300,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private Connection getConnection(WorkflowConnection workflowConnection) {
         return workflowConnection.getConnectionId()
             .map(connectionService::getConnection)
-            .orElseGet(() -> getConnection(
-                workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName())));
+            .orElseGet(() -> getConnection(workflowConnection.getKey(), workflowConnection.getTaskName()));
     }
 
     private Connection getConnection(WorkflowTrigger workflowTrigger) {
