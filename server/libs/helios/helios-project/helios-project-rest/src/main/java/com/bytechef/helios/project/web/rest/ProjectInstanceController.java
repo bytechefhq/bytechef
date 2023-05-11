@@ -75,8 +75,8 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         return createProjectInstanceJobRequestModelMono
             .map(createProjectInstanceJobRequestModel -> new CreateProjectInstanceJob200ResponseModel()
                 .jobId(
-                    projectInstanceFacade.createJob(
-                        createProjectInstanceJobRequestModel.getWorkflowId(), id)))
+                    projectInstanceFacade.createProjectInstanceJob(
+                        id, createProjectInstanceJobRequestModel.getWorkflowId())))
             .map(ResponseEntity::ok);
     }
 
@@ -139,7 +139,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         return projectInstanceModelMono
             .map(
                 projectInstanceModel -> conversionService.convert(
-                    projectInstanceFacade.update(
+                    projectInstanceFacade.updateProjectInstance(
                         conversionService.convert(
                             projectInstanceModel.id(id), ProjectInstanceDTO.class)),
                     ProjectInstanceModel.class))

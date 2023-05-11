@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.project.facade.ProjectInstanceFacade;
+import com.bytechef.helios.project.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import com.bytechef.helios.project.web.rest.mapper.ProjectMapper;
 import com.bytechef.helios.project.dto.ProjectDTO;
@@ -75,6 +76,9 @@ public class ProjectControllerIntTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @MockBean
+    private WorkflowExecutionFacade workflowExecutionFacade;
 
     @Test
     public void testDeleteProject() {
@@ -249,7 +253,7 @@ public class ProjectControllerIntTest {
                 "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
                 Workflow.Format.JSON.getId()));
 
-        when(projectFacade.addWorkflow(anyLong(), any(), any(), any()))
+        when(projectFacade.addProjectWorkflow(anyLong(), any(), any(), any()))
             .thenReturn(workflow);
 
         try {
@@ -276,7 +280,7 @@ public class ProjectControllerIntTest {
         ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(projectFacade).addWorkflow(
+        verify(projectFacade).addProjectWorkflow(
             anyLong(), nameArgumentCaptor.capture(), descriptionArgumentCaptor.capture(), isNull());
 
         Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());
@@ -298,7 +302,7 @@ public class ProjectControllerIntTest {
             .id(1L)
             .name("name2");
 
-        when(projectFacade.update(any(ProjectDTO.class))).thenReturn(projectDTO);
+        when(projectFacade.updateProject(any(ProjectDTO.class))).thenReturn(projectDTO);
 
         try {
             this.webTestClient

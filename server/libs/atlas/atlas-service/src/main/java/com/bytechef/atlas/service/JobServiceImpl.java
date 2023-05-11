@@ -20,7 +20,6 @@ package com.bytechef.atlas.service;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
@@ -67,14 +66,6 @@ public class JobServiceImpl implements JobService {
             curWorkflow -> Objects.equals(workflowId, curWorkflow.getId()));
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
-
-        ExecutionError executionError = workflow.getError();
-
-        Assert.isNull(
-            executionError,
-            executionError == null
-                ? ""
-                : String.format("%s: %s", workflowId, executionError.getMessage()));
 
         validate(jobParameters, workflow);
 

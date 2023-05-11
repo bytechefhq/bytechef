@@ -27,23 +27,23 @@ import java.util.List;
  */
 public interface ProjectInstanceFacade {
 
-    ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstance);
+    ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
-    long createJob(String workflowId, long projectInstanceId);
+    long createProjectInstanceJob(long id, String workflowId);
 
-    void deleteProjectInstance(long projectInstanceId);
+    void deleteProjectInstance(long id);
 
     void enableProjectInstance(long id, boolean enable);
 
     void enableProjectInstanceWorkflow(long id, String workflowId, boolean enable);
 
-    ProjectInstanceDTO getProjectInstance(long projectInstanceId);
+    ProjectInstanceDTO getProjectInstance(long id);
 
     List<Tag> getProjectInstanceTags();
 
     List<ProjectInstanceDTO> searchProjectInstances(List<Long> projectIds, List<Long> tagIds);
 
-    ProjectInstanceDTO update(ProjectInstanceDTO projectInstance);
+    ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
-    void updateProjectInstanceTags(Long projectInstanceId, List<Tag> tags);
+    void updateProjectInstanceTags(long id, List<Tag> tags);
 }

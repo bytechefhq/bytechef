@@ -75,7 +75,7 @@ public class ProjectController implements ProjectsApi {
         return createProjectWorkflowRequestModelMono
             .map(
                 requestModel -> conversionService.convert(
-                    projectFacade.addWorkflow(
+                    projectFacade.addProjectWorkflow(
                         id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
                     WorkflowModel.class))
             .map(ResponseEntity::ok);
@@ -139,7 +139,7 @@ public class ProjectController implements ProjectsApi {
         return projectModelMono
             .map(
                 projectModel -> conversionService.convert(
-                    projectFacade.update(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
+                    projectFacade.updateProject(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
                     ProjectModel.class))
             .map(ResponseEntity::ok);
     }

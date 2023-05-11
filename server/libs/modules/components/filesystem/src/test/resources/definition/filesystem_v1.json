@@ -274,7 +274,7 @@
   }, {
     "batch": null,
     "deprecated": null,
-    "description": "Creates a temporary directory oon the filesystem.",
+    "description": "Creates a temporary directory on the filesystem.",
     "sampleOutput": null,
     "help": null,
     "name": "createTempDir",

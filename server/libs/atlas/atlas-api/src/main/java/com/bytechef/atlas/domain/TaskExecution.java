@@ -68,8 +68,8 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@Table
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Table
 public final class TaskExecution
     implements Errorable, Cloneable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
 
