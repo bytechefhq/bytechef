@@ -18,10 +18,17 @@
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
 import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.JobParametersModel;
+import com.bytechef.hermes.workflow.web.rest.model.JobWorkflowConnectionModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.core.convert.converter.Converter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -30,5 +37,21 @@ import org.springframework.core.convert.converter.Converter;
 public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
 
     @Override
+    @Mapping(target = "metadata", qualifiedByName = "metadata", source = ".")
     JobParameters convert(JobParametersModel jobParametersModel);
+
+    @Named("metadata")
+    default Map<String, Object> getMetadata(JobParametersModel jobParametersModel) {
+        Map<String, Map<String, Map<String, Long>>> workflowConnectionMap = new HashMap<>();
+
+        for (JobWorkflowConnectionModel jobWorkflowConnectionModel : jobParametersModel.getConnections()) {
+            Map<String, Map<String, Long>> workflowConnection = workflowConnectionMap.computeIfAbsent(
+                jobWorkflowConnectionModel.getTaskName(), key -> new HashMap<>());
+
+            workflowConnection.put(
+                jobWorkflowConnectionModel.getKey(), Map.of(WorkflowConnection.ID, jobWorkflowConnectionModel.getId()));
+        }
+
+        return Map.of(WorkflowConnection.CONNECTIONS, workflowConnectionMap);
+    }
 }
