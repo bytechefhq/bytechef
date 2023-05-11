@@ -63,14 +63,15 @@ const NodeDetailsDialog = () => {
             : (firstAction?.name as string);
     };
 
-    const {data: currentAction} = useGetActionDefinitionQuery(
-        {
-            componentName: currentComponent?.name as string,
-            componentVersion: currentComponent?.version as number,
-            actionName: getActionName(),
-        },
-        !!currentComponent?.actions
-    );
+    const {data: currentAction, isFetching: currentActionFetching} =
+        useGetActionDefinitionQuery(
+            {
+                componentName: currentComponent?.name as string,
+                componentVersion: currentComponent?.version as number,
+                actionName: getActionName(),
+            },
+            !!currentComponent?.actions
+        );
 
     const componentDefinitionNames = componentDefinitions?.map(
         (component) => component.name
@@ -79,26 +80,32 @@ const NodeDetailsDialog = () => {
     useEffect(() => {
         if (activeTab === 'output' && !currentAction) {
             setActiveTab('description');
-        } else if (
-            currentComponent?.name &&
+        }
+
+        if (
             activeTab === 'connection' &&
+            currentComponent?.name &&
             !componentDefinitionNames?.includes(currentComponent.name)
         ) {
             setActiveTab('description');
-        } else if (
-            activeTab === 'properties' &&
-            !currentAction?.properties?.length
-        ) {
+        }
+
+        if (!currentActionFetching && !currentAction?.properties?.length) {
             setActiveTab('description');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent?.name]);
+    }, [
+        activeTab,
+        componentDefinitionNames,
+        currentAction,
+        currentActionFetching,
+        currentComponent?.name,
+    ]);
 
     useEffect(() => {
         if (currentAction) {
             setCurrentActionName(currentAction.name);
         }
-    }, [currentAction]);
+    }, [activeTab, currentAction]);
 
     const singleActionComponent = currentComponent?.actions?.length === 1;
 
@@ -205,10 +212,10 @@ const NodeDetailsDialog = () => {
                                                 label="Actions"
                                                 options={currentComponent.actions.map(
                                                     (action) => ({
-                                                        label: action.title!,
-                                                        value: action.name,
                                                         description:
                                                             action.description,
+                                                        label: action.title!,
+                                                        value: action.name,
                                                     })
                                                 )}
                                                 triggerClassName="w-full bg-gray-100 border-none"
