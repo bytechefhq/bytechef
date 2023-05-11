@@ -26,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,35 +46,9 @@ public class CategoryController implements CategoriesApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteCategory(Long id, ServerWebExchange exchange) {
-        categoryService.delete(id);
-
-        return Mono.empty();
-    }
-
-    @Override
     public Mono<ResponseEntity<CategoryModel>> getCategory(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
             conversionService.convert(categoryService.getCategory(id), CategoryModel.class)));
-    }
-
-    @Override
-    public Mono<ResponseEntity<Flux<CategoryModel>>> getCategories(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(categoryService.getCategories()
-            .stream()
-            .map(category -> conversionService.convert(category, CategoryModel.class))
-            .toList())));
-    }
-
-    @Override
-    public Mono<ResponseEntity<CategoryModel>> createCategory(
-        Mono<CategoryModel> categoryModelMono, ServerWebExchange exchange) {
-
-        return categoryModelMono.map(
-            categoryModel -> conversionService.convert(
-                categoryService.create(conversionService.convert(categoryModel, Category.class)),
-                CategoryModel.class))
-            .map(ResponseEntity::ok);
     }
 
     @Override
