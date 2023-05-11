@@ -23,7 +23,6 @@ import com.bytechef.atlas.domain.Workflow.Input;
 import com.bytechef.atlas.domain.Workflow.Output;
 import com.bytechef.atlas.domain.Workflow.SourceType;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.connection.WorkflowConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -36,16 +35,15 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record WorkflowDTO(
     List<WorkflowConnection> connections, String createdBy, LocalDateTime createdDate, String definition,
-    String description, ExecutionError error, Format format, String id, List<Input> inputs, String label,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, List<Output> outputs, SourceType sourceType, int maxRetries,
+    String description, Format format, String id, List<Input> inputs, String label, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, List<Output> outputs, SourceType sourceType, int maxRetries,
     List<WorkflowTask> tasks, int version) {
 
     public WorkflowDTO(List<WorkflowConnection> connections, Workflow workflow) {
         this(
             connections, workflow.getCreatedBy(), workflow.getCreatedDate(), workflow.getDefinition(),
-            workflow.getDescription(), workflow.getError(), workflow.getFormat(), workflow.getId(),
-            workflow.getInputs(), workflow.getLabel(), workflow.getLastModifiedBy(), workflow.getLastModifiedDate(),
-            workflow.getOutputs(), workflow.getSourceType(), workflow.getMaxRetries(), workflow.getTasks(),
-            workflow.getVersion());
+            workflow.getDescription(), workflow.getFormat(), workflow.getId(), workflow.getInputs(),
+            workflow.getLabel(), workflow.getLastModifiedBy(), workflow.getLastModifiedDate(), workflow.getOutputs(),
+            workflow.getSourceType(), workflow.getMaxRetries(), workflow.getTasks(), workflow.getVersion());
     }
 }

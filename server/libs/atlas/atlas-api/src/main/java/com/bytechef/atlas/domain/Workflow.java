@@ -20,8 +20,6 @@
 package com.bytechef.atlas.domain;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.error.Errorable;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.workflow.mapper.WorkflowResource;
@@ -62,7 +60,7 @@ import org.springframework.util.Assert;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Table
-public final class Workflow implements Errorable, Persistable<String> {
+public final class Workflow implements Persistable<String> {
 
     public enum Format {
         JSON(1),
@@ -115,9 +113,6 @@ public final class Workflow implements Errorable, Persistable<String> {
 
     @Transient
     private String description;
-
-    @Transient
-    private ExecutionError error;
 
     @Transient
     private Map<String, Object> extensions = new HashMap<>();
@@ -280,11 +275,6 @@ public final class Workflow implements Errorable, Persistable<String> {
         return description;
     }
 
-    @Override
-    public ExecutionError getError() {
-        return error;
-    }
-
     public Format getFormat() {
         return Format.valueOf(format);
     }
@@ -382,7 +372,6 @@ public final class Workflow implements Errorable, Persistable<String> {
             ", sourceType=" + sourceType +
             ", inputs=" + inputs +
             ", outputs=" + outputs +
-            ", error=" + error +
             ", maxRetries=" + maxRetries +
             ", tasks=" + tasks +
             ", version=" + version +
