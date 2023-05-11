@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.definition.registry.component.factory;
 
-import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ContextImpl;
 import com.bytechef.hermes.definition.registry.component.definition.WebhookBodyImpl;
 import com.bytechef.hermes.definition.registry.component.definition.WebhookHeadersImpl;
@@ -45,16 +45,18 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
+        this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
     }
@@ -71,7 +73,7 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private ContextImpl createContext(Map<String, Long> connectionIdMap, Long taskExecutionId) {
         return new ContextImpl(
-            connectionDefinitionService, connectionIdMap, connectionService, eventPublisher, fileStorageService,
-            taskExecutionId);
+            connectionDefinitionService, connectionIdMap, connectionService, dataStorageService, eventPublisher,
+            fileStorageService, taskExecutionId);
     }
 }

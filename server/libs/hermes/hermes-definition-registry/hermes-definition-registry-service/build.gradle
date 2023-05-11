@@ -2,6 +2,7 @@ dependencies {
     api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:core:event:event-api")
     api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     api project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
