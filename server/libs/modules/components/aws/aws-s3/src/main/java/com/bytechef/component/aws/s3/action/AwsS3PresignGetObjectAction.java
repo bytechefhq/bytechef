@@ -17,8 +17,9 @@
 
 package com.bytechef.component.aws.s3.action;
 
-import com.bytechef.component.aws.s3.util.AmazonS3Uri;
+import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -27,8 +28,10 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import java.net.URL;
 import java.time.Duration;
 
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.PRESIGN_GET_OBJECT;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.URI;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PRESIGN_GET_OBJECT;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SIGNATURE_DURATION;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -41,22 +44,29 @@ public class AwsS3PresignGetObjectAction {
     public static final ActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
         .title("Get Pre-signed Object")
         .description("Get the url of an pre-signed AWS S3 object.")
-        .properties(string(URI)
-            .label("URI")
-            .description("The AWS S3 uri.")
-            .required(true))
+        .properties(
+            string(KEY)
+                .label("Key")
+                .description("The object key.")
+                .required(true),
+            string(SIGNATURE_DURATION)
+                .label("Signature Duration")
+                .placeholder("15M, 10H, PT-6H3M, etc.")
+                .required(true))
         .outputSchema(string())
         .execute(AwsS3PresignGetObjectAction::executeGetPresignedObject);
 
     protected static String executeGetPresignedObject(Context context, InputParameters inputParameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
+        Connection connection = context.getConnection();
 
-        try (S3Presigner s3Presigner = S3Presigner.create()) {
-            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(builder -> builder
-                .signatureDuration(
-                    Duration.parse("PT" + inputParameters.getRequiredString("signatureDuration")))
-                .getObjectRequest(por -> por.bucket(amazonS3Uri.getBucket())
-                    .key(amazonS3Uri.getKey())));
+        try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connection)) {
+            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
+                presignedObjectBuilder -> presignedObjectBuilder
+                    .signatureDuration(Duration.parse("PT" + inputParameters.getRequiredString(SIGNATURE_DURATION)))
+                    .getObjectRequest(
+                        requestBuilder -> requestBuilder
+                            .bucket(connection.getRequiredString(BUCKET_NAME))
+                            .key(inputParameters.getRequiredString(KEY))));
 
             URL url = presignedGetObjectRequest.url();
 
