@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.data.storage.domain;
 
+import com.bytechef.hermes.component.Context;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -35,39 +36,6 @@ import java.util.Objects;
  */
 @Table("data_storage")
 public class DataStorage implements Persistable<Long> {
-
-    public enum Scope {
-        ACCOUNT(4, "Account"),
-        CURRENT_EXECUTION(1, "Current Execution"),
-        WORKFLOW(3, "Workflow"),
-        WORKFLOW_INSTANCE(2, "Workflow instance");
-
-        private final int id;
-        private final String label;
-
-        Scope(int id, String label) {
-            this.id = id;
-            this.label = label;
-        }
-
-        public static Scope valueOf(int id) {
-            return switch (id) {
-                case 1 -> Scope.CURRENT_EXECUTION;
-                case 2 -> Scope.WORKFLOW_INSTANCE;
-                case 3 -> Scope.WORKFLOW;
-                case 4 -> Scope.ACCOUNT;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
-            };
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-    }
 
     @CreatedBy
     @Column("created_by")
@@ -138,8 +106,8 @@ public class DataStorage implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public Scope getScope() {
-        return Scope.valueOf(scope);
+    public Context.DataStorageScope getScope() {
+        return Context.DataStorageScope.valueOf(scope);
     }
 
     public Long getScopeId() {
@@ -195,7 +163,7 @@ public class DataStorage implements Persistable<Long> {
         this.scopeId = scopeId;
     }
 
-    public void setScope(Scope scope) {
+    public void setScope(Context.DataStorageScope scope) {
         this.scope = scope.getId();
     }
 

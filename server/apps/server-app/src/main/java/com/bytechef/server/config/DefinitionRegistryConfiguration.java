@@ -19,6 +19,7 @@ package com.bytechef.server.config;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
@@ -98,10 +99,10 @@ public class DefinitionRegistryConfiguration {
     @Bean
     ContextFactory contextFactory(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
 
         return new ContextFactoryImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService);
+            connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
     }
 
     @Bean

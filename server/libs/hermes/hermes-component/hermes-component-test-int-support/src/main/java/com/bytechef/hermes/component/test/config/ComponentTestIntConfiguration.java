@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.test.config;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
@@ -86,13 +87,16 @@ public class ComponentTestIntConfiguration {
     @MockBean(name = "connectionDefinitionService")
     private ConnectionDefinitionService connectionDefinitionService;
 
+    @MockBean(name = "dataStorageService")
+    private DataStorageService dataStorageService;
+
     @Bean
     ContextFactory contextFactory(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
 
         return new ContextFactoryImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService);
+            connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
     }
 
     @Bean
