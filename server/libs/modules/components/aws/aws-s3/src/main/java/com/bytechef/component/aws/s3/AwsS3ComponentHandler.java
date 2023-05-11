@@ -17,7 +17,7 @@
 
 package com.bytechef.component.aws.s3;
 
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.AWS_S3;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.AWS_S3;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.aws.s3.action.AwsS3GetObjectAction;
@@ -25,6 +25,7 @@ import com.bytechef.component.aws.s3.action.AwsS3GetUrlAction;
 import com.bytechef.component.aws.s3.action.AwsS3ListObjectsAction;
 import com.bytechef.component.aws.s3.action.AwsS3PresignGetObjectAction;
 import com.bytechef.component.aws.s3.action.AwsS3PutObjectAction;
+import com.bytechef.component.aws.s3.connection.AwsS3Connection;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -43,7 +44,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
             AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
             AwsS3ListObjectsAction.ACTION_DEFINITION,
             AwsS3PresignGetObjectAction.ACTION_DEFINITION, AwsS3PutObjectAction.ACTION_DEFINITION)
-        .customAction(true);
+        .connection(AwsS3Connection.CONNECTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

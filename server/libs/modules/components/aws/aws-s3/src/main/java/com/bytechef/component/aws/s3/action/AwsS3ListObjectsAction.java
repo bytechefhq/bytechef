@@ -17,12 +17,13 @@
 
 package com.bytechef.component.aws.s3.action;
 
+import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -33,9 +34,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.BUCKET;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.LIST_OBJECTS;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.PREFIX;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.LIST_OBJECTS;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PREFIX;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
@@ -51,10 +52,6 @@ public class AwsS3ListObjectsAction {
         .title("List Objects")
         .description("Get the list AWS S3 objects.")
         .properties(
-            string(BUCKET)
-                .label("Bucket")
-                .description("The bucket to list AWS S3 objects from.")
-                .required(true),
             string(PREFIX)
                 .label("Prefix")
                 .description("The prefix of an AWS S3 objects.")
@@ -62,24 +59,23 @@ public class AwsS3ListObjectsAction {
         .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
         .execute(AwsS3ListObjectsAction::executeListObjects);
 
-    protected static List<S3ObjectDescription> executeListObjects(
-        Context context, InputParameters inputParameters) {
-        S3ClientBuilder builder = S3Client.builder();
+    protected static List<S3ObjectDescription> executeListObjects(Context context, InputParameters inputParameters) {
+        Connection connection = context.getConnection();
 
-        try (S3Client s3Client = builder.build()) {
+        try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(inputParameters.getRequiredString(BUCKET))
+                .bucket(inputParameters.getRequiredString(BUCKET_NAME))
                 .prefix(inputParameters.getRequiredString(PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
-                .map(o -> new S3ObjectDescription(inputParameters.getRequiredString(BUCKET), o))
+                .map(o -> new S3ObjectDescription(inputParameters.getRequiredString(BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }
 
-    protected record S3ObjectDescription(String bucket, S3Object s3Object) {
+    private record S3ObjectDescription(String bucket, S3Object s3Object) {
 
         public String getKey() {
             return s3Object.key();
