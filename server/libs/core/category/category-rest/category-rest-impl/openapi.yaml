@@ -9,59 +9,7 @@ tags:
 - name: "categories"
   description: "The Core Categories API"
 paths:
-  /categories:
-    get:
-      description: "Get all categories."
-      summary: "Get all categories."
-      tags:
-      - "categories"
-      operationId: "getCategories"
-      responses:
-        "200":
-          description: "A list of categories."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Category"
-    post:
-      description: "Create a new category."
-      summary: "Create a new category."
-      tags:
-      - "categories"
-      operationId: "createCategory"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Category"
-        required: true
-      responses:
-        "200":
-          description: "The category object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Category"
   /categories/{id}:
-    delete:
-      description: "Delete a category."
-      summary: "Delete a category."
-      tags:
-      - "categories"
-      operationId: "deleteCategory"
-      parameters:
-      - name: "id"
-        description: "The id of a category."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "Successful operation."
     get:
       description: "Get a category by id."
       summary: "Get a category by id."

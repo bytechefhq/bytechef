@@ -9,59 +9,7 @@ tags:
 - name: "tags"
   description: "The Core Tags API"
 paths:
-  /tags:
-    get:
-      description: "Get all tags."
-      summary: "Get all tags."
-      tags:
-      - "tags"
-      operationId: "getTags"
-      responses:
-        "200":
-          description: "The list of tags."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
-    post:
-      description: "Create a new tag."
-      summary: "Create a new tag."
-      tags:
-      - "tags"
-      operationId: "createTag"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Tag"
-        required: true
-      responses:
-        "200":
-          description: "The tag object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Tag"
   /tags/{id}:
-    delete:
-      description: "Delete a tag."
-      summary: "Delete a tag."
-      tags:
-      - "tags"
-      operationId: "deleteTag"
-      parameters:
-      - name: "id"
-        description: "The id of a tag."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "Successful operation."
     get:
       description: "Get a tag by id."
       summary: "Get a tag by id."
