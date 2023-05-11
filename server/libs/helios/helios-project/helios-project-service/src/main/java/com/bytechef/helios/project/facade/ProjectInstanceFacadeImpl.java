@@ -114,18 +114,18 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     // the job id is missing.
     @Transactional(propagation = Propagation.NEVER)
     @SuppressFBWarnings("NP")
-    public long createJob(String workflowId, long instanceId) {
-        return projectInstanceJobFactory.createJob(workflowId, instanceId);
+    public long createProjectInstanceJob(long id, String workflowId) {
+        return projectInstanceJobFactory.createJob(workflowId, id);
     }
 
     @Override
-    public void deleteProjectInstance(long projectInstanceId) {
-        projectInstanceService.delete(projectInstanceId);
+    public void deleteProjectInstance(long id) {
+        projectInstanceService.delete(id);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-            .getProjectInstanceWorkflows(projectInstanceId);
+            .getProjectInstanceWorkflows(id);
 
-        disableWorkflowTriggers(projectInstanceId, projectInstanceWorkflows);
+        disableWorkflowTriggers(id, projectInstanceWorkflows);
 
 // TODO find a way to delete ll tags not referenced anymore
 //        project.getTagIds()
@@ -160,12 +160,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ProjectInstanceDTO getProjectInstance(long projectInstanceId) {
-        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
+    public ProjectInstanceDTO getProjectInstance(long id) {
+        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
         return new ProjectInstanceDTO(
             getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())),
-            projectInstance, projectInstanceWorkflowService.getProjectInstanceWorkflows(projectInstanceId),
+            projectInstance, projectInstanceWorkflowService.getProjectInstanceWorkflows(id),
             projectService.getProject(projectInstance.getProjectId()), tagService.getTags(projectInstance.getTagIds()));
     }
 
@@ -203,7 +203,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public ProjectInstanceDTO update(ProjectInstanceDTO projectInstanceDTO) {
+    public ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService.update(
             projectInstanceDTO.projectInstanceWorkflows());
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
@@ -217,8 +217,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public void updateProjectInstanceTags(Long projectInstanceId, List<Tag> tags) {
-        projectInstanceService.update(projectInstanceId, CollectionUtils.map(checkTags(tags), Tag::getId));
+    public void updateProjectInstanceTags(long id, List<Tag> tags) {
+        projectInstanceService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
     private LocalDateTime getLastExecutionDate(long projectInstanceId) {

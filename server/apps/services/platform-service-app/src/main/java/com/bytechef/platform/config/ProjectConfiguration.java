@@ -25,6 +25,8 @@ import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.facade.ProjectFacadeImpl;
 import com.bytechef.helios.project.facade.ProjectInstanceFacadeImpl;
+import com.bytechef.helios.project.facade.WorkflowExecutionFacade;
+import com.bytechef.helios.project.facade.WorkflowExecutionFacadeImpl;
 import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
@@ -56,13 +58,21 @@ public class ProjectConfiguration {
 
     @Bean
     ProjectFacade projectFacade(
-        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-        ContextService contextService, JobService jobService, ProjectInstanceService projectInstanceService,
-        ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
-        WorkflowService workflowService) {
+        CategoryService categoryService, ProjectInstanceService projectInstanceService, ProjectService projectService,
+        TagService tagService, WorkflowService workflowService) {
 
         return new ProjectFacadeImpl(
-            categoryService, contextService, componentDefinitionService, jobService, projectInstanceService,
-            projectService, taskExecutionService, tagService, workflowService);
+            categoryService, projectInstanceService, projectService, tagService, workflowService);
+    }
+
+    @Bean
+    WorkflowExecutionFacade workflowExecutionFacade(
+        ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
+        ProjectInstanceService projectInstanceService, ProjectService projectService,
+        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+
+        return new WorkflowExecutionFacadeImpl(
+            componentDefinitionService, contextService, jobService, projectInstanceService, projectService,
+            taskExecutionService, workflowService);
     }
 }

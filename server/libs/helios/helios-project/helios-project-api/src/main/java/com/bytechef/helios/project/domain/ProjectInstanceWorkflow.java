@@ -90,7 +90,10 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     }
 
     @SuppressFBWarnings("NP")
-    public ProjectInstanceWorkflow(Map<String, Object> inputs, String workflowId) {
+    public ProjectInstanceWorkflow(
+        List<ProjectInstanceWorkflowConnection> connections, Map<String, Object> inputs, String workflowId) {
+
+        this.projectInstanceWorkflowConnections = new HashSet<>(connections);
         this.inputs = new MapWrapper(inputs);
         this.workflowId = workflowId;
     }

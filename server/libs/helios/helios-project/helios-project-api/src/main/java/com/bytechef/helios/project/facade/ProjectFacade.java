@@ -18,13 +18,10 @@
 package com.bytechef.helios.project.facade;
 
 import com.bytechef.category.domain.Category;
-import com.bytechef.helios.project.dto.WorkflowExecutionDTO;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
-import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -32,7 +29,7 @@ import java.util.List;
  */
 public interface ProjectFacade {
 
-    WorkflowDTO addWorkflow(long id, String label, String description, String definition);
+    WorkflowDTO addProjectWorkflow(long id, String label, String description, String definition);
 
     ProjectDTO createProject(ProjectDTO projectDTO);
 
@@ -48,15 +45,9 @@ public interface ProjectFacade {
 
     List<WorkflowDTO> getProjectWorkflows(long id);
 
-    WorkflowExecutionDTO getWorkflowExecution(long id);
-
-    Page<WorkflowExecutionDTO> searchWorkflowExecutions(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, Integer pageNumber);
-
     List<ProjectDTO> searchProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds);
 
-    ProjectDTO update(ProjectDTO project);
+    ProjectDTO updateProject(ProjectDTO projectDTO);
 
     void updateProjectTags(long id, List<Tag> tags);
 

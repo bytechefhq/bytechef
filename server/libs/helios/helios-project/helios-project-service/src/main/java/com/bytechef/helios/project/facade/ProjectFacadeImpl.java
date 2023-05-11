@@ -17,26 +17,13 @@
 
 package com.bytechef.helios.project.facade;
 
-import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.dto.ProjectDTO;
-import com.bytechef.helios.project.dto.WorkflowExecutionDTO;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.util.ComponentUtils;
-import com.bytechef.hermes.util.ComponentUtils.ComponentType;
-import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.hermes.connection.WorkflowConnection;
@@ -44,10 +31,8 @@ import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,35 +46,25 @@ import java.util.Objects;
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
-    private final ContextService contextService;
-    private final ComponentDefinitionService componentDefinitionService;
-    private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
     private final TagService tagService;
-    private final TaskExecutionService taskExecutionService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ContextService contextService,
-        ComponentDefinitionService componentDefinitionService, JobService jobService,
-        ProjectInstanceService projectInstanceService, ProjectService projectService,
-        TaskExecutionService taskExecutionService, TagService tagService, WorkflowService workflowService) {
+        CategoryService categoryService, ProjectInstanceService projectInstanceService, ProjectService projectService,
+        TagService tagService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
-        this.contextService = contextService;
-        this.componentDefinitionService = componentDefinitionService;
-        this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
-        this.taskExecutionService = taskExecutionService;
         this.tagService = tagService;
         this.workflowService = workflowService;
     }
 
     @Override
-    public WorkflowDTO addWorkflow(long id, String label, String description, String definition) {
+    public WorkflowDTO addProjectWorkflow(long id, String label, String description, String definition) {
         if (definition == null) {
             definition = "{\"description\": \"%s\", \"label\": \"%s\", \"tasks\": []}"
                 .formatted(description, label);
@@ -208,75 +183,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
-    public WorkflowExecutionDTO getWorkflowExecution(long id) {
-        Job job = jobService.getJob(id);
-
-        return new WorkflowExecutionDTO(
-            Objects.requireNonNull(job.getId()),
-            OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null), job,
-            projectService.getWorkflowProject(job.getWorkflowId()),
-            CollectionUtils.map(
-                taskExecutionService.getJobTaskExecutions(
-                    Objects.requireNonNull(job.getId())),
-                taskExecution -> new TaskExecutionDTO(
-                    getComponentDefinition(taskExecution),
-                    contextService.peek(
-                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
-                    taskExecution)),
-            workflowService.getWorkflow(job.getWorkflowId()));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
-    public Page<WorkflowExecutionDTO> searchWorkflowExecutions(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, Integer pageNumber) {
-
-        List<Project> projects;
-
-        if (projectId == null) {
-            projects = projectService.getProjects();
-        } else {
-            projects = List.of(projectService.getProject(projectId));
-        }
-
-        List<String> projectWorkflowIds = Collections.emptyList();
-
-        if (projectId != null) {
-            Project project = projects.get(0);
-
-            projectWorkflowIds = project.getWorkflowIds();
-        }
-
-        Page<Job> jobsPage = jobService.searchJobs(
-            jobStatus, jobStartDate, jobEndDate, workflowId, projectWorkflowIds, pageNumber);
-
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobsTaskExecutions(
-            CollectionUtils.map(jobsPage.toList(), Job::getId));
-
-        List<Workflow> workflows = workflowService.getWorkflows(
-            CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
-
-        return jobsPage.map(job -> new WorkflowExecutionDTO(
-            Objects.requireNonNull(job.getId()),
-            OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null), job,
-            CollectionUtils.getFirst(
-                projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
-            taskExecutions.stream()
-                .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()))
-                .map(taskExecution -> new TaskExecutionDTO(
-                    getComponentDefinition(taskExecution),
-                    contextService.peek(
-                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
-                    taskExecution))
-                .toList(),
-            CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<ProjectDTO> searchProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds) {
         List<Long> projectIds = null;
 
@@ -308,7 +214,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO update(ProjectDTO projectDTO) {
+    public ProjectDTO updateProject(ProjectDTO projectDTO) {
         Category category = projectDTO.category() == null ? null : categoryService.save(projectDTO.category());
         List<Tag> tags = checkTags(projectDTO.tags());
 
@@ -363,12 +269,5 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         return oldName + " (%s)".formatted(addendum);
-    }
-
-    private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
-        ComponentType componentType = ComponentUtils.getComponentType(taskExecution.getType());
-
-        return componentDefinitionService.getComponentDefinition(
-            componentType.componentName(), componentType.componentVersion());
     }
 }

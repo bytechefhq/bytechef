@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -59,6 +60,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Table
 public final class Workflow implements Errorable, Persistable<String> {
 
@@ -232,11 +234,6 @@ public final class Workflow implements Errorable, Persistable<String> {
     public Workflow(String id, String definition) {
         this.id = id;
         this.definition = definition;
-    }
-
-    public Workflow(String id, ExecutionError error) {
-        this.id = id;
-        this.error = error;
     }
 
     @Override

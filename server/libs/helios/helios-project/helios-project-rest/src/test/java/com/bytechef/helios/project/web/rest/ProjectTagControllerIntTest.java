@@ -19,6 +19,7 @@ package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.facade.ProjectInstanceFacade;
+import com.bytechef.helios.project.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import org.junit.jupiter.api.Assertions;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.when;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = ProjectRestTestConfiguration.class)
-@WebFluxTest(value = ProjectController.class)
+@WebFluxTest(value = ProjectTagController.class)
 public class ProjectTagControllerIntTest {
 
     @MockBean
@@ -48,6 +49,9 @@ public class ProjectTagControllerIntTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @MockBean
+    private WorkflowExecutionFacade workflowExecutionFacade;
 
     @Test
     public void testGetProjectTags() {
