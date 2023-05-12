@@ -1097,7 +1097,7 @@ components:
       - "INPUT_PHONE"
       - "INPUT_TEXT"
       - "INPUT_URL"
-      - "JSON_BUILDER"
+      - "OBJECT_BUILDER"
       - "MULTI_SELECT"
       - "PHONE"
       - "SCHEMA_DESIGNER"

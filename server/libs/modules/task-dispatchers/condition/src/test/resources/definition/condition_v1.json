@@ -137,7 +137,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -216,7 +216,7 @@
         "optionsDataSource": null,
         "controlType": "DATE_TIME"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -326,7 +326,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -454,12 +454,12 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   }, {
     "advancedOption": null,
     "description": "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
@@ -543,7 +543,7 @@
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute sequentially if the result of evaluating expression is false.",
@@ -581,7 +581,7 @@
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Condition",
   "version": 1

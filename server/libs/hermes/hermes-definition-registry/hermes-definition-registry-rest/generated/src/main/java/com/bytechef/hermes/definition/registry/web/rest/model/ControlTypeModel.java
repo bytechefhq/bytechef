@@ -22,49 +22,49 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
 public enum ControlTypeModel {
-  
+
   CHECKBOX("CHECKBOX"),
-  
+
   CODE_EDITOR("CODE_EDITOR"),
-  
+
   DATE("DATE"),
-  
+
   DATE_TIME("DATE_TIME"),
-  
+
   EMAIL("EMAIL"),
-  
+
   EXPRESSION("EXPRESSION"),
-  
+
   INPUT_EMAIL("INPUT_EMAIL"),
-  
+
   INPUT_INTEGER("INPUT_INTEGER"),
-  
+
   INPUT_NUMBER("INPUT_NUMBER"),
-  
+
   INPUT_PASSWORD("INPUT_PASSWORD"),
-  
+
   INPUT_PHONE("INPUT_PHONE"),
-  
+
   INPUT_TEXT("INPUT_TEXT"),
-  
+
   INPUT_URL("INPUT_URL"),
-  
-  JSON_BUILDER("JSON_BUILDER"),
-  
+
+  OBJECT_BUILDER("OBJECT_BUILDER"),
+
   MULTI_SELECT("MULTI_SELECT"),
-  
+
   PHONE("PHONE"),
-  
+
   SCHEMA_DESIGNER("SCHEMA_DESIGNER"),
-  
+
   SELECT("SELECT"),
-  
+
   SUBDOMAIN("SUBDOMAIN"),
-  
+
   TEXT_AREA("TEXT_AREA"),
-  
+
   TIME("TIME"),
-  
+
   URL("URL");
 
   private String value;

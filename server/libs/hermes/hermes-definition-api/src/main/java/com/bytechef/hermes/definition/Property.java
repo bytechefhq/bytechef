@@ -79,7 +79,7 @@ public sealed interface Property<P extends Property<P>>
         EXPRESSION,
         DATE,
         DATE_TIME,
-        JSON_BUILDER,
+        OBJECT_BUILDER,
         INPUT_EMAIL,
         INPUT_INTEGER,
         INPUT_NUMBER,

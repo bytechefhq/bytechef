@@ -20,7 +20,7 @@
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The name of the item variable.",

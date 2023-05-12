@@ -67,7 +67,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"sampleDataType":null,"expressionEnabled":null}],"multipleValues":true,"options":null,"optionsDataSource":null,"controlType":"JSON_BUILDER","expressionEnabled":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"sampleDataType":null,"expressionEnabled":null}],"multipleValues":true,"options":null,"optionsDataSource":null,"controlType":"OBJECT_BUILDER","expressionEnabled":null}
                 """,
             property);
     }
@@ -179,7 +179,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"OBJECT","defaultValue":{"key":{"key1":"value1"}},"exampleValue":null,"additionalProperties":null,"multipleValues":true,"objectType":null,"options":null,"optionsDataSource":null,"properties":null,"controlType":"JSON_BUILDER","expressionEnabled":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","placeholder":"placeholder","required":true,"name":"name","type":"OBJECT","defaultValue":{"key":{"key1":"value1"}},"exampleValue":null,"additionalProperties":null,"multipleValues":true,"objectType":null,"options":null,"optionsDataSource":null,"properties":null,"controlType":"OBJECT_BUILDER","expressionEnabled":null}
                 """,
             property);
     }
