@@ -1088,6 +1088,8 @@ components:
       - "CODE_EDITOR"
       - "DATE"
       - "DATE_TIME"
+      - "EMAIL"
+      - "EXPRESSION"
       - "INPUT_EMAIL"
       - "INPUT_INTEGER"
       - "INPUT_NUMBER"
@@ -1097,10 +1099,13 @@ components:
       - "INPUT_URL"
       - "JSON_BUILDER"
       - "MULTI_SELECT"
+      - "PHONE"
       - "SCHEMA_DESIGNER"
       - "SELECT"
+      - "SUBDOMAIN"
       - "TEXT_AREA"
       - "TIME"
+      - "URL"
     DateProperty:
       description: "A date property type."
       type: "object"
@@ -1309,9 +1314,9 @@ components:
         displayCondition:
           description: "Defines rules when a property should be shown or hidden."
           type: "string"
-        expressionDisabled:
+        expressionEnabled:
           description: "Defines if the property can contain expressions or only constant\
-            \ values."
+            \ values. Defaults to true."
           type: "boolean"
         hidden:
           description: "If the property should be visible or not."
