@@ -22,6 +22,8 @@ export const ControlTypeModel = {
     CodeEditor: 'CODE_EDITOR',
     Date: 'DATE',
     DateTime: 'DATE_TIME',
+    Email: 'EMAIL',
+    Expression: 'EXPRESSION',
     InputEmail: 'INPUT_EMAIL',
     InputInteger: 'INPUT_INTEGER',
     InputNumber: 'INPUT_NUMBER',
@@ -31,10 +33,13 @@ export const ControlTypeModel = {
     InputUrl: 'INPUT_URL',
     JsonBuilder: 'JSON_BUILDER',
     MultiSelect: 'MULTI_SELECT',
+    Phone: 'PHONE',
     SchemaDesigner: 'SCHEMA_DESIGNER',
     Select: 'SELECT',
+    Subdomain: 'SUBDOMAIN',
     TextArea: 'TEXT_AREA',
-    Time: 'TIME'
+    Time: 'TIME',
+    Url: 'URL'
 } as const;
 export type ControlTypeModel = typeof ControlTypeModel[keyof typeof ControlTypeModel];
 
