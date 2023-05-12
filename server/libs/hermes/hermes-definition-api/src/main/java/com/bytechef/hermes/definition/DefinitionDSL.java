@@ -220,7 +220,7 @@ public class DefinitionDSL {
         private Boolean advancedOption;
         private String description;
         private String displayCondition;
-        private Boolean expressionEnabled;
+        private Boolean expressionEnabled; // Defaults to true
         private Boolean hidden;
         private String label;
 
@@ -330,7 +330,7 @@ public class DefinitionDSL {
         }
 
         @Override
-        public Optional<Boolean> getExpressionDisabled() {
+        public Optional<Boolean> getExpressionEnabled() {
             return Optional.ofNullable(expressionEnabled);
         }
 
@@ -375,7 +375,7 @@ public class DefinitionDSL {
             implements Property.ArrayProperty {
 
             private List<Property<?>> items;
-            private Boolean multipleValues = true;
+            private boolean multipleValues = true;
             private List<Option<?>> options;
             private OptionsDataSource optionsDataSource;
 
@@ -491,7 +491,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableArrayProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableArrayProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
@@ -535,7 +535,11 @@ public class DefinitionDSL {
         @JsonTypeName("BOOLEAN")
         public static final class ModifiableBooleanProperty
             extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty, BooleanProperty>
-            implements Property.BooleanProperty {
+            implements Property.BooleanProperty, OptionsProperty {
+
+            private final List<Option<?>> options = List.of(
+                option("True", true),
+                option("False", true));
 
             private ModifiableBooleanProperty() {
                 this(null);
@@ -565,6 +569,11 @@ public class DefinitionDSL {
             @Override
             public Object accept(PropertyVisitor propertyVisitor) {
                 return propertyVisitor.visit(this);
+            }
+
+            @Override
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.of(options);
             }
         }
 
@@ -601,7 +610,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableDateProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableDateProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
@@ -666,7 +675,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableDateTimeProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableDateTimeProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
@@ -745,7 +754,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableIntegerProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableIntegerProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
@@ -896,7 +905,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableNumberProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableNumberProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
@@ -948,7 +957,7 @@ public class DefinitionDSL {
             implements Property.ObjectProperty {
 
             private List<? extends Property<?>> additionalProperties;
-            private Boolean multipleValues = true;
+            private boolean multipleValues = true;
             private String objectType;
             private List<Option<?>> options;
             private OptionsDataSource optionsDataSource;
@@ -1032,7 +1041,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableObjectProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableObjectProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
@@ -1073,6 +1082,10 @@ public class DefinitionDSL {
 
             @Override
             public ControlType getControlType() {
+                if (objectType != null && !objectType.isEmpty()) {
+                    return ControlType.EXPRESSION;
+                }
+
                 if ((options == null || options.isEmpty()) && optionsDataSource == null) {
                     return ControlType.JSON_BUILDER;
                 } else {
@@ -1118,7 +1131,7 @@ public class DefinitionDSL {
             @JsonIgnore
             private DynamicPropertiesDataSource dynamicPropertiesDataSource;
 
-            public ModifiableDynamicPropertiesProperty dynamicPropertiesDataSource(
+            public ModifiableDynamicPropertiesProperty dynamicProperties(
                 DynamicPropertiesDataSource dynamicPropertiesDataSource) {
 
                 this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
@@ -1223,7 +1236,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableStringProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+            public ModifiableStringProperty options(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;

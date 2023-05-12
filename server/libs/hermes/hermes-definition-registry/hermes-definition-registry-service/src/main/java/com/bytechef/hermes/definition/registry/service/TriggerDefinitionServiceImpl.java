@@ -27,8 +27,8 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
+import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.OptionsProperty;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -188,11 +188,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
-        OptionsProperty property = (OptionsProperty) componentDefinitionRegistry.getTriggerProperty(
-            propertyName, triggerName, componentName, componentVersion);
+        DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
+            .getTriggerProperty(propertyName, triggerName, componentName, componentVersion);
 
         ComponentOptionsDataSource optionsDataSource = (ComponentOptionsDataSource) OptionalUtils.get(
-            property.getOptionsDataSource());
+            dynamicOptionsProperty.getOptionsDataSource());
 
         OptionsFunction optionsFunction = optionsDataSource.getOptions();
 

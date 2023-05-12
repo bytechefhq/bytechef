@@ -26,8 +26,8 @@ import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.Optio
 import com.bytechef.hermes.component.definition.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
+import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.OptionsProperty;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -100,11 +100,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
-        OptionsProperty property = (OptionsProperty) componentDefinitionRegistry.getActionProperty(
-            propertyName, actionName, componentName, componentVersion);
+        DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
+            .getActionProperty(propertyName, actionName, componentName, componentVersion);
 
         ComponentOptionsDataSource optionsDataSource = (ComponentOptionsDataSource) OptionalUtils.get(
-            property.getOptionsDataSource());
+            dynamicOptionsProperty.getOptionsDataSource());
 
         OptionsFunction optionsFunction = optionsDataSource.getOptions();
 
