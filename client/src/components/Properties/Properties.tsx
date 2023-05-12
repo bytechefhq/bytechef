@@ -3,6 +3,7 @@
 import Editor from '@monaco-editor/react';
 import Select, {ISelectOption} from 'components/Select/Select';
 import {TagModel} from 'middleware/core/tag/models/TagModel';
+import {useState} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {TYPE_ICONS} from 'shared/typeIcons';
@@ -39,6 +40,8 @@ const Property = ({
     property,
     register,
 }: PropertyProps) => {
+    const [integerValue, setIntegerValue] = useState('');
+
     const {
         controlType,
         defaultValue = '',
@@ -47,6 +50,7 @@ const Property = ({
         label,
         name,
         options,
+        properties,
         required,
         type,
         types,
@@ -69,28 +73,42 @@ const Property = ({
     return (
         <li
             className={twMerge(
-                'flex w-full items-center space-x-2',
-                controlType === 'CODE_EDITOR' && 'h-5/6'
+                'mb-3 flex w-full items-center',
+                controlType === 'CODE_EDITOR' && 'h-5/6',
+                type === 'OBJECT' && 'flex-col'
             )}
         >
-            <span
-                className={twMerge(
-                    controlType === 'CODE_EDITOR' && 'self-start'
-                )}
-                title={type}
-            >
-                {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-            </span>
+            {type === 'OBJECT' && label && (
+                <div className="flex w-full">
+                    <span className={'self-start pb-2 pr-2'} title={type}>
+                        {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                    </span>
+
+                    <span className="text-sm font-medium">{label}</span>
+                </div>
+            )}
+
+            {type !== 'OBJECT' && (
+                <span
+                    className={twMerge(
+                        'self-end pb-2 pr-2',
+                        controlType === 'CODE_EDITOR' && 'self-start'
+                    )}
+                    title={type}
+                >
+                    {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                </span>
+            )}
 
             {register && controlType === 'INPUT_TEXT' && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full"
-                    type={hidden ? 'hidden' : 'text'}
+                    fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label}
+                    type={hidden ? 'hidden' : 'text'}
                     {...register(`${path}.${name}`, {
                         required: required!,
                     })}
@@ -102,7 +120,7 @@ const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full"
+                    fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label || name}
                     name={name!}
@@ -113,9 +131,31 @@ const Property = ({
             {controlType === 'INPUT_INTEGER' && (
                 <Input
                     description={description}
+                    error={hasError(name!)}
+                    fieldsetClassName="w-full mb-0"
+                    key={name}
+                    label={label || name}
+                    name={name!}
+                    onChange={({target}) => {
+                        const {value} = target;
+
+                        const integerOnlyRegex = /^[0-9\b]+$/;
+
+                        if (value === '' || integerOnlyRegex.test(value)) {
+                            setIntegerValue(value);
+                        }
+                    }}
+                    value={integerValue}
+                    type={hidden ? 'hidden' : 'text'}
+                />
+            )}
+
+            {controlType === 'INPUT_NUMBER' && (
+                <Input
+                    description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full"
+                    fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label || name}
                     name={name!}
@@ -136,8 +176,23 @@ const Property = ({
                 />
             )}
 
+            {controlType === 'DATE' && (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={hasError(name!)}
+                    fieldsetClassName="w-full mb-0"
+                    key={name}
+                    label={label || name}
+                    name={name!}
+                    type={hidden ? 'hidden' : 'date'}
+                />
+            )}
+
             {controlType === 'SELECT' && (
                 <Select
+                    description={description}
+                    label={label}
                     options={formattedOptions!}
                     triggerClassName="w-full bg-gray-100 border-none"
                 />
@@ -154,8 +209,6 @@ const Property = ({
                     triggerClassName="w-full bg-gray-100 border-none"
                 />
             )}
-
-            {controlType === 'OBJECT_BUILDER' && <span>JSON builder</span>}
 
             {controlType === 'CODE_EDITOR' && (
                 <div className="h-full w-full border-2">
@@ -183,12 +236,14 @@ const Property = ({
                 </div>
             )}
 
+            {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
+
             {!controlType && type === 'ONE_OF' && (
-                <ul className="space-y-2">
+                <ul>
                     {(types as Array<PropertyType>).map(
                         ({controlType, type}, index) => (
                             <li
-                                className="h-full space-y-2 rounded-md bg-gray-100 p-2"
+                                className="h-full rounded-md bg-gray-100 p-2"
                                 key={`${controlType}_${type}_${index}`}
                             >
                                 <span>
@@ -199,6 +254,19 @@ const Property = ({
                     )}
                 </ul>
             )}
+
+            {type === 'OBJECT' && (
+                <ul className="w-full">
+                    {properties?.map((subProperty) => (
+                        <Property
+                            key={subProperty.name}
+                            property={subProperty}
+                        />
+                    ))}
+                </ul>
+            )}
+
+            {type === 'ARRAY' && <span>array</span>}
         </li>
     );
 };
@@ -216,7 +284,7 @@ const Properties = ({
     properties,
     register,
 }: PropertiesProps): JSX.Element => (
-    <ul className="h-full flex-[1_1_1px] space-y-2 overflow-auto p-4">
+    <ul className="h-full flex-[1_1_1px] overflow-auto p-4">
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}
