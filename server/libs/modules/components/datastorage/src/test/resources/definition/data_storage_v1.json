@@ -23,7 +23,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace for appending a value.",
@@ -60,7 +60,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -88,7 +88,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -101,8 +101,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -120,7 +131,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -139,7 +150,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -159,7 +170,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -176,7 +187,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -187,9 +198,9 @@
         "required": null,
         "name": null,
         "type": "NULL",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
@@ -202,8 +213,19 @@
       "type": "BOOLEAN",
       "defaultValue": null,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.",
@@ -216,8 +238,19 @@
       "type": "BOOLEAN",
       "defaultValue": null,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -246,7 +279,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to obtain a value from.",
@@ -283,7 +316,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The value that can be added to the existing numeric value, which may have a negative value.",
@@ -301,7 +334,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -330,7 +363,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to obtain a value from.",
@@ -367,7 +400,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
@@ -385,7 +418,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -414,7 +447,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
@@ -451,7 +484,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -480,7 +513,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
@@ -517,7 +550,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.",
@@ -535,7 +568,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -584,7 +617,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -613,7 +646,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
@@ -650,7 +683,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -678,7 +711,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -691,8 +724,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -710,7 +754,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -729,7 +773,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -749,7 +793,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -766,7 +810,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -777,9 +821,9 @@
         "required": null,
         "name": null,
         "type": "NULL",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -808,7 +852,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
@@ -845,7 +889,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -873,7 +917,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -886,8 +930,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -905,7 +960,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -924,7 +979,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -944,7 +999,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -961,7 +1016,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -972,9 +1027,9 @@
         "required": null,
         "name": null,
         "type": "NULL",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1003,7 +1058,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
@@ -1040,7 +1095,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The index in a list to set a value under. The previous value will be overridden.",
@@ -1058,7 +1113,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1086,7 +1141,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1099,8 +1154,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1118,7 +1184,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1137,7 +1203,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1157,7 +1223,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1174,7 +1240,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1185,9 +1251,9 @@
         "required": null,
         "name": null,
         "type": "NULL",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

@@ -10,6 +10,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -27,6 +28,7 @@
         "advancedOption": null,
         "description": "The MD5 hash of the lowercase version of the list member's email address.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -38,14 +40,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Email address for a subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Email_address",
+        "label": "Email Address",
         "placeholder": null,
         "required": false,
         "name": "email_address",
@@ -55,14 +57,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "An identifier for the address across all of Mailchimp.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Unique_email_id",
+        "label": "Unique Email Id",
         "placeholder": null,
         "required": false,
         "name": "unique_email_id",
@@ -72,14 +74,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Contact_id",
+        "label": "Contact Id",
         "placeholder": null,
         "required": false,
         "name": "contact_id",
@@ -89,14 +91,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The contact's full name.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Full_name",
+        "label": "Full Name",
         "placeholder": null,
         "required": false,
         "name": "full_name",
@@ -106,14 +108,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Web_id",
+        "label": "Web Id",
         "placeholder": null,
         "required": false,
         "name": "web_id",
@@ -123,14 +125,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Type of email this member asked to get ('html' or 'text').",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Email_type",
+        "label": "Email Type",
         "placeholder": null,
         "required": false,
         "name": "email_type",
@@ -140,12 +142,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Subscriber's current status.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -182,14 +184,14 @@
           "value": "transactional"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "A subscriber's reason for unsubscribing.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Unsubscribe_reason",
+        "label": "Unsubscribe Reason",
         "placeholder": null,
         "required": false,
         "name": "unsubscribe_reason",
@@ -199,28 +201,39 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Indicates whether a contact consents to 1:1 messaging.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Consents_to_one_to_one_messaging",
+        "label": "Consents To One To One Messaging",
         "placeholder": null,
         "required": false,
         "name": "consents_to_one_to_one_messaging",
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Merge_fields",
+        "label": "Merge Fields",
         "placeholder": "Add",
         "required": false,
         "name": "merge_fields",
@@ -231,6 +244,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -242,20 +256,19 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The key of this object's properties is the ID of the interest in question.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Interests",
         "placeholder": "Add",
@@ -268,6 +281,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -279,20 +293,19 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Open and click rates for this subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Stats",
         "placeholder": null,
@@ -310,8 +323,9 @@
           "advancedOption": null,
           "description": "A subscriber's average open rate.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Avg_open_rate",
+          "label": "Avg Open Rate",
           "placeholder": null,
           "required": false,
           "name": "avg_open_rate",
@@ -323,14 +337,14 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "controlType": "INPUT_NUMBER"
         }, {
           "advancedOption": null,
           "description": "A subscriber's average clickthrough rate.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Avg_click_rate",
+          "label": "Avg Click Rate",
           "placeholder": null,
           "required": false,
           "name": "avg_click_rate",
@@ -342,14 +356,14 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "controlType": "INPUT_NUMBER"
         }, {
           "advancedOption": null,
           "description": "Ecommerce stats for the list member if the list is attached to a store.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Ecommerce_data",
+          "label": "Ecommerce Data",
           "placeholder": null,
           "required": false,
           "name": "ecommerce_data",
@@ -365,8 +379,9 @@
             "advancedOption": null,
             "description": "The total revenue the list member has brought in.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
-            "label": "Total_revenue",
+            "label": "Total Revenue",
             "placeholder": null,
             "required": false,
             "name": "total_revenue",
@@ -378,14 +393,14 @@
             "numberPrecision": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_NUMBER",
-            "expressionDisabled": null
+            "controlType": "INPUT_NUMBER"
           }, {
             "advancedOption": null,
             "description": "The total number of orders placed by the list member.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
-            "label": "Number_of_orders",
+            "label": "Number Of Orders",
             "placeholder": null,
             "required": false,
             "name": "number_of_orders",
@@ -397,14 +412,14 @@
             "numberPrecision": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_NUMBER",
-            "expressionDisabled": null
+            "controlType": "INPUT_NUMBER"
           }, {
             "advancedOption": null,
             "description": "The three-letter ISO 4217 code for the currency that the store accepts.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
-            "label": "Currency_code",
+            "label": "Currency Code",
             "placeholder": null,
             "required": false,
             "name": "currency_code",
@@ -414,20 +429,18 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "IP address the subscriber signed up from.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Ip_signup",
+        "label": "Ip Signup",
         "placeholder": null,
         "required": false,
         "name": "ip_signup",
@@ -437,14 +450,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The date and time the subscriber signed up for the list in ISO 8601 format.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Timestamp_signup",
+        "label": "Timestamp Signup",
         "placeholder": null,
         "required": false,
         "name": "timestamp_signup",
@@ -454,14 +467,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The IP address the subscriber used to confirm their opt-in status.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Ip_opt",
+        "label": "Ip Opt",
         "placeholder": null,
         "required": false,
         "name": "ip_opt",
@@ -471,14 +484,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The date and time the subscriber confirmed their opt-in status in ISO 8601 format.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Timestamp_opt",
+        "label": "Timestamp Opt",
         "placeholder": null,
         "required": false,
         "name": "timestamp_opt",
@@ -488,14 +501,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Star rating for this member, between 1 and 5.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Member_rating",
+        "label": "Member Rating",
         "placeholder": null,
         "required": false,
         "name": "member_rating",
@@ -506,14 +519,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": "The date and time the member's info was last changed in ISO 8601 format.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Last_changed",
+        "label": "Last Changed",
         "placeholder": null,
         "required": false,
         "name": "last_changed",
@@ -523,12 +536,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "If set/detected, the subscriber's language.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Language",
         "placeholder": null,
@@ -540,12 +553,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "VIP status for subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Vip",
         "placeholder": null,
@@ -554,14 +567,25 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": "The list member's email client.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Email_client",
+        "label": "Email Client",
         "placeholder": null,
         "required": false,
         "name": "email_client",
@@ -571,12 +595,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Subscriber location information.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Location",
         "placeholder": null,
@@ -594,6 +618,7 @@
           "advancedOption": null,
           "description": "The location latitude.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Latitude",
           "placeholder": null,
@@ -607,12 +632,12 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "controlType": "INPUT_NUMBER"
         }, {
           "advancedOption": null,
           "description": "The location longitude.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Longitude",
           "placeholder": null,
@@ -626,12 +651,12 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "controlType": "INPUT_NUMBER"
         }, {
           "advancedOption": null,
           "description": "The time difference in hours from GMT.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Gmtoff",
           "placeholder": null,
@@ -644,12 +669,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": "The offset for timezones where daylight saving time is observed.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Dstoff",
           "placeholder": null,
@@ -662,14 +687,14 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": "The unique code for the location country.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Country_code",
+          "label": "Country Code",
           "placeholder": null,
           "required": false,
           "name": "country_code",
@@ -679,12 +704,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": "The timezone for the location.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Timezone",
           "placeholder": null,
@@ -696,12 +721,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": "The region for the location.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Region",
           "placeholder": null,
@@ -713,17 +738,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The marketing permissions for the subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Marketing_permissions",
+        "label": "Marketing Permissions",
         "placeholder": "Add",
         "required": false,
         "name": "marketing_permissions",
@@ -734,6 +758,7 @@
           "advancedOption": null,
           "description": "The marketing permissions for the subscriber.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -751,8 +776,9 @@
             "advancedOption": null,
             "description": "The id for the marketing permission on the list",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
-            "label": "Marketing_permission_id",
+            "label": "Marketing Permission Id",
             "placeholder": null,
             "required": false,
             "name": "marketing_permission_id",
@@ -762,12 +788,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "The text of the marketing permission.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Text",
             "placeholder": null,
@@ -779,12 +805,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "If the subscriber has opted-in to the marketing permission.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Enabled",
             "placeholder": null,
@@ -793,23 +819,32 @@
             "type": "BOOLEAN",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "CHECKBOX",
-            "expressionDisabled": null
+            "options": [ {
+              "description": null,
+              "displayCondition": null,
+              "name": "True",
+              "value": true
+            }, {
+              "description": null,
+              "displayCondition": null,
+              "name": "False",
+              "value": true
+            } ],
+            "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The most recent Note added about this member.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Last_note",
+        "label": "Last Note",
         "placeholder": null,
         "required": false,
         "name": "last_note",
@@ -825,8 +860,9 @@
           "advancedOption": null,
           "description": "The note id.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Note_id",
+          "label": "Note Id",
           "placeholder": null,
           "required": false,
           "name": "note_id",
@@ -837,14 +873,14 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": "The date and time the note was created in ISO 8601 format.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Created_at",
+          "label": "Created At",
           "placeholder": null,
           "required": false,
           "name": "created_at",
@@ -854,14 +890,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": "The author of the note.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "Created_by",
+          "label": "Created By",
           "placeholder": null,
           "required": false,
           "name": "created_by",
@@ -871,12 +907,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": "The content of the note.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Note",
           "placeholder": null,
@@ -888,15 +924,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The source from which the subscriber was added to this list.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Source",
         "placeholder": null,
@@ -908,14 +943,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The number of tags applied to this member.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Tags_count",
+        "label": "Tags Count",
         "placeholder": null,
         "required": false,
         "name": "tags_count",
@@ -926,12 +961,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": "Returns up to 50 tags applied to this member.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": null,
@@ -949,6 +984,7 @@
           "advancedOption": null,
           "description": "The tag id.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -961,12 +997,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": "The name of the tag.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -978,17 +1014,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The list id.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "List_id",
+        "label": "List Id",
         "placeholder": null,
         "required": false,
         "name": "list_id",
@@ -998,14 +1033,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "A list of link types and descriptions for the API schema documents.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "_links",
+        "label": "Links",
         "placeholder": "Add",
         "required": false,
         "name": "_links",
@@ -1016,6 +1051,7 @@
           "advancedOption": null,
           "description": "A list of link types and descriptions for the API schema documents.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1033,6 +1069,7 @@
             "advancedOption": null,
             "description": "As with an HTML 'rel' attribute, this describes the type of link.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Rel",
             "placeholder": null,
@@ -1044,12 +1081,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "This property contains a fully-qualified URL that can be called to retrieve the linked resource or perform the linked action.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Href",
             "placeholder": null,
@@ -1061,12 +1098,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "The HTTP method that should be used when accessing the URL defined in 'href'. Possible values: \"GET\", \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\", or \"HEAD\".",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Method",
             "placeholder": null,
@@ -1078,14 +1115,14 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "For GETs, this is a URL representing the schema that the response should conform to.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
-            "label": "TargetSchema",
+            "label": "Target Schema",
             "placeholder": null,
             "required": false,
             "name": "targetSchema",
@@ -1095,12 +1132,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Schema",
             "placeholder": null,
@@ -1112,27 +1149,24 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The unique ID for the list.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "ListId",
+      "label": "List Id",
       "placeholder": null,
       "required": true,
       "name": "listId",
@@ -1142,26 +1176,37 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": "If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "Skip_merge_validation",
+      "label": "Skip Merge Validation",
       "placeholder": null,
       "required": false,
       "name": "skip_merge_validation",
       "type": "BOOLEAN",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1179,8 +1224,9 @@
         "advancedOption": null,
         "description": "Email address for a subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Email_address",
+        "label": "Email Address",
         "placeholder": null,
         "required": true,
         "name": "email_address",
@@ -1190,12 +1236,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Subscriber's current status.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -1232,14 +1278,14 @@
           "value": "transactional"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Type of email this member asked to get ('html' or 'text').",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Email_type",
+        "label": "Email Type",
         "placeholder": null,
         "required": false,
         "name": "email_type",
@@ -1249,14 +1295,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "A dictionary of merge fields where the keys are the merge tags.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Merge_fields",
+        "label": "Merge Fields",
         "placeholder": "Add",
         "required": false,
         "name": "merge_fields",
@@ -1267,6 +1313,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1278,20 +1325,19 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The key of this object's properties is the ID of the interest in question.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Interests",
         "placeholder": "Add",
@@ -1304,6 +1350,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1315,20 +1362,19 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If set/detected, the subscriber's language.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Language",
         "placeholder": null,
@@ -1340,12 +1386,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "VIP status for subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Vip",
         "placeholder": null,
@@ -1354,12 +1400,23 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": "Subscriber location information.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Location",
         "placeholder": null,
@@ -1377,6 +1434,7 @@
           "advancedOption": null,
           "description": "The location latitude.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Latitude",
           "placeholder": null,
@@ -1390,12 +1448,12 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "controlType": "INPUT_NUMBER"
         }, {
           "advancedOption": null,
           "description": "The location longitude.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Longitude",
           "placeholder": null,
@@ -1409,17 +1467,16 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "controlType": "INPUT_NUMBER"
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The marketing permissions for the subscriber.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Marketing_permissions",
+        "label": "Marketing Permissions",
         "placeholder": "Add",
         "required": false,
         "name": "marketing_permissions",
@@ -1430,6 +1487,7 @@
           "advancedOption": null,
           "description": "The marketing permissions for the subscriber.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1447,8 +1505,9 @@
             "advancedOption": null,
             "description": "The id for the marketing permission on the list.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
-            "label": "Marketing_permission_id",
+            "label": "Marketing Permission Id",
             "placeholder": null,
             "required": false,
             "name": "marketing_permission_id",
@@ -1458,12 +1517,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": "If the subscriber has opted-in to the marketing permission.",
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Enabled",
             "placeholder": null,
@@ -1472,23 +1531,32 @@
             "type": "BOOLEAN",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "CHECKBOX",
-            "expressionDisabled": null
+            "options": [ {
+              "description": null,
+              "displayCondition": null,
+              "name": "True",
+              "value": true
+            }, {
+              "description": null,
+              "displayCondition": null,
+              "name": "False",
+              "value": true
+            } ],
+            "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "IP address the subscriber signed up from.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Ip_signup",
+        "label": "Ip Signup",
         "placeholder": null,
         "required": false,
         "name": "ip_signup",
@@ -1498,14 +1566,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The date and time the subscriber signed up for the list in ISO 8601 format.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Timestamp_signup",
+        "label": "Timestamp Signup",
         "placeholder": null,
         "required": false,
         "name": "timestamp_signup",
@@ -1515,14 +1583,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The IP address the subscriber used to confirm their opt-in status.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Ip_opt",
+        "label": "Ip Opt",
         "placeholder": null,
         "required": false,
         "name": "ip_opt",
@@ -1532,14 +1600,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The date and time the subscriber confirmed their opt-in status in ISO 8601 format.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "Timestamp_opt",
+        "label": "Timestamp Opt",
         "placeholder": null,
         "required": false,
         "name": "timestamp_opt",
@@ -1549,12 +1617,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The tags that are associated with a member.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": "Add",
@@ -1567,6 +1635,7 @@
           "advancedOption": null,
           "description": "The tags that are associated with a member.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1578,17 +1647,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1604,6 +1670,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Client Id",
         "placeholder": null,
@@ -1615,12 +1682,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Client Secret",
         "placeholder": null,
@@ -1632,8 +1699,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE"
@@ -1665,6 +1731,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1682,6 +1749,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -1699,6 +1767,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1710,12 +1779,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1727,12 +1796,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1744,12 +1813,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1761,12 +1830,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1778,12 +1847,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1795,12 +1864,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1818,6 +1887,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1829,12 +1899,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1846,12 +1916,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1863,12 +1933,12 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1880,18 +1950,16 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -1902,12 +1970,12 @@
         "exampleValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -1919,17 +1987,16 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The list id of intended audience to which you would like to add the contact.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "List Id",
       "placeholder": null,
@@ -1941,8 +2008,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Subscribe",

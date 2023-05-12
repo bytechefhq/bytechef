@@ -26,7 +26,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Specify the necessary mappings by defining that \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
@@ -72,7 +72,7 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -89,16 +89,16 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -128,7 +128,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The value's key will serve as the key in the newly created object.",
@@ -145,7 +145,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The value of the key will become the value in the new object.",
@@ -162,7 +162,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -194,7 +194,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Object containing one or more properties.",
@@ -214,7 +214,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "In defining mappings, the key \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.",
@@ -260,7 +260,7 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -277,16 +277,16 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -318,7 +318,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "An object that consists of key-value pairs defines the source key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.",
@@ -338,7 +338,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Should fields from the original object that do not have mappings be included?",
@@ -351,8 +351,19 @@
       "type": "BOOLEAN",
       "defaultValue": true,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Should fields that have null values be included?",
@@ -365,8 +376,19 @@
       "type": "BOOLEAN",
       "defaultValue": true,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Should fields with empty string values be included?",
@@ -379,8 +401,19 @@
       "type": "BOOLEAN",
       "defaultValue": true,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "A list of fields that are required on the mapped object.",
@@ -409,13 +442,13 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -447,7 +480,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The name of the key to map keys to.",
@@ -464,7 +497,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The name of the key to map keys to.",
@@ -481,7 +514,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -521,7 +554,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -534,8 +567,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -554,7 +598,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -574,7 +618,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -591,7 +635,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -602,9 +646,9 @@
         "required": null,
         "name": null,
         "type": "NULL",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "If no mapping exists, map this value by default.",
@@ -632,7 +676,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -645,8 +689,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -665,7 +720,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -685,7 +740,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -702,7 +757,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -713,9 +768,9 @@
         "required": null,
         "name": null,
         "type": "NULL",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "A list of \"mappings\" for the value. If the value specified matches the \"From\", then the connector will return the \"To\" value.",
@@ -761,7 +816,7 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -778,16 +833,16 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -829,7 +884,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -847,9 +902,9 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Specify the necessary mappings by defining that \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
@@ -895,7 +950,7 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -912,16 +967,16 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

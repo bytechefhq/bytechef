@@ -52,7 +52,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -70,7 +70,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -88,7 +88,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -118,8 +118,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -132,8 +143,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -146,8 +168,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -160,8 +193,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -174,8 +218,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -188,8 +243,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -202,11 +268,22 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -223,10 +300,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -246,7 +323,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -264,7 +341,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -294,8 +371,19 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -308,8 +396,19 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -322,8 +421,19 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -336,8 +446,19 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -350,8 +471,19 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -364,8 +496,19 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -378,11 +521,22 @@
         "type": "BOOLEAN",
         "defaultValue": true,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -3414,7 +3568,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Every day",
@@ -3462,7 +3616,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3480,7 +3634,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3498,7 +3652,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3516,7 +3670,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3533,10 +3687,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -3556,7 +3710,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -3574,7 +3728,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -3627,7 +3781,7 @@
       } ],
       "optionsDataSource": null,
       "controlType": "SELECT",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -6659,7 +6813,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Every week",
@@ -6707,7 +6861,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -6725,7 +6879,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -6743,7 +6897,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -6761,7 +6915,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -6778,10 +6932,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -6801,7 +6955,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -6819,7 +6973,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The day of the month  at which a workflow will be triggered.",
@@ -6837,7 +6991,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -9869,7 +10023,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Every month",
@@ -9917,7 +10071,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -9935,7 +10089,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -9953,10 +10107,10 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -9976,7 +10130,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -10014,7 +10168,7 @@
       } ],
       "optionsDataSource": null,
       "controlType": "SELECT",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Interval",
@@ -10062,7 +10216,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -10079,7 +10233,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -10096,10 +10250,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -10118,7 +10272,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -13150,7 +13304,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Cron",

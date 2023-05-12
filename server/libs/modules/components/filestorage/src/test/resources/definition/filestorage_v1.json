@@ -22,7 +22,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -57,7 +57,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -74,7 +74,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -91,7 +91,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -108,10 +108,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -156,7 +156,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -173,7 +173,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -190,7 +190,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -207,10 +207,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -228,7 +228,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Filename to set for data. By default, \"file.txt\" will be used.",
@@ -245,7 +245,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -290,7 +290,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -307,7 +307,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -324,7 +324,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -341,10 +341,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -362,7 +362,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Filename to set for data. By default, \"file.txt\" will be used.",
@@ -379,7 +379,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

@@ -7,6 +7,7 @@
     "advancedOption": null,
     "description": "Set condition as raw expression or list of conditions.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Raw expression",
     "placeholder": null,
@@ -15,12 +16,23 @@
     "type": "BOOLEAN",
     "defaultValue": false,
     "exampleValue": null,
-    "controlType": "CHECKBOX",
-    "expressionDisabled": null
+    "options": [ {
+      "description": null,
+      "displayCondition": null,
+      "name": "True",
+      "value": true
+    }, {
+      "description": null,
+      "displayCondition": null,
+      "name": "False",
+      "value": true
+    } ],
+    "controlType": "CHECKBOX"
   }, {
     "advancedOption": null,
     "description": "The type of values to compare.",
     "displayCondition": "rawExpression === true",
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Conditions",
     "placeholder": "Add Condition",
@@ -33,6 +45,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Boolean",
       "placeholder": null,
@@ -50,6 +63,7 @@
         "advancedOption": null,
         "description": "The boolean value to compare with the second one.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
         "placeholder": null,
@@ -58,12 +72,23 @@
         "type": "BOOLEAN",
         "defaultValue": false,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
         "placeholder": null,
@@ -85,12 +110,12 @@
           "value": "NOT_EQUALS"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The boolean value to compare with the first one.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
         "placeholder": null,
@@ -99,15 +124,25 @@
         "type": "BOOLEAN",
         "defaultValue": false,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Date & Time",
       "placeholder": null,
@@ -125,6 +160,7 @@
         "advancedOption": null,
         "description": "The date & time value to compare with the second one.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
         "placeholder": null,
@@ -135,12 +171,12 @@
         "exampleValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
         "placeholder": null,
@@ -162,12 +198,12 @@
           "value": "BEFORE"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The date & time value to compare with the first one.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
         "placeholder": null,
@@ -178,15 +214,14 @@
         "exampleValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "controlType": "DATE_TIME"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Number",
       "placeholder": null,
@@ -204,6 +239,7 @@
         "advancedOption": null,
         "description": "The number value to compare with the second one.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
         "placeholder": null,
@@ -217,12 +253,12 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "controlType": "INPUT_NUMBER"
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
         "placeholder": null,
@@ -269,12 +305,12 @@
           "value": "EMPTY"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The number value to compare with the first one.",
         "displayCondition": "operation !== 'EMPTY'",
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
         "placeholder": null,
@@ -288,15 +324,14 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "controlType": "INPUT_NUMBER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "String",
       "placeholder": null,
@@ -314,6 +349,7 @@
         "advancedOption": null,
         "description": "The string value to compare with the second one.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
         "placeholder": null,
@@ -325,12 +361,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
         "placeholder": null,
@@ -382,12 +418,12 @@
           "value": "EMPTY"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The string value to compare with the first one.",
         "displayCondition": "!['EMPTY','REGEX'].includes('operation')",
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
         "placeholder": null,
@@ -399,12 +435,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The regex value to compare with the first one.",
         "displayCondition": "operation === 'REGEX'",
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Regex",
         "placeholder": "/text/i",
@@ -416,21 +452,19 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   }, {
     "advancedOption": null,
     "description": "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
     "displayCondition": "rawExpression === false",
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Combine",
     "placeholder": null,
@@ -452,12 +486,12 @@
       "value": "ANY"
     } ],
     "optionsDataSource": null,
-    "sampleDataType": null,
-    "expressionDisabled": null
+    "sampleDataType": null
   }, {
     "advancedOption": null,
     "description": "The raw expression.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Expression",
     "placeholder": null,
@@ -469,14 +503,14 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
-    "sampleDataType": null,
-    "expressionDisabled": null
+    "sampleDataType": null
   } ],
   "resources": null,
   "taskProperties": [ {
     "advancedOption": null,
     "description": "The list of tasks to execute sequentially if the result of evaluating expression is true.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -489,6 +523,7 @@
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -503,18 +538,17 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute sequentially if the result of evaluating expression is false.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -527,6 +561,7 @@
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -541,14 +576,12 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   } ],
   "title": "Condition",
   "version": 1

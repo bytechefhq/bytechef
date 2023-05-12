@@ -6,6 +6,7 @@
     "advancedOption": null,
     "description": null,
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -16,6 +17,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -28,12 +30,12 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -42,12 +44,23 @@
       "type": "BOOLEAN",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -58,12 +71,12 @@
       "exampleValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "DATE",
-      "expressionDisabled": null
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -74,12 +87,12 @@
       "exampleValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "DATE_TIME",
-      "expressionDisabled": null
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -92,12 +105,12 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -111,12 +124,12 @@
       "numberPrecision": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_NUMBER",
-      "expressionDisabled": null
+      "controlType": "INPUT_NUMBER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -131,12 +144,12 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -148,14 +161,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
-    } ],
-    "expressionDisabled": null
+      "sampleDataType": null
+    } ]
   }, {
     "advancedOption": null,
     "description": null,
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -168,13 +180,13 @@
     "minValue": null,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "INPUT_INTEGER",
-    "expressionDisabled": null
+    "controlType": "INPUT_INTEGER"
   } ],
   "properties": [ {
     "advancedOption": null,
     "description": "List of items to iterate over.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "List of items",
     "placeholder": null,
@@ -187,12 +199,12 @@
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The name of the item variable.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Item Var",
     "placeholder": null,
@@ -204,12 +216,12 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
-    "sampleDataType": null,
-    "expressionDisabled": null
+    "sampleDataType": null
   }, {
     "advancedOption": null,
     "description": "The name of the index variable.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Item Index",
     "placeholder": null,
@@ -221,12 +233,12 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
-    "sampleDataType": null,
-    "expressionDisabled": null
+    "sampleDataType": null
   }, {
     "advancedOption": null,
     "description": "Should loop iterate until condition set by 'Loop Break' statement is met.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Loop Forever",
     "placeholder": null,
@@ -235,14 +247,25 @@
     "type": "BOOLEAN",
     "defaultValue": false,
     "exampleValue": null,
-    "controlType": "CHECKBOX",
-    "expressionDisabled": null
+    "options": [ {
+      "description": null,
+      "displayCondition": null,
+      "name": "True",
+      "value": true
+    }, {
+      "description": null,
+      "displayCondition": null,
+      "name": "False",
+      "value": true
+    } ],
+    "controlType": "CHECKBOX"
   } ],
   "resources": null,
   "taskProperties": [ {
     "advancedOption": null,
     "description": "The task or task dispatcher to use.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -257,8 +280,7 @@
     "options": null,
     "optionsDataSource": null,
     "properties": null,
-    "controlType": "INPUT_TEXT",
-    "expressionDisabled": null
+    "controlType": "EXPRESSION"
   } ],
   "title": "Loop",
   "version": 1
