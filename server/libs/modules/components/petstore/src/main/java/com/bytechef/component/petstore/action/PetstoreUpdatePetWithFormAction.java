@@ -40,7 +40,7 @@ public class PetstoreUpdatePetWithFormAction {
                 "path", "/pet/{petId}"
 
             ))
-        .properties(integer("petId").label("PetId")
+        .properties(integer("petId").label("Pet Id")
             .description("ID of pet that needs to be updated")
             .required(true)
             .metadata(

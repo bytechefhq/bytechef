@@ -43,7 +43,7 @@ public class PetstorePetProperties {
             .required(false),
         array("photoUrls").items(string())
             .placeholder("Add")
-            .label("PhotoUrls")
+            .label("Photo Urls")
             .required(true),
         array("tags").items(object().properties(PetstoreTagProperties.PROPERTIES))
             .placeholder("Add")

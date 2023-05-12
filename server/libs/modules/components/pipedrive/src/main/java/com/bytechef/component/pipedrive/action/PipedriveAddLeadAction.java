@@ -53,21 +53,21 @@ public class PipedriveAddLeadAction {
         .properties(object().properties(string("title").label("Title")
             .description("The name of the lead")
             .required(true),
-            integer("owner_id").label("Owner_id")
+            integer("owner_id").label("Owner Id")
                 .description(
                     "The ID of the user which will be the owner of the created lead. If not provided, the user making the request will be used.")
                 .required(false),
             array("label_ids")
                 .items(string().description("The IDs of the lead labels which will be associated with the lead"))
                 .placeholder("Add")
-                .label("Label_ids")
+                .label("Label Ids")
                 .description("The IDs of the lead labels which will be associated with the lead")
                 .required(false),
-            integer("person_id").label("Person_id")
+            integer("person_id").label("Person Id")
                 .description(
                     "The ID of a person which this lead will be linked to. If the person does not exist yet, it needs to be created first. This property is required unless `organization_id` is specified.")
                 .required(false),
-            integer("organization_id").label("Organization_id")
+            integer("organization_id").label("Organization Id")
                 .description(
                     "The ID of an organization which this lead will be linked to. If the organization does not exist yet, it needs to be created first. This property is required unless `person_id` is specified.")
                 .required(false),
@@ -78,16 +78,16 @@ public class PipedriveAddLeadAction {
                 .label("Value")
                 .description("The potential value of the lead")
                 .required(false),
-            date("expected_close_date").label("Expected_close_date")
+            date("expected_close_date").label("Expected Close Date")
                 .description(
                     "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
                 .required(false),
-            string("visible_to").label("Visible_to")
+            string("visible_to").label("Visible To")
                 .description(
                     "The visibility of the lead. If omitted, the visibility will be set to the default visibility setting of this item type for the authorized user. Read more about visibility groups <a href=\"https://support.pipedrive.com/en/article/visibility-groups\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.<h4>Essential / Advanced plan</h4><table><tr><th style=\"width: 40px\">Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner &amp; followers</td><tr><td>`3`</td><td>Entire company</td></tr></table><h4>Professional / Enterprise plan</h4><table><tr><th style=\"width: 40px\">Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner only</td><tr><td>`3`</td><td>Owner's visibility group</td></tr><tr><td>`5`</td><td>Owner's visibility group and sub-groups</td></tr><tr><td>`7`</td><td>Entire company</td></tr></table>")
                 .options(option("1", "1"), option("3", "3"), option("5", "5"), option("7", "7"))
                 .required(false),
-            bool("was_seen").label("Was_seen")
+            bool("was_seen").label("Was Seen")
                 .description("A flag indicating whether the lead was seen by someone in the Pipedrive UI")
                 .required(false))
             .metadata(
@@ -101,32 +101,32 @@ public class PipedriveAddLeadAction {
                 string("title").label("Title")
                     .description("The title of the lead")
                     .required(false),
-                integer("owner_id").label("Owner_id")
+                integer("owner_id").label("Owner Id")
                     .description("The ID of the user who owns the lead")
                     .required(false),
-                integer("creator_id").label("Creator_id")
+                integer("creator_id").label("Creator Id")
                     .description("The ID of the user who created the lead")
                     .required(false),
                 array("label_ids")
                     .items(string().description("The IDs of the lead labels which are associated with the lead"))
                     .placeholder("Add")
-                    .label("Label_ids")
+                    .label("Label Ids")
                     .description("The IDs of the lead labels which are associated with the lead")
                     .required(false),
-                integer("person_id").label("Person_id")
+                integer("person_id").label("Person Id")
                     .description("The ID of a person which this lead is linked to")
                     .required(false),
-                integer("organization_id").label("Organization_id")
+                integer("organization_id").label("Organization Id")
                     .description("The ID of an organization which this lead is linked to")
                     .required(false),
-                string("source_name").label("Source_name")
+                string("source_name").label("Source Name")
                     .description(
                         "Defines where the lead comes from. Will be `API` if the lead was created through the Public API and will be `Manually created` if the lead was created manually through the UI.\n")
                     .required(false),
-                bool("is_archived").label("Is_archived")
+                bool("is_archived").label("Is Archived")
                     .description("A flag indicating whether the lead is archived or not")
                     .required(false),
-                bool("was_seen").label("Was_seen")
+                bool("was_seen").label("Was Seen")
                     .description("A flag indicating whether the lead was seen by someone in the Pipedrive UI")
                     .required(false),
                 object("value").properties(number("amount").label("Amount")
@@ -136,27 +136,27 @@ public class PipedriveAddLeadAction {
                     .label("Value")
                     .description("The potential value of the lead")
                     .required(false),
-                date("expected_close_date").label("Expected_close_date")
+                date("expected_close_date").label("Expected Close Date")
                     .description(
                         "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
                     .required(false),
-                integer("next_activity_id").label("Next_activity_id")
+                integer("next_activity_id").label("Next Activity Id")
                     .description("The ID of the next activity associated with the lead")
                     .required(false),
-                dateTime("add_time").label("Add_time")
+                dateTime("add_time").label("Add Time")
                     .description(
                         "The date and time of when the lead was created. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
                     .required(false),
-                dateTime("update_time").label("Update_time")
+                dateTime("update_time").label("Update Time")
                     .description(
                         "The date and time of when the lead was last updated. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
                     .required(false),
-                string("visible_to").label("Visible_to")
+                string("visible_to").label("Visible To")
                     .description(
                         "The visibility of the lead. If omitted, the visibility will be set to the default visibility setting of this item type for the authorized user.<table><tr><th>Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner &amp; followers (private)</td></tr><tr><td>`3`</td><td>Entire company (shared)</td></tr></table>")
                     .options(option("1", "1"), option("3", "3"), option("5", "5"), option("7", "7"))
                     .required(false),
-                string("cc_email").label("Cc_email")
+                string("cc_email").label("Cc Email")
                     .description("The BCC email of the lead")
                     .required(false))
                 .label("Data")

@@ -35,7 +35,7 @@ public class JiraStatusDetailsProperties {
         string("description").label("Description")
             .description("The description of the status.")
             .required(false),
-        string("iconUrl").label("IconUrl")
+        string("iconUrl").label("Icon Url")
             .description("The URL of the icon used to represent the status.")
             .required(false),
         string("name").label("Name")
@@ -45,7 +45,7 @@ public class JiraStatusDetailsProperties {
             .description("The ID of the status.")
             .required(false),
         object("statusCategory").properties(JiraStatusCategoryProperties.PROPERTIES)
-            .label("StatusCategory")
+            .label("Status Category")
             .description("A status category.")
             .required(false));
 }

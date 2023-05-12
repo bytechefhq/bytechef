@@ -33,7 +33,7 @@ public class JiraOperationsProperties {
         .items(object().properties(JiraLinkGroupProperties.PROPERTIES)
             .description("Details a link group, which defines issue operations."))
         .placeholder("Add")
-        .label("LinkGroups")
+        .label("Link Groups")
         .description("Details of the link groups defining issue operations.")
         .required(false));
 }
