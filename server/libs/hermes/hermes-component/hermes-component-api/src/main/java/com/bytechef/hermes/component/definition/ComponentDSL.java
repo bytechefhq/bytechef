@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
@@ -67,9 +66,12 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableConnectionDefinition();
     }
 
-    public static ModifiableSampleOutputDataSource sampleOutputDataSource(SampleOutputFunction sampleOutputFunction) {
+    public static ModifiableComponentDynamicPropertiesDataSource dynamicProperties(
+        ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction dynamicPropertiesFunction,
+        String... propertiesDependOnPropertyNames) {
 
-        return new ModifiableSampleOutputDataSource(sampleOutputFunction);
+        return new ModifiableComponentDynamicPropertiesDataSource(dynamicPropertiesFunction,
+            List.of(propertiesDependOnPropertyNames));
     }
 
     public static ModifiableProperty.ModifiableObjectProperty fileEntry() {
@@ -78,13 +80,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static ModifiableProperty.ModifiableObjectProperty fileEntry(String name) {
         return buildObject(
-            name,
-            null,
-            "FILE_ENTRY",
-            string("extension").required(true),
-            string("mimeType").required(true),
-            string("name").required(true),
-            string("url").required(true));
+            name, null, "FILE_ENTRY", string("extension").required(true), string("mimeType").required(true),
+            string("name").required(true), string("url").required(true));
     }
 
     public static Help help(String body) {
@@ -99,24 +96,21 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableJdbcComponentDefinition(name);
     }
 
-    public static ModifiableComponentOptionsDataSource optionsDataSource(
+    public static ModifiableComponentOptionsDataSource options(
         ComponentOptionsDataSource.OptionsFunction optionsFunction, String... loadOptionsDependOnPropertyNames) {
 
         return new ModifiableComponentOptionsDataSource(optionsFunction, List.of(loadOptionsDependOnPropertyNames));
     }
 
-    public static ModifiableOutputSchemaDataSource outputSchemaDataSource(
+    public static ModifiableOutputSchemaDataSource outputSchema(
         OutputSchemaDataSource.OutputSchemaFunction outputSchemaFunction) {
 
         return new ModifiableOutputSchemaDataSource(outputSchemaFunction);
     }
 
-    public static ModifiableComponentDynamicPropertiesDataSource propertiesDataSource(
-        ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction dynamicPropertiesFunction,
-        String... propertiesDependOnPropertyNames) {
-
-        return new ModifiableComponentDynamicPropertiesDataSource(dynamicPropertiesFunction,
-            List.of(propertiesDependOnPropertyNames));
+    public static ModifiableSampleOutputDataSource
+        sampleOutput(SampleOutputDataSource.SampleOutputFunction sampleOutputFunction) {
+        return new ModifiableSampleOutputDataSource(sampleOutputFunction);
     }
 
     public static ModifiableTriggerDefinition trigger(String name) {
@@ -221,7 +215,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition outputSchemaDataSource(OutputSchemaDataSource outputSchemaDataSource) {
+        public ModifiableActionDefinition outputSchema(OutputSchemaDataSource outputSchemaDataSource) {
             this.outputSchemaDataSource = outputSchemaDataSource;
 
             return this;
@@ -239,7 +233,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
+        public ModifiableActionDefinition sampleOutput(SampleOutputDataSource sampleOutputDataSource) {
             this.sampleOutputDataSource = sampleOutputDataSource;
 
             return this;
@@ -1469,7 +1463,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchemaDataSource(OutputSchemaDataSource outputSchemaDataSource) {
+        public ModifiableTriggerDefinition outputSchema(OutputSchemaDataSource outputSchemaDataSource) {
             this.outputSchemaDataSource = outputSchemaDataSource;
 
             return this;
@@ -1487,7 +1481,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
+        public ModifiableTriggerDefinition sampleOutput(SampleOutputDataSource sampleOutputDataSource) {
             this.sampleOutputDataSource = sampleOutputDataSource;
 
             return this;
