@@ -33,7 +33,7 @@ import java.util.List;
 public class JiraLinkGroupProperties {
     public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
         .required(false),
-        string("styleClass").label("StyleClass")
+        string("styleClass").label("Style Class")
             .required(false),
         object("header").properties(JiraSimpleLinkProperties.PROPERTIES)
             .label("Header")

@@ -40,20 +40,20 @@ public class JiraIssueTransitionProperties {
             .label("To")
             .description("A status.")
             .required(false),
-        bool("hasScreen").label("HasScreen")
+        bool("hasScreen").label("Has Screen")
             .description("Whether there is a screen associated with the issue transition.")
             .required(false),
-        bool("isGlobal").label("IsGlobal")
+        bool("isGlobal").label("Is Global")
             .description(
                 "Whether the issue transition is global, that is, the transition is applied to issues regardless of their status.")
             .required(false),
-        bool("isInitial").label("IsInitial")
+        bool("isInitial").label("Is Initial")
             .description("Whether this is the initial issue transition for the workflow.")
             .required(false),
-        bool("isAvailable").label("IsAvailable")
+        bool("isAvailable").label("Is Available")
             .description("Whether the transition is available to be performed.")
             .required(false),
-        bool("isConditional").label("IsConditional")
+        bool("isConditional").label("Is Conditional")
             .description("Whether the issue has to meet criteria before the issue transition is applied.")
             .required(false),
         object("fields").additionalProperties(object().properties(JiraFieldMetadataProperties.PROPERTIES))

@@ -44,7 +44,7 @@ public class JiraIssueBeanProperties {
             .required(false),
         object("renderedFields").additionalProperties(object())
             .placeholder("Add")
-            .label("RenderedFields")
+            .label("Rendered Fields")
             .description("The rendered value of each field present on the issue.")
             .required(false),
         object("properties").additionalProperties(object())
@@ -82,11 +82,11 @@ public class JiraIssueBeanProperties {
             .required(false),
         object("versionedRepresentations").additionalProperties(object())
             .placeholder("Add")
-            .label("VersionedRepresentations")
+            .label("Versioned Representations")
             .description("The versions of each field on the issue.")
             .required(false),
         object("fieldsToInclude").properties(JiraIncludedFieldsProperties.PROPERTIES)
-            .label("FieldsToInclude")
+            .label("Fields To Include")
             .required(false),
         object("fields").additionalProperties(object())
             .placeholder("Add")

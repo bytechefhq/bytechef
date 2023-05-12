@@ -35,19 +35,19 @@ public class JiraHistoryMetadataProperties {
         string("description").label("Description")
             .description("The description of the history record.")
             .required(false),
-        string("descriptionKey").label("DescriptionKey")
+        string("descriptionKey").label("Description Key")
             .description("The description key of the history record.")
             .required(false),
-        string("activityDescription").label("ActivityDescription")
+        string("activityDescription").label("Activity Description")
             .description("The activity described in the history record.")
             .required(false),
-        string("activityDescriptionKey").label("ActivityDescriptionKey")
+        string("activityDescriptionKey").label("Activity Description Key")
             .description("The key of the activity described in the history record.")
             .required(false),
-        string("emailDescription").label("EmailDescription")
+        string("emailDescription").label("Email Description")
             .description("The description of the email address associated the history record.")
             .required(false),
-        string("emailDescriptionKey").label("EmailDescriptionKey")
+        string("emailDescriptionKey").label("Email Description Key")
             .description("The description key of the email address associated the history record.")
             .required(false),
         object("actor").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
@@ -64,7 +64,7 @@ public class JiraHistoryMetadataProperties {
             .required(false),
         object("extraData").additionalProperties(string())
             .placeholder("Add")
-            .label("ExtraData")
+            .label("Extra Data")
             .description("Additional arbitrary information about the history record.")
             .required(false));
 }

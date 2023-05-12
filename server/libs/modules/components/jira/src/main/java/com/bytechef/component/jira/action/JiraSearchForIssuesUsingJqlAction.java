@@ -66,20 +66,20 @@ public class JiraSearchForIssuesUsingJqlAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
-            integer("startAt").label("StartAt")
+            integer("startAt").label("Start At")
                 .description("The index of the first item to return in a page of results (page offset).")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("maxResults").label("MaxResults")
+            integer("maxResults").label("Max Results")
                 .description(
                     "The maximum number of items to return per page. To manage page size, Jira may return fewer items per page where a large number of fields are requested. The greatest number of items returned per page is achieved when requesting `id` or `key` only.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            string("validateQuery").label("ValidateQuery")
+            string("validateQuery").label("Validate Query")
                 .description(
                     "Determines how to validate the JQL query and treat the validation results. Supported values are:\n"
                         + "\n"
@@ -144,7 +144,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            bool("fieldsByKeys").label("FieldsByKeys")
+            bool("fieldsByKeys").label("Fields By Keys")
                 .description("Reference fields by their key (rather than ID).")
                 .required(false)
                 .metadata(

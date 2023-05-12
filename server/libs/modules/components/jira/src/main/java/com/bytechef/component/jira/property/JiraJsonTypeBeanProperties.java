@@ -42,7 +42,7 @@ public class JiraJsonTypeBeanProperties {
         string("custom").label("Custom")
             .description("If the field is a custom field, the URI of the field.")
             .required(false),
-        integer("customId").label("CustomId")
+        integer("customId").label("Custom Id")
             .description("If the field is a custom field, the custom ID of the field.")
             .required(false),
         object("configuration").additionalProperties(object())

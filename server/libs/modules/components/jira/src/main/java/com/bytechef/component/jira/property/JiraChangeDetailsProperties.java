@@ -34,19 +34,19 @@ public class JiraChangeDetailsProperties {
         string("fieldtype").label("Fieldtype")
             .description("The type of the field changed.")
             .required(false),
-        string("fieldId").label("FieldId")
+        string("fieldId").label("Field Id")
             .description("The ID of the field changed.")
             .required(false),
         string("from").label("From")
             .description("The details of the original value.")
             .required(false),
-        string("fromString").label("FromString")
+        string("fromString").label("From String")
             .description("The details of the original value as a string.")
             .required(false),
         string("to").label("To")
             .description("The details of the new value.")
             .required(false),
-        string("toString").label("ToString")
+        string("toString").label("To String")
             .description("The details of the new value as a string.")
             .required(false));
 }

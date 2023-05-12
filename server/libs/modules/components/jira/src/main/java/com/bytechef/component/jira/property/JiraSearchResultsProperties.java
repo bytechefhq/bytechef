@@ -34,10 +34,10 @@ public class JiraSearchResultsProperties {
     public static final List<Property> PROPERTIES = List.of(string("expand").label("Expand")
         .description("Expand options that include additional search result details in the response.")
         .required(false),
-        integer("startAt").label("StartAt")
+        integer("startAt").label("Start At")
             .description("The index of the first item returned on the page.")
             .required(false),
-        integer("maxResults").label("MaxResults")
+        integer("maxResults").label("Max Results")
             .description("The maximum number of results that could be on the page.")
             .required(false),
         integer("total").label("Total")
@@ -51,7 +51,7 @@ public class JiraSearchResultsProperties {
             .required(false),
         array("warningMessages").items(string().description("Any warnings related to the JQL query."))
             .placeholder("Add")
-            .label("WarningMessages")
+            .label("Warning Messages")
             .description("Any warnings related to the JQL query.")
             .required(false),
         object("names").additionalProperties(string())

@@ -44,13 +44,13 @@ public class AirtableCreateRecordAction {
                 "path", "/{baseId}/{tableId}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("baseId").label("BaseId")
+        .properties(string("baseId").label("Base Id")
             .description("The base id.")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            string("tableId").label("TableId")
+            string("tableId").label("Table Id")
                 .description("The table id.")
                 .required(true)
                 .metadata(
@@ -63,7 +63,7 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object().properties(dateTime("createdTime").label("CreatedTime")
+        .outputSchema(object().properties(dateTime("createdTime").label("Created Time")
             .required(false),
             object("fields").additionalProperties(oneOf())
                 .placeholder("Add")

@@ -31,9 +31,9 @@ import java.util.List;
 public class JiraSimpleLinkProperties {
     public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
         .required(false),
-        string("styleClass").label("StyleClass")
+        string("styleClass").label("Style Class")
             .required(false),
-        string("iconClass").label("IconClass")
+        string("iconClass").label("Icon Class")
             .required(false),
         string("label").label("Label")
             .required(false),
