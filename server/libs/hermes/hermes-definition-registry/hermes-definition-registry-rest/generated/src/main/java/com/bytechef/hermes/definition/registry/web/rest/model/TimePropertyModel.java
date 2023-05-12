@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TimeProperty", description = "A time property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-10T17:56:08.674559+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
 public class TimePropertyModel extends ValuePropertyModel {
 
   private Integer hour;
@@ -127,8 +127,8 @@ public class TimePropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public TimePropertyModel expressionDisabled(Boolean expressionDisabled) {
-    super.setExpressionDisabled(expressionDisabled);
+  public TimePropertyModel expressionEnabled(Boolean expressionEnabled) {
+    super.setExpressionEnabled(expressionEnabled);
     return this;
   }
 
