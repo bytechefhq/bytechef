@@ -113,7 +113,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -148,7 +148,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -216,12 +216,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -255,7 +255,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -364,7 +364,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -399,7 +399,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -467,12 +467,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -506,7 +506,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -625,7 +625,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -660,7 +660,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -728,12 +728,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -767,7 +767,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -876,7 +876,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -911,7 +911,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -979,12 +979,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -1018,7 +1018,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1150,7 +1150,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1185,7 +1185,7 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1253,12 +1253,12 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -1292,12 +1292,12 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -1462,7 +1462,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1497,7 +1497,7 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1565,12 +1565,12 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -1604,12 +1604,12 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -1645,7 +1645,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1811,7 +1811,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1846,7 +1846,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1914,12 +1914,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -1953,7 +1953,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -2119,7 +2119,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -2292,7 +2292,7 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ ],
     "sampleOutputDataSource": null,
@@ -2451,7 +2451,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -2599,7 +2599,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -2787,7 +2787,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -2975,7 +2975,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -3134,7 +3134,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -3316,12 +3316,12 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -3493,12 +3493,12 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -3696,7 +3696,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -3883,7 +3883,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -4059,7 +4059,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

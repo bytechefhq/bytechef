@@ -282,7 +282,7 @@
           "controlType": "CHECKBOX",
           "expressionEnabled": null
         } ],
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -302,7 +302,7 @@
         "sampleDataType": null,
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
@@ -535,7 +535,7 @@
         "controlType": "CHECKBOX",
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     }, {
       "advancedOption": null,
@@ -3689,7 +3689,7 @@
         "sampleDataType": null,
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
@@ -6934,7 +6934,7 @@
         "sampleDataType": null,
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
@@ -10109,7 +10109,7 @@
         "controlType": "INPUT_INTEGER",
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
@@ -10252,7 +10252,7 @@
         "sampleDataType": null,
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,

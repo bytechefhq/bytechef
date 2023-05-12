@@ -159,7 +159,7 @@
         "controlType": "INPUT_INTEGER",
         "expressionEnabled": null
       } ],
-      "controlType": "JSON_BUILDER",
+      "controlType": "OBJECT_BUILDER",
       "expressionEnabled": null
     } ],
     "properties": [ {

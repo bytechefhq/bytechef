@@ -335,12 +335,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of the person associated with the deal",
@@ -450,12 +450,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of the owner of the person that is associated with the deal",
@@ -630,7 +630,7 @@
               "optionsDataSource": null,
               "controlType": "INPUT_INTEGER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The expected close date of the deal",
@@ -1731,12 +1731,12 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The additional data of the list",
@@ -1817,7 +1817,7 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1974,7 +1974,7 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The organization which is associated with the deal",
@@ -2106,7 +2106,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The person who is associated with the deal",
@@ -2258,12 +2258,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The phone numbers of the person associated with the deal",
@@ -2355,12 +2355,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of the owner of the person that is associated with the deal",
@@ -2380,11 +2380,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -2873,12 +2873,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the person associated with the deal",
@@ -2988,12 +2988,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the owner of the person that is associated with the deal",
@@ -3168,7 +3168,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The expected close date of the deal",
@@ -4424,7 +4424,7 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The organization which is associated with the deal",
@@ -4556,7 +4556,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The person who is associated with the deal",
@@ -4708,12 +4708,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The phone numbers of the person associated with the deal",
@@ -4805,12 +4805,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of the owner of the person that is associated with the deal",
@@ -4830,11 +4830,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -5139,7 +5139,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -5414,7 +5414,7 @@
                   "optionsDataSource": null,
                   "controlType": "INPUT_INTEGER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -5469,7 +5469,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -5524,7 +5524,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -5579,7 +5579,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Custom fields",
@@ -5614,7 +5614,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "An array of notes",
@@ -5649,18 +5649,18 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -5802,11 +5802,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -6099,9 +6099,9 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -6247,7 +6247,7 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The order of the deal progression through the pipeline stages",
@@ -6283,9 +6283,9 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The number of products associated with the deal",
@@ -6506,12 +6506,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the person associated with the deal",
@@ -6621,12 +6621,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the owner of the person that is associated with the deal",
@@ -6801,7 +6801,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The expected close date of the deal",
@@ -7664,7 +7664,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The title of the deal",
@@ -7736,7 +7736,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The details of the next activity associated with the deal",
@@ -7756,7 +7756,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The number of activities associated with the deal",
@@ -8251,7 +8251,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -8288,7 +8288,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -8445,7 +8445,7 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The organization which is associated with the deal",
@@ -8577,7 +8577,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The person who is associated with the deal",
@@ -8729,12 +8729,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The phone numbers of the person associated with the deal",
@@ -8826,12 +8826,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of the owner of the person that is associated with the deal",
@@ -8851,11 +8851,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -9064,7 +9064,7 @@
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of a person which this lead is linked to",
@@ -9223,7 +9223,7 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.",
@@ -9345,12 +9345,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The additional data of the list",
@@ -9431,9 +9431,9 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -9813,7 +9813,7 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The ID of a person which this lead is linked to",
@@ -9972,7 +9972,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.",
@@ -10094,9 +10094,9 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -10185,7 +10185,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of a person which this lead will be linked to. If the person does not exist yet, it needs to be created first. This property is required unless `organization_id` is specified.",
@@ -10277,7 +10277,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.",
@@ -10357,7 +10357,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -10448,9 +10448,9 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -10645,7 +10645,7 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The ID of a person which this lead is linked to",
@@ -10804,7 +10804,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.",
@@ -10926,9 +10926,9 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -11150,7 +11150,7 @@
                   "optionsDataSource": null,
                   "controlType": "INPUT_INTEGER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -11205,7 +11205,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -11260,7 +11260,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -11295,7 +11295,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -11330,7 +11330,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Custom fields",
@@ -11365,7 +11365,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "An array of notes",
@@ -11400,7 +11400,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The value of the lead",
@@ -11480,16 +11480,16 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -11631,11 +11631,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -11950,9 +11950,9 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The array of organizations",
@@ -12410,7 +12410,7 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The count of persons related to the organization",
@@ -13076,12 +13076,12 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -13224,7 +13224,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -13279,7 +13279,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether the user has picture or not. 0 = No picture, 1 = Has picture.",
@@ -13376,7 +13376,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The picture that is associated with the item",
@@ -13578,11 +13578,11 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -13609,7 +13609,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -14172,7 +14172,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The count of persons related to the organization",
@@ -15004,7 +15004,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -15059,7 +15059,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether the user has picture or not. 0 = No picture, 1 = Has picture.",
@@ -15156,7 +15156,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The picture that is associated with the item",
@@ -15358,11 +15358,11 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -15389,7 +15389,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -15499,7 +15499,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -15739,7 +15739,7 @@
                   "optionsDataSource": null,
                   "controlType": "INPUT_INTEGER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Custom fields",
@@ -15774,7 +15774,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "An array of notes",
@@ -15809,18 +15809,18 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -15962,11 +15962,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -16174,9 +16174,9 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -16349,7 +16349,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Dropbox email for the organization",
@@ -16368,7 +16368,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The route of the organization location",
@@ -17125,7 +17125,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the last activity associated with the deal",
@@ -17180,7 +17180,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Please refer to response schema of <a href=\"https://developers.pipedrive.com/docs/api/v1/Activities#getActivity\">Activity</a>",
@@ -17200,7 +17200,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The count of activities related to the organization",
@@ -17667,7 +17667,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -17722,7 +17722,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether the user has picture or not. 0 = No picture, 1 = Has picture.",
@@ -17819,7 +17819,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The picture that is associated with the item",
@@ -18021,11 +18021,11 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -18052,7 +18052,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -18217,9 +18217,9 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The array of persons",
@@ -18677,7 +18677,7 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID of the last activity associated with the deal",
@@ -18891,12 +18891,12 @@
                 "optionsDataSource": null,
                 "sampleDataType": null
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The count of won deals related with the item",
@@ -19253,12 +19253,12 @@
                 "optionsDataSource": null,
                 "sampleDataType": null
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The visibility group ID of who can see the person",
@@ -19530,12 +19530,12 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -19678,7 +19678,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -19733,7 +19733,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether the user has picture or not. 0 = No picture, 1 = Has picture.",
@@ -19830,7 +19830,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The picture that is associated with the item",
@@ -20032,11 +20032,11 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -20063,7 +20063,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -20626,7 +20626,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the last activity associated with the deal",
@@ -20840,12 +20840,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The count of won deals related with the item",
@@ -21202,12 +21202,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The visibility group ID of who can see the person",
@@ -21550,7 +21550,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether the user has picture or not. 0 = No picture, 1 = Has picture.",
@@ -21647,9 +21647,9 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -21676,7 +21676,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -21824,12 +21824,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The visibility of the person. If omitted, the visibility will be set to the default visibility setting of this item type for the authorized user. Read more about visibility groups <a href=\"https://support.pipedrive.com/en/article/visibility-groups\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.<h4>Essential / Advanced plan</h4><table><tr><th style=\"width:40px\">Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner &amp; followers</td><tr><td>`3`</td><td>Entire company</td></tr></table><h4>Professional / Enterprise plan</h4><table><tr><th style=\"width:40px\">Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner only</td><tr><td>`3`</td><td>Owner's visibility group</td></tr><tr><td>`5`</td><td>Owner's visibility group and sub-groups</td></tr><tr><td>`7`</td><td>Entire company</td></tr></table>",
@@ -22028,14 +22028,14 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -22237,7 +22237,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "An array of email addresses",
@@ -22272,7 +22272,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The visibility of the person",
@@ -22328,7 +22328,7 @@
                   "optionsDataSource": null,
                   "controlType": "INPUT_INTEGER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -22383,7 +22383,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Custom fields",
@@ -22418,7 +22418,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "An array of notes",
@@ -22453,18 +22453,18 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -22606,11 +22606,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -22838,7 +22838,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -22865,7 +22865,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -22950,7 +22950,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The count of related closed deals related with the item",
@@ -23377,7 +23377,7 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID of the last activity associated with the deal",
@@ -23591,12 +23591,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The count of won deals related with the item",
@@ -23953,12 +23953,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The visibility group ID of who can see the person",
@@ -24371,7 +24371,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -24426,7 +24426,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether the user has picture or not. 0 = No picture, 1 = Has picture.",
@@ -24523,7 +24523,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The picture that is associated with the item",
@@ -24725,11 +24725,11 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If the response is successful or not",
@@ -24756,7 +24756,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -25583,7 +25583,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -25925,12 +25925,12 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -26006,12 +26006,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -26202,9 +26202,9 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -26413,7 +26413,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -26570,7 +26570,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -26722,12 +26722,12 @@
               } ],
               "controlType": "CHECKBOX"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -26819,12 +26819,12 @@
               } ],
               "controlType": "CHECKBOX"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -26844,7 +26844,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -26994,7 +26994,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -27912,7 +27912,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -28132,7 +28132,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -28644,7 +28644,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -28664,7 +28664,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -29073,7 +29073,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -29293,7 +29293,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -29444,7 +29444,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -29918,12 +29918,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -30015,12 +30015,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -30302,7 +30302,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -30322,7 +30322,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -30510,7 +30510,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -30719,7 +30719,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -30876,7 +30876,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -31028,12 +31028,12 @@
               } ],
               "controlType": "CHECKBOX"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -31125,12 +31125,12 @@
               } ],
               "controlType": "CHECKBOX"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -31150,7 +31150,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -31300,7 +31300,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -32218,7 +32218,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -32438,7 +32438,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -32950,7 +32950,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -32970,7 +32970,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -33379,7 +33379,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -33599,7 +33599,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -33750,7 +33750,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -34224,12 +34224,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -34321,12 +34321,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -34608,7 +34608,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -34628,7 +34628,7 @@
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -34816,7 +34816,7 @@
         "optionsDataSource": null,
         "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
