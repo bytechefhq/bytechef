@@ -60,6 +60,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -101,7 +103,7 @@ public class OpenApiComponentGenerator {
         }
     };
     private static final String[] COMPONENT_DIR_NAMES = {
-        "action", "property"
+        "action", "connection", "property", "trigger", "util"
     };
 
     private final String basePackageName;
@@ -1409,6 +1411,11 @@ public class OpenApiComponentGenerator {
             }
 
             if (propertyName != null) {
+                propertyName = Arrays.stream(StringUtils.split(propertyName, '_'))
+                    .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
+                    .map(StringUtils::capitalize)
+                    .collect(Collectors.joining(" "));
+
                 builder.add(".label($S)", StringUtils.capitalize(propertyName));
             }
 
