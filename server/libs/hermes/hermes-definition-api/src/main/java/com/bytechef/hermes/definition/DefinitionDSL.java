@@ -1008,9 +1008,8 @@ public class DefinitionDSL {
                                 !emptyName && (name == null || name.isEmpty())) {
 
                                 throw new IllegalArgumentException(
-                                    emptyName
-                                        ? "Additional properties defined have to have empty names."
-                                        : "Additional properties defined cannot to have empty names.");
+                                    "Defined additional properties either have to have all names defined or no " +
+                                        "defined names.");
                             }
                         }
                     }
