@@ -46,7 +46,7 @@ public class PipedriveAddOrganizationAction {
                 "path", "/organizations", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object().properties(string("name").label("Name")
+        .properties(object("__item").properties(string("name").label("Name")
             .description("The name of the organization")
             .required(false),
             string("add_time").label("Add Time")

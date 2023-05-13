@@ -43,7 +43,7 @@ public class PetstoreCreateUsersWithListInputAction {
                 "path", "/user/createWithList", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("items").items(object().properties(PetstoreUserProperties.PROPERTIES))
+        .properties(array("__items").items(object().properties(PetstoreUserProperties.PROPERTIES))
             .placeholder("Add")
             .metadata(
                 Map.of(

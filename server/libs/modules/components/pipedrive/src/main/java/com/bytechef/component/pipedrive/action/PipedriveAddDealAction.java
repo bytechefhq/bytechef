@@ -49,7 +49,7 @@ public class PipedriveAddDealAction {
                 "path", "/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object().properties(date("expected_close_date").label("Expected Close Date")
+        .properties(object("__item").properties(date("expected_close_date").label("Expected Close Date")
             .description("The expected close date of the deal. In ISO 8601 format: YYYY-MM-DD.")
             .required(false),
             integer("stage_id").label("Stage Id")
