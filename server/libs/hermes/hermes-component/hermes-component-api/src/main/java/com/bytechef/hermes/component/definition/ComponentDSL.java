@@ -222,7 +222,17 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public <P extends Property<?>> ModifiableActionDefinition properties(P... properties) {
-            this.properties = List.of(properties);
+            if (properties != null) {
+                for (Property<?> property : properties) {
+                    String name = property.getName();
+
+                    if (name == null || name.isEmpty()) {
+                        throw new IllegalArgumentException("Defined properties cannot to have empty names.");
+                    }
+                }
+
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -1059,6 +1069,14 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public <P extends Property<?>> ModifiableConnectionDefinition properties(P... properties) {
             if (properties != null) {
+                for (Property<?> property : properties) {
+                    String name = property.getName();
+
+                    if (name == null || name.isEmpty()) {
+                        throw new IllegalArgumentException("Defined properties cannot to have empty names.");
+                    }
+                }
+
                 this.properties = List.of(properties);
             }
 
@@ -1476,7 +1494,17 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public <P extends Property<?>> ModifiableTriggerDefinition properties(P... properties) {
-            this.properties = List.of(properties);
+            if (properties != null) {
+                for (Property<?> property : properties) {
+                    String name = property.getName();
+
+                    if (name == null || name.isEmpty()) {
+                        throw new IllegalArgumentException("Defined properties cannot to have empty names.");
+                    }
+                }
+
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
