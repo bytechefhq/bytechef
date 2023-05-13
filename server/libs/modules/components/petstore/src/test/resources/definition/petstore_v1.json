@@ -3332,7 +3332,7 @@
       "label": null,
       "placeholder": "Add",
       "required": null,
-      "name": "items",
+      "name": "__items",
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
