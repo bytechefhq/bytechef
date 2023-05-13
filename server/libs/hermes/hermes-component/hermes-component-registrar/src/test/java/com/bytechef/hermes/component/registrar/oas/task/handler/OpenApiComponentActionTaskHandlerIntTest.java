@@ -684,7 +684,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(
             Map.of(
-                "items", List.of(
+                "__items", List.of(
                     new LinkedHashMap<String, Object>() {
                         {
                             put("id", 10);
