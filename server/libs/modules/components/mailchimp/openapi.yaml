@@ -45,6 +45,9 @@ paths:
                   description: "Type of email this member asked to get ('html' or\
                     \ 'text')."
                   type: "string"
+                  enum:
+                  - "html"
+                  - "text"
                 merge_fields:
                   description: "A dictionary of merge fields where the keys are the\
                     \ merge tags."
