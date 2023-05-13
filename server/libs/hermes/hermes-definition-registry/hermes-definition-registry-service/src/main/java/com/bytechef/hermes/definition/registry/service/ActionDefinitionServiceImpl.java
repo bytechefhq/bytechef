@@ -192,13 +192,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
-        List<? extends Property<?>> outputSchema = Collections.emptyList();
-
         return new ActionDefinitionDTO(
             OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
             OptionalUtils.orElse(actionDefinition.getSampleOutput(), null),
             OptionalUtils.orElse(actionDefinition.getHelp(), null), actionDefinition.getName(),
-            outputSchema, OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+            OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList()),
+            OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
             actionDefinition.getTitle());
     }
 }
