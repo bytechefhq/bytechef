@@ -40,14 +40,22 @@ public class ScheduleUtils {
         Set<String> zoneIds = ZoneId.getAvailableZoneIds();
 
         for (String zoneId : zoneIds) {
-            ZonedDateTime zonedDateTime = now.atZone(ZoneId.of(zoneId));
+            if ((zoneId.startsWith("Etc/GMT+") || zoneId.startsWith("Etc/GMT-")) && !zoneId.equals("Etc/GMT-0")) {
+                ZonedDateTime zonedDateTime = now.atZone(ZoneId.of(zoneId));
 
-            ZoneOffset zoneOffset = zonedDateTime.getOffset();
+                ZoneOffset zoneOffset = zonedDateTime.getOffset();
 
-            String zoneOffsetId = zoneOffset.getId();
+                String zoneOffsetId = zoneOffset.getId();
 
-            options.add(ComponentDSL.option("(GMT" + zoneOffsetId.replace("Z", "+00:00") + ") " + zoneId, zoneId));
+                options.add(ComponentDSL.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
+            }
         }
+
+        options.sort((o1, o2) -> {
+            String name = o1.getName();
+
+            return name.compareTo(o2.getName());
+        });
 
         return options;
     }
