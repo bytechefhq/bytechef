@@ -202,6 +202,13 @@ public class OpenApiComponentGenerator {
             .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI");
     }
 
+    private static String buildPropertyName(String propertyName) {
+        return Arrays.stream(StringUtils.split(propertyName, '_'))
+            .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining(" "));
+    }
+
     @SuppressWarnings("rawtypes")
     private void checkComponentSchemaSources(Set<String> schemas) {
         Components components = openAPI.getComponents();
@@ -299,7 +306,7 @@ public class OpenApiComponentGenerator {
     }
 
     private String deleteWhitespace(final String str) {
-        if (str == null || str.isEmpty()) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
 
@@ -453,7 +460,7 @@ public class OpenApiComponentGenerator {
 
         CodeBlock apiKeyCodeBlock;
 
-        if (securityScheme.getName() == null || Objects.equals(securityScheme.getName(), "api_token")) {
+        if (StringUtils.isEmpty(securityScheme.getName()) || Objects.equals(securityScheme.getName(), "api_token")) {
             apiKeyCodeBlock = CodeBlock.builder()
                 .build();
         } else {
@@ -906,6 +913,28 @@ public class OpenApiComponentGenerator {
             .collect(CodeBlock.joining(","));
     }
 
+    private String getMimeType(Set<Map.Entry<String, MediaType>> entries) {
+        String mimeType;
+
+        // Check if there is application/json as body content type
+
+        if (entries.stream()
+            .map(Map.Entry::getKey)
+            .anyMatch(curBodyContentType -> Objects.equals(curBodyContentType, "application/json"))) {
+
+            mimeType = "application/json";
+        } else {
+
+            // else use the first body content type
+
+            mimeType = entries.iterator()
+                .next()
+                .getKey();
+        }
+
+        return mimeType;
+    }
+
     private String getOAUth2Scopes(Scopes scopes) {
         Collection<String> scopeNames;
 
@@ -1009,24 +1038,8 @@ public class OpenApiComponentGenerator {
 
             Set<Map.Entry<String, MediaType>> entries = content.entrySet();
 
-            // Check if there is application/json as response type
-
             if (!entries.isEmpty()) {
-                String mimeType;
-
-                if (entries.stream()
-                    .map(Map.Entry::getKey)
-                    .anyMatch(curBodyContentType -> Objects.equals(curBodyContentType, "application/json"))) {
-
-                    mimeType = "application/json";
-                } else {
-
-                    // else use the first response type
-
-                    mimeType = entries.iterator()
-                        .next()
-                        .getKey();
-                }
+                String mimeType = getMimeType(entries);
 
                 MediaType mediaType = content.get(mimeType);
 
@@ -1066,7 +1079,7 @@ public class OpenApiComponentGenerator {
     }
 
     private String getPackageName() {
-        return deleteWhitespace(basePackageName == null ? "" : basePackageName + ".") +
+        return deleteWhitespace(StringUtils.isEmpty(basePackageName) ? "" : basePackageName + ".") +
             StringUtils.replaceChars(componentName, "-_", ".");
     }
 
@@ -1078,19 +1091,21 @@ public class OpenApiComponentGenerator {
             for (Parameter parameter : parameters) {
                 CodeBlock.Builder builder = CodeBlock.builder();
 
-                builder.add(getSchemaCodeBlock(
-                    parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
-                    parameter.getSchema(), openAPI, false));
-                builder.add(CodeBlock.of(
-                    """
-                        .metadata(
-                           $T.of(
-                             "type", PropertyType.$L
-                           )
-                        )
-                        """,
-                    Map.class,
-                    StringUtils.upperCase(parameter.getIn())));
+                builder.add(
+                    getSchemaCodeBlock(
+                        parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
+                        parameter.getSchema(), openAPI, false));
+                builder.add(
+                    CodeBlock.of(
+                        """
+                            .metadata(
+                               $T.of(
+                                 "type", PropertyType.$L
+                               )
+                            )
+                            """,
+                        Map.class,
+                        StringUtils.upperCase(parameter.getIn())));
 
                 codeBlocks.add(builder.build());
             }
@@ -1158,22 +1173,7 @@ public class OpenApiComponentGenerator {
             Set<Map.Entry<String, MediaType>> entries = content.entrySet();
 
             if (!entries.isEmpty()) {
-
-                // Check if there is application/json as body content type
-
-                if (entries.stream()
-                    .map(Map.Entry::getKey)
-                    .anyMatch(curBodyContentType -> Objects.equals(curBodyContentType, "application/json"))) {
-
-                    mimeType = "application/json";
-                } else {
-
-                    // else use the first body content type
-
-                    mimeType = entries.iterator()
-                        .next()
-                        .getKey();
-                }
+                mimeType = getMimeType(entries);
 
                 // CHECKSTYLE:OFF
                 bodyContentType = switch (mimeType) {
@@ -1216,7 +1216,7 @@ public class OpenApiComponentGenerator {
         } else {
             Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
 
-            if (additionalPropertiesSchema.get$ref() == null) {
+            if (StringUtils.isEmpty(additionalPropertiesSchema.get$ref())) {
                 builder.add(".additionalProperties($L())", getAdditionalPropertiesItemType(additionalPropertiesSchema));
             } else {
                 String ref = additionalPropertiesSchema.get$ref();
@@ -1240,7 +1240,7 @@ public class OpenApiComponentGenerator {
 
     @SuppressWarnings("rawtypes")
     private String getAdditionalPropertiesItemType(Schema additionalPropertiesSchema) {
-        String additionalPropertiesSchemaType = additionalPropertiesSchema.getType() == null ? "object"
+        String additionalPropertiesSchemaType = StringUtils.isEmpty(additionalPropertiesSchema.getType()) ? "object"
             : additionalPropertiesSchema.getType();
 
         return switch (additionalPropertiesSchemaType) {
@@ -1250,7 +1250,7 @@ public class OpenApiComponentGenerator {
             case "number" -> "number";
             case "object" -> "object";
             case "string" -> {
-                if (additionalPropertiesSchema.getFormat() == null) {
+                if (StringUtils.isEmpty(additionalPropertiesSchema.getFormat())) {
                     yield "string";
                 } else if (Objects.equals(additionalPropertiesSchema.getFormat(), "date")) {
                     yield "date";
@@ -1325,16 +1325,16 @@ public class OpenApiComponentGenerator {
     })
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
-        OpenAPI openAPI, boolean outputEntry) {
+        OpenAPI openAPI, boolean excludePropertyNameIfEmpty) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        if (schema.get$ref() == null) {
-            String type = schema.getType() == null ? "object" : schema.getType();
+        if (StringUtils.isEmpty(schema.get$ref())) {
+            String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
             switch (type) {
                 case "array" -> {
-                    if (StringUtils.isEmpty(propertyName) && outputEntry) {
+                    if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
                         builder.add(
                             "array().items($L)",
                             getSchemaCodeBlock(
@@ -1342,12 +1342,12 @@ public class OpenApiComponentGenerator {
                     } else {
                         builder.add(
                             "array($S).items($L)",
-                            propertyName == null ? "items" : propertyName,
+                            StringUtils.isEmpty(propertyName) ? "__items" : propertyName,
                             getSchemaCodeBlock(
                                 null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
                     }
 
-                    if (!outputEntry) {
+                    if (!excludePropertyNameIfEmpty) {
                         builder.add(".placeholder($S)", "Add");
                     }
                 }
@@ -1379,16 +1379,16 @@ public class OpenApiComponentGenerator {
                     }
                 }
                 case "object" -> {
-                    if (propertyName == null) {
+                    if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
                         builder.add("object()");
                     } else {
-                        builder.add("object($S)", propertyName);
+                        builder.add("object($S)", StringUtils.isEmpty(propertyName) ? "__item" : propertyName);
                     }
 
                     if (schema.getProperties() != null || schema.getAllOf() != null) {
                         builder.add(getPropertiesCodeBlock(propertyName, schemaName, schema, openAPI));
                     } else if (schema.getAdditionalProperties() != null) {
-                        builder.add(getAdditionalPropertiesCodeBlock(schema, outputEntry));
+                        builder.add(getAdditionalPropertiesCodeBlock(schema, excludePropertyNameIfEmpty));
                     }
                 }
                 case "string" -> {
@@ -1397,7 +1397,7 @@ public class OpenApiComponentGenerator {
                     } else if (Objects.equals(schema.getFormat(), "date-time")) {
                         builder.add("dateTime($S)", propertyName);
                     } else if (Objects.equals(schema.getFormat(), "binary")) {
-                        builder.add("fileEntry($S)", propertyName == null ? "fileEntry" : propertyName);
+                        builder.add("fileEntry($S)", StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName);
                     } else {
                         if (StringUtils.isEmpty(propertyName)) {
                             builder.add("string()");
@@ -1411,10 +1411,7 @@ public class OpenApiComponentGenerator {
             }
 
             if (propertyName != null) {
-                propertyName = Arrays.stream(StringUtils.split(propertyName, '_'))
-                    .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
-                    .map(StringUtils::capitalize)
-                    .collect(Collectors.joining(" "));
+                propertyName = buildPropertyName(propertyName);
 
                 builder.add(".label($S)", StringUtils.capitalize(propertyName));
             }
@@ -1469,8 +1466,10 @@ public class OpenApiComponentGenerator {
 
             builder.add(
                 getSchemaCodeBlock(
-                    propertyName == null && !outputEntry ? StringUtils.uncapitalize(curSchemaName) : propertyName,
-                    schema.getDescription(), required, curSchemaName, schema, openAPI, false));
+                    StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
+                        ? StringUtils.uncapitalize(curSchemaName)
+                        : propertyName,
+                    schema.getDescription(), required, curSchemaName, schema, openAPI, excludePropertyNameIfEmpty));
         }
 
         return builder.build();
