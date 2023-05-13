@@ -12,16 +12,16 @@ import {ReactComponent as StringIcon} from 'assets/string.svg';
 import {ReactComponent as TimeIcon} from 'assets/time.svg';
 
 export const TYPE_ICONS = {
-    ARRAY: <ArrayIcon className="h-5 w-5 text-gray-600" />,
-    BOOLEAN: <BooleanIcon className="h-5 w-5 text-gray-600" />,
-    DATE: <DateIcon className="h-5 w-5 text-gray-600" />,
-    DATE_TIME: <DateTimeIcon className="h-5 w-5 text-gray-600" />,
-    DYNAMIC_PROPERTIES: <DynamicIcon className="h-5 w-5 text-gray-600" />,
-    INTEGER: <IntegerIcon className="h-5 w-5 text-gray-600" />,
-    NUMBER: <NumberIcon className="h-5 w-5 text-gray-600" />,
-    NULL: <NullIcon className="h-5 w-5 text-gray-600" />,
-    OBJECT: <ObjectIcon className="h-5 w-5 text-gray-600" />,
-    ONE_OF: <OneOfIcon className="h-5 w-5 text-gray-600" />,
-    STRING: <StringIcon className="h-5 w-5 text-gray-600" />,
-    TIME: <TimeIcon className="h-5 w-5 text-gray-600" />,
+    ARRAY: <ArrayIcon className="h-4 w-4 text-gray-600" />,
+    BOOLEAN: <BooleanIcon className="h-4 w-4 text-gray-600" />,
+    DATE: <DateIcon className="h-4 w-4 text-gray-600" />,
+    DATE_TIME: <DateTimeIcon className="h-4 w-4 text-gray-600" />,
+    DYNAMIC_PROPERTIES: <DynamicIcon className="h-4 w-4 text-gray-600" />,
+    INTEGER: <IntegerIcon className="h-4 w-4 text-gray-600" />,
+    NUMBER: <NumberIcon className="h-4 w-4 text-gray-600" />,
+    NULL: <NullIcon className="h-4 w-4 text-gray-600" />,
+    OBJECT: <ObjectIcon className="h-4 w-4 text-gray-600" />,
+    ONE_OF: <OneOfIcon className="h-4 w-4 text-gray-600" />,
+    STRING: <StringIcon className="h-4 w-4 text-gray-600" />,
+    TIME: <TimeIcon className="h-4 w-4 text-gray-600" />,
 };
