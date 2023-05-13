@@ -7,7 +7,7 @@ import {PropertyType} from '../../../../../types/projectTypes';
 import {useNodeDetailsDialogStore} from '../../stores/useNodeDetailsDialogStore';
 
 const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
-    <div className="inline-flex rounded-md p-1 text-sm hover:bg-gray-100">
+    <div className="inline-flex items-center rounded-md p-1.5 text-sm hover:bg-gray-100">
         <span>{TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}</span>
 
         <span className="pl-2">{label}</span>
