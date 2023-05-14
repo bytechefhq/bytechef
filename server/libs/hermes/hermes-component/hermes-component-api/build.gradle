@@ -5,11 +5,9 @@ dependencies {
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation "com.jayway.jsonpath:json-path"
     implementation libs.com.github.mizosoft.methanol
-    implementation "org.slf4j:slf4j-api"
     implementation libs.org.apache.tika.tika.core
+
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 }
