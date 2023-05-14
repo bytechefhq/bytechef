@@ -19,6 +19,7 @@ package com.bytechef.component.jsonfile;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.component.jsonfile.util.JsonStreamUtils;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -35,10 +36,12 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
+@Import(JsonStreamUtils.class)
 @ComponentIntTest
 public class JsonFileComponentHandlerIntTest {
 

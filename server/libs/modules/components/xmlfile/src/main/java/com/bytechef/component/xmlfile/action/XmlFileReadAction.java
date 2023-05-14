@@ -17,6 +17,7 @@
 
 package com.bytechef.component.xmlfile.action;
 
+import com.bytechef.component.xmlfile.util.XmlStreamUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -92,7 +93,7 @@ public class XmlFileReadAction {
             List<Map<String, ?>> items;
 
             if (path == null) {
-                try (Stream<Map<String, ?>> stream = XmlUtils.stream(context.getFileStream(fileEntry))) {
+                try (Stream<Map<String, ?>> stream = XmlStreamUtils.stream(context.getFileStream(fileEntry))) {
                     items = stream.toList();
                 }
             } else {
@@ -117,7 +118,7 @@ public class XmlFileReadAction {
 
             result = items;
         } else {
-            result = XmlUtils.read(context.readFileToString(fileEntry), Map.class);
+            result = XmlUtils.read(context.readFileToString(fileEntry));
         }
 
         return result;

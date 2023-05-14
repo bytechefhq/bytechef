@@ -21,6 +21,7 @@ import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
@@ -37,6 +38,8 @@ public class ComponentDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
             registerModule(new JavaTimeModule());
             registerModule(new Jdk8Module());
         }

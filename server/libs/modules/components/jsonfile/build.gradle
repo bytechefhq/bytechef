@@ -1,1 +1,7 @@
 version="1.0"
+
+dependencies {
+    api "com.fasterxml.jackson.core:jackson-databind"
+
+    implementation "org.springframework:spring-context"
+}
