@@ -40,14 +40,6 @@ public class ListenerTriggerUtilsConfiguration implements InitializingBean {
     @Override
     @SuppressFBWarnings("ST")
     public void afterPropertiesSet() {
-        ListenerTriggerUtils.listenerEmitter = (workflowExecutionId, output) -> {
-
-            TriggerExecution triggerExecution = TriggerExecution.builder()
-                .output(output)
-                .workflowExecutionId(WorkflowExecutionId.parse(workflowExecutionId))
-                .build();
-
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, triggerExecution);
-        };
+        ListenerTriggerUtils.listenerEmitter = new ListenerEmitter(messageBroker);
     }
 }
