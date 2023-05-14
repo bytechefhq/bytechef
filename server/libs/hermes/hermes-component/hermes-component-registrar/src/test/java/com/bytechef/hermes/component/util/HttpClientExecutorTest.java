@@ -24,6 +24,10 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationConte
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
@@ -55,28 +59,40 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientUtilsTest {
+public class HttpClientExecutorTest {
 
-    public static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     private final Context context = Mockito.mock(Context.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper() {
+        {
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            registerModule(new JavaTimeModule());
+            registerModule(new Jdk8Module());
+        }
+    };
+
+    private static final HttpClientExecutor HTTP_CLIENT_EXECUTOR = new HttpClientExecutor(
+        new JsonMapper(objectMapper), new XmlMapper());
 
     @Test
     public void testCreateBodyHandler() {
-        HttpResponse.BodyHandler<?> bodyHandler = HttpClientUtils.createBodyHandler(
+        HttpResponse.BodyHandler<?> bodyHandler = HTTP_CLIENT_EXECUTOR.createBodyHandler(
             Configuration.configuration());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.discarding());
 
         //
 
-        bodyHandler = HttpClientUtils.createBodyHandler(
+        bodyHandler = HTTP_CLIENT_EXECUTOR.createBodyHandler(
             HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY));
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
 
         //
 
-        bodyHandler = HttpClientUtils.createBodyHandler(
+        bodyHandler = HTTP_CLIENT_EXECUTOR.createBodyHandler(
             HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML));
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofString());
@@ -93,7 +109,7 @@ public class HttpClientUtilsTest {
         Mockito.when(fileEntry.getMimeType())
             .thenReturn("text/plain");
 
-        MultipartBodyPublisher multipartBodyPublisher = (MultipartBodyPublisher) HttpClientUtils.createBodyPublisher(
+        MultipartBodyPublisher multipartBodyPublisher = (MultipartBodyPublisher) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
             context,
             HttpClientUtils.Body.of(
                 Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA));
@@ -113,7 +129,7 @@ public class HttpClientUtilsTest {
 
         //
 
-        FormBodyPublisher formBodyPublisher = (FormBodyPublisher) HttpClientUtils.createBodyPublisher(
+        FormBodyPublisher formBodyPublisher = (FormBodyPublisher) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
             context,
             HttpClientUtils.Body.of(
                 Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URL_ENCODED));
@@ -127,7 +143,7 @@ public class HttpClientUtilsTest {
 
         //
 
-        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
+        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
             context,
             HttpClientUtils.Body.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON));
 
@@ -135,7 +151,7 @@ public class HttpClientUtilsTest {
 
         //
 
-        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
+        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
             context,
             HttpClientUtils.Body.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML));
 
@@ -143,12 +159,12 @@ public class HttpClientUtilsTest {
 
         //
 
-        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
+        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
             context, HttpClientUtils.Body.of("text"));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
-        HttpRequest.BodyPublisher emptyBodyPublisher = HttpClientUtils.createBodyPublisher(context, null);
+        HttpRequest.BodyPublisher emptyBodyPublisher = HTTP_CLIENT_EXECUTOR.createBodyPublisher(context, null);
 
         Assertions.assertEquals(0, emptyBodyPublisher.contentLength());
 
@@ -163,14 +179,14 @@ public class HttpClientUtilsTest {
         Mockito.when(fileEntry.getUrl())
             .thenReturn("base64:text");
 
-        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
+        mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
             context, HttpClientUtils.Body.of(fileEntry));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         //
 
-        HttpRequest.BodyPublisher bodyPublisher = HttpClientUtils.createBodyPublisher(context, null);
+        HttpRequest.BodyPublisher bodyPublisher = HTTP_CLIENT_EXECUTOR.createBodyPublisher(context, null);
 
         Assertions.assertEquals(0, bodyPublisher.contentLength());
     }
@@ -179,7 +195,7 @@ public class HttpClientUtilsTest {
     @SuppressFBWarnings("RV")
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testCreateHTTPClient() {
-        HttpClient httpClient = HttpClientUtils.createHttpClient(
+        HttpClient httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
             context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.allowUnauthorizedCerts(true));
 
         Assertions.assertTrue(httpClient.authenticator()
@@ -201,7 +217,7 @@ public class HttpClientUtilsTest {
 
         Map<String, List<String>> headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
@@ -219,7 +235,7 @@ public class HttpClientUtilsTest {
 
         Map<String, List<String>> queryParameters = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(
+        HTTP_CLIENT_EXECUTOR.createHttpClient(
             context, null, new HashMap<>(), queryParameters, Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
@@ -237,7 +253,7 @@ public class HttpClientUtilsTest {
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(
             Map.of(
@@ -258,7 +274,7 @@ public class HttpClientUtilsTest {
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
@@ -275,7 +291,7 @@ public class HttpClientUtilsTest {
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(
             Map.of(
@@ -295,27 +311,27 @@ public class HttpClientUtilsTest {
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
         //
 
-        httpClient = HttpClientUtils.createHttpClient(
+        httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
             context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.followRedirect(true));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
-        httpClient = HttpClientUtils.createHttpClient(
+        httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
             context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.followAllRedirects(true));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
-        httpClient = HttpClientUtils.createHttpClient(
+        httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
             context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.proxy("10.11.12.13:30"));
 
         Assertions.assertTrue(httpClient.proxy()
@@ -323,7 +339,7 @@ public class HttpClientUtilsTest {
 
         //
 
-        httpClient = HttpClientUtils.createHttpClient(
+        httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
             context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.timeout(Duration.ofMillis(2000)));
 
         Assertions.assertEquals(
@@ -333,7 +349,7 @@ public class HttpClientUtilsTest {
 
     @Test
     public void testCreateHTTPRequest() {
-        HttpRequest httpRequest = HttpClientUtils.createHTTPRequest(
+        HttpRequest httpRequest = HTTP_CLIENT_EXECUTOR.createHTTPRequest(
             context, "http://localhost:8080", HttpClientUtils.RequestMethod.DELETE,
             Map.of("header1", List.of("value1")), Map.of("param1", List.of("value1")), null);
 
@@ -347,7 +363,7 @@ public class HttpClientUtilsTest {
     @Test
     public void testHandleResponse() throws Exception {
         Assertions.assertNull(
-            HttpClientUtils.handleResponse(context, new TestHttpResponse(null), Configuration.configuration())
+            HTTP_CLIENT_EXECUTOR.handleResponse(context, new TestHttpResponse(null), Configuration.configuration())
                 .getBody());
 
         //
@@ -359,7 +375,7 @@ public class HttpClientUtilsTest {
 
         Assertions.assertEquals(
             fileEntry,
-            HttpClientUtils.handleResponse(
+            HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY))
                 .getBody());
@@ -368,7 +384,7 @@ public class HttpClientUtilsTest {
 
         Assertions.assertEquals(
             Map.of("key1", "value1"),
-            HttpClientUtils.handleResponse(
+            HTTP_CLIENT_EXECUTOR.handleResponse(
                 context,
                 new TestHttpResponse(
                     """
@@ -383,7 +399,7 @@ public class HttpClientUtilsTest {
 
         Assertions.assertEquals(
             "text",
-            HttpClientUtils.handleResponse(
+            HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse("text"),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT))
                 .getBody());
@@ -392,7 +408,7 @@ public class HttpClientUtilsTest {
 
         Assertions.assertEquals(
             Map.of("object", Map.of("key1", "value1")),
-            HttpClientUtils.handleResponse(
+            HTTP_CLIENT_EXECUTOR.handleResponse(
                 context,
                 new TestHttpResponse(
                     """
@@ -410,7 +426,7 @@ public class HttpClientUtilsTest {
 
         Assertions.assertEquals(
             new HttpClientUtils.Response(Map.of(), "text", 200),
-            HttpClientUtils.handleResponse(
+            HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse("text"),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
     }
