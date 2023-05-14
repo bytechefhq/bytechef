@@ -84,22 +84,6 @@ public final class JsonUtils {
         }
     }
 
-    public static <T> T read(InputStream inputStream, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(inputStream, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T read(String json, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static <T> T read(InputStream inputStream, String path) {
         DocumentContext documentContext = JsonPath.parse(inputStream);
 

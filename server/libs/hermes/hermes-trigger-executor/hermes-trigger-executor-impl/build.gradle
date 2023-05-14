@@ -4,4 +4,5 @@ dependencies {
     api project(":server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-api")
 
     implementation libs.com.github.kagkarlsson.db.scheduler
+    implementation project(":server:libs:core:commons:commons-util")
 }
