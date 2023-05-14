@@ -17,11 +17,13 @@
 
 package com.bytechef.component.mailchimp.trigger;
 
+import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
@@ -30,11 +32,9 @@ import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.hermes.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 
@@ -55,8 +55,7 @@ public class MailchimpSubscribeTrigger {
         .type(TriggerType.WEBHOOK_DYNAMIC)
         .properties(
             string(LIST_ID)
-// TODO
-//                .optionsDataSource()
+                .options(MailchimpUtils.getListIdOptionsDataSource())
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact."))
         .outputSchema(
@@ -85,7 +84,7 @@ public class MailchimpSubscribeTrigger {
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = context.dynamicWebhookEnableOutput();
         InputParameters inputParameters = context.inputParameters();
 
-        String server = getMailChimpServer(connection.getString(ACCESS_TOKEN));
+        String server = MailchimpUtils.getMailChimpServer(connection.getRequiredString(ACCESS_TOKEN));
 
         HttpClientUtils
             .delete(
@@ -94,17 +93,15 @@ public class MailchimpSubscribeTrigger {
             .execute();
     }
 
-    protected static DynamicWebhookEnableOutput
-        dynamicWebhookEnable(TriggerDefinition.DynamicWebhookEnableContext context) {
+    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
         Connection connection = context.connection();
         InputParameters inputParameters = context.inputParameters();
 
-        String server = getMailChimpServer(connection.getString(ACCESS_TOKEN));
+        String server = MailchimpUtils.getMailChimpServer(connection.getRequiredString(ACCESS_TOKEN));
 
         Map<?, ?> response = (Map<?, ?>) HttpClientUtils
-            .post(
-                "https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
-                    server, inputParameters.getString(LIST_ID)))
+            .post("https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
+                server, inputParameters.getString(LIST_ID)))
             .body(Body.of(
                 Map.of(
                     "url", context.webhookUrl(),
@@ -117,9 +114,7 @@ public class MailchimpSubscribeTrigger {
             .execute()
             .getBody();
 
-        String id = (String) response.get("id");
-
-        return new DynamicWebhookEnableOutput(Map.of("id", id), null);
+        return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
     protected static WebhookOutput
@@ -127,16 +122,5 @@ public class MailchimpSubscribeTrigger {
         WebhookBody webhookBody = context.body();
 
         return WebhookOutput.map((Map<?, ?>) webhookBody.getContent());
-    }
-
-    private static String getMailChimpServer(String accessToken) {
-        Map<?, ?> response = (Map<?, ?>) HttpClientUtils
-            .get("https://login.mailchimp.com/oauth2/metadata")
-            .configuration(responseFormat(ResponseFormat.JSON))
-            .headers(Map.of(AUTHORIZATION, List.of("OAuth " + accessToken)))
-            .execute()
-            .getBody();
-
-        return (String) response.get("dc");
     }
 }
