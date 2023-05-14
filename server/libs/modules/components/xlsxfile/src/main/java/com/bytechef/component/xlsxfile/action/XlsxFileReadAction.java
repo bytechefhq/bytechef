@@ -22,7 +22,6 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.ObjectUtils;
 import com.bytechef.hermes.component.util.ValueUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -149,6 +148,18 @@ public class XlsxFileReadAction {
             : new XSSFWorkbook(inputStream);
     }
 
+    private static boolean isEmpty(final Object object) {
+        if (object == null) {
+            return true;
+        }
+
+        if (object instanceof CharSequence) {
+            return ((CharSequence) object).length() == 0;
+        }
+
+        return false;
+    }
+
     @SuppressWarnings("checkstyle:whitespaceafter")
     private static Object processValue(Cell cell, boolean includeEmptyCells, boolean readAsString) {
         Object value = null;
@@ -175,7 +186,7 @@ public class XlsxFileReadAction {
             };
         }
 
-        if (ObjectUtils.isEmpty(value)) {
+        if (isEmpty(value)) {
             if (includeEmptyCells) {
                 value = "";
             }
