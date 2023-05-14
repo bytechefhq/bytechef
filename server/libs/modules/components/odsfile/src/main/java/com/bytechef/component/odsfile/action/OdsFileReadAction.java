@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.ObjectUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -222,8 +221,19 @@ public class OdsFileReadAction {
         return rows;
     }
 
+    public static boolean isEmpty(final Object object) {
+        if (object == null) {
+            return true;
+        }
+        if (object instanceof CharSequence) {
+            return ((CharSequence) object).length() == 0;
+        }
+
+        return false;
+    }
+
     private static Object processValue(Object value, boolean includeEmptyCells, boolean readAsString) {
-        if (ObjectUtils.isEmpty(value)) {
+        if (isEmpty(value)) {
             if (includeEmptyCells) {
                 value = "";
             }

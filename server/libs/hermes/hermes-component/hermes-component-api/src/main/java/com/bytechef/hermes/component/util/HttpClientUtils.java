@@ -30,6 +30,7 @@ import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.Socket;
@@ -40,6 +41,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -297,14 +299,14 @@ public final class HttpClientUtils {
 
             Object body;
 
-            if (!ObjectUtils.isEmpty(httpResponseBody) && responseFormat == ResponseFormat.BINARY) {
+            if (!isEmpty(httpResponseBody) && responseFormat == ResponseFormat.BINARY) {
                 body = storeBinaryResponseBody(context, configuration, headers, (InputStream) httpResponseBody);
             } else if (responseFormat == ResponseFormat.JSON) {
-                body = ObjectUtils.isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
+                body = isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
             } else if (responseFormat == ResponseFormat.TEXT) {
-                body = ObjectUtils.isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
+                body = isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
             } else {
-                body = ObjectUtils.isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());
+                body = isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());
             }
 
             response = new Response(headers, body, httpResponse.statusCode());
@@ -465,6 +467,18 @@ public final class HttpClientUtils {
         return MoreBodyPublishers.ofMediaType(
             HttpRequest.BodyPublishers.ofString(XmlUtils.write(body.content)),
             MediaType.APPLICATION_XML);
+    }
+
+    private static boolean isEmpty(final Object object) {
+        if (object == null) {
+            return true;
+        }
+
+        if (object instanceof CharSequence) {
+            return ((CharSequence) object).length() == 0;
+        }
+
+        return false;
     }
 
     private static Context.FileEntry storeBinaryResponseBody(
