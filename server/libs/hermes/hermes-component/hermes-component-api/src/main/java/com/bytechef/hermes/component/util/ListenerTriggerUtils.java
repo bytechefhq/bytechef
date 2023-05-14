@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public abstract class ListenerTriggerUtils {
+public final class ListenerTriggerUtils {
 
     static ListenerEmitter listenerEmitter;
 

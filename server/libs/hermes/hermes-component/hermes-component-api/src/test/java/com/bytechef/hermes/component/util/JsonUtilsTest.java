@@ -32,19 +32,10 @@ public class JsonUtilsTest {
         Assertions.assertThat((Boolean) JsonUtils.read("true"))
             .isEqualTo(true);
 
-        Assertions.assertThat(JsonUtils.read("true", Boolean.class))
-            .isEqualTo(true);
-
         Assertions.assertThat((String) JsonUtils.read("\"c\""))
             .isEqualTo("c");
 
-        Assertions.assertThat(JsonUtils.read("\"c\"", String.class))
-            .isEqualTo("c");
-
         Assertions.assertThat((Integer) JsonUtils.read("2"))
-            .isEqualTo(2);
-
-        Assertions.assertThat(JsonUtils.read("2", Integer.class))
             .isEqualTo(2);
 
         Assertions.assertThatExceptionOfType(RuntimeException.class)
@@ -53,19 +44,7 @@ public class JsonUtilsTest {
         Assertions.assertThat((String) JsonUtils.read("\"item\""))
             .isEqualTo("item");
 
-        Assertions.assertThat(JsonUtils.read("\"item\"", String.class))
-            .isEqualTo("item");
-
-        Assertions.assertThat(JsonUtils.read("[2,4]", List.class))
-            .isEqualTo(List.of(2, 4));
-
-        Assertions.assertThat(JsonUtils.read("[\"item1\",\"item2\"]", List.class))
-            .isEqualTo(List.of("item1", "item2"));
-
         Assertions.assertThat((Map<?, ?>) JsonUtils.read("{\"key\":\"value\"}"))
-            .isEqualTo(Map.of("key", "value"));
-
-        Assertions.assertThat(JsonUtils.read("{\"key\":\"value\"}", Map.class))
             .isEqualTo(Map.of("key", "value"));
 
         Assertions.assertThat((List<?>) JsonUtils.read("[{\"key\":\"value\"}]"))
@@ -93,31 +72,6 @@ public class JsonUtilsTest {
                 "45",
                 "Florists",
                 Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))));
-
-        Assertions.assertThat((Map<?, ?>) JsonUtils.read(
-            JsonUtils.write(Map.of(
-                "name",
-                "Poppy",
-                "color",
-                "RED",
-                "petals",
-                "9",
-                "id",
-                "45",
-                "Florists",
-                Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark"))))),
-            Map.class))
-            .isEqualTo(Map.of(
-                "name",
-                "Poppy",
-                "color",
-                "RED",
-                "petals",
-                "9",
-                "id",
-                "45",
-                "Florists",
-                Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))));
     }
 
     @Test
@@ -127,9 +81,6 @@ public class JsonUtilsTest {
 
         Assertions.assertThat((List<?>) JsonUtils.read("[\"item1\",\"item2\"]"))
             .isEqualTo(List.of("item1", "item2"));
-
-        Assertions.assertThat(JsonUtils.read("[{\"key\":\"value\"}]", List.class))
-            .isEqualTo(List.of(Map.of("key", "value")));
 
         Assertions.assertThat((List<?>) JsonUtils.read(JsonUtils.write(List.of(
             Map.of(
@@ -144,35 +95,6 @@ public class JsonUtilsTest {
                 "Florists",
                 Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
             Map.of("name", "Rose", "color", "YELLOW", "petals", "5", "id", "46")))))
-            .isEqualTo(List.of(
-                Map.of(
-                    "name",
-                    "Poppy",
-                    "color",
-                    "RED",
-                    "petals",
-                    "9",
-                    "id",
-                    "45",
-                    "Florists",
-                    Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
-                Map.of("name", "Rose", "color", "YELLOW", "petals", "5", "id", "46")));
-
-        Assertions.assertThat(JsonUtils.read(
-            JsonUtils.write(List.of(
-                Map.of(
-                    "name",
-                    "Poppy",
-                    "color",
-                    "RED",
-                    "petals",
-                    "9",
-                    "id",
-                    "45",
-                    "Florists",
-                    Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
-                Map.of("name", "Rose", "color", "YELLOW", "petals", "5", "id", "46"))),
-            List.class))
             .isEqualTo(List.of(
                 Map.of(
                     "name",
@@ -303,44 +225,6 @@ public class JsonUtilsTest {
 
         Assertions.assertThat(JsonUtils.write(Map.of("key", "value")))
             .isEqualTo("{\"key\":\"value\"}");
-
-        Assertions.assertThat(JsonUtils.read(
-            JsonUtils.write(Map.of(
-                "name",
-                "Poppy",
-                "color",
-                "RED",
-                "petals",
-                "9",
-                "id",
-                "45",
-                "Florists",
-                Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark"))))),
-            Map.class))
-            .isEqualTo(
-                JsonUtils.read(
-                    """
-                        {"Florists":{"Florist":[{"name":"Joe"}, {"name":"Mark"}]}, "color":"RED", "id":"45", "name":"Poppy", "petals":"9"}
-                        """));
-
-        Assertions.assertThat(JsonUtils.read(
-            JsonUtils.write(Map.of(
-                "name",
-                "Poppy",
-                "color",
-                "RED",
-                "petals",
-                "9",
-                "id",
-                "45",
-                "Florists",
-                Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark"))))),
-            Map.class))
-            .isEqualTo(
-                JsonUtils.read(
-                    """
-                        {"Florists":{"Florist":[{"name":"Joe"}, {"name":"Mark"}]}, "color":"RED", "id":"45", "name":"Poppy", "petals":"9"}
-                        """));
     }
 
     @Test
@@ -353,47 +237,5 @@ public class JsonUtilsTest {
 
         Assertions.assertThat(JsonUtils.write(List.of(Map.of("key", "value"))))
             .isEqualTo("[{\"key\":\"value\"}]");
-
-        Assertions.assertThat(JsonUtils.read(
-            JsonUtils.write(List.of(
-                Map.of(
-                    "name",
-                    "Poppy",
-                    "color",
-                    "RED",
-                    "petals",
-                    "9",
-                    "id",
-                    "45",
-                    "Florists",
-                    Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
-                Map.of("name", "Rose", "color", "YELLOW", "petals", "5", "id", "46"))),
-            List.class))
-            .isEqualTo(
-                JsonUtils.read(
-                    """
-                        [{"Florists":{"Florist":[{"name":"Joe"}, {"name":"Mark"}]}, "color":"RED", "id":"45", "name":"Poppy", "petals":"9"},{"color":"YELLOW", "id":"46", "name":"Rose", "petals":"5"}]
-                        """));
-
-        Assertions.assertThat(JsonUtils.read(
-            JsonUtils.write(List.of(
-                Map.of(
-                    "name",
-                    "Poppy",
-                    "color",
-                    "RED",
-                    "petals",
-                    "9",
-                    "id",
-                    "45",
-                    "Florists",
-                    Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
-                Map.of("name", "Rose", "color", "YELLOW", "petals", "5", "id", "46"))),
-            List.class))
-            .isEqualTo(
-                JsonUtils.read(
-                    """
-                        [{"Florists":{"Florist":[{"name":"Joe"}, {"name":"Mark"}]}, "color":"RED", "id":"45", "name":"Poppy", "petals":"9"},{"color":"YELLOW", "id":"46", "name":"Rose", "petals":"5"}]
-                        """));
     }
 }
