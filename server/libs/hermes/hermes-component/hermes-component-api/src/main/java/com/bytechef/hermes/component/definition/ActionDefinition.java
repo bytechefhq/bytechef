@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -29,8 +30,8 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
-public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
+@JsonDeserialize(as = ModifiableActionDefinition.class)
+public sealed interface ActionDefinition permits ModifiableActionDefinition {
 
     /**
      * TODO

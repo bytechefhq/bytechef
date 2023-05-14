@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -29,8 +30,8 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableConnectionDefinition.class)
-public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
+@JsonDeserialize(as = ModifiableConnectionDefinition.class)
+public sealed interface ConnectionDefinition permits ModifiableConnectionDefinition {
 
     String BASE_URI = "baseUri";
 
