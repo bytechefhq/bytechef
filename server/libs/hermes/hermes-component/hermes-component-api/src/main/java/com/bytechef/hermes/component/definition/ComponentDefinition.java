@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -29,8 +30,8 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableComponentDefinition.class)
-public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
+@JsonDeserialize(as = ModifiableComponentDefinition.class)
+public sealed interface ComponentDefinition permits ModifiableComponentDefinition {
 
     /**
      *

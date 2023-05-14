@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,7 +33,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableTriggerDefinition.class)
+@JsonDeserialize(as = ModifiableTriggerDefinition.class)
 public interface TriggerDefinition {
 
     /**
