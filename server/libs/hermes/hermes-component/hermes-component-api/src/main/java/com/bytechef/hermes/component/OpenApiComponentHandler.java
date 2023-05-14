@@ -18,9 +18,13 @@
 package com.bytechef.hermes.component;
 
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.Property;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,34 +38,35 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
         BODY, PATH, HEADER, QUERY
     }
 
-    default ComponentDSL.ModifiableActionDefinition[] modifyActions(
-        ComponentDSL.ModifiableActionDefinition... actionDefinitions) {
+    default ModifiableActionDefinition[] modifyActions(ModifiableActionDefinition... actionDefinitions) {
+        return Arrays.stream(actionDefinitions)
+            .map(this::modifyAction)
+            .map(actionDefinition -> {
+                Property<?>[] properties = actionDefinition.getProperties()
+                    .orElse(List.of())
+                    .stream()
+                    .map(property -> modifyProperty((Property<?>) property))
+                    .toArray(Property<?>[]::new);
 
-        return actionDefinitions;
+                return actionDefinition.properties(properties);
+            })
+            .toArray(ModifiableActionDefinition[]::new);
     }
 
-    default List<ComponentDSL.ModifiableActionDefinition>[] modifyActions(
-        List<ComponentDSL.ModifiableActionDefinition>... actionsList) {
-
-        return actionsList;
+    default ModifiableActionDefinition modifyAction(ModifiableActionDefinition actionDefinition) {
+        return actionDefinition;
     }
 
-    default ComponentDSL.ModifiableAuthorization modifyAuthorization(
-        ComponentDSL.ModifiableAuthorization authorization) {
-
-        return authorization;
-    }
-
-    default ComponentDSL.ModifiableComponentDefinition modifyComponent(
-        ComponentDSL.ModifiableComponentDefinition modifiableComponentDefinition) {
-
+    default ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition;
     }
 
-    default ComponentDSL.ModifiableConnectionDefinition modifyConnection(
-        ComponentDSL.ModifiableConnectionDefinition connectionDefinition) {
-
+    default ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
         return connectionDefinition;
+    }
+
+    default Property<?> modifyProperty(Property<?> property) {
+        return property;
     }
 
     default List<TriggerDefinition> getTriggers() {
