@@ -78,8 +78,14 @@ const NodeDetailsDialog = () => {
     );
 
     useEffect(() => {
-        if (activeTab === 'output' && !currentAction) {
-            setActiveTab('description');
+        if (!currentActionFetching) {
+            if (!currentAction?.properties?.length) {
+                setActiveTab('description');
+            }
+
+            if (activeTab === 'output' && !currentAction) {
+                setActiveTab('description');
+            }
         }
 
         if (
@@ -87,10 +93,6 @@ const NodeDetailsDialog = () => {
             currentComponent?.name &&
             !componentDefinitionNames?.includes(currentComponent.name)
         ) {
-            setActiveTab('description');
-        }
-
-        if (!currentActionFetching && !currentAction?.properties?.length) {
             setActiveTab('description');
         }
     }, [
@@ -257,6 +259,7 @@ const NodeDetailsDialog = () => {
                                     !!currentAction?.properties?.length && (
                                         <Properties
                                             actionName={currentActionName}
+                                            customClassName="p-4"
                                             properties={
                                                 currentAction.properties
                                             }
