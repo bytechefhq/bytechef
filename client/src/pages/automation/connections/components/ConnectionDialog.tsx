@@ -769,7 +769,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
         <div className="flex">
             <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
 
-            <Tooltip text={'OAuth permission scopes used for this connection.'}>
+            <Tooltip text="OAuth permission scopes used for this connection.">
                 <QuestionMarkCircledIcon />
             </Tooltip>
         </div>

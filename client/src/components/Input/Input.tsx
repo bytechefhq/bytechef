@@ -11,6 +11,7 @@ type InputProps = {
     error?: boolean;
     label?: string;
     labelClassName?: string;
+    leadingIcon?: ReactNode;
     name: string;
     trailing?: ReactNode;
     type?: string;
@@ -28,9 +29,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             fieldsetClassName,
             label,
             labelClassName,
+            leadingIcon,
             name,
             type = 'text',
             error,
+            title,
             trailing,
             ...props
         },
@@ -60,25 +63,36 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 </div>
             )}
 
-            <div className={twMerge(['relative', label && 'mt-1'])}>
+            <div
+                className={twMerge(['relative', label && 'mt-1'])}
+                title={title}
+            >
                 <div
                     className={twMerge(
+                        'relative',
                         trailing &&
-                            'relative flex flex-grow items-stretch focus-within:z-10'
+                            'flex flex-grow items-stretch focus-within:z-10'
                     )}
                 >
+                    {leadingIcon && (
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 px-2">
+                            {leadingIcon}
+                        </div>
+                    )}
+
                     <input
-                        className={twMerge([
+                        className={twMerge(
                             'block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800 sm:text-sm',
                             error
                                 ? 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500 dark:text-rose-500'
                                 : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:placeholder:text-gray-600 dark:focus:ring-sky-500',
                             disabled &&
                                 'cursor-not-allowed bg-gray-100 text-gray-500',
+                            leadingIcon && 'pl-10',
                             trailing &&
                                 'rounded-none rounded-l-md bg-gray-50 text-gray-700 outline-0 focus:border-gray-300 focus:ring-0',
-                            className,
-                        ])}
+                            className
+                        )}
                         disabled={disabled}
                         id={name}
                         name={name}

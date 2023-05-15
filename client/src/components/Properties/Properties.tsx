@@ -75,8 +75,6 @@ const Property = ({
             } as ISelectOption)
     );
 
-    const showTypeIcon = type !== 'OBJECT' && type !== 'ARRAY';
-
     return (
         <li
             className={twMerge(
@@ -103,18 +101,6 @@ const Property = ({
                 </div>
             )}
 
-            {showTypeIcon && (
-                <span
-                    className={twMerge(
-                        'self-end pb-2 pr-2',
-                        controlType === 'CODE_EDITOR' && 'self-start'
-                    )}
-                    title={type}
-                >
-                    {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                </span>
-            )}
-
             {register && controlType === 'INPUT_TEXT' && (
                 <Input
                     description={description}
@@ -123,6 +109,7 @@ const Property = ({
                     fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     type={hidden ? 'hidden' : 'text'}
                     {...register(`${path}.${name}`, {
                         required: required!,
@@ -138,7 +125,9 @@ const Property = ({
                     fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    title={type}
                     type={hidden ? 'hidden' : 'text'}
                 />
             )}
@@ -150,6 +139,7 @@ const Property = ({
                     fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
                     onChange={({target}) => {
                         const {value} = target;
@@ -160,8 +150,9 @@ const Property = ({
                             setIntegerValue(value);
                         }
                     }}
-                    value={integerValue}
+                    title={type}
                     type={hidden ? 'hidden' : 'text'}
+                    value={integerValue}
                 />
             )}
 
@@ -173,7 +164,9 @@ const Property = ({
                     fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    title={type}
                     type={hidden ? 'hidden' : 'number'}
                 />
             )}
@@ -186,7 +179,9 @@ const Property = ({
                     fieldsetClassName="w-full"
                     key={name}
                     label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    title={type}
                     type={hidden ? 'hidden' : 'password'}
                 />
             )}
@@ -199,7 +194,9 @@ const Property = ({
                     fieldsetClassName="w-full mb-0"
                     key={name}
                     label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    title={type}
                     type={hidden ? 'hidden' : 'date'}
                 />
             )}
@@ -208,6 +205,7 @@ const Property = ({
                 <Select
                     description={description}
                     label={label}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     options={formattedOptions!}
                     triggerClassName="w-full bg-gray-100 border-none"
                 />
@@ -274,6 +272,7 @@ const Property = ({
                 <Select
                     description={description}
                     label={label}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     options={[
                         {value: 'true', label: 'True'},
                         {value: 'false', label: 'False'},
@@ -312,12 +311,7 @@ const Properties = ({
     properties,
     register,
 }: PropertiesProps): JSX.Element => (
-    <ul
-        className={twMerge(
-            'h-full flex-[1_1_1px] overflow-auto',
-            customClassName
-        )}
-    >
+    <ul className={twMerge('h-full flex-[1_1_1px]', customClassName)}>
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}
