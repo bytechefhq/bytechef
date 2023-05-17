@@ -63,7 +63,7 @@ const NodeDetailsDialog = () => {
             : (firstAction?.name as string);
     };
 
-    const {data: currentAction, isFetching: currentActionFetching} =
+    const {data: currentAction, isFetched: currentActionFetched} =
         useGetActionDefinitionQuery(
             {
                 componentName: currentComponent?.name as string,
@@ -78,7 +78,7 @@ const NodeDetailsDialog = () => {
     );
 
     useEffect(() => {
-        if (!currentActionFetching) {
+        if (currentActionFetched) {
             if (!currentAction?.properties?.length) {
                 setActiveTab('description');
             }
@@ -99,15 +99,15 @@ const NodeDetailsDialog = () => {
         activeTab,
         componentDefinitionNames,
         currentAction,
-        currentActionFetching,
+        currentActionFetched,
         currentComponent?.name,
     ]);
 
     useEffect(() => {
-        if (currentAction) {
+        if (currentAction && currentActionFetched) {
             setCurrentActionName(currentAction.name);
         }
-    }, [activeTab, currentAction]);
+    }, [activeTab, currentAction, currentActionFetched]);
 
     const singleActionComponent = currentComponent?.actions?.length === 1;
 
@@ -196,22 +196,10 @@ const NodeDetailsDialog = () => {
                                         ) : (
                                             <Select
                                                 contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
-                                                customValueComponent={
-                                                    <div className="flex flex-col">
-                                                        <span className="inline-flex text-sm font-medium">
-                                                            {
-                                                                currentAction?.title
-                                                            }
-                                                        </span>
-
-                                                        <p className="mt-1 line-clamp-2 w-full text-left text-xs text-gray-500">
-                                                            {
-                                                                currentAction?.description
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                }
                                                 label="Actions"
+                                                onValueChange={(value) =>
+                                                    setCurrentActionName(value)
+                                                }
                                                 options={currentComponent.actions.map(
                                                     (action) => ({
                                                         description:
@@ -221,9 +209,6 @@ const NodeDetailsDialog = () => {
                                                     })
                                                 )}
                                                 triggerClassName="w-full bg-gray-100 border-none"
-                                                onValueChange={(value) => {
-                                                    setCurrentActionName(value);
-                                                }}
                                             />
                                         )}
                                     </div>
