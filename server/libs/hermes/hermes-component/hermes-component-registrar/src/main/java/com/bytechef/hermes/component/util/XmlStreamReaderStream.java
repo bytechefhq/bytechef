@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xmlfile.util;
+package com.bytechef.hermes.component.util;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;

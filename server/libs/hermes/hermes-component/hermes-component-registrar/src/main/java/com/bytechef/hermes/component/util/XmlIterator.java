@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xmlfile.util;
+package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;

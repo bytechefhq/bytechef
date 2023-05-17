@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jsonfile.util;
+package com.bytechef.hermes.component.util;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;

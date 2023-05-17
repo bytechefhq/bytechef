@@ -25,6 +25,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
@@ -37,6 +39,10 @@ public class ConnectionDefinitionMapper {
         @Override
         @Mapping(target = "baseUri", ignore = true)
         ConnectionDefinitionModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
+
+        default String mapToString(Optional<String> optional) {
+            return optional.orElse(null);
+        }
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
@@ -45,5 +51,9 @@ public class ConnectionDefinitionMapper {
 
         @Override
         ConnectionDefinitionBasicModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
+
+        default String mapToString(Optional<String> optional) {
+            return optional.orElse(null);
+        }
     }
 }

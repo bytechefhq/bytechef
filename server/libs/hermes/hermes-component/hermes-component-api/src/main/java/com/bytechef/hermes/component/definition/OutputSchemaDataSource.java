@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableOutputSchemaDataSource;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
@@ -27,7 +26,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public sealed interface OutputSchemaDataSource permits ModifiableOutputSchemaDataSource {
+public interface OutputSchemaDataSource {
 
     /**
      * The function that returns output schema.

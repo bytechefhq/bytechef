@@ -18,6 +18,7 @@
 package com.bytechef.server.config;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,11 @@ public class JacksonConfiguration {
     @Bean
     JavaTimeModule javaTimeModule() {
         return new JavaTimeModule();
+    }
+
+    @Bean
+    Jdk8Module jdk8Module() {
+        return new Jdk8Module();
     }
 
     @Bean

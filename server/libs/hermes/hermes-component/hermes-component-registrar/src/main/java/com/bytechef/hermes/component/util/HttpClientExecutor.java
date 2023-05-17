@@ -1,5 +1,23 @@
+
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.hermes.component.util;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -13,6 +31,7 @@ import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
 import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -32,7 +51,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -238,27 +259,23 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         }
 
         if (componentDefinition == null) {
-            context
-                .fetchConnection()
-                .ifPresent(
-                    connection -> connection.applyAuthorization(
-                        new Authorization.AuthorizationContext(headers, queryParameters, new HashMap<>())));
+            OptionalUtils.ifPresent(
+                context.fetchConnection(),
+                (connection -> connection.applyAuthorization(
+                    new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()))));
         } else {
-            ConnectionDefinition connectionDefinition = componentDefinition
-                .getConnection()
+            ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
                 .orElse(null);
 
             if (connectionDefinition != null && connectionDefinition.isAuthorizationRequired()) {
                 Context.Connection connection = context.getConnection();
 
-                connection.applyAuthorization(
-                    new Authorization.AuthorizationContext(headers, queryParameters, new HashMap<>()));
+                connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()));
             } else {
-                context
-                    .fetchConnection()
-                    .ifPresent(
-                        connection -> connection.applyAuthorization(
-                            new Authorization.AuthorizationContext(headers, queryParameters, new HashMap<>())));
+                OptionalUtils.ifPresent(
+                    context.fetchConnection(),
+                    connection -> connection.applyAuthorization(
+                        new AuthorizationContextImpl(headers, queryParameters, new HashMap<>())));
             }
         }
     }
@@ -414,6 +431,38 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
         public void checkServerTrusted(
             final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {
+        }
+    }
+
+    @SuppressFBWarnings("EI")
+    record AuthorizationContextImpl(
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> body)
+        implements Authorization.AuthorizationContext {
+
+        private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+        @Override
+        public void setHeaders(Map<String, List<String>> headers) {
+            this.headers.putAll(headers);
+        }
+
+        @Override
+        public void setQueryParameters(Map<String, List<String>> queryParameters) {
+            this.queryParameters.putAll(queryParameters);
+        }
+
+        @Override
+        public void setBody(Map<String, String> body) {
+            this.body.putAll(body);
+        }
+
+        @Override
+        public void setUsernamePassword(String username, String password) {
+            String valueToEncode = username + ":" + password;
+
+            headers.put(
+                "Authorization",
+                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
         }
     }
 }

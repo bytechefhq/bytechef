@@ -20,11 +20,8 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableAuthorization;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +30,6 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ModifiableAuthorization.class)
 public sealed interface Authorization permits ModifiableAuthorization {
 
     String ACCESS_TOKEN = "access_token";
@@ -60,93 +56,12 @@ public sealed interface Authorization permits ModifiableAuthorization {
      *
      */
     enum AuthorizationType {
-        API_KEY((
-            InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-            HttpVerb httpVerb) -> {
-
-            String addTo = connectionInputParameters.getString(ADD_TO, ApiTokenLocation.HEADER.name());
-
-            if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
-                authorizationContext.setHeaders(
-                    Map.of(
-                        connectionInputParameters.getString(KEY, API_TOKEN),
-                        List.of(connectionInputParameters.getString(VALUE, ""))));
-            } else {
-                authorizationContext.setQueryParameters(
-                    Map.of(
-                        connectionInputParameters.getString(KEY, API_TOKEN),
-                        List.of(connectionInputParameters.getString(VALUE, ""))));
-            }
-        }),
-        BASIC_AUTH(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setUsernamePassword(
-                        connectionInputParameters.getString(USERNAME),
-                        connectionInputParameters.getString(PASSWORD))),
-        BEARER_TOKEN(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setHeaders(
-                        Map.of(
-                            AUTHORIZATION,
-                            List.of(BEARER + " " + connectionInputParameters.getString(TOKEN))))),
-        CUSTOM(null),
-        DIGEST_AUTH(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setUsernamePassword(
-                        connectionInputParameters.getString(USERNAME),
-                        connectionInputParameters.getString(PASSWORD))),
-        OAUTH2_AUTHORIZATION_CODE(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setHeaders(getOAuth2Headers(connectionInputParameters))),
-        OAUTH2_AUTHORIZATION_CODE_PKCE(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setHeaders(getOAuth2Headers(connectionInputParameters))),
-        OAUTH2_CLIENT_CREDENTIALS(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setHeaders(getOAuth2Headers(connectionInputParameters))),
-        OAUTH2_IMPLICIT_CODE(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setHeaders(getOAuth2Headers(connectionInputParameters))),
-        OAUTH2_RESOURCE_OWNER_PASSWORD(
-            (
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-                HttpVerb httpVerb) -> authorizationContext
-                    .setHeaders(getOAuth2Headers(connectionInputParameters)));
-
-        private final ApplyConsumer defaultApplyConsumer;
-
-        AuthorizationType(ApplyConsumer defaultApplyConsumer) {
-            this.defaultApplyConsumer = defaultApplyConsumer;
-        }
-
-        public ApplyConsumer getDefaultApply() {
-            return defaultApplyConsumer;
-        }
+        API_KEY, BASIC_AUTH, BEARER_TOKEN, CUSTOM, DIGEST_AUTH, OAUTH2_AUTHORIZATION_CODE,
+        OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS, OAUTH2_IMPLICIT_CODE,
+        OAUTH2_RESOURCE_OWNER_PASSWORD;
 
         public String toLowerCase() {
             return name().toLowerCase();
-        }
-
-        private static Map<String, List<String>> getOAuth2Headers(InputParameters connectionInputParameters) {
-            return Map.of(
-                AUTHORIZATION,
-                List.of(
-                    connectionInputParameters.getString(HEADER_PREFIX, BEARER) + " " +
-                        connectionInputParameters.getString(ACCESS_TOKEN)));
         }
     }
 
@@ -156,13 +71,6 @@ public sealed interface Authorization permits ModifiableAuthorization {
     enum ApiTokenLocation {
         HEADER,
         QUERY_PARAMETERS,
-    }
-
-    /**
-     *
-     */
-    enum HttpVerb {
-        DELETE, GET, PATCH, POST, PUT
     }
 
     /**
@@ -176,31 +84,31 @@ public sealed interface Authorization permits ModifiableAuthorization {
      *
      * @return
      */
-    ApplyConsumer getApply();
+    Optional<ApplyConsumer> getApply();
 
     /**
      *
      * @return
      */
-    AuthorizationCallbackFunction getAuthorizationCallback();
+    Optional<AuthorizationCallbackFunction> getAuthorizationCallback();
 
     /**
      *
      * @return
      */
-    AuthorizationUrlFunction getAuthorizationUrl();
+    Optional<AuthorizationUrlFunction> getAuthorizationUrl();
 
     /**
      *
      * @return
      */
-    ClientIdFunction getClientId();
+    Optional<ClientIdFunction> getClientId();
 
     /**
      *
      * @return
      */
-    ClientSecretFunction getClientSecret();
+    Optional<ClientSecretFunction> getClientSecret();
 
     /**
      * TODO
@@ -222,13 +130,13 @@ public sealed interface Authorization permits ModifiableAuthorization {
      *
      * @return
      */
-    PkceFunction getPkce();
+    Optional<PkceFunction> getPkce();
 
     /**
      *
      * @return
      */
-    List<? extends Property<?>> getProperties();
+    Optional<List<? extends Property<?>>> getProperties();
 
     /**
      * TODO
@@ -249,25 +157,25 @@ public sealed interface Authorization permits ModifiableAuthorization {
      *
      * @return
      */
-    RefreshUrlFunction getRefreshUrl();
+    Optional<RefreshUrlFunction> getRefreshUrl();
 
     /**
      *
      * @return
      */
-    ScopesFunction getScopes();
+    Optional<ScopesFunction> getScopes();
 
     /**
      *
      * @return
      */
-    String getTitle();
+    Optional<String> getTitle();
 
     /**
      *
      * @return
      */
-    TokenUrlFunction getTokenUrl();
+    Optional<TokenUrlFunction> getTokenUrl();
 
     /**
      *
@@ -298,8 +206,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param authorizationContext
          */
         void accept(
-            InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
-            HttpVerb httpVerb);
+            InputParameters connectionInputParameters, AuthorizationContext authorizationContext);
     }
 
     /**
@@ -368,7 +275,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
     @FunctionalInterface
     interface PkceFunction {
 
-        Pkce apply(String verifier, String challenge);
+        Pkce apply(String verifier, String challenge, String challengeMethod);
     }
 
     /**
@@ -437,7 +344,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
     record AuthorizationCallbackResponse(
         String accessToken, String refreshToken, Map<String, Object> additionalParameters) {
 
-        AuthorizationCallbackResponse(String accessToken, String refreshToken) {
+        public AuthorizationCallbackResponse(String accessToken, String refreshToken) {
             this(accessToken, refreshToken, Map.of());
         }
 
@@ -453,31 +360,14 @@ public sealed interface Authorization permits ModifiableAuthorization {
         }
     }
 
-    @SuppressFBWarnings("EI")
-    record AuthorizationContext(
-        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> body) {
+    interface AuthorizationContext {
+        void setHeaders(Map<String, List<String>> headers);
 
-        private static final Base64.Encoder ENCODER = Base64.getEncoder();
+        void setQueryParameters(Map<String, List<String>> queryParameters);
 
-        public void setHeaders(Map<String, List<String>> headers) {
-            this.headers.putAll(headers);
-        }
+        void setBody(Map<String, String> body);
 
-        public void setQueryParameters(Map<String, List<String>> queryParameters) {
-            this.queryParameters.putAll(queryParameters);
-        }
-
-        public void setBody(Map<String, String> body) {
-            this.body.putAll(body);
-        }
-
-        public void setUsernamePassword(String username, String password) {
-            String valueToEncode = username + ":" + password;
-
-            headers.put(
-                "Authorization",
-                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
-        }
+        void setUsernamePassword(String username, String password);
     }
 
     record Pkce(String verifier, String challenge, String challengeMethod) {

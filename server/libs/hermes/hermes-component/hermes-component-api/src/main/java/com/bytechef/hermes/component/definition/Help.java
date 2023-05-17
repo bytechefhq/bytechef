@@ -22,9 +22,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  *
- * @param body
- * @param learnMoreUrl
  */
 @SuppressFBWarnings("EI")
-public record Help(String body, String learnMoreUrl) {
+public interface Help {
+
+    /**
+     *
+     * @return
+     */
+    String getBody();
+
+    /**
+     *
+     * @return
+     */
+    String getLearnMoreUrl();
 }

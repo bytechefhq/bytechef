@@ -17,18 +17,59 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Help;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.definition.Property;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record TriggerDefinitionDTO(
-    boolean batch, String description, Object sampleOutput, Help help, String name,
-    List<? extends Property<?>> outputSchema, List<? extends Property<?>> properties, String title, TriggerType type) {
+    boolean batch, String description, boolean editorDescriptionDataSource, Optional<HelpDTO> help, String name,
+    List<? extends PropertyDTO> outputSchema, boolean outputSchemaDataSource, List<? extends PropertyDTO> properties,
+    Optional<Object> sampleOutput, boolean sampleOutputDataSource, String title, TriggerType type) {
+
+    public TriggerDefinitionDTO(TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+        this(
+            OptionalUtils.orElse(triggerDefinition.getBatch(), false),
+            getDescription(triggerDefinition, componentDefinition),
+            OptionalUtils.mapOrElse(
+                triggerDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
+            getHelp(triggerDefinition.getHelp()),
+            triggerDefinition.getName(),
+            CollectionUtils.map(
+                OptionalUtils.orElse(triggerDefinition.getOutputSchema(), List.of()), PropertyDTO::toPropertyDTO),
+            OptionalUtils.mapOrElse(
+                triggerDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
+            CollectionUtils.map(
+                OptionalUtils.orElse(triggerDefinition.getProperties(), Collections.emptyList()),
+                PropertyDTO::toPropertyDTO),
+            triggerDefinition.getSampleOutput(),
+            OptionalUtils.mapOrElse(
+                triggerDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false),
+            getTitle(triggerDefinition), triggerDefinition.getType());
+    }
+
+    public static String getDescription(TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+        return OptionalUtils.orElse(
+            triggerDefinition.getDescription(),
+            ComponentDefinitionDTO.getTitle(componentDefinition) + ": " + getTitle(triggerDefinition));
+    }
+
+    public static String getTitle(TriggerDefinition triggerDefinition) {
+        return OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName());
+    }
+
+    private static Optional<HelpDTO> getHelp(Optional<Help> help) {
+        return help.map(HelpDTO::new);
+    }
 }

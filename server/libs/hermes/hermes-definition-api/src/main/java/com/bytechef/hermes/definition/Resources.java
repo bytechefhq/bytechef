@@ -17,22 +17,20 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableResources.class)
-public sealed interface Resources permits DefinitionDSL.ModifiableResources {
+public interface Resources {
 
     /**
      *
      * @return
      */
-    Optional<String[]> getCategories();
+    Optional<List<String>> getCategories();
 
     /**
      *

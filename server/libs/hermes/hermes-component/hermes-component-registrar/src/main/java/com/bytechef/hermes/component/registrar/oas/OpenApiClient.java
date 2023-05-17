@@ -20,7 +20,6 @@ package com.bytechef.hermes.component.registrar.oas;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.hermes.component.definition.ActionDefinition;

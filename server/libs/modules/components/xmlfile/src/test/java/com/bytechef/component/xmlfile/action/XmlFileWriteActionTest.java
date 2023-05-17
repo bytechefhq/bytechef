@@ -20,13 +20,16 @@ package com.bytechef.component.xmlfile.action;
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.util.XmlMapper;
 import com.bytechef.hermes.component.util.XmlUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -48,6 +51,11 @@ public class XmlFileWriteActionTest {
     private static final String FILE_XML = "file.xml";
     private static final String SAMPLE_ARRAY_XML = "sample_array.xml";
     private static final String SAMPLE_XML = "sample.xml";
+
+    @BeforeAll
+    public static void beforeAll() {
+        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
+    }
 
     @BeforeEach
     public void beforeEach() {

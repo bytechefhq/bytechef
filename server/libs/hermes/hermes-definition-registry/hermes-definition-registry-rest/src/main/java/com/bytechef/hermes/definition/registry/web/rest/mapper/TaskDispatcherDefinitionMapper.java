@@ -17,12 +17,16 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
+import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
+import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -36,6 +40,17 @@ public class TaskDispatcherDefinitionMapper {
 
         @Override
         TaskDispatcherDefinitionModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
+
+        ResourcesModel map(ResourcesDTO resourcesDTO);
+
+        default ResourcesModel mapToResource(Optional<ResourcesDTO> optional) {
+            return optional.map(this::map)
+                .orElse(null);
+        }
+
+        default String mapToString(Optional<String> value) {
+            return value.orElse(null);
+        }
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
@@ -44,5 +59,16 @@ public class TaskDispatcherDefinitionMapper {
 
         @Override
         TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
+
+        ResourcesModel map(ResourcesDTO resourcesDTO);
+
+        default ResourcesModel mapToResource(Optional<ResourcesDTO> optional) {
+            return optional.map(this::map)
+                .orElse(null);
+        }
+
+        default String mapToString(Optional<String> value) {
+            return value.orElse(null);
+        }
     }
 }

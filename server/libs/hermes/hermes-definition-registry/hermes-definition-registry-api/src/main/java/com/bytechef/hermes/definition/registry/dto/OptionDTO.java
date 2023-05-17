@@ -15,22 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.definition.Option;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-public interface EditorDescriptionFunction {
+@SuppressFBWarnings("EI")
+public record OptionDTO(String description, String displayCondition, String name, Object value) {
 
-    /**
-     *
-     * @param connection
-     * @param inputParameters
-     * @return
-     */
-    String apply(Connection connection, InputParameters inputParameters);
-
+    public OptionDTO(Option<?> option) {
+        this(option.getDescription(), option.getDisplayCondition(), option.getName(), option.getValue());
+    }
 }

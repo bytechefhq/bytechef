@@ -20,18 +20,15 @@ package com.bytechef.hermes.task.dispatcher.definition;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public final class TaskDispatcherDSL extends DefinitionDSL {
-
-    private static final int VERSION_1 = 1;
 
     public static ModifiableTaskDispatcherDefinition taskDispatcher(String name) {
         return new ModifiableTaskDispatcherDefinition(name);
@@ -49,16 +46,13 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
 
         private String description;
         private String icon;
-        private String name;
-        private List<Property<? extends Property<?>>> outputSchema;
-        private List<Property<?>> properties;
+        private final String name;
+        private List<? extends Property<?>> outputSchema;
+        private List<? extends Property<?>> properties;
         private Resources resources;
-        private List<Property<?>> taskProperties;
+        private List<? extends Property<?>> taskProperties;
         private String title;
-        private int version = VERSION_1;
-
-        private ModifiableTaskDispatcherDefinition() {
-        }
+        private int version = 1;
 
         private ModifiableTaskDispatcherDefinition(String name) {
             this.name = name;
@@ -66,12 +60,6 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
 
         public ModifiableTaskDispatcherDefinition description(String description) {
             this.description = description;
-
-            return this;
-        }
-
-        public ModifiableTaskDispatcherDefinition display(ModifiableResources resources) {
-            this.resources = resources;
 
             return this;
         }
@@ -86,6 +74,26 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             if (outputSchema != null) {
                 this.outputSchema = List.of(outputSchema);
             }
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition resources(String documentationUrl) {
+            this.resources = new ResourcesImpl(null, null, documentationUrl);
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition resources(String documentationUrl, List<String> categories) {
+            this.resources = new ResourcesImpl(null, null, documentationUrl);
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition resources(
+            String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
+
+            this.resources = new ResourcesImpl(null, null, documentationUrl);
 
             return this;
         }
@@ -122,8 +130,8 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public String getIcon() {
-            return icon;
+        public Optional<String> getIcon() {
+            return Optional.ofNullable(icon);
         }
 
         @Override
@@ -132,24 +140,23 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Property<? extends Property<?>>> getOutputSchema() {
-            return outputSchema;
+        public Optional<List<? extends Property<?>>> getOutputSchema() {
+            return Optional.ofNullable(outputSchema);
         }
 
         @Override
-        public List<Property<?>> getProperties() {
-            return properties;
+        public Optional<List<? extends Property<?>>> getProperties() {
+            return Optional.ofNullable(properties);
         }
 
         @Override
-        @SuppressFBWarnings("EI")
-        public Resources getResources() {
-            return resources;
+        public Optional<Resources> getResources() {
+            return Optional.ofNullable(resources);
         }
 
         @Override
-        public String getTitle() {
-            return Objects.requireNonNullElseGet(title, () -> name);
+        public Optional<String> getTitle() {
+            return Optional.ofNullable(title);
         }
 
         @Override
@@ -158,8 +165,8 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Property<?>> getTaskProperties() {
-            return taskProperties;
+        public Optional<List<? extends Property<?>>> getTaskProperties() {
+            return Optional.ofNullable(taskProperties);
         }
     }
 }

@@ -1,25 +1,12 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesDataSourceModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -31,26 +18,26 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
-  private DynamicPropertiesDataSourceModel dynamicPropertiesDataSource;
+  private PropertiesDataSourceModel propertiesDataSource;
 
-  public DynamicPropertiesPropertyModel dynamicPropertiesDataSource(DynamicPropertiesDataSourceModel dynamicPropertiesDataSource) {
-    this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
+  public DynamicPropertiesPropertyModel propertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+    this.propertiesDataSource = propertiesDataSource;
     return this;
   }
 
   /**
-   * Get dynamicPropertiesDataSource
-   * @return dynamicPropertiesDataSource
+   * Get propertiesDataSource
+   * @return propertiesDataSource
   */
-  @Valid 
-  @Schema(name = "dynamicPropertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("dynamicPropertiesDataSource")
-  public DynamicPropertiesDataSourceModel getDynamicPropertiesDataSource() {
-    return dynamicPropertiesDataSource;
+  @Valid
+  @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("propertiesDataSource")
+  public PropertiesDataSourceModel getPropertiesDataSource() {
+    return propertiesDataSource;
   }
 
-  public void setDynamicPropertiesDataSource(DynamicPropertiesDataSourceModel dynamicPropertiesDataSource) {
-    this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
+  public void setPropertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+    this.propertiesDataSource = propertiesDataSource;
   }
 
   public DynamicPropertiesPropertyModel advancedOption(Boolean advancedOption) {
@@ -112,13 +99,13 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
       return false;
     }
     DynamicPropertiesPropertyModel dynamicPropertiesProperty = (DynamicPropertiesPropertyModel) o;
-    return Objects.equals(this.dynamicPropertiesDataSource, dynamicPropertiesProperty.dynamicPropertiesDataSource) &&
+    return Objects.equals(this.propertiesDataSource, dynamicPropertiesProperty.propertiesDataSource) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(dynamicPropertiesDataSource, super.hashCode());
+    return Objects.hash(propertiesDataSource, super.hashCode());
   }
 
   @Override
@@ -126,7 +113,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class DynamicPropertiesPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    dynamicPropertiesDataSource: ").append(toIndentedString(dynamicPropertiesDataSource)).append("\n");
+    sb.append("    propertiesDataSource: ").append(toIndentedString(propertiesDataSource)).append("\n");
     sb.append("}");
     return sb.toString();
   }

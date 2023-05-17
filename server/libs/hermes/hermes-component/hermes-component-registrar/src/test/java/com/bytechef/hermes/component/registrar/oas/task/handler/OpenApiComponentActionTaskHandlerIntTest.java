@@ -47,7 +47,6 @@ import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,12 +115,6 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
-
-    @Autowired
-    private ConnectionService connectionService;
-
-    @MockBean
-    private TagService tagService;
 
     private Connection connection;
 
@@ -603,7 +596,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
                         put("id", 10);
                         put("petId", 198772);
                         put("quantity", 7);
-                        put("shipDate", LocalDateTime.of(2023, 01, 23, 7, 45));
+                        put("shipDate", LocalDateTime.of(2023, 1, 23, 7, 45));
                         put("status", "approved");
                         put("complete", true);
                     }

@@ -15,21 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition;
+package com.bytechef.hermes.definition.registry.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import java.util.List;
+import com.bytechef.hermes.component.definition.Help;
 
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableDynamicPropertiesDataSource.class)
-public interface DynamicPropertiesDataSource {
+public record HelpDTO(String body, String learnMoreUrl) {
 
-    /**
-     *
-     * @return
-     */
-    List<String> getLoadPropertiesDependsOn();
+    HelpDTO(Help help) {
+        this(help.getBody(), help.getLearnMoreUrl());
+    }
 }

@@ -20,6 +20,14 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.Authorization.ApplyConsumer;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import com.bytechef.hermes.component.definition.Authorization.ClientSecretFunction;
+import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.Authorization;
@@ -30,15 +38,17 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFu
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.util.AuthorizationUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 
 /**
  * @author Ivica Cardic
@@ -72,10 +82,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
-        Authorization.ApplyConsumer applyConsumer = authorization.getApply();
+        ApplyConsumer applyConsumer = OptionalUtils.orElse(
+            authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
 
-        // TODO Add url and httpVerb values
-        applyConsumer.accept(new InputParametersImpl(connectionParameters), authorizationContext, null, null);
+        applyConsumer.accept(new InputParametersImpl(connectionParameters), authorizationContext);
     }
 
     @Override
@@ -86,14 +96,71 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
-        AuthorizationCallbackFunction authorizationCallbackFunction = authorization.getAuthorizationCallback();
+        AuthorizationCallbackFunction authorizationCallbackFunction =
+            OptionalUtils.orElse(
+                authorization.getAuthorizationCallback(),
+                getDefaultAuthorizationCallback(
+                    OptionalUtils.orElse(authorization.getClientId(), AuthorizationUtils::getDefaultClientId),
+                    OptionalUtils.orElse(authorization.getClientSecret(), AuthorizationUtils::getDefaultClientSecret),
+                    OptionalUtils.orElse(authorization.getTokenUrl(), AuthorizationUtils::getDefaultTokenUrl)));
 
-        InputParameters inputParameters = new InputParametersImpl(connectionParameters);
+        InputParameters connectionInputParameters = new InputParametersImpl(connectionParameters);
+
+        Authorization.PkceFunction pkceFunction = OptionalUtils.orElse(
+            authorization.getPkce(), AuthorizationUtils.getDefaultPkce());
+
+        String verifier = null;
+
+        if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+
+            // TODO pkce
+            Authorization.Pkce pkce = pkceFunction.apply(null, null, "SHA256");
+
+            verifier = pkce.verifier();
+        }
 
         return authorizationCallbackFunction.apply(
-            inputParameters, inputParameters.getString(Authorization.CODE), redirectUri, null /*
-                                                                                               * TODO pkce verifier
-                                                                                               */);
+            connectionInputParameters, connectionInputParameters.getString(Authorization.CODE), redirectUri, verifier);
+    }
+
+    private AuthorizationCallbackFunction getDefaultAuthorizationCallback(
+        ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
+        TokenUrlFunction tokenUrlFunction) {
+
+        return (connectionParameters, code, redirectUri, codeVerifier) -> {
+            Map<String, Object> payload = new HashMap<>() {
+                {
+                    put("client_id", clientIdFunction.apply(connectionParameters));
+                    put("client_secret", clientSecretFunction.apply(connectionParameters));
+                    put("code", code);
+                    put("grant_type", "authorization_code");
+                    put("redirect_uri", redirectUri);
+                }
+            };
+
+            if (codeVerifier != null) {
+                payload.put("code_verifier", codeVerifier);
+            }
+
+            HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
+                .body(
+                    HttpClientUtils.Body.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
+                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .execute();
+
+            if (response.getStatusCode() != 200) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            if (response.getBody() == null) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            Map<?, ?> body = (Map<?, ?>) response.getBody();
+
+            return new AuthorizationCallbackResponse(
+                (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
+        };
     }
 
     @Override
@@ -103,13 +170,14 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ConnectionDefinition connectionDefinition = componentDefinitionRegistry.getComponentConnectionDefinition(
             componentName, connectionVersion);
 
-        ConnectionDefinition.BaseUriFunction baseUriFunction = connectionDefinition.getBaseUri();
+        BaseUriFunction baseUriFunction =
+            OptionalUtils.orElse(connectionDefinition.getBaseUri(), AuthorizationUtils::getDefaultBaseUri);
 
         return Optional.ofNullable(baseUriFunction.apply(new InputParametersImpl(connectionParameters)));
     }
 
     @Override
-    public Authorization.AuthorizationType getAuthorizationType(
+    public AuthorizationType getAuthorizationType(
         String authorizationName, String componentName, int connectionVersion) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -121,58 +189,58 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     @Override
     public ConnectionDefinitionDTO getConnectionDefinition(
         String componentName, int componentVersion) {
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         return toConnectionDefinitionDTO(
-            componentDefinitionRegistry.getConnectionDefinition(componentName, componentVersion));
+            OptionalUtils.get(componentDefinition.getConnection()), componentDefinition);
     }
 
     @Override
     public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
-        return componentDefinitionRegistry.getConnectionDefinitions()
+        return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .map(this::toConnectionDefinitionDTO)
+            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
+            .map(componentDefinition -> toConnectionDefinitionDTO(
+                OptionalUtils.get(componentDefinition.getConnection()), componentDefinition))
             .toList();
     }
 
     @Override
     public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String componentName, int connectionVersion, Map<String, Object> connectionInputParameters,
         String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
-        AuthorizationUrlFunction authorizationUrlFunction = authorization.getAuthorizationUrl();
-        ClientIdFunction clientIdFunction = authorization.getClientId();
-        ScopesFunction scopesFunction = authorization.getScopes();
+        AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
+            authorization.getAuthorizationUrl(), AuthorizationUtils::getDefaultAuthorizationUrl);
+        ClientIdFunction clientIdFunction = OptionalUtils.orElse(
+            authorization.getClientId(), AuthorizationUtils::getDefaultClientId);
+        ScopesFunction scopesFunction = OptionalUtils.orElse(
+            authorization.getScopes(), AuthorizationUtils::getDefaultScopes);
 
         return new OAuth2AuthorizationParametersDTO(
-            authorizationUrlFunction.apply(new InputParametersImpl(connectionParameters)),
-            clientIdFunction.apply(new InputParametersImpl(connectionParameters)),
-            scopesFunction.apply(new InputParametersImpl(connectionParameters)));
+            authorizationUrlFunction.apply(new InputParametersImpl(connectionInputParameters)),
+            clientIdFunction.apply(new InputParametersImpl(connectionInputParameters)),
+            scopesFunction.apply(new InputParametersImpl(connectionInputParameters)));
     }
 
     @Override
     public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion) {
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         return CollectionUtils.map(
             componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion),
-            this::toConnectionDefinitionDTO);
+            connectionDefinition -> toConnectionDefinitionDTO(connectionDefinition, componentDefinition));
     }
 
-    private List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {
-        return authorizations.stream()
-            .map(authorization -> new AuthorizationDTO(
-                OptionalUtils.orElse(authorization.getDescription(), null), authorization.getName(),
-                authorization.getProperties(), authorization.getTitle(), authorization.getType()))
-            .toList();
-    }
+    private ConnectionDefinitionDTO toConnectionDefinitionDTO(
+        ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
 
-    private ConnectionDefinitionDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
-        return new ConnectionDefinitionDTO(
-            connectionDefinition.isAuthorizationRequired(),
-            toAuthorizationDTOs(
-                OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList())),
-            OptionalUtils.orElse(connectionDefinition.getDescription(), null), connectionDefinition.getName(),
-            OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
-            connectionDefinition.getTitle(), connectionDefinition.getVersion());
+        return new ConnectionDefinitionDTO(connectionDefinition, componentDefinition);
     }
 }

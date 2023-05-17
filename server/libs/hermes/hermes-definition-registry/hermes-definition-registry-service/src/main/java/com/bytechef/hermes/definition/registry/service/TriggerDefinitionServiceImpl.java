@@ -18,17 +18,21 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource;
-import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
-import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.OptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction;
-import com.bytechef.hermes.component.definition.EditorDescriptionFunction;
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
+import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.Option;
+import com.bytechef.hermes.definition.OptionsDataSource;
+import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -43,7 +47,6 @@ import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -124,12 +127,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
             propertyName, triggerName, componentName, componentVersion);
 
-        ComponentDynamicPropertiesDataSource dynamicPropertiesDataSource =
-            (ComponentDynamicPropertiesDataSource) property.getDynamicPropertiesDataSource();
+        PropertiesDataSource propertiesDataSource = property.getDynamicPropertiesDataSource();
 
-        DynamicPropertiesFunction dynamicPropertiesFunction = dynamicPropertiesDataSource.getDynamicProperties();
+        ComponentPropertiesFunction propertiesFunction = (ComponentPropertiesFunction) propertiesDataSource
+            .getProperties();
 
-        return dynamicPropertiesFunction.apply(
+        return propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
             new InputParametersImpl(triggerParameters));
@@ -140,10 +143,17 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         String authorizationName, Map<String, Object> connectionParameters) {
 
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
 
-        EditorDescriptionFunction editorDescriptionFunction = triggerDefinition.getEditorDescription();
+        EditorDescriptionFunction editorDescriptionFunction = OptionalUtils.mapOrElse(
+            triggerDefinition.getEditorDescriptionDataSource(),
+            EditorDescriptionDataSource::getEditorDescription,
+            (Context.Connection connection, InputParameters inputParameters) -> componentDefinition.getTitle() + ": "
+                + triggerDefinition.getTitle());
 
         return editorDescriptionFunction.apply(
             contextConnectionFactory.createConnection(
@@ -191,10 +201,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getTriggerProperty(propertyName, triggerName, componentName, componentVersion);
 
-        ComponentOptionsDataSource optionsDataSource = (ComponentOptionsDataSource) OptionalUtils.get(
-            dynamicOptionsProperty.getOptionsDataSource());
+        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
-        OptionsFunction optionsFunction = optionsDataSource.getOptions();
+        ComponentOptionsFunction optionsFunction = (ComponentOptionsFunction) optionsDataSource.getOptions();
 
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
@@ -242,27 +251,28 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public TriggerDefinitionDTO getTriggerDefinition(String triggerName, String componentName, int componentVersion) {
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         return toTriggerDefinitionDTO(
-            componentDefinitionRegistry.getTriggerDefinition(triggerName, componentName, componentVersion));
+            componentDefinitionRegistry.getTriggerDefinition(triggerName, componentName, componentVersion),
+            componentDefinition);
     }
 
     @Override
-    public List<TriggerDefinitionDTO> getTriggerDefinitions(
-        String componentName, int componentVersion) {
+    public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
 
         return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
             .stream()
-            .map(this::toTriggerDefinitionDTO)
+            .map(triggerDefinition -> toTriggerDefinitionDTO(triggerDefinition, componentDefinition))
             .toList();
     }
 
-    private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
-        return new TriggerDefinitionDTO(
-            OptionalUtils.orElse(triggerDefinition.getBatch(), false), triggerDefinition.getDescription(),
-            triggerDefinition.getSampleOutput(), OptionalUtils.orElse(triggerDefinition.getHelp(), null),
-            triggerDefinition.getName(),
-            OptionalUtils.orElse(triggerDefinition.getOutputSchema(), Collections.emptyList()),
-            OptionalUtils.orElse(triggerDefinition.getProperties(), Collections.emptyList()),
-            triggerDefinition.getTitle(), triggerDefinition.getType());
+    private TriggerDefinitionDTO toTriggerDefinitionDTO(
+        TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+
+        return new TriggerDefinitionDTO(triggerDefinition, componentDefinition);
     }
 }

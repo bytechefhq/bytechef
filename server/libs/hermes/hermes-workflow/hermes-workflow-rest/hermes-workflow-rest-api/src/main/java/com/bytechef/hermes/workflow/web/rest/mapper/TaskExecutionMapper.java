@@ -23,6 +23,8 @@ import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
@@ -31,4 +33,8 @@ public interface TaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExe
 
     @Override
     TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
+
+    default String map(Optional<String> value) {
+        return value.orElse(null);
+    }
 }

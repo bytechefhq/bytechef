@@ -24,6 +24,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationConte
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
+import com.bytechef.hermes.definition.registry.util.AuthorizationUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -109,10 +110,11 @@ public class HttpClientExecutorTest {
         Mockito.when(fileEntry.getMimeType())
             .thenReturn("text/plain");
 
-        MultipartBodyPublisher multipartBodyPublisher = (MultipartBodyPublisher) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
-            context,
-            HttpClientUtils.Body.of(
-                Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA));
+        MultipartBodyPublisher multipartBodyPublisher =
+            (MultipartBodyPublisher) HTTP_CLIENT_EXECUTOR.createBodyPublisher(
+                context,
+                HttpClientUtils.Body.of(
+                    Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA));
 
         Assertions.assertTrue(multipartBodyPublisher.mediaType()
             .toString()
@@ -498,9 +500,10 @@ public class HttpClientExecutorTest {
 
         @Override
         public void applyAuthorization(AuthorizationContext authorizationContext) {
-            authorization.getApply()
-                .accept(
-                    new MockInputParameters(parameters), authorizationContext, null, null);
+            // TODO mock ConnectionDefinitionService
+            Authorization.ApplyConsumer applyConsumer = AuthorizationUtils.getDefaultApply(authorization.getType());
+
+            applyConsumer.accept(new MockInputParameters(parameters), authorizationContext);
         }
 
         @Override

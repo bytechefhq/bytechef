@@ -59,7 +59,7 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     @Override
     public Property<?> modifyProperty(Property<?> property) {
         if (Objects.equals(property.getName(), "listId")) {
-            ((ModifiableStringProperty) property).options(MailchimpUtils.getListIdOptionsDataSource());
+            ((ModifiableStringProperty) property).options(MailchimpUtils.getListIdOptions());
         }
 
         return property;

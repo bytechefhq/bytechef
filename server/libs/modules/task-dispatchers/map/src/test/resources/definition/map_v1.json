@@ -10,6 +10,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "List of items",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "list",
@@ -17,7 +18,7 @@
     "defaultValue": null,
     "exampleValue": null,
     "items": null,
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
     "controlType": "OBJECT_BUILDER"
@@ -28,6 +29,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Item Var",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "itemVar",
@@ -36,8 +38,8 @@
     "exampleValue": null,
     "controlType": "INPUT_TEXT",
     "options": null,
-    "optionsDataSource": null,
-    "sampleDataType": null
+    "sampleDataType": null,
+    "optionsDataSource": null
   }, {
     "advancedOption": null,
     "description": "The name of the index variable.",
@@ -45,6 +47,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Item Index",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "itemIndex",
@@ -53,8 +56,8 @@
     "exampleValue": null,
     "controlType": "INPUT_TEXT",
     "options": null,
-    "optionsDataSource": null,
-    "sampleDataType": null
+    "sampleDataType": null,
+    "optionsDataSource": null
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -64,6 +67,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": null,
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "iteratee",
@@ -71,11 +75,11 @@
     "defaultValue": null,
     "exampleValue": null,
     "additionalProperties": null,
-    "multipleValues": true,
+    "multipleValues": null,
     "objectType": "TASK",
     "options": null,
-    "optionsDataSource": null,
     "properties": null,
+    "optionsDataSource": null,
     "controlType": "EXPRESSION"
   } ],
   "title": "Map",

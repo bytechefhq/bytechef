@@ -18,7 +18,6 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
-import com.bytechef.component.jsonfile.util.JsonStreamUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -115,7 +114,7 @@ public class JsonFileReadAction {
 
             if (fileType == FileType.JSON) {
                 if (path == null) {
-                    try (Stream<Map<String, ?>> stream = JsonStreamUtils.stream(inputStream)) {
+                    try (Stream<Map<String, ?>> stream = JsonUtils.stream(inputStream)) {
                         items = stream.toList();
                     }
                 } else {

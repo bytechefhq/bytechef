@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.util;
 
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +28,7 @@ public class DefinitionUtils {
 
     public static String readIcon(String icon) {
         if (icon != null && icon.startsWith("path:")) {
-            ClassLoader classLoader = ComponentDefinitionServiceImpl.class.getClassLoader();
+            ClassLoader classLoader = DefinitionUtils.class.getClassLoader();
 
             try (InputStream inputStream = classLoader.getResourceAsStream(icon.replace("path:", ""))) {
                 if (inputStream != null) {

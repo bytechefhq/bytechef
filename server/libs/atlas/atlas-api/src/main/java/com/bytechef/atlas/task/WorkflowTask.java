@@ -63,8 +63,7 @@ public class WorkflowTask implements Task {
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
                 this.finalize = CollectionUtils.map(
-                    MapValueUtils.getList(
-                        source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()),
+                    MapValueUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()),
                     WorkflowTask::new);
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
@@ -78,13 +77,11 @@ public class WorkflowTask implements Task {
                 this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
             } else if (WorkflowConstants.POST.equals(entry.getKey())) {
                 this.post = CollectionUtils.map(
-                    MapValueUtils.getList(
-                        source, WorkflowConstants.POST, Map.class, Collections.emptyList()),
+                    MapValueUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList()),
                     WorkflowTask::new);
             } else if (WorkflowConstants.PRE.equals(entry.getKey())) {
                 this.pre = CollectionUtils.map(
-                    MapValueUtils.getList(
-                        source, WorkflowConstants.PRE, Map.class, Collections.emptyList()),
+                    MapValueUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList()),
                     WorkflowTask::new);
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
                 this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);

@@ -19,12 +19,11 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableSampleOutputDataSource;
 
 /**
  * @author Ivica Cardic
  */
-public sealed interface SampleOutputDataSource permits ModifiableSampleOutputDataSource {
+public interface SampleOutputDataSource {
 
     /**
      * The function that returns an example output.
