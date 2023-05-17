@@ -10,6 +10,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Workflow Id",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "workflowId",
@@ -18,8 +19,8 @@
     "exampleValue": null,
     "controlType": "INPUT_TEXT",
     "options": null,
-    "optionsDataSource": null,
-    "sampleDataType": null
+    "sampleDataType": null,
+    "optionsDataSource": null
   } ],
   "resources": null,
   "taskProperties": null,

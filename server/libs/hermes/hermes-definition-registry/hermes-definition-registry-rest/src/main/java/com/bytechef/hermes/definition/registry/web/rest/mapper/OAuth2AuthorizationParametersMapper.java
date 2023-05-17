@@ -31,5 +31,5 @@ public interface OAuth2AuthorizationParametersMapper
     extends Converter<OAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel> {
 
     @Override
-    OAuth2AuthorizationParametersModel convert(OAuth2AuthorizationParametersDTO source);
+    OAuth2AuthorizationParametersModel convert(OAuth2AuthorizationParametersDTO oAuth2AuthorizationParametersDTO);
 }

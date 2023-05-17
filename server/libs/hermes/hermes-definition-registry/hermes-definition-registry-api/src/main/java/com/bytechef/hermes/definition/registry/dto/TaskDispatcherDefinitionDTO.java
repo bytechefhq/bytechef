@@ -17,21 +17,57 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Resources;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record TaskDispatcherDefinitionDTO(
-    String description, String icon, String name, List<Property<? extends Property<?>>> outputSchema,
-    List<Property<?>> properties, Resources resources, List<Property<?>> taskProperties, String title, int version) {
+    Optional<String> description, Optional<String> icon, String name, List<? extends PropertyDTO> outputSchema,
+    List<? extends PropertyDTO> properties, Optional<ResourcesDTO> resources,
+    List<? extends PropertyDTO> taskProperties, String title, int version) {
 
     public TaskDispatcherDefinitionDTO(String name) {
-        this(null, null, name, null, null, null, null, null, 0);
+        this(
+            Optional.empty(), Optional.empty(), name, List.of(), List.of(), Optional.empty(), List.of(),
+            null, 1);
+    }
+
+    public TaskDispatcherDefinitionDTO(TaskDispatcherDefinition taskDispatcherDefinition) {
+        this(
+            taskDispatcherDefinition.getDescription(), getIcon(taskDispatcherDefinition),
+            taskDispatcherDefinition.getName(),
+            CollectionUtils.map(
+                OptionalUtils.orElse(taskDispatcherDefinition.getOutputSchema(), List.of()),
+                PropertyDTO::toPropertyDTO),
+            CollectionUtils.map(
+                OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), PropertyDTO::toPropertyDTO),
+            getResources(taskDispatcherDefinition),
+            CollectionUtils.map(
+                OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
+                PropertyDTO::toPropertyDTO),
+            getTitle(taskDispatcherDefinition), taskDispatcherDefinition.getVersion());
+    }
+
+    private static Optional<String> getIcon(TaskDispatcherDefinition taskDispatcherDefinition) {
+        return taskDispatcherDefinition.getIcon()
+            .map(DefinitionUtils::readIcon);
+    }
+
+    private static Optional<ResourcesDTO> getResources(TaskDispatcherDefinition taskDispatcherDefinition) {
+        return taskDispatcherDefinition.getResources()
+            .map(ResourcesDTO::new);
+    }
+
+    public static String getTitle(TaskDispatcherDefinition taskDispatcherDefinition) {
+        return OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName());
     }
 }

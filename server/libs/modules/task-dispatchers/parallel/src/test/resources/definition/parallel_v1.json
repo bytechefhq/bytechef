@@ -12,6 +12,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": null,
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "tasks",
@@ -25,6 +26,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": null,
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": null,
@@ -32,17 +34,17 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": "TASK",
       "options": null,
-      "optionsDataSource": null,
       "properties": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     } ],
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
   } ],
   "title": "Parallel",
   "version": 1

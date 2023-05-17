@@ -38,7 +38,6 @@ import com.bytechef.atlas.service.WorkflowServiceImpl;
 import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -67,10 +66,10 @@ import java.util.List;
 @SpringBootConfiguration
 public class TaskDispatcherIntTestConfiguration {
 
-    @Bean
-    JavaTimeModule javaTimeModule() {
-        return new JavaTimeModule();
-    }
+//    @Bean
+//    JavaTimeModule javaTimeModule() {
+//        return new JavaTimeModule();
+//    }
 
     @EnableCaching
     @TestConfiguration

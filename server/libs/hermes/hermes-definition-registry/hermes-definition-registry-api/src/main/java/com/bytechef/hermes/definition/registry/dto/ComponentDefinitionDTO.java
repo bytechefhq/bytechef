@@ -17,21 +17,105 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Resources;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.component.action.CustomAction;
+import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record ComponentDefinitionDTO(
-    List<ActionDefinitionBasicDTO> actions, String category, ConnectionDefinitionBasicDTO connection,
-    String description, String icon, String name, Resources resources, String[] tags,
-    List<TriggerDefinitionBasicDTO> triggers, String title, int version) {
+    List<ActionDefinitionBasicDTO> actions, Optional<String> category,
+    Optional<ConnectionDefinitionBasicDTO> connection, Optional<String> description, Optional<String> icon,
+    String name, Optional<ResourcesDTO> resources, List<String> tags, List<TriggerDefinitionBasicDTO> triggers,
+    String title, int version) {
 
     public ComponentDefinitionDTO(String name) {
-        this(null, null, null, null, null, name, null, null, null, null, 0);
+        this(List.of(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), name, Optional.empty(),
+            List.of(), List.of(), null, 1);
+    }
+
+    public ComponentDefinitionDTO(ComponentDefinition componentDefinition) {
+        this(
+            getActions(componentDefinition), componentDefinition.getCategory(), getConnection(componentDefinition),
+            componentDefinition.getDescription(), getIcon(componentDefinition),
+            componentDefinition.getName(), getResources(componentDefinition),
+            OptionalUtils.orElse(componentDefinition.getTags(), null),
+            OptionalUtils.mapOrElse(
+                componentDefinition.getTriggers(),
+                triggerDefinitions -> CollectionUtils.map(
+                    triggerDefinitions,
+                    triggerDefinition -> ComponentDefinitionDTO.toTriggerDefinitionBasicDTO(
+                        triggerDefinition, componentDefinition)),
+                Collections.emptyList()),
+            getTitle(componentDefinition), componentDefinition.getVersion());
+    }
+
+    private static List<ActionDefinitionBasicDTO> getActions(ComponentDefinition componentDefinition) {
+        List<ActionDefinitionBasicDTO> actionDefinitionBasicDTOs = OptionalUtils.mapOrElse(
+            componentDefinition.getActions(),
+            actionDefinitions -> CollectionUtils.map(
+                actionDefinitions,
+                actionDefinition -> toActionDefinitionBasicDTO(actionDefinition, componentDefinition)),
+            Collections.emptyList());
+
+        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
+            actionDefinitionBasicDTOs = new ArrayList<>(actionDefinitionBasicDTOs);
+
+            actionDefinitionBasicDTOs.add(
+                toActionDefinitionBasicDTO(
+                    CustomAction.getCustomActionDefinition(componentDefinition), componentDefinition));
+        }
+
+        return actionDefinitionBasicDTOs;
+    }
+
+    private static Optional<ConnectionDefinitionBasicDTO> getConnection(ComponentDefinition componentDefinition) {
+        return componentDefinition.getConnection()
+            .map(connectionDefinition -> toConnectionDefinitionDTO(connectionDefinition, componentDefinition));
+    }
+
+    private static Optional<String> getIcon(ComponentDefinition componentDefinition) {
+        return componentDefinition.getIcon()
+            .map(DefinitionUtils::readIcon);
+    }
+
+    private static Optional<ResourcesDTO> getResources(ComponentDefinition componentDefinition) {
+        return componentDefinition.getResources()
+            .map(ResourcesDTO::new);
+    }
+
+    public static String getTitle(ComponentDefinition componentDefinition) {
+        return OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName());
+    }
+
+    private static ActionDefinitionBasicDTO toActionDefinitionBasicDTO(
+        ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+
+        return new ActionDefinitionBasicDTO(actionDefinition, componentDefinition);
+    }
+
+    private static ConnectionDefinitionBasicDTO toConnectionDefinitionDTO(
+        ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
+
+        return new ConnectionDefinitionBasicDTO(connectionDefinition, componentDefinition);
+    }
+
+    private static TriggerDefinitionBasicDTO toTriggerDefinitionBasicDTO(
+        TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+
+        return new TriggerDefinitionBasicDTO(triggerDefinition, componentDefinition);
     }
 }

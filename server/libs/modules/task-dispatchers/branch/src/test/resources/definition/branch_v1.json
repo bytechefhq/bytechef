@@ -10,6 +10,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Expression",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "expression",
@@ -18,8 +19,8 @@
     "exampleValue": null,
     "controlType": "INPUT_TEXT",
     "options": null,
-    "optionsDataSource": null,
-    "sampleDataType": null
+    "sampleDataType": null,
+    "optionsDataSource": null
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -29,6 +30,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": null,
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "cases",
@@ -42,6 +44,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": null,
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": null,
@@ -49,10 +52,9 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": null,
       "options": null,
-      "optionsDataSource": null,
       "properties": [ {
         "advancedOption": null,
         "description": null,
@@ -60,6 +62,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "key",
@@ -68,8 +71,8 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The list of tasks.",
@@ -77,6 +80,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "tasks",
@@ -90,6 +94,7 @@
           "expressionEnabled": null,
           "hidden": null,
           "label": null,
+          "metadata": { },
           "placeholder": null,
           "required": null,
           "name": null,
@@ -97,24 +102,25 @@
           "defaultValue": null,
           "exampleValue": null,
           "additionalProperties": null,
-          "multipleValues": true,
+          "multipleValues": null,
           "objectType": "TASK",
           "options": null,
-          "optionsDataSource": null,
           "properties": null,
-          "controlType": "EXPRESSION"
+          "controlType": "EXPRESSION",
+          "optionsDataSource": null
         } ],
-        "multipleValues": true,
+        "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
@@ -122,6 +128,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": null,
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "default",
@@ -135,6 +142,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": null,
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": null,
@@ -142,17 +150,17 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": "TASK",
       "options": null,
-      "optionsDataSource": null,
       "properties": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     } ],
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
   } ],
   "title": "Branch",
   "version": 1

@@ -4,15 +4,18 @@
     "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "appendValueToList",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -21,15 +24,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace for appending a value.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -58,15 +62,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Value",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "value",
@@ -75,8 +80,10 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -84,17 +91,18 @@
         "defaultValue": null,
         "exampleValue": null,
         "items": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -112,14 +120,15 @@
           "name": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX",
-        "expressionEnabled": null
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -129,15 +138,16 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -148,15 +158,16 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -164,19 +175,20 @@
         "defaultValue": null,
         "exampleValue": null,
         "additionalProperties": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "objectType": null,
         "options": null,
-        "optionsDataSource": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -185,28 +197,29 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
-        "type": "NULL",
-        "expressionEnabled": null
-      } ],
-      "expressionEnabled": null
+        "type": "NULL"
+      } ]
     }, {
       "advancedOption": null,
       "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Create value if missing",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "createValueIfMissing",
@@ -224,14 +237,15 @@
         "name": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX",
-      "expressionEnabled": null
+      "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
       "description": "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Append a list as a single item",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "appendListAsSingleItem",
@@ -249,26 +263,30 @@
         "name": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX",
-      "expressionEnabled": null
+      "controlType": "CHECKBOX"
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Append Value to List",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Append Value to List"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "atomicIncrement",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to increment.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -277,15 +295,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to obtain a value from.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -314,15 +333,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value that can be added to the existing numeric value, which may have a negative value.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Value to add",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "valueToAdd",
@@ -332,27 +352,31 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionEnabled": null
+      "optionsDataSource": null
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Atomic Increment",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Atomic Increment"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "awaitGetValue",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to wait for.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -361,15 +385,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to obtain a value from.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -398,15 +423,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Timeout (1 to 300 sec)",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "timeout",
@@ -416,27 +442,31 @@
       "maxValue": 300,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionEnabled": null
+      "optionsDataSource": null
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Await Get Value",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Await Get Value"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "deleteValue",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to delete, stored earlier in the selected scope.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -445,15 +475,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -482,27 +513,31 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Delete Value",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Delete Value"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Delete a value from the given index in a list.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "deleteValueFromlist",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list to delete value from, stored earlier in the selected scope.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -511,15 +546,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -548,15 +584,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Index",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "index",
@@ -566,27 +603,31 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionEnabled": null
+      "optionsDataSource": null
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Delete Value from List",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Delete Value from List"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "getAllKeys",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The namespace to get keys from.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -615,27 +656,31 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Get All Keys",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Get All Keys"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "getValue",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to get, stored earlier in the selected scope.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -644,15 +689,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -681,15 +727,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Default value",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "defaultValue",
@@ -698,8 +745,10 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -707,17 +756,18 @@
         "defaultValue": null,
         "exampleValue": null,
         "items": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -735,14 +785,15 @@
           "name": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX",
-        "expressionEnabled": null
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -752,15 +803,16 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -771,15 +823,16 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -787,19 +840,20 @@
         "defaultValue": null,
         "exampleValue": null,
         "additionalProperties": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "objectType": null,
         "options": null,
-        "optionsDataSource": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -808,40 +862,44 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
-        "type": "NULL",
-        "expressionEnabled": null
-      } ],
-      "expressionEnabled": null
+        "type": "NULL"
+      } ]
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Get Value",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Get Value"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "setValue",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -850,15 +908,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -887,15 +946,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Value",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "value",
@@ -904,8 +964,10 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -913,17 +975,18 @@
         "defaultValue": null,
         "exampleValue": null,
         "items": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -941,14 +1004,15 @@
           "name": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX",
-        "expressionEnabled": null
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -958,15 +1022,16 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -977,15 +1042,16 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -993,19 +1059,20 @@
         "defaultValue": null,
         "exampleValue": null,
         "additionalProperties": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "objectType": null,
         "options": null,
-        "optionsDataSource": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1014,40 +1081,44 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
-        "type": "NULL",
-        "expressionEnabled": null
-      } ],
-      "expressionEnabled": null
+        "type": "NULL"
+      } ]
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Set Value",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Set Value"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
     "description": "Set value under a specified index in a list.",
     "sampleOutput": null,
+    "execute": { },
     "help": null,
+    "metadata": null,
     "name": "setValueInList",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "key",
@@ -1056,15 +1127,16 @@
       "exampleValue": null,
       "controlType": "INPUT_TEXT",
       "options": null,
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Scope",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "scope",
@@ -1093,15 +1165,16 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The index in a list to set a value under. The previous value will be overridden.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Index",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "index",
@@ -1111,15 +1184,16 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionEnabled": null
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Value",
+      "metadata": { },
       "placeholder": null,
       "required": true,
       "name": "value",
@@ -1128,8 +1202,10 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1137,17 +1213,18 @@
         "defaultValue": null,
         "exampleValue": null,
         "items": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1165,14 +1242,15 @@
           "name": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX",
-        "expressionEnabled": null
+        "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1182,15 +1260,16 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1201,15 +1280,16 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1217,19 +1297,20 @@
         "defaultValue": null,
         "exampleValue": null,
         "additionalProperties": null,
-        "multipleValues": true,
+        "multipleValues": null,
         "objectType": null,
         "options": null,
-        "optionsDataSource": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
@@ -1238,26 +1319,27 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionEnabled": null
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": null,
-        "type": "NULL",
-        "expressionEnabled": null
-      } ],
-      "expressionEnabled": null
+        "type": "NULL"
+      } ]
     } ],
-    "sampleOutputDataSource": null,
+    "title": "Set Value in List",
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "title": "Set Value in List"
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -1266,6 +1348,8 @@
   "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
   "icon": "path:assets/datastorage.svg",
   "tags": null,
+  "filterCompatibleConnectionDefinitions": null,
+  "metadata": null,
   "name": "dataStorage",
   "resources": null,
   "version": 1,

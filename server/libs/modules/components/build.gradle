@@ -8,7 +8,7 @@ subprojects {
 
         api project(":server:libs:hermes:hermes-component:hermes-component-api")
 
-        implementation "com.fasterxml.jackson.core:jackson-databind"
+//        implementation "com.fasterxml.jackson.core:jackson-databind"
         implementation "org.slf4j:slf4j-api"
         implementation libs.com.google.auto.service.auto.service.annotations
 

@@ -18,11 +18,15 @@
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.dto.HelpDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.HelpModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -35,6 +39,17 @@ public class ActionDefinitionMapper {
 
         @Override
         ActionDefinitionModel convert(ActionDefinitionDTO actionDefinitionDTO);
+
+        HelpModel map(HelpDTO helpDTO);
+
+        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
+            return optional.map(this::map)
+                .orElse(null);
+        }
+
+        default String mapToString(Optional<String> value) {
+            return value.orElse(null);
+        }
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
@@ -43,5 +58,16 @@ public class ActionDefinitionMapper {
 
         @Override
         ActionDefinitionBasicModel convert(ActionDefinitionDTO actionDefinitionDTO);
+
+        HelpModel map(HelpDTO helpDTO);
+
+        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
+            return optional.map(this::map)
+                .orElse(null);
+        }
+
+        default String mapToString(Optional<String> value) {
+            return value.orElse(null);
+        }
     }
 }

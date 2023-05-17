@@ -1,19 +1,13 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesDataSourceModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -24,9 +18,9 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyAllOfModel {
 
-  private DynamicPropertiesDataSourceModel dynamicPropertiesDataSource;
+  private PropertiesDataSourceModel dynamicPropertiesDataSource;
 
-  public DynamicPropertiesPropertyAllOfModel dynamicPropertiesDataSource(DynamicPropertiesDataSourceModel dynamicPropertiesDataSource) {
+  public DynamicPropertiesPropertyAllOfModel dynamicPropertiesDataSource(PropertiesDataSourceModel dynamicPropertiesDataSource) {
     this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
     return this;
   }
@@ -35,14 +29,14 @@ public class DynamicPropertiesPropertyAllOfModel {
    * Get dynamicPropertiesDataSource
    * @return dynamicPropertiesDataSource
   */
-  @Valid 
+  @Valid
   @Schema(name = "dynamicPropertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("dynamicPropertiesDataSource")
-  public DynamicPropertiesDataSourceModel getDynamicPropertiesDataSource() {
+  public PropertiesDataSourceModel getDynamicPropertiesDataSource() {
     return dynamicPropertiesDataSource;
   }
 
-  public void setDynamicPropertiesDataSource(DynamicPropertiesDataSourceModel dynamicPropertiesDataSource) {
+  public void setDynamicPropertiesDataSource(PropertiesDataSourceModel dynamicPropertiesDataSource) {
     this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
   }
 

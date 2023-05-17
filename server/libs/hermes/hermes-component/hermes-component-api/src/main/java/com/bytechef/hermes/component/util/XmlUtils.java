@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.util;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -48,6 +49,10 @@ public final class XmlUtils {
         return xmlMapper.readList(xml);
     }
 
+    public static Stream<Map<String, ?>> stream(InputStream inputStream) {
+        return xmlMapper.stream(inputStream);
+    }
+
     public static String write(Object object) {
         return xmlMapper.write(object);
     }
@@ -66,6 +71,8 @@ public final class XmlUtils {
         <T> List<T> readList(InputStream inputStream);
 
         <T> List<T> readList(String xml);
+
+        Stream<Map<String, ?>> stream(InputStream inputStream);
 
         String write(Object object);
 

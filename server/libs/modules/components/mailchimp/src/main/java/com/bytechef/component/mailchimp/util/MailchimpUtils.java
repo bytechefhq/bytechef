@@ -17,8 +17,7 @@
 
 package com.bytechef.component.mailchimp.util;
 
-import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
-import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.OptionsFunction;
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.Option;
 
@@ -47,8 +46,8 @@ public class MailchimpUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static ComponentOptionsDataSource getListIdOptionsDataSource() {
-        return () -> (OptionsFunction) (connection, inputParameters) -> {
+    public static ComponentOptionsFunction getListIdOptions() {
+        return (connection, inputParameters) -> {
             Map<?, ?> response = ((Map<?, ?>) HttpClientUtils
                 .get("https://%s.api.mailchimp.com/3.0/lists".formatted(
                     getMailChimpServer(connection.getRequiredString(ACCESS_TOKEN))))

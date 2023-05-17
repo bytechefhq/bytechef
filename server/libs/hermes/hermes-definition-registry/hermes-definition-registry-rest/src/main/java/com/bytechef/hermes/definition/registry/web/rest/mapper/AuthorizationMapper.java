@@ -23,6 +23,8 @@ import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationModel
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
@@ -33,5 +35,9 @@ public class AuthorizationMapper {
 
         @Override
         AuthorizationModel convert(AuthorizationDTO authorizationDTO);
+
+        default String mapToString(Optional<String> value) {
+            return value.orElse(null);
+        }
     }
 }

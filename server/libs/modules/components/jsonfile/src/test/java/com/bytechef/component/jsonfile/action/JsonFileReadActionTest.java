@@ -21,15 +21,20 @@ import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.util.JsonMapper;
+import com.bytechef.hermes.component.util.JsonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,6 +58,11 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 public class JsonFileReadActionTest {
 
     private static final Context context = Mockito.mock(Context.class);
+
+    @BeforeAll
+    public static void beforeAll() {
+        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
+    }
 
     @BeforeEach
     public void beforeEach() {
