@@ -1134,16 +1134,6 @@ components:
               $ref: "#/components/schemas/Option"
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
-    DynamicPropertiesDataSource:
-      description: "Defines function that should load properties."
-      type: "object"
-      properties:
-        loadPropertiesDependsOn:
-          description: "The list of property names on which value change the properties\
-            \ should load/reload."
-          type: "array"
-          items:
-            type: "string"
     DynamicPropertiesProperty:
       description: "A dynamic properties property type."
       type: "object"
@@ -1151,8 +1141,8 @@ components:
       - $ref: "#/components/schemas/Property"
       - type: "object"
         properties:
-          dynamicPropertiesDataSource:
-            $ref: "#/components/schemas/DynamicPropertiesDataSource"
+          propertiesDataSource:
+            $ref: "#/components/schemas/PropertiesDataSource"
     Help:
       description: "The help text that is meant to guide your users as to how to configure\
         \ this action or trigger."
@@ -1296,6 +1286,16 @@ components:
         loadOptionsDependsOn:
           description: "The list of property names on which value change the property\
             \ options should load/reload."
+          type: "array"
+          items:
+            type: "string"
+    PropertiesDataSource:
+      description: "Defines function that should load properties."
+      type: "object"
+      properties:
+        loadPropertiesDependsOn:
+          description: "The list of property names on which value change the properties\
+            \ should load/reload."
           type: "array"
           items:
             type: "string"
@@ -1454,15 +1454,13 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
-          hour:
-            description: "The hour."
-            type: "integer"
-          minute:
-            description: "The minute."
-            type: "integer"
-          second:
-            description: "The second."
-            type: "integer"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
     TriggerDefinition:
       description: "A trigger definition defines ways to trigger workflows from the\
         \ outside services."
