@@ -1,13 +1,19 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertiesDataSourceModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -15,29 +21,29 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DynamicPropertiesProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyAllOfModel {
 
-  private PropertiesDataSourceModel dynamicPropertiesDataSource;
+  private PropertiesDataSourceModel propertiesDataSource;
 
-  public DynamicPropertiesPropertyAllOfModel dynamicPropertiesDataSource(PropertiesDataSourceModel dynamicPropertiesDataSource) {
-    this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
+  public DynamicPropertiesPropertyAllOfModel propertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+    this.propertiesDataSource = propertiesDataSource;
     return this;
   }
 
   /**
-   * Get dynamicPropertiesDataSource
-   * @return dynamicPropertiesDataSource
+   * Get propertiesDataSource
+   * @return propertiesDataSource
   */
-  @Valid
-  @Schema(name = "dynamicPropertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("dynamicPropertiesDataSource")
-  public PropertiesDataSourceModel getDynamicPropertiesDataSource() {
-    return dynamicPropertiesDataSource;
+  @Valid 
+  @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("propertiesDataSource")
+  public PropertiesDataSourceModel getPropertiesDataSource() {
+    return propertiesDataSource;
   }
 
-  public void setDynamicPropertiesDataSource(PropertiesDataSourceModel dynamicPropertiesDataSource) {
-    this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
+  public void setPropertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+    this.propertiesDataSource = propertiesDataSource;
   }
 
   @Override
@@ -49,19 +55,19 @@ public class DynamicPropertiesPropertyAllOfModel {
       return false;
     }
     DynamicPropertiesPropertyAllOfModel dynamicPropertiesPropertyAllOf = (DynamicPropertiesPropertyAllOfModel) o;
-    return Objects.equals(this.dynamicPropertiesDataSource, dynamicPropertiesPropertyAllOf.dynamicPropertiesDataSource);
+    return Objects.equals(this.propertiesDataSource, dynamicPropertiesPropertyAllOf.propertiesDataSource);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(dynamicPropertiesDataSource);
+    return Objects.hash(propertiesDataSource);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DynamicPropertiesPropertyAllOfModel {\n");
-    sb.append("    dynamicPropertiesDataSource: ").append(toIndentedString(dynamicPropertiesDataSource)).append("\n");
+    sb.append("    propertiesDataSource: ").append(toIndentedString(propertiesDataSource)).append("\n");
     sb.append("}");
     return sb.toString();
   }

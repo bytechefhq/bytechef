@@ -1,24 +1,29 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
  * Defines function that should load properties.
  */
 
-@Schema(name = "DynamicPropertiesDataSource", description = "Defines function that should load properties.")
-@JsonTypeName("DynamicPropertiesDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
+@Schema(name = "PropertiesDataSource", description = "Defines function that should load properties.")
+@JsonTypeName("PropertiesDataSource")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
 public class PropertiesDataSourceModel {
 
   @Valid
@@ -41,7 +46,7 @@ public class PropertiesDataSourceModel {
    * The list of property names on which value change the properties should load/reload.
    * @return loadPropertiesDependsOn
   */
-
+  
   @Schema(name = "loadPropertiesDependsOn", description = "The list of property names on which value change the properties should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("loadPropertiesDependsOn")
   public List<String> getLoadPropertiesDependsOn() {
@@ -60,8 +65,8 @@ public class PropertiesDataSourceModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PropertiesDataSourceModel dynamicPropertiesDataSource = (PropertiesDataSourceModel) o;
-    return Objects.equals(this.loadPropertiesDependsOn, dynamicPropertiesDataSource.loadPropertiesDependsOn);
+    PropertiesDataSourceModel propertiesDataSource = (PropertiesDataSourceModel) o;
+    return Objects.equals(this.loadPropertiesDependsOn, propertiesDataSource.loadPropertiesDependsOn);
   }
 
   @Override
@@ -72,7 +77,7 @@ public class PropertiesDataSourceModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class DynamicPropertiesDataSourceModel {\n");
+    sb.append("class PropertiesDataSourceModel {\n");
     sb.append("    loadPropertiesDependsOn: ").append(toIndentedString(loadPropertiesDependsOn)).append("\n");
     sb.append("}");
     return sb.toString();

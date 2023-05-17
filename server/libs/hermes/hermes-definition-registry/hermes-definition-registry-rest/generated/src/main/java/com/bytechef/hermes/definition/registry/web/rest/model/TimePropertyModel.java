@@ -3,6 +3,8 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -28,73 +32,60 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TimeProperty", description = "A time property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
 public class TimePropertyModel extends ValuePropertyModel {
 
-  private Integer hour;
+  @Valid
+  private List<@Valid OptionModel> options;
 
-  private Integer minute;
+  private OptionsDataSourceModel optionsDataSource;
 
-  private Integer second;
+  public TimePropertyModel options(List<@Valid OptionModel> options) {
+    this.options = options;
+    return this;
+  }
 
-  public TimePropertyModel hour(Integer hour) {
-    this.hour = hour;
+  public TimePropertyModel addOptionsItem(OptionModel optionsItem) {
+    if (this.options == null) {
+      this.options = new ArrayList<>();
+    }
+    this.options.add(optionsItem);
     return this;
   }
 
   /**
-   * The hour.
-   * @return hour
+   * The list of valid property options.
+   * @return options
   */
-  
-  @Schema(name = "hour", description = "The hour.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("hour")
-  public Integer getHour() {
-    return hour;
+  @Valid 
+  @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
+    return options;
   }
 
-  public void setHour(Integer hour) {
-    this.hour = hour;
+  public void setOptions(List<@Valid OptionModel> options) {
+    this.options = options;
   }
 
-  public TimePropertyModel minute(Integer minute) {
-    this.minute = minute;
+  public TimePropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+    this.optionsDataSource = optionsDataSource;
     return this;
   }
 
   /**
-   * The minute.
-   * @return minute
+   * Get optionsDataSource
+   * @return optionsDataSource
   */
-  
-  @Schema(name = "minute", description = "The minute.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("minute")
-  public Integer getMinute() {
-    return minute;
+  @Valid 
+  @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsDataSource")
+  public OptionsDataSourceModel getOptionsDataSource() {
+    return optionsDataSource;
   }
 
-  public void setMinute(Integer minute) {
-    this.minute = minute;
-  }
-
-  public TimePropertyModel second(Integer second) {
-    this.second = second;
-    return this;
-  }
-
-  /**
-   * The second.
-   * @return second
-  */
-  
-  @Schema(name = "second", description = "The second.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("second")
-  public Integer getSecond() {
-    return second;
-  }
-
-  public void setSecond(Integer second) {
-    this.second = second;
+  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
+    this.optionsDataSource = optionsDataSource;
   }
 
   public TimePropertyModel controlType(ControlTypeModel controlType) {
@@ -171,15 +162,14 @@ public class TimePropertyModel extends ValuePropertyModel {
       return false;
     }
     TimePropertyModel timeProperty = (TimePropertyModel) o;
-    return Objects.equals(this.hour, timeProperty.hour) &&
-        Objects.equals(this.minute, timeProperty.minute) &&
-        Objects.equals(this.second, timeProperty.second) &&
+    return Objects.equals(this.options, timeProperty.options) &&
+        Objects.equals(this.optionsDataSource, timeProperty.optionsDataSource) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(hour, minute, second, super.hashCode());
+    return Objects.hash(options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -187,9 +177,8 @@ public class TimePropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class TimePropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    hour: ").append(toIndentedString(hour)).append("\n");
-    sb.append("    minute: ").append(toIndentedString(minute)).append("\n");
-    sb.append("    second: ").append(toIndentedString(second)).append("\n");
+    sb.append("    options: ").append(toIndentedString(options)).append("\n");
+    sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");
     return sb.toString();
   }

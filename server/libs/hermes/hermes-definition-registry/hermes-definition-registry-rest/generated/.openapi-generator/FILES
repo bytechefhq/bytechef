@@ -20,7 +20,6 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ControlType
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DateTimePropertyModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesDataSourceModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
@@ -37,13 +36,13 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfProper
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionsDataSourceModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertiesDataSourceModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ResourcesModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TimePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerDefinitionModel.java
