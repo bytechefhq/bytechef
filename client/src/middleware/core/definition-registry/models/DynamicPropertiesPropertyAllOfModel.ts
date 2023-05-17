@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DynamicPropertiesDataSourceModel } from './DynamicPropertiesDataSourceModel';
+import type { PropertiesDataSourceModel } from './PropertiesDataSourceModel';
 import {
-    DynamicPropertiesDataSourceModelFromJSON,
-    DynamicPropertiesDataSourceModelFromJSONTyped,
-    DynamicPropertiesDataSourceModelToJSON,
-} from './DynamicPropertiesDataSourceModel';
+    PropertiesDataSourceModelFromJSON,
+    PropertiesDataSourceModelFromJSONTyped,
+    PropertiesDataSourceModelToJSON,
+} from './PropertiesDataSourceModel';
 
 /**
  * 
@@ -28,10 +28,10 @@ import {
 export interface DynamicPropertiesPropertyAllOfModel {
     /**
      * 
-     * @type {DynamicPropertiesDataSourceModel}
+     * @type {PropertiesDataSourceModel}
      * @memberof DynamicPropertiesPropertyAllOfModel
      */
-    dynamicPropertiesDataSource?: DynamicPropertiesDataSourceModel;
+    propertiesDataSource?: PropertiesDataSourceModel;
 }
 
 /**
@@ -53,7 +53,7 @@ export function DynamicPropertiesPropertyAllOfModelFromJSONTyped(json: any, igno
     }
     return {
         
-        'dynamicPropertiesDataSource': !exists(json, 'dynamicPropertiesDataSource') ? undefined : DynamicPropertiesDataSourceModelFromJSON(json['dynamicPropertiesDataSource']),
+        'propertiesDataSource': !exists(json, 'propertiesDataSource') ? undefined : PropertiesDataSourceModelFromJSON(json['propertiesDataSource']),
     };
 }
 
@@ -66,7 +66,7 @@ export function DynamicPropertiesPropertyAllOfModelToJSON(value?: DynamicPropert
     }
     return {
         
-        'dynamicPropertiesDataSource': DynamicPropertiesDataSourceModelToJSON(value.dynamicPropertiesDataSource),
+        'propertiesDataSource': PropertiesDataSourceModelToJSON(value.propertiesDataSource),
     };
 }
 

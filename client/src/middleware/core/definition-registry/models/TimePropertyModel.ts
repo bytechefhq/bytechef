@@ -19,6 +19,18 @@ import {
     ControlTypeModelFromJSONTyped,
     ControlTypeModelToJSON,
 } from './ControlTypeModel';
+import type { OptionModel } from './OptionModel';
+import {
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
+import type { OptionsDataSourceModel } from './OptionsDataSourceModel';
+import {
+    OptionsDataSourceModelFromJSON,
+    OptionsDataSourceModelFromJSONTyped,
+    OptionsDataSourceModelToJSON,
+} from './OptionsDataSourceModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -39,23 +51,17 @@ import {
  */
 export interface TimePropertyModel extends ValuePropertyModel {
     /**
-     * The hour.
-     * @type {number}
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
      * @memberof TimePropertyModel
      */
-    hour?: number;
+    options?: Array<OptionModel>;
     /**
-     * The minute.
-     * @type {number}
+     * 
+     * @type {OptionsDataSourceModel}
      * @memberof TimePropertyModel
      */
-    minute?: number;
-    /**
-     * The second.
-     * @type {number}
-     * @memberof TimePropertyModel
-     */
-    second?: number;
+    optionsDataSource?: OptionsDataSourceModel;
 }
 
 /**
@@ -77,9 +83,8 @@ export function TimePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'hour': !exists(json, 'hour') ? undefined : json['hour'],
-        'minute': !exists(json, 'minute') ? undefined : json['minute'],
-        'second': !exists(json, 'second') ? undefined : json['second'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
@@ -92,9 +97,8 @@ export function TimePropertyModelToJSON(value?: TimePropertyModel | null): any {
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'hour': value.hour,
-        'minute': value.minute,
-        'second': value.second,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };
 }
 
