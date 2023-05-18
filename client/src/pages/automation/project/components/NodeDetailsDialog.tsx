@@ -1,3 +1,4 @@
+import {ArrowPathIcon} from '@heroicons/react/24/outline';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -13,6 +14,7 @@ import {twMerge} from 'tailwind-merge';
 import Select from '../../../../components/Select/Select';
 import Tooltip from '../../../../components/Tooltip/Tooltip';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
@@ -51,8 +53,6 @@ const NodeDetailsDialog = () => {
         componentName: currentNode.originNodeName || currentNode.name,
     });
 
-    const firstAction = currentComponent?.actions?.[0];
-
     const getActionName = (): string => {
         const currentComponentActionNames = currentComponent?.actions?.map(
             (action) => action.name
@@ -60,18 +60,21 @@ const NodeDetailsDialog = () => {
 
         return currentComponentActionNames?.includes(currentActionName)
             ? currentActionName
-            : (firstAction?.name as string);
+            : (currentComponent?.actions?.[0]?.name as string);
     };
 
-    const {data: currentAction, isFetched: currentActionFetched} =
-        useGetActionDefinitionQuery(
-            {
-                componentName: currentComponent?.name as string,
-                componentVersion: currentComponent?.version as number,
-                actionName: getActionName(),
-            },
-            !!currentComponent?.actions
-        );
+    const {
+        data: currentAction,
+        isFetched: currentActionFetched,
+        isLoading: currentActionLoading,
+    } = useGetActionDefinitionQuery(
+        {
+            componentName: currentComponent?.name as string,
+            componentVersion: currentComponent?.version as number,
+            actionName: getActionName(),
+        },
+        !!currentComponent?.actions
+    );
 
     const componentDefinitionNames = componentDefinitions?.map(
         (component) => component.name
@@ -108,8 +111,6 @@ const NodeDetailsDialog = () => {
             setCurrentActionName(currentAction.name);
         }
     }, [activeTab, currentAction, currentActionFetched]);
-
-    const singleActionComponent = currentComponent?.actions?.length === 1;
 
     const componentTabs = tabs.filter((tab) => {
         const {name} = tab;
@@ -172,65 +173,45 @@ const NodeDetailsDialog = () => {
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">
-                                {!!currentComponent?.actions?.length && (
-                                    <div className="border-b border-gray-100 p-4">
-                                        {singleActionComponent &&
-                                        !!firstAction ? (
-                                            <>
-                                                <span className="block text-sm font-medium leading-6">
-                                                    Action
-                                                </span>
-
-                                                <div className="flex flex-col overflow-hidden rounded-md bg-gray-100 px-4 py-2">
-                                                    <span className="inline-flex text-sm font-medium">
-                                                        {firstAction.title}
-                                                    </span>
-
-                                                    <p className="mt-1 line-clamp-2 w-full text-xs font-medium text-gray-500">
-                                                        {
-                                                            firstAction.description
-                                                        }
-                                                    </p>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <Select
-                                                contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
-                                                label="Actions"
-                                                onValueChange={(value) =>
-                                                    setCurrentActionName(value)
-                                                }
-                                                options={currentComponent.actions.map(
-                                                    (action) => ({
-                                                        description:
-                                                            action.description,
-                                                        label: action.title!,
-                                                        value: action.name,
-                                                    })
-                                                )}
-                                                triggerClassName="w-full bg-gray-100 border-none"
-                                            />
-                                        )}
-                                    </div>
-                                )}
+                                {currentComponent.actions &&
+                                    !!currentComponent.description && (
+                                        <CurrentActionSelect
+                                            actions={currentComponent.actions}
+                                            description={
+                                                currentComponent.description
+                                            }
+                                            handleValueChange={
+                                                setCurrentActionName
+                                            }
+                                        />
+                                    )}
 
                                 {componentTabs.length > 1 && (
                                     <div className="flex justify-center pt-4">
-                                        {componentTabs.map((tab) => (
-                                            <Button
-                                                className={twMerge(
-                                                    'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                    activeTab === tab.name &&
-                                                        'border-blue-500 text-blue-500 hover:text-blue-500'
-                                                )}
-                                                key={tab.name}
-                                                label={tab.label}
-                                                name={tab.name}
-                                                onClick={() =>
-                                                    setActiveTab(tab.name)
-                                                }
-                                            />
-                                        ))}
+                                        {currentActionLoading ? (
+                                            <ArrowPathIcon className="my-2 ml-4 mr-2 h-6 w-6 animate-spin" />
+                                        ) : (
+                                            <>
+                                                {componentTabs.map((tab) => (
+                                                    <Button
+                                                        className={twMerge(
+                                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                            activeTab ===
+                                                                tab.name &&
+                                                                'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                        )}
+                                                        key={tab.name}
+                                                        label={tab.label}
+                                                        name={tab.name}
+                                                        onClick={() =>
+                                                            setActiveTab(
+                                                                tab.name
+                                                            )
+                                                        }
+                                                    />
+                                                ))}
+                                            </>
+                                        )}
                                     </div>
                                 )}
 
