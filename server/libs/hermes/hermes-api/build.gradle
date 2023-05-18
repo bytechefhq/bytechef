@@ -2,8 +2,6 @@ dependencies {
     api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:core:error:error-api")
     api project(":server:libs:core:event:event-api")
-    api project(":server:libs:hermes:hermes-component:hermes-component-api")
-    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation project(":server:libs:core:commons:commons-data")
