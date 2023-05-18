@@ -18,6 +18,7 @@
 package com.bytechef.commons.typeconverter.conversion;
 
 import com.bytechef.commons.typeconverter.TypeConverter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Convert to a boolean by parsing the value as a string
@@ -37,7 +38,8 @@ public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> 
     }
 
     @Override
-    public Boolean convert(Object value) {
+    @SuppressFBWarnings("NP")
+    public Boolean convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

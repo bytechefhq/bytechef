@@ -270,7 +270,7 @@ public class WorkflowTask implements Task {
         }
 
         @SuppressWarnings("unchecked")
-        public WorkflowTask convert(Object value) {
+        public WorkflowTask convert(Object value, Object typeKey) {
             return new WorkflowTask((Map<String, ?>) value);
         }
     }

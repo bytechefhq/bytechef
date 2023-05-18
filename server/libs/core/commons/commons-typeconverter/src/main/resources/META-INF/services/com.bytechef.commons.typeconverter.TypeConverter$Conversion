@@ -5,6 +5,7 @@ com.bytechef.commons.typeconverter.conversion.CharacterTypeConversion
 com.bytechef.commons.typeconverter.conversion.DateTypeConversion
 com.bytechef.commons.typeconverter.conversion.DoubleTypeConversion
 com.bytechef.commons.typeconverter.conversion.DurationTypeConversion
+com.bytechef.commons.typeconverter.conversion.EnumTypeConversion
 com.bytechef.commons.typeconverter.conversion.FloatTypeConversion
 com.bytechef.commons.typeconverter.conversion.IntegerTypeConversion
 com.bytechef.commons.typeconverter.conversion.LocalDateTypeConversion

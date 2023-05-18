@@ -22,7 +22,7 @@ import com.bytechef.commons.typeconverter.TypeConverter;
 import java.sql.Time;
 
 /**
- * Convert to a {@link SqlTime} by parsing a value as a string of form <code>hh:mm:ss</code>.
+ * Convert to a {@link Time} by parsing a value as a string of form <code>hh:mm:ss</code>.
  *
  * @see java.sql.Date#valueOf(String)
  *
@@ -33,18 +33,18 @@ public class SqlTimeTypeConversion implements TypeConverter.Conversion<Time> {
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            java.sql.Time.class,
-            java.sql.Time.class.getName(),
+            Time.class,
+            Time.class.getName(),
             TypeConverter.TYPE_SQL_TIME
         };
     }
 
     @Override
-    public Time convert(Object value) {
+    public Time convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
-        if (!(value instanceof java.sql.Time)) {
+        if (!(value instanceof Time)) {
             String v = value.toString();
 
             v = v.trim();

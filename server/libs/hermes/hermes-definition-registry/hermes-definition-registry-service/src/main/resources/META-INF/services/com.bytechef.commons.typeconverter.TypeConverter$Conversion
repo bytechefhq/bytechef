@@ -1,4 +1,4 @@
-com.bytechef.hermes.definition.registry.component.ContextImpl.ContextFileEntryConverter
-com.bytechef.hermes.definition.registry.component.definition.WebhookBodyImpl.WebhookBodyConverter
-com.bytechef.hermes.definition.registry.component.definition.WebhookHeadersImpl.WebhookHeadersConverter
-com.bytechef.hermes.definition.registry.component.definition.WebhookParametersImpl.WebhookParametersConverter
+com.bytechef.hermes.definition.registry.component.ContextImpl$ContextFileEntryConverter
+com.bytechef.hermes.definition.registry.component.definition.WebhookBodyImpl$WebhookBodyConverter
+com.bytechef.hermes.definition.registry.component.definition.WebhookHeadersImpl$WebhookHeadersConverter
+com.bytechef.hermes.definition.registry.component.definition.WebhookParametersImpl$WebhookParametersConverter

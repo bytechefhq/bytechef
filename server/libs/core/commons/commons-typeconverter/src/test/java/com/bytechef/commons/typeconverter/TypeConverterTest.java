@@ -19,8 +19,10 @@ package com.bytechef.commons.typeconverter;
 
 import java.math.BigDecimal;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -29,11 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TypeConverterTest {
 
     @Test
+    @SuppressFBWarnings("BC")
     public void testGeneral() {
         Object in;
         Object out;
 
-        in = new Integer(12);
+        in = Integer.valueOf(12);
         out = TypeConverter.asString(in);
         assertTrue(out instanceof String);
         assertEquals("12", out);
@@ -102,24 +105,26 @@ public class TypeConverterTest {
             new StringWrapper.TypeConversion();
         TypeConverter.registerTypeConversion(conversion);
 
-        final String IN = "Hello, world";
-        final StringWrapper out = TypeConverter.convert(StringWrapper.class, IN);
-        assertEquals(StringWrapper.getWrappedString(IN), out.toString());
+        final String in = "Hello, world";
+        final StringWrapper out = TypeConverter.convert(StringWrapper.class, in);
+        assertEquals(StringWrapper.getWrappedString(in), out.toString());
     }
 
     @Test
-    public void testConversionUnregistration() throws IllegalArgumentException {
-        NaughtyConversion conversion = new NaughtyConversion();
-        TypeConverter.registerTypeConversion(conversion);
-        TypeConverter.registerTypeConversion("foobar", conversion);
+    public void testConversionUnregister() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            NaughtyConversion conversion = new NaughtyConversion();
+            TypeConverter.registerTypeConversion(conversion);
+            TypeConverter.registerTypeConversion("foobar", conversion);
 
-        conversion.setTypeKeys(new Object[0]);
+            conversion.setTypeKeys(new Object[0]);
 
-        // This should unregister it even though the keys are bogus
-        TypeConverter.unregisterTypeConversion(conversion);
+            // This should unregister it even though the keys are bogus
+            TypeConverter.unregisterTypeConversion(conversion);
 
-        // Throw exception
-        TypeConverter.convert(Bogus.class, "don't care");
+            // Throw exception
+            TypeConverter.convert(Bogus.class, "don't care");
+        });
     }
 
     @Test
@@ -128,29 +133,30 @@ public class TypeConverterTest {
         Object in;
         Object out;
 
-        TypeConverter.Conversion<String> converter =
-            TypeConverter.to(String.class);
+        TypeConverter.Conversion<String> converter = TypeConverter.to(String.class);
 
         in = 12;
-        out = converter.convert(in);
+        out = converter.convert(in, String.class);
         assertEquals("12", out);
 
         in = 13;
-        out = converter.convert(in);
+        out = converter.convert(in, String.class);
         assertEquals("13", out);
 
         in = "14";
-        out = converter.convert(in);
+        out = converter.convert(in, String.class);
         assertEquals("14", out);
 
         in = 1.1f;
-        out = converter.convert(in);
+        out = converter.convert(in, String.class);
         assertEquals("1.1", out);
     }
 
     @Test
-    public void testBogusInteger() throws IllegalArgumentException {
-        TypeConverter.asInt("bogus");
+    public void testBogusInteger() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            TypeConverter.asInt("bogus");
+        });
     }
 
     @Test

@@ -19,6 +19,8 @@ package com.bytechef.commons.typeconverter.conversion;
 
 import com.bytechef.commons.typeconverter.TypeConverter;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Converts the value to a string. If the value is a byte or char array, it is converted to a string via
  * {@link toString()}.
@@ -37,7 +39,7 @@ public class StringTypeConversion implements TypeConverter.Conversion<String> {
     }
 
     @Override
-    public String convert(Object value) {
+    public String convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
@@ -47,7 +49,7 @@ public class StringTypeConversion implements TypeConverter.Conversion<String> {
         if (valueClass.isArray()) {
             // This is a byte array; we can convert it to a string
             if (valueClass.getComponentType() == Byte.TYPE) {
-                value = new String((byte[]) value);
+                value = new String((byte[]) value, StandardCharsets.UTF_8);
             } else if (valueClass.getComponentType() == Character.TYPE) {
                 value = new String((char[]) value);
             }

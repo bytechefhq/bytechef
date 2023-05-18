@@ -44,7 +44,7 @@ public class DateTypeConversion implements TypeConverter.Conversion<Date> {
     }
 
     @Override
-    public Date convert(Object value) {
+    public Date convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
