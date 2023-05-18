@@ -1,0 +1,15 @@
+com.toddfast.util.convert.conversion.BigDecimalTypeConversion
+com.toddfast.util.convert.conversion.BooleanTypeConversion
+com.toddfast.util.convert.conversion.ByteTypeConversion
+com.toddfast.util.convert.conversion.CharacterTypeConversion
+com.toddfast.util.convert.conversion.DoubleTypeConversion
+com.toddfast.util.convert.conversion.FloatTypeConversion
+com.toddfast.util.convert.conversion.IntegerTypeConversion
+com.toddfast.util.convert.conversion.LongTypeConversion
+com.toddfast.util.convert.conversion.ObjectTypeConversion
+com.toddfast.util.convert.conversion.ShortTypeConversion
+com.toddfast.util.convert.conversion.SqlDateTypeConversion
+com.toddfast.util.convert.conversion.SqlTimeTypeConversion
+com.toddfast.util.convert.conversion.SqlTimestampTypeConversion
+com.toddfast.util.convert.conversion.StringTypeConversion
+com.toddfast.util.convert.conversion.UnknownTypeConversion
