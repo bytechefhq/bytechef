@@ -69,8 +69,7 @@ public class HttpClientExecutorTest {
         }
     };
 
-    private static final HttpClientExecutor HTTP_CLIENT_EXECUTOR = new HttpClientExecutor(
-        new JsonMapper(objectMapper), new XmlMapper());
+    private static final HttpClientExecutor HTTP_CLIENT_EXECUTOR = new HttpClientExecutor();
 
     @Test
     public void testCreateBodyHandler() {

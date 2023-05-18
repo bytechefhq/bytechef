@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -28,7 +27,6 @@ import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.EnumSet;
@@ -39,8 +37,7 @@ import java.util.stream.Stream;
 /**
  * @author Ivica Cardic
  */
-@Component
-final class JsonMapper implements JsonUtils.JsonMapper {
+public final class JsonMapper implements JsonUtils.JsonMapper {
 
     static {
         com.jayway.jsonpath.Configuration.setDefaults(new com.jayway.jsonpath.Configuration.Defaults() {
@@ -64,16 +61,10 @@ final class JsonMapper implements JsonUtils.JsonMapper {
         });
     }
 
-    private final ObjectMapper objectMapper;
-
-    public JsonMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
     public <T> T read(String json) {
         try {
-            return objectMapper.readValue(json, new TypeReference<>() {});
+            return ComponentUtilsInstance.objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -96,7 +87,7 @@ final class JsonMapper implements JsonUtils.JsonMapper {
     @Override
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
-            return new JsonParserStream(inputStream, objectMapper);
+            return new JsonParserStream(inputStream, ComponentUtilsInstance.objectMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -105,7 +96,7 @@ final class JsonMapper implements JsonUtils.JsonMapper {
     @Override
     public String write(Object object) {
         try {
-            return objectMapper.writeValueAsString(object);
+            return ComponentUtilsInstance.objectMapper.writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

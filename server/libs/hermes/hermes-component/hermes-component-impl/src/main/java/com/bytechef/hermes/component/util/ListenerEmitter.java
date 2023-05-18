@@ -20,18 +20,11 @@ package com.bytechef.hermes.component.util;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
-import com.bytechef.message.broker.MessageBroker;
 
 /**
  * @author Ivica Cardic
  */
-final class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitter {
-
-    private final MessageBroker messageBroker;
-
-    public ListenerEmitter(MessageBroker messageBroker) {
-        this.messageBroker = messageBroker;
-    }
+public final class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitter {
 
     @Override
     public void emit(String workflowExecutionId, Object output) {
@@ -40,6 +33,6 @@ final class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitter {
             .workflowExecutionId(WorkflowExecutionId.parse(workflowExecutionId))
             .build();
 
-        messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, triggerExecution);
+        ComponentUtilsInstance.messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, triggerExecution);
     }
 }
