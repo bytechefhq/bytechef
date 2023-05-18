@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -78,7 +77,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        Map<String, Object> selectedCase = resolveCase(taskExecution);
+        Map<String, ?> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey(TASKS)) {
             List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
@@ -133,10 +132,12 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> resolveCase(TaskExecution taskExecution) {
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private Map<String, ?> resolveCase(TaskExecution taskExecution) {
         Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = (List)MapValueUtils.getList(taskExecution.getParameters(), CASES, Map.class);
+        List<Map<String, Object>> cases = (List) MapValueUtils.getList(taskExecution.getParameters(), CASES, Map.class);
 
         Assert.notNull(cases, "you must specify 'cases' in a branch statement");
 

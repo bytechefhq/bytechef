@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**

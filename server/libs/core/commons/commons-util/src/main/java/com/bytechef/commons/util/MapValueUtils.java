@@ -17,13 +17,13 @@
 
 package com.bytechef.commons.util;
 
+import com.bytechef.commons.typeconverter.TypeConverter;
+
 import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 public final class MapValueUtils {
-
-    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     private MapValueUtils() {
     }
@@ -196,19 +194,7 @@ public final class MapValueUtils {
     }
 
     public static Date getDate(Map<String, ?> map, String key) {
-        Object value = get(map, key);
-
-        if (value instanceof String) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_FORMAT);
-
-            try {
-                return dateFormat.parse((String) value);
-            } catch (ParseException parseException) {
-                throw new RuntimeException(parseException);
-            }
-        }
-
-        return (Date) value;
+        return get(map, key, Date.class);
     }
 
     public static Date getDate(Map<String, ?> map, String key, Date defaultValue) {
@@ -230,13 +216,7 @@ public final class MapValueUtils {
     }
 
     public static Duration getDuration(Map<String, ?> map, String key) {
-        String value = getString(map, key);
-
-        if (value == null) {
-            return null;
-        }
-
-        return Duration.parse("PT" + value);
+        return get(map, key, Duration.class);
     }
 
     public static Duration getDuration(Map<String, ?> map, String key, Duration defaultDuration) {
@@ -322,13 +302,7 @@ public final class MapValueUtils {
     }
 
     public static LocalDate getLocalDate(Map<String, ?> map, String key) {
-        Object value = get(map, key);
-
-        if (value instanceof String) {
-            return LocalDate.parse((String) value, DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
-        }
-
-        return (LocalDate) value;
+        return get(map, key, LocalDate.class);
     }
 
     public static LocalDate getLocalDate(Map<String, ?> map, String key, LocalDate defaultValue) {
@@ -342,13 +316,7 @@ public final class MapValueUtils {
     }
 
     public static LocalDateTime getLocalDateTime(Map<String, ?> map, String key) {
-        Object value = get(map, key);
-
-        if (value instanceof String) {
-            return LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
-        }
-
-        return (LocalDateTime) value;
+        return get(map, key, LocalDateTime.class);
     }
 
     public static LocalDateTime getLocalDateTime(Map<String, ?> map, String key, LocalDateTime defaultValue) {
@@ -359,6 +327,20 @@ public final class MapValueUtils {
         }
 
         return localDateTime;
+    }
+
+    public static LocalTime getLocalTime(Map<String, ?> map, String key) {
+        return get(map, key, LocalTime.class);
+    }
+
+    public static LocalTime getLocalTime(Map<String, ?> map, String key, LocalTime defaultValue) {
+        LocalTime localTime = getLocalTime(map, key);
+
+        if (localTime == null) {
+            localTime = defaultValue;
+        }
+
+        return localTime;
     }
 
     public static Long getLong(Map<String, ?> map, String key) {
@@ -543,6 +525,14 @@ public final class MapValueUtils {
         return value;
     }
 
+    public static LocalTime getRequiredLocalTime(Map<String, ?> map, String key) {
+        LocalTime value = getLocalTime(map, key);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
     public static LocalDateTime getRequiredLocalDateTime(Map<String, ?> map, String key) {
         LocalDateTime value = getLocalDateTime(map, key);
 
@@ -586,13 +576,15 @@ public final class MapValueUtils {
     }
 
     private static <T> T convert(Object value, Class<T> elementType) {
-        return conversionService.convert(value, elementType);;
+        return TypeConverter.convert(elementType, value);
     }
 
     private static Object convert(Object value, List<Class<?>> elementTypes) {
         for (Class<?> elementType : elementTypes) {
-            if (value != null && conversionService.canConvert(value.getClass(), elementType)) {
-                value = convert(value, elementType);
+            value = convert(value, elementType);
+
+            if (value.getClass() == elementType) {
+                break;
             }
         }
 

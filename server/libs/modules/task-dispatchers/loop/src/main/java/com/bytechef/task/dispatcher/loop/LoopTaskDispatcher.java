@@ -72,9 +72,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapValueUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        Map<String, Object> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
-        List<Object> list = MapValueUtils.getList(
-            taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
+        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        List<?> list = MapValueUtils.getList(taskExecution.getParameters(), LIST, Collections.emptyList());
 
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);

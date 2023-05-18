@@ -18,6 +18,7 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
@@ -106,9 +107,9 @@ public class OdsFileReadAction {
         boolean readAsString = MapValueUtils.getBoolean(inputParameters, READ_AS_STRING, false);
         String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME);
 
-        try (
-            InputStream inputStream = context
-                .getFileStream(MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY))) {
+        try (InputStream inputStream = context.getFileStream(
+            MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class))) {
+
             if (inputStream == null) {
                 throw new ComponentExecutionException("Unable to get file content from task " + inputParameters);
             }

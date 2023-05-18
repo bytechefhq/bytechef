@@ -1,6 +1,7 @@
 dependencies {
     api "com.fasterxml.jackson.core:jackson-databind"
     api "org.springframework.data:spring-data-jdbc"
+    api project(":server:libs:core:commons:commons-typeconverter")
     api project(":server:libs:core:error:error-api")
     api project(":server:libs:core:event:event-api")
     api project(":server:libs:core:message-broker:message-broker-api")

@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.component.definition;
 
+import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders;
-import org.springframework.core.convert.converter.Converter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,11 +54,20 @@ public class WebhookHeadersImpl implements WebhookHeaders {
             '}';
     }
 
-    public static class WebhookHeadersConverter implements Converter<Map<String, Object>, WebhookHeaders> {
+    public static class WebhookHeadersConverter implements TypeConverter.Conversion<WebhookHeaders> {
+
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                WebhookHeaders.class
+            };
+        }
 
         @Override
-        public WebhookHeaders convert(Map<String, Object> source) {
-            return new WebhookHeadersImpl(MapValueUtils.getMap(source, "headers"));
+        @SuppressWarnings("unchecked")
+        public WebhookHeaders convert(Object value) {
+            Map<String, Object> source = (Map<String, Object>) value;
+
+            return new WebhookHeadersImpl(MapValueUtils.getMap(source, "headers", String[].class));
         }
     }
 }

@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.component.definition;
 
+import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
-import org.springframework.core.convert.converter.Converter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,11 +54,19 @@ public class WebhookParametersImpl implements WebhookParameters {
             '}';
     }
 
-    public static class WebhookParametersConverter implements Converter<Map<String, Object>, WebhookParameters> {
+    public static class WebhookParametersConverter implements TypeConverter.Conversion<WebhookParameters> {
+
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                WebhookParameters.class
+            };
+        }
 
         @Override
-        public WebhookParameters convert(Map<String, Object> source) {
-            return new WebhookParametersImpl(MapValueUtils.getMap(source, "parameters"));
+        public WebhookParameters convert(Object value) {
+            Map<String, Object> source = (Map<String, Object>) value;
+
+            return new WebhookParametersImpl(MapValueUtils.getMap(source, "parameters", String[].class));
         }
     }
 }

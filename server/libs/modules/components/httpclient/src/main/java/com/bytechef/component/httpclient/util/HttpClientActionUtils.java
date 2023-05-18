@@ -128,6 +128,9 @@ public class HttpClientActionUtils {
         return properties;
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     public static Object execute(Map<String, ?> inputParameters, RequestMethod requestMethod) {
         HttpClientUtils.Response response = exchange(
             MapValueUtils.getRequiredString(inputParameters, URI), requestMethod)
@@ -139,8 +142,8 @@ public class HttpClientActionUtils {
                         .proxy(MapValueUtils.getString(inputParameters, PROXY))
                         .responseFormat(getResponseFormat(inputParameters))
                         .timeout(Duration.ofMillis(MapValueUtils.getInteger(inputParameters, TIMEOUT, 10000))))
-                .headers((Map<String, List<String>>) MapValueUtils.getMap(inputParameters, HEADERS))
-                .queryParameters((Map<String, List<String>>) MapValueUtils.getMap(inputParameters, QUERY_PARAMETERS))
+                .headers((Map) MapValueUtils.getMap(inputParameters, HEADERS, List.class))
+                .queryParameters((Map) MapValueUtils.getMap(inputParameters, QUERY_PARAMETERS, List.class))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
                 .execute();
 
@@ -175,7 +178,7 @@ public class HttpClientActionUtils {
         if (inputParameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
                 body = Body.of(
-                    MapValueUtils.getFileEntry(inputParameters, BODY_CONTENT),
+                    MapValueUtils.getRequired(inputParameters, BODY_CONTENT, FileEntry.class),
                     MapValueUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 body = Body.of(

@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.util;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -180,6 +181,16 @@ final class MapValueReader implements MapValueUtils.MapValueReader {
     }
 
     @Override
+    public LocalTime getLocalTime(Map<String, ?> map, String key) {
+        return com.bytechef.commons.util.MapValueUtils.getLocalTime(map, key);
+    }
+
+    @Override
+    public LocalTime getLocalTime(Map<String, ?> map, String key, LocalTime defaultValue) {
+        return com.bytechef.commons.util.MapValueUtils.getLocalTime(map, key, defaultValue);
+    }
+
+    @Override
     public Long getLong(Map<String, ?> map, String key) {
         return com.bytechef.commons.util.MapValueUtils.getLong(map, key);
     }
@@ -284,6 +295,11 @@ final class MapValueReader implements MapValueUtils.MapValueReader {
     @Override
     public LocalDateTime getRequiredLocalDateTime(Map<String, ?> map, String key) {
         return com.bytechef.commons.util.MapValueUtils.getRequiredLocalDateTime(map, key);
+    }
+
+    @Override
+    public LocalTime getRequiredLocalTime(Map<String, ?> map, String key) {
+        return com.bytechef.commons.util.MapValueUtils.getRequiredLocalTime(map, key);
     }
 
     @Override

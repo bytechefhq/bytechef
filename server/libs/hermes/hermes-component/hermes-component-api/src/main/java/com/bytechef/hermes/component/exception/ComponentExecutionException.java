@@ -22,10 +22,19 @@ package com.bytechef.hermes.component.exception;
  */
 public class ComponentExecutionException extends RuntimeException {
 
+    /**
+     *
+     * @param message
+     */
     public ComponentExecutionException(String message) {
         super(message);
     }
 
+    /**
+     *
+     * @param message
+     * @param cause
+     */
     public ComponentExecutionException(String message, Throwable cause) {
         super(message, cause);
     }
