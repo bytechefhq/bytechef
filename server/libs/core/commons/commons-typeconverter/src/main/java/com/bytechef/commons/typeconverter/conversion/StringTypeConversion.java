@@ -1,6 +1,6 @@
-package com.toddfast.util.convert.conversion;
+package com.bytechef.commons.typeconverter.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import com.bytechef.commons.typeconverter.TypeConverter;
 
 /**
  * Converts the value to a string. If the value is a byte or char array,

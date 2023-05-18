@@ -1,7 +1,7 @@
-package com.toddfast.util.convert;
+package com.bytechef.commons.typeconverter;
 
-import com.toddfast.util.convert.conversion.IdentityTypeConversion;
-import com.toddfast.util.convert.conversion.ObjectTypeConversion;
+import com.bytechef.commons.typeconverter.conversion.IdentityTypeConversion;
+import com.bytechef.commons.typeconverter.conversion.ObjectTypeConversion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -1,0 +1,15 @@
+com.bytechef.commons.typeconverter.conversion.BigDecimalTypeConversion
+com.bytechef.commons.typeconverter.conversion.BooleanTypeConversion
+com.bytechef.commons.typeconverter.conversion.ByteTypeConversion
+com.bytechef.commons.typeconverter.conversion.CharacterTypeConversion
+com.bytechef.commons.typeconverter.conversion.DoubleTypeConversion
+com.bytechef.commons.typeconverter.conversion.FloatTypeConversion
+com.bytechef.commons.typeconverter.conversion.IntegerTypeConversion
+com.bytechef.commons.typeconverter.conversion.LongTypeConversion
+com.bytechef.commons.typeconverter.conversion.ObjectTypeConversion
+com.bytechef.commons.typeconverter.conversion.ShortTypeConversion
+com.bytechef.commons.typeconverter.conversion.SqlDateTypeConversion
+com.bytechef.commons.typeconverter.conversion.SqlTimeTypeConversion
+com.bytechef.commons.typeconverter.conversion.SqlTimestampTypeConversion
+com.bytechef.commons.typeconverter.conversion.StringTypeConversion
+com.bytechef.commons.typeconverter.conversion.UnknownTypeConversion
