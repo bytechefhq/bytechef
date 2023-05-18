@@ -19,7 +19,6 @@ package com.bytechef.component.csvfile.action;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 import static com.bytechef.component.csvfile.constant.CsvFileConstants.DELIMITER;
 import static com.bytechef.component.csvfile.constant.CsvFileConstants.FILE_ENTRY;
@@ -260,27 +260,19 @@ public class CsvFileReadActionTest {
     }
 
     @SuppressFBWarnings("OBL")
-    private InputParameters getReadParameters(
+    private Map<String, ?> getReadParameters(
         boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize, boolean readAsString,
         File file)
         throws FileNotFoundException {
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(DELIMITER, ","))
-            .thenReturn(",");
-        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
-            .thenReturn(Mockito.mock(Context.FileEntry.class));
-        Mockito.when(inputParameters.getBoolean(HEADER_ROW, true))
-            .thenReturn(headerRow);
-        Mockito.when(inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
-            .thenReturn(includeEmptyCells);
-        Mockito.when(inputParameters.getInteger(PAGE_NUMBER))
-            .thenReturn(pageNumber);
-        Mockito.when(inputParameters.getInteger(PAGE_SIZE))
-            .thenReturn(pageSize);
-        Mockito.when(inputParameters.getBoolean(READ_AS_STRING, false))
-            .thenReturn(readAsString);
+        Map<String, ?> inputParameters = Map.of(
+            DELIMITER, ",",
+            FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
+            HEADER_ROW, headerRow,
+            INCLUDE_EMPTY_CELLS, includeEmptyCells,
+            PAGE_NUMBER, pageNumber,
+            PAGE_SIZE, pageSize,
+            READ_AS_STRING, readAsString);
 
         if (file != null) {
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))

@@ -17,7 +17,6 @@
 
 package com.bytechef.component.webhook.trigger;
 
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
@@ -85,7 +84,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
 
     protected static boolean webhookValidate(WebhookValidateContext context) {
         WebhookHeaders webhookHeaders = context.headers();
-        InputParameters inputParameters = context.inputParameters();
+        Map<String, ?> inputParameters = context.inputParameters();
 
         return Objects.equals(webhookHeaders.getValue(X_CRSF_TOKEN), inputParameters.get(CSRF_TOKEN));
     }

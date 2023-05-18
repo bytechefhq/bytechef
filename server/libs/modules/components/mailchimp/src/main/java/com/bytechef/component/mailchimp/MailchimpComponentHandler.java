@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
 import com.bytechef.hermes.definition.Property;
 import com.google.auto.service.AutoService;
@@ -53,7 +54,8 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     @Override
     public ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
         return connectionDefinition.baseUri(connectionInputParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
-            MailchimpUtils.getMailChimpServer(connectionInputParameters.getRequiredString(ACCESS_TOKEN))));
+            MailchimpUtils.getMailChimpServer(
+                MapValueUtils.getRequiredString(connectionInputParameters, ACCESS_TOKEN))));
     }
 
     @Override

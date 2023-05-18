@@ -18,13 +18,10 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.util.XmlMapper;
 import com.bytechef.hermes.component.util.XmlUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Map;
 
@@ -38,19 +35,14 @@ public class XmlHelperStringifyActionTest {
 
     @BeforeAll
     public static void beforeAll() {
-        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
+//        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
     }
 
     @Test
     public void testExecuteStringify() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
+        Map<String, Object> source = Map.of("id", 45, "name", "Poppy");
 
-        Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(source);
-
-        assertThat(XmlHelperStringifyAction.executeStringify(Mockito.mock(Context.class), inputParameters))
+        assertThat(XmlHelperStringifyAction.executeStringify(Mockito.mock(Context.class), Map.of(SOURCE, source)))
             .isEqualTo(XmlUtils.write(source));
     }
 }

@@ -19,8 +19,9 @@ package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+
+import java.util.Map;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.DELETE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
@@ -47,9 +48,9 @@ public class HttpClientDeleteAction {
 
                 HttpClientActionUtils.options(false)))
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
-        .execute((inputParameters, inputParameters2) -> executeDelete(inputParameters2));
+        .execute((actionContext, inputParameters) -> executeDelete(inputParameters));
 
-    protected static Object executeDelete(InputParameters inputParameters) {
+    protected static Object executeDelete(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.DELETE);
     }
 }

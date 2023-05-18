@@ -27,8 +27,6 @@ import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
@@ -158,11 +156,6 @@ public class DefinitionRegistryConfiguration {
 
         return new ContextFactoryImpl(
             connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
-    }
-
-    @Bean
-    InputParametersFactory inputParametersFactory() {
-        return new InputParametersFactoryImpl();
     }
 
     @Bean

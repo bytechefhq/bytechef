@@ -19,10 +19,10 @@ package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
@@ -82,12 +82,12 @@ public class ScheduleIntervalTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        int interval = inputParameters.getInteger(INTERVAL);
+        int interval = MapValueUtils.getInteger(inputParameters, INTERVAL);
 
         CronSchedule cron = new CronSchedule(
-            switch (inputParameters.getInteger(TIME_UNIT)) {
+            switch (MapValueUtils.getInteger(inputParameters, TIME_UNIT)) {
                 case 1 -> "0 */%s * ? * *".formatted(interval);
                 case 2 -> "0 0 */%s ? * *".formatted(interval);
                 case 3 -> "0 0 0 */%s * ?".formatted(interval);
@@ -101,15 +101,15 @@ public class ScheduleIntervalTrigger {
                 new WorkflowScheduleAndData(
                     cron,
                     Map.of(
-                        INTERVAL, inputParameters.getInteger(INTERVAL),
-                        TIME_UNIT, inputParameters.getInteger(TIME_UNIT)),
+                        INTERVAL, MapValueUtils.getInteger(inputParameters, INTERVAL),
+                        TIME_UNIT, MapValueUtils.getInteger(inputParameters, TIME_UNIT)),
                     workflowExecutionId)),
             cron.getInitialExecutionTime(Instant.now()));
 
     }
 
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }

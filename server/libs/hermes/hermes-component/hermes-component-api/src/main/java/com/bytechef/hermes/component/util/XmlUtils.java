@@ -29,34 +29,79 @@ public final class XmlUtils {
 
     static XmlMapper xmlMapper;
 
+    /**
+     *
+     * @param inputStream
+     * @return
+     */
     public static Map<String, ?> read(InputStream inputStream) {
         return xmlMapper.read(inputStream);
     }
 
+    /**
+     *
+     * @param xml
+     * @return
+     */
     public static Map<String, ?> read(String xml) {
         return xmlMapper.read(xml);
     }
 
+    /**
+     *
+     * @param inputStream
+     * @param path
+     * @return
+     * @param <T>
+     */
     public static <T> T read(InputStream inputStream, String path) {
         return xmlMapper.read(inputStream, path);
     }
 
+    /**
+     *
+     * @param inputStream
+     * @return
+     * @param <T>
+     */
     public static <T> List<T> readList(InputStream inputStream) {
         return xmlMapper.readList(inputStream);
     }
 
+    /**
+     *
+     * @param xml
+     * @return
+     * @param <T>
+     */
     public static <T> List<T> readList(String xml) {
         return xmlMapper.readList(xml);
     }
 
+    /**
+     *
+     * @param inputStream
+     * @return
+     */
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
         return xmlMapper.stream(inputStream);
     }
 
+    /**
+     *
+     * @param object
+     * @return
+     */
     public static String write(Object object) {
         return xmlMapper.write(object);
     }
 
+    /**
+     *
+     * @param object
+     * @param rootName
+     * @return
+     */
     public static String write(Object object, String rootName) {
         return xmlMapper.write(object, rootName);
     }

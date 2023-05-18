@@ -21,9 +21,9 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACL;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
@@ -75,21 +76,23 @@ public class AwsS3PutObjectAction {
         .outputSchema(string())
         .execute(AwsS3PutObjectAction::executePutObject);
 
-    protected static Object executePutObject(Context context, InputParameters inputParameters) {
+    protected static Object executePutObject(Context context, Map<String, ?> inputParameters) {
         Connection connection = context.getConnection();
-        FileEntry fileEntry = inputParameters.get(FILE_ENTRY, FileEntry.class);
+        FileEntry fileEntry = MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY);
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
 
             Files.copy(context.getFileStream(fileEntry), tempFilePath);
 
+            Map<String, Object> connectionInputParameters = connection.getParameters();
+
             s3Client.putObject(
                 PutObjectRequest.builder()
-                    .bucket(connection.getRequiredString(BUCKET_NAME))
-                    .key(inputParameters.getRequiredString(KEY))
-                    .acl(inputParameters.getString(ACL) != null
-                        ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
+                    .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                    .key(MapValueUtils.getRequiredString(inputParameters, KEY))
+                    .acl(MapValueUtils.getString(inputParameters, ACL) != null
+                        ? ObjectCannedACL.fromValue(MapValueUtils.getString(inputParameters, ACL))
                         : null)
                     .build(),
                 tempFilePath);

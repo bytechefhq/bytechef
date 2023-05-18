@@ -20,9 +20,9 @@ package com.bytechef.component.csvfile.action;
 import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -105,17 +105,17 @@ public class CsvFileReadAction {
         .outputSchema(array())
         .execute(CsvFileReadAction::executeRead);
 
-    protected static List<Map<String, Object>> executeRead(Context context, InputParameters inputParameters) {
-        String delimiter = inputParameters.getString(DELIMITER, ",");
-        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
-        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
-        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
+    protected static List<Map<String, Object>> executeRead(Context context, Map<String, ?> inputParameters) {
+        String delimiter = MapValueUtils.getString(inputParameters, DELIMITER, ",");
+        boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
+        boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
+        Integer pageNumber = MapValueUtils.getInteger(inputParameters, PAGE_NUMBER);
+        boolean readAsString = MapValueUtils.getBoolean(inputParameters, READ_AS_STRING, false);
 
         try (
-            InputStream inputStream = context
-                .getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+            InputStream inputStream = context.getFileStream(
+                MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 
@@ -281,11 +281,7 @@ public class CsvFileReadAction {
     }
 
     protected record ReadConfiguration(
-        String delimiter,
-        boolean headerRow,
-        boolean includeEmptyCells,
-        long rangeStartRow,
-        long rangeEndRow,
+        String delimiter, boolean headerRow, boolean includeEmptyCells, long rangeStartRow, long rangeEndRow,
         boolean readAsString) {
     }
 }

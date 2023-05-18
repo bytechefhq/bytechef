@@ -18,8 +18,8 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,9 +28,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RM;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
@@ -40,6 +43,11 @@ public class FilesystemRmAction {
     public static final ActionDefinition ACTION_DEFINITION = action(RM)
         .title("Remove")
         .description("Removes the content of a directory.")
+        .properties(
+            string(PATH)
+                .label("Path")
+                .description("The path of a directory.")
+                .required(true))
         .execute(FilesystemRmAction::executeRm);
 
     /**
@@ -49,8 +57,8 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    protected static Object executeRm(Context context, InputParameters inputParameters) {
-        File file = new File(inputParameters.getRequiredString("path"));
+    protected static Object executeRm(Context context, Map<String, ?> inputParameters) {
+        File file = new File(MapValueUtils.getRequiredString(inputParameters, PATH));
 
         try {
             return deleteRecursively(file.toPath());

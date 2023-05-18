@@ -18,9 +18,9 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,12 +28,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.LS;
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.RECURSIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
@@ -43,12 +48,21 @@ public class FilesystemLsAction {
     public static final ActionDefinition ACTION_DEFINITION = action(LS)
         .title("List")
         .description("Lists a content of directory for the given path.")
+        .properties(
+            string(PATH)
+                .label("Path")
+                .description("The path of a directory.")
+                .required(true),
+            bool(RECURSIVE)
+                .label("Recursive")
+                .description("Should subdirectories be included.")
+                .defaultValue(false))
         .execute(FilesystemLsAction::executeLs);
 
-    protected static List<FileInfo> executeLs(Context context, InputParameters inputParameters) {
-        Path root = Paths.get(inputParameters.getRequiredString("path"));
+    protected static List<FileInfo> executeLs(Context context, Map<String, ?> inputParameters) {
+        Path root = Paths.get(MapValueUtils.getRequiredString(inputParameters, PATH));
 
-        boolean recursive = inputParameters.getBoolean("recursive", false);
+        boolean recursive = MapValueUtils.getBoolean(inputParameters, RECURSIVE, false);
 
         try (Stream<Path> stream = Files.walk(root)) {
             return stream.filter(p -> recursive || p.getParent()

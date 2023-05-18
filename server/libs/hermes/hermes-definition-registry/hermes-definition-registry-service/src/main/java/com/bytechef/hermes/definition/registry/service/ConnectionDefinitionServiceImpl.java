@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.Authorization.ApplyConsumer;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.Authorization.ClientSecretFunction;
@@ -29,7 +29,6 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunc
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
@@ -85,7 +84,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ApplyConsumer applyConsumer = OptionalUtils.orElse(
             authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
 
-        applyConsumer.accept(new InputParametersImpl(connectionParameters), authorizationContext);
+        applyConsumer.accept(connectionParameters, authorizationContext);
     }
 
     @Override
@@ -104,8 +103,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     OptionalUtils.orElse(authorization.getClientSecret(), AuthorizationUtils::getDefaultClientSecret),
                     OptionalUtils.orElse(authorization.getTokenUrl(), AuthorizationUtils::getDefaultTokenUrl)));
 
-        InputParameters connectionInputParameters = new InputParametersImpl(connectionParameters);
-
         Authorization.PkceFunction pkceFunction = OptionalUtils.orElse(
             authorization.getPkce(), AuthorizationUtils.getDefaultPkce());
 
@@ -120,7 +117,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
 
         return authorizationCallbackFunction.apply(
-            connectionInputParameters, connectionInputParameters.getString(Authorization.CODE), redirectUri, verifier);
+            connectionParameters, MapValueUtils.getString(connectionParameters, Authorization.CODE), redirectUri,
+            verifier);
     }
 
     private AuthorizationCallbackFunction getDefaultAuthorizationCallback(
@@ -148,15 +146,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
                 .execute();
 
-            if (response.getStatusCode() != 200) {
+            if (response.statusCode() != 200) {
                 throw new ComponentExecutionException("Invalid claim");
             }
 
-            if (response.getBody() == null) {
+            if (response.body() == null) {
                 throw new ComponentExecutionException("Invalid claim");
             }
 
-            Map<?, ?> body = (Map<?, ?>) response.getBody();
+            Map<?, ?> body = (Map<?, ?>) response.body();
 
             return new AuthorizationCallbackResponse(
                 (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
@@ -173,7 +171,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(connectionDefinition.getBaseUri(), AuthorizationUtils::getDefaultBaseUri);
 
-        return Optional.ofNullable(baseUriFunction.apply(new InputParametersImpl(connectionParameters)));
+        return Optional.ofNullable(baseUriFunction.apply(connectionParameters));
     }
 
     @Override
@@ -223,9 +221,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getScopes(), AuthorizationUtils::getDefaultScopes);
 
         return new OAuth2AuthorizationParametersDTO(
-            authorizationUrlFunction.apply(new InputParametersImpl(connectionInputParameters)),
-            clientIdFunction.apply(new InputParametersImpl(connectionInputParameters)),
-            scopesFunction.apply(new InputParametersImpl(connectionInputParameters)));
+            authorizationUrlFunction.apply(connectionInputParameters),
+            clientIdFunction.apply(connectionInputParameters),
+            scopesFunction.apply(connectionInputParameters));
     }
 
     @Override

@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -130,6 +129,6 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
          * @param inputParameters
          * @return
          */
-        Object apply(ActionContext context, InputParameters inputParameters);
+        Object apply(ActionContext context, Map<String, ?> inputParameters);
     }
 }

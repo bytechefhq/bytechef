@@ -133,10 +133,10 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
         Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = MapValueUtils.getList(
-            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
+        List<Map<String, Object>> cases = (List)MapValueUtils.getList(taskExecution.getParameters(), CASES, Map.class);
 
         Assert.notNull(cases, "you must specify 'cases' in a branch statement");
 

@@ -18,12 +18,7 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
-import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.util.JsonMapper;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -34,12 +29,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILENAME;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
@@ -55,7 +50,7 @@ public class JsonFileWriteActionTest {
 
     @BeforeAll
     public static void beforeAll() {
-        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
+//        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
     }
 
     @BeforeEach
@@ -67,12 +62,9 @@ public class JsonFileWriteActionTest {
     public void testExecuteWriteJSON() throws JSONException {
         File file = getFile("sample.json");
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name()))
-            .thenReturn("JSON");
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
+        Map<String, ?> inputParameters = Map.of(
+            FILE_TYPE, "JSON",
+            SOURCE, new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
         JsonFileWriteAction.executeWrite(context, inputParameters);
 
@@ -96,12 +88,9 @@ public class JsonFileWriteActionTest {
     public void testExecuteWriteJSONArray() throws JSONException {
         File file = getFile("sample_array.json");
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name()))
-            .thenReturn("JSON");
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
+        Map<String, ?> inputParameters = Map.of(
+            FILE_TYPE, "JSON",
+            SOURCE, new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
         JsonFileWriteAction.executeWrite(context, inputParameters);
 
@@ -122,14 +111,10 @@ public class JsonFileWriteActionTest {
 
         Mockito.reset(context);
 
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILENAME))
-            .thenReturn("test.json");
-        Mockito.when(inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name()))
-            .thenReturn("JSONL");
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
+        inputParameters = Map.of(
+            FILENAME, "test.json",
+            FILE_TYPE, "JSONL",
+            SOURCE, new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
         JsonFileWriteAction.executeWrite(context, inputParameters);
 
@@ -145,13 +130,10 @@ public class JsonFileWriteActionTest {
     @Test
     public void testExecuteWriteJSONL() throws JSONException {
         File file = getFile("sample.jsonl");
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name()))
-            .thenReturn("JSONL");
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(
-                linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
+        Map<String, ?> inputParameters = Map.of(
+            FILE_TYPE, "JSONL",
+            SOURCE, linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
         JsonFileWriteAction.executeWrite(context, inputParameters);
 
@@ -172,15 +154,10 @@ public class JsonFileWriteActionTest {
 
         Mockito.reset(context);
 
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILENAME))
-            .thenReturn("test.jsonl");
-        Mockito.when(inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name()))
-            .thenReturn("JSONL");
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(
-                linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
+        inputParameters = Map.of(
+            FILENAME, "test.jsonl",
+            FILE_TYPE, "JSONL",
+            SOURCE, linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
         JsonFileWriteAction.executeWrite(context, inputParameters);
 

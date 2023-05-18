@@ -59,8 +59,7 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
                     actionDefinitions,
                     actionDefinition -> new HandlerBeanDefinitionEntry(
                         actionDefinition.getName(),
-                        getComponentActionTaskHandlerBeanDefinition(
-                            actionDefinition, componentDefinitionFactory))));
+                        getComponentActionTaskHandlerBeanDefinition(actionDefinition, componentDefinitionFactory))));
 
             // Custom Actions support
 
@@ -69,8 +68,7 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
                     new HandlerBeanDefinitionEntry(
                         CustomAction.CUSTOM,
                         getComponentActionTaskHandlerBeanDefinition(
-                            CustomAction.getCustomActionDefinition(componentDefinition),
-                            componentDefinitionFactory)));
+                            CustomAction.getCustomActionDefinition(componentDefinition), componentDefinitionFactory)));
             }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
@@ -111,7 +109,6 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
                 .addConstructorArgValue(componentDefinitionFactory)
                 .addConstructorArgReference("contextFactory")
                 .addConstructorArgReference("dataStorageService")
-                .addConstructorArgReference("inputParametersFactory")
                 .addConstructorArgValue(triggerDefinition)
                 .getBeanDefinition();
         }

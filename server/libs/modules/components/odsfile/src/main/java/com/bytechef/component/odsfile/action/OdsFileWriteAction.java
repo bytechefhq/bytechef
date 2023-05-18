@@ -19,9 +19,9 @@ package com.bytechef.component.odsfile.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -76,12 +76,10 @@ public class OdsFileWriteAction {
         .outputSchema(fileEntry())
         .execute(OdsFileWriteAction::executeWrite);
 
-    protected static FileEntry executeWrite(Context context, InputParameters inputParameters) {
-        String fileName = inputParameters.getString(FILENAME, "file.ods");
-        @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, Map.class, List.of());
-
-        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
+    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+        String fileName = MapValueUtils.getString(inputParameters, FILENAME, "file.ods");
+        List<Map<String, ?>> rows = (List)MapValueUtils.getList(inputParameters, ROWS, List.of());
+        String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME, "Sheet");
 
         try {
             return context.storeFileContent(

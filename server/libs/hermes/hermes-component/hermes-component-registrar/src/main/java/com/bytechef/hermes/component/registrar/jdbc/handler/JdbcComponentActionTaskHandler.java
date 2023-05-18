@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.registrar.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.handler.DefaultComponentActionTaskHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -35,9 +34,9 @@ public class JdbcComponentActionTaskHandler extends DefaultComponentActionTaskHa
     @SuppressFBWarnings("EI2")
     public JdbcComponentActionTaskHandler(
         ActionDefinition actionDefinition, ContextFactory contextFactory, DataSourceFactory dataSourceFactory,
-        InputParametersFactory inputParametersFactory, JdbcComponentHandler jdbcComponentHandler) {
+        JdbcComponentHandler jdbcComponentHandler) {
 
-        super(actionDefinition, jdbcComponentHandler, contextFactory, inputParametersFactory);
+        super(actionDefinition, jdbcComponentHandler, contextFactory);
 
         this.dataSourceFactory = dataSourceFactory;
     }

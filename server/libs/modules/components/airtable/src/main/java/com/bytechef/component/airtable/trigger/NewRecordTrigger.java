@@ -17,10 +17,10 @@
 
 package com.bytechef.component.airtable.trigger;
 
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,7 +61,7 @@ public class NewRecordTrigger {
         .poll(NewRecordTrigger::poll);
 
     protected static TriggerDefinition.PollOutput poll(TriggerDefinition.PollContext context) {
-        InputParameters inputParameters = context.inputParameters();
+        Map<String, ?> inputParameters = context.inputParameters();
         Map<String, Object> closureParameters = context.closureParameters();
 
         LocalDateTime startDate = (LocalDateTime) closureParameters.getOrDefault(
@@ -72,18 +72,19 @@ public class NewRecordTrigger {
         List<Map<?, ?>> records = (List<Map<?, ?>>) HttpClientUtils
             .get(
                 "/{%s}/{%s}".formatted(
-                    inputParameters.getRequiredString(TABLE_ID), inputParameters.getRequiredString(BASE_ID)))
+                    MapValueUtils.getRequiredString(inputParameters, TABLE_ID),
+                    MapValueUtils.getRequiredString(inputParameters, BASE_ID)))
             .queryParameters(
                 Map.of(
                     "filterByFormula",
                     List.of(
                         "IS_AFTER({%s}, DATETIME_PARSE(\"%s\", \"YYYY-MM-DD HH:mm:ss\"))"
                             .formatted(
-                                inputParameters.getRequiredString(TRIGGER_FIELD),
+                                MapValueUtils.getRequiredString(inputParameters, TRIGGER_FIELD),
                                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
             .configuration(responseFormat(ResponseFormat.JSON))
             .execute()
-            .getBody();
+            .body();
 
         return new TriggerDefinition.PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }

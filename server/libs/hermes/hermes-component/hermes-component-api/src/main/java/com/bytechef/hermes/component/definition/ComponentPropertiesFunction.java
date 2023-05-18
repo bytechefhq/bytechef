@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -35,5 +35,5 @@ public interface ComponentPropertiesFunction extends PropertiesDataSource.Proper
      * @param inputParameters
      * @return
      */
-    List<? extends Property<?>> apply(Context.Connection connection, InputParameters inputParameters);
+    List<? extends Property<?>> apply(Connection connection, Map<String, ?> inputParameters);
 }

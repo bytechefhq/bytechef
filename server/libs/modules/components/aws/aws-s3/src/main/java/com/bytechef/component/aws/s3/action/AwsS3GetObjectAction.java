@@ -20,11 +20,13 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+
+import java.util.Map;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.FILENAME;
@@ -56,16 +58,18 @@ public class AwsS3GetObjectAction {
         .outputSchema(fileEntry())
         .execute(AwsS3GetObjectAction::executeGetObject);
 
-    protected static Context.FileEntry executeGetObject(Context context, InputParameters inputParameters) {
+    protected static Context.FileEntry executeGetObject(Context context, Map<String, ?> inputParameters) {
         Connection connection = context.getConnection();
+
+        Map<String, Object> connectionInputParameters = connection.getParameters();
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             return context.storeFileContent(
-                inputParameters.getRequiredString(FILENAME),
+                MapValueUtils.getRequiredString(inputParameters, FILENAME),
                 s3Client.getObject(
                     GetObjectRequest.builder()
-                        .bucket(connection.getRequiredString(BUCKET_NAME))
-                        .key(inputParameters.getRequiredString(KEY))
+                        .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                        .key(MapValueUtils.getRequiredString(inputParameters, KEY))
                         .build(),
                     ResponseTransformer.toInputStream()));
         }

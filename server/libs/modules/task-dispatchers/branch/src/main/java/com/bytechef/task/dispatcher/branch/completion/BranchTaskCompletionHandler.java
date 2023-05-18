@@ -135,16 +135,14 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
         Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
         List<WorkflowTask> caseWorkflowTasks = MapValueUtils.getList(
-            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {},
-            Collections.emptyList());
+            taskExecution.getParameters(), CASES, WorkflowTask.class, Collections.emptyList());
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
             Object key = MapValueUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
             List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
-                caseWorkflowTask.getParameters(), TASKS, new ParameterizedTypeReference<>() {},
-                Collections.emptyList());
+                caseWorkflowTask.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
@@ -152,6 +150,6 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         return MapValueUtils.getList(
-            taskExecution.getParameters(), DEFAULT, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            taskExecution.getParameters(), DEFAULT, WorkflowTask.class, Collections.emptyList());
     }
 }

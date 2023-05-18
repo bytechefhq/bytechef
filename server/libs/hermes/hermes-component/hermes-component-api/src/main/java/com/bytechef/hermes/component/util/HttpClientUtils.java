@@ -33,6 +33,9 @@ import java.util.Objects;
  */
 public final class HttpClientUtils {
 
+    /**
+     *
+     */
     public enum BodyContentType {
         BINARY,
         FORM_DATA,
@@ -42,6 +45,9 @@ public final class HttpClientUtils {
         XML
     }
 
+    /**
+     *
+     */
     public enum ResponseFormat {
         BINARY,
         JSON,
@@ -49,6 +55,9 @@ public final class HttpClientUtils {
         XML,
     }
 
+    /**
+     *
+     */
     public enum RequestMethod {
         DELETE,
         GET,
@@ -63,6 +72,11 @@ public final class HttpClientUtils {
     private HttpClientUtils() {
     }
 
+    /**
+     *
+     * @param allowUnauthorizedCerts
+     * @return
+     */
     public static Configuration allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
         Configuration configuration = new Configuration();
 
@@ -71,6 +85,11 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param followAllRedirects
+     * @return
+     */
     public static Configuration followAllRedirects(boolean followAllRedirects) {
         Configuration configuration = new Configuration();
 
@@ -79,6 +98,11 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param filename
+     * @return
+     */
     public static Configuration filename(String filename) {
         Configuration configuration = new Configuration();
 
@@ -87,6 +111,11 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param followRedirect
+     * @return
+     */
     public static Configuration followRedirect(boolean followRedirect) {
         Configuration configuration = new Configuration();
 
@@ -95,6 +124,11 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param proxy
+     * @return
+     */
     public static Configuration proxy(String proxy) {
         Configuration configuration = new Configuration();
 
@@ -103,6 +137,11 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param responseFormat
+     * @return
+     */
     public static Configuration responseFormat(ResponseFormat responseFormat) {
         Configuration configuration = new Configuration();
 
@@ -111,6 +150,11 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param timeout
+     * @return
+     */
     public static Configuration timeout(Duration timeout) {
         Configuration configuration = new Configuration();
 
@@ -119,82 +163,80 @@ public final class HttpClientUtils {
         return configuration;
     }
 
+    /**
+     *
+     * @param uri
+     * @return
+     */
     public static Executor delete(String uri) {
-        return new Executor().delete(uri);
+        return new Executor(uri, RequestMethod.DELETE);
     }
 
+    /**
+     *
+     * @param uri
+     * @param requestMethod
+     * @return
+     */
     public static Executor exchange(String uri, RequestMethod requestMethod) {
-        return new Executor().exchange(uri, requestMethod);
+        return new Executor(uri, requestMethod);
     }
 
+    /**
+     *
+     * @param uri
+     * @return
+     */
     public static Executor head(String uri) {
-        return new Executor().head(uri);
+        return new Executor(uri, RequestMethod.HEAD);
     }
 
+    /**
+     *
+     * @param uri
+     * @return
+     */
     public static Executor get(String uri) {
-        return new Executor().get(uri);
+        return new Executor(uri, RequestMethod.GET);
     }
 
+    /**
+     *
+     * @param uri
+     * @return
+     */
     public static Executor patch(String uri) {
-        return new Executor().patch(uri);
+        return new Executor(uri, RequestMethod.PATCH);
     }
 
+    /**
+     *
+     * @param uri
+     * @return
+     */
     public static Executor post(String uri) {
-        return new Executor().post(uri);
+        return new Executor(uri, RequestMethod.POST);
     }
 
+    /**
+     *
+     * @param uri
+     * @return
+     */
     public static Executor put(String uri) {
-        return new Executor().put(uri);
+        return new Executor(uri, RequestMethod.PUT);
     }
 
-    @SuppressFBWarnings({
-        "EI", "EI2"
-    })
-    public static class Response {
-
-        private final Object body;
-        private final Map<String, List<String>> headers;
-        private final int statusCode;
-
-        public Response(Map<String, List<String>> headers, Object body, int statusCode) {
-            this.body = body;
-            this.headers = headers;
-            this.statusCode = statusCode;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Response response = (Response) o;
-
-            return statusCode == response.statusCode &&
-                Objects.equals(body, response.body) && Objects.equals(headers, response.headers);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(body, headers, statusCode);
-        }
-
-        public Object getBody() {
-            return body;
-        }
-
-        public Map<String, List<String>> getHeaders() {
-            return headers;
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
+    /**
+     *
+     */
+    @SuppressFBWarnings("EI")
+    public record Response(Map<String, List<String>> headers, Object body, int statusCode) {
     }
 
+    /**
+     *
+     */
     public static class Configuration {
 
         private boolean allowUnauthorizedCerts;
@@ -208,81 +250,151 @@ public final class HttpClientUtils {
         private Configuration() {
         }
 
+        /**
+         *
+         * @return
+         */
         public static Configuration configuration() {
             return new Configuration();
         }
 
+        /**
+         *
+         * @param allowUnauthorizedCerts
+         * @return
+         */
         public Configuration allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
             this.allowUnauthorizedCerts = allowUnauthorizedCerts;
 
             return this;
         }
 
+        /**
+         *
+         * @param followAllRedirects
+         * @return
+         */
         public Configuration followAllRedirects(boolean followAllRedirects) {
             this.followAllRedirects = followAllRedirects;
 
             return this;
         }
 
+        /**
+         *
+         * @param filename
+         * @return
+         */
         public Configuration filename(String filename) {
             this.filename = filename;
 
             return this;
         }
 
+        /**
+         *
+         * @param followRedirect
+         * @return
+         */
         public Configuration followRedirect(boolean followRedirect) {
             this.followRedirect = followRedirect;
 
             return this;
         }
 
+        /**
+         *
+         * @param proxy
+         * @return
+         */
         public Configuration proxy(String proxy) {
             this.proxy = proxy;
 
             return this;
         }
 
+        /**
+         *
+         * @param responseFormat
+         * @return
+         */
         public Configuration responseFormat(ResponseFormat responseFormat) {
             this.responseFormat = responseFormat;
 
             return this;
         }
 
+        /**
+         *
+         * @param timeout
+         * @return
+         */
         public Configuration timeout(Duration timeout) {
             this.timeout = timeout;
 
             return this;
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isAllowUnauthorizedCerts() {
             return allowUnauthorizedCerts;
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isFollowAllRedirects() {
             return followAllRedirects;
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isFollowRedirect() {
             return followRedirect;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getFilename() {
             return filename;
         }
 
+        /**
+         *
+         * @return
+         */
         public ResponseFormat getResponseFormat() {
             return responseFormat;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getProxy() {
             return proxy;
         }
 
+        /**
+         *
+         * @return
+         */
         public Duration getTimeout() {
             return timeout;
         }
     }
 
+    /**
+     *
+     */
     public static class Executor {
 
         private Configuration configuration = new Configuration();
@@ -292,36 +404,27 @@ public final class HttpClientUtils {
         private RequestMethod requestMethod;
         private String url;
 
-        private Executor() {
+        private Executor(String url, RequestMethod requestMethod) {
+            this.url = Objects.requireNonNull(url);
+            this.requestMethod = Objects.requireNonNull(requestMethod);
         }
 
+        /**
+         *
+         * @param configuration
+         * @return
+         */
         public Executor configuration(Configuration configuration) {
             this.configuration = Objects.requireNonNull(configuration);
 
             return this;
         }
 
-        public Executor delete(String url) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = RequestMethod.DELETE;
-
-            return this;
-        }
-
-        public Executor exchange(String url, RequestMethod requestMethod) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = Objects.requireNonNull(requestMethod);
-
-            return this;
-        }
-
-        public Executor head(String url) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = RequestMethod.HEAD;
-
-            return this;
-        }
-
+        /**
+         *
+         * @param headers
+         * @return
+         */
         public Executor headers(Map<String, List<String>> headers) {
             if (headers != null) {
                 this.headers = new HashMap<>(headers);
@@ -330,13 +433,11 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor get(String url) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = RequestMethod.GET;
-
-            return this;
-        }
-
+        /**
+         *
+         * @param queryParameters
+         * @return
+         */
         public Executor queryParameters(Map<String, List<String>> queryParameters) {
             if (queryParameters != null) {
                 this.queryParameters = new HashMap<>(queryParameters);
@@ -345,33 +446,21 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor patch(String url) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = RequestMethod.PATCH;
-
-            return this;
-        }
-
+        /**
+         *
+         * @param body
+         * @return
+         */
         public Executor body(Body body) {
             this.body = body;
 
             return this;
         }
 
-        public Executor post(String url) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = RequestMethod.POST;
-
-            return this;
-        }
-
-        public Executor put(String url) {
-            this.url = Objects.requireNonNull(url);
-            this.requestMethod = RequestMethod.PUT;
-
-            return this;
-        }
-
+        /**
+         *
+         * @return
+         */
         public Response execute() {
             try {
                 return httpClientExecutor.execute(url, headers, queryParameters, body, configuration, requestMethod);
@@ -381,6 +470,9 @@ public final class HttpClientUtils {
         }
     }
 
+    /**
+     *
+     */
     public static class Body {
 
         private final Object content;
@@ -397,70 +489,132 @@ public final class HttpClientUtils {
             this.mimeType = mimeType;
         }
 
-        public static Body of(FileEntry fileEntry) {
-            return new Body(fileEntry, BodyContentType.BINARY);
+        /**
+         *
+         * @param content
+         * @return
+         */
+        public static Body of(FileEntry content) {
+            return new Body(content, BodyContentType.BINARY);
         }
 
-        public static Body of(FileEntry fileEntry, String mimeType) {
-            Objects.requireNonNull(fileEntry);
-
-            return new Body(fileEntry, BodyContentType.BINARY, mimeType);
-        }
-
-        public static Body of(List<?> list) {
-            Objects.requireNonNull(list);
-
-            return new Body(list, BodyContentType.JSON);
-        }
-
-        public static Body of(List<?> list, BodyContentType bodyContentType) {
-            Objects.requireNonNull(list);
-            Objects.requireNonNull(bodyContentType);
-
-            return new Body(list, bodyContentType);
-        }
-
-        public static Body of(Map<String, Object> map) {
-            Objects.requireNonNull(map);
-
-            return new Body(map, BodyContentType.JSON);
-        }
-
-        public static Body of(Map<String, Object> content, BodyContentType bodyContentType) {
+        /**
+         *
+         * @param content
+         * @param mimeType
+         * @return
+         */
+        public static Body of(FileEntry content, String mimeType) {
             Objects.requireNonNull(content);
-            Objects.requireNonNull(bodyContentType);
 
-            return new Body(content, bodyContentType);
+            return new Body(content, BodyContentType.BINARY, mimeType);
         }
 
-        public static Body of(String string) {
-            Objects.requireNonNull(string);
+        /**
+         *
+         * @param content
+         * @return
+         */
+        public static Body of(List<?> content) {
+            Objects.requireNonNull(content);
 
-            return new Body(string, BodyContentType.RAW, "text/plain");
+            return new Body(content, BodyContentType.JSON);
         }
 
-        public static Body of(String string, String mimeType) {
-            Objects.requireNonNull(string);
+        /**
+         *
+         * @param content
+         * @param contentType
+         * @return
+         */
+        public static Body of(List<?> content, BodyContentType contentType) {
+            Objects.requireNonNull(content);
+            Objects.requireNonNull(contentType);
+
+            return new Body(content, contentType);
+        }
+
+        /**
+         *
+         * @param content
+         * @return
+         */
+        public static Body of(Map<String, ?> content) {
+            Objects.requireNonNull(content);
+
+            return new Body(content, BodyContentType.JSON);
+        }
+
+        /**
+         *
+         * @param content
+         * @param contentType
+         * @return
+         */
+        public static Body of(Map<String, ?> content, BodyContentType contentType) {
+            Objects.requireNonNull(content);
+            Objects.requireNonNull(contentType);
+
+            return new Body(content, contentType);
+        }
+
+        /**
+         *
+         * @param content
+         * @return
+         */
+        public static Body of(String content) {
+            Objects.requireNonNull(content);
+
+            return new Body(content, BodyContentType.RAW, "text/plain");
+        }
+
+        /**
+         *
+         * @param content
+         * @param mimeType
+         * @return
+         */
+        public static Body of(String content, String mimeType) {
+            Objects.requireNonNull(content);
             Objects.requireNonNull(mimeType);
 
-            return new Body(string, BodyContentType.RAW, mimeType);
+            return new Body(content, BodyContentType.RAW, mimeType);
         }
 
-        public static Body of(String string, BodyContentType bodyContentType) {
-            Objects.requireNonNull(string);
-            Objects.requireNonNull(bodyContentType);
+        /**
+         *
+         * @param content
+         * @param contentType
+         * @return
+         */
+        public static Body of(String content, BodyContentType contentType) {
+            Objects.requireNonNull(content);
+            Objects.requireNonNull(contentType);
 
-            return new Body(string, bodyContentType, null);
+            return new Body(content, contentType, null);
         }
 
+        /**
+         *
+         * @return
+         */
         public Object getContent() {
             return content;
         }
 
+        /**
+         *
+         * @return
+         */
         public BodyContentType getContentType() {
             return contentType;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getMimeType() {
             return mimeType;
         }

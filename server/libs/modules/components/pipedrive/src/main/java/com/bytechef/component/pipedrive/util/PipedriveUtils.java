@@ -41,7 +41,7 @@ public class PipedriveUtils {
                         "subscription_url", webhookUrl)))
             .configuration(responseFormat(ResponseFormat.JSON))
             .execute()
-            .getBody();
+            .body();
 
         return (String) result.get("id");
     }

@@ -18,10 +18,12 @@
 package com.bytechef.component.logger.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 import static com.bytechef.component.logger.constant.LoggerConstants.INFO;
 import static com.bytechef.component.logger.constant.LoggerConstants.TEXT;
@@ -41,8 +43,8 @@ public class LoggerInfoAction {
         .properties(string(TEXT))
         .execute(LoggerInfoAction::executeInfo);
 
-    protected static Object executeInfo(Context context, InputParameters inputParameters) {
-        logger.info(inputParameters.getString(TEXT));
+    protected static Object executeInfo(Context context, Map<String, ?> inputParameters) {
+        logger.info(MapValueUtils.getString(inputParameters, TEXT));
 
         return null;
     }

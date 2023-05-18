@@ -19,10 +19,10 @@ package com.bytechef.component.csvfile.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.fasterxml.jackson.databind.SequenceWriter;
 
 import java.io.ByteArrayInputStream;
@@ -73,9 +73,8 @@ public class CsvFileWriteAction {
         .outputSchema(fileEntry())
         .execute(CsvFileWriteAction::executeWrite);
 
-    protected static FileEntry executeWrite(Context context, InputParameters inputParameters) {
-        @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, Map.class, List.of());
+    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+        List<Map<String, ?>> rows = (List<Map<String, ?>>)MapValueUtils.getList(inputParameters, ROWS, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.storeFileContent("file.csv", inputStream);
