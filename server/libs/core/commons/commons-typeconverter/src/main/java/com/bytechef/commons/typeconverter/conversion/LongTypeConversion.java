@@ -37,7 +37,7 @@ public class LongTypeConversion implements TypeConverter.Conversion<Long> {
     }
 
     @Override
-    public Long convert(Object value) {
+    public Long convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

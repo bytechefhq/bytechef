@@ -39,26 +39,21 @@ public class ObjectTypeConversion implements TypeConverter.Conversion<Object> {
     }
 
     @Override
-    public Object convert(Object value) {
+    public Object convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
 
         Class<?> valueClass = value.getClass();
 
-        if (valueClass.isArray()) {
-            // This is a byte array; presume we can convert it to an object
-            if (valueClass.getComponentType() == Byte.TYPE) {
-                try (ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) value);
-                    ObjectInputStream ois = new ObjectInputStream(bis)) {
+        // This is a byte array; presume we can convert it to an object
+        if (valueClass.isArray() && valueClass.getComponentType() == Byte.TYPE) {
+            try (ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) value);
+                ObjectInputStream ois = new ObjectInputStream(bis)) {
 
-                    value = ois.readObject();
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(
-                        "Could not deserialize object", e);
-                }
-            } else {
-                ; // value is OK as is
+                value = ois.readObject();
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Could not deserialize object", e);
             }
         }
 

@@ -38,7 +38,7 @@ public class IntegerTypeConversion implements TypeConverter.Conversion<Integer> 
     }
 
     @Override
-    public Integer convert(Object value) {
+    public Integer convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

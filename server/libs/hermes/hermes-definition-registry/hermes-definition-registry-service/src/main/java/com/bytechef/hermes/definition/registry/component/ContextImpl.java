@@ -167,7 +167,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
 
         @SuppressWarnings("unchecked")
-        public FileEntry convert(Object value) {
+        public FileEntry convert(Object value, Object typeKey) {
             Map<String, ?> source = (Map<String, ?>) value;
 
             return new ContextFileEntry(

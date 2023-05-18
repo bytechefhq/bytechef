@@ -37,7 +37,7 @@ public class ShortTypeConversion implements TypeConverter.Conversion<Short> {
     }
 
     @Override
-    public Short convert(Object value) {
+    public Short convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

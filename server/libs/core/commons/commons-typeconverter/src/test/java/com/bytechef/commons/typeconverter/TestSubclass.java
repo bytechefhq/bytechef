@@ -44,7 +44,7 @@ public class TestSubclass extends TestSuperclass
             }
 
             @Override
-            public Object convert(Object value) {
+            public Object convert(Object value, Object typeKey) {
                 System.out.println("--- Converting value to type \"" + key +
                     "\": " + value);
                 return "Converted Test value";

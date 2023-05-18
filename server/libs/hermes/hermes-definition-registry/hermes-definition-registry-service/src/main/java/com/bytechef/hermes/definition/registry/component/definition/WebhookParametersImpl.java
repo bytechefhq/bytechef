@@ -63,7 +63,7 @@ public class WebhookParametersImpl implements WebhookParameters {
         }
 
         @Override
-        public WebhookParameters convert(Object value) {
+        public WebhookParameters convert(Object value, Object typeKey) {
             Map<String, Object> source = (Map<String, Object>) value;
 
             return new WebhookParametersImpl(MapValueUtils.getMap(source, "parameters", String[].class));

@@ -37,7 +37,7 @@ public class BigDecimalTypeConversion implements TypeConverter.Conversion<BigDec
         };
     }
 
-    public BigDecimal convert(Object value) {
+    public BigDecimal convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

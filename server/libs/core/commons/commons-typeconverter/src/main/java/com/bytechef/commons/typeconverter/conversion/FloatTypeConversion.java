@@ -37,7 +37,7 @@ public class FloatTypeConversion implements TypeConverter.Conversion<Float> {
     }
 
     @Override
-    public Float convert(Object value) {
+    public Float convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

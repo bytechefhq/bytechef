@@ -39,7 +39,7 @@ public class LocalDateTypeConversion implements TypeConverter.Conversion<LocalDa
     }
 
     @Override
-    public LocalDate convert(Object value) {
+    public LocalDate convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
