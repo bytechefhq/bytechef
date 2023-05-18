@@ -2,9 +2,14 @@ com.bytechef.commons.typeconverter.conversion.BigDecimalTypeConversion
 com.bytechef.commons.typeconverter.conversion.BooleanTypeConversion
 com.bytechef.commons.typeconverter.conversion.ByteTypeConversion
 com.bytechef.commons.typeconverter.conversion.CharacterTypeConversion
+com.bytechef.commons.typeconverter.conversion.DateTypeConversion
 com.bytechef.commons.typeconverter.conversion.DoubleTypeConversion
+com.bytechef.commons.typeconverter.conversion.DurationTypeConversion
 com.bytechef.commons.typeconverter.conversion.FloatTypeConversion
 com.bytechef.commons.typeconverter.conversion.IntegerTypeConversion
+com.bytechef.commons.typeconverter.conversion.LocalDateTypeConversion
+com.bytechef.commons.typeconverter.conversion.LocalDateTimeTypeConversion
+com.bytechef.commons.typeconverter.conversion.LocalTimeTypeConversion
 com.bytechef.commons.typeconverter.conversion.LongTypeConversion
 com.bytechef.commons.typeconverter.conversion.ObjectTypeConversion
 com.bytechef.commons.typeconverter.conversion.ShortTypeConversion
