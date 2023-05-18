@@ -1,6 +1,6 @@
-package com.toddfast.util.convert.conversion;
+package com.bytechef.commons.typeconverter.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import com.bytechef.commons.typeconverter.TypeConverter;
 
 /**
  * Convert to a {@link SqlTime} by parsing a value as a string of
