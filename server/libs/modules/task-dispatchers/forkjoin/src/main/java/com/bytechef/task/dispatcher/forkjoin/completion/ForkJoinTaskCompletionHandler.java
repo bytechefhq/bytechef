@@ -101,8 +101,9 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
         TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
-            forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        List<List<Map<String, Object>>> branches = (List)MapValueUtils.getRequiredList(
+            forkJoinTaskExecution.getParameters(), BRANCHES, List.class);
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))

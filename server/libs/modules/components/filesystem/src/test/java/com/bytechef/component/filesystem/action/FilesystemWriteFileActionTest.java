@@ -19,7 +19,6 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,6 +26,7 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
@@ -40,13 +40,11 @@ public class FilesystemWriteFileActionTest {
     @Test
     @SuppressFBWarnings("OBL")
     public void testExecuteWriteFile() throws IOException {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getSampleFile();
 
-        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
-            .thenReturn(Mockito.mock(Context.FileEntry.class));
-        Mockito.when(inputParameters.getRequiredString(FILENAME))
-            .thenReturn(file.getAbsolutePath());
+        Map<String, ?> inputParameters = Map.of(
+            FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
+            FILENAME, file.getAbsolutePath());
 
         Context context = Mockito.mock(Context.class);
 

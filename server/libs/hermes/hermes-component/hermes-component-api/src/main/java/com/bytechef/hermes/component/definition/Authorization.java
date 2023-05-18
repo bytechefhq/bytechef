@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableAuthorization;
 import com.bytechef.hermes.definition.Property;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -194,7 +193,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     @FunctionalInterface
@@ -206,7 +205,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param authorizationContext
          */
         void accept(
-            InputParameters connectionInputParameters, AuthorizationContext authorizationContext);
+            Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext);
     }
 
     /**
@@ -224,7 +223,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @return
          */
         AuthorizationCallbackResponse apply(
-            InputParameters connectionInputParameters, String code, String redirectUri, String codeVerifier);
+            Map<String, Object> connectionInputParameters, String code, String redirectUri, String codeVerifier);
     }
 
     /**
@@ -238,7 +237,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -252,7 +251,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -266,7 +265,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -289,7 +288,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -303,7 +302,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -317,7 +316,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        List<String> apply(InputParameters connectionInputParameters);
+        List<String> apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -331,7 +330,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**

@@ -17,15 +17,16 @@
 
 package com.bytechef.component.delay.action;
 
-import com.bytechef.component.delay.constant.DelayConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 import static com.bytechef.component.delay.constant.DelayConstants.SLEEP;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
@@ -39,19 +40,19 @@ public class DelaySleepAction {
     public static final ActionDefinition ACTION_DEFINITION = action(SLEEP)
         .title("Sleep")
         .description("Delay action execution.")
-        .properties(integer(DelayConstants.MILLIS)
+        .properties(integer(MILLIS)
             .label("Millis")
             .description("Time in milliseconds.")
             .required(true)
             .defaultValue(1))
         .execute(DelaySleepAction::executeDelay);
 
-    protected static Object executeDelay(Context context, InputParameters inputParameters) {
+    protected static Object executeDelay(Context context, Map<String, ?> inputParameters) {
         try {
             if (inputParameters.containsKey("millis")) {
-                Thread.sleep(inputParameters.getLong("millis"));
+                Thread.sleep(MapValueUtils.getLong(inputParameters, MILLIS));
             } else if (inputParameters.containsKey("duration")) {
-                Duration duration = inputParameters.getDuration("duration");
+                Duration duration = MapValueUtils.getDuration(inputParameters, "duration");
 
                 Thread.sleep(duration.toMillis());
             } else {

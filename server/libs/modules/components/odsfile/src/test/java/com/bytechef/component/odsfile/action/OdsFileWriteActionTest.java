@@ -19,7 +19,6 @@ package com.bytechef.component.odsfile.action;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -52,7 +51,7 @@ public class OdsFileWriteActionTest {
     public void testExecuteWriteODS() throws JSONException, IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        InputParameters inputParameters = getWriteParameters(new JSONArray(jsonContent).toList());
+        Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList());
 
         OdsFileWriteAction.executeWrite(context, inputParameters);
 
@@ -78,18 +77,11 @@ public class OdsFileWriteActionTest {
             .getFile());
     }
 
-    @SuppressWarnings("unchecked")
-    private InputParameters getWriteParameters(List items) {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILENAME, "file.ods"))
-            .thenReturn("file.ods");
-        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(items);
-        Mockito.when(inputParameters.getString(SHEET_NAME, "Sheet"))
-            .thenReturn("Sheet");
-
-        return inputParameters;
+    private Map<String, Object> getWriteParameters(List<?> items) {
+        return Map.of(
+            FILENAME, "file.ods",
+            ROWS, items,
+            SHEET_NAME, "Sheet");
     }
 
     private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {

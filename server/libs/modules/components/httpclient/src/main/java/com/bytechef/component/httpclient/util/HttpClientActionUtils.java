@@ -17,13 +17,13 @@
 
 package com.bytechef.component.httpclient.util;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.Property;
 
 import java.time.Duration;
@@ -128,26 +128,26 @@ public class HttpClientActionUtils {
         return properties;
     }
 
-    public static Object execute(InputParameters inputParameters, RequestMethod requestMethod) {
+    public static Object execute(Map<String, ?> inputParameters, RequestMethod requestMethod) {
         HttpClientUtils.Response response = exchange(
-            inputParameters.getRequiredString(URI), requestMethod)
+            MapValueUtils.getRequiredString(inputParameters, URI), requestMethod)
                 .configuration(
-                    allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                        .filename(inputParameters.getString(RESPONSE_FILENAME))
-                        .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
-                        .proxy(inputParameters.getString(PROXY))
+                    allowUnauthorizedCerts(MapValueUtils.getBoolean(inputParameters, ALLOW_UNAUTHORIZED_CERTS, false))
+                        .filename(MapValueUtils.getString(inputParameters, RESPONSE_FILENAME))
+                        .followAllRedirects(MapValueUtils.getBoolean(inputParameters, FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(MapValueUtils.getBoolean(inputParameters, FOLLOW_REDIRECT, false))
+                        .proxy(MapValueUtils.getString(inputParameters, PROXY))
                         .responseFormat(getResponseFormat(inputParameters))
-                        .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
-                .headers(inputParameters.getMap(HEADERS))
-                .queryParameters(inputParameters.getMap(QUERY_PARAMETERS))
+                        .timeout(Duration.ofMillis(MapValueUtils.getInteger(inputParameters, TIMEOUT, 10000))))
+                .headers((Map<String, List<String>>) MapValueUtils.getMap(inputParameters, HEADERS))
+                .queryParameters((Map<String, List<String>>) MapValueUtils.getMap(inputParameters, QUERY_PARAMETERS))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
                 .execute();
 
-        if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
+        if (MapValueUtils.getBoolean(inputParameters, FULL_RESPONSE, false)) {
             return response;
         } else {
-            return response.getBody();
+            return response.body();
         }
     }
 
@@ -161,46 +161,44 @@ public class HttpClientActionUtils {
         return allProperties.toArray(size -> new Property<?>[size]);
     }
 
-    private static BodyContentType getBodyContentType(InputParameters inputParameters) {
-        String bodyContentTypeParameter = inputParameters.getString(BODY_CONTENT_TYPE);
+    private static BodyContentType getBodyContentType(Map<String, ?> inputParameters) {
+        String bodyContentTypeParameter = MapValueUtils.getString(inputParameters, BODY_CONTENT_TYPE);
 
         return bodyContentTypeParameter == null
             ? null
             : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
     }
 
-    private static Body getPayload(InputParameters inputParameters, BodyContentType bodyContentType) {
-        HttpClientUtils.Body body = null;
+    private static Body getPayload(Map<String, ?> inputParameters, BodyContentType bodyContentType) {
+        Body body = null;
 
         if (inputParameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
                 body = Body.of(
-                    inputParameters.get(BODY_CONTENT, Context.FileEntry.class),
-                    inputParameters.getString(BODY_CONTENT_MIME_TYPE));
+                    MapValueUtils.getFileEntry(inputParameters, BODY_CONTENT),
+                    MapValueUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
-                body = HttpClientUtils.Body.of(
-                    inputParameters.getMap(BODY_CONTENT, List.of(Context.FileEntry.class), Map.of()),
+                body = Body.of(
+                    MapValueUtils.getMap(inputParameters, BODY_CONTENT, List.of(FileEntry.class), Map.of()),
                     bodyContentType);
             } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                body = HttpClientUtils.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
-            } else if (bodyContentType == BodyContentType.JSON) {
-                body = HttpClientUtils.Body.of(
-                    inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
-            } else if (bodyContentType == BodyContentType.RAW) {
+                body = Body.of(MapValueUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.JSON || bodyContentType == BodyContentType.XML) {
                 body = Body.of(
-                    inputParameters.getString(BODY_CONTENT),
-                    inputParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
+                    MapValueUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
             } else {
-                body = HttpClientUtils.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                body = Body.of(
+                    MapValueUtils.getString(inputParameters, BODY_CONTENT),
+                    MapValueUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE, "text/plain"));
             }
         }
 
         return body;
     }
 
-    private static ResponseFormat getResponseFormat(InputParameters inputParameters) {
+    private static ResponseFormat getResponseFormat(Map<String, ?> inputParameters) {
         return inputParameters.containsKey(RESPONSE_FORMAT)
-            ? ResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT))
+            ? ResponseFormat.valueOf(MapValueUtils.getString(inputParameters, RESPONSE_FORMAT))
             : null;
     }
 }

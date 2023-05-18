@@ -17,14 +17,15 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -39,13 +40,14 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, InputParameters inputParameters) {
-        List<String> columns = inputParameters.getList(JdbcConstants.COLUMNS, String.class, List.of());
-        @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) inputParameters.getList(JdbcConstants.ROWS, Map.class, List.of());
-        String schema = inputParameters.getString(JdbcConstants.SCHEMA, "public");
-        String table = inputParameters.getRequiredString(JdbcConstants.TABLE);
-        String updateKey = inputParameters.getString(JdbcConstants.UPDATE_KEY, "id");
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
+        List<String> columns = MapValueUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
+        List<Map<String, ?>> rows = (List)MapValueUtils.getList(
+            inputParameters, JdbcConstants.ROWS, Map.class, List.of());
+        String schema = MapValueUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
+        String table = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
+        String updateKey = MapValueUtils.getString(inputParameters, JdbcConstants.UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
             context.getConnection(),

@@ -24,7 +24,6 @@ import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstant
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.operation.config.JdbcActionIntTestConfiguration;
@@ -85,16 +84,11 @@ public class DeleteJdbcActionIntTest {
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(List.of(Map.of("id", "id1"), Map.of("id", "id2")));
-        Mockito.when(inputParameters.getString(DELETE_KEY, "id"))
-            .thenReturn("id");
-        Mockito.when(inputParameters.getString(SCHEMA, "public"))
-            .thenReturn("public");
-        Mockito.when(inputParameters.getRequiredString(TABLE))
-            .thenReturn("test");
+        Map<String, ?> inputParameters = Map.of(
+            ROWS, List.of(Map.of("id", "id1"), Map.of("id", "id2")),
+            DELETE_KEY, "id",
+            SCHEMA, "public",
+            TABLE, "test");
 
         Map<String, Integer> result = deleteJdbcOperation.execute(context, inputParameters);
 

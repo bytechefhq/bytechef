@@ -20,13 +20,14 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
@@ -56,17 +57,21 @@ public class AwsS3PresignGetObjectAction {
         .outputSchema(string())
         .execute(AwsS3PresignGetObjectAction::executeGetPresignedObject);
 
-    protected static String executeGetPresignedObject(Context context, InputParameters inputParameters) {
+    protected static String executeGetPresignedObject(Context context, Map<String, ?> inputParameters) {
         Connection connection = context.getConnection();
+
+        Map<String, Object> connectionInputParameters = connection.getParameters();
 
         try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connection)) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
                 presignedObjectBuilder -> presignedObjectBuilder
-                    .signatureDuration(Duration.parse("PT" + inputParameters.getRequiredString(SIGNATURE_DURATION)))
+                    .signatureDuration(
+                        Duration.parse(
+                            "PT" + MapValueUtils.getRequiredString(connectionInputParameters, SIGNATURE_DURATION)))
                     .getObjectRequest(
                         requestBuilder -> requestBuilder
-                            .bucket(connection.getRequiredString(BUCKET_NAME))
-                            .key(inputParameters.getRequiredString(KEY))));
+                            .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                            .key(MapValueUtils.getRequiredString(inputParameters, KEY))));
 
             URL url = presignedGetObjectRequest.url();
 

@@ -28,6 +28,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.Type;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class OpenApiClient {
         BodyContentType bodyContentType, String mimeType, Map<String, Object> parameters,
         List<? extends Property<?>> properties) {
 
-        HttpClientUtils.Body body = null;
+        Body body = null;
 
         if (bodyContentType != null) {
             for (Property<?> property : properties) {
@@ -105,25 +106,27 @@ public class OpenApiClient {
                 }
 
                 body = switch (bodyContentType) {
-                    case BINARY -> HttpClientUtils.Body.of(
-                        MapValueUtils.getRequired(parameters, property.getName(), FileEntry.class), mimeType);
-                    case FORM_DATA, FORM_URL_ENCODED -> HttpClientUtils.Body.of(
-                        MapValueUtils.getRequiredMap(parameters, property.getName()));
+                    case BINARY -> Body.of(
+                        MapValueUtils.get(parameters, property.getName(), FileEntry.class), mimeType);
+                    case FORM_DATA -> Body.of(
+                        MapValueUtils.getMap(parameters, property.getName(), List.of(FileEntry.class), Map.of()),
+                        bodyContentType);
+                    case FORM_URL_ENCODED -> Body.of(
+                        MapValueUtils.getMap(parameters, property.getName(), Map.of()), bodyContentType);
                     case JSON, XML -> {
-                        if (property.getType() == Property.Type.ARRAY) {
+                        if (property.getType() == Type.ARRAY) {
                             yield Body.of(
-                                MapValueUtils.getRequiredList(parameters, property.getName(), Object.class));
-                        } else if (property.getType() == Property.Type.OBJECT) {
-                            yield HttpClientUtils.Body.of(
-                                MapValueUtils.getRequiredMap(parameters, property.getName()));
+                                MapValueUtils.getList(parameters, property.getName(), Object.class, List.of()),
+                                bodyContentType);
+                        } else if (property.getType() == Type.OBJECT) {
+                            yield Body.of(
+                                MapValueUtils.getMap(parameters, property.getName(), Map.of()), bodyContentType);
                         } else {
                             yield Body.of(
-                                MapValueUtils.getRequiredString(parameters, property.getName()));
+                                MapValueUtils.getRequiredString(parameters, property.getName()), bodyContentType);
                         }
                     }
-                    case RAW ->
-                        HttpClientUtils.Body.of(
-                            MapValueUtils.getRequiredString(parameters, property.getName()), mimeType);
+                    case RAW -> Body.of(MapValueUtils.getString(parameters, property.getName()), mimeType);
                 };
             }
         }

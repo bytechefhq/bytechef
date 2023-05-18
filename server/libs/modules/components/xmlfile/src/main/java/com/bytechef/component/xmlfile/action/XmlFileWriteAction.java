@@ -19,9 +19,9 @@ package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 
 import java.io.ByteArrayInputStream;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
@@ -66,8 +67,8 @@ public class XmlFileWriteAction {
         .outputSchema(fileEntry())
         .execute(XmlFileWriteAction::executeWrite);
 
-    protected static FileEntry executeWrite(Context context, InputParameters inputParameters) {
-        Object source = inputParameters.getRequired(SOURCE);
+    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+        Object source = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -77,9 +78,9 @@ public class XmlFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                inputParameters.getString(FILENAME) == null
+                MapValueUtils.getString(inputParameters, FILENAME) == null
                     ? "file.xml"
-                    : inputParameters.getString(FILENAME),
+                    : MapValueUtils.getString(inputParameters, FILENAME),
                 inputStream);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);

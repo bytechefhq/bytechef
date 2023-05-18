@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
@@ -68,25 +67,22 @@ public class ExecuteJdbcActionIntTest {
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequiredString(JdbcConstants.EXECUTE))
-            .thenReturn(
-                """
-                        CREATE TABLE IF NOT EXISTS test (
-                            id   varchar(256) not null primary key,
-                            name varchar(256) not null
-                        )
-                    """);
+        Map<String, ?> inputParameters = Map.of(
+            JdbcConstants.EXECUTE,
+            """
+                    CREATE TABLE IF NOT EXISTS test (
+                        id   varchar(256) not null primary key,
+                        name varchar(256) not null
+                    )
+                """);
 
         executeJdbcOperation.execute(context, inputParameters);
 
         Assertions.assertEquals(0, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
 
-        Mockito.when(inputParameters.getMap(JdbcConstants.PARAMETERS, Map.of()))
-            .thenReturn(Map.of("id", "id1", "name", "name1"));
-        Mockito.when(inputParameters.getRequiredString(JdbcConstants.EXECUTE))
-            .thenReturn("INSERT INTO test VALUES(:id, :name)");
+        inputParameters = Map.of(
+            JdbcConstants.PARAMETERS, Map.of("id", "id1", "name", "name1"),
+            JdbcConstants.EXECUTE, "INSERT INTO test VALUES(:id, :name)");
 
         executeJdbcOperation.execute(context, inputParameters);
 

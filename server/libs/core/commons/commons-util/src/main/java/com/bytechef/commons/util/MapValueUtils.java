@@ -25,17 +25,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -44,66 +41,47 @@ public final class MapValueUtils {
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private static final DefaultConversionService conversionService = new DefaultConversionService();
-
     private MapValueUtils() {
     }
 
-    @SuppressWarnings(("unchecked"))
-    public static <V> Map<String, Object> append(Map<String, Object> map, String key, Map<String, V> values) {
-        Assert.notNull(key, "'key' must not be null");
-        Assert.notNull(values, "'values' must not be null");
+    public static Map<String, ?> append(Map<String, ?> map, String key, Map<String, ?> values) {
+        Objects.requireNonNull(key, "'key' must not be null");
+        Objects.requireNonNull(values, "'values' must not be null");
 
-        Map<String, V> submap = new HashMap<>(getMap(map, key));
+        Map<String, Object> submap = new HashMap<>(getMap(map, key, Map.of()));
 
         submap.putAll(values);
 
-        map = new HashMap<>(map);
+        Map<String, Object> newMap = new HashMap<>(map);
 
-        map.put(key, submap);
+        newMap.put(key, submap);
 
-        return Collections.unmodifiableMap(map);
+        return Collections.unmodifiableMap(newMap);
     }
 
-    public static boolean containsKey(Map<String, Object> map, String key) {
-        Assert.notNull(map, "'map' must not be null");
+    public static boolean containsKey(Map<String, ?> map, String key) {
+        Objects.requireNonNull(map, "'map' must not be null");
 
         return map.containsKey(key);
     }
 
     public static Object get(Map<String, ?> map, String key) {
-        Assert.notNull(map, "'map' must not be null");
+        Objects.requireNonNull(map, "'map' must not be null");
 
         return map.get(key);
     }
 
-    public static <T> T get(Map<String, Object> map, String key, Class<T> returnType) {
+    public static <T> T get(Map<String, ?> map, String key, Class<T> returnType) {
         Object value = get(map, key);
 
         if (value == null) {
             return null;
         }
 
-        return conversionService.convert(value, returnType);
+        return convert(value, returnType);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T get(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
-
-        return get(map, key, (Class<T>) resolvableType.getRawClass());
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T get(
-        Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, T defaultValue) {
-
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
-
-        return get(map, key, (Class<T>) resolvableType.getRawClass(), defaultValue);
-    }
-
-    public static <T> T get(Map<String, Object> map, String key, Class<T> returnType, T defaultValue) {
+    public static <T> T get(Map<String, ?> map, String key, Class<T> returnType, T defaultValue) {
         T value = get(map, key, returnType);
 
         if (value == null) {
@@ -113,9 +91,57 @@ public final class MapValueUtils {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T[] getArray(Map<String, Object> map, String key, Class<T> elementType) {
+    public static Object[] getArray(Map<String, ?> map, String key) {
         Object value = get(map, key);
+
+        if (value == null) {
+            return null;
+        }
+
+        Class<?> valueClass = value.getClass();
+
+        if (valueClass.isArray()) {
+            return (Object[]) value;
+        }
+
+        List<?> list = getList(map, key);
+
+        if (list == null) {
+            return null;
+        }
+
+        return list.toArray((Object[]) Array.newInstance(Object.class, 0));
+    }
+
+    public static Object[] getArray(Map<String, ?> map, String key, Object[] defaultValue) {
+        Object value = get(map, key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        Class<?> valueClass = value.getClass();
+
+        if (valueClass.isArray()) {
+            return (Object[]) value;
+        }
+
+        List<?> list = getList(map, key);
+
+        if (list == null) {
+            return defaultValue;
+        }
+
+        return list.toArray((Object[]) Array.newInstance(Object.class, 0));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType) {
+        Object value = get(map, key);
+
+        if (value == null) {
+            return null;
+        }
 
         Class<?> valueClass = value.getClass();
 
@@ -127,20 +153,49 @@ public final class MapValueUtils {
 
         List<T> list = getList(map, key, elementType);
 
+        if (list == null) {
+            return null;
+        }
+
         return list.toArray((T[]) Array.newInstance(elementType, 0));
     }
 
-    public static Boolean getBoolean(Map<String, Object> map, String key) {
+    @SuppressWarnings("unchecked")
+    public static <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType, T[] defaultValue) {
+        Object value = get(map, key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        Class<?> valueClass = value.getClass();
+
+        Class<?> valueComponentType = valueClass.getComponentType();
+
+        if (valueClass.isArray() && valueComponentType.equals(elementType)) {
+            return (T[]) value;
+        }
+
+        List<T> list = getList(map, key, elementType);
+
+        if (list == null) {
+            return defaultValue;
+        }
+
+        return list.toArray((T[]) Array.newInstance(elementType, 0));
+    }
+
+    public static Boolean getBoolean(Map<String, ?> map, String key) {
         return get(map, key, Boolean.class);
     }
 
-    public static boolean getBoolean(Map<String, Object> map, String key, boolean defaultValue) {
+    public static boolean getBoolean(Map<String, ?> map, String key, boolean defaultValue) {
         Boolean value = getBoolean(map, key);
 
         return value != null ? value : defaultValue;
     }
 
-    public static Date getDate(Map<String, Object> map, String key) {
+    public static Date getDate(Map<String, ?> map, String key) {
         Object value = get(map, key);
 
         if (value instanceof String) {
@@ -156,7 +211,7 @@ public final class MapValueUtils {
         return (Date) value;
     }
 
-    public static Date getDate(Map<String, Object> map, String key, Date defaultValue) {
+    public static Date getDate(Map<String, ?> map, String key, Date defaultValue) {
         Date date = getDate(map, key);
 
         if (date == null) {
@@ -166,15 +221,15 @@ public final class MapValueUtils {
         return date;
     }
 
-    public static Double getDouble(Map<String, Object> map, String key) {
+    public static Double getDouble(Map<String, ?> map, String key) {
         return get(map, key, Double.class);
     }
 
-    public static Double getDouble(Map<String, Object> map, String key, double defaultValue) {
+    public static Double getDouble(Map<String, ?> map, String key, double defaultValue) {
         return get(map, key, Double.class, defaultValue);
     }
 
-    public static Duration getDuration(Map<String, Object> map, String key) {
+    public static Duration getDuration(Map<String, ?> map, String key) {
         String value = getString(map, key);
 
         if (value == null) {
@@ -184,94 +239,89 @@ public final class MapValueUtils {
         return Duration.parse("PT" + value);
     }
 
-    public static Duration getDuration(Map<String, Object> map, String key, Duration defaultDuration) {
+    public static Duration getDuration(Map<String, ?> map, String key, Duration defaultDuration) {
         Duration value = getDuration(map, key);
 
         return value != null ? value : defaultDuration;
     }
 
-    public static Float getFloat(Map<String, Object> map, String key) {
+    public static Float getFloat(Map<String, ?> map, String key) {
         return get(map, key, Float.class);
     }
 
-    public static float getFloat(Map<String, Object> map, String key, float defaultValue) {
+    public static float getFloat(Map<String, ?> map, String key, float defaultValue) {
         return get(map, key, Float.class, defaultValue);
     }
 
-    public static Integer getInteger(Map<String, Object> map, String key) {
+    public static Integer getInteger(Map<String, ?> map, String key) {
         return get(map, key, Integer.class);
     }
 
-    public static int getInteger(Map<String, Object> map, String key, int defaultValue) {
+    public static int getInteger(Map<String, ?> map, String key, int defaultValue) {
         return get(map, key, Integer.class, defaultValue);
     }
 
-    public static <T> List<T> getList(Map<String, Object> map, String key, Class<T> elementType) {
+    public static List<?> getList(Map<String, ?> map, String key) {
+        return get(map, key, List.class);
+    }
+
+    public static List<?> getList(Map<String, ?> map, String key, List<?> defaultValue) {
+        List<?> list = get(map, key, List.class);
+
+        return list == null ? defaultValue : list;
+    }
+
+    public static <T> List<T> getList(Map<String, ?> map, String key, Class<T> elementType) {
         List<?> list = get(map, key, List.class);
 
         if (list == null) {
-            return Collections.emptyList();
+            return null;
         }
 
         List<T> typedList = new ArrayList<>();
 
         for (Object item : list) {
-            typedList.add(conversionService.convert(item, elementType));
+            typedList.add(convert(item, elementType));
         }
 
         return Collections.unmodifiableList(typedList);
     }
 
-    public static <T> List<T> getList(Map<String, Object> map, String key, Class<T> elementType, List<T> defaultValue) {
+    public static <T> List<T> getList(Map<String, ?> map, String key, Class<T> elementType, List<T> defaultValue) {
         List<T> list = getList(map, key, elementType);
 
         return list != null ? list : defaultValue;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> getList(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
+    public static List<?> getList(Map<String, ?> map, String key, Class<?>[] elementTypes) {
+        List<?> list = get(map, key, List.class);
 
-        return getList(map, key, (Class<T>) resolvableType.getRawClass());
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> getList(
-        Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
-
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
-
-        List<T> list = getList(map, key, (Class<T>) resolvableType.getRawClass(), defaultValue);
-
-        return list != null ? list : defaultValue;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<Object> getList(
-        Map<String, Object> map, String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
-
-        List<Object> list = get(map, key, List.class);
-
-        if (list == null) {
-            list = defaultValue;
-        } else {
+        if (list != null) {
             list = list.stream()
-                .map(value -> {
-                    for (Class<?> elementType : elementTypes) {
-                        if (conversionService.canConvert(value.getClass(), elementType)) {
-                            value = conversionService.convert(value, elementType);
-                        }
-                    }
-
-                    return value;
-                })
+                .map(value -> convert(value, Arrays.asList(elementTypes)))
                 .toList();
         }
 
         return list;
     }
 
-    public static LocalDate getLocalDate(Map<String, Object> map, String key) {
+    public static List<?> getList(
+        Map<String, ?> map, String key, List<Class<?>> elementTypes, List<?> defaultValue) {
+
+        List<?> list = get(map, key, List.class);
+
+        if (list == null) {
+            list = defaultValue;
+        } else {
+            list = list.stream()
+                .map(value -> convert(value, elementTypes))
+                .toList();
+        }
+
+        return list;
+    }
+
+    public static LocalDate getLocalDate(Map<String, ?> map, String key) {
         Object value = get(map, key);
 
         if (value instanceof String) {
@@ -281,7 +331,7 @@ public final class MapValueUtils {
         return (LocalDate) value;
     }
 
-    public static LocalDate getLocalDate(Map<String, Object> map, String key, LocalDate defaultValue) {
+    public static LocalDate getLocalDate(Map<String, ?> map, String key, LocalDate defaultValue) {
         LocalDate localDate = getLocalDate(map, key);
 
         if (localDate == null) {
@@ -291,7 +341,7 @@ public final class MapValueUtils {
         return localDate;
     }
 
-    public static LocalDateTime getLocalDateTime(Map<String, Object> map, String key) {
+    public static LocalDateTime getLocalDateTime(Map<String, ?> map, String key) {
         Object value = get(map, key);
 
         if (value instanceof String) {
@@ -301,7 +351,7 @@ public final class MapValueUtils {
         return (LocalDateTime) value;
     }
 
-    public static LocalDateTime getLocalDateTime(Map<String, Object> map, String key, LocalDateTime defaultValue) {
+    public static LocalDateTime getLocalDateTime(Map<String, ?> map, String key, LocalDateTime defaultValue) {
         LocalDateTime localDateTime = getLocalDateTime(map, key);
 
         if (localDateTime == null) {
@@ -311,174 +361,241 @@ public final class MapValueUtils {
         return localDateTime;
     }
 
-    public static Long getLong(Map<String, Object> map, String key) {
+    public static Long getLong(Map<String, ?> map, String key) {
         return get(map, key, Long.class);
     }
 
-    public static long getLong(Map<String, Object> map, String key, long defaultValue) {
+    public static long getLong(Map<String, ?> map, String key, long defaultValue) {
         return get(map, key, Long.class, defaultValue);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <V> Map<String, V> getMap(Map<String, Object> map, String key) {
-        Map<String, V> value = (Map<String, V>) get(map, key, Map.class);
+    public static Map<String, ?> getMap(Map<String, ?> map, String key) {
+        Map<?, ?> value = get(map, key, Map.class);
 
         if (value == null) {
             return null;
         }
 
-        return Collections.unmodifiableMap(value);
+        return Collections.unmodifiableMap(
+            map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> (String) entry.getKey(), Map.Entry::getValue)));
     }
 
-    public static <V> Map<String, V> getMap(Map<String, Object> map, String key, Map<String, V> defaultValue) {
-        Map<String, V> value = getMap(map, key);
+    public static Map<String, ?> getMap(Map<String, ?> map, String key, Map<String, ?> defaultValue) {
+        Map<?, ?> value = get(map, key, Map.class);
 
-        return value != null ? value : defaultValue;
+        if (value == null) {
+            return Collections.unmodifiableMap(defaultValue);
+        }
+
+        return Collections.unmodifiableMap(
+            map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> (String) entry.getKey(), Map.Entry::getValue)));
     }
 
-    public static Map<String, Object> getMap(
-        Map<String, Object> map, String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
-        Map<String, Object> mapValue = getMap(map, key);
+    public static <V> Map<String, V> getMap(Map<String, ?> map, String key, Class<V> valueType) {
+        Map<?, ?> value = get(map, key, Map.class);
 
-        if (mapValue == null) {
-            mapValue = defaultValue;
-        } else {
+        if (value == null) {
+            return null;
+        }
+
+        return Collections.unmodifiableMap(
+            map.entrySet()
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        entry -> (String) entry.getKey(),
+                        entry -> convert(entry.getValue(), valueType))));
+    }
+
+    public static <V> Map<String, V> getMap(
+        Map<String, ?> map, String key, Class<V> valueType, Map<String, V> defaultValue) {
+
+        Map<String, V> value = getMap(map, key, valueType);
+
+        return value == null ? Collections.unmodifiableMap(defaultValue) : value;
+    }
+
+    public static Map<String, ?> getMap(Map<String, ?> map, String key, List<Class<?>> valueTypes) {
+        Map<String, ?> mapValue = getMap(map, key);
+
+        if (mapValue != null) {
             mapValue = mapValue.entrySet()
                 .stream()
-                .map(entry -> {
-                    for (Class<?> valueType : valueTypes) {
-                        Object value = entry.getValue();
-
-                        if (value != null && conversionService.canConvert(value.getClass(), valueType)) {
-                            entry = Map.entry(entry.getKey(), conversionService.convert(value, valueType));
-                        }
-                    }
-
-                    return entry;
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes)));
         }
 
         return mapValue;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T getRequired(Map<String, ?> map, String key) {
-        T value = (T) get(map, key);
+    public static Map<String, ?> getMap(
+        Map<String, ?> map, String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Map<String, ?> mapValue = getMap(map, key);
+
+        if (mapValue == null) {
+            mapValue = Collections.unmodifiableMap(defaultValue);
+        } else {
+            mapValue = mapValue.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes)));
+        }
+
+        return mapValue;
+    }
+
+    public static Object getRequired(Map<String, ?> map, String key) {
+        Object value = get(map, key);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static <T> T getRequired(Map<String, Object> map, String key, Class<T> returnType) {
+    public static <T> T getRequired(Map<String, ?> map, String key, Class<T> returnType) {
         T value = get(map, key, returnType);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static Boolean getRequiredBoolean(Map<String, Object> map, String key) {
+    public static Object[] getRequiredArray(Map<String, ?> map, String key) {
+        Object[] value = getArray(map, key);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static <T> T[] getRequiredArray(Map<String, ?> map, String key, Class<T> elementType) {
+        T[] value = getArray(map, key, elementType);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static Boolean getRequiredBoolean(Map<String, ?> map, String key) {
         Boolean value = getBoolean(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static Date getRequiredDate(Map<String, Object> map, String key) {
+    public static Date getRequiredDate(Map<String, ?> map, String key) {
         Date value = getDate(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static Double getRequiredDouble(Map<String, Object> map, String key) {
+    public static Double getRequiredDouble(Map<String, ?> map, String key) {
         Double value = getDouble(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static Float getRequiredFloat(Map<String, Object> map, String key) {
+    public static Float getRequiredFloat(Map<String, ?> map, String key) {
         Float value = getFloat(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static Integer getRequiredInteger(Map<String, Object> map, String key) {
+    public static Integer getRequiredInteger(Map<String, ?> map, String key) {
         Integer value = getInteger(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static <T> List<T> getRequiredList(Map<String, Object> map, String key, Class<T> elementType) {
+    public static List<?> getRequiredList(Map<String, ?> map, String key) {
+        List<?> value = getList(map, key);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static <T> List<T> getRequiredList(Map<String, ?> map, String key, Class<T> elementType) {
         List<T> value = getList(map, key, elementType);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static <T> List<T> getRequiredList(
-        Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
-        List<T> value = getList(map, key, elementType);
-
-        Assert.notNull(value, "Unknown value for : " + key);
-
-        return value;
-    }
-
-    public static LocalDate getRequiredLocalDate(Map<String, Object> map, String key) {
+    public static LocalDate getRequiredLocalDate(Map<String, ?> map, String key) {
         LocalDate value = getLocalDate(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static LocalDateTime getRequiredLocalDateTime(Map<String, Object> map, String key) {
+    public static LocalDateTime getRequiredLocalDateTime(Map<String, ?> map, String key) {
         LocalDateTime value = getLocalDateTime(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static <V> Map<String, V> getRequiredMap(Map<String, Object> map, String key) {
-        Map<String, V> value = getMap(map, key);
+    public static <V> Map<String, V> getRequiredMap(Map<String, ?> map, String key, Class<V> valueType) {
+        Map<String, V> value = getMap(map, key, valueType);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static String getRequiredString(Map<String, Object> map, String key) {
+    public static Map<String, ?> getRequiredMap(Map<String, ?> map, String key) {
+        Map<String, ?> value = getMap(map, key);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static String getRequiredString(Map<String, ?> map, String key) {
         String value = getString(map, key);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static String getString(Map<String, Object> map, String key) {
+    public static String getString(Map<String, ?> map, String key) {
         return get(map, key, String.class);
     }
 
-    public static String getString(Map<String, Object> map, String key, String defaultValue) {
+    public static String getString(Map<String, ?> map, String key, String defaultValue) {
         String value = getString(map, key);
 
         return value != null ? value : defaultValue;
     }
 
-    public static void addConverter(Converter<?, ?> converter) {
-        conversionService.addConverter(converter);
+    private static <T> T convert(Object value, Class<T> elementType) {
+        return conversionService.convert(value, elementType);;
+    }
+
+    private static Object convert(Object value, List<Class<?>> elementTypes) {
+        for (Class<?> elementType : elementTypes) {
+            if (value != null && conversionService.canConvert(value.getClass(), elementType)) {
+                value = convert(value, elementType);
+            }
+        }
+
+        return value;
     }
 }

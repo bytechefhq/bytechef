@@ -32,7 +32,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.registrar.jdbc.sql.DataSourceFactory;
@@ -84,23 +83,23 @@ public class JdbcComponentHandler implements ComponentHandler {
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
     }
 
-    protected Map<String, Integer> executeDelete(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeDelete(Context context, Map<String, ?> inputParameters) {
         return deleteJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> executeExecute(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeExecute(Context context, Map<String, ?> inputParameters) {
         return executeJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> executeInsert(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeInsert(Context context, Map<String, ?> inputParameters) {
         return insertJdbcOperation.execute(context, inputParameters);
     }
 
-    protected List<Map<String, Object>> executeQuery(Context context, InputParameters inputParameters) {
+    protected List<Map<String, Object>> executeQuery(Context context, Map<String, ?> inputParameters) {
         return queryJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> executeUpdate(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeUpdate(Context context, Map<String, ?> inputParameters) {
         return updateJdbcOperation.execute(context, inputParameters);
     }
 

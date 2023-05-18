@@ -18,8 +18,9 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+
+import java.util.Map;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.INDEX;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
@@ -56,7 +57,7 @@ public class DataStorageDeleteValueFromListAction {
                 .required(true))
         .execute(DataStorageDeleteValueFromListAction::execute);
 
-    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
         System.out.println(actionContext.toString());
 
         return null;

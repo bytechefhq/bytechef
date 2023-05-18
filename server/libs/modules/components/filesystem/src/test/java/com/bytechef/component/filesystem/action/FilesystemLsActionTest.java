@@ -19,13 +19,13 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,13 +36,11 @@ public class FilesystemLsActionTest {
 
     @Test
     public void testLs1() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getLsFile();
 
-        Mockito.when(inputParameters.getRequiredString("path"))
-            .thenReturn(file.getAbsolutePath());
-        Mockito.when(inputParameters.getBoolean("recursive", false))
-            .thenReturn(true);
+        Map<String, ?> inputParameters = Map.of(
+            "path", file.getAbsolutePath(),
+            "recursive", true);
 
         List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(
             Mockito.mock(Context.class), inputParameters);
@@ -56,13 +54,11 @@ public class FilesystemLsActionTest {
 
     @Test
     public void testLs2() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getLsFile();
 
-        Mockito.when(inputParameters.getRequiredString("path"))
-            .thenReturn(file.getAbsolutePath());
-        Mockito.when(inputParameters.getBoolean("recursive", false))
-            .thenReturn(true);
+        Map<String, ?> inputParameters = Map.of(
+            "path", file.getAbsolutePath(),
+            "recursive", true);
 
         List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(
             Mockito.mock(Context.class), inputParameters);
@@ -76,11 +72,9 @@ public class FilesystemLsActionTest {
 
     @Test
     public void testLs3() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getLsFile();
 
-        Mockito.when(inputParameters.getRequiredString("path"))
-            .thenReturn(file.getAbsolutePath());
+        Map<String, ?> inputParameters = Map.of("path", file.getAbsolutePath());
 
         List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(
             Mockito.mock(Context.class), inputParameters);

@@ -18,10 +18,10 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -47,6 +47,6 @@ public interface OutputSchemaDataSource {
          * @param inputParameters
          * @return
          */
-        List<? extends Property<?>> apply(Connection connection, InputParameters inputParameters);
+        List<? extends Property<?>> apply(Connection connection, Map<String, ?> inputParameters);
     }
 }

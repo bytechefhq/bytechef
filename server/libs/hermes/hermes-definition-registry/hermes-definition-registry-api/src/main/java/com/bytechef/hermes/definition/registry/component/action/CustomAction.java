@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.component.action;
 
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -190,14 +190,15 @@ public class CustomAction {
                 .map(Help::getLearnMoreUrl), null));
     }
 
-    protected static Object execute(ActionContext context, InputParameters inputParameters) {
+    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
         return HttpClientUtils.exchange(
-            inputParameters.getRequiredString(PATH),
-            inputParameters.getRequired(METHOD, HttpClientUtils.RequestMethod.class))
+            MapValueUtils.getRequiredString(inputParameters, PATH),
+            MapValueUtils.getRequired(inputParameters, METHOD, HttpClientUtils.RequestMethod.class))
             .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
-            .body(getBody(inputParameters.get(BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
+            .body(getBody(
+                MapValueUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
             .headers(
-                inputParameters.getMap(HEADERS, Map.of())
+                MapValueUtils.getMap(inputParameters, HEADERS, Map.of())
                     .entrySet()
                     .stream()
                     .collect(
@@ -205,7 +206,7 @@ public class CustomAction {
                             Map.Entry::getKey,
                             entry -> List.of((String) entry.getValue()))))
             .queryParameters(
-                inputParameters.getMap(QUERY_PARAMETERS, Map.of())
+                MapValueUtils.getMap(inputParameters, QUERY_PARAMETERS, Map.of())
                     .entrySet()
                     .stream()
                     .collect(
@@ -215,14 +216,14 @@ public class CustomAction {
             .execute();
     }
 
-    private static HttpClientUtils.Body getBody(BodyContentType bodyContentType, InputParameters inputParameters) {
+    private static HttpClientUtils.Body getBody(BodyContentType bodyContentType, Map<String, ?> inputParameters) {
         HttpClientUtils.Body body = null;
 
         if (bodyContentType != null) {
             if (bodyContentType == BodyContentType.RAW) {
-                body = HttpClientUtils.Body.of(inputParameters.getRequiredString(BODY_CONTENT));
+                body = HttpClientUtils.Body.of(MapValueUtils.getRequiredString(inputParameters, BODY_CONTENT));
             } else {
-                HttpClientUtils.Body.of(inputParameters.getRequiredMap(BODY_CONTENT));
+                HttpClientUtils.Body.of(MapValueUtils.getRequiredMap(inputParameters, BODY_CONTENT));
             }
         }
 

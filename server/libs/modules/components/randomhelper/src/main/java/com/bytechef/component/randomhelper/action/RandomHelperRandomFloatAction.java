@@ -19,12 +19,17 @@ package com.bytechef.component.randomhelper.action;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
+import java.util.Map;
+
+import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.END_INCLUSIVE;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_FLOAT;
+import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.START_INCLUSIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 
 /**
  * @author Ivica Cardic
@@ -34,14 +39,23 @@ public class RandomHelperRandomFloatAction {
     public static final ActionDefinition ACTION_DEFINITION = action(RANDOM_FLOAT)
         .title("Float")
         .description("Generates a random float value.")
+        .properties(
+            integer(START_INCLUSIVE)
+                .description("The minimum possible generated value.")
+                .required(true)
+                .defaultValue(0),
+            integer(END_INCLUSIVE)
+                .description("The maximum possible generated value.")
+                .required(true)
+                .defaultValue(100))
         .execute(RandomHelperRandomFloatAction::executeNextFloat);
 
     /**
      * Generates a random float.
      */
-    protected static Object executeNextFloat(Context context, InputParameters inputParameters) {
-        int startInclusive = inputParameters.getInteger("startInclusive", 0);
-        int endInclusive = inputParameters.getInteger("endInclusive", 100);
+    protected static Object executeNextFloat(Context context, Map<String, ?> inputParameters) {
+        int startInclusive = MapValueUtils.getInteger(inputParameters, START_INCLUSIVE, 0);
+        int endInclusive = MapValueUtils.getInteger(inputParameters, END_INCLUSIVE, 100);
 
         return nextFloat(startInclusive, endInclusive);
     }

@@ -19,8 +19,9 @@ package com.bytechef.component.datastorage.action;
 
 import com.bytechef.component.datastorage.constant.DataStorageConstants;
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+
+import java.util.Map;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
@@ -68,7 +69,7 @@ public class DataStorageAppendValueToListAction {
                     "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists."))
         .execute(DataStorageAppendValueToListAction::execute);
 
-    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
         System.out.println(actionContext);
 
         return null;

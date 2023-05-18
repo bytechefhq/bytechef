@@ -18,13 +18,13 @@
 package com.bytechef.component.delay.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -35,14 +35,7 @@ public class DelaySleepActionTest {
     public void test1() {
         long now = System.currentTimeMillis();
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.containsKey("millis"))
-            .thenReturn(false);
-        Mockito.when(inputParameters.containsKey("duration"))
-            .thenReturn(true);
-        Mockito.when(inputParameters.getDuration("duration"))
-            .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
+        Map<String, ?> inputParameters = Map.of("duration", Duration.of(1500, ChronoUnit.MILLIS));
 
         DelaySleepAction.executeDelay(Mockito.mock(Context.class), inputParameters);
 
@@ -56,12 +49,7 @@ public class DelaySleepActionTest {
     public void test2() {
         long now = System.currentTimeMillis();
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.containsKey("millis"))
-            .thenReturn(true);
-        Mockito.when(inputParameters.getLong("millis"))
-            .thenReturn(500L);
+        Map<String, ?> inputParameters = Map.of("millis", 500L);
 
         DelaySleepAction.executeDelay(Mockito.mock(Context.class), inputParameters);
 
@@ -75,7 +63,7 @@ public class DelaySleepActionTest {
     public void test3() {
         long now = System.currentTimeMillis();
 
-        DelaySleepAction.executeDelay(Mockito.mock(Context.class), Mockito.mock(InputParameters.class));
+        DelaySleepAction.executeDelay(Mockito.mock(Context.class), Map.of());
 
         long delta = System.currentTimeMillis() - now;
 

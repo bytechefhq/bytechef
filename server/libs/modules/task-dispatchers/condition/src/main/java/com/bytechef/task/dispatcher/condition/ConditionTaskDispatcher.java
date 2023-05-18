@@ -75,12 +75,10 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         if (ConditionTaskUtils.resolveCase(taskExecution)) {
             subWorkflowTasks = MapValueUtils.getList(
-                taskExecution.getParameters(), CASE_TRUE, new ParameterizedTypeReference<>() {},
-                Collections.emptyList());
+                taskExecution.getParameters(), CASE_TRUE, WorkflowTask.class, Collections.emptyList());
         } else {
             subWorkflowTasks = MapValueUtils.getList(
-                taskExecution.getParameters(), CASE_FALSE, new ParameterizedTypeReference<>() {},
-                Collections.emptyList());
+                taskExecution.getParameters(), CASE_FALSE, WorkflowTask.class, Collections.emptyList());
         }
 
         if (subWorkflowTasks.size() > 0) {

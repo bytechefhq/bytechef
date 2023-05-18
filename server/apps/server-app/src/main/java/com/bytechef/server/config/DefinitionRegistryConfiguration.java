@@ -28,8 +28,6 @@ import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImp
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
@@ -103,11 +101,6 @@ public class DefinitionRegistryConfiguration {
 
         return new ContextFactoryImpl(
             connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
-    }
-
-    @Bean
-    InputParametersFactory inputParametersFactory() {
-        return new InputParametersFactoryImpl();
     }
 
     @Bean

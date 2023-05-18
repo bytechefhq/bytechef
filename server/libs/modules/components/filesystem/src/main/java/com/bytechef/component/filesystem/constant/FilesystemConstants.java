@@ -32,4 +32,6 @@ public class FilesystemConstants {
     public static final String RM = "rm";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
+    public static final String PATH = "path";
+    public static final String RECURSIVE = "recursive";
 }

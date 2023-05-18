@@ -22,10 +22,11 @@ package com.bytechef.component.bash.action;
 import com.bytechef.component.bash.BashComponentHandlerTest;
 import com.bytechef.component.bash.constant.BashConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.Map;
 
 /**
  * @author Arik Cohen
@@ -35,10 +36,8 @@ public class BashExecuteActionTest {
 
     @Test
     public void testExecute() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequiredString(BashConstants.SCRIPT))
-            .thenReturn("ls -l "
+        Map<String, ?> inputParameters = Map.of(
+            BashConstants.SCRIPT, "ls -l "
                 + BashComponentHandlerTest.class
                     .getClassLoader()
                     .getResource("dependencies/test.txt")

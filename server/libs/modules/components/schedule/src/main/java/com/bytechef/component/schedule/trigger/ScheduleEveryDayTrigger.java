@@ -20,9 +20,9 @@ package com.bytechef.component.schedule.trigger;
 import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
@@ -118,18 +118,13 @@ public class ScheduleEveryDayTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         CronSchedule cronSchedule = new CronSchedule(
             "0 %s %s ? * %s".formatted(
-                inputParameters.getInteger(MINUTE), inputParameters.getInteger(HOUR),
-                inputParameters.getMap(DAY_OF_WEEK)
-                    .entrySet()
-                    .stream()
-                    .filter(entry -> entry.getValue() == null || !((Boolean) entry.getValue()))
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.joining(","))),
-            ZoneId.of(inputParameters.getString(TIMEZONE)));
+                MapValueUtils.getInteger(inputParameters, MINUTE), MapValueUtils.getInteger(inputParameters, HOUR),
+                getDayOfWeek(inputParameters)),
+            ZoneId.of(MapValueUtils.getString(inputParameters, TIMEZONE)));
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
@@ -137,16 +132,25 @@ public class ScheduleEveryDayTrigger {
                 new WorkflowScheduleAndData(
                     cronSchedule,
                     Map.of(
-                        HOUR, inputParameters.getInteger(HOUR),
-                        MINUTE, inputParameters.getInteger(MINUTE),
-                        DAY_OF_WEEK, inputParameters.getMap(DAY_OF_WEEK),
-                        TIMEZONE, inputParameters.getString(TIMEZONE)),
+                        HOUR, MapValueUtils.getInteger(inputParameters, HOUR),
+                        MINUTE, MapValueUtils.getInteger(inputParameters, MINUTE),
+                        DAY_OF_WEEK, MapValueUtils.getMap(inputParameters, DAY_OF_WEEK),
+                        TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
                     workflowExecutionId)),
             cronSchedule.getInitialExecutionTime(Instant.now()));
     }
 
+    private static String getDayOfWeek(Map<String, ?> inputParameters) {
+        return MapValueUtils.getMap(inputParameters, DAY_OF_WEEK)
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() == null || !((Boolean) entry.getValue()))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.joining(","));
+    }
+
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }

@@ -18,9 +18,9 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -98,17 +98,17 @@ public class OdsFileReadAction {
         .outputSchema(array())
         .execute(OdsFileReadAction::executeRead);
 
-    protected static List<Map<String, ?>> executeRead(Context context, InputParameters inputParameters) {
-        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
-        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
-        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
-        String sheetName = inputParameters.getString(SHEET_NAME);
+    protected static List<Map<String, ?>> executeRead(Context context, Map<String, ?> inputParameters) {
+        boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
+        boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
+        Integer pageNumber = MapValueUtils.getInteger(inputParameters, PAGE_NUMBER);
+        boolean readAsString = MapValueUtils.getBoolean(inputParameters, READ_AS_STRING, false);
+        String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME);
 
         try (
             InputStream inputStream = context
-                .getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+                .getFileStream(MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY))) {
             if (inputStream == null) {
                 throw new ComponentExecutionException("Unable to get file content from task " + inputParameters);
             }

@@ -17,11 +17,10 @@
 
 package com.bytechef.commons.util;
 
-import org.springframework.util.Assert;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,40 +37,40 @@ public final class CollectionUtils {
     }
 
     public static <T> List<T> concat(List<T> list1, T item) {
-        Assert.notNull(list1, "'list1' must not be null");
-        Assert.notNull(item, "'item' must not be null");
+        Objects.requireNonNull(list1, "'list1' must not be null");
+        Objects.requireNonNull(item, "'item' must not be null");
 
         return Stream.concat(list1.stream(), Stream.of(item))
             .toList();
     }
 
     public static <T> List<T> concat(List<T> list1, List<T> list2) {
-        Assert.notNull(list1, "'list1' must not be null");
-        Assert.notNull(list2, "'list2' must not be null");
+        Objects.requireNonNull(list1, "'list1' must not be null");
+        Objects.requireNonNull(list2, "'list2' must not be null");
 
         return Stream.concat(list1.stream(), list2.stream())
             .toList();
     }
 
     public static <T> List<T> concat(Stream<T> stream1, Stream<T> stream2) {
-        Assert.notNull(stream1, "'stream1' must not be null");
-        Assert.notNull(stream1, "'stream1' must not be null");
+        Objects.requireNonNull(stream1, "'stream1' must not be null");
+        Objects.requireNonNull(stream1, "'stream1' must not be null");
 
         return Stream.concat(stream1, stream2)
             .toList();
     }
 
     public static <K, V> Map<K, V> concat(Map<K, V> map1, Map<K, V> map2) {
-        Assert.notNull(map1, "'map1' must not be null");
-        Assert.notNull(map2, "'map2' must not be null");
+        Objects.requireNonNull(map1, "'map1' must not be null");
+        Objects.requireNonNull(map2, "'map2' must not be null");
 
         return Stream.concat(stream(map1), stream(map2))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
     public static <T> List<T> concatDistinct(List<T> list1, List<T> list2) {
-        Assert.notNull(list1, "'list1' must not be null");
-        Assert.notNull(list2, "'list2' must not be null");
+        Objects.requireNonNull(list1, "'list1' must not be null");
+        Objects.requireNonNull(list2, "'list2' must not be null");
 
         return Stream.concat(list1.stream(), list2.stream())
             .distinct()
@@ -79,21 +78,21 @@ public final class CollectionUtils {
     }
 
     public static <T> boolean contains(List<T> list, T item) {
-        Assert.notNull(list, "'list' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
 
-        return org.springframework.util.CollectionUtils.contains(list.iterator(), item);
+        return list.contains(item);
     }
 
     public static <T> long count(Iterable<T> iterable) {
-        Assert.notNull(iterable, "'iterable' must not be null");
+        Objects.requireNonNull(iterable, "'iterable' must not be null");
 
         return StreamSupport.stream(iterable.spliterator(), false)
             .count();
     }
 
     public static <T> List<T> filter(List<T> list, Predicate<? super T> filter) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(filter, "'filter' must not be null");
 
         return list.stream()
             .filter(filter)
@@ -101,8 +100,8 @@ public final class CollectionUtils {
     }
 
     public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(filter, "'filter' must not be null");
 
         return OptionalUtils.orElse(
             list.stream()
@@ -112,8 +111,8 @@ public final class CollectionUtils {
     }
 
     public static <T> T getFirst(Collection<T> list, Predicate<? super T> filter) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(filter, "'filter' must not be null");
 
         return OptionalUtils.get(
             list.stream()
@@ -124,9 +123,9 @@ public final class CollectionUtils {
     public static <T, U> U getFirst(
         Collection<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
 
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(filter, "'filter' must not be null");
+        Objects.requireNonNull(mapper, "'mapper' must not be null");
 
         return OptionalUtils.get(
             list.stream()
@@ -138,9 +137,9 @@ public final class CollectionUtils {
     public static <T, U> U getFirstFlat(
         Collection<T> list, Function<? super T, ? extends Stream<? extends U>> mapper, Predicate<? super U> filter) {
 
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(mapper, "'mapper' must not be null");
+        Objects.requireNonNull(filter, "'filter' must not be null");
 
         return OptionalUtils.get(
             list.stream()
@@ -150,8 +149,8 @@ public final class CollectionUtils {
     }
 
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(mapper, "'mapper' must not be null");
 
         return list.stream()
             .map(mapper)
@@ -159,13 +158,13 @@ public final class CollectionUtils {
     }
 
     public static int size(Collection<?> collection) {
-        Assert.notNull(collection, "'collection' must not be null");
+        Objects.requireNonNull(collection, "'collection' must not be null");
 
         return collection.size();
     }
 
     public static <T> Stream<T> stream(Collection<T> collection) {
-        Assert.notNull(collection, "'collection' must not be null");
+        Objects.requireNonNull(collection, "'collection' must not be null");
 
         return collection.stream();
     }
@@ -175,7 +174,7 @@ public final class CollectionUtils {
     }
 
     public static <K, V> Stream<Map.Entry<K, V>> stream(Map<K, V> map) {
-        Assert.notNull(map, "'map' must not be null");
+        Objects.requireNonNull(map, "'map' must not be null");
 
         Set<Map.Entry<K, V>> entry = map.entrySet();
 

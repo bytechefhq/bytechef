@@ -18,7 +18,6 @@
 package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.util.JsonUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,12 +34,10 @@ public class ObjectHelperStringifyActionTest {
 
     @Test
     public void testExecuteStringify() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
+        Map<String, ?> inputParameters = Map.of(
+            SOURCE, (Map.of("key", 3)));
 
         Map<String, Integer> input = Map.of("key", 3);
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(Map.of("key", 3));
 
         assertThat(ObjectHelperStringifyAction.executeStringify(Mockito.mock(Context.class), inputParameters))
             .isEqualTo(JsonUtils.write(input));

@@ -18,13 +18,13 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,13 +34,11 @@ public class FilesystemMkdirActionTest {
 
     @Test
     public void testCreateDir1() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
             .toString()
             .replace("-", "");
 
-        Mockito.when(inputParameters.getRequiredString("path"))
-            .thenReturn(tempDir);
+        Map<String, ?> inputParameters = Map.of("path", tempDir);
 
         FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), inputParameters);
 
@@ -50,10 +48,7 @@ public class FilesystemMkdirActionTest {
     @Test
     public void testCreateDir2() {
         Assertions.assertThrows(ComponentExecutionException.class, () -> {
-            InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-            Mockito.when(inputParameters.getRequiredString("path"))
-                .thenReturn("/no/such/thing");
+            Map<String, ?> inputParameters = Map.of("path", "/no/such/thing");
 
             FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), inputParameters);
         });

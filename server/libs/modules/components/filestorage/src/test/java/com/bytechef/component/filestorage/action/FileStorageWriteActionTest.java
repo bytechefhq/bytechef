@@ -19,7 +19,6 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.FileStorageComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,6 +26,7 @@ import org.mockito.Mockito;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
@@ -43,12 +43,9 @@ public class FileStorageWriteActionTest {
     public void testExecuteWrite() {
         File file = getFile();
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(CONTENT))
-            .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(inputParameters.getString(FILENAME, "file.txt"))
-            .thenReturn("file.txt");
+        Map<String, ?> inputParameters = Map.of(
+            CONTENT, Files.contentOf(file, StandardCharsets.UTF_8),
+            FILENAME, "file.txt");
 
         FileStorageWriteAction.executeWrite(context, inputParameters);
 
@@ -61,12 +58,9 @@ public class FileStorageWriteActionTest {
         assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
         assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
 
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(CONTENT))
-            .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(inputParameters.getString(FILENAME, "file.txt"))
-            .thenReturn("test.txt");
+        inputParameters = Map.of(
+            CONTENT, Files.contentOf(file, StandardCharsets.UTF_8),
+            FILENAME, "test.txt");
 
         Mockito.reset(context);
 

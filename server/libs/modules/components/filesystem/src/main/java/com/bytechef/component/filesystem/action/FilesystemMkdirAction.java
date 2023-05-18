@@ -18,16 +18,19 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.MKDIR;
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
@@ -37,6 +40,11 @@ public class FilesystemMkdirAction {
     public static final ActionDefinition ACTION_DEFINITION = action(MKDIR)
         .title("Create")
         .description("Creates a directory.")
+        .properties(
+            string(PATH)
+                .label("Path")
+                .description("The path of a directory.")
+                .required(true))
         .execute(FilesystemMkdirAction::executeMkdir);
 
     /**
@@ -45,9 +53,9 @@ public class FilesystemMkdirAction {
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
      */
-    protected static Object executeMkdir(Context context, InputParameters inputParameters) {
+    protected static Object executeMkdir(Context context, Map<String, ?> inputParameters) {
         try {
-            return Files.createDirectories(Paths.get(inputParameters.getRequiredString("path")));
+            return Files.createDirectories(Paths.get(MapValueUtils.getRequiredString(inputParameters, PATH)));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create directories " + inputParameters, ioException);
         }
