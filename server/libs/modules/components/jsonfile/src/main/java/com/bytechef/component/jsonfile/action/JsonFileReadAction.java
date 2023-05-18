@@ -19,6 +19,7 @@ package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
@@ -103,7 +104,7 @@ public class JsonFileReadAction {
         throws ComponentExecutionException {
 
         FileType fileType = getFileType(inputParameters);
-        Context.FileEntry fileEntry = MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY);
+        FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean isArray = MapValueUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;
 
@@ -123,6 +124,7 @@ public class JsonFileReadAction {
             } else {
                 try (BufferedReader bufferedReader = new BufferedReader(
                     new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+
                     items = bufferedReader
                         .lines()
                         .map(line -> (Map<String, ?>) JsonUtils.read(line))

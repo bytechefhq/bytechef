@@ -18,6 +18,7 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
@@ -82,7 +83,7 @@ public class XmlFileReadAction {
         .execute(XmlFileReadAction::executeRead);
 
     protected static Object executeRead(Context context, Map<String, ?> inputParameters) {
-        Context.FileEntry fileEntry = MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY);
+        FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean isArray = MapValueUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;
 

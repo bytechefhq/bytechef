@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -40,10 +39,12 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
         List<String> columns = MapValueUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
-        List<Map<String, ?>> rows = (List)MapValueUtils.getList(
+        List<Map<String, ?>> rows = (List) MapValueUtils.getList(
             inputParameters, JdbcConstants.ROWS, Map.class, List.of());
         String schema = MapValueUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);

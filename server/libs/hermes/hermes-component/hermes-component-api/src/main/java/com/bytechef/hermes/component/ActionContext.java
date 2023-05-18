@@ -24,8 +24,18 @@ import java.util.Optional;
  */
 public interface ActionContext extends Context {
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     Optional<Connection> fetchConnection(String key);
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     Connection getConnection(String key);
 
     /**

@@ -47,6 +47,7 @@ public class FileStorageReadAction {
         .execute(FileStorageReadAction::executeRead);
 
     protected static String executeRead(Context context, Map<String, ?> inputParameters) {
-        return context.readFileToString(MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY));
+        return context.readFileToString(
+            MapValueUtils.getRequired(inputParameters, FILE_ENTRY, Context.FileEntry.class));
     }
 }

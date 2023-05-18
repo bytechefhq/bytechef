@@ -74,7 +74,7 @@ public class CsvFileWriteAction {
         .execute(CsvFileWriteAction::executeWrite);
 
     protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
-        List<Map<String, ?>> rows = (List<Map<String, ?>>)MapValueUtils.getList(inputParameters, ROWS, List.of());
+        List<Map<String, ?>> rows = (List<Map<String, ?>>) MapValueUtils.getList(inputParameters, ROWS, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.storeFileContent("file.csv", inputStream);

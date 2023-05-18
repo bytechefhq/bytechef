@@ -26,5 +26,9 @@ import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
  */
 public interface JdbcComponentDefinitionFactory {
 
+    /**
+     *
+     * @return
+     */
     JdbcComponentDefinition getJdbcComponentDefinition();
 }

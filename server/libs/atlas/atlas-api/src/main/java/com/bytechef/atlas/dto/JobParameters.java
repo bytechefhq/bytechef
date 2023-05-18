@@ -33,9 +33,9 @@ import java.util.Objects;
  */
 public class JobParameters {
 
-    private Map<String, Object> inputs = Collections.emptyMap();
+    private Map<String, ?> inputs = Collections.emptyMap();
     private String label;
-    private Map<String, Object> metadata = Collections.emptyMap();
+    private Map<String, ?> metadata = Collections.emptyMap();
     private Long parentTaskExecutionId;
     private int priority = Prioritizable.DEFAULT_PRIORITY;
     private String workflowId;
@@ -45,14 +45,14 @@ public class JobParameters {
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(Map<String, Object> inputs, Long parentTaskExecutionId, String workflowId) {
+    public JobParameters(Map<String, ?> inputs, Long parentTaskExecutionId, String workflowId) {
         this.inputs = inputs;
         this.parentTaskExecutionId = parentTaskExecutionId;
         this.workflowId = workflowId;
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(Map<String, Object> inputs, String workflowId) {
+    public JobParameters(Map<String, ?> inputs, String workflowId) {
         this.inputs = inputs;
         this.workflowId = workflowId;
     }

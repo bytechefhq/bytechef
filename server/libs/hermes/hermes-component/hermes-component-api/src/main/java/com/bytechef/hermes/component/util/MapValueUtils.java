@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.util;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -372,6 +373,27 @@ public class MapValueUtils {
     }
 
     /**
+     *
+     * @param map
+     * @param key
+     * @return
+     */
+    public static LocalTime getLocalTime(Map<String, ?> map, String key) {
+        return mapValueReader.getLocalTime(map, key);
+    }
+
+    /**
+     *
+     * @param map
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static LocalTime getLocalTime(Map<String, ?> map, String key, LocalTime defaultValue) {
+        return mapValueReader.getLocalTime(map, key, defaultValue);
+    }
+
+    /**
      * Return the {@link Long} value associated with the given key -- converting as necessary.
      *
      * @param map
@@ -486,6 +508,40 @@ public class MapValueUtils {
      *
      * @param map
      * @param key
+     * @param elementType
+     * @return
+     * @param <T>
+     */
+    public static <T> T getRequired(Map<String, ?> map, String key, Class<T> elementType) {
+        return mapValueReader.getRequired(map, key, elementType);
+    }
+
+    /**
+     *
+     * @param map
+     * @param key
+     * @return
+     */
+    public static Object[] getRequiredArray(Map<String, ?> map, String key) {
+        return mapValueReader.getRequiredArray(map, key);
+    }
+
+    /**
+     *
+     * @param map
+     * @param key
+     * @param elementType
+     * @return
+     * @param <T>
+     */
+    public static <T> T[] getRequiredArray(Map<String, ?> map, String key, Class<T> elementType) {
+        return mapValueReader.getRequiredArray(map, key, elementType);
+    }
+
+    /**
+     *
+     * @param map
+     * @param key
      * @return
      */
     public static Boolean getRequiredBoolean(Map<String, ?> map, String key) {
@@ -557,10 +613,31 @@ public class MapValueUtils {
      * @param map
      * @param key
      * @return
+     */
+    public static LocalTime getRequiredLocalTime(Map<String, ?> map, String key) {
+        return mapValueReader.getRequiredLocalTime(map, key);
+    }
+
+    /**
+     *
+     * @param map
+     * @param key
+     * @return
+     */
+    public static Map<String, ?> getRequiredMap(Map<String, ?> map, String key) {
+        return mapValueReader.getRequiredMap(map, key);
+    }
+
+    /**
+     *
+     * @param map
+     * @param key
+     * @param valueType
+     * @return
      * @param <V>
      */
-    public static <V> Map<String, V> getRequiredMap(Map<String, ?> map, String key) {
-        return mapValueReader.getRequiredMap(map, key);
+    public static <V> Map<String, V> getRequiredMap(Map<String, ?> map, String key, Class<V> valueType) {
+        return mapValueReader.getRequiredMap(map, key, valueType);
     }
 
     /**
@@ -614,7 +691,7 @@ public class MapValueUtils {
 
         <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType);
 
-        <T> T[] getArray(Map<String,?> map, String key, Class<T> elementType, T[] defaultValue);
+        <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType, T[] defaultValue);
 
         Boolean getBoolean(Map<String, ?> map, String key);
 
@@ -660,6 +737,10 @@ public class MapValueUtils {
 
         LocalDateTime getLocalDateTime(Map<String, ?> map, String key, LocalDateTime defaultValue);
 
+        LocalTime getLocalTime(Map<String, ?> map, String key);
+
+        LocalTime getLocalTime(Map<String, ?> map, String key, LocalTime defaultValue);
+
         Long getLong(Map<String, ?> map, String key);
 
         long getLong(Map<String, ?> map, String key, long defaultValue);
@@ -672,7 +753,7 @@ public class MapValueUtils {
 
         <V> Map<String, V> getMap(Map<String, ?> map, String key, Class<V> valueType, Map<String, V> defaultValue);
 
-        Map<String,?> getMap(Map<String, ?> map, String key, List<Class<?>> valueTypes);
+        Map<String, ?> getMap(Map<String, ?> map, String key, List<Class<?>> valueTypes);
 
         Map<String, ?> getMap(Map<String, ?> map, String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue);
 
@@ -686,7 +767,7 @@ public class MapValueUtils {
 
         Boolean getRequiredBoolean(Map<String, ?> map, String key);
 
-        Date getRequiredDate(Map<String, ?> map, String key) ;
+        Date getRequiredDate(Map<String, ?> map, String key);
 
         Double getRequiredDouble(Map<String, ?> map, String key);
 
@@ -701,6 +782,8 @@ public class MapValueUtils {
         LocalDate getRequiredLocalDate(Map<String, ?> map, String key);
 
         LocalDateTime getRequiredLocalDateTime(Map<String, ?> map, String key);
+
+        LocalTime getRequiredLocalTime(Map<String, ?> map, String key);
 
         Map<String, ?> getRequiredMap(Map<String, ?> map, String key);
 

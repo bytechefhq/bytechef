@@ -70,19 +70,20 @@ public class ConditionTaskUtils {
 
         for (Map<String, Object> condition : conditions) {
             for (String operandType : condition.keySet()) {
-                Map<String, Object> conditionParts = MapValueUtils.getMap(condition, operandType);
+                Map<String, ?> conditionParts = MapValueUtils.getMap(condition, operandType);
 
                 String conditionTemplate = conditionTemplates
                     .get(operandType)
                     .get(MapValueUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.OPERATION));
 
-                conditionExpressions.add(conditionTemplate
-                    .replace(
-                        "${value1}",
-                        MapValueUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.VALUE_1))
-                    .replace(
-                        "${value2}",
-                        MapValueUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.VALUE_2)));
+                conditionExpressions.add(
+                    conditionTemplate
+                        .replace(
+                            "${value1}",
+                            MapValueUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.VALUE_1))
+                        .replace(
+                            "${value2}",
+                            MapValueUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.VALUE_2)));
             }
         }
 
