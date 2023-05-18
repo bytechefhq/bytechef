@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 
 /**
  * @author Matija Petanjek
@@ -68,6 +69,13 @@ public final class HttpClientUtils {
     }
 
     static HttpClientExecutor httpClientExecutor;
+
+    static {
+        ServiceLoader<HttpClientExecutor> loader = ServiceLoader.load(HttpClientExecutor.class);
+
+        httpClientExecutor = loader.findFirst()
+            .orElseThrow(() -> new IllegalStateException("HttpClientExecutor instance is not available"));
+    }
 
     private HttpClientUtils() {
     }

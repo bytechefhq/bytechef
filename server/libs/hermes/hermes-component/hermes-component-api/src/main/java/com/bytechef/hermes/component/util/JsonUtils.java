@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.util;
 
 import java.io.InputStream;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 /**
@@ -27,6 +28,13 @@ import java.util.stream.Stream;
 public final class JsonUtils {
 
     static JsonMapper jsonMapper;
+
+    static {
+        ServiceLoader<JsonMapper> loader = ServiceLoader.load(JsonMapper.class);
+
+        jsonMapper = loader.findFirst()
+            .orElseThrow(() -> new IllegalStateException("JsonMapper instance is not available"));
+    }
 
     private JsonUtils() {
     }

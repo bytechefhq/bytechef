@@ -17,26 +17,24 @@
 
 package com.bytechef.hermes.component.util;
 
+import com.bytechef.message.broker.MessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Ivica Cardic
- */
-@Configuration
-public class JsonUtilsConfiguration implements InitializingBean {
+@Component
+class ComponentUtilsInstance {
 
-    private final ObjectMapper objectMapper;
+    static MessageBroker messageBroker;
+    static ObjectMapper objectMapper;
 
-    public JsonUtilsConfiguration(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    @Autowired
+    public void setMessageBroker(MessageBroker messageBroker) {
+        ComponentUtilsInstance.messageBroker = messageBroker;
     }
 
-    @Override
-    @SuppressFBWarnings("ST")
-    public void afterPropertiesSet() {
-        JsonUtils.jsonMapper = new JsonMapper(objectMapper);
+    @Autowired
+    void setObjectMapper(ObjectMapper objectMapper) {
+        ComponentUtilsInstance.objectMapper = objectMapper;
     }
 }

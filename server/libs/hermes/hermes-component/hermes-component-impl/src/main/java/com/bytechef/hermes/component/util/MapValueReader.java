@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-final class MapValueReader implements MapValueUtils.MapValueReader {
+public final class MapValueReader implements MapValueUtils.MapValueReader {
 
     @Override
     public boolean containsKey(Map<String, ?> map, String key) {

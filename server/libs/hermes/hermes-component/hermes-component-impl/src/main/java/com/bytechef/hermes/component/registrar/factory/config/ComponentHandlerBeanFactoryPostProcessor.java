@@ -61,6 +61,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
                     componentHandlerBeanDefinitionLoader.loadComponentHandlerBeanDefinitions()))
             .toList();
 
+        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
         List<ComponentDefinition> componentDefinitions = new ArrayList<>();
 
         for (ComponentHandlerBeanDefinition componentHandlerBeanDefinition : componentHandlerFactories) {
@@ -76,7 +77,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
 
                 BeanDefinition handlerBeanDefinition = handlerBeanDefinitionEntry.handlerBeanDefinition();
 
-                ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(
+                beanDefinitionRegistry.registerBeanDefinition(
                     getBeanName(
                         componentDefinition.getName(), componentDefinition.getVersion(),
                         handlerBeanDefinitionEntry.handlerName(), '/'),
@@ -90,7 +91,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             .map(beanFactory::getBeanDefinition)
             .forEach(componentDefinitionFactoryManagedList::add);
 
-        ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(
+        beanDefinitionRegistry.registerBeanDefinition(
             "componentDefinitionRegistry",
             getComponentDefinitionRegistryBeanDefinition(
                 componentDefinitions, componentDefinitionFactoryManagedList));

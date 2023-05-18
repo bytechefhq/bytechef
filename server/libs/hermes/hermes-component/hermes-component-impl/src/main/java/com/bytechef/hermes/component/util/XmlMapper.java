@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -45,8 +44,7 @@ import java.util.stream.Stream;
 /**
  * @author Ivica Cardic
  */
-@Component
-final class XmlMapper implements XmlUtils.XmlMapper {
+public final class XmlMapper implements XmlUtils.XmlMapper {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();
