@@ -19,6 +19,10 @@ package com.bytechef.hermes.component.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -38,6 +42,15 @@ import java.util.stream.Stream;
  * @author Ivica Cardic
  */
 public final class JsonMapper implements JsonUtils.JsonMapper {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper() {
+        {
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            registerModule(new JavaTimeModule());
+            registerModule(new Jdk8Module());
+        }
+    };
 
     static {
         com.jayway.jsonpath.Configuration.setDefaults(new com.jayway.jsonpath.Configuration.Defaults() {
@@ -64,7 +77,7 @@ public final class JsonMapper implements JsonUtils.JsonMapper {
     @Override
     public <T> T read(String json) {
         try {
-            return ComponentUtilsInstance.objectMapper.readValue(json, new TypeReference<>() {});
+            return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -87,7 +100,7 @@ public final class JsonMapper implements JsonUtils.JsonMapper {
     @Override
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
-            return new JsonParserStream(inputStream, ComponentUtilsInstance.objectMapper);
+            return new JsonParserStream(inputStream, objectMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,7 +109,7 @@ public final class JsonMapper implements JsonUtils.JsonMapper {
     @Override
     public String write(Object object) {
         try {
-            return ComponentUtilsInstance.objectMapper.writeValueAsString(object);
+            return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

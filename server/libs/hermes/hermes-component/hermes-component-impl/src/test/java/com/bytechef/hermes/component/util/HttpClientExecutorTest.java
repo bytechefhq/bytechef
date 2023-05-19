@@ -24,10 +24,6 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
 import com.bytechef.hermes.definition.registry.util.AuthorizationUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
@@ -49,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.net.ssl.SSLSession;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -60,16 +57,14 @@ public class HttpClientExecutorTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     private final Context context = Mockito.mock(Context.class);
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
 
     private static final HttpClientExecutor HTTP_CLIENT_EXECUTOR = new HttpClientExecutor();
+
+    @BeforeAll
+    public static void beforeAll() {
+        JsonUtils.jsonMapper = new JsonMapper();
+        XmlUtils.xmlMapper = new XmlMapper();
+    }
 
     @Test
     public void testCreateBodyHandler() {

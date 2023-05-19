@@ -18,9 +18,11 @@
 package com.bytechef.server.config;
 
 import com.bytechef.event.EventPublisher;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -74,6 +76,13 @@ public class DefinitionRegistryConfiguration {
         ComponentDefinitionService componentDefinitionService, ConnectionService connectionService) {
 
         return new ComponentDefinitionFacadeImpl(componentDefinitionService, connectionService);
+    }
+
+    @Bean
+    public ComponentDefinitionRegistry componentDefinitionRegistry(
+        List<ComponentDefinitionFactory> componentDefinitionFactories) {
+
+        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories);
     }
 
     @Bean
