@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -208,13 +209,23 @@ public class XlsxFileReadActionTest {
         throws FileNotFoundException {
 
         Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
-        Map<String, ?> inputParameters = Map.of(
-            FILE_ENTRY, fileEntry,
-            HEADER_ROW, headerRow,
-            INCLUDE_EMPTY_CELLS, includeEmptyCells,
-            PAGE_NUMBER, pageNumber,
-            PAGE_SIZE, pageSize,
-            READ_AS_STRING, readAsString);
+        Map<String, ?> inputParameters = new HashMap<>() {
+            {
+                put(FILE_ENTRY, fileEntry);
+                put(HEADER_ROW, headerRow);
+                put(INCLUDE_EMPTY_CELLS, includeEmptyCells);
+
+                if (pageNumber != null) {
+                    put(PAGE_NUMBER, pageNumber);
+                }
+
+                if (pageSize != null) {
+                    put(PAGE_SIZE, pageSize);
+                }
+
+                put(READ_AS_STRING, readAsString);
+            }
+        };
 
         Mockito.when(fileEntry.getExtension())
             .thenReturn(extension);

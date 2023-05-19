@@ -1,9 +1,6 @@
 dependencies {
     api project(":server:libs:atlas:atlas-api")
-    api project(":server:libs:core:encryption:encryption-api")
-    api project(":server:libs:hermes:hermes-api")
-    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
-    api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
+    api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     api project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -16,8 +13,10 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-sync-executor")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:core:encryption:encryption-api")
     implementation project(":server:libs:core:event:event-listener:event-listener-impl")
     implementation project(":server:libs:core:message-broker:message-broker-sync")
-    api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
 }

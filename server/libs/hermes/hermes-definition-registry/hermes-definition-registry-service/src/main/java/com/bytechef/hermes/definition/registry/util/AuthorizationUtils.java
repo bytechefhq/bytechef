@@ -36,7 +36,7 @@ public class AuthorizationUtils {
 
     public static Authorization.ApplyConsumer getDefaultApply(Authorization.AuthorizationType type) {
         return switch (type) {
-            case API_KEY -> ((
+            case API_KEY -> (
                 Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {
 
                 String addTo = MapValueUtils.getString(
@@ -59,14 +59,14 @@ public class AuthorizationUtils {
                             List.of(
                                 MapValueUtils.getString(connectionInputParameters, Authorization.VALUE, ""))));
                 }
-            });
-            case BASIC_AUTH, DIGEST_AUTH -> ((
+            };
+            case BASIC_AUTH, DIGEST_AUTH -> (
                 Map<String, Object> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext
                     .setUsernamePassword(
                         MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME),
-                        MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD)));
-            case BEARER_TOKEN -> ((
+                        MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD));
+            case BEARER_TOKEN -> (
                 Map<String, Object> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext
                     .setHeaders(
@@ -74,11 +74,11 @@ public class AuthorizationUtils {
                             Authorization.AUTHORIZATION,
                             List.of(
                                 Authorization.BEARER + " " +
-                                    MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN)))));
-            case CUSTOM -> ((
-                Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {});
+                                    MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN))));
+            case CUSTOM -> (
+                Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {};
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
-                OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> ((
+                OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
                     Map<String, Object> connectionInputParameters,
                     AuthorizationContext authorizationContext) -> authorizationContext
                         .setHeaders(
@@ -89,7 +89,7 @@ public class AuthorizationUtils {
                                         connectionInputParameters, Authorization.HEADER_PREFIX, Authorization.BEARER) +
                                         " " +
                                         MapValueUtils.getString(
-                                            connectionInputParameters, Authorization.ACCESS_TOKEN)))));
+                                            connectionInputParameters, Authorization.ACCESS_TOKEN))));
         };
     }
 
@@ -98,9 +98,7 @@ public class AuthorizationUtils {
     }
 
     public static String getDefaultBaseUri(Map<String, Object> connectionInputParameters) {
-        return connectionInputParameters.containsKey(ConnectionDefinition.BASE_URI)
-            ? MapValueUtils.getString(connectionInputParameters, ConnectionDefinition.BASE_URI)
-            : null;
+        return MapValueUtils.getString(connectionInputParameters, ConnectionDefinition.BASE_URI);
     }
 
     public static String getDefaultClientId(Map<String, Object> connectionInputParameters) {
@@ -128,7 +126,7 @@ public class AuthorizationUtils {
 
     @SuppressWarnings("unchecked")
     public static List<String> getDefaultScopes(Map<String, Object> connectionInputParameters) {
-        Object scopes = MapValueUtils.getString(connectionInputParameters, Authorization.SCOPES);
+        Object scopes = MapValueUtils.get(connectionInputParameters, Authorization.SCOPES);
 
         if (scopes == null) {
             return Collections.emptyList();

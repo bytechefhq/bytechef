@@ -17,12 +17,17 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
+
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
-import com.bytechef.hermes.component.jdbc.operation.config.JdbcActionIntTestConfiguration;
+import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.List;
 import java.util.Map;
@@ -42,14 +47,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = JdbcActionIntTestConfiguration.class)
-public class QueryJdbcActionIntTest {
+@SpringBootTest(classes = JdbcOperationIntTestConfiguration.class)
+public class UpdateJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private QueryJdbcOperation queryJdbcOperation;
+    private UpdateJdbcOperation updateJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -74,36 +79,41 @@ public class QueryJdbcActionIntTest {
     }
 
     @Test
-    public void testQuery() {
+    public void testUpdate() {
         Context context = Mockito.mock(Context.class);
 
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
         Map<String, ?> inputParameters = Map.of(
-            JdbcConstants.PARAMETERS, Map.of("id", "id2"),
-            JdbcConstants.QUERY, "SELECT count(*) FROM test where id=:id");
+            COLUMNS, List.of("name"),
+            ROWS, List.of(Map.of("id", "id2", "name", "name3")),
+            SCHEMA, "public",
+            TABLE, "test",
+            UPDATE_KEY, "id");
 
-        List<Map<String, Object>> result = queryJdbcOperation.execute(context, inputParameters);
+        Map<String, Integer> result = updateJdbcOperation.execute(context, inputParameters);
 
-        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(1, result.get("rows"));
+        Assertions.assertEquals(
+            "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
     }
 
     @TestConfiguration
-    public static class InsertJdbcActionIntTestConfiguration {
+    public static class UpdateJdbcActionIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        QueryJdbcOperation queryJdbcOperation() {
-            return new QueryJdbcOperation(new JdbcExecutor(
+        UpdateJdbcOperation updateJdbcOperation() {
+            return new UpdateJdbcOperation(new JdbcExecutor(
                 null,
                 new DataSourceFactory() {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
 
                         return dataSource;
                     }

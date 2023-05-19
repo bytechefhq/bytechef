@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationConte
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -67,7 +68,7 @@ public class ContextConnectionImpl implements Context.Connection {
 
     @Override
     public Map<String, Object> getParameters() {
-        return parameters;
+        return Collections.unmodifiableMap(parameters);
     }
 
     @Override

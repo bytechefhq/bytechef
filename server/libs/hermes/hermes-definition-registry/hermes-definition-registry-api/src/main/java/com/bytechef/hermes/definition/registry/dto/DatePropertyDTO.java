@@ -22,6 +22,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property.DateProperty;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +48,7 @@ public class DatePropertyDTO extends ValuePropertyDTO<LocalDate> {
     }
 
     public List<OptionDTO> getOptions() {
-        return options;
+        return Collections.unmodifiableList(options);
     }
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
