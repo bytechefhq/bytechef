@@ -49,7 +49,7 @@ public class DelaySleepAction {
 
     protected static Object executeDelay(Context context, Map<String, ?> inputParameters) {
         try {
-            if (inputParameters.containsKey("millis")) {
+            if (inputParameters.containsKey(MILLIS)) {
                 Thread.sleep(MapValueUtils.getLong(inputParameters, MILLIS));
             } else if (inputParameters.containsKey("duration")) {
                 Duration duration = MapValueUtils.getDuration(inputParameters, "duration");
