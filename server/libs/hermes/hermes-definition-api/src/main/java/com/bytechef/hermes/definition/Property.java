@@ -203,7 +203,7 @@ public sealed interface Property<P extends Property<P>>
         /**
          *
          */
-        Optional<List<Property<?>>> getItems();
+        Optional<List<? extends Property<?>>> getItems();
 
         /**
          *
