@@ -21,10 +21,10 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
@@ -100,15 +100,10 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    List<ComponentDefinition> componentDefinitions(List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        return componentDefinitionFactories.stream()
-            .map(ComponentDefinitionFactory::getDefinition)
-            .sorted((o1, o2) -> {
-                String o1Name = o1.getName();
+    public ComponentDefinitionRegistry componentDefinitionRegistry(
+        List<ComponentDefinitionFactory> componentDefinitionFactories) {
 
-                return o1Name.compareTo(o2.getName());
-            })
-            .toList();
+        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories);
     }
 
     @Bean

@@ -1,7 +1,5 @@
 dependencies {
     api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
-    api project(":server:libs:core:message-broker:message-broker-api")
-    api project(":server:libs:hermes:hermes-api")
     api project(":server:libs:hermes:hermes-component:hermes-component-api")
     api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
@@ -12,16 +10,19 @@ dependencies {
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation "com.jayway.jsonpath:json-path"
     implementation libs.com.github.mizosoft.methanol
+    implementation "com.jayway.jsonpath:json-path"
     implementation "org.slf4j:slf4j-api"
     implementation libs.org.apache.tika.tika.core
-    implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-jdbc"
     implementation "org.springframework.boot:spring-boot"
+    implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:hermes:hermes-api")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     testImplementation libs.com.github.tomakehurst.wiremock
     testImplementation project(":server:libs:core:encryption:encryption-api")
     testImplementation project(":server:libs:core:commons:commons-data")
