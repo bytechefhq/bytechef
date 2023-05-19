@@ -24,7 +24,6 @@ import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -48,11 +47,6 @@ public class JsonFileWriteActionTest {
 
     private static final Context context = Mockito.mock(Context.class);
 
-    @BeforeAll
-    public static void beforeAll() {
-//        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
-    }
-
     @BeforeEach
     public void beforeEach() {
         Mockito.reset(context);
@@ -68,8 +62,8 @@ public class JsonFileWriteActionTest {
 
         JsonFileWriteAction.executeWrite(context, inputParameters);
 
-        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
-            .forClass(ByteArrayInputStream.class);
+        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
+            ByteArrayInputStream.class);
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
         Mockito.verify(context)
