@@ -19,7 +19,6 @@ package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.util.XmlUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -32,11 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Ivica Cardic
  */
 public class XmlHelperStringifyActionTest {
-
-    @BeforeAll
-    public static void beforeAll() {
-//        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
-    }
 
     @Test
     public void testExecuteStringify() {

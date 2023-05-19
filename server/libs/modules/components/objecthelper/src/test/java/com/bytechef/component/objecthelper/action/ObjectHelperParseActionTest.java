@@ -19,7 +19,6 @@ package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -35,11 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ObjectHelperParseActionTest {
 
     private static final Context context = Mockito.mock(Context.class);
-
-    @BeforeAll
-    public static void beforeAll() {
-//        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
-    }
 
     @Test
     public void testExecuteParse() {
