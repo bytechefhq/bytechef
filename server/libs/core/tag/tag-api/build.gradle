@@ -1,3 +1,5 @@
 dependencies {
-    api "org.springframework.data:spring-data-jdbc"
+    api "org.springframework.data:spring-data-commons"
+
+    implementation "org.springframework.data:spring-data-jdbc"
 }

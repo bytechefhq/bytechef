@@ -21,6 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property.BooleanProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,6 +44,6 @@ public class BooleanPropertyDTO extends ValuePropertyDTO<Boolean> {
     }
 
     public List<OptionDTO> getOptions() {
-        return options;
+        return Collections.unmodifiableList(options);
     }
 }

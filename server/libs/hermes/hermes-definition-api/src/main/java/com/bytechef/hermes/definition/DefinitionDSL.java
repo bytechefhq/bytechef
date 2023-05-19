@@ -1463,6 +1463,7 @@ public class DefinitionDSL {
         private final List<String> categories;
         private final String documentationUrl;
 
+        @SuppressFBWarnings("EI")
         public ResourcesImpl(Map<String, String> additionalUrls, List<String> categories, String documentationUrl) {
             this.additionalUrls = additionalUrls;
             this.categories = categories;

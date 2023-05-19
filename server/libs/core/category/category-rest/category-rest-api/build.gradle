@@ -4,9 +4,9 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
-    api "org.springframework.data:spring-data-commons"
     api project(":server:libs:core:category:category-api")
 
+    implementation "org.springframework:spring-context"
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
     implementation "jakarta.validation:jakarta.validation-api"

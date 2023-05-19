@@ -60,22 +60,22 @@ import org.springframework.util.Assert;
  *   - type: fork
  *     branches:
  *       - - name: randomNumber
- *           label: Generate a random number
- *           type: randomInt
- *           startInclusive: 0
- *           endInclusive: 5000
+ *       label: Generate a random number
+ *       type: randomInt
+ *       startInclusive: 0
+ *       endInclusive: 5000
  *
- *         - type: sleep
- *           millis: ${randomNumber}
+ *     - type: sleep
+ *       millis: ${randomNumber}
  *
  *       - - name: randomNumber
- *           label: Generate a random number
- *           type: randomInt
- *           startInclusive: 0
- *           endInclusive: 5000
+ *       label: Generate a random number
+ *       type: randomInt
+ *       startInclusive: 0
+ *       endInclusive: 5000
  *
- *         - type: sleep
- *           millis: ${randomNumber}
+ *     - type: sleep
+ *       millis: ${randomNumber}
  * </pre>
  *
  * @author Arik Cohen

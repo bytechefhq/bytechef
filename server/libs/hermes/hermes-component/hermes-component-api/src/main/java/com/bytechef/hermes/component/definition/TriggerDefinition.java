@@ -247,6 +247,7 @@ public interface TriggerDefinition {
      * @param dynamicWebhookEnableOutput
      * @param workflowExecutionId
      */
+    @SuppressFBWarnings("EI")
     record DynamicWebhookDisableContext(
         Connection connection, Map<String, ?> inputParameters,
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput, String workflowExecutionId) {
@@ -259,6 +260,7 @@ public interface TriggerDefinition {
      * @param webhookUrl
      * @param workflowExecutionId
      */
+    @SuppressFBWarnings("EI")
     record DynamicWebhookEnableContext(
         Connection connection, Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId) {
     }
@@ -309,6 +311,7 @@ public interface TriggerDefinition {
      * @param method
      * @param dynamicWebhookEnableOutput
      */
+    @SuppressFBWarnings("EI")
     record DynamicWebhookRequestContext(
         TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
         WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method,
@@ -411,6 +414,7 @@ public interface TriggerDefinition {
      * @param path
      * @param method
      */
+    @SuppressFBWarnings("EI")
     record StaticWebhookRequestContext(
         TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
         WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
@@ -610,6 +614,7 @@ public interface TriggerDefinition {
      * @param path
      * @param method
      */
+    @SuppressFBWarnings("EI")
     record WebhookValidateContext(
         TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
         WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {

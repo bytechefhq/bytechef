@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -283,13 +284,23 @@ public class OdsFileReadActionTest {
         File file)
         throws FileNotFoundException {
 
-        Map<String, ?> inputParameters = Map.of(
-            FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
-            HEADER_ROW, headerRow,
-            INCLUDE_EMPTY_CELLS, includeEmptyCells,
-            PAGE_NUMBER, pageNumber,
-            PAGE_SIZE, pageSize,
-            READ_AS_STRING, readAsString);
+        Map<String, ?> inputParameters = new HashMap<>() {
+            {
+                put(FILE_ENTRY, Mockito.mock(Context.FileEntry.class));
+                put(HEADER_ROW, headerRow);
+                put(INCLUDE_EMPTY_CELLS, includeEmptyCells);
+
+                if (pageNumber != null) {
+                    put(PAGE_NUMBER, pageNumber);
+                }
+
+                if (pageSize != null) {
+                    put(PAGE_SIZE, pageSize);
+                }
+
+                put(READ_AS_STRING, readAsString);
+            }
+        };
 
         if (file != null) {
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
