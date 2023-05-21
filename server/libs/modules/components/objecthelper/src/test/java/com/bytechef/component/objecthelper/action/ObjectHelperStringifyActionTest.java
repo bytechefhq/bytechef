@@ -19,7 +19,9 @@ package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.util.JsonUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -34,9 +36,24 @@ public class ObjectHelperStringifyActionTest {
 
     @Test
     public void testExecuteStringify() {
-        Map<String, ?> inputParameters = Map.of(SOURCE, Map.of("key", 3));
+        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+            MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
 
-        assertThat(ObjectHelperStringifyAction.executeStringify(Mockito.mock(Context.class), inputParameters))
-            .isEqualTo(JsonUtils.write(Map.of("key", 3)));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+                .thenReturn(Map.of("key", 3));
+            jsonUtilsMockedStatic.when(() -> JsonUtils.write(Mockito.any()))
+                .thenReturn("""
+                    {
+                        "key": 3
+                    }
+                    """);
+
+            assertThat(ObjectHelperStringifyAction.executeStringify(Mockito.mock(Context.class), Map.of()))
+                .isEqualTo("""
+                    {
+                        "key": 3
+                    }
+                    """);
+        }
     }
 }

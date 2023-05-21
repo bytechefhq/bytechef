@@ -19,18 +19,19 @@ package com.bytechef.component.odsfile.action;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,75 +54,86 @@ public class OdsFileReadActionTest {
     public void testExecuteReadODS() throws IOException, JSONException {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
-        assertEquals(
-            new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(true, false, null, null, false, getFile("sample_header.ods")))),
-            true);
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            assertEquals(
+                new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(true, false, null, null, false, getFile("sample_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: true, includeEmptyCells: true, readAsString: false
+            // headerRow: true, includeEmptyCells: true, readAsString: false
 
-        assertEquals(
-            new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(true, true, null, null, false, getFile("sample_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(true, true, null, null, false, getFile("sample_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: true, includeEmptyCells: false, readAsString: true
+            // headerRow: true, includeEmptyCells: false, readAsString: true
 
-        assertEquals(
-            new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(true, false, null, null, true, getFile("sample_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(true, false, null, null, true, getFile("sample_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: true, includeEmptyCells: true, readAsString: true
+            // headerRow: true, includeEmptyCells: true, readAsString: true
 
-        assertEquals(
-            new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(true, true, null, null, true, getFile("sample_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(true, true, null, null, true, getFile("sample_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: false, includeEmptyCells: false, readAsString: false
+            // headerRow: false, includeEmptyCells: false, readAsString: false
 
-        assertEquals(
-            new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(false, false, null, null, false, getFile("sample_no_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: false, includeEmptyCells: false, readAsString: true
+            // headerRow: false, includeEmptyCells: false, readAsString: true
 
-        assertEquals(
-            new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(false, false, null, null, true, getFile("sample_no_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: false, includeEmptyCells: true, readAsString: false
+            // headerRow: false, includeEmptyCells: true, readAsString: false
 
-        assertEquals(
-            new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(false, true, null, null, false, getFile("sample_no_header.ods"), mockedStatic))),
+                true);
 
-        // headerRow: false, includeEmptyCells: true, readAsString: true
+            // headerRow: false, includeEmptyCells: true, readAsString: true
 
-        assertEquals(
-            new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(false, true, null, null, true, getFile("sample_no_header.ods"), mockedStatic))),
+                true);
 
-        // paging
+            // paging
 
-        assertEquals(
-            new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-            new JSONArray((List) OdsFileReadAction.executeRead(
-                context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods")))),
-            true);
+            assertEquals(
+                new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
+                new JSONArray((List) OdsFileReadAction.executeRead(
+                    context,
+                    getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods"), mockedStatic))),
+                true);
+        }
     }
 
     private File getFile(String filename) {
@@ -281,32 +293,30 @@ public class OdsFileReadActionTest {
     @SuppressFBWarnings("OBL")
     private Map<String, ?> getReadParameters(
         boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize, boolean readAsString,
-        File file)
+        File file, MockedStatic<MapValueUtils> mockedStatic)
         throws FileNotFoundException {
 
-        Map<String, ?> inputParameters = new HashMap<>() {
-            {
-                put(FILE_ENTRY, Mockito.mock(Context.FileEntry.class));
-                put(HEADER_ROW, headerRow);
-                put(INCLUDE_EMPTY_CELLS, includeEmptyCells);
-
-                if (pageNumber != null) {
-                    put(PAGE_NUMBER, pageNumber);
-                }
-
-                if (pageSize != null) {
-                    put(PAGE_SIZE, pageSize);
-                }
-
-                put(READ_AS_STRING, readAsString);
-            }
-        };
+        mockedStatic.when(() -> MapValueUtils.getRequired(
+            Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
+        mockedStatic.when(() -> MapValueUtils.getBoolean(Mockito.anyMap(), Mockito.eq(HEADER_ROW), Mockito.eq(true)))
+            .thenReturn(headerRow);
+        mockedStatic.when(() -> MapValueUtils.getBoolean(
+            Mockito.anyMap(), Mockito.eq(INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
+            .thenReturn(includeEmptyCells);
+        mockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            .thenReturn(pageNumber);
+        mockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            .thenReturn(pageSize);
+        mockedStatic.when(() -> MapValueUtils.getBoolean(
+            Mockito.anyMap(), Mockito.eq(READ_AS_STRING), Mockito.eq(false)))
+            .thenReturn(readAsString);
 
         if (file != null) {
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
         }
 
-        return inputParameters;
+        return Map.of();
     }
 }

@@ -78,10 +78,7 @@ public class XmlFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                MapValueUtils.getString(inputParameters, FILENAME) == null
-                    ? "file.xml"
-                    : MapValueUtils.getString(inputParameters, FILENAME),
-                inputStream);
+                MapValueUtils.getString(inputParameters, FILENAME, "file.xml"), inputStream);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }

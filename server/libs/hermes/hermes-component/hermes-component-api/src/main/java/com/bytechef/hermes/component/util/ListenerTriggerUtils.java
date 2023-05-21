@@ -32,7 +32,11 @@ public final class ListenerTriggerUtils {
         ServiceLoader<ListenerEmitter> loader = ServiceLoader.load(ListenerEmitter.class);
 
         listenerEmitter = loader.findFirst()
-            .orElseThrow(() -> new IllegalStateException("ListenerEmitter instance is not available"));
+            .orElse(null);
+
+        if (listenerEmitter == null) {
+            System.err.println("ListenerEmitter instance is not available");
+        }
     }
 
     private ListenerTriggerUtils() {

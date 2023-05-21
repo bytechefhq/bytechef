@@ -73,6 +73,7 @@ public class CsvFileWriteAction {
         .outputSchema(fileEntry())
         .execute(CsvFileWriteAction::executeWrite);
 
+    @SuppressWarnings("unchecked")
     protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
         List<Map<String, ?>> rows = (List<Map<String, ?>>) MapValueUtils.getList(inputParameters, ROWS, List.of());
 
