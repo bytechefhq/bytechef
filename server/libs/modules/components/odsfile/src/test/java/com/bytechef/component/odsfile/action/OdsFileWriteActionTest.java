@@ -19,12 +19,14 @@ package com.bytechef.component.odsfile.action;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
@@ -51,23 +53,25 @@ public class OdsFileWriteActionTest {
     public void testExecuteWriteODS() throws JSONException, IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList());
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), mockedStatic);
 
-        OdsFileWriteAction.executeWrite(context, inputParameters);
+            OdsFileWriteAction.executeWrite(context, inputParameters);
 
-        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
-            .forClass(ByteArrayInputStream.class);
-        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
+                .forClass(ByteArrayInputStream.class);
+            ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
+            Mockito.verify(context)
+                .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
-        assertEquals(
-            new JSONArray(jsonContent),
-            new JSONArray(read(inputStreamArgumentCaptor.getValue())),
-            true);
-        Assertions.assertThat(filenameArgumentCaptor.getValue())
-            .isEqualTo("file.ods");
+            assertEquals(
+                new JSONArray(jsonContent),
+                new JSONArray(read(inputStreamArgumentCaptor.getValue())),
+                true);
+            Assertions.assertThat(filenameArgumentCaptor.getValue())
+                .isEqualTo("file.ods");
+        }
     }
 
     private File getFile(String filename) {
@@ -77,11 +81,15 @@ public class OdsFileWriteActionTest {
             .getFile());
     }
 
-    private Map<String, Object> getWriteParameters(List<?> items) {
-        return Map.of(
-            FILENAME, "file.ods",
-            ROWS, items,
-            SHEET_NAME, "Sheet");
+    private Map<String, Object> getWriteParameters(List<?> items, MockedStatic<MapValueUtils> mockedStatic) {
+        mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.ods")))
+            .thenReturn("file.ods");
+        mockedStatic.when(() -> MapValueUtils.getList(Mockito.anyMap(), Mockito.eq(ROWS), Mockito.eq(List.of())))
+            .thenReturn(items);
+        mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
+            .thenReturn("Sheet");
+
+        return Map.of();
     }
 
     private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {

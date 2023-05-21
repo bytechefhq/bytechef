@@ -19,19 +19,18 @@ package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.XmlUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Files;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -61,15 +60,28 @@ public class XmlFileReadActionTest {
     public void testExecuteRead() throws IOException {
         File file = getFile(SAMPLE_XML);
 
-        Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
-            .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
+        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(
+                Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
+                .thenReturn(Mockito.mock(Context.FileEntry.class));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getBoolean(
+                Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+                .thenReturn(false);
 
-        Map<String, ?> inputParameters = Map.of(
-            FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
-            IS_ARRAY, false);
+            Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
+                .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-        Assertions.assertThat((Map<String, ?>) XmlFileReadAction.executeRead(context, inputParameters))
-            .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8)));
+            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.executeRead(context, Map.of()))
+                .isEqualTo(
+                    Map.of(
+                        "Flower",
+                        Map.of(
+                            "id", "45",
+                            "name", "Poppy",
+                            "color", "RED",
+                            "petals", "9",
+                            "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark"))))));
+        }
     }
 
     @Test
@@ -77,27 +89,54 @@ public class XmlFileReadActionTest {
     public void testExecuteReadArray() throws FileNotFoundException {
         File file = getFile(SAMPLE_ARRAY_XML);
 
-        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
-            .thenReturn(new FileInputStream(file));
+        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(
+                Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
+                .thenReturn(Mockito.mock(Context.FileEntry.class));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getBoolean(
+                Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+                .thenReturn(true);
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+                .thenReturn(null);
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+                .thenReturn(null);
 
-        Map<String, ?> inputParameters = Map.of(
-            FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
-            IS_ARRAY, true);
+            Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
+                .thenReturn(new FileInputStream(file));
 
-        Assertions.assertThat((List<?>) XmlFileReadAction.executeRead(context, inputParameters))
-            .isEqualTo(XmlUtils.readList(Files.contentOf(file, StandardCharsets.UTF_8)));
+            Assertions.assertThat((List<?>) XmlFileReadAction.executeRead(context, Map.of()))
+                .isEqualTo(
+                    List.of(
+                        Map.of(
+                            "id", "45",
+                            "name", "Poppy",
+                            "color", "RED",
+                            "petals", "9",
+                            "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
+                        Map.of(
+                            "id", "46",
+                            "name", "Rose",
+                            "color", "YELLOW",
+                            "petals", "5")));
 
-        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
-            .thenReturn(new FileInputStream(file));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(
+                Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
+                .thenReturn(Mockito.mock(Context.FileEntry.class));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getBoolean(
+                Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+                .thenReturn(true);
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+                .thenReturn(1);
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+                .thenReturn(2);
 
-        inputParameters = Map.of(
-            FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
-            IS_ARRAY, true,
-            PAGE_NUMBER, 1,
-            PAGE_SIZE, 2);
+            Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
+                .thenReturn(new FileInputStream(file));
 
-        Assertions.assertThat(((List<?>) XmlFileReadAction.executeRead(context, inputParameters)).size())
-            .isEqualTo(2);
+            Assertions.assertThat(((List<?>) XmlFileReadAction.executeRead(context, Map.of()))
+                .size())
+                .isEqualTo(2);
+        }
     }
 
     private File getFile(String filename) {

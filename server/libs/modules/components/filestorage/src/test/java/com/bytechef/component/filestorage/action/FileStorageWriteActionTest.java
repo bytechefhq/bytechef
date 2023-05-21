@@ -19,9 +19,11 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.FileStorageComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
@@ -43,35 +45,42 @@ public class FileStorageWriteActionTest {
     public void testExecuteWrite() {
         File file = getFile();
 
-        Map<String, ?> inputParameters = Map.of(
-            CONTENT, Files.contentOf(file, StandardCharsets.UTF_8),
-            FILENAME, "file.txt");
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(CONTENT)))
+                .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
+            mockedStatic.when(() -> MapValueUtils.getString(
+                Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.txt")))
+                .thenReturn("file.txt");
 
-        FileStorageWriteAction.executeWrite(context, inputParameters);
+            FileStorageWriteAction.executeWrite(context, Map.of());
 
-        ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            Mockito.verify(context)
+                .storeFileContent(filenameArgumentCaptor.capture(), contentArgumentCaptor.capture());
 
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), contentArgumentCaptor.capture());
-
-        assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
-
-        inputParameters = Map.of(
-            CONTENT, Files.contentOf(file, StandardCharsets.UTF_8),
-            FILENAME, "test.txt");
+            assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
+            assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
+        }
 
         Mockito.reset(context);
 
-        FileStorageWriteAction.executeWrite(context, inputParameters);
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(CONTENT)))
+                .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
+            mockedStatic.when(() -> MapValueUtils.getString(
+                Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.txt")))
+                .thenReturn("test.txt");
 
-        filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            FileStorageWriteAction.executeWrite(context, Map.of());
 
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), Mockito.anyString());
+            ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.txt");
+            Mockito.verify(context)
+                .storeFileContent(filenameArgumentCaptor.capture(), Mockito.anyString());
+
+            assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.txt");
+        }
     }
 
     private File getFile() {

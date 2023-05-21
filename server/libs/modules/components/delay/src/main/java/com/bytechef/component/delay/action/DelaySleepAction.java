@@ -48,20 +48,24 @@ public class DelaySleepAction {
         .execute(DelaySleepAction::executeDelay);
 
     protected static Object executeDelay(Context context, Map<String, ?> inputParameters) {
-        try {
-            if (inputParameters.containsKey(MILLIS)) {
-                Thread.sleep(MapValueUtils.getLong(inputParameters, MILLIS));
-            } else if (inputParameters.containsKey("duration")) {
-                Duration duration = MapValueUtils.getDuration(inputParameters, "duration");
+        if (inputParameters.containsKey(MILLIS)) {
+            sleep(MapValueUtils.getLong(inputParameters, MILLIS));
+        } else if (inputParameters.containsKey("duration")) {
+            Duration duration = MapValueUtils.getDuration(inputParameters, "duration");
 
-                Thread.sleep(duration.toMillis());
-            } else {
-                TimeUnit.SECONDS.sleep(1);
-            }
-        } catch (InterruptedException interruptedException) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, interruptedException);
+            sleep(duration.toMillis());
+        } else {
+            sleep(1000);
         }
 
         return null;
+    }
+
+    protected static void sleep(long millis) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(millis);
+        } catch (InterruptedException interruptedException) {
+            throw new ComponentExecutionException("Unable to handle delay action", interruptedException);
+        }
     }
 }
