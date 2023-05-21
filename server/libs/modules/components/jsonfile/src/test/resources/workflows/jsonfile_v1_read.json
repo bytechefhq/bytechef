@@ -15,8 +15,7 @@
     "label": "Read from the JSON file",
     "type": "jsonFile/v1/read",
     "parameters": {
-      "fileEntry": "${fileEntry}",
-      "includeEmptyCells": true
+      "fileEntry": "${fileEntry}"
     }
   } ]
 }

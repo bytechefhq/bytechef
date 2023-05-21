@@ -16,7 +16,7 @@
     "type": "xmlFile/v1/read",
     "parameters": {
       "fileEntry": "${fileEntry}",
-      "includeEmptyCells": true
+      "isArray": false
     }
   } ]
 }
