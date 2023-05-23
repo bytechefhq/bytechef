@@ -19,8 +19,8 @@ package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -44,7 +44,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public List<? extends Property<?>> executeDynamicProperties(
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId) {
 
@@ -68,7 +68,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public List<Option<?>> executeOptions(
+    public List<OptionDTO> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId) {
 
@@ -80,7 +80,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public List<? extends Property<?>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 

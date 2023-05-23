@@ -19,8 +19,8 @@ package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -44,7 +44,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public List<? extends Property<?>> executeDynamicProperties(
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
@@ -68,7 +68,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public List<Option<?>> executeOptions(
+    public List<OptionDTO> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
@@ -80,7 +80,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public List<? extends Property<?>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 

@@ -91,7 +91,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     }
 
     @Override
-    public Property<?> getActionProperty(
+    public Property getActionProperty(
         String propertyName, String actionName, String componentName, int componentVersion) {
 
         ActionDefinition actionDefinition = getActionDefinition(actionName, componentName, componentVersion);
@@ -200,7 +200,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     }
 
     @Override
-    public Property<?> getTriggerProperty(
+    public Property getTriggerProperty(
         String propertyName, String actionName, String componentName, int componentVersion) {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(actionName, componentName, componentVersion);

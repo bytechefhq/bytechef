@@ -18,9 +18,9 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -55,15 +55,15 @@ public interface TriggerDefinitionService {
         String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId);
 
-    List<Option<?>> executeOptions(
+    List<OptionDTO> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters);
 
-    List<? extends Property<?>> executeOutputSchema(
+    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         String authorizationName, Map<String, Object> connectionParameters);
 
-    List<? extends Property<?>> executeDynamicProperties(
+    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters);
 

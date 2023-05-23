@@ -33,7 +33,7 @@ public interface ComponentDefinitionRegistry {
 
     List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
 
-    Property<?> getActionProperty(
+    Property getActionProperty(
         String propertyName, String actionName, String componentName, int componentVersion);
 
     Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName);
@@ -57,6 +57,6 @@ public interface ComponentDefinitionRegistry {
 
     List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion);
 
-    Property<?> getTriggerProperty(
+    Property getTriggerProperty(
         String propertyName, String actionName, String componentName, int componentVersion);
 }

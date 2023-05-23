@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.facade;
 
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -50,7 +50,7 @@ public class TriggerDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeOptions")
-    public Mono<List<Option<?>>> executeOptions(Options options) {
+    public Mono<List<OptionDTO>> executeOptions(Options options) {
         return Mono.just(
             triggerDefinitionFacade.executeOptions(
                 options.propertyName, options.triggerName, options.componentName, options.componentVersion,
@@ -58,7 +58,7 @@ public class TriggerDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeProperties")
-    public Mono<List<? extends Property<?>>> executeProperties(Properties properties) {
+    public Mono<List<? extends ValuePropertyDTO<?>>> executeProperties(Properties properties) {
         return Mono.just(
             triggerDefinitionFacade.executeDynamicProperties(
                 properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
@@ -66,7 +66,7 @@ public class TriggerDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeOutputSchema")
-    public Mono<List<? extends Property<?>>> executeOutputSchema(OutputSchema outputSchema) {
+    public Mono<List<? extends ValuePropertyDTO<?>>> executeOutputSchema(OutputSchema outputSchema) {
         return Mono.just(
             triggerDefinitionFacade.executeOutputSchema(
                 outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,

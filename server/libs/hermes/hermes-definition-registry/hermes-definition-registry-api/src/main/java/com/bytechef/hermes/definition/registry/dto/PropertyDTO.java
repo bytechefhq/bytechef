@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.AnyProperty;
 import com.bytechef.hermes.definition.Property.ArrayProperty;
 import com.bytechef.hermes.definition.Property.BooleanProperty;
 import com.bytechef.hermes.definition.Property.DateProperty;
@@ -28,7 +29,6 @@ import com.bytechef.hermes.definition.Property.IntegerProperty;
 import com.bytechef.hermes.definition.Property.NullProperty;
 import com.bytechef.hermes.definition.Property.NumberProperty;
 import com.bytechef.hermes.definition.Property.ObjectProperty;
-import com.bytechef.hermes.definition.Property.OneOfProperty;
 import com.bytechef.hermes.definition.Property.StringProperty;
 import com.bytechef.hermes.definition.Property.TimeProperty;
 import com.bytechef.hermes.definition.Property.Type;
@@ -48,13 +48,13 @@ public abstract class PropertyDTO {
     private final String name;
     private final Type type;
 
-    public PropertyDTO(Property<?> property) {
+    public PropertyDTO(Property property) {
         this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
         this.description = OptionalUtils.orElse(property.getDescription(), null);
         this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
         this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
         this.hidden = OptionalUtils.orElse(property.getHidden(), false);
-        this.label = OptionalUtils.orElse(property.getLabel(), null);
+        this.label = OptionalUtils.orElse(property.getLabel(), property.getName());
         this.placeholder = OptionalUtils.orElse(property.getPlaceholder(), null);
         this.required = OptionalUtils.orElse(property.getRequired(), false);
         this.name = property.getName();
@@ -95,29 +95,34 @@ public abstract class PropertyDTO {
         return required;
     }
 
-    public String getName() {
-        return name;
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
     }
 
     public Type getType() {
         return type;
     }
 
-    public static PropertyDTO toPropertyDTO(Property<?> property) {
+    @SuppressWarnings("unchecked")
+    public static <P extends PropertyDTO> P toPropertyDTO(Property property) {
         return switch (property.getType()) {
-            case ARRAY -> toArrayPropertyDTO((ArrayProperty) property);
-            case BOOLEAN -> toBooleanPropertyDTO((BooleanProperty) property);
-            case DATE -> toDatePropertyDTO((DateProperty) property);
-            case DATE_TIME -> toDateTimePropertyDTO((DateTimeProperty) property);
-            case DYNAMIC_PROPERTIES -> toDynamicPropertiesPropertyDTO((DynamicPropertiesProperty) property);
-            case INTEGER -> toIntegerPropertyDTO((IntegerProperty) property);
-            case NULL -> toNullPropertyDTO((NullProperty) property);
-            case NUMBER -> toNumberPropertyDTO((NumberProperty) property);
-            case OBJECT -> toObjectPropertyDTO((ObjectProperty) property);
-            case ONE_OF -> toOneOfPropertyDTO((OneOfProperty) property);
-            case STRING -> toStringPropertyDTO((StringProperty) property);
-            case TIME -> toTimePropertyDTO((TimeProperty) property);
+            case ANY -> (P) toAnyPropertyDTO((AnyProperty) property);
+            case ARRAY -> (P) toArrayPropertyDTO((ArrayProperty) property);
+            case BOOLEAN -> (P) toBooleanPropertyDTO((BooleanProperty) property);
+            case DATE -> (P) toDatePropertyDTO((DateProperty) property);
+            case DATE_TIME -> (P) toDateTimePropertyDTO((DateTimeProperty) property);
+            case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesPropertyDTO((DynamicPropertiesProperty) property);
+            case INTEGER -> (P) toIntegerPropertyDTO((IntegerProperty) property);
+            case NULL -> (P) toNullPropertyDTO((NullProperty) property);
+            case NUMBER -> (P) toNumberPropertyDTO((NumberProperty) property);
+            case OBJECT -> (P) toObjectPropertyDTO((ObjectProperty) property);
+            case STRING -> (P) toStringPropertyDTO((StringProperty) property);
+            case TIME -> (P) toTimePropertyDTO((TimeProperty) property);
         };
+    }
+
+    private static AnyPropertyDTO toAnyPropertyDTO(AnyProperty anyProperty) {
+        return new AnyPropertyDTO(anyProperty);
     }
 
     private static ArrayPropertyDTO toArrayPropertyDTO(ArrayProperty arrayProperty) {
@@ -158,10 +163,6 @@ public abstract class PropertyDTO {
         return new ObjectPropertyDTO(objectProperty);
     }
 
-    private static OneOfPropertyDTO toOneOfPropertyDTO(OneOfProperty oneOfPropertyDTO) {
-        return new OneOfPropertyDTO(oneOfPropertyDTO);
-    }
-
     private static StringPropertyDTO toStringPropertyDTO(StringProperty stringProperty) {
         return new StringPropertyDTO(stringProperty);
     }
@@ -172,28 +173,28 @@ public abstract class PropertyDTO {
 
     public interface PropertyVisitor {
 
-        Object visit(ArrayPropertyDTO arrayProperty);
+        Object visit(AnyPropertyDTO anyPropertyDTO);
 
-        Object visit(BooleanPropertyDTO booleanProperty);
+        Object visit(ArrayPropertyDTO arrayPropertyDTO);
 
-        Object visit(DatePropertyDTO dateProperty);
+        Object visit(BooleanPropertyDTO booleanPropertyDTO);
 
-        Object visit(DateTimePropertyDTO dateTimeProperty);
+        Object visit(DatePropertyDTO datePropertyDTO);
 
-        Object visit(DynamicPropertiesPropertyDTO dateProperty);
+        Object visit(DateTimePropertyDTO dateTimePropertyDTO);
 
-        Object visit(IntegerPropertyDTO integerProperty);
+        Object visit(DynamicPropertiesPropertyDTO dynamicPropertiesPropertyDTO);
 
-        Object visit(NullPropertyDTO nullProperty);
+        Object visit(IntegerPropertyDTO integerPropertyDTO);
 
-        Object visit(NumberPropertyDTO numberProperty);
+        Object visit(NullPropertyDTO nullPropertyDTO);
 
-        Object visit(OneOfPropertyDTO oneOfProperty);
+        Object visit(NumberPropertyDTO numberPropertyDTO);
 
-        Object visit(ObjectPropertyDTO objectProperty);
+        Object visit(ObjectPropertyDTO objectPropertyDTO);
 
-        Object visit(StringPropertyDTO stringProperty);
+        Object visit(StringPropertyDTO stringPropertyDTO);
 
-        Object visit(TimePropertyDTO timeProperty);
+        Object visit(TimePropertyDTO timePropertyDTO);
     }
 }
