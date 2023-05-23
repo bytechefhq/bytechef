@@ -38,7 +38,7 @@ export class TagsApi extends runtime.BaseAPI {
 
     /**
      * Get a tag by id.
-     * Get a tag by id.
+     * Get a tag by id
      */
     async getTagRaw(requestParameters: GetTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -61,7 +61,7 @@ export class TagsApi extends runtime.BaseAPI {
 
     /**
      * Get a tag by id.
-     * Get a tag by id.
+     * Get a tag by id
      */
     async getTag(requestParameters: GetTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
         const response = await this.getTagRaw(requestParameters, initOverrides);
@@ -70,7 +70,7 @@ export class TagsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing tag.
-     * Update an existing tag.
+     * Update an existing tag
      */
     async updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -100,7 +100,7 @@ export class TagsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing tag.
-     * Update an existing tag.
+     * Update an existing tag
      */
     async updateTag(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
         const response = await this.updateTagRaw(requestParameters, initOverrides);

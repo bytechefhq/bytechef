@@ -89,7 +89,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action definition of a component.
-     * Get an action definition of a component.
+     * Get an action definition of a component
      */
     async getComponentActionDefinitionRaw(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinitionModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -120,7 +120,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action definition of a component.
-     * Get an action definition of a component.
+     * Get an action definition of a component
      */
     async getComponentActionDefinition(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ActionDefinitionModel> {
         const response = await this.getComponentActionDefinitionRaw(requestParameters, initOverrides);
@@ -129,7 +129,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a list of action definitions for a component.
-     * Get a list of action definitions for a component.
+     * Get a list of action definitions for a component
      */
     async getComponentActionDefinitionsRaw(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionBasicModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -156,7 +156,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a list of action definitions for a component.
-     * Get a list of action definitions for a component.
+     * Get a list of action definitions for a component
      */
     async getComponentActionDefinitions(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionBasicModel>> {
         const response = await this.getComponentActionDefinitionsRaw(requestParameters, initOverrides);
@@ -165,7 +165,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action description shown in the editor.
-     * Get an action description shown in the editor.
+     * Get an action description shown in the editor
      */
     async getComponentActionEditorDescriptionRaw(requestParameters: GetComponentActionEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -203,7 +203,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action description shown in the editor.
-     * Get an action description shown in the editor.
+     * Get an action description shown in the editor
      */
     async getComponentActionEditorDescription(requestParameters: GetComponentActionEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.getComponentActionEditorDescriptionRaw(requestParameters, initOverrides);
@@ -212,7 +212,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action output schema shown in the editor.
-     * Get an action output schema shown in the editor.
+     * Get an action output schema shown in the editor
      */
     async getComponentActionOutputSchemaRaw(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -246,7 +246,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action output schema shown in the editor.
-     * Get an action output schema shown in the editor.
+     * Get an action output schema shown in the editor
      */
     async getComponentActionOutputSchema(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
         const response = await this.getComponentActionOutputSchemaRaw(requestParameters, initOverrides);
@@ -255,7 +255,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get dynamic properties for an action property shown in the editor.
-     * Get dynamic properties for an action property shown in the editor.
+     * Get dynamic properties for an action property shown in the editor
      */
     async getComponentActionPropertyDynamicPropertiesRaw(requestParameters: GetComponentActionPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -293,7 +293,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get dynamic properties for an action property shown in the editor.
-     * Get dynamic properties for an action property shown in the editor.
+     * Get dynamic properties for an action property shown in the editor
      */
     async getComponentActionPropertyDynamicProperties(requestParameters: GetComponentActionPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
         const response = await this.getComponentActionPropertyDynamicPropertiesRaw(requestParameters, initOverrides);
@@ -302,7 +302,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action property options shown in the editor.
-     * Get an action property options shown in the editor.
+     * Get an action property options shown in the editor
      */
     async getComponentActionPropertyOptionsRaw(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OptionModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -340,7 +340,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action property options shown in the editor.
-     * Get an action property options shown in the editor.
+     * Get an action property options shown in the editor
      */
     async getComponentActionPropertyOptions(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OptionModel>> {
         const response = await this.getComponentActionPropertyOptionsRaw(requestParameters, initOverrides);
@@ -349,7 +349,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action sample output shown in the editor.
-     * Get an action sample output shown in the editor.
+     * Get an action sample output shown in the editor
      */
     async getComponentActionSampleOutputRaw(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -383,7 +383,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an action sample output shown in the editor.
-     * Get an action sample output shown in the editor.
+     * Get an action sample output shown in the editor
      */
     async getComponentActionSampleOutput(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.getComponentActionSampleOutputRaw(requestParameters, initOverrides);

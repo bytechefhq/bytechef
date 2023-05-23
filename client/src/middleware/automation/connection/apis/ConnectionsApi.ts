@@ -59,7 +59,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Create a new connection.
-     * Create a new connection.
+     * Create a new connection
      */
     async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
         if (requestParameters.connectionModel === null || requestParameters.connectionModel === undefined) {
@@ -85,7 +85,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Create a new connection.
-     * Create a new connection.
+     * Create a new connection
      */
     async createConnection(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.createConnectionRaw(requestParameters, initOverrides);
@@ -94,7 +94,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Delete a connection.
-     * Delete a connection.
+     * Delete a connection
      */
     async deleteConnectionRaw(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -117,7 +117,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Delete a connection.
-     * Delete a connection.
+     * Delete a connection
      */
     async deleteConnection(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteConnectionRaw(requestParameters, initOverrides);
@@ -125,7 +125,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Get a connection by id.
-     * Get a connection by id.
+     * Get a connection by id
      */
     async getConnectionRaw(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -148,7 +148,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Get a connection by id.
-     * Get a connection by id.
+     * Get a connection by id
      */
     async getConnection(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.getConnectionRaw(requestParameters, initOverrides);
@@ -157,7 +157,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Get connections.
-     * Get connections.
+     * Get connections
      */
     async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
         const queryParameters: any = {};
@@ -184,7 +184,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Get connections.
-     * Get connections.
+     * Get connections
      */
     async getConnections(requestParameters: GetConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
         const response = await this.getConnectionsRaw(requestParameters, initOverrides);
@@ -193,7 +193,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing connection.
-     * Update an existing connection.
+     * Update an existing connection
      */
     async updateConnectionRaw(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -223,7 +223,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing connection.
-     * Update an existing connection.
+     * Update an existing connection
      */
     async updateConnection(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.updateConnectionRaw(requestParameters, initOverrides);
@@ -232,7 +232,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Updates tags of an existing connection.
-     * Updates tags of an existing connection.
+     * Updates tags of an existing connection
      */
     async updateConnectionTagsRaw(requestParameters: UpdateConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -262,7 +262,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Updates tags of an existing connection.
-     * Updates tags of an existing connection.
+     * Updates tags of an existing connection
      */
     async updateConnectionTags(requestParameters: UpdateConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateConnectionTagsRaw(requestParameters, initOverrides);

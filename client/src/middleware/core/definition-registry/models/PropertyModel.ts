@@ -21,6 +21,7 @@ import {
 } from './PropertyTypeModel';
 
 import {
+     AnyPropertyModelFromJSONTyped,
      ArrayPropertyModelFromJSONTyped,
      BooleanPropertyModelFromJSONTyped,
      DatePropertyModelFromJSONTyped,
@@ -30,7 +31,6 @@ import {
      NullPropertyModelFromJSONTyped,
      NumberPropertyModelFromJSONTyped,
      ObjectPropertyModelFromJSONTyped,
-     OneOfPropertyModelFromJSONTyped,
      StringPropertyModelFromJSONTyped
 } from './';
 
@@ -120,6 +120,9 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     if (!ignoreDiscriminator) {
+        if (json['type'] === 'ANY') {
+            return AnyPropertyModelFromJSONTyped(json, true);
+        }
         if (json['type'] === 'ARRAY') {
             return ArrayPropertyModelFromJSONTyped(json, true);
         }
@@ -146,9 +149,6 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         }
         if (json['type'] === 'OBJECT') {
             return ObjectPropertyModelFromJSONTyped(json, true);
-        }
-        if (json['type'] === 'ONE_OF') {
-            return OneOfPropertyModelFromJSONTyped(json, true);
         }
         if (json['type'] === 'STRING') {
             return StringPropertyModelFromJSONTyped(json, true);

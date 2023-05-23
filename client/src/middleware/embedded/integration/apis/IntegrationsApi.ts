@@ -74,7 +74,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Create a new integration.
-     * Create a new integration.
+     * Create a new integration
      */
     async createIntegrationRaw(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.integrationModel === null || requestParameters.integrationModel === undefined) {
@@ -100,7 +100,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Create a new integration.
-     * Create a new integration.
+     * Create a new integration
      */
     async createIntegration(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.createIntegrationRaw(requestParameters, initOverrides);
@@ -109,7 +109,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Create new workflow and adds it to an existing integration.
-     * Create new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration
      */
     async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -139,7 +139,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Create new workflow and adds it to an existing integration.
-     * Create new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration
      */
     async createIntegrationWorkflow(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.createIntegrationWorkflowRaw(requestParameters, initOverrides);
@@ -148,7 +148,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Delete an integration.
-     * Delete an integration.
+     * Delete an integration
      */
     async deleteIntegrationRaw(requestParameters: DeleteIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -171,7 +171,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Delete an integration.
-     * Delete an integration.
+     * Delete an integration
      */
     async deleteIntegration(requestParameters: DeleteIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteIntegrationRaw(requestParameters, initOverrides);
@@ -179,7 +179,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Get an integration by id.
-     * Get an integration by id.
+     * Get an integration by id
      */
     async getIntegrationRaw(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -202,7 +202,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Get an integration by id.
-     * Get an integration by id.
+     * Get an integration by id
      */
     async getIntegration(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.getIntegrationRaw(requestParameters, initOverrides);
@@ -211,7 +211,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Get workflows for particular integration.
-     * Get workflows for particular integration.
+     * Get workflows for particular integration
      */
     async getIntegrationWorkflowsRaw(requestParameters: GetIntegrationWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -234,7 +234,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Get workflows for particular integration.
-     * Get workflows for particular integration.
+     * Get workflows for particular integration
      */
     async getIntegrationWorkflows(requestParameters: GetIntegrationWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
         const response = await this.getIntegrationWorkflowsRaw(requestParameters, initOverrides);
@@ -243,7 +243,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Get integrations.
-     * Get integrations.
+     * Get integrations
      */
     async getIntegrationsRaw(requestParameters: GetIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationModel>>> {
         const queryParameters: any = {};
@@ -270,7 +270,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Get integrations.
-     * Get integrations.
+     * Get integrations
      */
     async getIntegrations(requestParameters: GetIntegrationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationModel>> {
         const response = await this.getIntegrationsRaw(requestParameters, initOverrides);
@@ -279,7 +279,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing integration.
-     * Update an existing integration.
+     * Update an existing integration
      */
     async updateIntegrationRaw(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -309,7 +309,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing integration.
-     * Update an existing integration.
+     * Update an existing integration
      */
     async updateIntegration(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.updateIntegrationRaw(requestParameters, initOverrides);
@@ -318,7 +318,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Updates tags of an existing integration.
-     * Updates tags of an existing integration.
+     * Updates tags of an existing integration
      */
     async updateIntegrationTagsRaw(requestParameters: UpdateIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -348,7 +348,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Updates tags of an existing integration.
-     * Updates tags of an existing integration.
+     * Updates tags of an existing integration
      */
     async updateIntegrationTags(requestParameters: UpdateIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateIntegrationTagsRaw(requestParameters, initOverrides);

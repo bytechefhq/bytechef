@@ -38,7 +38,7 @@ export class CategoriesApi extends runtime.BaseAPI {
 
     /**
      * Get a category by id.
-     * Get a category by id.
+     * Get a category by id
      */
     async getCategoryRaw(requestParameters: GetCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CategoryModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -61,7 +61,7 @@ export class CategoriesApi extends runtime.BaseAPI {
 
     /**
      * Get a category by id.
-     * Get a category by id.
+     * Get a category by id
      */
     async getCategory(requestParameters: GetCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CategoryModel> {
         const response = await this.getCategoryRaw(requestParameters, initOverrides);
@@ -70,7 +70,7 @@ export class CategoriesApi extends runtime.BaseAPI {
 
     /**
      * Update an existing category.
-     * Update an existing category.
+     * Update an existing category
      */
     async updateCategoryRaw(requestParameters: UpdateCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CategoryModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -100,7 +100,7 @@ export class CategoriesApi extends runtime.BaseAPI {
 
     /**
      * Update an existing category.
-     * Update an existing category.
+     * Update an existing category
      */
     async updateCategory(requestParameters: UpdateCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CategoryModel> {
         const response = await this.updateCategoryRaw(requestParameters, initOverrides);

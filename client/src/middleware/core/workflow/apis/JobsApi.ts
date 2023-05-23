@@ -65,7 +65,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.
-     * Create a request for running a new job.
+     * Create a request for running a new job
      */
     async createJobRaw(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateJob200ResponseModel>> {
         if (requestParameters.jobParametersModel === null || requestParameters.jobParametersModel === undefined) {
@@ -91,7 +91,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.
-     * Create a request for running a new job.
+     * Create a request for running a new job
      */
     async createJob(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateJob200ResponseModel> {
         const response = await this.createJobRaw(requestParameters, initOverrides);
@@ -100,7 +100,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get a job by id.
-     * Get a job by id.
+     * Get a job by id
      */
     async getJobRaw(requestParameters: GetJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -123,7 +123,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get a job by id.
-     * Get a job by id.
+     * Get a job by id
      */
     async getJob(requestParameters: GetJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModel> {
         const response = await this.getJobRaw(requestParameters, initOverrides);
@@ -132,7 +132,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get task executions of a job.
-     * Get task executions of a job.
+     * Get task executions of a job
      */
     async getJobTaskExecutionsRaw(requestParameters: GetJobTaskExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskExecutionModel>>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -155,7 +155,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get task executions of a job.
-     * Get task executions of a job.
+     * Get task executions of a job
      */
     async getJobTaskExecutions(requestParameters: GetJobTaskExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskExecutionModel>> {
         const response = await this.getJobTaskExecutionsRaw(requestParameters, initOverrides);
@@ -164,7 +164,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get a page of jobs.
-     * Get a page of jobs.
+     * Get a page of jobs
      */
     async getJobsRaw(requestParameters: GetJobsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
@@ -187,7 +187,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get a page of jobs.
-     * Get a page of jobs.
+     * Get a page of jobs
      */
     async getJobs(requestParameters: GetJobsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
         const response = await this.getJobsRaw(requestParameters, initOverrides);
@@ -196,7 +196,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get the latest job.
-     * Get the latest job.
+     * Get the latest job
      */
     async getLatestJobRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModel>> {
         const queryParameters: any = {};
@@ -215,7 +215,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Get the latest job.
-     * Get the latest job.
+     * Get the latest job
      */
     async getLatestJob(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModel> {
         const response = await this.getLatestJobRaw(initOverrides);
@@ -224,7 +224,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Restart a job.
-     * Restart a job.
+     * Restart a job
      */
     async restartJobRaw(requestParameters: RestartJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -247,7 +247,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Restart a job.
-     * Restart a job.
+     * Restart a job
      */
     async restartJob(requestParameters: RestartJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.restartJobRaw(requestParameters, initOverrides);
@@ -255,7 +255,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Stop a job.
-     * Stop a job.
+     * Stop a job
      */
     async stopJobRaw(requestParameters: StopJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -278,7 +278,7 @@ export class JobsApi extends runtime.BaseAPI {
 
     /**
      * Stop a job.
-     * Stop a job.
+     * Stop a job
      */
     async stopJob(requestParameters: StopJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.stopJobRaw(requestParameters, initOverrides);

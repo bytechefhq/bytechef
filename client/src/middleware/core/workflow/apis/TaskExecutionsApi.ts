@@ -33,7 +33,7 @@ export class TaskExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get a task execution by id.
-     * Get a task execution by id.
+     * Get a task execution by id
      */
     async getTaskExecutionRaw(requestParameters: GetTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskExecutionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -56,7 +56,7 @@ export class TaskExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get a task execution by id.
-     * Get a task execution by id.
+     * Get a task execution by id
      */
     async getTaskExecution(requestParameters: GetTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskExecutionModel> {
         const response = await this.getTaskExecutionRaw(requestParameters, initOverrides);

@@ -54,7 +54,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Create a new workflow.
-     * Create a new workflow.
+     * Create a new workflow
      */
     async createWorkflowRaw(requestParameters: CreateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.workflowModel === null || requestParameters.workflowModel === undefined) {
@@ -80,7 +80,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Create a new workflow.
-     * Create a new workflow.
+     * Create a new workflow
      */
     async createWorkflow(requestParameters: CreateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.createWorkflowRaw(requestParameters, initOverrides);
@@ -89,7 +89,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Delete a workflow.
-     * Delete a workflow.
+     * Delete a workflow
      */
     async deleteWorkflowRaw(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -112,7 +112,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Delete a workflow.
-     * Delete a workflow.
+     * Delete a workflow
      */
     async deleteWorkflow(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteWorkflowRaw(requestParameters, initOverrides);
@@ -120,7 +120,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Get a workflow by id.
-     * Get a workflow by id.
+     * Get a workflow by id
      */
     async getWorkflowRaw(requestParameters: GetWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -143,7 +143,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Get a workflow by id.
-     * Get a workflow by id.
+     * Get a workflow by id
      */
     async getWorkflow(requestParameters: GetWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.getWorkflowRaw(requestParameters, initOverrides);
@@ -152,7 +152,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow definitions.
-     * Get workflow definitions.
+     * Get workflow definitions
      */
     async getWorkflowsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
         const queryParameters: any = {};
@@ -171,7 +171,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow definitions.
-     * Get workflow definitions.
+     * Get workflow definitions
      */
     async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
         const response = await this.getWorkflowsRaw(initOverrides);
@@ -180,7 +180,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Execute a workflow synchronously for testing purposes.
-     * Execute a workflow synchronously for testing purpose.
+     * Execute a workflow synchronously for testing purpose
      */
     async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowResponseModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -210,7 +210,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Execute a workflow synchronously for testing purposes.
-     * Execute a workflow synchronously for testing purpose.
+     * Execute a workflow synchronously for testing purpose
      */
     async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowResponseModel> {
         const response = await this.testWorkflowRaw(requestParameters, initOverrides);
@@ -219,7 +219,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing workflow.
-     * Update an existing workflow.
+     * Update an existing workflow
      */
     async updateWorkflowRaw(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -249,7 +249,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
      * Update an existing workflow.
-     * Update an existing workflow.
+     * Update an existing workflow
      */
     async updateWorkflow(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.updateWorkflowRaw(requestParameters, initOverrides);
