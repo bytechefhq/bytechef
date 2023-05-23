@@ -20,7 +20,7 @@ paths:
   /component-definitions:
     get:
       description: "Get all component definitions."
-      summary: "Get all component definitions."
+      summary: "Get all component definitions"
       tags:
       - "component-definitions"
       operationId: "getComponentDefinitions"
@@ -62,7 +62,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/action-definitions:
     get:
       description: "Get a list of action definitions for a component."
-      summary: "Get a list of action definitions for a component."
+      summary: "Get a list of action definitions for a component"
       tags:
       - "action-definitions"
       operationId: "getComponentActionDefinitions"
@@ -91,7 +91,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}:
     get:
       description: "Get an action definition of a component."
-      summary: "Get an action definition of a component."
+      summary: "Get an action definition of a component"
       tags:
       - "action-definitions"
       operationId: "getComponentActionDefinition"
@@ -124,7 +124,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/editor-description:
     post:
       description: "Get an action description shown in the editor."
-      summary: "Get an action description shown in the editor."
+      summary: "Get an action description shown in the editor"
       tags:
       - "action-definitions"
       operationId: "getComponentActionEditorDescription"
@@ -162,7 +162,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/output-schema:
     post:
       description: "Get an action output schema shown in the editor."
-      summary: "Get an action output schema shown in the editor."
+      summary: "Get an action output schema shown in the editor"
       tags:
       - "action-definitions"
       operationId: "getComponentActionOutputSchema"
@@ -202,7 +202,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output:
     post:
       description: "Get an action sample output shown in the editor."
-      summary: "Get an action sample output shown in the editor."
+      summary: "Get an action sample output shown in the editor"
       tags:
       - "action-definitions"
       operationId: "getComponentActionSampleOutput"
@@ -240,7 +240,7 @@ paths:
   ? /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties
   : post:
       description: "Get dynamic properties for an action property shown in the editor."
-      summary: "Get dynamic properties for an action property shown in the editor."
+      summary: "Get dynamic properties for an action property shown in the editor"
       tags:
       - "action-definitions"
       operationId: "getComponentActionPropertyDynamicProperties"
@@ -286,7 +286,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/options:
     post:
       description: "Get an action property options shown in the editor."
-      summary: "Get an action property options shown in the editor."
+      summary: "Get an action property options shown in the editor"
       tags:
       - "action-definitions"
       operationId: "getComponentActionPropertyOptions"
@@ -332,7 +332,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/connection-definition:
     get:
       description: "Get connection definition for a component."
-      summary: "Get connection definition for a component."
+      summary: "Get connection definition for a component"
       tags:
       - "connection-definitions"
       operationId: "getComponentConnectionDefinition"
@@ -359,7 +359,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/connection-definitions:
     get:
       description: "Get all compatible connection definitions for a component."
-      summary: "Get all compatible connection definitions for a component."
+      summary: "Get all compatible connection definitions for a component"
       tags:
       - "connection-definitions"
       operationId: "getComponentConnectionDefinitions"
@@ -388,7 +388,7 @@ paths:
   /component-definitions/{componentName}:
     get:
       description: "Get a component definition."
-      summary: "Get a component definition."
+      summary: "Get a component definition"
       tags:
       - "component-definitions"
       operationId: "getComponentDefinition"
@@ -851,6 +851,11 @@ components:
         title:
           description: "The title"
           type: "string"
+    AnyProperty:
+      description: "An any of property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
     AnyValue:
       description: "Can be anything: string, number, array, object, etc. (except `null`)"
     ActionDefinitionBasic:
@@ -1184,12 +1189,12 @@ components:
       description: "A null property type."
       type: "object"
       allOf:
-      - $ref: "#/components/schemas/Property"
+      - $ref: "#/components/schemas/ValueProperty"
     NumberProperty:
       description: "A number property type."
       type: "object"
       allOf:
-      - $ref: "#/components/schemas/ValueProperty"
+      - $ref: "#/components/schemas/Property"
       - type: "object"
         properties:
           maxValue:
@@ -1248,18 +1253,6 @@ components:
             $ref: "#/components/schemas/OptionsDataSource"
           properties:
             description: "The list of valid object property types."
-            type: "array"
-            items:
-              $ref: "#/components/schemas/Property"
-    OneOfProperty:
-      description: "A one of property type."
-      type: "object"
-      allOf:
-      - $ref: "#/components/schemas/Property"
-      - type: "object"
-        properties:
-          types:
-            description: "Possible types of properties that can be used."
             type: "array"
             items:
               $ref: "#/components/schemas/Property"
@@ -1338,6 +1331,7 @@ components:
       discriminator:
         propertyName: "type"
         mapping:
+          ANY: "#/components/schemas/AnyProperty"
           ARRAY: "#/components/schemas/ArrayProperty"
           BOOLEAN: "#/components/schemas/BooleanProperty"
           DATE: "#/components/schemas/DateProperty"
@@ -1348,11 +1342,11 @@ components:
           NUMBER: "#/components/schemas/NumberProperty"
           STRING: "#/components/schemas/StringProperty"
           OBJECT: "#/components/schemas/ObjectProperty"
-          ONE_OF: "#/components/schemas/OneOfProperty"
     PropertyType:
       description: "A type of property."
       type: "string"
       enum:
+      - "ANY"
       - "ARRAY"
       - "BOOLEAN"
       - "DATE"
@@ -1363,7 +1357,6 @@ components:
       - "NUMBER"
       - "STRING"
       - "OBJECT"
-      - "ONE_OF"
       - "TIME"
     Resources:
       description: "A set of available resources."

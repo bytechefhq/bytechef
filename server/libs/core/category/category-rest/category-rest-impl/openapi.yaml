@@ -12,7 +12,7 @@ paths:
   /categories/{id}:
     get:
       description: "Get a category by id."
-      summary: "Get a category by id."
+      summary: "Get a category by id"
       tags:
       - "categories"
       operationId: "getCategory"
@@ -33,7 +33,7 @@ paths:
                 $ref: "#/components/schemas/Category"
     put:
       description: "Update an existing category."
-      summary: "Update an existing category."
+      summary: "Update an existing category"
       tags:
       - "categories"
       operationId: "updateCategory"
