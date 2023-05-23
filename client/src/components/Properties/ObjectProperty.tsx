@@ -67,13 +67,13 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
                                     label="Name"
                                 />
 
-                                {(additionalProperties as PropertyType[])[0]
-                                    .types?.length ? (
+                                {(additionalProperties as PropertyType[])
+                                    ?.length > 1 ? (
                                     <Select
                                         label="Type"
                                         options={(
                                             additionalProperties as PropertyType[]
-                                        )[0]!.types!.map((type) => ({
+                                        ).map((type) => ({
                                             value: type.type!,
                                             label: type.type!,
                                         }))}
