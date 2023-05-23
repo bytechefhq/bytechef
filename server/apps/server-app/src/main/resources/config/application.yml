@@ -69,6 +69,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
     serialization:
+      indent-output: false
       write-dates-as-timestamps: false
       write-null-map-values: false
     date-format: ${bytechef.serialization.date-format}
