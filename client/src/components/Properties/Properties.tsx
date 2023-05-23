@@ -306,7 +306,7 @@ const Properties = ({
     properties,
     register,
 }: PropertiesProps): JSX.Element => (
-    <ul className={twMerge('h-full flex-[1_1_1px]', customClassName)}>
+    <ul className={twMerge('h-full', customClassName)}>
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}
