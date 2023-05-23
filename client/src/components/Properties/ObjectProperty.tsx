@@ -9,19 +9,11 @@ import {PropertyType} from 'types/projectTypes';
 
 import {Property} from './Properties';
 
-interface ObjectPropertyProps {
-    additionalProperties: PropertyType[] | undefined;
-    label: string | undefined;
-    properties: PropertyType[];
-}
-
-const ObjectProperty = ({
-    additionalProperties,
-    label,
-    properties,
-}: ObjectPropertyProps) => {
+const ObjectProperty = ({property}: {property: PropertyType}) => {
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] =
         useState(false);
+
+    const {additionalProperties, label, properties} = property;
 
     return (
         <>
@@ -66,15 +58,16 @@ const ObjectProperty = ({
                                     label="Name"
                                 />
 
-                                {additionalProperties[0].types?.length ? (
+                                {(additionalProperties as PropertyType[])[0]
+                                    .types?.length ? (
                                     <Select
                                         label="Type"
-                                        options={additionalProperties[0].types.map(
-                                            (type) => ({
-                                                value: type.type!,
-                                                label: type.type!,
-                                            })
-                                        )}
+                                        options={(
+                                            additionalProperties as PropertyType[]
+                                        )[0]!.types!.map((type) => ({
+                                            value: type.type!,
+                                            label: type.type!,
+                                        }))}
                                         triggerClassName="w-full"
                                     />
                                 ) : (
