@@ -29,10 +29,10 @@ import java.util.List;
  * @generated
  */
 public class JiraOperationsProperties {
-    public static final List<Property> PROPERTIES = List.of(array("linkGroups")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(array("linkGroups")
         .items(object().properties(JiraLinkGroupProperties.PROPERTIES)
             .description("Details a link group, which defines issue operations."))
-        .placeholder("Add")
+        .placeholder("Add to Link Groups")
         .label("Link Groups")
         .description("Details of the link groups defining issue operations.")
         .required(false));

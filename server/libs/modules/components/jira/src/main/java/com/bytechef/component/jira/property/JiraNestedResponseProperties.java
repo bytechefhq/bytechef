@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class JiraNestedResponseProperties {
-    public static final List<Property> PROPERTIES = List.of(integer("status").label("Status")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(integer("status").label("Status")
         .required(false),
         object("errorCollection").properties(JiraErrorCollectionProperties.PROPERTIES)
             .label("Error Collection")

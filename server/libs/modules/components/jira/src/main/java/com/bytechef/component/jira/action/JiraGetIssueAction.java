@@ -60,7 +60,7 @@ public class JiraGetIssueAction {
                 Map.of(
                     "type", PropertyType.PATH)),
             array("fields").items(string())
-                .placeholder("Add")
+                .placeholder("Add to Fields")
                 .label("Fields")
                 .description(
                     "A list of fields to return for the issue. This parameter accepts a comma-separated list. Use it to retrieve a subset of fields. Allowed values:\n"
@@ -105,7 +105,7 @@ public class JiraGetIssueAction {
                     Map.of(
                         "type", PropertyType.QUERY)),
             array("properties").items(string())
-                .placeholder("Add")
+                .placeholder("Add to Properties")
                 .label("Properties")
                 .description(
                     "A list of issue properties to return for the issue. This parameter accepts a comma-separated list. Allowed values:\n"

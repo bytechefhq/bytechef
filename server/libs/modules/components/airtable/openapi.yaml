@@ -13,7 +13,7 @@ paths:
     post:
       tags:
       - "records"
-      summary: "Creates a record."
+      summary: "Creates a record"
       description: "Adds a record into an Airtable table."
       operationId: "createRecord"
       parameters:

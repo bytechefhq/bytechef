@@ -48,13 +48,10 @@ public class PipedriveDeleteDealAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(bool("success").label("Success")
-            .description("If the request was successful or not")
+        .outputSchema(object().properties(bool("success").description("If the request was successful or not")
             .required(false),
-            object("data").properties(integer("id").label("Id")
-                .description("The ID of the deal that was deleted")
+            object("data").properties(integer("id").description("The ID of the deal that was deleted")
                 .required(false))
-                .label("Data")
                 .required(false))
             .metadata(
                 Map.of(

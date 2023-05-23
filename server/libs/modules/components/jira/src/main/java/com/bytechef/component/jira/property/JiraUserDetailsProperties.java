@@ -30,7 +30,7 @@ import java.util.List;
  * @generated
  */
 public class JiraUserDetailsProperties {
-    public static final List<Property> PROPERTIES = List.of(string("self").label("Self")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("self").label("Self")
         .description("The URL of the user.")
         .required(false),
         string("name").label("Name")

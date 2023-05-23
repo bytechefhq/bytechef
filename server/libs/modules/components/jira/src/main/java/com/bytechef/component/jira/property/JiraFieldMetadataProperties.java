@@ -31,7 +31,7 @@ import java.util.List;
  * @generated
  */
 public class JiraFieldMetadataProperties {
-    public static final List<Property> PROPERTIES = List.of(bool("required").label("Required")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(bool("required").label("Required")
         .description("Whether the field is required.")
         .required(true),
         object("schema").properties(JiraJsonTypeBeanProperties.PROPERTIES)
@@ -51,12 +51,12 @@ public class JiraFieldMetadataProperties {
             .description("Whether the field has a default value.")
             .required(false),
         array("operations").items(string().description("The list of operations that can be performed on the field."))
-            .placeholder("Add")
+            .placeholder("Add to Operations")
             .label("Operations")
             .description("The list of operations that can be performed on the field.")
             .required(true),
         array("allowedValues").items(object().description("The list of values allowed in the field."))
-            .placeholder("Add")
+            .placeholder("Add to Allowed Values")
             .label("Allowed Values")
             .description("The list of values allowed in the field.")
             .required(false),
@@ -64,7 +64,7 @@ public class JiraFieldMetadataProperties {
             .description("The default value of the field.")
             .required(false),
         object("configuration").additionalProperties(object())
-            .placeholder("Add")
+            .placeholder("Add to Configuration")
             .label("Configuration")
             .description("The configuration properties.")
             .required(false));

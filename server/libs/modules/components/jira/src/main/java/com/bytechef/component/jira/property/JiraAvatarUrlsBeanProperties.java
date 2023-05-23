@@ -28,7 +28,7 @@ import java.util.List;
  * @generated
  */
 public class JiraAvatarUrlsBeanProperties {
-    public static final List<Property> PROPERTIES = List.of(string("16x16").label("16 X 16")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("16x16").label("16 X 16")
         .description("The URL of the item's 16x16 pixel avatar.")
         .required(false),
         string("24x24").label("24 X 24")

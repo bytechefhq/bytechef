@@ -48,14 +48,12 @@ public class PipedriveDeletePersonAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(object("data").properties(integer("id").label("Id")
-            .description("The ID of the deleted person")
-            .required(false))
-            .label("Data")
-            .required(false),
-            bool("success").label("Success")
-                .description("If the response is successful or not")
+        .outputSchema(object()
+            .properties(object("data").properties(integer("id").description("The ID of the deleted person")
                 .required(false))
+                .required(false),
+                bool("success").description("If the response is successful or not")
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))
