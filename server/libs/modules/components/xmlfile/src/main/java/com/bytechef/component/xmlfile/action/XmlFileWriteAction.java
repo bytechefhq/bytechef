@@ -34,13 +34,15 @@ import java.util.Map;
 
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.TYPE;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.WRITE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -52,15 +54,25 @@ public class XmlFileWriteAction {
         .title("Write to file")
         .description("Writes the data to a XML file.")
         .properties(
-            oneOf(SOURCE)
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
+            object(SOURCE)
                 .label("Source")
-                .description("The data to write to the file.")
-                .required(true)
-                .types(array(), object()),
+                .description("The object to write to the file.")
+                .displayCondition("type === 1")
+                .required(true),
+            array(SOURCE)
+                .label("Source")
+                .description("The aray to write to the file.")
+                .displayCondition("type === 2")
+                .required(true),
             string(FILENAME)
                 .label("Filename")
-                .description(
-                    "Filename to set for binary data. By default, \"file.xml\" will be used.")
+                .description("Filename to set for binary data. By default, \"file.xml\" will be used.")
                 .required(true)
                 .defaultValue("file.xml")
                 .advancedOption(true))

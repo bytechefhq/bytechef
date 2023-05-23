@@ -99,8 +99,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
@@ -170,8 +170,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -189,8 +189,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -255,8 +255,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
@@ -308,20 +308,196 @@
           "placeholder": null,
           "required": null,
           "name": null,
-          "type": "ONE_OF",
-          "types": null
+          "type": "ARRAY",
+          "defaultValue": null,
+          "exampleValue": null,
+          "items": null,
+          "multipleValues": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "BOOLEAN",
+          "defaultValue": null,
+          "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
+          "controlType": "CHECKBOX"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "DATE",
+          "defaultValue": null,
+          "exampleValue": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "DATE"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "DATE_TIME",
+          "defaultValue": null,
+          "exampleValue": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "INTEGER",
+          "defaultValue": null,
+          "exampleValue": null,
+          "maxValue": null,
+          "minValue": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "NULL",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "NUMBER",
+          "defaultValue": null,
+          "exampleValue": null,
+          "maxValue": null,
+          "minValue": null,
+          "numberPrecision": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "objectType": null,
+          "options": null,
+          "properties": null,
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "INPUT_TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "TIME",
+          "defaultValue": null,
+          "exampleValue": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.ods\" will be used.",
@@ -452,8 +628,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null

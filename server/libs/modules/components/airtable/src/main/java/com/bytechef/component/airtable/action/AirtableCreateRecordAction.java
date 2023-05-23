@@ -19,10 +19,16 @@ package com.bytechef.component.airtable.action;
 
 import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
 import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.oneOf;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
@@ -36,7 +42,7 @@ import java.util.Map;
  */
 public class AirtableCreateRecordAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("createRecord")
-        .title("Creates a record.")
+        .title("Creates a record")
         .description("Adds a record into an Airtable table.")
         .metadata(
             Map.of(
@@ -56,18 +62,18 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            object("__item").properties(object("fields").additionalProperties(oneOf())
-                .placeholder("Add")
+            object("__item").properties(object("fields").additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                .placeholder("Add to Fields")
                 .label("Fields")
                 .required(false))
+                .label("Item")
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object().properties(dateTime("createdTime").label("Created Time")
-            .required(false),
-            object("fields").additionalProperties(oneOf())
-                .placeholder("Add")
-                .label("Fields")
+        .outputSchema(object()
+            .properties(dateTime("createdTime").required(false), object("fields").additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .required(false))
             .metadata(
                 Map.of(

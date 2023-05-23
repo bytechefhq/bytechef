@@ -44,7 +44,7 @@ public class DataStorageDeleteValueFromListAction {
                 .label("Key")
                 .description("The identifier of a list to delete value from, stored earlier in the selected scope.")
                 .required(true),
-            string(SCOPE)
+            integer(SCOPE)
                 .label("Scope")
                 .description(
                     "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
@@ -58,7 +58,7 @@ public class DataStorageDeleteValueFromListAction {
         .execute(DataStorageDeleteValueFromListAction::execute);
 
     protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
-        System.out.println(actionContext.toString());
+        // TODO
 
         return null;
     }

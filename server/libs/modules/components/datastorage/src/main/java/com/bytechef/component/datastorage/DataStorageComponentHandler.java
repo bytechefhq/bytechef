@@ -22,7 +22,7 @@ import com.bytechef.component.datastorage.action.DataStorageAtomicIncrementActio
 import com.bytechef.component.datastorage.action.DataStorageAwaitGetValueAction;
 import com.bytechef.component.datastorage.action.DataStorageDeleteValueAction;
 import com.bytechef.component.datastorage.action.DataStorageDeleteValueFromListAction;
-import com.bytechef.component.datastorage.action.DataStorageGetAllKeysAction;
+import com.bytechef.component.datastorage.action.DataStorageGetAllEntriesAction;
 import com.bytechef.component.datastorage.action.DataStorageGetValueAction;
 import com.bytechef.component.datastorage.action.DataStorageSetValueInListAction;
 import com.bytechef.component.datastorage.action.DataStorageSetValueAction;
@@ -47,7 +47,7 @@ public class DataStorageComponentHandler implements ComponentHandler {
             DataStorageAwaitGetValueAction.ACTION_DEFINITION,
             DataStorageDeleteValueAction.ACTION_DEFINITION,
             DataStorageDeleteValueFromListAction.ACTION_DEFINITION,
-            DataStorageGetAllKeysAction.ACTION_DEFINITION,
+            DataStorageGetAllEntriesAction.ACTION_DEFINITION,
             DataStorageGetValueAction.ACTION_DEFINITION,
             DataStorageSetValueAction.ACTION_DEFINITION,
             DataStorageSetValueInListAction.ACTION_DEFINITION);

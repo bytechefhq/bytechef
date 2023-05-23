@@ -37,13 +37,14 @@ import java.util.Map;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILENAME;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.TYPE;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.WRITE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -64,11 +65,22 @@ public class JsonFileWriteAction {
                     option("JSON Line", JsonFileTaskConstants.FileType.JSONL.name()))
                 .defaultValue(JsonFileTaskConstants.FileType.JSON.name())
                 .required(true),
-            oneOf(SOURCE)
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
+            object(SOURCE)
                 .label("Source")
-                .description("The data to write to the file.")
-                .required(true)
-                .types(array(), object()),
+                .description("The object to write to the file.")
+                .displayCondition("type === 1")
+                .required(true),
+            array(SOURCE)
+                .label("Source")
+                .description("The array to write to the file.")
+                .displayCondition("type === 2")
+                .required(true),
             string(FILENAME)
                 .label("Filename")
                 .description(

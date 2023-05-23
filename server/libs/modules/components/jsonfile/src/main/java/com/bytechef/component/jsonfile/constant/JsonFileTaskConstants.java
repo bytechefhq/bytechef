@@ -33,6 +33,7 @@ public class JsonFileTaskConstants {
     public static final String WRITE = "write";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
+    public static final String TYPE = "type";
 
     public enum FileType {
         JSON,
