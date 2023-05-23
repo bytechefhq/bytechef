@@ -28,7 +28,6 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from XML string",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -48,11 +47,12 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -64,8 +64,37 @@
     "name": "stringify",
     "properties": [ {
       "advancedOption": null,
-      "description": "The data to convert to XML string.",
+      "description": "The value type.",
       "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Type",
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "type",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "Object",
+        "value": 1
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "Array",
+        "value": 2
+      } ],
+      "optionsDataSource": null,
+      "controlType": "SELECT"
+    }, {
+      "advancedOption": null,
+      "description": "The object to convert to XML string.",
+      "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
       "label": "Source",
@@ -73,51 +102,37 @@
       "placeholder": null,
       "required": true,
       "name": "source",
-      "type": "ONE_OF",
-      "types": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "items": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "objectType": null,
-        "options": null,
-        "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      } ]
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": null,
+      "objectType": null,
+      "options": null,
+      "properties": null,
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    }, {
+      "advancedOption": null,
+      "description": "The array to convert to XML string.",
+      "displayCondition": "type === 2",
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Source",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "source",
+      "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "items": null,
+      "multipleValues": null,
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Convert to XML string",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -138,7 +153,8 @@
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

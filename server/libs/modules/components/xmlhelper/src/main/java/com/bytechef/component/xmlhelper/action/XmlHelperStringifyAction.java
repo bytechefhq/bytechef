@@ -26,11 +26,13 @@ import java.util.Map;
 
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURCE;
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.STRINGIFY;
+import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.TYPE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -41,11 +43,23 @@ public class XmlHelperStringifyAction {
     public static final ActionDefinition ACTION_DEFINITION = action(STRINGIFY)
         .title("Convert to XML string")
         .description("Writes the object/array to a XML string.")
-        .properties(oneOf(SOURCE)
-            .label("Source")
-            .description("The data to convert to XML string.")
-            .required(true)
-            .types(array(), object()))
+        .properties(
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
+            object(SOURCE)
+                .label("Source")
+                .description("The object to convert to XML string.")
+                .displayCondition("type === 1")
+                .required(true),
+            array(SOURCE)
+                .label("Source")
+                .description("The array to convert to XML string.")
+                .displayCondition("type === 2")
+                .required(true))
         .outputSchema(string())
         .execute(XmlHelperStringifyAction::executeStringify);
 

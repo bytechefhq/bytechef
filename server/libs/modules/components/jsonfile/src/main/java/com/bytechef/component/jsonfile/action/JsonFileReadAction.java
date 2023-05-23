@@ -21,6 +21,7 @@ import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
@@ -44,11 +45,9 @@ import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAT
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.READ;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -94,9 +93,7 @@ public class JsonFileReadAction {
                 .description("The page number to get.")
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
-        .outputSchema(
-            array().displayCondition("%s === true".formatted(IS_ARRAY)),
-            object().displayCondition("%s === false".formatted(IS_ARRAY)))
+        .outputSchema(getOutputSchemaFunction())
         .execute(JsonFileReadAction::executeRead);
 
     @SuppressWarnings("unchecked")
@@ -162,5 +159,10 @@ public class JsonFileReadAction {
         String fileType = MapValueUtils.getString(inputParameters, FILE_TYPE, FileType.JSON.name());
 
         return FileType.valueOf(fileType.toUpperCase());
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

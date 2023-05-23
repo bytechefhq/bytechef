@@ -20,47 +20,153 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
 
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FROM;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.MAPPINGS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 /**
  * @author Ivica Cardic
  */
 public class DataMapperMapValuesAction {
 
-    private static final String INPUT = "input";
-    private static final String MAPPINGS = "mappings";
-
     public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapValues")
         .title("Map values")
         .description(
-            "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and updated values.")
+            "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and mapped values.")
         .properties(
-            oneOf(INPUT)
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
+            object(INPUT)
                 .label("Input")
-                .description("Object containing one or more properties.")
-                .types(object(), array())
+                .description("The object to map.")
+                .displayCondition("type === 1"),
+            array(INPUT)
+                .label("Input")
+                .description("The array of values to map.")
+                .displayCondition("type === 2")
                 .required(true),
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "Specify the necessary mappings by defining that \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
+                    "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
                 .items(
                     object().properties(
-                        string("from")
-                            .label("From"),
-                        string("to")
-                            .label("To")))
+                        array(FROM)
+                            .label("From")
+                            .displayCondition("type === 1")
+                            .required(true),
+                        bool(FROM)
+                            .label("From")
+                            .displayCondition("type === 2")
+                            .required(true),
+                        date(FROM)
+                            .label("From")
+                            .displayCondition("type === 3")
+                            .required(true),
+                        dateTime(FROM)
+                            .label("From")
+                            .displayCondition("type === 4")
+                            .required(true),
+                        integer(FROM)
+                            .label("From")
+                            .displayCondition("type === 5")
+                            .required(true),
+                        nullable(FROM)
+                            .label("From")
+                            .displayCondition("type === 6")
+                            .required(true),
+                        number(FROM)
+                            .label("From")
+                            .displayCondition("type === 7")
+                            .required(true),
+                        object(FROM)
+                            .label("From")
+                            .displayCondition("type === 8")
+                            .required(true),
+                        string(FROM)
+                            .label("From")
+                            .displayCondition("type === 9")
+                            .required(true),
+                        time(FROM)
+                            .label("From")
+                            .displayCondition("type === 10")
+                            .required(true),
+                        array(TO)
+                            .label("To")
+                            .displayCondition("type === 1")
+                            .required(true),
+                        bool(TO)
+                            .label("To")
+                            .displayCondition("type === 2")
+                            .required(true),
+                        date(TO)
+                            .label("To")
+                            .displayCondition("type === 3")
+                            .required(true),
+                        dateTime(TO)
+                            .label("To")
+                            .displayCondition("type === 4")
+                            .required(true),
+                        integer(TO)
+                            .label("To")
+                            .displayCondition("type === 5")
+                            .required(true),
+                        nullable(TO)
+                            .label("To")
+                            .displayCondition("type === 6")
+                            .required(true),
+                        number(TO)
+                            .label("To")
+                            .displayCondition("type === 7")
+                            .required(true),
+                        object(TO)
+                            .label("To")
+                            .displayCondition("type === 8")
+                            .required(true),
+                        string(TO)
+                            .label("To")
+                            .displayCondition("type === 9")
+                            .required(true),
+                        time(TO)
+                            .label("To")
+                            .displayCondition("type === 10")
+                            .required(true)))
                 .required(true))
+        .outputSchema(
+            getOutputSchemaFunction(),
+            object().displayCondition("type === 1"),
+            array().displayCondition("type === 2"))
         .execute(DataMapperMapValuesAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+        // TODO
         return null;
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

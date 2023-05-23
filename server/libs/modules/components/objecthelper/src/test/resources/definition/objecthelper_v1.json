@@ -39,10 +39,14 @@
       "placeholder": null,
       "required": null,
       "name": null,
-      "type": "ONE_OF",
-      "types": null
+      "type": "ANY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": null
     } ],
-    "outputSchemaDataSource": null,
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
     "sampleOutputDataSource": null,
     "editorDescriptionDataSource": null
   }, {
@@ -56,8 +60,37 @@
     "name": "stringify",
     "properties": [ {
       "advancedOption": null,
-      "description": "The data to convert to JSON string.",
+      "description": "The value type.",
       "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Type",
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "type",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "Object",
+        "value": 1
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "Array",
+        "value": 2
+      } ],
+      "controlType": "SELECT",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The data to convert to JSON string.",
+      "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
       "label": "Source",
@@ -65,8 +98,35 @@
       "placeholder": null,
       "required": true,
       "name": "source",
-      "type": "ONE_OF",
-      "types": null
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": null,
+      "objectType": null,
+      "options": null,
+      "properties": null,
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The data to convert to JSON string.",
+      "displayCondition": "type === 2",
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Source",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "source",
+      "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "items": null,
+      "multipleValues": null,
+      "options": null,
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Convert to JSON string",
     "outputSchema": [ {

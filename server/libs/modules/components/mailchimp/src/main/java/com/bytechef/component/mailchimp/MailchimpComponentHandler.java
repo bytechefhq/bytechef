@@ -20,12 +20,13 @@ package com.bytechef.component.mailchimp;
 import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
-import com.bytechef.hermes.definition.Property;
 import com.google.auto.service.AutoService;
 
 import java.util.List;
@@ -59,7 +60,9 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     }
 
     @Override
-    public Property<?> modifyProperty(Property<?> property) {
+    public ModifiableProperty<?, ?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?, ?> property) {
+
         if (Objects.equals(property.getName(), "listId")) {
             ((ModifiableStringProperty) property).options(MailchimpUtils.getListIdOptions());
         }
