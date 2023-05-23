@@ -75,12 +75,12 @@ public class MailchimpAddMemberToListAction {
                     .options(option("Html", "html"), option("Text", "text"))
                     .required(false),
                 object("merge_fields").additionalProperties(string())
-                    .placeholder("Add")
+                    .placeholder("Add to Merge Fields")
                     .label("Merge Fields")
                     .description("A dictionary of merge fields where the keys are the merge tags.")
                     .required(false),
                 object("interests").additionalProperties(string())
-                    .placeholder("Add")
+                    .placeholder("Add to Interests")
                     .label("Interests")
                     .description("The key of this object's properties is the ID of the interest in question.")
                     .required(false),
@@ -107,7 +107,7 @@ public class MailchimpAddMemberToListAction {
                             .description("If the subscriber has opted-in to the marketing permission.")
                             .required(false))
                         .description("The marketing permissions for the subscriber."))
-                    .placeholder("Add")
+                    .placeholder("Add to Marketing Permissions")
                     .label("Marketing Permissions")
                     .description("The marketing permissions for the subscriber.")
                     .required(false),
@@ -124,202 +124,154 @@ public class MailchimpAddMemberToListAction {
                     .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
                     .required(false),
                 array("tags").items(string().description("The tags that are associated with a member."))
-                    .placeholder("Add")
+                    .placeholder("Add to Tags")
                     .label("Tags")
                     .description("The tags that are associated with a member.")
                     .required(false))
+                .label("Item")
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object().properties(string("id").label("Id")
-            .description("The MD5 hash of the lowercase version of the list member's email address.")
-            .required(false),
-            string("email_address").label("Email Address")
-                .description("Email address for a subscriber.")
+        .outputSchema(object()
+            .properties(string("id")
+                .description("The MD5 hash of the lowercase version of the list member's email address.")
                 .required(false),
-            string("unique_email_id").label("Unique Email Id")
-                .description("An identifier for the address across all of Mailchimp.")
-                .required(false),
-            string("contact_id").label("Contact Id")
-                .description(
+                string("email_address").description("Email address for a subscriber.")
+                    .required(false),
+                string("unique_email_id").description("An identifier for the address across all of Mailchimp.")
+                    .required(false),
+                string("contact_id").description(
                     "As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address.")
-                .required(false),
-            string("full_name").label("Full Name")
-                .description("The contact's full name.")
-                .required(false),
-            string("web_id").label("Web Id")
-                .description(
+                    .required(false),
+                string("full_name").description("The contact's full name.")
+                    .required(false),
+                string("web_id").description(
                     "The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}.")
-                .required(false),
-            string("email_type").label("Email Type")
-                .description("Type of email this member asked to get ('html' or 'text').")
-                .required(false),
-            string("status").label("Status")
-                .description("Subscriber's current status.")
-                .options(option("Subscribed", "subscribed"), option("Unsubscribed", "unsubscribed"),
-                    option("Cleaned", "cleaned"), option("Pending", "pending"),
-                    option("Transactional", "transactional"))
-                .required(false),
-            string("unsubscribe_reason").label("Unsubscribe Reason")
-                .description("A subscriber's reason for unsubscribing.")
-                .required(false),
-            bool("consents_to_one_to_one_messaging").label("Consents To One To One Messaging")
-                .description("Indicates whether a contact consents to 1:1 messaging.")
-                .required(false),
-            object("merge_fields").additionalProperties(string())
-                .placeholder("Add")
-                .label("Merge Fields")
-                .description(
-                    "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.")
-                .required(false),
-            object("interests").additionalProperties(string())
-                .placeholder("Add")
-                .label("Interests")
-                .description("The key of this object's properties is the ID of the interest in question.")
-                .required(false),
-            object("stats").properties(number("avg_open_rate").label("Avg Open Rate")
-                .description("A subscriber's average open rate.")
-                .required(false),
-                number("avg_click_rate").label("Avg Click Rate")
-                    .description("A subscriber's average clickthrough rate.")
                     .required(false),
-                object("ecommerce_data").properties(number("total_revenue").label("Total Revenue")
-                    .description("The total revenue the list member has brought in.")
+                string("email_type").description("Type of email this member asked to get ('html' or 'text').")
                     .required(false),
-                    number("number_of_orders").label("Number Of Orders")
-                        .description("The total number of orders placed by the list member.")
-                        .required(false),
-                    string("currency_code").label("Currency Code")
-                        .description("The three-letter ISO 4217 code for the currency that the store accepts.")
-                        .required(false))
-                    .label("Ecommerce Data")
-                    .description("Ecommerce stats for the list member if the list is attached to a store.")
-                    .required(false))
-                .label("Stats")
-                .description("Open and click rates for this subscriber.")
-                .required(false),
-            string("ip_signup").label("Ip Signup")
-                .description("IP address the subscriber signed up from.")
-                .required(false),
-            string("timestamp_signup").label("Timestamp Signup")
-                .description("The date and time the subscriber signed up for the list in ISO 8601 format.")
-                .required(false),
-            string("ip_opt").label("Ip Opt")
-                .description("The IP address the subscriber used to confirm their opt-in status.")
-                .required(false),
-            string("timestamp_opt").label("Timestamp Opt")
-                .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
-                .required(false),
-            integer("member_rating").label("Member Rating")
-                .description("Star rating for this member, between 1 and 5.")
-                .required(false),
-            string("last_changed").label("Last Changed")
-                .description("The date and time the member's info was last changed in ISO 8601 format.")
-                .required(false),
-            string("language").label("Language")
-                .description("If set/detected, the subscriber's language.")
-                .required(false),
-            bool("vip").label("Vip")
-                .description("VIP status for subscriber.")
-                .required(false),
-            string("email_client").label("Email Client")
-                .description("The list member's email client.")
-                .required(false),
-            object("location").properties(number("latitude").label("Latitude")
-                .description("The location latitude.")
-                .required(false),
-                number("longitude").label("Longitude")
-                    .description("The location longitude.")
+                string("status").description("Subscriber's current status.")
+                    .options(option("Subscribed", "subscribed"), option("Unsubscribed", "unsubscribed"),
+                        option("Cleaned", "cleaned"), option("Pending", "pending"),
+                        option("Transactional", "transactional"))
                     .required(false),
-                integer("gmtoff").label("Gmtoff")
-                    .description("The time difference in hours from GMT.")
+                string("unsubscribe_reason").description("A subscriber's reason for unsubscribing.")
                     .required(false),
-                integer("dstoff").label("Dstoff")
-                    .description("The offset for timezones where daylight saving time is observed.")
+                bool("consents_to_one_to_one_messaging")
+                    .description("Indicates whether a contact consents to 1:1 messaging.")
                     .required(false),
-                string("country_code").label("Country Code")
-                    .description("The unique code for the location country.")
-                    .required(false),
-                string("timezone").label("Timezone")
-                    .description("The timezone for the location.")
-                    .required(false),
-                string("region").label("Region")
-                    .description("The region for the location.")
-                    .required(false))
-                .label("Location")
-                .description("Subscriber location information.")
-                .required(false),
-            array("marketing_permissions")
-                .items(object().properties(string("marketing_permission_id").label("Marketing Permission Id")
-                    .description("The id for the marketing permission on the list")
-                    .required(false),
-                    string("text").label("Text")
-                        .description("The text of the marketing permission.")
-                        .required(false),
-                    bool("enabled").label("Enabled")
-                        .description("If the subscriber has opted-in to the marketing permission.")
-                        .required(false))
-                    .description("The marketing permissions for the subscriber."))
-                .placeholder("Add")
-                .label("Marketing Permissions")
-                .description("The marketing permissions for the subscriber.")
-                .required(false),
-            object("last_note").properties(integer("note_id").label("Note Id")
-                .description("The note id.")
-                .required(false),
-                string("created_at").label("Created At")
-                    .description("The date and time the note was created in ISO 8601 format.")
-                    .required(false),
-                string("created_by").label("Created By")
-                    .description("The author of the note.")
-                    .required(false),
-                string("note").label("Note")
-                    .description("The content of the note.")
-                    .required(false))
-                .label("Last Note")
-                .description("The most recent Note added about this member.")
-                .required(false),
-            string("source").label("Source")
-                .description("The source from which the subscriber was added to this list.")
-                .required(false),
-            integer("tags_count").label("Tags Count")
-                .description("The number of tags applied to this member.")
-                .required(false),
-            object("tags").properties(integer("id").label("Id")
-                .description("The tag id.")
-                .required(false),
-                string("name").label("Name")
-                    .description("The name of the tag.")
-                    .required(false))
-                .label("Tags")
-                .description("Returns up to 50 tags applied to this member.")
-                .required(false),
-            string("list_id").label("List Id")
-                .description("The list id.")
-                .required(false),
-            array("_links").items(object().properties(string("rel").label("Rel")
-                .description("As with an HTML 'rel' attribute, this describes the type of link.")
-                .required(false),
-                string("href").label("Href")
+                object("merge_fields").additionalProperties(string())
                     .description(
+                        "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.")
+                    .required(false),
+                object("interests").additionalProperties(string())
+                    .description("The key of this object's properties is the ID of the interest in question.")
+                    .required(false),
+                object("stats").properties(number("avg_open_rate").description("A subscriber's average open rate.")
+                    .required(false),
+                    number("avg_click_rate").description("A subscriber's average clickthrough rate.")
+                        .required(false),
+                    object("ecommerce_data").properties(
+                        number("total_revenue").description("The total revenue the list member has brought in.")
+                            .required(false),
+                        number("number_of_orders").description("The total number of orders placed by the list member.")
+                            .required(false),
+                        string("currency_code")
+                            .description("The three-letter ISO 4217 code for the currency that the store accepts.")
+                            .required(false))
+                        .description("Ecommerce stats for the list member if the list is attached to a store.")
+                        .required(false))
+                    .description("Open and click rates for this subscriber.")
+                    .required(false),
+                string("ip_signup").description("IP address the subscriber signed up from.")
+                    .required(false),
+                string("timestamp_signup")
+                    .description("The date and time the subscriber signed up for the list in ISO 8601 format.")
+                    .required(false),
+                string("ip_opt").description("The IP address the subscriber used to confirm their opt-in status.")
+                    .required(false),
+                string("timestamp_opt")
+                    .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
+                    .required(false),
+                integer("member_rating").description("Star rating for this member, between 1 and 5.")
+                    .required(false),
+                string("last_changed")
+                    .description("The date and time the member's info was last changed in ISO 8601 format.")
+                    .required(false),
+                string("language").description("If set/detected, the subscriber's language.")
+                    .required(false),
+                bool("vip").description("VIP status for subscriber.")
+                    .required(false),
+                string("email_client").description("The list member's email client.")
+                    .required(false),
+                object("location").properties(number("latitude").description("The location latitude.")
+                    .required(false),
+                    number("longitude").description("The location longitude.")
+                        .required(false),
+                    integer("gmtoff").description("The time difference in hours from GMT.")
+                        .required(false),
+                    integer("dstoff").description("The offset for timezones where daylight saving time is observed.")
+                        .required(false),
+                    string("country_code").description("The unique code for the location country.")
+                        .required(false),
+                    string("timezone").description("The timezone for the location.")
+                        .required(false),
+                    string("region").description("The region for the location.")
+                        .required(false))
+                    .description("Subscriber location information.")
+                    .required(false),
+                array("marketing_permissions")
+                    .items(object().properties(
+                        string("marketing_permission_id").description("The id for the marketing permission on the list")
+                            .required(false),
+                        string("text").description("The text of the marketing permission.")
+                            .required(false),
+                        bool("enabled").description("If the subscriber has opted-in to the marketing permission.")
+                            .required(false))
+                        .description("The marketing permissions for the subscriber."))
+                    .description("The marketing permissions for the subscriber.")
+                    .required(false),
+                object("last_note").properties(integer("note_id").description("The note id.")
+                    .required(false),
+                    string("created_at").description("The date and time the note was created in ISO 8601 format.")
+                        .required(false),
+                    string("created_by").description("The author of the note.")
+                        .required(false),
+                    string("note").description("The content of the note.")
+                        .required(false))
+                    .description("The most recent Note added about this member.")
+                    .required(false),
+                string("source").description("The source from which the subscriber was added to this list.")
+                    .required(false),
+                integer("tags_count").description("The number of tags applied to this member.")
+                    .required(false),
+                object("tags").properties(integer("id").description("The tag id.")
+                    .required(false),
+                    string("name").description("The name of the tag.")
+                        .required(false))
+                    .description("Returns up to 50 tags applied to this member.")
+                    .required(false),
+                string("list_id").description("The list id.")
+                    .required(false),
+                array("_links").items(object().properties(string("rel")
+                    .description("As with an HTML 'rel' attribute, this describes the type of link.")
+                    .required(false),
+                    string("href").description(
                         "This property contains a fully-qualified URL that can be called to retrieve the linked resource or perform the linked action.")
-                    .required(false),
-                string("method").label("Method")
-                    .description(
+                        .required(false),
+                    string("method").description(
                         "The HTTP method that should be used when accessing the URL defined in 'href'. Possible values: \"GET\", \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\", or \"HEAD\".")
-                    .required(false),
-                string("targetSchema").label("Target Schema")
-                    .description("For GETs, this is a URL representing the schema that the response should conform to.")
-                    .required(false),
-                string("schema").label("Schema")
-                    .description(
+                        .required(false),
+                    string("targetSchema")
+                        .description(
+                            "For GETs, this is a URL representing the schema that the response should conform to.")
+                        .required(false),
+                    string("schema").description(
                         "For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to.")
+                        .required(false))
+                    .description("A list of link types and descriptions for the API schema documents."))
+                    .description("A list of link types and descriptions for the API schema documents.")
                     .required(false))
-                .description("A list of link types and descriptions for the API schema documents."))
-                .placeholder("Add")
-                .label("Links")
-                .description("A list of link types and descriptions for the API schema documents.")
-                .required(false))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))

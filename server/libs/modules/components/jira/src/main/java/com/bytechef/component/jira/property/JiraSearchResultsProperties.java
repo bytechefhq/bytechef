@@ -31,7 +31,7 @@ import java.util.List;
  * @generated
  */
 public class JiraSearchResultsProperties {
-    public static final List<Property> PROPERTIES = List.of(string("expand").label("Expand")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("expand").label("Expand")
         .description("Expand options that include additional search result details in the response.")
         .required(false),
         integer("startAt").label("Start At")
@@ -45,22 +45,22 @@ public class JiraSearchResultsProperties {
             .required(false),
         array("issues").items(object().properties(JiraIssueBeanProperties.PROPERTIES)
             .description("Details about an issue."))
-            .placeholder("Add")
+            .placeholder("Add to Issues")
             .label("Issues")
             .description("The list of issues found by the search.")
             .required(false),
         array("warningMessages").items(string().description("Any warnings related to the JQL query."))
-            .placeholder("Add")
+            .placeholder("Add to Warning Messages")
             .label("Warning Messages")
             .description("Any warnings related to the JQL query.")
             .required(false),
         object("names").additionalProperties(string())
-            .placeholder("Add")
+            .placeholder("Add to Names")
             .label("Names")
             .description("The ID and name of each field in the search results.")
             .required(false),
         object("schema").additionalProperties(object().properties(JiraJsonTypeBeanProperties.PROPERTIES))
-            .placeholder("Add")
+            .placeholder("Add to Schema")
             .label("Schema")
             .description("The schema describing the field types in the search results.")
             .required(false));

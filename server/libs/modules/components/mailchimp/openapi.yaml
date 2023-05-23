@@ -8,7 +8,7 @@ paths:
   /lists/{listId}/members:
     post:
       description: "Add a new member to the list."
-      summary: "Add a new member to the list."
+      summary: "Add a new member to the list"
       tags:
       - "Members"
       operationId: "addMemberToList"

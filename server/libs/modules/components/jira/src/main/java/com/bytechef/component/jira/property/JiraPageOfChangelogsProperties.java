@@ -30,7 +30,7 @@ import java.util.List;
  * @generated
  */
 public class JiraPageOfChangelogsProperties {
-    public static final List<Property> PROPERTIES = List.of(integer("startAt").label("Start At")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(integer("startAt").label("Start At")
         .description("The index of the first item returned on the page.")
         .required(false),
         integer("maxResults").label("Max Results")
@@ -41,7 +41,7 @@ public class JiraPageOfChangelogsProperties {
             .required(false),
         array("histories").items(object().properties(JiraChangelogProperties.PROPERTIES)
             .description("A changelog."))
-            .placeholder("Add")
+            .placeholder("Add to Histories")
             .label("Histories")
             .description("The list of changelogs.")
             .required(false));

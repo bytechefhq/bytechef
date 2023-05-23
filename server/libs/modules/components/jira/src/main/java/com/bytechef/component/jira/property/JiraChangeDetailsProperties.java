@@ -28,7 +28,7 @@ import java.util.List;
  * @generated
  */
 public class JiraChangeDetailsProperties {
-    public static final List<Property> PROPERTIES = List.of(string("field").label("Field")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("field").label("Field")
         .description("The name of the field changed.")
         .required(false),
         string("fieldtype").label("Fieldtype")

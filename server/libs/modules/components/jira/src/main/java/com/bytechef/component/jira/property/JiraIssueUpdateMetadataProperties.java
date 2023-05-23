@@ -28,9 +28,9 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueUpdateMetadataProperties {
-    public static final List<Property> PROPERTIES =
+    public static final List<Property.ValueProperty<?>> PROPERTIES =
         List.of(object("fields").additionalProperties(object().properties(JiraFieldMetadataProperties.PROPERTIES))
-            .placeholder("Add")
+            .placeholder("Add to Fields")
             .label("Fields")
             .required(false));
 }
