@@ -2,8 +2,9 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -27,8 +28,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NullProperty", description = "A null property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
-public class NullPropertyModel extends PropertyModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:33:56.395888+02:00[Europe/Zagreb]")
+public class NullPropertyModel extends ValuePropertyModel {
+
+  public NullPropertyModel controlType(ControlTypeModel controlType) {
+    super.setControlType(controlType);
+    return this;
+  }
+
+  public NullPropertyModel defaultValue(Object defaultValue) {
+    super.setDefaultValue(defaultValue);
+    return this;
+  }
+
+  public NullPropertyModel exampleValue(Object exampleValue) {
+    super.setExampleValue(exampleValue);
+    return this;
+  }
 
   public NullPropertyModel advancedOption(Boolean advancedOption) {
     super.setAdvancedOption(advancedOption);

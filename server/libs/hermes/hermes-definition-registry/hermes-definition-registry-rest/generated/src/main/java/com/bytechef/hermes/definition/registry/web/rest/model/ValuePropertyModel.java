@@ -33,6 +33,7 @@ import jakarta.annotation.Generated;
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
+  @JsonSubTypes.Type(value = AnyPropertyModel.class, name = "ANY"),
   @JsonSubTypes.Type(value = ArrayPropertyModel.class, name = "ARRAY"),
   @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BOOLEAN"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
@@ -42,12 +43,11 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = NullPropertyModel.class, name = "NULL"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
-  @JsonSubTypes.Type(value = OneOfPropertyModel.class, name = "ONE_OF"),
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING"),
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TimeProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:33:56.395888+02:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
