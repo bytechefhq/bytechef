@@ -33,31 +33,31 @@ import {
 } from './ValuePropertyModel';
 
 /**
- * A null property type.
+ * An any of property type.
  * @export
- * @interface NullPropertyModel
+ * @interface AnyPropertyModel
  */
-export interface NullPropertyModel extends ValuePropertyModel {
+export interface AnyPropertyModel extends ValuePropertyModel {
 }
 
 /**
- * Check if a given object implements the NullPropertyModel interface.
+ * Check if a given object implements the AnyPropertyModel interface.
  */
-export function instanceOfNullPropertyModel(value: object): boolean {
+export function instanceOfAnyPropertyModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function NullPropertyModelFromJSON(json: any): NullPropertyModel {
-    return NullPropertyModelFromJSONTyped(json, false);
+export function AnyPropertyModelFromJSON(json: any): AnyPropertyModel {
+    return AnyPropertyModelFromJSONTyped(json, false);
 }
 
-export function NullPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): NullPropertyModel {
+export function AnyPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): AnyPropertyModel {
     return json;
 }
 
-export function NullPropertyModelToJSON(value?: NullPropertyModel | null): any {
+export function AnyPropertyModelToJSON(value?: AnyPropertyModel | null): any {
     return value;
 }
 

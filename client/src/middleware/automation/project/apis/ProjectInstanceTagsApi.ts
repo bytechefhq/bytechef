@@ -29,7 +29,7 @@ export class ProjectInstanceTagsApi extends runtime.BaseAPI {
 
     /**
      * Get project instance tags.
-     * Get project instance tags.
+     * Get project instance tags
      */
     async getProjectInstanceTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
         const queryParameters: any = {};
@@ -48,7 +48,7 @@ export class ProjectInstanceTagsApi extends runtime.BaseAPI {
 
     /**
      * Get project instance tags.
-     * Get project instance tags.
+     * Get project instance tags
      */
     async getProjectInstanceTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
         const response = await this.getProjectInstanceTagsRaw(initOverrides);

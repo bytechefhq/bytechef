@@ -29,7 +29,7 @@ export class Oauth2Api extends runtime.BaseAPI {
 
     /**
      * Get OAuth2 properties.
-     * Get OAuth2 properties.
+     * Get OAuth2 properties
      */
     async getOAuth2PropertiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2PropertiesModel>> {
         const queryParameters: any = {};
@@ -48,7 +48,7 @@ export class Oauth2Api extends runtime.BaseAPI {
 
     /**
      * Get OAuth2 properties.
-     * Get OAuth2 properties.
+     * Get OAuth2 properties
      */
     async getOAuth2Properties(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2PropertiesModel> {
         const response = await this.getOAuth2PropertiesRaw(initOverrides);

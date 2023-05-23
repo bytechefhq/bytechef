@@ -29,7 +29,7 @@ export class IntegrationTagsApi extends runtime.BaseAPI {
 
     /**
      * Get integration tags.
-     * Get integration tags.
+     * Get integration tags
      */
     async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
         const queryParameters: any = {};
@@ -48,7 +48,7 @@ export class IntegrationTagsApi extends runtime.BaseAPI {
 
     /**
      * Get integration tags.
-     * Get integration tags.
+     * Get integration tags
      */
     async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
         const response = await this.getIntegrationTagsRaw(initOverrides);
