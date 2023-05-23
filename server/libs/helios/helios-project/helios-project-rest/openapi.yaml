@@ -22,7 +22,7 @@ paths:
   /project-categories:
     get:
       description: "Get categories."
-      summary: "Get categories."
+      summary: "Get categories"
       tags:
       - "project-categories"
       operationId: "getProjectCategories"
@@ -39,7 +39,7 @@ paths:
   /workflow-executions:
     get:
       description: "Get workflow executions."
-      summary: "Get workflow executions."
+      summary: "Get workflow executions"
       tags:
       - "workflow-executions"
       operationId: "getWorkflowExecutions"
@@ -108,7 +108,7 @@ paths:
   /workflow-executions/{id}:
     get:
       description: "Get workflow execution by id."
-      summary: "Get workflow executions by id."
+      summary: "Get workflow executions by id"
       tags:
       - "workflow-executions"
       operationId: "getWorkflowExecution"
@@ -130,7 +130,7 @@ paths:
   /project-instance-tags:
     get:
       description: "Get project instance tags."
-      summary: "Get project instance tags."
+      summary: "Get project instance tags"
       tags:
       - "project-instance-tags"
       operationId: "getProjectInstanceTags"
@@ -147,7 +147,7 @@ paths:
   /project-instances/{id}:
     delete:
       description: "Delete a project instance."
-      summary: "Delete a project instance."
+      summary: "Delete a project instance"
       tags:
       - "project-instances"
       operationId: "deleteProjectInstance"
@@ -164,7 +164,7 @@ paths:
           description: "Successful operation."
     get:
       description: "Get a project instance by id."
-      summary: "Get a project instance by id."
+      summary: "Get a project instance by id"
       tags:
       - "project-instances"
       operationId: "getProjectInstance"
@@ -185,7 +185,7 @@ paths:
                 $ref: "#/components/schemas/ProjectInstance"
     put:
       description: "Update an existing project instance."
-      summary: "Update an existing project instance."
+      summary: "Update an existing project instance"
       tags:
       - "project-instances"
       operationId: "updateProjectInstance"
@@ -213,7 +213,7 @@ paths:
   /project-instances/{id}/enable/{enable}:
     post:
       description: "Enable/disable a project instance."
-      summary: "Enable/disable a project instance."
+      summary: "Enable/disable a project instance"
       tags:
       - "project-instances"
       operationId: "enableProjectInstance"
@@ -237,7 +237,7 @@ paths:
   /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
     post:
       description: "Enable/disable a workflow of a project instance."
-      summary: "Enable/disable a workflow of a project instance."
+      summary: "Enable/disable a workflow of a project instance"
       tags:
       - "project-instances"
       operationId: "enableProjectInstanceWorkflow"
@@ -267,7 +267,7 @@ paths:
   /project-instances/{id}/jobs:
     post:
       description: "Create a request for running a new job."
-      summary: "Create a request for running a new job."
+      summary: "Create a request for running a new job"
       tags:
       - "project-instances"
       operationId: "createProjectInstanceJob"
@@ -304,7 +304,7 @@ paths:
   /project-instances/{id}/tags:
     put:
       description: "Updates tags of an existing project instance."
-      summary: "Updates tags of an existing project instance."
+      summary: "Updates tags of an existing project instance"
       tags:
       - "project-instances"
       operationId: "updateProjectInstanceTags"
@@ -328,7 +328,7 @@ paths:
   /project-instances:
     get:
       description: "Get project instances."
-      summary: "Get project instances."
+      summary: "Get project instances"
       tags:
       - "project-instances"
       operationId: "getProjectInstances"
@@ -362,7 +362,7 @@ paths:
                   $ref: "#/components/schemas/ProjectInstance"
     post:
       description: "Create a new project instance."
-      summary: "Create a new project instance."
+      summary: "Create a new project instance"
       tags:
       - "project-instances"
       operationId: "createProjectInstance"

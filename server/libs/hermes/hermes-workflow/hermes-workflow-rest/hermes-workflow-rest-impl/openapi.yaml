@@ -16,7 +16,7 @@ paths:
   /jobs:
     get:
       description: "Get a page of jobs."
-      summary: "Get a page of jobs."
+      summary: "Get a page of jobs"
       tags:
       - "jobs"
       operationId: "getJobs"
@@ -38,7 +38,7 @@ paths:
                 $ref: "#/components/schemas/Page"
     post:
       description: "Create a request for running a new job."
-      summary: "Create a request for running a new job."
+      summary: "Create a request for running a new job"
       tags:
       - "jobs"
       operationId: "createJob"
@@ -65,7 +65,7 @@ paths:
   /jobs/latest:
     get:
       description: "Get the latest job."
-      summary: "Get the latest job."
+      summary: "Get the latest job"
       tags:
       - "jobs"
       operationId: "getLatestJob"
@@ -79,7 +79,7 @@ paths:
   /jobs/{id}:
     get:
       description: "Get a job by id."
-      summary: "Get a job by id."
+      summary: "Get a job by id"
       tags:
       - "jobs"
       operationId: "getJob"
@@ -101,7 +101,7 @@ paths:
   /jobs/{id}/restart:
     put:
       description: "Restart a job."
-      summary: "Restart a job."
+      summary: "Restart a job"
       tags:
       - "jobs"
       operationId: "restartJob"
@@ -119,7 +119,7 @@ paths:
   /jobs/{id}/stop:
     put:
       description: "Stop a job."
-      summary: "Stop a job."
+      summary: "Stop a job"
       tags:
       - "jobs"
       operationId: "stopJob"
@@ -137,7 +137,7 @@ paths:
   /jobs/{id}/task-executions:
     get:
       description: "Get task executions of a job."
-      summary: "Get task executions of a job."
+      summary: "Get task executions of a job"
       tags:
       - "jobs"
       operationId: "getJobTaskExecutions"
@@ -161,7 +161,7 @@ paths:
   /task-executions/{id}:
     get:
       description: "Get a task execution by id."
-      summary: "Get a task execution by id."
+      summary: "Get a task execution by id"
       tags:
       - "task-executions"
       operationId: "getTaskExecution"
@@ -183,7 +183,7 @@ paths:
   /workflows:
     get:
       description: "Get workflow definitions."
-      summary: "Get workflow definitions."
+      summary: "Get workflow definitions"
       tags:
       - "workflows"
       operationId: "getWorkflows"
@@ -198,7 +198,7 @@ paths:
                   $ref: "#/components/schemas/Workflow"
     post:
       description: "Create a new workflow."
-      summary: "Create a new workflow."
+      summary: "Create a new workflow"
       tags:
       - "workflows"
       operationId: "createWorkflow"
@@ -219,7 +219,7 @@ paths:
   /workflows/{id}:
     delete:
       description: "Delete a workflow."
-      summary: "Delete a workflow."
+      summary: "Delete a workflow"
       tags:
       - "workflows"
       operationId: "deleteWorkflow"
@@ -235,7 +235,7 @@ paths:
           description: "Successful operation."
     get:
       description: "Get a workflow by id."
-      summary: "Get a workflow by id."
+      summary: "Get a workflow by id"
       tags:
       - "workflows"
       operationId: "getWorkflow"
@@ -255,7 +255,7 @@ paths:
                 $ref: "#/components/schemas/Workflow"
     put:
       description: "Update an existing workflow."
-      summary: "Update an existing workflow."
+      summary: "Update an existing workflow"
       tags:
       - "workflows"
       operationId: "updateWorkflow"
@@ -283,7 +283,7 @@ paths:
   /workflows/{id}/tests:
     post:
       description: "Execute a workflow synchronously for testing purposes."
-      summary: "Execute a workflow synchronously for testing purpose."
+      summary: "Execute a workflow synchronously for testing purpose"
       tags:
       - "workflows"
       operationId: "testWorkflow"
