@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +50,8 @@ public final class JsonMapper implements JsonUtils.JsonMapper {
 
             registerModule(new JavaTimeModule());
             registerModule(new Jdk8Module());
+
+            setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
     };
 

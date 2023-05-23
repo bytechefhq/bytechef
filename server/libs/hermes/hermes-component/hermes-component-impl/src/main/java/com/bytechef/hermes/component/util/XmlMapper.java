@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -50,7 +51,11 @@ public final class XmlMapper implements XmlUtils.XmlMapper {
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
 
     private static final com.fasterxml.jackson.dataformat.xml.XmlMapper xmlMapper =
-        new com.fasterxml.jackson.dataformat.xml.XmlMapper();
+        new com.fasterxml.jackson.dataformat.xml.XmlMapper() {
+            {
+                setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            }
+        };
 
     @Override
     public Map<String, ?> read(InputStream inputStream) {
