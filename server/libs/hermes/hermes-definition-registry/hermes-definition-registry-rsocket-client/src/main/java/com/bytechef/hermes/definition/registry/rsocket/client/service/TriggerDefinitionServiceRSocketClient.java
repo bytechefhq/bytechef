@@ -18,9 +18,9 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.reactor.util.MonoUtils;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.rsocket.client.AbstractRSocketClient;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -118,7 +118,7 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
     }
 
     @Override
-    public List<Option<?>> executeOptions(
+    public List<OptionDTO> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -126,7 +126,7 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
     }
 
     @Override
-    public List<? extends Property<?>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -134,7 +134,7 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
     }
 
     @Override
-    public List<? extends Property<?>> executeDynamicProperties(
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 

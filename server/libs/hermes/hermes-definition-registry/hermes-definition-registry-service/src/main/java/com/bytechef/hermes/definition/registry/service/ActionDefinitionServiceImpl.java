@@ -29,16 +29,17 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<? extends Property<?>> executeDynamicProperties(
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -78,7 +79,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters);
+            actionParameters)
+            .stream()
+            .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
+            .toList();
     }
 
     @Override
@@ -105,7 +109,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<Option<?>> executeOptions(
+    public List<OptionDTO> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -119,11 +123,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters);
+            actionParameters)
+            .stream()
+            .map(OptionDTO::new)
+            .toList();
     }
 
     @Override
-    public List<? extends Property<?>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -137,7 +144,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return outputSchemaFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters);
+            actionParameters)
+            .stream()
+            .map(outputProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(outputProperty))
+            .toList();
     }
 
     @Override

@@ -17,15 +17,15 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.AnyProperty;
 
 /**
  * @author Ivica Cardic
  */
-public class NullPropertyDTO extends ValuePropertyDTO<Void> {
+public class AnyPropertyDTO extends ValuePropertyDTO<Object> {
 
-    public NullPropertyDTO(Property.NullProperty nullProperty) {
-        super(nullProperty);
+    public AnyPropertyDTO(AnyProperty anyProperty) {
+        super(anyProperty);
     }
 
     @Override

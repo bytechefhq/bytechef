@@ -46,7 +46,8 @@ public record ActionDefinitionDTO(
                 actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
             getHelp(actionDefinition.getHelp()), actionDefinition.getName(),
             CollectionUtils.map(
-                OptionalUtils.orElse(actionDefinition.getOutputSchema(), List.of()), PropertyDTO::toPropertyDTO),
+                OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList()),
+                PropertyDTO::toPropertyDTO),
             OptionalUtils.mapOrElse(
                 actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
             CollectionUtils.map(

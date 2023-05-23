@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 
 import com.bytechef.commons.reactor.util.MonoUtils;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.rsocket.client.AbstractRSocketClient;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -54,7 +54,7 @@ public class ActionDefinitionFacadeRSocketClient extends AbstractRSocketClient i
     }
 
     @Override
-    public List<Option<?>> executeOptions(
+    public List<OptionDTO> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
@@ -68,7 +68,7 @@ public class ActionDefinitionFacadeRSocketClient extends AbstractRSocketClient i
     }
 
     @Override
-    public List<? extends Property<?>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
@@ -81,7 +81,7 @@ public class ActionDefinitionFacadeRSocketClient extends AbstractRSocketClient i
     }
 
     @Override
-    public List<? extends Property<?>> executeDynamicProperties(
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
