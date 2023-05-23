@@ -2,8 +2,9 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -11,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.ArrayList;
-import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -24,91 +23,75 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A one of property type.
+ * An any of property type.
  */
 
-@Schema(name = "OneOfProperty", description = "A one of property type.")
+@Schema(name = "AnyProperty", description = "An any of property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
-public class OneOfPropertyModel extends PropertyModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:33:56.395888+02:00[Europe/Zagreb]")
+public class AnyPropertyModel extends ValuePropertyModel {
 
-  @Valid
-  private List<@Valid PropertyModel> types;
-
-  public OneOfPropertyModel types(List<@Valid PropertyModel> types) {
-    this.types = types;
+  public AnyPropertyModel controlType(ControlTypeModel controlType) {
+    super.setControlType(controlType);
     return this;
   }
 
-  public OneOfPropertyModel addTypesItem(PropertyModel typesItem) {
-    if (this.types == null) {
-      this.types = new ArrayList<>();
-    }
-    this.types.add(typesItem);
+  public AnyPropertyModel defaultValue(Object defaultValue) {
+    super.setDefaultValue(defaultValue);
     return this;
   }
 
-  /**
-   * Possible types of properties that can be used.
-   * @return types
-  */
-  @Valid 
-  @Schema(name = "types", description = "Possible types of properties that can be used.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("types")
-  public List<@Valid PropertyModel> getTypes() {
-    return types;
+  public AnyPropertyModel exampleValue(Object exampleValue) {
+    super.setExampleValue(exampleValue);
+    return this;
   }
 
-  public void setTypes(List<@Valid PropertyModel> types) {
-    this.types = types;
-  }
-
-  public OneOfPropertyModel advancedOption(Boolean advancedOption) {
+  public AnyPropertyModel advancedOption(Boolean advancedOption) {
     super.setAdvancedOption(advancedOption);
     return this;
   }
 
-  public OneOfPropertyModel description(String description) {
+  public AnyPropertyModel description(String description) {
     super.setDescription(description);
     return this;
   }
 
-  public OneOfPropertyModel displayCondition(String displayCondition) {
+  public AnyPropertyModel displayCondition(String displayCondition) {
     super.setDisplayCondition(displayCondition);
     return this;
   }
 
-  public OneOfPropertyModel expressionEnabled(Boolean expressionEnabled) {
+  public AnyPropertyModel expressionEnabled(Boolean expressionEnabled) {
     super.setExpressionEnabled(expressionEnabled);
     return this;
   }
 
-  public OneOfPropertyModel hidden(Boolean hidden) {
+  public AnyPropertyModel hidden(Boolean hidden) {
     super.setHidden(hidden);
     return this;
   }
 
-  public OneOfPropertyModel label(String label) {
+  public AnyPropertyModel label(String label) {
     super.setLabel(label);
     return this;
   }
 
-  public OneOfPropertyModel name(String name) {
+  public AnyPropertyModel name(String name) {
     super.setName(name);
     return this;
   }
 
-  public OneOfPropertyModel placeholder(String placeholder) {
+  public AnyPropertyModel placeholder(String placeholder) {
     super.setPlaceholder(placeholder);
     return this;
   }
 
-  public OneOfPropertyModel required(Boolean required) {
+  public AnyPropertyModel required(Boolean required) {
     super.setRequired(required);
     return this;
   }
 
-  public OneOfPropertyModel type(PropertyTypeModel type) {
+  public AnyPropertyModel type(PropertyTypeModel type) {
     super.setType(type);
     return this;
   }
@@ -121,22 +104,19 @@ public class OneOfPropertyModel extends PropertyModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OneOfPropertyModel oneOfProperty = (OneOfPropertyModel) o;
-    return Objects.equals(this.types, oneOfProperty.types) &&
-        super.equals(o);
+    return true;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(types, super.hashCode());
+    return Objects.hash(super.hashCode());
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OneOfPropertyModel {\n");
+    sb.append("class AnyPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    types: ").append(toIndentedString(types)).append("\n");
     sb.append("}");
     return sb.toString();
   }
