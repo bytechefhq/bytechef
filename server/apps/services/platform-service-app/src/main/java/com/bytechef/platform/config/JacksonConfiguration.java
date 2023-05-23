@@ -17,10 +17,9 @@
 
 package com.bytechef.platform.config;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,7 +40,7 @@ public class JacksonConfiguration {
     }
 
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
-        return builder -> builder.featuresToDisable(SerializationFeature.INDENT_OUTPUT);
+    JsonNullableModule jsonNullableModule() {
+        return new JsonNullableModule();
     }
 }
