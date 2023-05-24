@@ -54,7 +54,7 @@ const DatePicker = ({
                     placeholderText={placeholder}
                     previousMonthButtonLabel="<"
                     popperClassName="react-datepicker-left"
-                    popperPlacement={'bottom-start'}
+                    popperPlacement="bottom-start"
                     renderCustomHeader={(props) => <Header {...props} />}
                     selected={date}
                     onChange={(date) => {

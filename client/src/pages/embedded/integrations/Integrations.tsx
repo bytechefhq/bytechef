@@ -82,7 +82,7 @@ const Integrations = () => {
                                         });
                                     },
                                 }}
-                                toLink={''}
+                                toLink=""
                             />
 
                             {!categoriesLoading &&

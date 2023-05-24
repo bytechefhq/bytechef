@@ -29,7 +29,7 @@ function renderApp() {
 
                 <ReactQueryDevtools
                     initialIsOpen={false}
-                    position={'bottom-right'}
+                    position="bottom-right"
                 />
             </QueryClientProvider>
         </React.StrictMode>

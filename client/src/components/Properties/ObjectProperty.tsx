@@ -17,17 +17,26 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
 
     return (
         <>
-            <ul className={twMerge('w-full', label && 'ml-4 border-l')}>
-                {properties?.map((subProperty, index) => (
-                    <Property
-                        customClassName={twMerge(
-                            'last-of-type:pb-0',
-                            label && 'mb-0 pb-4 pl-2'
-                        )}
-                        key={`${subProperty.name}_${index}`}
-                        property={subProperty}
-                    />
-                ))}
+            <ul className={twMerge(label && 'ml-2 border-l')}>
+                {(properties as PropertyType[])?.map((subProperty, index) => {
+                    if (
+                        subProperty.type === 'OBJECT' &&
+                        !subProperty.properties?.length
+                    ) {
+                        return <></>;
+                    }
+
+                    return (
+                        <Property
+                            customClassName={twMerge(
+                                'last-of-type:pb-0',
+                                label && 'mb-0 pb-4 pl-2'
+                            )}
+                            key={`${subProperty.name}_${index}`}
+                            property={subProperty}
+                        />
+                    );
+                })}
             </ul>
 
             {!!additionalProperties?.length && (
