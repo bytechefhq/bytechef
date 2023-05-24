@@ -17,7 +17,9 @@
 
 package com.bytechef.hermes.task.dispatcher.definition;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.Property.OutputProperty;
+import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -53,13 +55,13 @@ public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.Modif
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getOutputSchema();
+    Optional<List<? extends OutputProperty<?>>> getOutputSchema();
 
     /**
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getProperties();
+    Optional<List<? extends InputProperty>> getProperties();
 
     /**
      * TODO
@@ -84,5 +86,5 @@ public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.Modif
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getTaskProperties();
+    Optional<List<? extends ValueProperty<?>>> getTaskProperties();
 }
