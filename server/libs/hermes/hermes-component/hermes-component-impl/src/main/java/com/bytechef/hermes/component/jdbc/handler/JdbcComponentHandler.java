@@ -27,13 +27,17 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.DeleteJdbcOperation;
@@ -103,6 +107,11 @@ public class JdbcComponentHandler implements ComponentHandler {
         return updateJdbcOperation.execute(context, inputParameters);
     }
 
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
+    }
+
     private ComponentDefinition getComponentDefinition(String description, String name, String icon, String title) {
         return component(name)
             .description(description)
@@ -139,8 +148,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .label("Parameters")
                             .description(
                                 "The list of properties which should be used as query parameters.")
-                            .properties(bool(), dateTime(), number(), string()))
-                    .outputSchema(array().items(object().properties(integer())))
+                            .additionalProperties(bool(), dateTime(), number(), string()))
+                    .outputSchema(getOutputSchemaFunction(), any())
                     .execute(this::executeQuery),
                 action(JdbcConstants.INSERT)
                     .title("Insert")
@@ -163,8 +172,10 @@ public class JdbcComponentHandler implements ComponentHandler {
                         array(JdbcConstants.ROWS)
                             .label("Rows")
                             .description("List of rows.")
-                            .items(object().additionalProperties(oneOf())))
-                    .outputSchema(object().properties(integer()))
+                            .items(object().additionalProperties(
+                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                                string(), time())))
+                    .outputSchema(object().properties(integer("rows")))
                     .execute(this::executeInsert),
                 action(JdbcConstants.UPDATE)
                     .title("Update")
@@ -192,8 +203,10 @@ public class JdbcComponentHandler implements ComponentHandler {
                         array(JdbcConstants.ROWS)
                             .label("Rows")
                             .description("List of rows.")
-                            .items(object().additionalProperties(oneOf())))
-                    .outputSchema(object().properties(integer()))
+                            .items(object().additionalProperties(
+                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                                string(), time())))
+                    .outputSchema(object().properties(integer("rows")))
                     .execute(this::executeUpdate),
                 action(JdbcConstants.DELETE)
                     .title("Delete")
@@ -216,8 +229,10 @@ public class JdbcComponentHandler implements ComponentHandler {
                         array(JdbcConstants.ROWS)
                             .label("Rows")
                             .description("List of rows.")
-                            .items(object().additionalProperties(oneOf())))
-                    .outputSchema(object().properties(integer()))
+                            .items(object().additionalProperties(
+                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                                string(), time())))
+                    .outputSchema(object().properties(integer("rows")))
                     .execute(this::executeDelete),
                 action(JdbcConstants.EXECUTE)
                     .title("Execute")
@@ -233,13 +248,14 @@ public class JdbcComponentHandler implements ComponentHandler {
                         array(JdbcConstants.ROWS)
                             .label("Rows")
                             .description("List of rows.")
-                            .items(object().additionalProperties(oneOf())),
+                            .items(object().additionalProperties(
+                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                                string(), time())),
                         object(JdbcConstants.PARAMETERS)
                             .label("Parameters")
-                            .description(
-                                "The list of properties which should be used as parameters.")
-                            .properties(bool(), dateTime(), number(), string()))
-                    .outputSchema(object().properties(integer()))
+                            .description("The list of properties which should be used as parameters.")
+                            .additionalProperties(bool(), dateTime(), number(), string()))
+                    .outputSchema(object().properties(integer("rows")))
                     .execute(this::executeExecute));
     }
 }
