@@ -24,7 +24,10 @@ import com.bytechef.hermes.definition.Property;
  */
 public class DynamicPropertiesPropertyDTO extends PropertyDTO {
 
-    private final PropertiesDataSourceDTO propertiesDataSource;
+    private PropertiesDataSourceDTO propertiesDataSource;
+
+    private DynamicPropertiesPropertyDTO() {
+    }
 
     public DynamicPropertiesPropertyDTO(Property.DynamicPropertiesProperty property) {
         super(property);
