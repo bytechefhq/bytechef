@@ -69,8 +69,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
     public RedisMessageBrokerConfiguration(
         @Autowired(
             required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
-        RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper,
-        RedisProperties redisProperties) {
+        RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper, RedisProperties redisProperties) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList()
