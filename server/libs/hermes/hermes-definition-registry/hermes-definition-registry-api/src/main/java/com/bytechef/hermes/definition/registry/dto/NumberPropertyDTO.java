@@ -30,11 +30,14 @@ import java.util.Optional;
  */
 public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
 
-    private final Integer maxValue;
-    private final Integer minValue;
-    private final Integer numberPrecision;
-    private final List<OptionDTO> options;
-    private final OptionsDataSourceDTO optionsDataSource;
+    private Integer maxValue;
+    private Integer minValue;
+    private Integer numberPrecision;
+    private List<OptionDTO> options;
+    private OptionsDataSourceDTO optionsDataSource;
+
+    private NumberPropertyDTO() {
+    }
 
     public NumberPropertyDTO(NumberProperty numberProperty) {
         super(numberProperty);

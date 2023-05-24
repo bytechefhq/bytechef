@@ -30,12 +30,15 @@ import java.util.Optional;
  */
 public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
 
-    private final List<? extends PropertyDTO> additionalProperties;
-    private final boolean multipleValues;
-    private final String objectType;
-    private final List<OptionDTO> options;
-    private final OptionsDataSourceDTO optionsDataSource;
-    private final List<? extends PropertyDTO> properties;
+    private List<? extends PropertyDTO> additionalProperties;
+    private boolean multipleValues;
+    private String objectType;
+    private List<OptionDTO> options;
+    private OptionsDataSourceDTO optionsDataSource;
+    private List<? extends PropertyDTO> properties;
+
+    private ObjectPropertyDTO() {
+    }
 
     public ObjectPropertyDTO(ObjectProperty objectProperty) {
         super(objectProperty);

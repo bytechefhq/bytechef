@@ -32,21 +32,46 @@ import com.bytechef.hermes.definition.Property.ObjectProperty;
 import com.bytechef.hermes.definition.Property.StringProperty;
 import com.bytechef.hermes.definition.Property.TimeProperty;
 import com.bytechef.hermes.definition.Property.Type;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.Optional;
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = AnyPropertyDTO.class, name = "ANY"),
+    @JsonSubTypes.Type(value = ArrayPropertyDTO.class, name = "ARRAY"),
+    @JsonSubTypes.Type(value = BooleanPropertyDTO.class, name = "BOOLEAN"),
+    @JsonSubTypes.Type(value = DatePropertyDTO.class, name = "DATE"),
+    @JsonSubTypes.Type(value = DateTimePropertyDTO.class, name = "DATE_TIME"),
+    @JsonSubTypes.Type(value = DynamicPropertiesPropertyDTO.class, name = "DYNAMIC_PROPERTIES"),
+    @JsonSubTypes.Type(value = IntegerPropertyDTO.class, name = "INTEGER"),
+    @JsonSubTypes.Type(value = NumberPropertyDTO.class, name = "NUMBER"),
+    @JsonSubTypes.Type(value = NullPropertyDTO.class, name = "NULL"),
+    @JsonSubTypes.Type(value = ObjectPropertyDTO.class, name = "OBJECT"),
+    @JsonSubTypes.Type(value = StringPropertyDTO.class, name = "STRING"),
+    @JsonSubTypes.Type(value = TimePropertyDTO.class, name = "TIME"),
+})
+// CHECKSTYLE:OFF
 public abstract class PropertyDTO {
 
-    private final boolean advancedOption;
-    private final String description;
-    private final String displayCondition;
-    private final boolean expressionEnabled; // Defaults to true
-    private final boolean hidden;
-    private final String label;
-    private final String placeholder;
-    private final boolean required;
-    private final String name;
-    private final Type type;
+    private boolean advancedOption;
+    private String description;
+    private String displayCondition;
+    private boolean expressionEnabled; // Defaults to true
+    private boolean hidden;
+    private String label;
+    private String placeholder;
+    private boolean required;
+    private String name;
+    private Type type;
+
+    protected PropertyDTO() {
+    }
 
     public PropertyDTO(Property property) {
         this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);

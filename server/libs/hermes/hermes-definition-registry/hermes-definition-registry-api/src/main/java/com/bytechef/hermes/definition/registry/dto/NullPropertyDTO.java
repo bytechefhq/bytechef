@@ -24,6 +24,9 @@ import com.bytechef.hermes.definition.Property;
  */
 public class NullPropertyDTO extends ValuePropertyDTO<Void> {
 
+    private NullPropertyDTO() {
+    }
+
     public NullPropertyDTO(Property.NullProperty nullProperty) {
         super(nullProperty);
     }
