@@ -151,6 +151,8 @@ public class CustomAction {
                 .label("Body Content - XML")
                 .description("XML content to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("Body Content - Form Data")
