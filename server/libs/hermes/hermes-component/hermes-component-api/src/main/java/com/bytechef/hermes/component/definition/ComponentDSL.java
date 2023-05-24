@@ -26,6 +26,9 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.Property.OutputProperty;
+import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -36,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -82,6 +86,49 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableTriggerDefinition(name);
     }
 
+    private static <P extends InputProperty> List<P> checkInputProperties(P[] properties) {
+        if (properties != null) {
+            for (Property property : properties) {
+                String name = property.getName();
+
+                if (name == null || name.isEmpty()) {
+                    throw new IllegalArgumentException("Defined properties cannot to have empty names");
+                }
+            }
+
+            return Stream.of(properties)
+                .distinct()
+                .toList();
+        }
+
+        return null;
+    }
+
+    private static <P extends OutputProperty<?>> List<P> checkOutputProperties(P[] properties) {
+        if (properties != null) {
+            for (Property property : properties) {
+                String name = property.getName();
+
+                if (name != null && !name.isEmpty()) {
+                    throw new IllegalArgumentException("Defined properties must have empty names");
+                }
+
+                Optional<String> optionalDisplayCondition = property.getDisplayCondition();
+
+                if (optionalDisplayCondition.isEmpty() && properties.length > 1) {
+                    throw new IllegalArgumentException(
+                        "If multiple output properties are defined, they must have display condition defined");
+                }
+            }
+
+            return Stream.of(properties)
+                .distinct()
+                .toList();
+        }
+
+        return null;
+    }
+
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
@@ -92,8 +139,8 @@ public final class ComponentDSL extends DefinitionDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private List<? extends Property<?>> outputSchemaProperties;
-        private List<? extends Property<?>> properties;
+        private List<? extends OutputProperty<?>> outputSchemaProperties;
+        private List<? extends InputProperty> properties;
         private OutputSchemaFunction outputSchemaFunction;
         private SampleOutputFunction sampleOutputFunction;
         private String title;
@@ -162,32 +209,34 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableActionDefinition outputSchema(P... properties) {
-            if (properties != null) {
-                this.outputSchemaProperties = List.of(properties);
-            }
+        @SafeVarargs
+        public final <P extends OutputProperty<?>> ModifiableActionDefinition outputSchema(P... properties) {
+
+            this.outputSchemaProperties = checkOutputProperties(properties);
+
+            return this;
+        }
+
+        @SafeVarargs
+        public final <P extends OutputProperty<?>> ModifiableActionDefinition outputSchema(
+            OutputSchemaFunction outputSchema, P... properties) {
+
+            this.outputSchemaProperties = checkOutputProperties(properties);
+            this.outputSchemaFunction = outputSchema;
 
             return this;
         }
 
         public ModifiableActionDefinition outputSchema(OutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
+            this.outputSchemaProperties = List.of(any());
 
             return this;
         }
 
-        public <P extends Property<?>> ModifiableActionDefinition properties(P... properties) {
-            if (properties != null) {
-                for (Property<?> property : properties) {
-                    String name = property.getName();
-
-                    if (name == null || name.isEmpty()) {
-                        throw new IllegalArgumentException("Defined properties cannot to have empty names.");
-                    }
-                }
-
-                this.properties = List.of(properties);
-            }
+        @SafeVarargs
+        public final <P extends InputProperty> ModifiableActionDefinition properties(P... properties) {
+            this.properties = checkInputProperties(properties);
 
             return this;
         }
@@ -244,7 +293,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getOutputSchema() {
+        public Optional<List<? extends OutputProperty<?>>> getOutputSchema() {
             return Optional.ofNullable(outputSchemaProperties);
         }
 
@@ -256,7 +305,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getProperties() {
+        public Optional<List<? extends InputProperty>> getProperties() {
             return Optional.ofNullable(properties);
         }
 
@@ -300,7 +349,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<Object> detectOn;
         private String description;
         private String name;
-        private List<? extends Property<?>> properties;
+        private List<? extends InputProperty> properties;
         private RefreshFunction refreshFunction;
         private List<Object> refreshOn;
         private RefreshUrlFunction refreshUrlFunction;
@@ -395,10 +444,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableAuthorization properties(P... properties) {
-            if (properties != null) {
-                this.properties = List.of(properties);
-            }
+        @SafeVarargs
+        public final <P extends InputProperty> ModifiableAuthorization properties(P... properties) {
+            this.properties = checkInputProperties(properties);
 
             return this;
         }
@@ -495,7 +543,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getProperties() {
+        public Optional<List<? extends InputProperty>> getProperties() {
             return Optional.ofNullable(properties);
         }
 
@@ -542,14 +590,11 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<String> tags;
         private FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitions;
         private Map<String, Object> metadata;
-        private String name;
+        private final String name;
         private Resources resources;
         private int version = VERSION_1;
         private String title;
         private List<? extends TriggerDefinition> triggers;
-
-        private ModifiableComponentDefinition() {
-        }
 
         private ModifiableComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -792,20 +837,22 @@ public final class ComponentDSL extends DefinitionDSL {
         private boolean authorizationRequired = true;
         private List<? extends ModifiableAuthorization> authorizations;
         private BaseUriFunction baseUri;
-        private List<? extends Property<?>> properties;
+        private List<? extends InputProperty> properties;
         private TestConsumer testConsumer;
         private int version = 1;
 
         private ModifiableConnectionDefinition() {
         }
 
-        @SuppressWarnings("unchecked")
-        public <P extends Property<?>> ModifiableConnectionDefinition append(P property) {
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        public <P extends ValueProperty<?>> ModifiableConnectionDefinition append(P property) {
             if (this.properties == null) {
                 this.properties = new ArrayList<>();
             }
 
-            ((List<Property<?>>) this.properties).add(property);
+            ((List) this.properties).add(property);
 
             return this;
         }
@@ -838,18 +885,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableConnectionDefinition properties(P... properties) {
-            if (properties != null) {
-                for (Property<?> property : properties) {
-                    String name = property.getName();
-
-                    if (name == null || name.isEmpty()) {
-                        throw new IllegalArgumentException("Defined properties cannot to have empty names.");
-                    }
-                }
-
-                this.properties = List.of(properties);
-            }
+        @SafeVarargs
+        public final <P extends InputProperty> ModifiableConnectionDefinition properties(P... properties) {
+            this.properties = checkInputProperties(properties);
 
             return this;
         }
@@ -899,7 +937,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getProperties() {
+        public Optional<List<? extends InputProperty>> getProperties() {
             return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
         }
 
@@ -1037,11 +1075,11 @@ public final class ComponentDSL extends DefinitionDSL {
         private ListenerEnableConsumer listenerEnable;
         private ListenerDisableConsumer listenerDisable;
         private String name;
-        private List<? extends Property<?>> outputSchemaProperties;
+        private List<? extends OutputProperty<?>> outputSchemaProperties;
         private OutputSchemaFunction outputSchemaFunction;
         private SampleOutputFunction sampleOutputFunction;
         private PollFunction poll;
-        private List<? extends Property<?>> properties;
+        private List<? extends InputProperty> properties;
         private StaticWebhookRequestFunction staticWebhookRequest;
         private String title;
         private TriggerType type;
@@ -1144,16 +1182,25 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableTriggerDefinition outputSchema(P... properties) {
-            if (properties != null) {
-                this.outputSchemaProperties = List.of(properties);
-            }
+        public <P extends OutputProperty<?>> ModifiableTriggerDefinition outputSchema(P... properties) {
+            this.outputSchemaProperties = checkOutputProperties(properties);
+
+            return this;
+        }
+
+        @SafeVarargs
+        public final <P extends OutputProperty<?>> ModifiableTriggerDefinition outputSchema(
+            OutputSchemaFunction outputSchema, P... properties) {
+
+            this.outputSchemaProperties = checkOutputProperties(properties);
+            this.outputSchemaFunction = outputSchema;
 
             return this;
         }
 
         public ModifiableTriggerDefinition outputSchema(OutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
+            this.outputSchemaProperties = List.of(any());
 
             return this;
         }
@@ -1164,18 +1211,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableTriggerDefinition properties(P... properties) {
-            if (properties != null) {
-                for (Property<?> property : properties) {
-                    String name = property.getName();
-
-                    if (name == null || name.isEmpty()) {
-                        throw new IllegalArgumentException("Defined properties cannot to have empty names.");
-                    }
-                }
-
-                this.properties = List.of(properties);
-            }
+        @SafeVarargs
+        public final <P extends InputProperty> ModifiableTriggerDefinition properties(P... properties) {
+            this.properties = checkInputProperties(properties);
 
             return this;
         }
@@ -1291,15 +1329,14 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getOutputSchema() {
+        public Optional<List<? extends OutputProperty<?>>> getOutputSchema() {
             return Optional.ofNullable(outputSchemaProperties);
         }
 
         @Override
         public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
             return Optional.ofNullable(
-                outputSchemaFunction == null
-                    ? null : new OutputSchemaDataSourceImpl(outputSchemaFunction));
+                outputSchemaFunction == null ? null : new OutputSchemaDataSourceImpl(outputSchemaFunction));
         }
 
         @Override
@@ -1308,7 +1345,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getProperties() {
+        public Optional<List<? extends InputProperty>> getProperties() {
             return Optional.ofNullable(properties);
         }
 
@@ -1397,7 +1434,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    private static class SampleOutputDataSourceImpl implements SampleOutputDataSource {
+    private static final class SampleOutputDataSourceImpl implements SampleOutputDataSource {
 
         private final SampleOutputFunction sampleOutputFunction;
 

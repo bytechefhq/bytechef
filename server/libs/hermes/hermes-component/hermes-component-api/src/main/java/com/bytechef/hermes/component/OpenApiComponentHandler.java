@@ -22,7 +22,8 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
+import com.bytechef.hermes.definition.Property.InputProperty;
 
 import java.util.Arrays;
 import java.util.List;
@@ -50,15 +51,24 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
         return Arrays.stream(actionDefinitions)
             .map(this::modifyAction)
             .map(actionDefinition -> {
-                Property<?>[] properties = actionDefinition.getProperties()
+                InputProperty[] properties = actionDefinition.getProperties()
                     .orElse(List.of())
                     .stream()
-                    .map(property -> modifyProperty((Property<?>) property))
-                    .toArray(Property<?>[]::new);
+                    .map(property -> (InputProperty) modifyProperty(
+                        actionDefinition, (ModifiableProperty<?, ?>) property))
+                    .toArray(InputProperty[]::new);
 
                 return (ActionDefinition) actionDefinition.properties(properties);
             })
             .toList();
+    }
+
+    /**
+     *
+     * @return
+     */
+    default List<TriggerDefinition> getTriggers() {
+        return List.of();
     }
 
     /**
@@ -93,16 +103,10 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
      * @param property
      * @return
      */
-    default Property<?> modifyProperty(Property<?> property) {
-        return property;
-    }
+    default ModifiableProperty<?, ?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?, ?> property) {
 
-    /**
-     *
-     * @return
-     */
-    default List<TriggerDefinition> getTriggers() {
-        return List.of();
+        return property;
     }
 
     /**

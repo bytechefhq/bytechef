@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -62,7 +62,7 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getProperties();
+    Optional<List<? extends InputProperty>> getProperties();
 
     /**
      * TODO
