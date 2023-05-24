@@ -148,37 +148,17 @@ public class OdsFileReadActionTest {
         throws JSONException {
         return List.of(
             getJSONObjectWithNamedColumns(
-                readAsString ? "77.0" : 77,
-                "A",
-                "B",
-                "C",
-                readAsString ? "true" : true,
-                "2021-12-07",
+                readAsString ? "77.0" : 77, "A", "B", "C", readAsString ? "true" : true, "2021-12-07",
                 readAsString ? "11.2" : 11.2),
             getJSONObjectWithNamedColumns(
-                readAsString ? "4.0" : 4,
-                "name1",
-                "city1",
-                "description1",
-                readAsString ? "false" : false,
-                includeEmptyCells ? "" : null,
-                readAsString ? "12.0" : 12),
+                readAsString ? "4.0" : 4, "name1", "city1", "description1", readAsString ? "false" : false,
+                includeEmptyCells ? "" : null, readAsString ? "12.0" : 12),
             getJSONObjectWithNamedColumns(
-                readAsString ? "2.0" : 2,
-                "A",
-                "city2",
-                includeEmptyCells ? "" : null,
-                readAsString ? "true" : true,
-                "2021-12-09",
-                includeEmptyCells ? "" : null),
+                readAsString ? "2.0" : 2, "A", "city2", includeEmptyCells ? "" : null, readAsString ? "true" : true,
+                "2021-12-09", includeEmptyCells ? "" : null),
             getJSONObjectWithNamedColumns(
-                readAsString ? "5678.0" : 5678,
-                "ABCD",
-                "city3",
-                "EFGH",
-                readAsString ? "false" : false,
-                "2021-12-10",
-                readAsString ? "13.23" : 13.23));
+                readAsString ? "5678.0" : 5678, "ABCD", "city3", "EFGH", readAsString ? "false" : false,
+                "2021-12-10", readAsString ? "13.23" : 13.23));
     }
 
     @SuppressWarnings("PMD.SimplifiedTernary")
@@ -186,95 +166,41 @@ public class OdsFileReadActionTest {
         throws JSONException {
         return List.of(
             getJSONObjectWithoutNamedColumns(
-                readAsString ? "77.0" : 77,
-                "A",
-                "B",
-                "C",
-                readAsString ? "true" : true,
-                "2021-12-07",
+                readAsString ? "77.0" : 77, "A", "B", "C", readAsString ? "true" : true, "2021-12-07",
                 readAsString ? "11.2" : 11.2),
             getJSONObjectWithoutNamedColumns(
-                readAsString ? "4.0" : 4,
-                "name1",
-                "city1",
-                "description1",
-                readAsString ? "false" : false,
-                includeEmptyCells ? "" : null,
-                readAsString ? "12.0" : 12),
+                readAsString ? "4.0" : 4, "name1", "city1", "description1", readAsString ? "false" : false,
+                includeEmptyCells ? "" : null, readAsString ? "12.0" : 12),
             getJSONObjectWithoutNamedColumns(
-                readAsString ? "2.0" : 2,
-                "A",
-                "city2",
-                includeEmptyCells ? "" : null,
-                readAsString ? "true" : true,
-                "2021-12-09",
-                includeEmptyCells ? "" : null),
+                readAsString ? "2.0" : 2, "A", "city2", includeEmptyCells ? "" : null, readAsString ? "true" : true,
+                "2021-12-09", includeEmptyCells ? "" : null),
             getJSONObjectWithoutNamedColumns(
-                readAsString ? "5678.0" : 5678,
-                "ABCD",
-                "city3",
-                "EFGH",
-                readAsString ? "false" : false,
-                "2021-12-10",
-                readAsString ? "13.23" : 13.23));
+                readAsString ? "5678.0" : 5678, "ABCD", "city3", "EFGH", readAsString ? "false" : false,
+                "2021-12-10", readAsString ? "13.23" : 13.23));
     }
 
     private JSONObject getJSONObjectWithNamedColumns(
         Object id, String name, String city, String description, Object active, String date, Object sum)
         throws JSONException {
         return getJSONObject(
-            "id",
-            id,
-            "name",
-            name,
-            "city",
-            city,
-            "description",
-            description,
-            "active",
-            active,
-            "date",
-            date,
-            "sum",
-            sum);
+            "id", id, "name", name, "city", city, "description", description, "active", active, "date", date,
+            "sum", sum);
     }
 
     private JSONObject getJSONObjectWithoutNamedColumns(
         Object id, String name, String city, String description, Object active, String date, Object sum)
         throws JSONException {
         return getJSONObject(
-            "column_1",
-            id,
-            "column_2",
-            name,
-            "column_3",
-            city,
-            "column_4",
-            description,
-            "column_5",
-            active,
-            "column_6",
-            date,
-            "column_7",
-            sum);
+            "column_1", id, "column_2", name, "column_3", city, "column_4", description, "column_5", active,
+            "column_6", date, "column_7", sum);
     }
 
     private JSONObject getJSONObject(
-        String idKey,
-        Object idValue,
-        String nameKey,
-        String nameValue,
-        String cityKey,
-        String cityValue,
-        String descriptionKey,
-        String descriptionValue,
-        String activeKey,
-        Object activeValue,
-        String dateKey,
-        Object dateValue,
-        String sumKey,
-        Object sumValue)
+        String idKey, Object idValue, String nameKey, String nameValue, String cityKey, String cityValue,
+        String descriptionKey, String descriptionValue, String activeKey, Object activeValue, String dateKey,
+        Object dateValue, String sumKey, Object sumValue)
         throws JSONException {
+
         JSONObject jsonObject = new JSONObject()
             .put(idKey, idValue)
             .put(nameKey, nameValue)
