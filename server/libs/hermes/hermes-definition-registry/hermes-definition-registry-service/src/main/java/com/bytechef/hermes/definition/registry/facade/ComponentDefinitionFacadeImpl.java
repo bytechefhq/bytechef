@@ -57,7 +57,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
                     return false;
                 }
 
-                if (connectionDefinitions != null && componentDefinition.connection() == null) {
+                if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.connection())) {
                     return false;
                 }
 
