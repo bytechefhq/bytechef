@@ -44,7 +44,7 @@ public class ComponentDefinitionFacadeRSocketController {
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(Map<String, Boolean> map) {
 
         return Mono.just(
-            componentDefinitionFacade.getComponentDefinitions(
+            componentDefinitionFacade.searchComponentDefinitions(
                 map.get("actionDefinitions"), map.get("connectionDefinitions"), map.get("connectionInstances"),
                 map.get("triggerDefinitions")));
     }

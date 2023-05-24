@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
@@ -26,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -44,7 +46,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(
+    public List<ComponentDefinitionDTO> searchComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 
