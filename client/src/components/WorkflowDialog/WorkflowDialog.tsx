@@ -14,6 +14,7 @@ type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowRequestMutation: UseMutationResult<any, object, any, unknown>;
     id: string | number;
+    showTrigger?: boolean;
     visible?: boolean;
     onClose?: () => void;
 };
@@ -21,6 +22,7 @@ type WorkflowDialogProps = {
 const WorkflowDialog = ({
     createWorkflowRequestMutation,
     id,
+    showTrigger = true,
     visible = false,
     onClose,
 }: WorkflowDialogProps) => {
@@ -75,11 +77,13 @@ const WorkflowDialog = ({
             }}
             title="Create Workflow"
             customTrigger={
-                <Button
-                    displayType="light"
-                    icon={<PlusIcon className="h-5 w-5" />}
-                    size="small"
-                />
+                showTrigger && (
+                    <Button
+                        displayType="light"
+                        icon={<PlusIcon className="h-5 w-5" />}
+                        size="small"
+                    />
+                )
             }
         >
             <Input
