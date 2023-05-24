@@ -29,7 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Configuration
 @LoadBalancerClients({
-    @LoadBalancerClient(name = "coordinator-service-app"), @LoadBalancerClient(name = "worker-service-app")
+    @LoadBalancerClient(name = "coordinator-service-app"),
 })
 
 public class WebClientConfiguration {
