@@ -4,12 +4,14 @@ import React from 'react';
 import {FieldValues} from 'react-hook-form';
 import {FieldPath} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import InlineSVG from 'react-inlinesvg';
 import Select, {GroupBase, Props} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
 export interface ISelectOption {
     value: string;
     label: string;
+    icon?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     [key: string]: any;
 }
@@ -62,7 +64,26 @@ const FilterableSelect = <
             )}
 
             <div className={twMerge([label && 'mt-1'])}>
-                <Select {...field} classNamePrefix="react-select" {...props} />
+                <Select
+                    {...field}
+                    classNamePrefix="react-select"
+                    {...props}
+                    /* eslint-disable @typescript-eslint/no-explicit-any */
+                    formatOptionLabel={({icon, label}: any) => {
+                        return (
+                            <div className="flex items-center gap-2">
+                                {icon && (
+                                    <InlineSVG
+                                        className="mr-1 h-6 w-6 flex-none"
+                                        src={icon}
+                                    />
+                                )}
+
+                                <span>{label}</span>
+                            </div>
+                        ) as unknown as string;
+                    }}
+                />
             </div>
 
             {error && (
