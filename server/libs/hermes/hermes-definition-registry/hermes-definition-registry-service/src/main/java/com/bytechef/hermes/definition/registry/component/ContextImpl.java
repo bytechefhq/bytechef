@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.component;
 
-import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.hermes.component.ActionContext;
@@ -28,6 +27,7 @@ import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.convert.converter.Converter;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -158,18 +158,10 @@ public class ContextImpl implements ActionContext, TriggerContext {
             connection.getConnectionVersion(), connection.getParameters());
     }
 
-    public static class ContextFileEntryConverter implements TypeConverter.Conversion<FileEntry> {
+    public static class ContextFileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
 
-        public Object[] getTypeKeys() {
-            return new Object[] {
-                FileEntry.class
-            };
-        }
-
-        @SuppressWarnings("unchecked")
-        public FileEntry convert(Object value, Object typeKey) {
-            Map<String, ?> source = (Map<String, ?>) value;
-
+        @Override
+        public FileEntry convert(Map<?, ?> source) {
             return new ContextFileEntry(
                 (String) source.get("extension"),
                 (String) source.get("mimeType"),

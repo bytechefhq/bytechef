@@ -17,7 +17,8 @@
 
 package com.bytechef.commons.util;
 
-import com.bytechef.commons.typeconverter.TypeConverter;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.lang.reflect.Array;
 import java.time.Duration;
@@ -32,12 +33,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
 public final class MapValueUtils {
+
+    private static final DefaultConversionService conversionService = new DefaultConversionService();
+
+    static {
+        @SuppressWarnings("rawtypes")
+        ServiceLoader<Converter> serviceLoader = ServiceLoader.load(Converter.class);
+
+        for (Converter<?, ?> converter : serviceLoader) {
+            conversionService.addConverter(converter);
+        }
+    }
 
     private MapValueUtils() {
     }
@@ -576,12 +589,14 @@ public final class MapValueUtils {
     }
 
     private static <T> T convert(Object value, Class<T> elementType) {
-        return TypeConverter.convert(elementType, value);
+        return conversionService.convert(value, elementType);
     }
 
     private static Object convert(Object value, List<Class<?>> elementTypes) {
         for (Class<?> elementType : elementTypes) {
-            value = convert(value, elementType);
+            if (conversionService.canConvert(value.getClass(), elementType)) {
+                value = convert(value, elementType);
+            }
 
             if (value.getClass() == elementType) {
                 break;

@@ -20,7 +20,6 @@
 package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import java.util.Collections;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
@@ -261,17 +261,13 @@ public class WorkflowTask implements Task {
             + parameters + '\'' + '}';
     }
 
-    public static class WorkflowTaskConverter implements TypeConverter.Conversion<WorkflowTask> {
+    @SuppressWarnings("rawtypes")
+    public static class WorkflowTaskConverter implements Converter<Map, WorkflowTask> {
 
-        public Object[] getTypeKeys() {
-            return new Object[] {
-                WorkflowTask.class
-            };
-        }
-
+        @Override
         @SuppressWarnings("unchecked")
-        public WorkflowTask convert(Object value, Object typeKey) {
-            return new WorkflowTask((Map<String, ?>) value);
+        public WorkflowTask convert(Map source) {
+            return new WorkflowTask(source);
         }
     }
 }
