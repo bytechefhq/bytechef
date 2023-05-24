@@ -30,5 +30,5 @@ public interface TaskDispatcherDefinitionService {
 
     List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions();
 
-    List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(String name);
+    List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name);
 }

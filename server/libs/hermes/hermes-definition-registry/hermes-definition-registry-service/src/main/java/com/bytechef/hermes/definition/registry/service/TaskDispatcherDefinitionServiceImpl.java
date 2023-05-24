@@ -51,7 +51,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(String name) {
+    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
         return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions(name)
             .stream()
             .map(this::toTaskDispatcherDefinitionDTO)
