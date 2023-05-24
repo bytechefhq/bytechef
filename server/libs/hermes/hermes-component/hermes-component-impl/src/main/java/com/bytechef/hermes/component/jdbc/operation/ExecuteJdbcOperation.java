@@ -38,10 +38,9 @@ public class ExecuteJdbcOperation implements JdbcOperation<Map<String, Integer>>
     @Override
     public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
         String executeStatement = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.EXECUTE);
-        Map<String, ?> paramMap = MapValueUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
+        Map<String, ?> parameterMap = MapValueUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
 
-        int rowsAffected = jdbcExecutor.update(context.getConnection(), executeStatement,
-            paramMap);
+        int rowsAffected = jdbcExecutor.update(context.getConnection(), executeStatement, parameterMap);
 
         return Map.of("rows", rowsAffected);
     }
