@@ -27,7 +27,7 @@ interface ProjectDialogProps {
     project: ProjectModel | undefined;
     showTrigger?: boolean;
     visible?: boolean;
-    onClose?: () => void;
+    onClose?: (project?: ProjectModel) => void;
 }
 
 const ProjectDialog = ({
@@ -79,22 +79,22 @@ const ProjectDialog = ({
     const queryClient = useQueryClient();
 
     const createProjectMutation = useCreateProjectMutation({
-        onSuccess: () => {
+        onSuccess: (project: ProjectModel) => {
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
             queryClient.invalidateQueries(ProjectKeys.projects);
             queryClient.invalidateQueries(ProjectKeys.projectTags);
 
-            closeDialog();
+            closeDialog(project);
         },
     });
 
     const updateProjectMutation = useUpdateProjectMutation({
-        onSuccess: () => {
+        onSuccess: (project: ProjectModel) => {
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
             queryClient.invalidateQueries(ProjectKeys.projects);
             queryClient.invalidateQueries(ProjectKeys.projectTags);
 
-            closeDialog();
+            closeDialog(project);
         },
     });
 
@@ -102,13 +102,13 @@ const ProjectDialog = ({
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
-    function closeDialog() {
+    function closeDialog(project?: ProjectModel) {
         reset();
 
         setIsOpen(false);
 
         if (onClose) {
-            onClose();
+            onClose(project);
         }
     }
 
@@ -152,7 +152,7 @@ const ProjectDialog = ({
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {
-                    closeDialog();
+                    closeDialog(project);
                 }
             }}
             title={`${project?.id ? 'Edit' : 'Create'} Project`}
