@@ -19,7 +19,8 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.Property.OutputProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getOutputSchema();
+    Optional<List<? extends OutputProperty<?>>> getOutputSchema();
 
     /**
      *
@@ -97,7 +98,7 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getProperties();
+    Optional<List<? extends InputProperty>> getProperties();
 
     /**
      *

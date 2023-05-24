@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableAuthorization;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.HashMap;
@@ -135,7 +135,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getProperties();
+    Optional<List<? extends InputProperty>> getProperties();
 
     /**
      * TODO
