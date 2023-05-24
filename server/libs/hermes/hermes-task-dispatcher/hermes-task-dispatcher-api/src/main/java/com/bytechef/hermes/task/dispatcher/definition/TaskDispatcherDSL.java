@@ -18,12 +18,17 @@
 package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.Property.OutputProperty;
+import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -34,12 +39,30 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         return new ModifiableTaskDispatcherDefinition(name);
     }
 
-    public static ModifiableProperty.ModifiableObjectProperty task() {
+    public static ModifiableObjectProperty task() {
         return task(null);
     }
 
-    public static ModifiableProperty.ModifiableObjectProperty task(String name) {
+    public static ModifiableObjectProperty task(String name) {
         return buildObject(name, "The task or task dispatcher to use.", "TASK");
+    }
+
+    private static <P extends InputProperty> List<P> checkInputProperties(P[] properties) {
+        if (properties != null) {
+            for (Property property : properties) {
+                String name = property.getName();
+
+                if (name == null || name.isEmpty()) {
+                    throw new IllegalArgumentException("Defined properties cannot to have empty names.");
+                }
+            }
+
+            return Stream.of(properties)
+                .distinct()
+                .toList();
+        }
+
+        return null;
     }
 
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
@@ -47,10 +70,10 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         private String description;
         private String icon;
         private final String name;
-        private List<? extends Property<?>> outputSchema;
-        private List<? extends Property<?>> properties;
+        private List<? extends OutputProperty<?>> outputSchemaProperties;
+        private List<? extends InputProperty> properties;
         private Resources resources;
-        private List<? extends Property<?>> taskProperties;
+        private List<? extends ValueProperty<?>> taskProperties;
         private String title;
         private int version = 1;
 
@@ -70,10 +93,9 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableTaskDispatcherDefinition outputSchema(P... outputSchema) {
-            if (outputSchema != null) {
-                this.outputSchema = List.of(outputSchema);
-            }
+        @SafeVarargs
+        public final <P extends OutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(P... properties) {
+            this.outputSchemaProperties = checkPropertyNames(properties == null ? List.of() : List.of(properties));
 
             return this;
         }
@@ -98,10 +120,9 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableTaskDispatcherDefinition properties(P... properties) {
-            if (properties != null) {
-                this.properties = List.of(properties);
-            }
+        @SafeVarargs
+        public final <P extends InputProperty> ModifiableTaskDispatcherDefinition properties(P... properties) {
+            this.properties = checkInputProperties(properties);
 
             return this;
         }
@@ -118,7 +139,10 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableTaskDispatcherDefinition taskProperties(P... taskProperties) {
+        @SafeVarargs
+        public final <P extends ValueProperty<?>> ModifiableTaskDispatcherDefinition taskProperties(
+            P... taskProperties) {
+
             this.taskProperties = List.of(taskProperties);
 
             return this;
@@ -140,12 +164,12 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getOutputSchema() {
-            return Optional.ofNullable(outputSchema);
+        public Optional<List<? extends OutputProperty<?>>> getOutputSchema() {
+            return Optional.ofNullable(outputSchemaProperties);
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getProperties() {
+        public Optional<List<? extends InputProperty>> getProperties() {
             return Optional.ofNullable(properties);
         }
 
@@ -165,7 +189,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends Property<?>>> getTaskProperties() {
+        public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
             return Optional.ofNullable(taskProperties);
         }
     }
