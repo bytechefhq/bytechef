@@ -11,25 +11,28 @@ import {
 } from '@radix-ui/react-dialog';
 import {Cross1Icon} from '@radix-ui/react-icons';
 import {Dispatch, Fragment, ReactNode, SetStateAction} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import Button from '../Button/Button';
 
 type DialogProps = {
     children: ReactNode;
     isOpen: boolean;
-    title: string;
     onOpenChange: Dispatch<SetStateAction<boolean>>;
     customTrigger?: ReactNode;
     description?: string;
+    large?: boolean;
+    title?: string;
     triggerLabel?: string;
 };
 
 const Dialog = ({
     children,
-    customTrigger,
-    description,
     isOpen,
     onOpenChange,
+    customTrigger,
+    description,
+    large,
     title,
     triggerLabel,
 }: DialogProps): JSX.Element => (
@@ -70,7 +73,12 @@ const Dialog = ({
                 >
                     <Content
                         forceMount
-                        className="fixed left-[50%] top-[50%] z-50 w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-4 focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 dark:bg-gray-800 md:w-full"
+                        className={twMerge(
+                            'fixed left-[50%] top-[50%] z-50 max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-4 focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 dark:bg-gray-800 md:w-full',
+                            large
+                                ? 'h-[700px] w-[700px] md:max-w-2xl'
+                                : 'h-[700px] w-[700px]'
+                        )}
                     >
                         <Title className="text-base font-medium text-gray-900 dark:text-gray-100">
                             {title}

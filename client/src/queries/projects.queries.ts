@@ -22,10 +22,9 @@ export const ProjectKeys = {
     project: (id: number) => ['project', id],
     projectCategories: ['projectCategories'] as const,
     projectInstanceTags: ['projectInstanceTags'] as const,
-    projectList: (filters: {categoryIds?: number[]; tagIds?: number[]}) => [
-        ...ProjectKeys.projects,
-        filters,
-    ],
+    projectList: (
+        filters: {categoryIds?: number[]; tagIds?: number[]} | undefined
+    ) => [...ProjectKeys.projects, filters],
     projectTags: ['projectTags'] as const,
     projectWorkflows: (id: number) => [
         ...ProjectKeys.projects,
@@ -81,7 +80,7 @@ export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
         }
     );
 
-export const useGetProjectsQuery = (filters: {
+export const useGetProjectsQuery = (filters?: {
     categoryIds?: number[];
     projectInstances?: boolean;
     tagIds?: number[];
