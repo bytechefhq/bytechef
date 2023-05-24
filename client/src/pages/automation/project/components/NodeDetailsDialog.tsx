@@ -62,18 +62,15 @@ const NodeDetailsDialog = () => {
             : (currentComponent?.actions?.[0]?.name as string);
     };
 
-    const {
-        data: currentAction,
-        isFetched: currentActionFetched,
-        isLoading: currentActionLoading,
-    } = useGetActionDefinitionQuery(
-        {
-            componentName: currentComponent?.name as string,
-            componentVersion: currentComponent?.version as number,
-            actionName: getActionName(),
-        },
-        !!currentComponent?.actions
-    );
+    const {data: currentAction, isFetched: currentActionFetched} =
+        useGetActionDefinitionQuery(
+            {
+                componentName: currentComponent?.name as string,
+                componentVersion: currentComponent?.version as number,
+                actionName: getActionName(),
+            },
+            !!currentComponent?.actions
+        );
 
     const componentDefinitionNames = componentDefinitions?.map(
         (component) => component.name
@@ -177,7 +174,6 @@ const NodeDetailsDialog = () => {
                                         actions={currentComponent.actions}
                                         description={currentAction?.description}
                                         handleValueChange={setCurrentActionName}
-                                        loading={currentActionLoading}
                                         value={currentActionName}
                                     />
                                 )}

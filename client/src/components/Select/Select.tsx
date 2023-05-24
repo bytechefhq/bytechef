@@ -89,7 +89,7 @@ const Select = ({
                     displayType="light"
                 >
                     {leadingIcon && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 px-2">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-2">
                             {leadingIcon}
                         </div>
                     )}
@@ -104,6 +104,7 @@ const Select = ({
 
             <Portal className="z-50">
                 <Content
+                    align="start"
                     className={twMerge(
                         'max-h-select-content-available-height min-w-select-trigger-width',
                         contentClassName

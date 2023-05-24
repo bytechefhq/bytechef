@@ -78,15 +78,16 @@ export const Property = ({
     return (
         <li
             className={twMerge(
-                'mb-4 flex w-full items-center',
+                'mb-4 flex',
                 controlType === 'CODE_EDITOR' && 'h-5/6',
+                hidden && 'mb-0',
                 type === 'OBJECT' && 'flex-col',
                 type === 'ARRAY' && 'flex-col',
                 customClassName
             )}
         >
             {(type === 'OBJECT' || type === 'ARRAY') && label && (
-                <div className="flex w-full items-center py-2">
+                <div className="flex items-center py-2">
                     <span className="pr-2" title={type}>
                         {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     </span>
@@ -106,7 +107,7 @@ export const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full mb-0"
+                    fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -122,7 +123,7 @@ export const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full mb-0"
+                    fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -136,7 +137,7 @@ export const Property = ({
                 <Input
                     description={description}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full mb-0"
+                    fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -161,7 +162,7 @@ export const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full mb-0"
+                    fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -176,7 +177,7 @@ export const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full"
+                    fieldsetClassName="flex-1"
                     key={name}
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -191,7 +192,7 @@ export const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full mb-0"
+                    fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -206,7 +207,7 @@ export const Property = ({
                     description={description}
                     defaultValue={defaultValue as string}
                     error={hasError(name!)}
-                    fieldsetClassName="w-full mb-0"
+                    fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
@@ -222,12 +223,12 @@ export const Property = ({
                     label={label}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     options={formattedOptions!}
-                    triggerClassName="w-full bg-gray-100 border-none"
+                    triggerClassName="w-full border border-gray-300"
                 />
             )}
 
             {controlType === 'CODE_EDITOR' && (
-                <div className="h-full w-full border-2">
+                <div className="h-full border-2">
                     <Editor
                         defaultValue="// Add your custom code here..."
                         language={actionName}
