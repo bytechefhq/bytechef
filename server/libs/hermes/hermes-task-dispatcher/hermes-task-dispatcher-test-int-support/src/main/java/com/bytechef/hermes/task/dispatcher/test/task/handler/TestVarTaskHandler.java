@@ -37,7 +37,7 @@ public class TestVarTaskHandler<T, V> implements TaskHandler<Object> {
     @Override
     @SuppressWarnings("unchecked")
     public Object handle(TaskExecution taskExecution) {
-        Map<String, Object> parametersMap = taskExecution.getParameters();
+        Map<String, ?> parametersMap = taskExecution.getParameters();
 
         V value = (V) parametersMap.get("value");
 

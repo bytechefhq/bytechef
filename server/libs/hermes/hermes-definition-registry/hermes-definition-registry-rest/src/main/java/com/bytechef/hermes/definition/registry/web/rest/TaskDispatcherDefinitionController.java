@@ -52,10 +52,10 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     public Mono<ResponseEntity<TaskDispatcherDefinitionModel>> getTaskDispatcherDefinition(
         String taskDispatcherName, Integer taskDispatcherVersion, ServerWebExchange exchange) {
 
-        return Mono.just(
-            conversionService.convert(
-                taskDispatcherDefinitionService.getTaskDispatcherDefinition(taskDispatcherName, taskDispatcherVersion),
-                TaskDispatcherDefinitionModel.class))
+        return taskDispatcherDefinitionService
+            .getTaskDispatcherDefinitionMono(taskDispatcherName, taskDispatcherVersion)
+            .map(taskDispatcherDefinitionDTO -> conversionService.convert(
+                taskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -63,9 +63,8 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitions(
         @Parameter(hidden = true) ServerWebExchange exchange) {
 
-        return Mono.just(
-            taskDispatcherDefinitionService.getTaskDispatcherDefinitions()
-                .stream()
+        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
+            .map(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
                 .toList())
@@ -77,9 +76,8 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionBasicModel>>> getTaskDispatcherDefinitionVersions(
         String taskDispatcherName, ServerWebExchange exchange) {
 
-        return Mono.just(
-            taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(taskDispatcherName)
-                .stream()
+        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersionsMono(taskDispatcherName)
+            .map(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
                 .toList())
