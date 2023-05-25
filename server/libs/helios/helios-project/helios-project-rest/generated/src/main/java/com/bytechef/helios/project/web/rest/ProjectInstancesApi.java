@@ -25,11 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import org.springframework.http.codec.multipart.Part;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -38,10 +35,14 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:33:53.406663+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:34.901574+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
+
+    default Optional<NativeWebRequest> getRequest() {
+        return Optional.empty();
+    }
 
     /**
      * POST /project-instances : Create a new project instance
@@ -67,20 +68,19 @@ public interface ProjectInstancesApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<ProjectInstanceModel>> createProjectInstance(
-        @Parameter(name = "ProjectInstanceModel", description = "", required = true) @Valid @RequestBody Mono<ProjectInstanceModel> projectInstanceModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+    default ResponseEntity<ProjectInstanceModel> createProjectInstance(
+        @Parameter(name = "ProjectInstanceModel", description = "", required = true) @Valid @RequestBody ProjectInstanceModel projectInstanceModel
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(projectInstanceModel).then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -110,21 +110,20 @@ public interface ProjectInstancesApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<CreateProjectInstanceJob200ResponseModel>> createProjectInstanceJob(
+    default ResponseEntity<CreateProjectInstanceJob200ResponseModel> createProjectInstanceJob(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "CreateProjectInstanceJobRequestModel", description = "", required = true) @Valid @RequestBody Mono<CreateProjectInstanceJobRequestModel> createProjectInstanceJobRequestModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "CreateProjectInstanceJobRequestModel", description = "", required = true) @Valid @RequestBody CreateProjectInstanceJobRequestModel createProjectInstanceJobRequestModel
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"jobId\" : 0 }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"jobId\" : 0 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(createProjectInstanceJobRequestModel).then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -149,13 +148,10 @@ public interface ProjectInstancesApi {
         method = RequestMethod.DELETE,
         value = "/project-instances/{id}"
     )
-    default Mono<ResponseEntity<Void>> deleteProjectInstance(
-        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+    default ResponseEntity<Void> deleteProjectInstance(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(Mono.empty());
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -181,14 +177,11 @@ public interface ProjectInstancesApi {
         method = RequestMethod.POST,
         value = "/project-instances/{id}/enable/{enable}"
     )
-    default Mono<ResponseEntity<Void>> enableProjectInstance(
+    default ResponseEntity<Void> enableProjectInstance(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "enable", description = "Enable/disable the project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "enable", description = "Enable/disable the project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(Mono.empty());
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -215,15 +208,12 @@ public interface ProjectInstancesApi {
         method = RequestMethod.POST,
         value = "/project-instances/{id}/workflows/{workflowId}/enable/{enable}"
     )
-    default Mono<ResponseEntity<Void>> enableProjectInstanceWorkflow(
+    default ResponseEntity<Void> enableProjectInstanceWorkflow(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowId", description = "The id of a project workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @Parameter(name = "enable", description = "Enable/disable the workflow of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "enable", description = "Enable/disable the workflow of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(Mono.empty());
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -251,20 +241,19 @@ public interface ProjectInstancesApi {
         value = "/project-instances/{id}",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<ProjectInstanceModel>> getProjectInstance(
-        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+    default ResponseEntity<ProjectInstanceModel> getProjectInstance(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -293,21 +282,20 @@ public interface ProjectInstancesApi {
         value = "/project-instances",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<Flux<ProjectInstanceModel>>> getProjectInstances(
+    default ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
         @Parameter(name = "projectIds", description = "The list of the project ids used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectIds", required = false) List<Long> projectIds,
-        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }, { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" } ]";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }, { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -337,21 +325,20 @@ public interface ProjectInstancesApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<ProjectInstanceModel>> updateProjectInstance(
+    default ResponseEntity<ProjectInstanceModel> updateProjectInstance(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "ProjectInstanceModel", description = "", required = true) @Valid @RequestBody Mono<ProjectInstanceModel> projectInstanceModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "ProjectInstanceModel", description = "", required = true) @Valid @RequestBody ProjectInstanceModel projectInstanceModel
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 5, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 6, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 1, \"status\" : \"DISABLED\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(projectInstanceModel).then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -378,14 +365,11 @@ public interface ProjectInstancesApi {
         value = "/project-instances/{id}/tags",
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<Void>> updateProjectInstanceTags(
+    default ResponseEntity<Void> updateProjectInstanceTags(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<UpdateTagsRequestModel> updateTagsRequestModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(updateTagsRequestModel).then(Mono.empty());
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 

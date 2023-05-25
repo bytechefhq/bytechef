@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:33:59.288008+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:36.155618+02:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;

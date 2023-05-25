@@ -22,11 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import org.springframework.http.codec.multipart.Part;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -35,10 +32,14 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:34:00.199779+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:36.435637+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "categories", description = "The Core Categories API")
 public interface CategoriesApi {
+
+    default Optional<NativeWebRequest> getRequest() {
+        return Optional.empty();
+    }
 
     /**
      * GET /categories/{id} : Get a category by id
@@ -63,20 +64,19 @@ public interface CategoriesApi {
         value = "/categories/{id}",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<CategoryModel>> getCategory(
-        @Parameter(name = "id", description = "The id of a category.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+    default ResponseEntity<CategoryModel> getCategory(
+        @Parameter(name = "id", description = "The id of a category.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
@@ -106,21 +106,20 @@ public interface CategoriesApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<CategoryModel>> updateCategory(
+    default ResponseEntity<CategoryModel> updateCategory(
         @Parameter(name = "id", description = "The id of a category.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "CategoryModel", description = "", required = true) @Valid @RequestBody Mono<CategoryModel> categoryModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
+        @Parameter(name = "CategoryModel", description = "", required = true) @Valid @RequestBody CategoryModel categoryModel
     ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
             }
-        }
-        return result.then(categoryModel).then(Mono.empty());
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
