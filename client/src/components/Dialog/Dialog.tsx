@@ -28,11 +28,11 @@ type DialogProps = {
 
 const Dialog = ({
     children,
-    isOpen,
-    onOpenChange,
     customTrigger,
     description,
+    isOpen,
     large,
+    onOpenChange,
     title,
     triggerLabel,
 }: DialogProps): JSX.Element => (

@@ -5,8 +5,8 @@ import React from 'react';
 import Button from './Button';
 
 export default {
-    title: 'Button',
     component: Button,
+    title: 'Button',
 } as ComponentMeta<typeof Button>;
 
 const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
@@ -20,35 +20,35 @@ Primary.args = {
 export const Secondary = Template.bind({});
 
 Secondary.args = {
-    label: 'Button',
     displayType: 'secondary',
+    label: 'Button',
 };
 
 export const Danger = Template.bind({});
 
 Danger.args = {
-    label: 'Button',
     displayType: 'danger',
+    label: 'Button',
 };
 export const Unstyled = Template.bind({});
 
 Unstyled.args = {
-    label: 'Button',
     displayType: 'unstyled',
+    label: 'Button',
 };
 
 export const Large = Template.bind({});
 
 Large.args = {
-    size: 'large',
     label: 'Button',
+    size: 'large',
 };
 
 export const Small = Template.bind({});
 
 Small.args = {
-    size: 'small',
     label: 'Button',
+    size: 'small',
 };
 export const Icon = Template.bind({});
 

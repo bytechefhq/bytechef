@@ -17,6 +17,7 @@ type SidebarContentLayoutProps = {
 
 const LayoutContainer = ({
     bodyClassName,
+    children,
     className,
     footer,
     header,
@@ -25,7 +26,6 @@ const LayoutContainer = ({
     leftSidebarOpen = true,
     rightToolbarBody,
     rightToolbarOpen = false,
-    children,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 

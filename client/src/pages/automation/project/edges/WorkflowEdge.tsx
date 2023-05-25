@@ -6,24 +6,24 @@ import PopoverMenu from '../components/PopoverMenu';
 
 export default function WorkflowEdge({
     id,
+    markerEnd,
+    sourcePosition,
     sourceX,
     sourceY,
+    style,
+    targetPosition,
     targetX,
     targetY,
-    sourcePosition,
-    targetPosition,
-    style,
-    markerEnd,
 }: EdgeProps) {
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
 
     const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
+        sourcePosition,
         sourceX,
         sourceY,
-        sourcePosition,
+        targetPosition,
         targetX,
         targetY,
-        targetPosition,
     });
 
     return (

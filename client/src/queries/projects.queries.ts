@@ -21,7 +21,12 @@ import {WorkflowModel} from '../middleware/core/workflow';
 export const ProjectKeys = {
     project: (id: number) => ['project', id],
     projectCategories: ['projectCategories'] as const,
+    projectInstanceList: (filters: {
+        projectIds?: number[];
+        tagIds?: number[];
+    }) => [...ProjectKeys.projectInstances, filters],
     projectInstanceTags: ['projectInstanceTags'] as const,
+    projectInstances: ['projectInstances'] as const,
     projectList: (
         filters: {categoryIds?: number[]; tagIds?: number[]} | undefined
     ) => [...ProjectKeys.projects, filters],
@@ -31,19 +36,14 @@ export const ProjectKeys = {
         id,
         'projectWorkflows',
     ],
-    projectInstanceList: (filters: {
-        projectIds?: number[];
-        tagIds?: number[];
-    }) => [...ProjectKeys.projectInstances, filters],
-    projectInstances: ['projectInstances'] as const,
     projects: ['projects'] as const,
-    workflowExecutions: (filter: GetWorkflowExecutionsRequest) => [
-        'workflowExecutions',
-        filter,
-    ],
     workflowExecution: (request: GetWorkflowExecutionRequest) => [
         'workflowExecution',
         request,
+    ],
+    workflowExecutions: (filter: GetWorkflowExecutionsRequest) => [
+        'workflowExecutions',
+        filter,
     ],
 };
 

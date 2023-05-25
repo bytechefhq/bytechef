@@ -65,9 +65,9 @@ const NodeDetailsDialog = () => {
     const {data: currentAction, isFetched: currentActionFetched} =
         useGetActionDefinitionQuery(
             {
+                actionName: getActionName(),
                 componentName: currentComponent?.name as string,
                 componentVersion: currentComponent?.version as number,
-                actionName: getActionName(),
             },
             !!currentComponent?.actions
         );

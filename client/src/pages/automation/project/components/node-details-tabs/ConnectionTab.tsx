@@ -20,7 +20,7 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
         !!component.connection?.name
     );
 
-    const {showConnectionNote, setShowConnectionNote} =
+    const {setShowConnectionNote, showConnectionNote} =
         useConnectionNoteStore();
 
     return (

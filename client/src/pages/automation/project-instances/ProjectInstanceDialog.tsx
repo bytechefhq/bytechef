@@ -25,10 +25,10 @@ interface ProjectDialogProps {
 }
 
 const ProjectInstanceDialog = ({
+    onClose,
     projectInstance,
     showTrigger = true,
     visible = false,
-    onClose,
 }: ProjectDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
 
@@ -37,21 +37,21 @@ const ProjectInstanceDialog = ({
     const {
         control,
         formState: {errors, touchedFields},
-        handleSubmit,
         getValues,
+        handleSubmit,
         register,
         reset,
         setValue,
     } = useForm<ProjectInstanceModel>({
         defaultValues: {
             description: projectInstance?.description || '',
+            name: projectInstance?.name || '',
             project: projectInstance?.project
                 ? {
                       label: projectInstance?.project?.name,
                       ...projectInstance?.project,
                   }
                 : undefined,
-            name: projectInstance?.name || '',
             tags:
                 projectInstance?.tags?.map((tag) => ({
                     ...tag,
@@ -100,8 +100,6 @@ const ProjectInstanceDialog = ({
 
     const steps = [
         {
-            name: 'Basic',
-            onClick: handleStepClick,
             content: (
                 <StepBasic
                     projectInstance={projectInstance}
@@ -113,11 +111,13 @@ const ProjectInstanceDialog = ({
                     getValues={getValues}
                 />
             ),
+            name: 'Basic',
+            onClick: handleStepClick,
         },
         {
+            content: <InstanceDialogWorkflowList getValues={getValues} />,
             name: 'Workflows',
             onClick: handleStepClick,
-            content: <InstanceDialogWorkflowList getValues={getValues} />,
         },
     ];
 

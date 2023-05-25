@@ -78,13 +78,13 @@ export const WorkflowExecutions = () => {
         error: WorkflowExecutionsError,
         isLoading: WorkflowExecutionsLoading,
     } = useGetWorkflowExecutionsQuery({
-        jobStatus: filterStatus,
-        projectId: filterProjectId,
-        workflowId: filterWorkflowId,
-        jobStartDate: filterStartDate,
         jobEndDate: filterEndDate,
-        projectInstanceId: filterInstanceId,
+        jobStartDate: filterStartDate,
+        jobStatus: filterStatus,
         pageNumber: filterPageNumber,
+        projectId: filterProjectId,
+        projectInstanceId: filterInstanceId,
+        workflowId: filterWorkflowId,
     });
 
     const {data: workflows, error: workflowsError} = useGetWorkflowsQuery();

@@ -5,22 +5,22 @@ import styles from './EdgeTypes.module.css';
 
 export default function PlaceholderEdge({
     id,
+    markerEnd,
+    sourcePosition,
     sourceX,
     sourceY,
+    style,
+    targetPosition,
     targetX,
     targetY,
-    sourcePosition,
-    targetPosition,
-    style,
-    markerEnd,
 }: EdgeProps) {
     const [edgePath] = getBezierPath({
+        sourcePosition,
         sourceX,
         sourceY,
-        sourcePosition,
+        targetPosition,
         targetX,
         targetY,
-        targetPosition,
     });
 
     return (

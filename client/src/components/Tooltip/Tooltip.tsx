@@ -7,7 +7,7 @@ interface TooltipProps {
     side?: Side;
 }
 
-const Tooltip = ({side, text, children}: PropsWithChildren<TooltipProps>) => (
+const Tooltip = ({children, side, text}: PropsWithChildren<TooltipProps>) => (
     <Provider>
         <Root>
             <Trigger asChild>{children}</Trigger>

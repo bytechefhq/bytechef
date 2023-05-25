@@ -5,7 +5,7 @@ export interface HoverCardProps {
     text: ReactNode;
 }
 
-const HoverCard = ({text, children}: PropsWithChildren<HoverCardProps>) => (
+const HoverCard = ({children, text}: PropsWithChildren<HoverCardProps>) => (
     <Root>
         <Trigger asChild>{children}</Trigger>
 

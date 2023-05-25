@@ -26,9 +26,9 @@ const AlertDialog = ({
     danger,
     isOpen,
     message,
-    title,
-    setIsOpen,
     onConfirmClick,
+    setIsOpen,
+    title,
 }: AlertDialogProps) => {
     return (
         <Root open={isOpen} onOpenChange={setIsOpen}>

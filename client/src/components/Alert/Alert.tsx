@@ -12,7 +12,7 @@ export interface AlertProps {
     text: ReactNode;
 }
 
-const Alert = ({type = 'info', text}: AlertProps) => (
+const Alert = ({text, type = 'info'}: AlertProps) => (
     <div
         className={twMerge(
             'my-2 rounded-md p-4',

@@ -6,7 +6,7 @@ import PageHeader from '../../components/PageHeader/PageHeader';
 import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher';
 import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 
-const navigation = [{name: 'Display', href: '#', icon: CogIcon, current: true}];
+const navigation = [{current: true, href: '#', icon: CogIcon, name: 'Display'}];
 
 export default function Settings() {
     return (

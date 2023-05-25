@@ -10,22 +10,22 @@ import React, {useEffect, useState} from 'react';
 
 const availableThemes = [
     {
+        icon: <SunIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />,
         key: 'light',
         label: 'Light',
-        icon: <SunIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />,
     },
     {
+        icon: <MoonIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />,
         key: 'dark',
         label: 'Dark',
-        icon: <MoonIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />,
     },
 
     {
-        key: 'system',
-        label: 'System',
         icon: (
             <Half2Icon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
         ),
+        key: 'system',
+        label: 'System',
     },
 ];
 
@@ -71,7 +71,7 @@ const ThemeSwitcher: React.FC = () => {
                         className="w-48 rounded-lg bg-gray-50 px-1.5 py-1 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-700 md:w-56"
                     >
                         {availableThemes.map((theme) => {
-                            const {key, label, icon} = theme;
+                            const {icon, key, label} = theme;
 
                             return (
                                 <Item

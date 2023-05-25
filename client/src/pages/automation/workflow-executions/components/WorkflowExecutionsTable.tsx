@@ -29,7 +29,6 @@ const columnHelper = createColumnHelper<WorkflowExecutionModel>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
-        header: 'Status',
         cell: (info) => (
             <Badge
                 color={
@@ -42,25 +41,25 @@ const columns = [
                 text={info.getValue()?.status ?? ''}
             />
         ),
+        header: 'Status',
     }),
     columnHelper.accessor('workflow', {
-        header: 'Workflow',
         cell: (info) => info.getValue()?.label,
+        header: 'Workflow',
     }),
     columnHelper.accessor('project', {
-        header: 'Project',
         cell: (info) => info.getValue()?.name,
+        header: 'Project',
     }),
     columnHelper.accessor('instance', {
-        header: 'Instance',
         cell: (info) => info.getValue()?.name,
+        header: 'Instance',
     }),
     columnHelper.accessor((row) => row.job, {
-        header: 'Duration',
         cell: (info) => getDuration(info),
+        header: 'Duration',
     }),
     columnHelper.accessor((row) => row.job, {
-        header: 'Execution date',
         cell: (info) => (
             <>
                 {info.getValue()?.startDate &&
@@ -69,17 +68,18 @@ const columns = [
                         ?.startDate?.toLocaleTimeString()}`}
             </>
         ),
+        header: 'Execution date',
     }),
 ];
 
 const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
     const reactTable = useReactTable<WorkflowExecutionModel>({
-        data,
         columns,
+        data,
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const {setWorkflowExecutionId, setWorkflowExecutionDetailsDialogOpen} =
+    const {setWorkflowExecutionDetailsDialogOpen, setWorkflowExecutionId} =
         useWorkflowExecutionDetailsDialogStore();
 
     const headerGroups = reactTable.getHeaderGroups();

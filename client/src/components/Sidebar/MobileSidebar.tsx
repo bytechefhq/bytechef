@@ -19,10 +19,10 @@ type Props = {
 };
 
 export function MobileSidebar({
-    user,
-    navigation,
     mobileMenuOpen,
+    navigation,
     setMobileMenuOpen,
+    user,
 }: Props) {
     return (
         <Transition.Root show={mobileMenuOpen} as={Fragment}>
