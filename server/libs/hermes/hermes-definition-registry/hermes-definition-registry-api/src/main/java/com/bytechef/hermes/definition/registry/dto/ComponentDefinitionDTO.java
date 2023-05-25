@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
-import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
+import com.bytechef.commons.util.IconUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public record ComponentDefinitionDTO(
 
     private static Optional<String> getIcon(ComponentDefinition componentDefinition) {
         return componentDefinition.getIcon()
-            .map(DefinitionUtils::readIcon);
+            .map(IconUtils::readIcon);
     }
 
     private static Optional<ResourcesDTO> getResources(ComponentDefinition componentDefinition) {

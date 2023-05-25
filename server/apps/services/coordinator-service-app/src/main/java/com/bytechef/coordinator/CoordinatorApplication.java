@@ -64,7 +64,9 @@ public class CoordinatorApplication {
     }
 
     private static void logApplicationStartup(Environment environment) {
-        String protocol = "ws";
+        String protocol = Optional.ofNullable(environment.getProperty("server.ssl.key-store"))
+            .map(key -> "https")
+            .orElse("http");
         String serverPort = environment.getProperty("server.port");
         String contextPath = Optional.ofNullable(environment.getProperty("server.servlet.context-path"))
             .filter(StringUtils::hasText)

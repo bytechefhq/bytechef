@@ -95,10 +95,6 @@ spring:
     listener:
       direct:
         prefetch: 1
-  rsocket:
-    server:
-      mapping-path: /rsocket
-      transport: websocket
   task:
     execution:
       thread-name-prefix: platform-service-app-task-
