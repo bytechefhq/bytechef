@@ -44,7 +44,7 @@ public class FilesystemGetFilePathAction {
             .description("The path to full filename.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .execute(FilesystemGetFilePathAction::executeGetFilePath)
+        .perform(FilesystemGetFilePathAction::perform)
         .outputSchema(string())
         .sampleOutput("/data");
 
@@ -56,7 +56,7 @@ public class FilesystemGetFilePathAction {
      * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
      * the text before the last forward or backslash.
      */
-    protected static String executeGetFilePath(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         String filename = MapValueUtils.getRequiredString(inputParameters, FILENAME);
 
         return filename.substring(0, filename.lastIndexOf(File.separator));

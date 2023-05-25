@@ -107,9 +107,9 @@ public class XlsxFileReadAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(array())
-        .execute(XlsxFileReadAction::executeRead);
+        .perform(XlsxFileReadAction::perform);
 
-    protected static List<Map<String, ?>> executeRead(Context context, Map<String, ?> inputParameters) {
+    protected static List<Map<String, ?>> perform(Map<String, ?> inputParameters, Context context) {
         FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
         boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);

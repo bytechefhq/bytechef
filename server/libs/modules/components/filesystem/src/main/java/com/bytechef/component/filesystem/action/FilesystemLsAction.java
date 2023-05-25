@@ -57,9 +57,9 @@ public class FilesystemLsAction {
                 .label("Recursive")
                 .description("Should subdirectories be included.")
                 .defaultValue(false))
-        .execute(FilesystemLsAction::executeLs);
+        .perform(FilesystemLsAction::perform);
 
-    protected static List<FileInfo> executeLs(Context context, Map<String, ?> inputParameters) {
+    protected static List<FileInfo> perform(Map<String, ?> inputParameters, Context context) {
         Path root = Paths.get(MapValueUtils.getRequiredString(inputParameters, PATH));
         boolean recursive = MapValueUtils.getBoolean(inputParameters, RECURSIVE, false);
 

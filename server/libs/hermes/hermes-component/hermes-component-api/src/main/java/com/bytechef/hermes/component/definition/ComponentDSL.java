@@ -135,7 +135,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Boolean deprecated;
         private String description;
         private Object sampleOutput;
-        private ExecuteFunction execute;
+        private PerformFunction execute;
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
@@ -174,7 +174,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition execute(ExecuteFunction execute) {
+        public ModifiableActionDefinition perform(PerformFunction execute) {
             this.execute = execute;
 
             return this;
@@ -273,7 +273,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<ExecuteFunction> getExecute() {
+        public Optional<PerformFunction> getPerform() {
             return Optional.ofNullable(execute);
         }
 

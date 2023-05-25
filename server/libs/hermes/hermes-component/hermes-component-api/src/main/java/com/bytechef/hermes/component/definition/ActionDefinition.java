@@ -62,7 +62,7 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return an optional execute function implementation
      */
-    Optional<ExecuteFunction> getExecute();
+    Optional<PerformFunction> getPerform();
 
     /**
      *
@@ -122,14 +122,13 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      */
     @FunctionalInterface
-    interface ExecuteFunction {
+    interface PerformFunction {
 
         /**
-         *
-         * @param context
          * @param inputParameters
+         * @param context
          * @return
          */
-        Object apply(ActionContext context, Map<String, ?> inputParameters);
+        Object apply(Map<String, ?> inputParameters, ActionContext context);
     }
 }

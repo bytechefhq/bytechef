@@ -63,12 +63,12 @@ public class FileStorageDownloadAction {
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .outputSchema(fileEntry())
-        .execute(FileStorageDownloadAction::executeDownload);
+        .perform(FileStorageDownloadAction::perform);
 
     /**
-     * executes the download of a file (given its URL).
+     * performs the download of a file (given its URL).
      */
-    protected static FileEntry executeDownload(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         try {
             URL url = new URL(MapValueUtils.getRequiredString(inputParameters, FileStorageConstants.URL));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

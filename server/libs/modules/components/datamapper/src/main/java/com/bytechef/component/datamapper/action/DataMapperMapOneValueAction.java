@@ -266,9 +266,9 @@ public class DataMapperMapOneValueAction {
             object().displayCondition("type === 8"),
             string().displayCondition("type === 9"),
             time().displayCondition("type === 10"))
-        .execute(DataMapperMapOneValueAction::execute);
+        .perform(DataMapperMapOneValueAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         // TODO
         return null;
     }

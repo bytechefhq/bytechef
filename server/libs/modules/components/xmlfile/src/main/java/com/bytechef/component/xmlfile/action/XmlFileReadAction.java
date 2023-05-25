@@ -82,9 +82,9 @@ public class XmlFileReadAction {
             getOutputSchemaFunction(),
             array().displayCondition("%s === true".formatted(IS_ARRAY)),
             object().displayCondition("%s === false".formatted(IS_ARRAY)))
-        .execute(XmlFileReadAction::executeRead);
+        .perform(XmlFileReadAction::perform);
 
-    protected static Object executeRead(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean isArray = MapValueUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;

@@ -97,9 +97,9 @@ public class OdsFileReadAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(array())
-        .execute(OdsFileReadAction::executeRead);
+        .perform(OdsFileReadAction::perform);
 
-    protected static List<Map<String, ?>> executeRead(Context context, Map<String, ?> inputParameters) {
+    protected static List<Map<String, ?>> perform(Map<String, ?> inputParameters, Context context) {
         boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
         boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
         Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);

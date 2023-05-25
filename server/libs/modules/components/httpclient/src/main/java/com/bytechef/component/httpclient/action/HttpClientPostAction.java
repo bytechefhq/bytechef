@@ -54,9 +54,9 @@ public class HttpClientPostAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(getOutputSchemaFunction(), HttpClientConstants.OUTPUT_PROPERTIES)
-        .execute((actionContext, inputParameters) -> executePost(inputParameters));
+        .perform((inputParameters, actionContext) -> perform(inputParameters));
 
-    protected static Object executePost(Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.POST);
     }
 

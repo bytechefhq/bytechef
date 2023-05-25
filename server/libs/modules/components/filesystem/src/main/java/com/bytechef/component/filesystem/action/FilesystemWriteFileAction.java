@@ -58,9 +58,9 @@ public class FilesystemWriteFileAction {
                 .placeholder("/data/your_file.pdf")
                 .required(true))
         .outputSchema(object().properties(integer("bytes")))
-        .execute(FilesystemWriteFileAction::executeWriteFile);
+        .perform(FilesystemWriteFileAction::perform);
 
-    protected static Map<String, Long> executeWriteFile(Context context, Map<String, ?> inputParameters) {
+    protected static Map<String, Long> perform(Map<String, ?> inputParameters, Context context) {
         String fileName = MapValueUtils.getRequiredString(inputParameters, FILENAME);
 
         try (InputStream inputStream = context.getFileStream(

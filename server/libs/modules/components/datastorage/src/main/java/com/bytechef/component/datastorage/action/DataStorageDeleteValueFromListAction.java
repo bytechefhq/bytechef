@@ -55,9 +55,9 @@ public class DataStorageDeleteValueFromListAction {
                 .description(
                     "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.")
                 .required(true))
-        .execute(DataStorageDeleteValueFromListAction::execute);
+        .perform(DataStorageDeleteValueFromListAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

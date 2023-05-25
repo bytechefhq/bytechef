@@ -48,7 +48,7 @@ public class XmlHelperStringifyActionTest {
                     }
                     """);
 
-            assertThat(XmlHelperStringifyAction.executeStringify(Mockito.mock(Context.class), Map.of()))
+            assertThat(XmlHelperStringifyAction.perform(Map.of(), Mockito.mock(Context.class)))
                 .isEqualTo("""
                     {
                         "key": 3

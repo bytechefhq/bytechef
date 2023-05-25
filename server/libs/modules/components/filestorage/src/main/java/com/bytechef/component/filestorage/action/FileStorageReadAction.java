@@ -44,9 +44,9 @@ public class FileStorageReadAction {
                 "The object property which contains a reference to the file to read from.")
             .required(true))
         .outputSchema(string())
-        .execute(FileStorageReadAction::executeRead);
+        .perform(FileStorageReadAction::perform);
 
-    protected static String executeRead(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         return context.readFileToString(
             MapValueUtils.getRequired(inputParameters, FILE_ENTRY, Context.FileEntry.class));
     }

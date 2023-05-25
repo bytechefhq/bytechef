@@ -55,9 +55,9 @@ public class AwsS3PresignGetObjectAction {
                 .placeholder("15M, 10H, PT-6H3M, etc.")
                 .required(true))
         .outputSchema(string())
-        .execute(AwsS3PresignGetObjectAction::executeGetPresignedObject);
+        .perform(AwsS3PresignGetObjectAction::perform);
 
-    protected static String executeGetPresignedObject(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
 
         Map<String, Object> connectionInputParameters = connection.getParameters();
