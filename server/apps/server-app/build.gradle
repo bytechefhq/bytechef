@@ -15,9 +15,9 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
-    implementation "org.springframework.boot:spring-boot-starter-webflux"
+    implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.kafka:spring-kafka"
-    implementation libs.org.springdoc.springdoc.openapi.starter.webflux.ui
+    implementation libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:ee:libs:dione:dione-integration:dione-integration-rest")
     implementation project(":server:ee:libs:dione:dione-integration:dione-integration-service")
