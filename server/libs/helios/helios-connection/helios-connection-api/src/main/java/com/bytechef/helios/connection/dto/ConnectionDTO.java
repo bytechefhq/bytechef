@@ -32,7 +32,7 @@ import java.util.Map;
 public record ConnectionDTO(
     boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
     LocalDateTime createdDate, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate, String name,
-    Map<String, Object> parameters, List<Tag> tags, int version) {
+    Map<String, ?> parameters, List<Tag> tags, int version) {
 
     public ConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         this(

@@ -77,9 +77,7 @@ public class OpenApiClient {
             .execute();
     }
 
-    private String createUrl(
-        Map<String, Object> metadata, Map<String, Object> parameters, List<? extends Property> properties) {
-
+    private String createUrl(Map<String, ?> metadata, Map<String, ?> parameters, List<? extends Property> properties) {
         String path = (String) metadata.get("path");
 
         for (Property property : properties) {
@@ -93,20 +91,18 @@ public class OpenApiClient {
     }
 
     private Body getBody(
-        BodyContentType bodyContentType, String mimeType, Map<String, Object> parameters,
+        BodyContentType bodyContentType, String mimeType, Map<String, ?> parameters,
         List<? extends Property> properties) {
 
-        Body body = null;
+        if (bodyContentType == null) {
+            return null;
+        }
 
-        if (bodyContentType != null) {
-            for (Property property : properties) {
-                if (!Objects.equals(
-                    MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
+        for (Property property : properties) {
+            if (Objects.equals(
+                MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
 
-                    continue;
-                }
-
-                body = switch (bodyContentType) {
+                return switch (bodyContentType) {
                     case BINARY -> Body.of(
                         MapValueUtils.get(parameters, property.getName(), FileEntry.class), mimeType);
                     case FORM_DATA -> Body.of(
@@ -129,10 +125,12 @@ public class OpenApiClient {
                     }
                     case RAW -> Body.of(MapValueUtils.getString(parameters, property.getName()), mimeType);
                 };
+
+                break;
             }
         }
 
-        return body;
+        return null;
     }
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
@@ -150,7 +148,7 @@ public class OpenApiClient {
     }
 
     private Map<String, List<String>> getValuesMap(
-        Map<String, Object> parameters, List<? extends Property> properties, PropertyType propertyType) {
+        Map<String, ?> parameters, List<? extends Property> properties, PropertyType propertyType) {
 
         Map<String, List<String>> valuesMap = new HashMap<>();
 

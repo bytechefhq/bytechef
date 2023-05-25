@@ -35,12 +35,12 @@ public class ContextConnectionImpl implements Context.Connection {
     private final String componentName;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final int connectionVersion;
-    private final Map<String, Object> parameters;
+    private final Map<String, ?> parameters;
 
     @SuppressFBWarnings("EI")
     public ContextConnectionImpl(
         String authorizationName, String componentName, ConnectionDefinitionService connectionDefinitionService,
-        int connectionVersion, Map<String, Object> parameters) {
+        int connectionVersion, Map<String, ?> parameters) {
 
         this.authorizationName = authorizationName;
         this.componentName = componentName;

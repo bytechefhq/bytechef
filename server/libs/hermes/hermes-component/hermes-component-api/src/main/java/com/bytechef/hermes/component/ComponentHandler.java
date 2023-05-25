@@ -34,12 +34,12 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
      * <code>performFunction</code> of an <code>ActionDefinition</code> instance is null.
      *
      * @param actionDefinition
-     * @param context
      * @param inputParameters
+     * @param context
      * @return the result of execution
      * @throws ComponentExecutionException
      */
-    default Object handleAction(ActionDefinition actionDefinition, Context context, Map<String, ?> inputParameters)
+    default Object handleAction(ActionDefinition actionDefinition, Map<String, ?> inputParameters, Context context)
         throws ComponentExecutionException {
 
         return null;
