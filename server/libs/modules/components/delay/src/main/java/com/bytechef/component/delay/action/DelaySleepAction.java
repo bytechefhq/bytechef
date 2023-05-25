@@ -45,9 +45,9 @@ public class DelaySleepAction {
             .description("Time in milliseconds.")
             .required(true)
             .defaultValue(1))
-        .execute(DelaySleepAction::executeDelay);
+        .perform(DelaySleepAction::perform);
 
-    protected static Object executeDelay(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         if (inputParameters.containsKey(MILLIS)) {
             sleep(MapValueUtils.getLong(inputParameters, MILLIS));
         } else if (inputParameters.containsKey("duration")) {

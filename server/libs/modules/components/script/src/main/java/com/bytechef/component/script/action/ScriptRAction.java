@@ -62,9 +62,9 @@ public class ScriptRAction {
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(ScriptRAction::executeR);
+        .perform(ScriptRAction::perform);
 
-    protected static Object executeR(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("R", inputParameters);
     }
 

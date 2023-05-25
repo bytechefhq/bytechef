@@ -48,16 +48,16 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .execute(FilesystemRmAction::executeRm);
+        .perform(FilesystemRmAction::perform);
 
     /**
-     * Deletes a file, never throwing an exception. If file is a directory, delete it and all subdirectories.
+     * Deletes a file, never throwing an exception. If a file is a directory, delete it and all subdirectories.
      *
      * <p>
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    protected static Object executeRm(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         File file = new File(MapValueUtils.getRequiredString(inputParameters, PATH));
 
         try {

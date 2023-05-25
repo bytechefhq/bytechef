@@ -20,6 +20,7 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -56,9 +57,9 @@ public class AwsS3GetObjectAction {
                 .description("The object key.")
                 .required(true))
         .outputSchema(fileEntry())
-        .execute(AwsS3GetObjectAction::executeGetObject);
+        .perform(AwsS3GetObjectAction::perform);
 
-    protected static Context.FileEntry executeGetObject(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
 
         Map<String, Object> connectionInputParameters = connection.getParameters();

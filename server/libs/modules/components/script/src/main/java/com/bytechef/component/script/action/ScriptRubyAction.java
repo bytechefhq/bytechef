@@ -61,9 +61,9 @@ public class ScriptRubyAction {
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(ScriptRubyAction::executeRuby);
+        .perform(ScriptRubyAction::perform);
 
-    protected static Object executeRuby(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters);
     }
 

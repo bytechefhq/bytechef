@@ -58,10 +58,10 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
             context, componentHandler.getDefinition(),
             () -> {
                 try {
-                    return actionDefinition.getExecute()
-                        .map(executeFunction -> executeFunction.apply(context, taskExecution.getParameters()))
+                    return actionDefinition.getPerform()
+                        .map(performFunction -> performFunction.apply(taskExecution.getParameters(), context))
                         .orElseGet(() -> componentHandler.handleAction(
-                            actionDefinition, context, taskExecution.getParameters()));
+                            actionDefinition, taskExecution.getParameters(), context));
                 } catch (Exception e) {
                     throw new TaskExecutionException(e.getMessage(), e);
                 }

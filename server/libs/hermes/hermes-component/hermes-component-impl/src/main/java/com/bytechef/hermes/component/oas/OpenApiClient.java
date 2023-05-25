@@ -125,8 +125,6 @@ public class OpenApiClient {
                     }
                     case RAW -> Body.of(MapValueUtils.getString(parameters, property.getName()), mimeType);
                 };
-
-                break;
             }
         }
 

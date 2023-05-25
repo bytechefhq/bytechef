@@ -69,9 +69,9 @@ public class DataMapperMapObjectsToListAction {
             getOutputSchemaFunction(),
             object().displayCondition("type === 1"),
             array().displayCondition("type === 2"))
-        .execute(DataMapperMapObjectsToListAction::execute);
+        .perform(DataMapperMapObjectsToListAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         // TODO
         return null;
     }

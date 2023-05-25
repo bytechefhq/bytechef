@@ -302,20 +302,18 @@ public interface TriggerDefinition {
     }
 
     /**
-     *
-     * @param triggerContext
      * @param inputParameters
      * @param headers
      * @param parameters
      * @param body
      * @param method
      * @param dynamicWebhookEnableOutput
+     * @param triggerContext
      */
     @SuppressFBWarnings("EI")
     record DynamicWebhookRequestContext(
-        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
-        WebhookParameters parameters, WebhookBody body, WebhookMethod method,
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
+        Map<String, ?> inputParameters, WebhookHeaders headers, WebhookParameters parameters, WebhookBody body,
+        WebhookMethod method, DynamicWebhookEnableOutput dynamicWebhookEnableOutput, TriggerContext triggerContext) {
     }
 
     /**
@@ -362,14 +360,13 @@ public interface TriggerDefinition {
     }
 
     /**
-     *
-     * @param triggerContext
      * @param inputParameters
      * @param closureParameters
+     * @param triggerContext
      */
     @SuppressFBWarnings("EI")
     record PollContext(
-        TriggerContext triggerContext, Map<String, ?> inputParameters, Map<String, Object> closureParameters) {
+        Map<String, ?> inputParameters, Map<String, Object> closureParameters, TriggerContext triggerContext) {
     }
 
     /**
@@ -405,18 +402,17 @@ public interface TriggerDefinition {
     }
 
     /**
-     *
-     * @param triggerContext
      * @param inputParameters
      * @param headers
      * @param parameters
      * @param body
      * @param method
+     * @param triggerContext
      */
     @SuppressFBWarnings("EI")
     record StaticWebhookRequestContext(
-        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
-        WebhookParameters parameters, WebhookBody body, WebhookMethod method) {
+        Map<String, ?> inputParameters, WebhookHeaders headers, WebhookParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext triggerContext) {
     }
 
     /**
@@ -604,18 +600,17 @@ public interface TriggerDefinition {
     }
 
     /**
-     *
-     * @param triggerContext
      * @param inputParameters
      * @param headers
      * @param parameters
      * @param body
      * @param method
+     * @param triggerContext
      */
     @SuppressFBWarnings("EI")
     record WebhookValidateContext(
-        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
-        WebhookParameters parameters, WebhookBody body, WebhookMethod method) {
+        Map<String, ?> inputParameters, WebhookHeaders headers, WebhookParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext triggerContext) {
     }
 
     /**

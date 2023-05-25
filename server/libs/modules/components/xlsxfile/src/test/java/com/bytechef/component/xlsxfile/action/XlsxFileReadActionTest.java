@@ -244,98 +244,98 @@ public class XlsxFileReadActionTest {
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             assertEquals(
                 new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, true, false, null, null, false, getFile("sample_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: true, includeEmptyCells: true, readAsString: false
 
             assertEquals(
                 new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, true, true, null, null, false, getFile("sample_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: true, includeEmptyCells: false, readAsString: true
 
             assertEquals(
                 new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, true, false, null, null, true, getFile("sample_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: true, includeEmptyCells: true, readAsString: true
 
             assertEquals(
                 new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, true, true, null, null, true, getFile("sample_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: false, includeEmptyCells: false, readAsString: false
 
             assertEquals(
                 new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, false, false, null, null, false, getFile("sample_no_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: false, includeEmptyCells: false, readAsString: true
 
             assertEquals(
                 new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, false, false, null, null, true, getFile("sample_no_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: false, includeEmptyCells: true, readAsString: false
 
             assertEquals(
                 new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, false, true, null, null, false, getFile("sample_no_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // headerRow: false, includeEmptyCells: true, readAsString: true
 
             assertEquals(
                 new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(
                         extension, false, true, null, null, true, getFile("sample_no_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
 
             // paging
 
             assertEquals(
                 new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                new JSONArray((List<?>) XlsxFileReadAction.executeRead(
-                    context,
+                new JSONArray((List<?>) XlsxFileReadAction.perform(
                     getReadParameters(extension, true, false, 1, 3, false, getFile("sample_header." + extension),
-                        mockedStatic))),
+                        mockedStatic),
+                    context)),
                 true);
         }
     }

@@ -41,9 +41,9 @@ public class LoggerWarnAction {
     public static final ActionDefinition ACTION_DEFINITION = action(WARN)
         .title("Warn")
         .properties(string(TEXT))
-        .execute(LoggerWarnAction::executeWarn);
+        .perform(LoggerWarnAction::perform);
 
-    protected static Object executeWarn(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         logger.warn(MapValueUtils.getString(inputParameters, TEXT));
 
         return null;

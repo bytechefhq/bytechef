@@ -54,9 +54,9 @@ public class HttpClientPatchAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(getOutputSchemaFunction(), HttpClientConstants.OUTPUT_PROPERTIES)
-        .execute((actionContext, inputParameters) -> executePatch(inputParameters));
+        .perform((inputParameters, actionContext) -> perform(inputParameters));
 
-    protected static Object executePatch(Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.PATCH);
     }
 

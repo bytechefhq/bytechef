@@ -94,10 +94,10 @@ public class JsonFileReadAction {
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(JsonFileReadAction::executeRead);
+        .perform(JsonFileReadAction::perform);
 
     @SuppressWarnings("unchecked")
-    protected static Object executeRead(Context context, Map<String, ?> inputParameters)
+    protected static Object perform(Map<String, ?> inputParameters, Context context)
         throws ComponentExecutionException {
 
         FileType fileType = getFileType(inputParameters);

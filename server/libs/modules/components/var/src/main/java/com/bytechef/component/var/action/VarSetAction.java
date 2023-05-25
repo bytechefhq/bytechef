@@ -112,9 +112,9 @@ public class VarSetAction {
                 .displayCondition("type === 10")
                 .required(true))
         .outputSchema()
-        .execute(VarSetAction::executeSetValue);
+        .perform(VarSetAction::perform);
 
-    protected static Object executeSetValue(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         return MapValueUtils.getRequired(inputParameters, VALUE);
     }
 }

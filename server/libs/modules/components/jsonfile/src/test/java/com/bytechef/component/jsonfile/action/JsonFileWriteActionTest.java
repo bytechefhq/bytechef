@@ -68,7 +68,7 @@ public class JsonFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
-            JsonFileWriteAction.executeWrite(context, Map.of());
+            JsonFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
                 ByteArrayInputStream.class);
@@ -101,7 +101,7 @@ public class JsonFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-            JsonFileWriteAction.executeWrite(context, Map.of());
+            JsonFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
                 .forClass(ByteArrayInputStream.class);
@@ -130,7 +130,7 @@ public class JsonFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-            JsonFileWriteAction.executeWrite(context, Map.of());
+            JsonFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -155,9 +155,9 @@ public class JsonFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-            JsonFileWriteAction.executeWrite(
-                context,
-                Map.of(FILE_TYPE, "JSONL", SOURCE, linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList()));
+            JsonFileWriteAction.perform(
+                Map.of(FILE_TYPE, "JSONL", SOURCE, linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList()),
+                context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
                 .forClass(ByteArrayInputStream.class);
@@ -186,12 +186,12 @@ public class JsonFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-            JsonFileWriteAction.executeWrite(
-                context,
+            JsonFileWriteAction.perform(
                 Map.of(
                     FILENAME, "test.jsonl",
                     FILE_TYPE, "JSONL",
-                    SOURCE, linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList()));
+                    SOURCE, linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList()),
+                context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

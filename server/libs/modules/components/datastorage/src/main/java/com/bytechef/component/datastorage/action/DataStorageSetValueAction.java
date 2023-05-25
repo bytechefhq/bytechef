@@ -115,9 +115,9 @@ public class DataStorageSetValueAction {
                 .description("The value to set under the specified key.")
                 .displayCondition("type === 10")
                 .required(true))
-        .execute(DataStorageSetValueAction::execute);
+        .perform(DataStorageSetValueAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

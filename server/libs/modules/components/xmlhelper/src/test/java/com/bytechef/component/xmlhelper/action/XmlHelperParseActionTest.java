@@ -50,7 +50,7 @@ public class XmlHelperParseActionTest {
             xmlUtilsMockedStatic.when(() -> XmlUtils.read(Mockito.anyString()))
                 .thenReturn(Map.of("id", "45", "name", "Poppy"));
 
-            assertThat((Map<String, ?>) XmlHelperParseAction.executeParse(Mockito.mock(Context.class), Map.of()))
+            assertThat((Map<String, ?>) XmlHelperParseAction.perform(Map.of(), Mockito.mock(Context.class)))
                 .isEqualTo(Map.of("id", "45", "name", "Poppy"));
         }
 
@@ -73,7 +73,7 @@ public class XmlHelperParseActionTest {
                 .thenReturn(
                     Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
 
-            assertThat(XmlHelperParseAction.executeParse(Mockito.mock(Context.class), Map.of()))
+            assertThat(XmlHelperParseAction.perform(Map.of(), Mockito.mock(Context.class)))
                 .isEqualTo(
                     Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
         }

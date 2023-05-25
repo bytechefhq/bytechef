@@ -48,9 +48,9 @@ public class AwsS3GetUrlAction {
                 .description("The object key.")
                 .required(true))
         .outputSchema(string())
-        .execute(AwsS3GetUrlAction::executeGetUrl);
+        .perform(AwsS3GetUrlAction::perform);
 
-    protected static String executeGetUrl(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
 
         Map<String, Object> connectionInputParameters = connection.getParameters();

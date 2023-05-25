@@ -74,9 +74,9 @@ public class AwsS3PutObjectAction {
                     option("public-read", "public-read"),
                     option("public-read-write", "public-read-write")))
         .outputSchema(string())
-        .execute(AwsS3PutObjectAction::executePutObject);
+        .perform(AwsS3PutObjectAction::perform);
 
-    protected static Object executePutObject(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
         FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
 

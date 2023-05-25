@@ -45,7 +45,7 @@ public class FilesystemMkdirAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .execute(FilesystemMkdirAction::executeMkdir);
+        .perform(FilesystemMkdirAction::perform);
 
     /**
      * Creates a directory by creating all nonexistent parent directories first.
@@ -53,7 +53,7 @@ public class FilesystemMkdirAction {
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
      */
-    protected static Object executeMkdir(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         try {
             return Files.createDirectories(Paths.get(MapValueUtils.getRequiredString(inputParameters, PATH)));
         } catch (IOException ioException) {

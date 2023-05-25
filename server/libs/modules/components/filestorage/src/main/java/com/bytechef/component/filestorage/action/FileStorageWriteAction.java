@@ -51,9 +51,9 @@ public class FileStorageWriteAction {
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .outputSchema(fileEntry())
-        .execute(FileStorageWriteAction::executeWrite);
+        .perform(FileStorageWriteAction::perform);
 
-    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         Object content = MapValueUtils.getRequired(inputParameters, CONTENT);
         String fileName = MapValueUtils.getString(inputParameters, FILENAME, "file.txt");
 

@@ -48,12 +48,12 @@ public class RandomHelperRandomFloatAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .execute(RandomHelperRandomFloatAction::executeNextFloat);
+        .perform(RandomHelperRandomFloatAction::perform);
 
     /**
      * Generates a random float.
      */
-    protected static Object executeNextFloat(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         int startInclusive = MapValueUtils.getInteger(inputParameters, START_INCLUSIVE, 0);
         int endInclusive = MapValueUtils.getInteger(inputParameters, END_INCLUSIVE, 100);
 

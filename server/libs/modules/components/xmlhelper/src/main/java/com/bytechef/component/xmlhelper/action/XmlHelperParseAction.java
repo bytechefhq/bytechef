@@ -44,9 +44,9 @@ public class XmlHelperParseAction {
             .description("The XML string to convert to the data.")
             .required(true))
         .outputSchema(object())
-        .execute(XmlHelperParseAction::executeParse);
+        .perform(XmlHelperParseAction::perform);
 
-    protected static Map<String, ?> executeParse(Context context, Map<String, ?> inputParameters) {
+    protected static Map<String, ?> perform(Map<String, ?> inputParameters, Context context) {
         String source = MapValueUtils.getRequiredString(inputParameters, SOURCE);
 
         return XmlUtils.read(source);
