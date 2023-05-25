@@ -49,8 +49,8 @@ dependencies {
     implementation libs.org.mapstruct
     implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
     implementation "org.springframework:spring-context"
-    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework:spring-web"
 
-    testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+    testImplementation "org.springframework.boot:spring-boot-starter-web"
     testImplementation project(":server:libs:core:encryption:encryption-api")
 }

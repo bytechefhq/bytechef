@@ -49,9 +49,9 @@ dependencies {
     implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
-    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework:spring-web"
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation project(":server:libs:core:commons:commons-util")
 
-    testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+    testImplementation "org.springframework.boot:spring-boot-starter-web"
 }

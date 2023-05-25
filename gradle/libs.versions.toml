@@ -51,7 +51,7 @@ org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.ma
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.7"
-org-springdoc-springdoc-openapi-starter-webflux-ui = "org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0"
+org-springdoc-springdoc-openapi-starter-webmvc-ui = "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0"
 org-springframework-boot-spring-boot = { module = "org.springframework.boot:spring-boot", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
