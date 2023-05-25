@@ -36,19 +36,19 @@ const OAuthPopup = (props: Props) => {
 
         if (error) {
             window.opener.postMessage({
-                type: OAUTH_RESPONSE,
                 error:
                     decodeURI(error) || 'OAuth error: An error has occurred.',
+                type: OAUTH_RESPONSE,
             });
         } else if (state && checkState(state)) {
             window.opener.postMessage({
-                type: OAUTH_RESPONSE,
                 payload,
+                type: OAUTH_RESPONSE,
             });
         } else {
             window.opener.postMessage({
-                type: OAUTH_RESPONSE,
                 error: 'OAuth error: State mismatch.',
+                type: OAUTH_RESPONSE,
             });
         }
     }, []);

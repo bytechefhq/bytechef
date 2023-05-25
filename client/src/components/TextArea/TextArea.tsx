@@ -13,7 +13,7 @@ type TextAreaProps = {
 >;
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-    ({label, name, error, labelClassName, ...props}, ref) => (
+    ({error, label, labelClassName, name, ...props}, ref) => (
         <fieldset className="mb-3">
             <label
                 htmlFor={name}

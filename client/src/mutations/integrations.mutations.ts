@@ -22,8 +22,8 @@ export const useCreateIntegrationMutation = (
                 integrationModel: integration,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateIntegrationMutationProps = {
@@ -37,12 +37,12 @@ export const useUpdateIntegrationMutation = (
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
             return new IntegrationsApi().updateIntegration({
-                integrationModel: integration,
                 id: integration.id!,
+                integrationModel: integration,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateIntegrationTagsMutationProps = {
@@ -57,8 +57,8 @@ export const useUpdateIntegrationTagsMutation = (
         mutationFn: (request: UpdateIntegrationTagsRequest) => {
             return new IntegrationsApi().updateIntegrationTags(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type DeleteIntegrationMutationProps = {
@@ -73,8 +73,8 @@ export const useDeleteIntegrationMutation = (
         mutationFn: (request: DeleteIntegrationRequest) => {
             return new IntegrationsApi().deleteIntegration(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type CreateIntegrationWorkflowRequestMutationProps = {
@@ -95,6 +95,6 @@ export const useCreateIntegrationWorkflowRequestMutation = (
         mutationFn: (request: CreateIntegrationWorkflowRequest) => {
             return new IntegrationsApi().createIntegrationWorkflow(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });

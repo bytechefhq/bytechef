@@ -23,13 +23,13 @@ type InputProps = {
 
 const DatePicker = ({
     className,
+    error,
     fieldsetClassName,
     label,
     labelClassName,
     name,
-    error,
-    placeholder,
     onChange,
+    placeholder,
 }: InputProps): JSX.Element => {
     const [date, setDate] = useState<Date | null>(null);
 
@@ -91,8 +91,8 @@ const Header = ({
     date,
     decreaseMonth,
     increaseMonth,
-    prevMonthButtonDisabled,
     nextMonthButtonDisabled,
+    prevMonthButtonDisabled,
 }: ReactDatePickerCustomHeaderProps): JSX.Element => (
     <div className="flex items-center justify-between p-2">
         <span className="text-lg text-gray-700">

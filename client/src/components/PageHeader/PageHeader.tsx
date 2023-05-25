@@ -9,10 +9,10 @@ interface PageHeaderProps {
 }
 
 const PageHeader = ({
-    title,
-    position = 'sidebar',
     leftSidebar = false,
+    position = 'sidebar',
     right,
+    title,
 }: PageHeaderProps) => (
     <header
         className={twMerge(

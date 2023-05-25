@@ -10,8 +10,8 @@ interface EmptyListProps {
 const EmptyList = ({
     button,
     icon,
-    title,
     message,
+    title,
 }: EmptyListProps): JSX.Element => (
     <div className="text-center">
         <span className="mx-auto inline-block">{icon}</span>

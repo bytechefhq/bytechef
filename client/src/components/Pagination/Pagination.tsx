@@ -11,9 +11,9 @@ interface ButtonProps {
 }
 
 const Button = ({
+    onClick,
     pageIndexToMap,
     pageNumber,
-    onClick,
 }: ButtonProps): JSX.Element => (
     <button
         aria-current="page"
@@ -39,11 +39,11 @@ interface PaginationProps {
 }
 
 const Pagination = ({
+    onClick,
     pageNumber,
     pageSize,
     totalElements,
     totalPages,
-    onClick,
 }: PaginationProps): JSX.Element => {
     const renderPageLinks = useCallback(() => {
         if (totalPages === 0) {

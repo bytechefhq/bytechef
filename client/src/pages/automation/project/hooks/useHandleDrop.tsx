@@ -22,7 +22,7 @@ export default function useHandleDrop(): [
             | TaskDispatcherDefinitionBasicModel
     ) => void
 ] {
-    const {getEdges, setEdges, getNodes, setNodes} = useReactFlow();
+    const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
     const newNodeId = getRandomId();
 
@@ -38,7 +38,6 @@ export default function useHandleDrop(): [
     ) {
         const newWorkflowNode = {
             ...targetNode,
-            name: droppedNode.name,
             data: {
                 icon: droppedNode?.icon || (
                     <PlayIcon className="h-9 w-9 text-gray-700" />
@@ -47,12 +46,13 @@ export default function useHandleDrop(): [
                 name: getFormattedName(droppedNode.name!, nodes),
                 originNodeName: droppedNode.name,
             },
+            name: droppedNode.name,
             type: 'workflow',
         };
 
         const newPlaceholderNode = {
-            id: newNodeId,
             data: {label: '+'},
+            id: newNodeId,
             position: {x: 0, y: 150},
             type: 'placeholder',
         };

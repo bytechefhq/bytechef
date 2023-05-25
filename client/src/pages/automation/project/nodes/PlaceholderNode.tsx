@@ -5,7 +5,7 @@ import {twMerge} from 'tailwind-merge';
 import PopoverMenu from '../components/PopoverMenu';
 import styles from './NodeTypes.module.css';
 
-const PlaceholderNode = ({id, data}: NodeProps) => {
+const PlaceholderNode = ({data, id}: NodeProps) => {
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
 
     return (

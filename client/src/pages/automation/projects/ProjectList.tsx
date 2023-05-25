@@ -14,9 +14,9 @@ const ProjectList = () => {
     const [searchParams] = useSearchParams();
 
     const {
-        isLoading,
-        error,
         data: projects,
+        error,
+        isLoading,
     } = useGetProjectsQuery({
         categoryIds: searchParams.get('categoryId')
             ? [parseInt(searchParams.get('categoryId')!)]
