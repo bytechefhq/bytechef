@@ -30,24 +30,24 @@ import java.util.Map;
 public interface ActionDefinitionService {
 
     String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        String authorizationName, Map<String, Object> connectionParameters);
-
-    List<OptionDTO> executeOptions(
-        String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters);
-
-    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        String authorizationName, Map<String, Object> connectionParameters);
+        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String authorizationName, Map<String, ?> connectionParameters);
 
     List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters);
+        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters);
+
+    List<OptionDTO> executeOptions(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters);
+
+    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String authorizationName, Map<String, ?> connectionParameters);
 
     Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        String authorizationName, Map<String, Object> connectionParameters);
+        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String authorizationName, Map<String, ?> connectionParameters);
 
     ActionDefinitionDTO getComponentActionDefinition(
         String actionName, String componentName, int componentVersion);

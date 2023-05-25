@@ -44,7 +44,7 @@ public class ContextConnectionFactory {
     }
 
     public Context.Connection createConnection(
-        String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String componentName, int componentVersion, Map<String, ?> connectionParameters,
         String authorizationName) {
 
         ComponentDefinitionDTO componentDefinitionDTO = componentDefinitionService.getComponentDefinition(

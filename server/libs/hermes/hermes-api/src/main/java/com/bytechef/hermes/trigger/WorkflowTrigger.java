@@ -136,7 +136,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return label;
     }
 
-    public Map<String, Object> getParameters() {
+    public Map<String, ?> getParameters() {
         return Collections.unmodifiableMap(parameters);
     }
 

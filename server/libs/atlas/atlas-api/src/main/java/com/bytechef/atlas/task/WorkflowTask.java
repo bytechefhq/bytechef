@@ -177,7 +177,7 @@ public class WorkflowTask implements Task {
         return node;
     }
 
-    public Map<String, Object> getParameters() {
+    public Map<String, ?> getParameters() {
         return Collections.unmodifiableMap(parameters);
     }
 

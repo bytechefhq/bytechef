@@ -242,7 +242,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     }
 
     @JsonIgnore
-    public Map<String, Object> getParameters() {
+    public Map<String, ?> getParameters() {
         return workflowTrigger.getParameters();
     }
 

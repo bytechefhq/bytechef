@@ -75,8 +75,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
-        String authorizationName, AuthorizationContext authorizationContext) {
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
+        AuthorizationContext authorizationContext) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -89,7 +89,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
         String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -163,7 +163,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public Optional<String> fetchBaseUri(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters) {
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
 
         ConnectionDefinition connectionDefinition = componentDefinitionRegistry.getComponentConnectionDefinition(
             componentName, connectionVersion);
@@ -207,7 +207,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
-        String componentName, int connectionVersion, Map<String, Object> connectionInputParameters,
+        String componentName, int connectionVersion, Map<String, ?> connectionInputParameters,
         String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(

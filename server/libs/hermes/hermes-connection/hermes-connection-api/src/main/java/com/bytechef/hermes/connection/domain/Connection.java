@@ -187,7 +187,7 @@ public final class Connection implements Persistable<Long> {
     /**
      * Return the connection parameters.
      */
-    public Map<String, Object> getParameters() {
+    public Map<String, ?> getParameters() {
         return Collections.unmodifiableMap(parameters.getMap());
     }
 
@@ -231,7 +231,7 @@ public final class Connection implements Persistable<Long> {
         this.name = name;
     }
 
-    public void setParameters(Map<String, Object> parameters) {
+    public void setParameters(Map<String, ?> parameters) {
         if (!CollectionUtils.isEmpty(parameters)) {
             this.parameters = new EncryptedMapWrapper(parameters);
         }
