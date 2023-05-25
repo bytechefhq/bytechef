@@ -7,7 +7,7 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
-        "reactive": "false",
+
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
