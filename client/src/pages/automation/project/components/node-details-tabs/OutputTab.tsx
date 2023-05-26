@@ -7,7 +7,7 @@ import {PropertyType} from '../../../../../types/projectTypes';
 import {useNodeDetailsDialogStore} from '../../stores/useNodeDetailsDialogStore';
 
 const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
-    <div className="inline-flex items-center rounded-md p-1.5 text-sm hover:bg-gray-100">
+    <div className="inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
         <span title={data.type}>
             {TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}
         </span>
@@ -46,7 +46,7 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
         <div className="max-h-full flex-[1_1_1px] p-4">
             {outputSchema.map((schema: PropertyType, index) => (
                 <>
-                    <div className="mb-2 flex items-center">
+                    <div className="mb-1 flex items-center">
                         <span title={schema.type}>
                             {TYPE_ICONS[schema.type as keyof typeof TYPE_ICONS]}
                         </span>
