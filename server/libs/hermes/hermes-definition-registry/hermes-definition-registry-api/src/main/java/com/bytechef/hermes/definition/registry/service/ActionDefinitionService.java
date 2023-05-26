@@ -49,8 +49,8 @@ public interface ActionDefinitionService {
         String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters);
 
-    ActionDefinitionDTO getComponentActionDefinition(
+    ActionDefinitionDTO getActionDefinition(
         String actionName, String componentName, int componentVersion);
 
-    List<ActionDefinitionDTO> getComponentActionDefinitions(String componentName, int componentVersion);
+    List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
 }

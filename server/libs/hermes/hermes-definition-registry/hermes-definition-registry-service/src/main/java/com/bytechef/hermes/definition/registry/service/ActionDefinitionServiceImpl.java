@@ -170,9 +170,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public ActionDefinitionDTO getComponentActionDefinition(
-        String actionName, String componentName, int componentVersion) {
-
+    public ActionDefinitionDTO getActionDefinition(String actionName, String componentName, int componentVersion) {
         ActionDefinition actionDefinition;
 
         if (Objects.equals(actionName, CustomAction.CUSTOM)) {
@@ -185,37 +183,31 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 actionName, componentName, componentVersion);
         }
 
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
-
-        return toActionDefinitionDTO(actionDefinition, componentDefinition);
+        return toActionDefinitionDTO(actionDefinition);
     }
 
     @Override
-    public List<ActionDefinitionDTO> getComponentActionDefinitions(String componentName, int componentVersion) {
+    public List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
         List<ActionDefinitionDTO> actionDefinitionDTOs =
             componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
                 .stream()
-                .map(actionDefinition -> toActionDefinitionDTO(actionDefinition, componentDefinition))
+                .map(this::toActionDefinitionDTO)
                 .toList();
 
         if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
             actionDefinitionDTOs = new ArrayList<>(actionDefinitionDTOs);
 
             actionDefinitionDTOs.add(
-                toActionDefinitionDTO(CustomAction.getCustomActionDefinition(componentDefinition),
-                    componentDefinition));
+                toActionDefinitionDTO(CustomAction.getCustomActionDefinition(componentDefinition)));
         }
 
         return actionDefinitionDTOs;
     }
 
-    private ActionDefinitionDTO toActionDefinitionDTO(
-        ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
-
-        return new ActionDefinitionDTO(actionDefinition, componentDefinition);
+    private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
+        return new ActionDefinitionDTO(actionDefinition);
     }
 }

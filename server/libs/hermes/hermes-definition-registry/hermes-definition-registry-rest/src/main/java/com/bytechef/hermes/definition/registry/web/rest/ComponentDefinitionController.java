@@ -96,7 +96,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                actionDefinitionService.getComponentActionDefinition(actionName, componentName, componentVersion),
+                actionDefinitionService.getActionDefinition(actionName, componentName, componentVersion),
                 ActionDefinitionModel.class));
     }
 
@@ -105,7 +105,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion) {
 
         return ResponseEntity.ok(
-            actionDefinitionService.getComponentActionDefinitions(componentName, componentVersion)
+            actionDefinitionService.getActionDefinitions(componentName, componentVersion)
                 .stream()
                 .map(actionDefinition -> conversionService.convert(
                     actionDefinition, ActionDefinitionBasicModel.class))

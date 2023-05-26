@@ -54,7 +54,7 @@ public class ActionDefinitionServiceController {
         @PathVariable("actionName") String actionName) {
 
         return ResponseEntity.ok(
-            actionDefinitionService.getComponentActionDefinition(actionName, componentName, componentVersion));
+            actionDefinitionService.getActionDefinition(actionName, componentName, componentVersion));
     }
 
     @RequestMapping(
@@ -68,6 +68,6 @@ public class ActionDefinitionServiceController {
         @PathVariable("componentVersion") Integer componentVersion) {
 
         return ResponseEntity.ok(
-            actionDefinitionService.getComponentActionDefinitions(componentName, componentVersion));
+            actionDefinitionService.getActionDefinitions(componentName, componentVersion));
     }
 }
