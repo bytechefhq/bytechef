@@ -33,6 +33,8 @@ public interface ConnectionFacade {
 
     ConnectionDTO getConnection(Long id);
 
+    List<ConnectionDTO> getConnections(String componentName, Integer componentVersion);
+
     List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds);
 
     List<Tag> getConnectionTags();

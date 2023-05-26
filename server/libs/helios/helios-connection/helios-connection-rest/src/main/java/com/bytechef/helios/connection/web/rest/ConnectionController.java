@@ -35,7 +35,6 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ConnectionController implements ConnectionsApi {
 
@@ -74,6 +73,18 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
+    public ResponseEntity<List<ConnectionModel>> getComponentConnections(
+        String componentName, Integer componentVersion) {
+
+        return ResponseEntity.ok(
+            connectionFacade.getConnections(componentName, componentVersion)
+                .stream()
+                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
+                    .parameters(null))
+                .toList());
+    }
+
+    @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<List<ConnectionModel>> getConnections(
         List<String> componentNames, List<Long> tagIds) {
@@ -81,9 +92,8 @@ public class ConnectionController implements ConnectionsApi {
         return ResponseEntity.ok(
             connectionFacade.getConnections(componentNames, tagIds)
                 .stream()
-                .map(
-                    connection -> conversionService.convert(connection, ConnectionModel.class)
-                        .parameters(null))
+                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
+                    .parameters(null))
                 .toList());
     }
 
