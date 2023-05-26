@@ -130,7 +130,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .required(true),
                         string(JdbcConstants.PASSWORD)
                             .label("Password")
-                            .controlType(Property.ControlType.INPUT_PASSWORD)
+                            .controlType(Property.ControlType.PASSWORD)
                             .required(true)))
             .actions(
                 action(JdbcConstants.QUERY)

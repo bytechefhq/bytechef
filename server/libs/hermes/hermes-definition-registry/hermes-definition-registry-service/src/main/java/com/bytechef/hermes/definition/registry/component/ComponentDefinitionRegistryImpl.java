@@ -154,7 +154,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
         return CollectionUtils.getFirst(
             getComponentDefinitions(),
-            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+            componentDefinition -> Objects.equals(componentName, componentDefinition.getName()) &&
                 componentDefinition.getVersion() == componentVersion,
             componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
     }
@@ -168,10 +168,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     public List<ConnectionDefinition> getConnectionDefinitions(
         String componentName, int componentVersion) {
 
-        ComponentDefinition componentDefinition = CollectionUtils.getFirst(
-            componentDefinitions,
-            curComponentDefinition -> Objects.equals(curComponentDefinition.getName(), componentName) &&
-                curComponentDefinition.getVersion() == componentVersion);
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return CollectionUtils.concatDistinct(
             applyFilterCompatibleConnectionDefinitions(componentDefinition, connectionDefinitions),

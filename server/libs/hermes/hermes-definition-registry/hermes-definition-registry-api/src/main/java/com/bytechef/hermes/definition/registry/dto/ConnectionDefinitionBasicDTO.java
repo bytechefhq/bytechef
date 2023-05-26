@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,13 +29,15 @@ import java.util.Optional;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDefinitionBasicDTO(
-    Optional<String> description, String name, String title, int version) {
+    Optional<String> componentDescription, String componentName, String componentTitle, int version) {
 
     public ConnectionDefinitionBasicDTO(
         ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
 
         this(
             componentDefinition.getDescription(), componentDefinition.getName(),
-            ComponentDefinitionDTO.getTitle(componentDefinition), connectionDefinition.getVersion());
+            ComponentDefinitionDTO.getTitle(
+                componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null)),
+            connectionDefinition.getVersion());
     }
 }

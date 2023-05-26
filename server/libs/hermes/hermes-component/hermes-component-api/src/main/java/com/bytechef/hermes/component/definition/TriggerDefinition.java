@@ -66,6 +66,12 @@ public interface TriggerDefinition {
      */
     Optional<Boolean> getBatch();
 
+    Optional<String> getComponentDescription();
+
+    String getComponentName();
+
+    Optional<String> getComponentTitle();
+
     /**
      * TODO
      *

@@ -45,6 +45,12 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      */
     Optional<Boolean> getDeprecated();
 
+    Optional<String> getComponentDescription();
+
+    String getComponentName();
+
+    Optional<String> getComponentTitle();
+
     /**
      *
      * @return

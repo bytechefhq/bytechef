@@ -19,8 +19,6 @@ package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Optional;
@@ -32,15 +30,11 @@ import java.util.Optional;
 public record ActionDefinitionBasicDTO(
     boolean batch, String description, Optional<HelpDTO> help, String name, String title) {
 
-    public ActionDefinitionBasicDTO(ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+    public ActionDefinitionBasicDTO(ActionDefinition actionDefinition) {
         this(
             OptionalUtils.orElse(actionDefinition.getBatch(), false),
-            ActionDefinitionDTO.getDescription(actionDefinition, componentDefinition),
-            getHelp(actionDefinition.getHelp()), actionDefinition.getName(),
+            ActionDefinitionDTO.getDescription(actionDefinition),
+            OptionalUtils.mapOptional(actionDefinition.getHelp(), HelpDTO::new), actionDefinition.getName(),
             ActionDefinitionDTO.getTitle(actionDefinition));
-    }
-
-    private static Optional<HelpDTO> getHelp(Optional<Help> help) {
-        return help.map(HelpDTO::new);
     }
 }
