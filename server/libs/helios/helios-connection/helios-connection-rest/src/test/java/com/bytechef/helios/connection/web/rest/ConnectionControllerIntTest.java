@@ -147,7 +147,7 @@ public class ConnectionControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections(null, null)).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections((List<String>) null, null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()

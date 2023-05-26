@@ -35,13 +35,7 @@ public interface ConnectionRepository
 
     List<Connection> findAllByComponentNameInOrderByName(List<String> componentNames);
 
-    @Query("""
-            SELECT connection.* FROM connection
-            JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection_tag.tag_id IN (:tagIds)
-            ORDER BY connection.name
-        """)
-    List<Connection> findAllByTagIdIn(@Param("tagIds") List<Long> tagIds);
+    List<Connection> findAllByComponentNameAndConnectionVersion(String componentName, int version);
 
     @Query("""
             SELECT connection.* FROM connection
@@ -52,4 +46,12 @@ public interface ConnectionRepository
         """)
     List<Connection> findAllByComponentNamesAndTagIds(
         @Param("componentNames") List<String> componentNames, @Param("tagIds") List<Long> tagIds);
+
+    @Query("""
+            SELECT connection.* FROM connection
+            JOIN connection_tag ON connection.id = connection_tag.connection_id
+            WHERE connection_tag.tag_id IN (:tagIds)
+            ORDER BY connection.name
+        """)
+    List<Connection> findAllByTagIdIn(@Param("tagIds") List<Long> tagIds);
 }
