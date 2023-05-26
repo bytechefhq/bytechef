@@ -51,7 +51,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    */
   public enum StatusEnum {
     DISABLED("DISABLED"),
-    
+
     ENABLED("ENABLED");
 
     private String value;
@@ -108,7 +108,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The description of a project instance.
    * @return description
   */
-  
+
   @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -128,7 +128,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The created by.
    * @return createdBy
   */
-  
+
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -148,7 +148,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The created date.
    * @return createdDate
   */
-  @Valid 
+  @Valid
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
@@ -168,7 +168,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The id of a project instance.
    * @return id
   */
-  
+
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -188,7 +188,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The last execution date.
    * @return lastExecutionDate
   */
-  
+
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
   public String getLastExecutionDate() {
@@ -208,7 +208,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-  
+
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -228,7 +228,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid 
+  @Valid
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
@@ -248,7 +248,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The name of a project instance.
    * @return name
   */
-  @NotNull 
+  @NotNull
   @Schema(name = "name", description = "The name of a project instance.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -268,7 +268,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * Th id of a project.
    * @return projectId
   */
-  
+
   @Schema(name = "projectId", description = "Th id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectId")
   public Long getProjectId() {
@@ -288,7 +288,7 @@ public class ProjectInstanceWorkflowProjectInstanceModel {
    * The status of a project instance.
    * @return status
   */
-  
+
   @Schema(name = "status", description = "The status of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")
   public StatusEnum getStatus() {

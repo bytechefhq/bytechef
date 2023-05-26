@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * A type of the control to show in UI.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:35.328005+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-27T10:19:33.855801+02:00[Europe/Zagreb]")
 public enum ControlTypeModel {
   
   CHECKBOX("CHECKBOX"),
@@ -31,27 +31,19 @@ public enum ControlTypeModel {
   
   DATE_TIME("DATE_TIME"),
   
-  EMAIL("EMAIL"),
-  
   EXPRESSION("EXPRESSION"),
   
-  INPUT_EMAIL("INPUT_EMAIL"),
+  EMAIL("EMAIL"),
   
-  INPUT_INTEGER("INPUT_INTEGER"),
-  
-  INPUT_NUMBER("INPUT_NUMBER"),
-  
-  INPUT_PASSWORD("INPUT_PASSWORD"),
-  
-  INPUT_PHONE("INPUT_PHONE"),
-  
-  INPUT_TEXT("INPUT_TEXT"),
-  
-  INPUT_URL("INPUT_URL"),
+  INTEGER("INTEGER"),
   
   OBJECT_BUILDER("OBJECT_BUILDER"),
   
   MULTI_SELECT("MULTI_SELECT"),
+  
+  NUMBER("NUMBER"),
+  
+  PASSWORD("PASSWORD"),
   
   PHONE("PHONE"),
   
@@ -59,7 +51,7 @@ public enum ControlTypeModel {
   
   SELECT("SELECT"),
   
-  SUBDOMAIN("SUBDOMAIN"),
+  TEXT("TEXT"),
   
   TEXT_AREA("TEXT_AREA"),
   
