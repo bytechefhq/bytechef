@@ -35,10 +35,7 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.service.web.rest.client.facade.ComponentDefinitionFacadeClient;
-import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ActionDefinitionServiceClient;
-import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ComponentDefinitionServiceClient;
-import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ConnectionDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.ConnectionDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -72,13 +69,6 @@ public class DefinitionRegistryConfiguration {
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
 
         return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
-    }
-
-    @Bean
-    ActionDefinitionServiceClient actionDefinitionServiceClient(
-        DiscoveryClient discoveryClient) {
-
-        return new ActionDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
@@ -149,7 +139,7 @@ public class DefinitionRegistryConfiguration {
 
     /**
      * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, HttpClient)
-     * uses a connection from a different component that can be in a different worker instance.
+     * uses a compatible connection from a different component that can be in a different worker instance.
      */
     private static class WorkerConnectionDefinitionService implements ConnectionDefinitionService {
 

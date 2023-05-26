@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * @author Ivica Cardic
@@ -53,27 +54,35 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
 
         return componentDefinitionService.getComponentDefinitions()
             .stream()
-            .filter(componentDefinition -> {
-                if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
-                    return false;
-                }
-
-                if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.connection())) {
-                    return false;
-                }
-
-                if (connectionInstances != null && noneMatch(connections, componentDefinition)) {
-                    return false;
-                }
-
-                if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.triggers())) {
-                    return false;
-                }
-
-                return true;
-            })
+            .filter(filter(
+                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, connections))
             .distinct()
             .toList();
+    }
+
+    private static Predicate<ComponentDefinitionDTO> filter(
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions, List<Connection> connections) {
+
+        return componentDefinition -> {
+            if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
+                return false;
+            }
+
+            if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.connection())) {
+                return false;
+            }
+
+            if (connectionInstances != null && noneMatch(connections, componentDefinition)) {
+                return false;
+            }
+
+            if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.triggers())) {
+                return false;
+            }
+
+            return true;
+        };
     }
 
     private static boolean noneMatch(List<Connection> connections, ComponentDefinitionDTO componentDefinition) {
