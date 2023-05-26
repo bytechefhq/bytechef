@@ -3,6 +3,7 @@ import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
 } from 'middleware/core/definition-registry';
+import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 
 import getFormattedName from '../utils/getFormattedName';
@@ -25,9 +26,7 @@ export default function useHandleDrop(): [
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
     const newNodeId = getRandomId();
-
     const nodes = getNodes();
-
     const edges = getEdges();
 
     function handleDropOnPlaceholderNode(
@@ -39,7 +38,12 @@ export default function useHandleDrop(): [
         const newWorkflowNode = {
             ...targetNode,
             data: {
-                icon: droppedNode?.icon || (
+                icon: droppedNode?.icon ? (
+                    <InlineSVG
+                        className="h-9 w-9 text-gray-700"
+                        src={droppedNode?.icon}
+                    />
+                ) : (
                     <PlayIcon className="h-9 w-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
@@ -120,7 +124,12 @@ export default function useHandleDrop(): [
 
         const draggedNode = {
             data: {
-                icon: droppedNode?.icon || (
+                icon: droppedNode?.icon ? (
+                    <InlineSVG
+                        className="h-9 w-9 text-gray-700"
+                        src={droppedNode.icon}
+                    />
+                ) : (
                     <PlayIcon className="h-9 w-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
