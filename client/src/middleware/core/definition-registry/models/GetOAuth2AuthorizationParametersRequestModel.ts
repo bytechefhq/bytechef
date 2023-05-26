@@ -32,7 +32,7 @@ export interface GetOAuth2AuthorizationParametersRequestModel {
      */
     componentName: string;
     /**
-     * The version of a component that uses this connection.
+     * The version of a connection.
      * @type {number}
      * @memberof GetOAuth2AuthorizationParametersRequestModel
      */
