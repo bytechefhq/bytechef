@@ -38,7 +38,7 @@ import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 public class BashExecuteActionTest {
 
     @Test
-    public void testExecute() {
+    public void testPerform() {
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             String script = "ls -l " + BashComponentHandlerTest.class
                 .getClassLoader()

@@ -63,7 +63,7 @@ public class JsonFileReadActionTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testExecuteReadJSON() throws JSONException, IOException {
+    public void testPerformReadJSON() throws JSONException, IOException {
         File file = getFile("sample.json");
 
         Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
@@ -96,7 +96,7 @@ public class JsonFileReadActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
-    public void testExecuteReadJSONArray() throws JSONException, FileNotFoundException {
+    public void testPerformReadJSONArray() throws JSONException, FileNotFoundException {
         File file = getFile("sample_array.json");
 
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
@@ -148,7 +148,7 @@ public class JsonFileReadActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
-    public void testExecuteReadJSONL() throws JSONException, IOException {
+    public void testPerformReadJSONL() throws JSONException, IOException {
         File file = getFile("sample.jsonl");
 
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))

@@ -56,7 +56,7 @@ public class JsonFileWriteActionTest {
     }
 
     @Test
-    public void testExecuteWriteJSON() throws JSONException {
+    public void testPerformWriteJSON() throws JSONException {
         File file = getFile("sample.json");
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
@@ -89,7 +89,7 @@ public class JsonFileWriteActionTest {
     }
 
     @Test
-    public void testExecuteWriteJSONArray() throws JSONException {
+    public void testPerformWriteJSONArray() throws JSONException {
         File file = getFile("sample_array.json");
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
@@ -143,7 +143,7 @@ public class JsonFileWriteActionTest {
     }
 
     @Test
-    public void testExecuteWriteJSONL() throws JSONException {
+    public void testPerformWriteJSONL() throws JSONException {
         File file = getFile("sample.jsonl");
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {

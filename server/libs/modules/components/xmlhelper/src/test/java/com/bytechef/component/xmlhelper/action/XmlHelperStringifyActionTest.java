@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class XmlHelperStringifyActionTest {
 
     @Test
-    public void testExecuteStringify() {
+    public void testPerformStringify() {
         try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
             MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
 

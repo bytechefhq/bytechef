@@ -51,7 +51,7 @@ public class OdsFileReadActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteReadODS() throws IOException, JSONException {
+    public void testPerformReadODS() throws IOException, JSONException {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {

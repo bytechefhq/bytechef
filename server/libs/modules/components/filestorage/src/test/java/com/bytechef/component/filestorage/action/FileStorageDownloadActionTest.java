@@ -27,7 +27,7 @@ public class FileStorageDownloadActionTest {
 
     @Disabled
     @Test
-    public void testExecuteDownload() {
+    public void testPerformDownload() {
         // TODO
     }
 }

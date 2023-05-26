@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class XmlHelperParseActionTest {
 
     @Test
-    public void testExecuteParse() {
+    public void testPerformParse() {
         try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
             MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
 

@@ -50,7 +50,7 @@ public class OdsFileWriteActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteWriteODS() throws JSONException, IOException {
+    public void testPerformWriteODS() throws JSONException, IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
