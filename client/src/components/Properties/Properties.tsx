@@ -271,7 +271,7 @@ export const Property = ({
                         {label: 'True', value: 'true'},
                         {label: 'False', value: 'false'},
                     ]}
-                    triggerClassName="w-full bg-gray-100 border-none"
+                    triggerClassName="w-full border border-gray-300"
                 />
             )}
 
