@@ -9,6 +9,35 @@ tags:
 - name: "connections"
   description: "The Automation Connections API"
 paths:
+  /component-definitions/{componentName}/{componentVersion}/connections:
+    get:
+      description: "Get component connections."
+      summary: "Get component connections"
+      tags:
+      - "connections"
+      operationId: "getComponentConnections"
+      parameters:
+      - name: "componentName"
+        description: "The component name."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The component version."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "A list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
   /connection-tags:
     get:
       description: "Get connection tags."
