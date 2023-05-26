@@ -42,7 +42,7 @@ public class FileStorageWriteActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteWrite() {
+    public void testPerformWrite() {
         File file = getFile();
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {

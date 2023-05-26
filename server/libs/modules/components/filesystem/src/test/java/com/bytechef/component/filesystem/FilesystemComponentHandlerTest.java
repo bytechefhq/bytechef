@@ -33,37 +33,37 @@ public class FilesystemComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testExecuteCreateDir() {
+    public void testPerformCreateDir() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteCreateTempDir() {
+    public void testPerformCreateTempDir() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteDelete() {
+    public void testPerformDelete() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteDownload() {
+    public void testPerformDownload() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteGetFilePath() {
+    public void testPerformGetFilePath() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteList() {
+    public void testPerformList() {
         // TODO
     }
 }

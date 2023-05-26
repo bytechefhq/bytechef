@@ -61,7 +61,7 @@ public class ExecuteJdbcOperationIntTest {
     }
 
     @Test
-    public void testExecute() {
+    public void testPerform() {
         Context context = Mockito.mock(Context.class);
 
         Mockito.when(context.fetchConnection())

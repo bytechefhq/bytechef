@@ -27,7 +27,7 @@ public class TestWorkflowExecutorTest {
 
     @Disabled
     @Test
-    public void testExecute() {
+    public void testPerform() {
         // TODO
     }
 }
