@@ -53,7 +53,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"batch":null,"deprecated":null,"description":"description","sampleOutput":null,"perform":null,"help":null,"metadata":null,"name":"name","properties":null,"title":"title","editorDescriptionDataSource":null,"outputSchema":null,"outputSchemaDataSource":null,"sampleOutputDataSource":null}
+                {"batch":null,"componentDescription":null,"componentName":null,"componentTitle":null,"deprecated":null,"description":"description","sampleOutput":null,"help":null,"metadata":null,"name":"name","properties":null,"title":"title","editorDescriptionDataSource":null,"outputSchema":null,"outputSchemaDataSource":null,"sampleOutputDataSource":null,"perform":null}
                 """,
             action);
     }
@@ -70,7 +70,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"expressionEnabled":null,"hidden":null,"label":null,"metadata":{},"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}],"multipleValues":null,"options":null,"controlType":"OBJECT_BUILDER","optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"expressionEnabled":null,"hidden":null,"label":null,"metadata":{},"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}],"multipleValues":null,"options":null,"controlType":"OBJECT_BUILDER","optionsDataSource":null}
                 """,
             property);
     }
@@ -149,7 +149,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"INTEGER","defaultValue":2,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"controlType":"INPUT_INTEGER","optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"INTEGER","defaultValue":2,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"controlType":"INTEGER","optionsDataSource":null}
                  """,
             property);
     }
@@ -198,7 +198,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"INPUT_TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}
                 """,
             property);
     }

@@ -894,7 +894,7 @@ public class DefinitionDSL {
             @Override
             public ControlType getControlType() {
                 if ((options == null || options.isEmpty()) && optionsFunction == null) {
-                    return ControlType.INPUT_INTEGER;
+                    return ControlType.INTEGER;
                 } else {
                     return ControlType.SELECT;
                 }
@@ -1053,7 +1053,7 @@ public class DefinitionDSL {
             @Override
             public ControlType getControlType() {
                 if ((options == null || options.isEmpty()) && optionsFunction == null) {
-                    return ControlType.INPUT_NUMBER;
+                    return ControlType.NUMBER;
                 } else {
                     return ControlType.SELECT;
                 }
@@ -1315,7 +1315,7 @@ public class DefinitionDSL {
             public ControlType getControlType() {
                 if (this.controlType == null) {
                     if ((options == null || options.isEmpty()) && optionsFunction == null) {
-                        return ControlType.INPUT_TEXT;
+                        return ControlType.TEXT;
                     } else {
                         return ControlType.SELECT;
                     }

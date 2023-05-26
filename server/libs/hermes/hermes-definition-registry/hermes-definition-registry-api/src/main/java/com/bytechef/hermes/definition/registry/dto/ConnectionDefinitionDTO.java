@@ -20,7 +20,6 @@ package com.bytechef.hermes.definition.registry.dto;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -33,19 +32,22 @@ import java.util.Optional;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDefinitionDTO(
-    boolean authorizationRequired, List<AuthorizationDTO> authorizations, Optional<String> description, String name,
-    List<? extends PropertyDTO> properties, String title, int version) {
+    boolean authorizationRequired, List<AuthorizationDTO> authorizations, Optional<String> componentDescription,
+    String componentName, String componentTitle, List<? extends PropertyDTO> properties, int version) {
 
-    public ConnectionDefinitionDTO(ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
+    public ConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
         this(
             connectionDefinition.isAuthorizationRequired(),
             toAuthorizationDTOs(
                 OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList())),
-            componentDefinition.getDescription(), componentDefinition.getName(),
+            connectionDefinition.getComponentDescription(), connectionDefinition.getComponentName(),
+            ComponentDefinitionDTO.getTitle(
+                connectionDefinition.getComponentName(),
+                OptionalUtils.orElse(connectionDefinition.getComponentTitle(), null)),
             CollectionUtils.map(
                 OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
                 valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
-            ComponentDefinitionDTO.getTitle(componentDefinition), connectionDefinition.getVersion());
+            connectionDefinition.getVersion());
     }
 
     private static List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {
@@ -55,12 +57,8 @@ public record ConnectionDefinitionDTO(
                 CollectionUtils.map(
                     OptionalUtils.orElse(authorization.getProperties(), List.of()),
                     valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
-                OptionalUtils.orElse(authorization.getTitle(), getDefaultTitle(authorization)),
+                OptionalUtils.orElse(authorization.getTitle(), authorization.getName()),
                 authorization.getType()))
             .toList();
-    }
-
-    private static String getDefaultTitle(Authorization authorization) {
-        return authorization.getName();
     }
 }

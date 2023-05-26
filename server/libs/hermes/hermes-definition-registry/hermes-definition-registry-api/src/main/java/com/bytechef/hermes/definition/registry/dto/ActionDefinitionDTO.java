@@ -20,8 +20,6 @@ package com.bytechef.hermes.definition.registry.dto;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
@@ -38,13 +36,13 @@ public record ActionDefinitionDTO(
     List<? extends PropertyDTO> properties, Optional<Object> sampleOutput, boolean sampleOutputDataSource,
     String title) {
 
-    public ActionDefinitionDTO(ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+    public ActionDefinitionDTO(ActionDefinition actionDefinition) {
         this(
             OptionalUtils.orElse(actionDefinition.getBatch(), false),
-            getDescription(actionDefinition, componentDefinition),
+            getDescription(actionDefinition),
             OptionalUtils.mapOrElse(
                 actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
-            getHelp(actionDefinition.getHelp()), actionDefinition.getName(),
+            OptionalUtils.mapOptional(actionDefinition.getHelp(), HelpDTO::new), actionDefinition.getName(),
             CollectionUtils.map(
                 OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList()),
                 PropertyDTO::toPropertyDTO),
@@ -59,17 +57,16 @@ public record ActionDefinitionDTO(
             getTitle(actionDefinition));
     }
 
-    public static String getDescription(ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+    public static String getDescription(ActionDefinition actionDefinition) {
         return OptionalUtils.orElse(
             actionDefinition.getDescription(),
-            ComponentDefinitionDTO.getTitle(componentDefinition) + ": " + getTitle(actionDefinition));
+            ComponentDefinitionDTO.getTitle(
+                actionDefinition.getComponentName(),
+                OptionalUtils.orElse(actionDefinition.getComponentTitle(), null)) + ": "
+                + getTitle(actionDefinition));
     }
 
     public static String getTitle(ActionDefinition actionDefinition) {
         return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
-    }
-
-    private static Optional<HelpDTO> getHelp(Optional<Help> help) {
-        return help.map(HelpDTO::new);
     }
 }

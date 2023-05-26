@@ -52,6 +52,10 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableActionDefinition(name);
     }
 
+    public static ModifiableActionDefinition action(String name, ComponentDefinition componentDefinition) {
+        return new ModifiableActionDefinition(name, componentDefinition);
+    }
+
     public static ModifiableAuthorization authorization(String name, AuthorizationType authorizationType) {
         return new ModifiableAuthorization(name, authorizationType);
     }
@@ -132,6 +136,9 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
+        private String componentName;
+        private String componentDescription;
+        private String componentTitle;
         private Boolean deprecated;
         private String description;
         private Object sampleOutput;
@@ -148,6 +155,15 @@ public final class ComponentDSL extends DefinitionDSL {
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
+        }
+
+        private ModifiableActionDefinition(String name, ComponentDefinition componentDefinition) {
+            this.name = Objects.requireNonNull(name);
+            this.componentDescription = componentDefinition.getDescription()
+                .orElse(null);
+            this.componentName = componentDefinition.getName();
+            this.componentTitle = componentDefinition.getTitle()
+                .orElse(null);
         }
 
         public ModifiableActionDefinition batch(boolean batch) {
@@ -260,6 +276,31 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<Boolean> getBatch() {
+            return Optional.ofNullable(batch);
+        }
+
+        @Override
+        public Optional<Boolean> getDeprecated() {
+            return Optional.ofNullable(deprecated);
+        }
+
+        @Override
+        public Optional<String> getComponentDescription() {
+            return Optional.ofNullable(componentDescription);
+        }
+
+        @Override
+        public String getComponentName() {
+            return componentName;
+        }
+
+        @Override
+        public Optional<String> getComponentTitle() {
+            return Optional.ofNullable(componentTitle);
+        }
+
+        @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
         }
@@ -325,16 +366,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
-        }
-
-        @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.ofNullable(batch);
-        }
-
-        @Override
-        public Optional<Boolean> getDeprecated() {
-            return Optional.ofNullable(deprecated);
         }
     }
 
@@ -582,7 +613,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         private List<? extends ActionDefinition> actions;
         private String category;
-        private ModifiableConnectionDefinition connection;
+        private ConnectionDefinition connection;
         private Boolean customAction;
         private Help customActionHelp;
         private String description;
@@ -602,15 +633,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition actions(ActionDefinition... actionDefinitions) {
             if (actionDefinitions != null) {
-                this.actions = List.of(actionDefinitions);
-            }
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition actions(ModifiableActionDefinition... actionDefinitions) {
-            if (actionDefinitions != null) {
-                this.actions = List.of(actionDefinitions);
+                return actions(List.of(actionDefinitions));
             }
 
             return this;
@@ -619,6 +642,14 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition actions(List<ActionDefinition> actionDefinitions) {
             if (actionDefinitions != null) {
                 this.actions = Collections.unmodifiableList(actionDefinitions);
+
+                for (ActionDefinition actionDefinition : actions) {
+                    ((ModifiableActionDefinition) actionDefinition).componentDescription = this.getDescription()
+                        .orElse(null);
+                    ((ModifiableActionDefinition) actionDefinition).componentName = this.getName();
+                    ((ModifiableActionDefinition) actionDefinition).componentTitle = this.getTitle()
+                        .orElse(null);
+                }
             }
 
             return this;
@@ -631,13 +662,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
-            this.connection = (ModifiableConnectionDefinition) connectionDefinition;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition;
+
+            ((ModifiableConnectionDefinition) this.connection).componentDescription = this.getDescription()
+                .orElse(null);
+            ((ModifiableConnectionDefinition) this.connection).componentName = this.getName();
+            ((ModifiableConnectionDefinition) this.connection).componentTitle = this.getTitle()
+                .orElse(null);
 
             return this;
         }
@@ -727,15 +758,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition triggers(TriggerDefinition... triggerDefinitions) {
             if (triggerDefinitions != null) {
-                this.triggers = List.of(triggerDefinitions);
-            }
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition triggers(ModifiableTriggerDefinition... triggerDefinitions) {
-            if (triggerDefinitions != null) {
-                this.triggers = List.of(triggerDefinitions);
+                return triggers(List.of(triggerDefinitions));
             }
 
             return this;
@@ -744,6 +767,14 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition triggers(List<TriggerDefinition> triggerDefinitions) {
             if (triggerDefinitions != null) {
                 this.triggers = Collections.unmodifiableList(triggerDefinitions);
+
+                for (TriggerDefinition triggerDefinition : triggers) {
+                    ((ModifiableTriggerDefinition) triggerDefinition).componentDescription = this.getDescription()
+                        .orElse(null);
+                    ((ModifiableTriggerDefinition) triggerDefinition).componentName = this.getName();
+                    ((ModifiableTriggerDefinition) triggerDefinition).componentTitle = this.getTitle()
+                        .orElse(null);
+                }
             }
 
             return this;
@@ -837,6 +868,9 @@ public final class ComponentDSL extends DefinitionDSL {
         private boolean authorizationRequired = true;
         private List<? extends ModifiableAuthorization> authorizations;
         private BaseUriFunction baseUri;
+        private String componentName;
+        private String componentDescription;
+        private String componentTitle;
         private List<? extends InputProperty> properties;
         private TestConsumer testConsumer;
         private int version = 1;
@@ -926,13 +960,23 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<BaseUriFunction> getBaseUri() {
-            return Optional.ofNullable(baseUri);
+        public Optional<String> getComponentDescription() {
+            return Optional.ofNullable(componentDescription);
         }
 
         @Override
-        public int getVersion() {
-            return version;
+        public String getComponentName() {
+            return componentName;
+        }
+
+        @Override
+        public Optional<String> getComponentTitle() {
+            return Optional.ofNullable(componentTitle);
+        }
+
+        @Override
+        public Optional<BaseUriFunction> getBaseUri() {
+            return Optional.ofNullable(baseUri);
         }
 
         @Override
@@ -943,6 +987,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<TestConsumer> getTest() {
             return Optional.ofNullable(testConsumer);
+        }
+
+        @Override
+        public int getVersion() {
+            return version;
         }
     }
 
@@ -1062,6 +1111,9 @@ public final class ComponentDSL extends DefinitionDSL {
     public static class ModifiableTriggerDefinition implements TriggerDefinition {
 
         private Boolean batch;
+        private String componentName;
+        private String componentDescription;
+        private String componentTitle;
         private DeduplicateFunction deduplicate;
         private Boolean deprecated;
         private String description;
@@ -1262,6 +1314,21 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<Boolean> getBatch() {
             return Optional.ofNullable(batch);
+        }
+
+        @Override
+        public Optional<String> getComponentDescription() {
+            return Optional.ofNullable(componentDescription);
+        }
+
+        @Override
+        public String getComponentName() {
+            return componentName;
+        }
+
+        @Override
+        public Optional<String> getComponentTitle() {
+            return Optional.ofNullable(componentTitle);
         }
 
         @Override

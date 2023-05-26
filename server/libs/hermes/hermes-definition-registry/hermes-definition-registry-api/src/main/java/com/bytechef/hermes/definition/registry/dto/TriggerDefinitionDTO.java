@@ -19,8 +19,6 @@ package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.Help;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,14 +36,13 @@ public record TriggerDefinitionDTO(
     List<? extends PropertyDTO> outputSchema, boolean outputSchemaDataSource, List<? extends PropertyDTO> properties,
     Optional<Object> sampleOutput, boolean sampleOutputDataSource, String title, TriggerType type) {
 
-    public TriggerDefinitionDTO(TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+    public TriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
         this(
             OptionalUtils.orElse(triggerDefinition.getBatch(), false),
-            getDescription(triggerDefinition, componentDefinition),
+            getDescription(triggerDefinition),
             OptionalUtils.mapOrElse(
                 triggerDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
-            getHelp(triggerDefinition.getHelp()),
-            triggerDefinition.getName(),
+            OptionalUtils.mapOptional(triggerDefinition.getHelp(), HelpDTO::new), triggerDefinition.getName(),
             CollectionUtils.map(
                 OptionalUtils.orElse(triggerDefinition.getOutputSchema(), Collections.emptyList()),
                 PropertyDTO::toPropertyDTO),
@@ -60,17 +57,16 @@ public record TriggerDefinitionDTO(
             getTitle(triggerDefinition), triggerDefinition.getType());
     }
 
-    public static String getDescription(TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+    public static String getDescription(TriggerDefinition triggerDefinition) {
         return OptionalUtils.orElse(
             triggerDefinition.getDescription(),
-            ComponentDefinitionDTO.getTitle(componentDefinition) + ": " + getTitle(triggerDefinition));
+            ComponentDefinitionDTO.getTitle(
+                triggerDefinition.getComponentName(),
+                OptionalUtils.orElse(triggerDefinition.getComponentTitle(), null)) + ": " +
+                getTitle(triggerDefinition));
     }
 
     public static String getTitle(TriggerDefinition triggerDefinition) {
         return OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName());
-    }
-
-    private static Optional<HelpDTO> getHelp(Optional<Help> help) {
-        return help.map(HelpDTO::new);
     }
 }

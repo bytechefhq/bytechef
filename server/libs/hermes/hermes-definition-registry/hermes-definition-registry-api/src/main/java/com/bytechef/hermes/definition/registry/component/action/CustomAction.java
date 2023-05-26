@@ -80,121 +80,124 @@ public class CustomAction {
         PUT,
     }
 
-    private static final ModifiableActionDefinition CUSTOM_ACTION_DEFINITION = ComponentDSL.action(CUSTOM)
-        .title("Custom Action")
-        .description(
-            "By using custom actions, you can take advantage of the existing connector infrastructure to create new actions.")
-        .properties(
-            string(PATH)
-                .label("Path")
-                .description(
-                    "The relative URI that will be appended to the end of the base URI. Do not prepend '/' in your relative URL.")
-                .required(true),
-            string(METHOD)
-                .label("Method")
-                .description("The http method.")
-                .options(
-                    option(RequestMethod.DELETE.name(), RequestMethod.DELETE.name()),
-                    option(RequestMethod.GET.name(), RequestMethod.GET.name()),
-                    option(RequestMethod.PATCH.name(), RequestMethod.PATCH.name()),
-                    option(RequestMethod.POST.name(), RequestMethod.POST.name()),
-                    option(RequestMethod.PUT.name(), RequestMethod.PUT.name()))
-                .required(true)
-                .defaultValue(RequestMethod.GET.name()),
-
-            //
-            // Header parameters properties
-            //
-
-            object(HEADERS)
-                .label("Headers")
-                .description("Headers to send.")
-                .placeholder("Add header")
-                .additionalProperties(string()),
-
-            //
-            // Query parameters properties
-            //
-
-            object(QUERY_PARAMETERS)
-                .label("Query Parameters")
-                .description("Query parameters to send.")
-                .placeholder("Add parameter")
-                .additionalProperties(string()),
-
-            //
-            // Body properties
-            //
-
-            string(BODY_CONTENT_TYPE)
-                .label("Body Content Type")
-                .description("Content-Type to use when sending body parameters.")
-                .displayCondition(
-                    "['%s','%s','%s'].includes('%s')".formatted(
-                        RequestMethod.PATCH.name(), RequestMethod.POST.name(), RequestMethod.PUT.name(), METHOD))
-                .options(
-                    option("None", ""),
-                    option("JSON", HttpClientUtils.BodyContentType.JSON.name()),
-                    option("Form-Data", HttpClientUtils.BodyContentType.FORM_DATA.name()),
-                    option("Form-Urlencoded", HttpClientUtils.BodyContentType.FORM_URL_ENCODED.name()),
-                    option("Raw", HttpClientUtils.BodyContentType.RAW.name()))
-                .defaultValue(""),
-
-            object(BODY_CONTENT)
-                .label("Body Content - JSON")
-                .description("Body Parameters to send.")
-                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                .placeholder("Add Parameter"),
-            object(BODY_CONTENT)
-                .label("Body Content - XML")
-                .description("XML content to send.")
-                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                .placeholder("Add Parameter"),
-            object(BODY_CONTENT)
-                .label("Body Content - Form Data")
-                .description("Body parameters to send.")
-                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
-                .placeholder("Add Parameter")
-                .additionalProperties(string(), fileEntry()),
-            object(BODY_CONTENT)
-                .label("Body Content - Form URL-Encoded")
-                .description("Body parameters to send.")
-                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
-                .placeholder("Add Parameter")
-                .additionalProperties(string()),
-            string(BODY_CONTENT)
-                .label("Body Content - Raw")
-                .description("The raw text to send.")
-                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
-
-            string(BODY_CONTENT_MIME_TYPE)
-                .label("Content Type")
-                .description("Mime-Type to use when sending raw body content.")
-                .displayCondition(
-                    "'%s' === '%s'".formatted(
-                        HttpClientUtils.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
-                .defaultValue("text/plain")
-                .placeholder("text/plain"),
-
-            //
-            // TODO Add support for using it in the editor
-            //
-
-            string(OUTPUT_SCHEMA)
-                .label("Output Schema")
-                .description(
-                    "Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
-                .controlType(ControlType.SCHEMA_DESIGNER)
-                .sampleDataType(SampleDataType.JSON))
-        .outputSchema(getOutputSchemaFunction())
-        .perform(CustomAction::perform);
-
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
-        return CUSTOM_ACTION_DEFINITION.help(
+        ModifiableActionDefinition customActionDefinition = ComponentDSL.action(CUSTOM, componentDefinition)
+            .title("Custom Action")
+            .description(
+                "By using custom actions, you can take advantage of the existing connector infrastructure to create new actions.")
+            .properties(
+                string(PATH)
+                    .label("Path")
+                    .description(
+                        "The relative URI that will be appended to the end of the base URI. Do not prepend '/' in your relative URL.")
+                    .required(true),
+                string(METHOD)
+                    .label("Method")
+                    .description("The http method.")
+                    .options(
+                        option(RequestMethod.DELETE.name(), RequestMethod.DELETE.name()),
+                        option(RequestMethod.GET.name(), RequestMethod.GET.name()),
+                        option(RequestMethod.PATCH.name(), RequestMethod.PATCH.name()),
+                        option(RequestMethod.POST.name(), RequestMethod.POST.name()),
+                        option(RequestMethod.PUT.name(), RequestMethod.PUT.name()))
+                    .required(true)
+                    .defaultValue(RequestMethod.GET.name()),
+
+                //
+                // Header parameters properties
+                //
+
+                object(HEADERS)
+                    .label("Headers")
+                    .description("Headers to send.")
+                    .placeholder("Add header")
+                    .additionalProperties(string()),
+
+                //
+                // Query parameters properties
+                //
+
+                object(QUERY_PARAMETERS)
+                    .label("Query Parameters")
+                    .description("Query parameters to send.")
+                    .placeholder("Add parameter")
+                    .additionalProperties(string()),
+
+                //
+                // Body properties
+                //
+
+                string(BODY_CONTENT_TYPE)
+                    .label("Body Content Type")
+                    .description("Content-Type to use when sending body parameters.")
+                    .displayCondition(
+                        "['%s','%s','%s'].includes('%s')".formatted(
+                            RequestMethod.PATCH.name(), RequestMethod.POST.name(), RequestMethod.PUT.name(), METHOD))
+                    .options(
+                        option("None", ""),
+                        option("JSON", HttpClientUtils.BodyContentType.JSON.name()),
+                        option("Form-Data", HttpClientUtils.BodyContentType.FORM_DATA.name()),
+                        option("Form-Urlencoded", HttpClientUtils.BodyContentType.FORM_URL_ENCODED.name()),
+                        option("Raw", HttpClientUtils.BodyContentType.RAW.name()))
+                    .defaultValue(""),
+
+                object(BODY_CONTENT)
+                    .label("Body Content - JSON")
+                    .description("Body Parameters to send.")
+                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
+                    .additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                        time())
+                    .placeholder("Add Parameter"),
+                object(BODY_CONTENT)
+                    .label("Body Content - XML")
+                    .description("XML content to send.")
+                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
+                    .additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                        time())
+                    .placeholder("Add Parameter"),
+                object(BODY_CONTENT)
+                    .label("Body Content - Form Data")
+                    .description("Body parameters to send.")
+                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
+                    .placeholder("Add Parameter")
+                    .additionalProperties(string(), fileEntry()),
+                object(BODY_CONTENT)
+                    .label("Body Content - Form URL-Encoded")
+                    .description("Body parameters to send.")
+                    .displayCondition(
+                        "%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
+                    .placeholder("Add Parameter")
+                    .additionalProperties(string()),
+                string(BODY_CONTENT)
+                    .label("Body Content - Raw")
+                    .description("The raw text to send.")
+                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
+
+                string(BODY_CONTENT_MIME_TYPE)
+                    .label("Content Type")
+                    .description("Mime-Type to use when sending raw body content.")
+                    .displayCondition(
+                        "'%s' === '%s'".formatted(
+                            HttpClientUtils.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
+                    .defaultValue("text/plain")
+                    .placeholder("text/plain"),
+
+                //
+                // TODO Add support for using it in the editor
+                //
+
+                string(OUTPUT_SCHEMA)
+                    .label("Output Schema")
+                    .description(
+                        "Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
+                    .controlType(ControlType.SCHEMA_DESIGNER)
+                    .sampleDataType(SampleDataType.JSON))
+            .outputSchema(getOutputSchemaFunction())
+            .perform(CustomAction::perform);
+
+        return customActionDefinition.help(
             OptionalUtils.orElse(componentDefinition.getCustomActionHelp()
                 .map(Help::getBody), null),
             OptionalUtils.orElse(componentDefinition.getCustomActionHelp()

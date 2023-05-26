@@ -52,6 +52,12 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
      */
     Optional<List<? extends Authorization>> getAuthorizations();
 
+    Optional<String> getComponentDescription();
+
+    String getComponentName();
+
+    Optional<String> getComponentTitle();
+
     /**
      *
      * @return

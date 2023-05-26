@@ -190,8 +190,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        return toConnectionDefinitionDTO(
-            OptionalUtils.get(componentDefinition.getConnection()), componentDefinition);
+        return toConnectionDefinitionDTO(OptionalUtils.get(componentDefinition.getConnection()));
     }
 
     @Override
@@ -200,7 +199,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .stream()
             .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
             .map(componentDefinition -> toConnectionDefinitionDTO(
-                OptionalUtils.get(componentDefinition.getConnection()), componentDefinition))
+                OptionalUtils.get(componentDefinition.getConnection())))
             .toList();
     }
 
@@ -232,13 +231,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
             .stream()
-            .map(connectionDefinition -> toConnectionDefinitionDTO(connectionDefinition, componentDefinition))
+            .map(this::toConnectionDefinitionDTO)
             .toList();
     }
 
-    private ConnectionDefinitionDTO toConnectionDefinitionDTO(
-        ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
-
-        return new ConnectionDefinitionDTO(connectionDefinition, componentDefinition);
+    private ConnectionDefinitionDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
+        return new ConnectionDefinitionDTO(connectionDefinition);
     }
 }
