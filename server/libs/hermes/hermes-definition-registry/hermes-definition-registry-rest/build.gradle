@@ -41,6 +41,8 @@ dependencies {
     api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "jakarta.annotation:jakarta.annotation-api"

@@ -25,8 +25,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -46,19 +44,15 @@ public class CategoryController implements CategoriesApi {
     }
 
     @Override
-    public Mono<ResponseEntity<CategoryModel>> getCategory(Long id, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
-            conversionService.convert(categoryService.getCategory(id), CategoryModel.class)));
+    public ResponseEntity<CategoryModel> getCategory(Long id) {
+        return ResponseEntity.ok(conversionService.convert(categoryService.getCategory(id), CategoryModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<CategoryModel>> updateCategory(
-        Long id, Mono<CategoryModel> categoryModelMono, ServerWebExchange exchange) {
-
-        return categoryModelMono.map(
-            tagModel -> conversionService.convert(
-                categoryService.update(conversionService.convert(tagModel.id(id), Category.class)),
-                CategoryModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<CategoryModel> updateCategory(Long id, CategoryModel categoryModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                categoryService.update(conversionService.convert(categoryModel.id(id), Category.class)),
+                CategoryModel.class));
     }
 }

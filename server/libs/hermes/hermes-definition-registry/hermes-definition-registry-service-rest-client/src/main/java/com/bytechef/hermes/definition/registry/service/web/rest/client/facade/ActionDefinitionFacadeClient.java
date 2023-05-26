@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service.web.rest.client.facade;
 
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
@@ -42,15 +41,15 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/editor-description"))
-                .bodyValue(
-                    new EditorDescription(
-                        actionName, actionParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(String.class));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/editor-description"))
+            .bodyValue(
+                new EditorDescription(
+                    actionName, actionParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
     }
 
     @Override
@@ -58,15 +57,15 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/options"))
-                .bodyValue(
-                    new Options(
-                        actionName, propertyName, actionParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/options"))
+            .bodyValue(
+                new Options(
+                    actionName, propertyName, actionParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<OptionDTO>>() {})
+            .block();
     }
 
     @Override
@@ -74,15 +73,15 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/output-schema"))
-                .bodyValue(
-                    new OutputSchema(
-                        actionName, actionParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/output-schema"))
+            .bodyValue(
+                new OutputSchema(
+                    actionName, actionParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
+            .block();
     }
 
     @Override
@@ -90,15 +89,15 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/properties"))
-                .bodyValue(
-                    new Properties(
-                        actionName, actionParameters, componentName, componentVersion, connectionId, propertyName))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/properties"))
+            .bodyValue(
+                new Properties(
+                    actionName, actionParameters, componentName, componentVersion, connectionId, propertyName))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
+            .block();
     }
 
     @Override
@@ -106,15 +105,15 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/sample-output"))
-                .bodyValue(
-                    new SampleOutput(
-                        actionName, actionParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(Object.class));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/sample-output"))
+            .bodyValue(
+                new SampleOutput(
+                    actionName, actionParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(Object.class)
+            .block();
     }
 
     private record EditorDescription(

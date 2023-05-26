@@ -20,11 +20,11 @@ package com.bytechef.hermes.definition.registry.service.web.rest.facade;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -48,13 +48,13 @@ public class ComponentDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public Mono<List<ComponentDefinitionDTO>> searchComponentDefinitions(
-        @RequestParam("actionDefinitions") Boolean actionDefinitions,
-        @RequestParam("connectionDefinitions") Boolean connectionDefinitions,
-        @RequestParam("connectionInstances") Boolean connectionInstances,
-        @RequestParam("actionDefinitions") Boolean triggerDefinitions) {
+    public ResponseEntity<List<ComponentDefinitionDTO>> searchComponentDefinitions(
+        @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
+        @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
+        @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
+        @RequestParam(value = "actionDefinitions", required = false) Boolean triggerDefinitions) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             componentDefinitionFacade.searchComponentDefinitions(
                 actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions));
     }

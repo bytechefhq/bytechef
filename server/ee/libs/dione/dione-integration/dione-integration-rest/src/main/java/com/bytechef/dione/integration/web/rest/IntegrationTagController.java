@@ -24,9 +24,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -46,13 +45,11 @@ public class IntegrationTagController implements IntegrationTagsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TagModel>>> getIntegrationTags(ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                integrationFacade.getIntegrationTags()
-                    .stream()
-                    .map(tag -> conversionService.convert(tag, TagModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<TagModel>> getIntegrationTags() {
+        return ResponseEntity.ok(
+            integrationFacade.getIntegrationTags()
+                .stream()
+                .map(tag -> conversionService.convert(tag, TagModel.class))
+                .toList());
     }
 }

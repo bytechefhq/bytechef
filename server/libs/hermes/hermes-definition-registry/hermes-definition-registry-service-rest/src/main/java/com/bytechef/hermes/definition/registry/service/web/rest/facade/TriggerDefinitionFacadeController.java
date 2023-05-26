@@ -23,11 +23,11 @@ import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -52,8 +52,8 @@ public class TriggerDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public Mono<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
-        return Mono.just(
+    public ResponseEntity<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
+        return ResponseEntity.ok(
             triggerDefinitionFacade.executeEditorDescription(
                 editorDescription.triggerName, editorDescription.componentName, editorDescription.componentVersion,
                 editorDescription.triggerParameters, editorDescription.connectionId));
@@ -68,11 +68,10 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public Mono<List<OptionDTO>> executeOptions(@Valid @RequestBody Options options) {
-        return Mono.just(
-            triggerDefinitionFacade.executeOptions(
-                options.propertyName, options.triggerName, options.componentName, options.componentVersion,
-                options.triggerParameters, options.connectionId));
+    public List<OptionDTO> executeOptions(@Valid @RequestBody Options options) {
+        return triggerDefinitionFacade.executeOptions(
+            options.propertyName, options.triggerName, options.componentName, options.componentVersion,
+            options.triggerParameters, options.connectionId);
     }
 
     @RequestMapping(
@@ -84,11 +83,10 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public Mono<List<? extends ValuePropertyDTO<?>>> executeProperties(@Valid @RequestBody Properties properties) {
-        return Mono.just(
-            triggerDefinitionFacade.executeDynamicProperties(
-                properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
-                properties.triggerParameters, properties.connectionId));
+    public List<? extends ValuePropertyDTO<?>> executeProperties(@Valid @RequestBody Properties properties) {
+        return triggerDefinitionFacade.executeDynamicProperties(
+            properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
+            properties.triggerParameters, properties.connectionId);
     }
 
     @RequestMapping(
@@ -100,13 +98,12 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public Mono<List<? extends ValuePropertyDTO<?>>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         @Valid @RequestBody OutputSchema outputSchema) {
 
-        return Mono.just(
-            triggerDefinitionFacade.executeOutputSchema(
-                outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,
-                outputSchema.triggerParameters, outputSchema.connectionId));
+        return triggerDefinitionFacade.executeOutputSchema(
+            outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,
+            outputSchema.triggerParameters, outputSchema.connectionId);
     }
 
     @RequestMapping(
@@ -118,11 +115,10 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public Mono<Object> executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
-        return Mono.just(
-            triggerDefinitionFacade.executeSampleOutput(
-                sampleOutput.triggerName, sampleOutput.componentName, sampleOutput.componentVersion,
-                sampleOutput.triggerParameters, sampleOutput.connectionId));
+    public Object executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
+        return triggerDefinitionFacade.executeSampleOutput(
+            sampleOutput.triggerName, sampleOutput.componentName, sampleOutput.componentVersion,
+            sampleOutput.triggerParameters, sampleOutput.connectionId);
     }
 
     private record EditorDescription(

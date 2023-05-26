@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -49,11 +48,10 @@ public class TaskDispatcherDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinition(
+    public ResponseEntity<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinition(
         @PathVariable("name") String name, @PathVariable("version") Integer version) {
 
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionMono(name, version)
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version));
     }
 
     @RequestMapping(
@@ -62,10 +60,8 @@ public class TaskDispatcherDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<List<TaskDispatcherDefinitionDTO>>> getTaskDispatcherDefinitions() {
-
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions() {
+        return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinitions());
     }
 
     @RequestMapping(
@@ -74,10 +70,9 @@ public class TaskDispatcherDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<List<TaskDispatcherDefinitionDTO>>> getTaskDispatcherDefinitionVersions(
+    public ResponseEntity<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionVersions(
         @PathVariable("name") String name) {
 
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersionsMono(name)
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(name));
     }
 }

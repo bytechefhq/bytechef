@@ -25,8 +25,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -46,17 +44,15 @@ public class TagController implements TagsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<TagModel>> getTag(Long id, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
-            conversionService.convert(tagService.getTag(id), TagModel.class)));
+    public ResponseEntity<TagModel> getTag(Long id) {
+        return ResponseEntity.ok(conversionService.convert(tagService.getTag(id), TagModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<TagModel>> updateTag(Long id, Mono<TagModel> tagModelMono, ServerWebExchange exchange) {
-        return tagModelMono.map(
-            tagModel -> conversionService.convert(
+    public ResponseEntity<TagModel> updateTag(Long id, TagModel tagModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
                 tagService.update(conversionService.convert(tagModel.id(id), Tag.class)),
-                TagModel.class))
-            .map(ResponseEntity::ok);
+                TagModel.class));
     }
 }

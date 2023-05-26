@@ -28,9 +28,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -52,76 +49,64 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ConnectionModel>> createConnection(
-        Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
-
-        return connectionModelMono.map(
-            connectionModel -> conversionService.convert(
+    public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
                 connectionFacade.create(conversionService.convert(connectionModel, ConnectionDTO.class)),
-                ConnectionModel.class))
-            .map(ResponseEntity::ok);
+                ConnectionModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteConnection(Long id, ServerWebExchange exchange) {
+    public ResponseEntity<Void> deleteConnection(Long id) {
         connectionFacade.delete(id);
 
-        return Mono.empty();
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<ConnectionModel>> getConnection(Long id, ServerWebExchange exchange) {
-        return Mono.just(
+    public ResponseEntity<ConnectionModel> getConnection(Long id) {
+        return ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.getConnection(id), ConnectionModel.class)
-                .parameters(null))
-            .map(ResponseEntity::ok);
+                .parameters(null));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<Flux<ConnectionModel>>> getConnections(
-        List<String> componentNames, List<Long> tagIds, ServerWebExchange exchange) {
+    public ResponseEntity<List<ConnectionModel>> getConnections(
+        List<String> componentNames, List<Long> tagIds) {
 
-        return Mono.just(Flux.fromIterable(
+        return ResponseEntity.ok(
             connectionFacade.getConnections(componentNames, tagIds)
                 .stream()
                 .map(
                     connection -> conversionService.convert(connection, ConnectionModel.class)
                         .parameters(null))
-                .toList()))
-            .map(ResponseEntity::ok);
+                .toList());
     }
 
     @Override
-    public Mono<ResponseEntity<ConnectionModel>> updateConnection(
-        Long id, Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
-
-        return connectionModelMono.map(
-            connectionModel -> conversionService.convert(
+    public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
                 connectionFacade.update(
                     conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
-                ConnectionModel.class))
-            .map(ResponseEntity::ok);
+                ConnectionModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> updateConnectionTags(
-        Long id, Mono<UpdateTagsRequestModel> updateConnectionTagsRequestModelMono,
-        ServerWebExchange exchange) {
+    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateConnectionTagsRequestModel) {
+        List<TagModel> tagModels = updateConnectionTagsRequestModel.getTags();
 
-        return updateConnectionTagsRequestModelMono.map(putConnectionTagsRequestModel -> {
-            List<TagModel> tagModels = putConnectionTagsRequestModel.getTags();
+        connectionFacade.update(
+            id,
+            tagModels.stream()
+                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+                .toList());
 
-            connectionFacade.update(
-                id,
-                tagModels.stream()
-                    .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                    .toList());
-
-            return ResponseEntity.noContent()
-                .build();
-        });
+        return ResponseEntity.noContent()
+            .build();
     }
 }

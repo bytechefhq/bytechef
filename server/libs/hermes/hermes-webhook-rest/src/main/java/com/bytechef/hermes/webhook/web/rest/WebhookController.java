@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -37,8 +36,8 @@ public class WebhookController {
             RequestMethod.GET, RequestMethod.POST
         },
         value = "/webhooks")
-    public Mono<ResponseEntity<Object>> webhooks(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok()
-            .build());
+    public ResponseEntity<Object> webhooks(ServerWebExchange exchange) {
+        return ResponseEntity.ok()
+            .build();
     }
 }

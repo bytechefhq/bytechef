@@ -26,8 +26,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Arik Cohen
@@ -49,9 +47,8 @@ public class TaskExecutionController implements TaskExecutionsApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            conversionService.convert(taskExecutionFacade.getTaskExecution(id), TaskExecutionModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<TaskExecutionModel> getTaskExecution(Long id) {
+        return ResponseEntity.ok(
+            conversionService.convert(taskExecutionFacade.getTaskExecution(id), TaskExecutionModel.class));
     }
 }

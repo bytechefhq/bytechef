@@ -26,8 +26,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
@@ -49,17 +47,16 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<OAuth2AuthorizationParametersModel>> getOAuth2AuthorizationParameters(
-        Mono<GetOAuth2AuthorizationParametersRequestModel> parametersRequestModelMono, ServerWebExchange exchange) {
+    public ResponseEntity<OAuth2AuthorizationParametersModel> getOAuth2AuthorizationParameters(
+        GetOAuth2AuthorizationParametersRequestModel parametersRequestModel) {
 
-        return parametersRequestModelMono
-            .map(parametersRequestModel -> connectionDefinitionService.getOAuth2Parameters(
-                parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
-                oAuth2Properties.checkPredefinedApp(
-                    parametersRequestModel.getComponentName(), parametersRequestModel.getParameters()),
-                parametersRequestModel.getAuthorizationName()))
-            .map(oAuth2AuthorizationParametersDTO -> conversionService.convert(
-                oAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel.class))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                connectionDefinitionService.getOAuth2Parameters(
+                    parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
+                    oAuth2Properties.checkPredefinedApp(
+                        parametersRequestModel.getComponentName(), parametersRequestModel.getParameters()),
+                    parametersRequestModel.getAuthorizationName()),
+                OAuth2AuthorizationParametersModel.class));
     }
 }

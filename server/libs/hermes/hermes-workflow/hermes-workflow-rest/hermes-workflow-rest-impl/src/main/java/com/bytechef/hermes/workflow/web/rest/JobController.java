@@ -36,9 +36,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Arik Cohen
@@ -68,62 +67,57 @@ public class JobController implements JobsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
-        Mono<JobParametersModel> jobParametersModelMono, ServerWebExchange exchange) {
+    public ResponseEntity<CreateJob200ResponseModel> createJob(
+        JobParametersModel jobParametersModel) {
 
-        return jobParametersModelMono
-            .map(jobParametersModel -> new CreateJob200ResponseModel()
-                .jobId(jobFactory.create(conversionService.convert(jobParametersModel, JobParameters.class))))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            new CreateJob200ResponseModel()
+                .jobId(jobFactory.create(conversionService.convert(jobParametersModel, JobParameters.class))));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<JobModel>> getJob(Long id, ServerWebExchange exchange) {
-        return Mono.just(conversionService.convert(jobService.getJob(id), JobModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<JobModel> getJob(Long id) {
+        return ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-        Long jobId, ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                taskExecutionFacade.getJobTaskExecutions(jobId)
-                    .stream()
-                    .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<TaskExecutionModel>> getJobTaskExecutions(Long jobId) {
+        return ResponseEntity.ok(
+            taskExecutionFacade.getJobTaskExecutions(jobId)
+                .stream()
+                .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
+                .toList());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Mono<ResponseEntity<Page>> getJobs(Integer pageNumber, ServerWebExchange exchange) {
-        return Mono.just(
+    public ResponseEntity<Page> getJobs(Integer pageNumber) {
+        return ResponseEntity.ok(
             jobService.getJobs(pageNumber)
-                .map(job -> conversionService.convert(job, JobModel.class)))
-            .map(ResponseEntity::ok);
+                .map(job -> conversionService.convert(job, JobModel.class)));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
-        return Mono.just(
-            conversionService.convert(OptionalUtils.orElse(jobService.fetchLatestJob(), null), JobModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<JobModel> getLatestJob() {
+        return ResponseEntity.ok(
+            conversionService.convert(OptionalUtils.orElse(jobService.fetchLatestJob(), null), JobModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> restartJob(Long id, ServerWebExchange exchange) {
+    public ResponseEntity<Void> restartJob(Long id) {
         messageBroker.send(TaskMessageRoute.TASKS_RESTARTS, id);
 
-        return Mono.empty();
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> stopJob(Long id, ServerWebExchange exchange) {
+    public ResponseEntity<Void> stopJob(Long id) {
         messageBroker.send(TaskMessageRoute.TASKS_STOPS, id);
 
-        return Mono.empty();
+        return ResponseEntity.noContent()
+            .build();
     }
 }
