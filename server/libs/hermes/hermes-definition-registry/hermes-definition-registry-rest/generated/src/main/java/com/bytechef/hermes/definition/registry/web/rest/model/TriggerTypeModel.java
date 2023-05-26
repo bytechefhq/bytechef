@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets TriggerType
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:35.328005+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-27T10:19:33.855801+02:00[Europe/Zagreb]")
 public enum TriggerTypeModel {
   
   HYBRID_DYNAMIC("HYBRID_DYNAMIC"),

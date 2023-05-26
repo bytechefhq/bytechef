@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Help", description = "The help text that is meant to guide your users as to how to configure this action or trigger.")
 @JsonTypeName("Help")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:35.328005+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-27T10:19:33.855801+02:00[Europe/Zagreb]")
 public class HelpModel {
 
   private String body;
