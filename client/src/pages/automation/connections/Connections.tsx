@@ -98,7 +98,7 @@ const Connections = () => {
                                                 current?.id === item.name &&
                                                 current.type === Type.Component,
                                             id: item.name!,
-                                            name: item.name!,
+                                            name: item.title!,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
