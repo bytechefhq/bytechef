@@ -79,7 +79,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ActionDefinitionDTO getComponentActionDefinition(
+    public ActionDefinitionDTO getActionDefinition(
         String actionName, String componentName, int componentVersion) {
 
         return WORKER_WEB_CLIENT
@@ -94,7 +94,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ActionDefinitionDTO> getComponentActionDefinitions(
+    public List<ActionDefinitionDTO> getActionDefinitions(
         String componentName, int componentVersion) {
 
         return WORKER_WEB_CLIENT
