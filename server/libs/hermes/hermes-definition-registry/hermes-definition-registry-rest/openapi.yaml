@@ -1035,7 +1035,7 @@ components:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "name"
+      - "componentName"
       - "version"
       properties:
         authorizationRequired:
@@ -1049,19 +1049,19 @@ components:
         baseUri:
           description: "Defines the base URI for all future HTTP requests."
           type: "string"
-        description:
-          description: "The description."
+        componentDescription:
+          description: "The description used from the connection's component."
           type: "string"
-        name:
-          description: "The connection name."
+        componentName:
+          description: "The connection name used from the connection's component."
           type: "string"
         properties:
           description: "The properties of the connection."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
-        title:
-          description: "The title"
+        componentTitle:
+          description: "The title used from the connection's component."
           type: "string"
         version:
           description: "The version of a connection."
@@ -1070,17 +1070,17 @@ components:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "name"
+      - "componentName"
       - "version"
       properties:
-        description:
-          description: "The description."
+        componentDescription:
+          description: "The description used from the connection's component."
           type: "string"
-        name:
-          description: "The connection name."
+        componentName:
+          description: "The connection name used from the connection's component."
           type: "string"
-        title:
-          description: "The title"
+        componentTitle:
+          description: "The title used from the connection's component"
           type: "string"
         version:
           description: "The version of a connection."
