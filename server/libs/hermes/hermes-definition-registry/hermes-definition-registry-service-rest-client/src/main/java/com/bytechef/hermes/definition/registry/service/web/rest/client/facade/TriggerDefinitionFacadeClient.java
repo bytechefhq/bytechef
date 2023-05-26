@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service.web.rest.client.facade;
 
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -42,15 +41,15 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/editor-description"))
-                .bodyValue(
-                    new EditorDescription(
-                        triggerName, triggerParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(String.class));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/editor-description"))
+            .bodyValue(
+                new EditorDescription(
+                    triggerName, triggerParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
     }
 
     @Override
@@ -58,15 +57,15 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/options"))
-                .bodyValue(
-                    new Options(
-                        triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/options"))
+            .bodyValue(
+                new Options(
+                    triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<OptionDTO>>() {})
+            .block();
     }
 
     @Override
@@ -74,15 +73,15 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/output-schema"))
-                .bodyValue(
-                    new OutputSchema(
-                        triggerName, triggerParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/output-schema"))
+            .bodyValue(
+                new OutputSchema(
+                    triggerName, triggerParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
+            .block();
     }
 
     @Override
@@ -90,15 +89,15 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/properties"))
-                .bodyValue(
-                    new Properties(
-                        triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/properties"))
+            .bodyValue(
+                new Properties(
+                    triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
+            .block();
     }
 
     @Override
@@ -106,15 +105,15 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/sample-output"))
-                .bodyValue(
-                    new SampleOutput(
-                        triggerName, triggerParameters, componentName, componentVersion, connectionId))
-                .retrieve()
-                .bodyToMono(Object.class));
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/sample-output"))
+            .bodyValue(
+                new SampleOutput(
+                    triggerName, triggerParameters, componentName, componentVersion, connectionId))
+            .retrieve()
+            .bodyToMono(Object.class)
+            .block();
     }
 
     private record EditorDescription(

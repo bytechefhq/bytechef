@@ -32,9 +32,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,28 +63,24 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteWorkflow(String id, ServerWebExchange exchange) {
+    public ResponseEntity<Void> deleteWorkflow(String id) {
         workflowService.delete(id);
 
-        return Mono.just(
-            ResponseEntity
-                .ok()
-                .build());
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowModel>> getWorkflow(String id, ServerWebExchange exchange) {
-        return Mono
-            .just(
-                conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class)
-                    .definition(null))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<WorkflowModel> getWorkflow(String id) {
+        return ResponseEntity.ok(conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class)
+            .definition(null));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<Flux<WorkflowModel>>> getWorkflows(ServerWebExchange exchange) {
+    public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
         for (WorkflowDTO workflowDTO : workflowFacade.getWorkflows()) {
@@ -96,55 +89,35 @@ public class WorkflowController implements WorkflowsApi {
                     .definition(null));
         }
 
-        return Mono
-            .just(Flux.fromIterable(workflowModels))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(workflowModels);
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowModel>> createWorkflow(
-        Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
-
-        return workflowModelMono
-            .map(this::getWorkflowModel)
-            .map(ResponseEntity::ok);
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowResponseModel>> testWorkflow(
-        String id, Mono<Map<String, Object>> inputsMono, ServerWebExchange exchange) {
-
-        return inputsMono
-            .map(inputs -> testWorkflowExecutor.execute(id, inputs))
-            .map(
-                workflowResponse -> conversionService.convert(
-                    workflowResponse, WorkflowResponseModel.class))
-            .map(ResponseEntity::ok);
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowModel>> updateWorkflow(
-        String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
-
-        return workflowModelMono
-            .map(
-                workflowModel -> conversionService.convert(
-                    workflowFacade.update(id, workflowModel.getDefinition()), WorkflowModel.class))
-            .map(ResponseEntity::ok);
-    }
-
-    private WorkflowModel getWorkflowModel(WorkflowModel workflowModel) {
+    public ResponseEntity<WorkflowModel> createWorkflow(WorkflowModel workflowModel) {
         WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
         WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
 
-        return conversionService.convert(
-            workflowFacade.create(
-                workflowModel.getDefinition(),
-                Workflow.Format.valueOf(workflowFormatModel.name()),
-                Workflow.SourceType.valueOf(sourceTypeEnum.name())),
-            WorkflowModel.class);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                workflowFacade.create(
+                    workflowModel.getDefinition(),
+                    Workflow.Format.valueOf(workflowFormatModel.name()),
+                    Workflow.SourceType.valueOf(sourceTypeEnum.name())),
+                WorkflowModel.class));
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
+    public ResponseEntity<WorkflowResponseModel> testWorkflow(String id, Map<String, Object> inputs) {
+        return ResponseEntity.ok(
+            conversionService.convert(testWorkflowExecutor.execute(id, inputs), WorkflowResponseModel.class));
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
+    public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(workflowFacade.update(id, workflowModel.getDefinition()), WorkflowModel.class));
     }
 }

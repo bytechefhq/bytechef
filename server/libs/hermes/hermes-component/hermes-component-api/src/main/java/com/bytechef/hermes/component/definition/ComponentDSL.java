@@ -915,8 +915,7 @@ public final class ComponentDSL extends DefinitionDSL {
             }
 
             return authorizations.stream()
-                .filter(
-                    authorization -> Objects.equals(authorization.getName(), authorizationName))
+                .filter(authorization -> Objects.equals(authorization.getName(), authorizationName))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
         }

@@ -19,7 +19,7 @@ package com.bytechef.hermes.connection.web.rest.mapper;
 
 import com.bytechef.hermes.connection.web.rest.mapper.config.OAuth2MapperSpringConfig;
 import com.bytechef.oauth2.config.OAuth2Properties;
-import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.oauth2.web.rest.model.OAuth2PropertiesModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

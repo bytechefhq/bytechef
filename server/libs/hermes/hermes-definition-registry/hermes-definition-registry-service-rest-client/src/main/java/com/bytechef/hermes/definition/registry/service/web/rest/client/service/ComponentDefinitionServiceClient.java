@@ -18,7 +18,6 @@
 package com.bytechef.hermes.definition.registry.service.web.rest.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.web.rest.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -42,42 +41,43 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .get()
-                .uri(uriBuilder -> toUri(uriBuilder, name, "/component-definitions/{name}/{version}", name, version))
-                .retrieve()
-                .bodyToMono(ComponentDefinitionDTO.class));
+        return WORKER_WEB_CLIENT
+            .get()
+            .uri(uriBuilder -> toUri(
+                uriBuilder, name, "/component-definitions/{name}/{version}", name, version == null ? 1 : version))
+            .retrieve()
+            .bodyToMono(ComponentDefinitionDTO.class)
+            .block();
     }
 
     @Override
     public List<ComponentDefinitionDTO> getComponentDefinitions() {
-        return MonoUtils.get(
-            Mono.zip(
-                WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                    .stream()
-                    .map(serviceInstance -> WORKER_WEB_CLIENT
-                        .get()
-                        .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions"))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                    .toList(),
-                this::toComponentDefinitions));
+        return Mono.zip(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> WORKER_WEB_CLIENT
+                    .get()
+                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions"))
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                .toList(),
+            this::toComponentDefinitions)
+            .block();
     }
 
     @Override
     public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
-        return MonoUtils.get(
-            Mono.zip(
-                WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                    .stream()
-                    .map(serviceInstance -> WORKER_WEB_CLIENT
-                        .get()
-                        .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions/{name}", name))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                    .toList(),
-                this::toComponentDefinitions));
+        return Mono.zip(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> WORKER_WEB_CLIENT
+                    .get()
+                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions/{name}", name))
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                .toList(),
+            this::toComponentDefinitions)
+            .block();
     }
 
     @SuppressWarnings("unchecked")

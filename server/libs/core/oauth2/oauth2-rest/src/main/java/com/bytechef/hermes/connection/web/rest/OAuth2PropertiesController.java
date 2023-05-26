@@ -18,14 +18,13 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.oauth2.config.OAuth2Properties;
-import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.oauth2.web.rest.Oauth2PropertiesApi;
+import com.bytechef.oauth2.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -45,8 +44,7 @@ public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<OAuth2PropertiesModel>> getOAuth2Properties(ServerWebExchange exchange) {
-        return Mono.just(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties() {
+        return ResponseEntity.ok(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class));
     }
 }

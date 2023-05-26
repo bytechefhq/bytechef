@@ -20,11 +20,11 @@ package com.bytechef.hermes.definition.registry.service.web.rest.service;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -43,30 +43,31 @@ public class ActionDefinitionServiceController {
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}",
         produces = {
             "application/json"
         })
-    public Mono<ActionDefinitionDTO> getComponentActionDefinition(
+    public ResponseEntity<ActionDefinitionDTO> getComponentActionDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion,
         @PathVariable("actionName") String actionName) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             actionDefinitionService.getComponentActionDefinition(actionName, componentName, componentVersion));
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/component-definitions/{componentName}/{componentVersion}/action-definitions",
         produces = {
             "application/json"
         })
-    public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitions(
+    public ResponseEntity<List<ActionDefinitionDTO>> getComponentActionDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
-        return Mono.just(actionDefinitionService.getComponentActionDefinitions(componentName, componentVersion));
+        return ResponseEntity.ok(
+            actionDefinitionService.getComponentActionDefinitions(componentName, componentVersion));
     }
 }

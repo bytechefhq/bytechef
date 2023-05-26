@@ -26,8 +26,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -52,23 +50,21 @@ public class WorkflowExecutionController implements WorkflowExecutionsApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowExecutionModel>> getWorkflowExecution(Long id, ServerWebExchange exchange) {
-        return Mono.just(workflowExecutionFacade.getWorkflowExecution(id))
-            .map(worflowExecutionDTO -> conversionService.convert(worflowExecutionDTO, WorkflowExecutionModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
+        return ResponseEntity.ok(
+            conversionService.convert(workflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Page>> getWorkflowExecutions(
+    public ResponseEntity<Page> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, Integer pageNumber, ServerWebExchange exchange) {
+        String workflowId, Integer pageNumber) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             workflowExecutionFacade
                 .searchWorkflowExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
-                    workflowExecutionDTO, WorkflowExecutionBasicModel.class)))
-            .map(ResponseEntity::ok);
+                    workflowExecutionDTO, WorkflowExecutionBasicModel.class)));
     }
 }

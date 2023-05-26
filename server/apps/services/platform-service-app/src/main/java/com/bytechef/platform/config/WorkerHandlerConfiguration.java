@@ -30,12 +30,12 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class WorkerClientConfiguration {
+public class WorkerHandlerConfiguration {
 
     private final TaskHandlerClient taskHandlerClient;
     private final TriggerHandlerClient triggerHandlerClient;
 
-    public WorkerClientConfiguration(TaskHandlerClient taskHandlerClient, TriggerHandlerClient triggerHandlerClient) {
+    public WorkerHandlerConfiguration(TaskHandlerClient taskHandlerClient, TriggerHandlerClient triggerHandlerClient) {
         this.taskHandlerClient = taskHandlerClient;
         this.triggerHandlerClient = triggerHandlerClient;
     }

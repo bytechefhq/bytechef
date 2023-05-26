@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service.web.rest.client.service;
 
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
@@ -25,7 +24,6 @@ import com.bytechef.hermes.definition.registry.service.web.rest.client.AbstractW
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -64,7 +62,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
         String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
         String workflowExecutionId) {
 
-        return MonoUtils.get(WORKER_WEB_CLIENT
+        return WORKER_WEB_CLIENT
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/dynamic-webhook-enable"))
             .bodyValue(
@@ -72,19 +70,21 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
                     triggerParameters, webhookUrl, workflowExecutionId))
             .retrieve()
-            .bodyToMono(DynamicWebhookEnableOutput.class));
+            .bodyToMono(DynamicWebhookEnableOutput.class)
+            .block();
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
 
-        return MonoUtils.get(WORKER_WEB_CLIENT
+        return WORKER_WEB_CLIENT
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/dynamic-webhook-enable"))
             .bodyValue(new DynamicWebhookRefresh(componentName, componentVersion, output, triggerName))
             .retrieve()
-            .bodyToMono(DynamicWebhookEnableOutput.class));
+            .bodyToMono(DynamicWebhookEnableOutput.class)
+            .block();
     }
 
     @Override
@@ -159,12 +159,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public TriggerDefinitionDTO getTriggerDefinition(String triggerName, String componentName, int componentVersion) {
-        return MonoUtils.get(getTriggerDefinitionMono(triggerName, componentName, componentVersion));
-    }
-
-    @Override
-    public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(
+    public TriggerDefinitionDTO getTriggerDefinition(
         String triggerName, String componentName, int componentVersion) {
 
         return WORKER_WEB_CLIENT
@@ -174,16 +169,12 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}",
                 componentName, componentVersion, triggerName))
             .retrieve()
-            .bodyToMono(TriggerDefinitionDTO.class);
+            .bodyToMono(TriggerDefinitionDTO.class)
+            .block();
     }
 
     @Override
     public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitionsMono(String componentName, int componentVersion) {
         return WORKER_WEB_CLIENT
             .get()
             .uri(uriBuilder -> toUri(
@@ -191,7 +182,8 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 "/component-definitions/{componentName}/{componentVersion}/trigger-definitions", componentName,
                 componentVersion))
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<>() {});
+            .bodyToMono(new ParameterizedTypeReference<List<TriggerDefinitionDTO>>() {})
+            .block();
     }
 
     private record DynamicWebhookDisable(

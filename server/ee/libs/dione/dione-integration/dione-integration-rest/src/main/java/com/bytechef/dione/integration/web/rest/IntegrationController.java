@@ -30,9 +30,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -53,103 +50,86 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteIntegration(Long id, ServerWebExchange exchange) {
+    public ResponseEntity<Void> deleteIntegration(Long id) {
         integrationFacade.delete(id);
 
-        return Mono.just(
-            ResponseEntity.ok()
-                .build());
+        return ResponseEntity.ok()
+            .build();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<IntegrationModel>> getIntegration(Long id, ServerWebExchange exchange) {
-        return Mono.just(conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<IntegrationModel> getIntegration(Long id) {
+        return ResponseEntity.ok(
+            conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
-        List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                integrationFacade.searchIntegrations(categoryIds, tagIds)
-                    .stream()
-                    .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<IntegrationModel>> getIntegrations(
+        List<Long> categoryIds, List<Long> tagIds) {
+        return ResponseEntity.ok(
+            integrationFacade.searchIntegrations(categoryIds, tagIds)
+                .stream()
+                .map(integration -> conversionService.convert(integration, IntegrationModel.class))
+                .toList());
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<WorkflowModel>>> getIntegrationWorkflows(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                integrationFacade.getIntegrationWorkflows(id)
-                    .stream()
-                    .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(Long id) {
+        return ResponseEntity.ok(
+            integrationFacade.getIntegrationWorkflows(id)
+                .stream()
+                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                .toList());
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<IntegrationModel>> createIntegration(
-        Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
-
-        return integrationModelMono
-            .map(
-                integrationModel -> conversionService.convert(
-                    integrationFacade.create(
-                        conversionService.convert(integrationModel, IntegrationDTO.class)),
-                    IntegrationModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<IntegrationModel> createIntegration(IntegrationModel integrationModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationFacade.create(
+                    conversionService.convert(integrationModel, IntegrationDTO.class)),
+                IntegrationModel.class));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowModel>> createIntegrationWorkflow(
-        Long id, Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModelMono,
-        ServerWebExchange exchange) {
+    public ResponseEntity<WorkflowModel> createIntegrationWorkflow(
+        Long id, CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel) {
 
-        return createIntegrationWorkflowRequestModelMono
-            .map(
-                requestModel -> conversionService.convert(
-                    integrationFacade.addWorkflow(
-                        id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
-                    WorkflowModel.class))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationFacade.addWorkflow(
+                    id, createIntegrationWorkflowRequestModel.getLabel(),
+                    createIntegrationWorkflowRequestModel.getDescription(),
+                    createIntegrationWorkflowRequestModel.getDefinition()),
+                WorkflowModel.class));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<IntegrationModel>> updateIntegration(
-        Long id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
-
-        return integrationModelMono
-            .map(
-                integrationModel -> conversionService.convert(
-                    integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
-                    IntegrationModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<IntegrationModel> updateIntegration(Long id, IntegrationModel integrationModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
+                IntegrationModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> updateIntegrationTags(
-        Long id, Mono<UpdateTagsRequestModel> updateIntegrationTagsRequestModelMono,
-        ServerWebExchange exchange) {
+    public ResponseEntity<Void> updateIntegrationTags(
+        Long id, UpdateTagsRequestModel updateIntegrationTagsRequestModel) {
 
-        return updateIntegrationTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
-            List<TagModel> tagModels = putIntegrationTagsRequestModel.getTags();
+        List<TagModel> tagModels = updateIntegrationTagsRequestModel.getTags();
 
-            integrationFacade.update(
-                id,
-                tagModels.stream()
-                    .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                    .toList());
+        integrationFacade.update(
+            id,
+            tagModels.stream()
+                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+                .toList());
 
-            return ResponseEntity
-                .noContent()
-                .build();
-        });
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 }

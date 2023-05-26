@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -74,9 +73,5 @@ public interface TriggerDefinitionService {
 
     TriggerDefinitionDTO getTriggerDefinition(String triggerName, String componentName, int componentVersion);
 
-    Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(String triggerName, String componentName, int componentVersion);
-
     List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion);
-
-    Mono<List<TriggerDefinitionDTO>> getTriggerDefinitionsMono(String componentName, int componentVersion);
 }

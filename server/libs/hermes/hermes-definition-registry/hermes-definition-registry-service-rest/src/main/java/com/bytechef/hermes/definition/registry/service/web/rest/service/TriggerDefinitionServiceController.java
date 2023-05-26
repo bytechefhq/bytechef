@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -54,19 +53,17 @@ public class TriggerDefinitionServiceController {
         consumes = {
             "application/json"
         })
-    public Mono<ResponseEntity<Void>> executeDynamicWebhookDisable(
-        @Valid @RequestBody Mono<DynamicWebhookDisable> dynamicWebhookDisableMono) {
+    public ResponseEntity<Void> executeDynamicWebhookDisable(
+        @Valid @RequestBody DynamicWebhookDisable dynamicWebhookDisable) {
 
-        return dynamicWebhookDisableMono.map(dynamicWebhookDisable -> {
-            triggerDefinitionService.executeDynamicWebhookDisable(
-                dynamicWebhookDisable.triggerName, dynamicWebhookDisable.componentName,
-                dynamicWebhookDisable.componentVersion, dynamicWebhookDisable.connectionParameters,
-                dynamicWebhookDisable.authorizationName, dynamicWebhookDisable.triggerParameters,
-                dynamicWebhookDisable.workflowExecutionId, dynamicWebhookDisable.output);
+        triggerDefinitionService.executeDynamicWebhookDisable(
+            dynamicWebhookDisable.triggerName, dynamicWebhookDisable.componentName,
+            dynamicWebhookDisable.componentVersion, dynamicWebhookDisable.connectionParameters,
+            dynamicWebhookDisable.authorizationName, dynamicWebhookDisable.triggerParameters,
+            dynamicWebhookDisable.workflowExecutionId, dynamicWebhookDisable.output);
 
-            return ResponseEntity.noContent()
-                .build();
-        });
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @RequestMapping(
@@ -78,17 +75,15 @@ public class TriggerDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<DynamicWebhookEnableOutput>> executeDynamicWebhookEnable(
-        @Valid @RequestBody Mono<DynamicWebhookEnable> dynamicWebhookEnableMono) {
+    public ResponseEntity<DynamicWebhookEnableOutput> executeDynamicWebhookEnable(
+        @Valid @RequestBody DynamicWebhookEnable dynamicWebhookEnable) {
 
-        return dynamicWebhookEnableMono
-            .map(dynamicWebhookEnable -> triggerDefinitionService.executeDynamicWebhookEnable(
-                dynamicWebhookEnable.triggerName, dynamicWebhookEnable.componentName,
-                dynamicWebhookEnable.componentVersion,
-                dynamicWebhookEnable.connectionParameters, dynamicWebhookEnable.authorizationName,
-                dynamicWebhookEnable.triggerParameters, dynamicWebhookEnable.webhookUrl,
-                dynamicWebhookEnable.workflowExecutionId))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(triggerDefinitionService.executeDynamicWebhookEnable(
+            dynamicWebhookEnable.triggerName, dynamicWebhookEnable.componentName,
+            dynamicWebhookEnable.componentVersion,
+            dynamicWebhookEnable.connectionParameters, dynamicWebhookEnable.authorizationName,
+            dynamicWebhookEnable.triggerParameters, dynamicWebhookEnable.webhookUrl,
+            dynamicWebhookEnable.workflowExecutionId));
     }
 
     @RequestMapping(
@@ -100,14 +95,12 @@ public class TriggerDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<DynamicWebhookEnableOutput>> executeDynamicWebhookRefresh(
-        @Valid @RequestBody Mono<DynamicWebhookRefresh> dynamicWebhookRefreshMono) {
+    public ResponseEntity<DynamicWebhookEnableOutput> executeDynamicWebhookRefresh(
+        @Valid @RequestBody DynamicWebhookRefresh dynamicWebhookRefresh) {
 
-        return dynamicWebhookRefreshMono
-            .map(dynamicWebhookRefresh -> triggerDefinitionService.executeDynamicWebhookRefresh(
-                dynamicWebhookRefresh.componentName, dynamicWebhookRefresh.componentVersion,
-                dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.output))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(triggerDefinitionService.executeDynamicWebhookRefresh(
+            dynamicWebhookRefresh.componentName, dynamicWebhookRefresh.componentVersion,
+            dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.output));
     }
 
     @RequestMapping(
@@ -116,17 +109,16 @@ public class TriggerDefinitionServiceController {
         consumes = {
             "application/json"
         })
-    public Mono<ResponseEntity<Void>>
-        executeListenerDisable(@Valid @RequestBody Mono<ListenerDisable> listenerDisableMono) {
-        return listenerDisableMono.map(listenerDisable -> {
-            triggerDefinitionService.executeListenerDisable(
-                listenerDisable.triggerName, listenerDisable.componentName, listenerDisable.componentVersion,
-                listenerDisable.connectionParameters, listenerDisable.authorizationName,
-                listenerDisable.triggerParameters, listenerDisable.workflowExecutionId);
+    public ResponseEntity<Void>
+        executeListenerDisable(@Valid @RequestBody ListenerDisable listenerDisable) {
 
-            return ResponseEntity.noContent()
-                .build();
-        });
+        triggerDefinitionService.executeListenerDisable(
+            listenerDisable.triggerName, listenerDisable.componentName, listenerDisable.componentVersion,
+            listenerDisable.connectionParameters, listenerDisable.authorizationName,
+            listenerDisable.triggerParameters, listenerDisable.workflowExecutionId);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @RequestMapping(
@@ -135,17 +127,16 @@ public class TriggerDefinitionServiceController {
         consumes = {
             "application/json"
         })
-    public Mono<ResponseEntity<Void>>
-        executeListenerEnable(@Valid @RequestBody Mono<ListenerEnable> listenerEnableMono) {
-        return listenerEnableMono.map(listenerEnable -> {
-            triggerDefinitionService.executeListenerEnable(
-                listenerEnable.triggerName, listenerEnable.componentName, listenerEnable.componentVersion,
-                listenerEnable.connectionParameters, listenerEnable.authorizationName, listenerEnable.triggerParameters,
-                listenerEnable.workflowExecutionId);
+    public ResponseEntity<Void>
+        executeListenerEnable(@Valid @RequestBody ListenerEnable listenerEnable) {
 
-            return ResponseEntity.noContent()
-                .build();
-        });
+        triggerDefinitionService.executeListenerEnable(
+            listenerEnable.triggerName, listenerEnable.componentName, listenerEnable.componentVersion,
+            listenerEnable.connectionParameters, listenerEnable.authorizationName, listenerEnable.triggerParameters,
+            listenerEnable.workflowExecutionId);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @RequestMapping(
@@ -154,13 +145,12 @@ public class TriggerDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<TriggerDefinitionDTO>> getTriggerDefinitionMono(
+    public ResponseEntity<TriggerDefinitionDTO> getTriggerDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion, @PathVariable("triggerName") String triggerName) {
 
-        return Mono.just(
-            triggerDefinitionService.getTriggerDefinition(triggerName, componentName, componentVersion))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            triggerDefinitionService.getTriggerDefinition(triggerName, componentName, componentVersion));
     }
 
     @RequestMapping(
@@ -169,12 +159,11 @@ public class TriggerDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<ResponseEntity<List<TriggerDefinitionDTO>>> getTriggerDefinitions(
+    public ResponseEntity<List<TriggerDefinitionDTO>> getTriggerDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
-        return triggerDefinitionService.getTriggerDefinitionsMono(componentName, componentVersion)
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion));
     }
 
     private record DynamicWebhookDisable(

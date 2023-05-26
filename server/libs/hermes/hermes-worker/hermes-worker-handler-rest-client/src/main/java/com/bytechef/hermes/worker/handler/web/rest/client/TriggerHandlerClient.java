@@ -18,7 +18,6 @@
 package com.bytechef.hermes.worker.handler.web.rest.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
@@ -46,17 +45,17 @@ public class TriggerHandlerClient {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
             discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0]);
 
-        return MonoUtils.get(
-            WebClient.create()
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                    .scheme("http")
-                    .host(serviceInstance.getHost())
-                    .port(serviceInstance.getPort())
-                    .path("/api/internal/trigger-handler")
-                    .build())
-                .bodyValue(Map.of("type", type, "triggerExecution", triggerExecution))
-                .retrieve()
-                .bodyToMono(Object.class));
+        return WebClient.create()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .scheme("http")
+                .host(serviceInstance.getHost())
+                .port(serviceInstance.getPort())
+                .path("/api/internal/trigger-handler")
+                .build())
+            .bodyValue(Map.of("type", type, "triggerExecution", triggerExecution))
+            .retrieve()
+            .bodyToMono(Object.class)
+            .block();
     }
 }

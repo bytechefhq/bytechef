@@ -19,7 +19,6 @@ package com.bytechef.hermes.worker.handler.web.rest.client;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.reactor.util.MonoUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -46,17 +45,17 @@ public class TaskHandlerClient {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
             discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0]);
 
-        return MonoUtils.get(
-            WebClient.create()
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                    .scheme("http")
-                    .host(serviceInstance.getHost())
-                    .port(serviceInstance.getPort())
-                    .path("/api/internal/task-handler")
-                    .build())
-                .bodyValue(Map.of("type", type, "taskExecution", taskExecution))
-                .retrieve()
-                .bodyToMono(Object.class));
+        return WebClient.create()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .scheme("http")
+                .host(serviceInstance.getHost())
+                .port(serviceInstance.getPort())
+                .path("/api/internal/task-handler")
+                .build())
+            .bodyValue(Map.of("type", type, "taskExecution", taskExecution))
+            .retrieve()
+            .bodyToMono(Object.class)
+            .block();
     }
 }
