@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,6 +48,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 /**
  * @author Ivica Cardic
@@ -70,6 +73,8 @@ public class WorkflowControllerIntTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
+    private MockMvc mockMvc;
+
     private WebTestClient webTestClient;
 
     @Autowired
@@ -80,6 +85,13 @@ public class WorkflowControllerIntTest {
 
     @MockBean
     private WorkflowExecutor testWorkflowExecutor;
+
+    @BeforeEach
+    public void setup() {
+        this.webTestClient = MockMvcWebTestClient
+            .bindTo(mockMvc)
+            .build();
+    }
 
     @Test
     public void testDeleteWorkflow() {
