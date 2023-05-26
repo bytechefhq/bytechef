@@ -19,13 +19,13 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 /**
  * @author Ivica Cardic
  */
 @Disabled
-@WebFluxTest(TaskExecutionController.class)
+@WebMvcTest(TaskExecutionController.class)
 public class TaskExecutionControllerIntTest {
 
     @Test
