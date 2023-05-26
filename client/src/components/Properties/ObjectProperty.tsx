@@ -21,6 +21,7 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
                 {(properties as PropertyType[])?.map((subProperty, index) => {
                     if (
                         subProperty.type === 'OBJECT' &&
+                        !subProperty.additionalProperties?.length &&
                         !subProperty.properties?.length
                     ) {
                         return <></>;
