@@ -41,6 +41,7 @@ import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -50,6 +51,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -77,10 +80,19 @@ public class ProjectControllerIntTest {
     private ProjectMapper projectMapper;
 
     @Autowired
+    private MockMvc mockMvc;
+
     private WebTestClient webTestClient;
 
     @MockBean
     private WorkflowExecutionFacade workflowExecutionFacade;
+
+    @BeforeEach
+    public void setup() {
+        this.webTestClient = MockMvcWebTestClient
+            .bindTo(mockMvc)
+            .build();
+    }
 
     @Test
     public void testDeleteProject() {
