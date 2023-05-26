@@ -136,7 +136,7 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
         setViewportWidth(width);
 
         const adaptedViewportWidth = nodeDetailsOpen
-            ? width / 2 - window.innerWidth / 4
+            ? width / 2 - window.innerWidth / 6
             : width / 2;
 
         setViewport({
