@@ -89,11 +89,6 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionFacadeClient componentDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        return new ComponentDefinitionFacadeClient(discoveryClient);
-    }
-
-    @Bean
     public ComponentDefinitionRegistry componentDefinitionRegistry(
         List<ComponentDefinitionFactory> componentDefinitionFactories) {
 
@@ -103,13 +98,6 @@ public class DefinitionRegistryConfiguration {
     @Bean
     ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
         return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
-    }
-
-    @Bean
-    ComponentDefinitionServiceClient componentDefinitionServiceClient(
-        DiscoveryClient discoveryClient) {
-
-        return new ComponentDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
