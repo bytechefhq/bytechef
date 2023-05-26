@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Authorization.ApplyConsumer;
@@ -231,9 +230,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        return CollectionUtils.map(
-            componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion),
-            connectionDefinition -> toConnectionDefinitionDTO(connectionDefinition, componentDefinition));
+        return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
+            .stream()
+            .map(connectionDefinition -> toConnectionDefinitionDTO(connectionDefinition, componentDefinition))
+            .toList();
     }
 
     private ConnectionDefinitionDTO toConnectionDefinitionDTO(

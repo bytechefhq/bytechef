@@ -44,11 +44,11 @@ dependencies {
     implementation project(":server:libs:helios:helios-project:helios-project-rest")
     implementation project(":server:libs:helios:helios-project:helios-project-service")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
-    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service-rest-client")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-rest-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-service")
     implementation project(":server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-impl")
-    implementation project(":server:libs:hermes:hermes-worker:hermes-worker-handler-rest-client")
+    implementation project(":server:libs:hermes:hermes-worker:hermes-worker-handler-remote-rest-client")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-impl")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-service")
 
