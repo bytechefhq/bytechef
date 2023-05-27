@@ -9,7 +9,7 @@ const CurrentActionSelect = ({
     handleValueChange,
     value,
 }: {
-    actions: ActionDefinitionBasicModel[] | [];
+    actions: ActionDefinitionBasicModel[];
     handleValueChange: (value: string) => void;
     value: string;
     description?: string;
@@ -41,7 +41,7 @@ const CurrentActionSelect = ({
                 onValueChange={(value) => handleValueChange(value)}
                 options={actions?.map((action) => ({
                     description: action.description,
-                    label: action.title!,
+                    label: action.title || action.name,
                     value: action.name,
                 }))}
                 value={value}

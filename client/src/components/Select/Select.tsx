@@ -76,7 +76,7 @@ const Select = ({
         )}
 
         <Root
-            defaultValue={defaultValue || options[0].value}
+            defaultValue={defaultValue || options[0]?.value}
             onValueChange={onValueChange}
             value={value}
         >
