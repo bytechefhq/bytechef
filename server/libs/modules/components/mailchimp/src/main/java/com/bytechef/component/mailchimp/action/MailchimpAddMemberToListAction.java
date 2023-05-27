@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class MailchimpAddMemberToListAction {
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("addMemberToList")
-        .title("Add a new member to the list.")
+        .title("Add a new member to the list")
         .description("Add a new member to the list.")
         .metadata(
             Map.of(
