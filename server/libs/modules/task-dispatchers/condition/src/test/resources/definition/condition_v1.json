@@ -264,7 +264,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
@@ -337,7 +337,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
@@ -373,7 +373,7 @@
         "type": "STRING",
         "defaultValue": "",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -449,7 +449,7 @@
         "type": "STRING",
         "defaultValue": "",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -467,7 +467,7 @@
         "type": "STRING",
         "defaultValue": "",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -521,7 +521,7 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
-    "controlType": "INPUT_TEXT",
+    "controlType": "TEXT",
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null

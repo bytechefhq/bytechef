@@ -49,6 +49,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public ConditionTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {

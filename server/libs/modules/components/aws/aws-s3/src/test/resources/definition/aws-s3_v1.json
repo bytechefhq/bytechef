@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "aws-s3",
+    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "componentTitle": "AWS S3",
     "deprecated": null,
     "description": "Get the AWS S3 object.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "getObject",
@@ -22,7 +24,7 @@
       "type": "STRING",
       "defaultValue": "file.txt",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -40,13 +42,12 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Get Object",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -79,7 +80,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -97,7 +98,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -115,7 +116,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -133,7 +134,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -142,13 +143,17 @@
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "aws-s3",
+    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "componentTitle": "AWS S3",
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "getUrl",
@@ -166,13 +171,12 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Get URL",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -187,19 +191,23 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "aws-s3",
+    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "componentTitle": "AWS S3",
     "deprecated": null,
     "description": "Get the list AWS S3 objects.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "listObjects",
@@ -217,13 +225,12 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "List Objects",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -270,7 +277,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -288,7 +295,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -306,7 +313,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -320,13 +327,17 @@
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "aws-s3",
+    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "componentTitle": "AWS S3",
     "deprecated": null,
     "description": "Get the url of an pre-signed AWS S3 object.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "presignGetObject",
@@ -344,7 +355,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -362,13 +373,12 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Get Pre-signed Object",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -383,19 +393,23 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "aws-s3",
+    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "componentTitle": "AWS S3",
     "deprecated": null,
     "description": "Store an object to AWS S3.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "putObject",
@@ -431,7 +445,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -449,7 +463,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -467,7 +481,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -485,7 +499,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -506,7 +520,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -565,7 +579,6 @@
       "optionsDataSource": null
     } ],
     "title": "Put Object",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -580,19 +593,24 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
     "authorizationRequired": false,
     "authorizations": null,
     "baseUri": null,
+    "componentName": "aws-s3",
+    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "componentTitle": "AWS S3",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -607,7 +625,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -625,7 +643,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -806,7 +824,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null

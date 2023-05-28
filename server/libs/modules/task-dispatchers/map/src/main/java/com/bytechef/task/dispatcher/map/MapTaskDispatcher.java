@@ -152,12 +152,14 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             return this;
         }
 
+        @SuppressFBWarnings("EI")
         public Builder contextService(ContextService contextService) {
             this.contextService = contextService;
 
             return this;
         }
 
+        @SuppressFBWarnings("EI")
         public Builder counterService(CounterService counterService) {
             this.counterService = counterService;
 

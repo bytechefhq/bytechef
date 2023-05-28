@@ -58,6 +58,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public LoopTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {

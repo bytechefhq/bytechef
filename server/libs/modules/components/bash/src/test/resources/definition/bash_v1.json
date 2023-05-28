@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "bash",
+    "componentDescription": "Allows you to run arbitrary Bash scripts.",
+    "componentTitle": "Bash",
     "deprecated": null,
     "description": "Executes the script.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -22,7 +24,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -42,13 +44,14 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,

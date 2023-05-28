@@ -35,7 +35,7 @@
     "type": "STRING",
     "defaultValue": "item",
     "exampleValue": null,
-    "controlType": "INPUT_TEXT",
+    "controlType": "TEXT",
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -53,7 +53,7 @@
     "type": "STRING",
     "defaultValue": "itemIndex",
     "exampleValue": null,
-    "controlType": "INPUT_TEXT",
+    "controlType": "TEXT",
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -147,7 +147,7 @@
     "maxValue": null,
     "minValue": null,
     "options": null,
-    "controlType": "INPUT_INTEGER",
+    "controlType": "INTEGER",
     "optionsDataSource": null
   } ]
 }

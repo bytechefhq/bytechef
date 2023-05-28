@@ -50,6 +50,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public SequenceTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {

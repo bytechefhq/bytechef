@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "deprecated": null,
     "description": "The request method to use.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "get",
@@ -22,7 +24,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -104,7 +106,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -136,7 +138,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -145,8 +147,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -175,7 +177,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -184,11 +186,12 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "GET",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -241,8 +244,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -260,11 +263,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -287,10 +290,12 @@
     "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "deprecated": null,
     "description": "The request method to use.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "post",
@@ -308,7 +313,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -390,7 +395,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -422,7 +427,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -431,8 +436,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -461,7 +466,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -470,8 +475,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -503,8 +508,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -546,8 +551,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
         "description": null,
@@ -563,8 +568,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -582,8 +587,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -617,8 +622,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "INPUT_NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -638,8 +643,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -654,7 +659,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -673,15 +678,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -701,8 +706,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -731,7 +736,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -767,7 +772,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -785,7 +790,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -803,7 +808,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -821,20 +826,20 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "EXPRESSION",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "EXPRESSION"
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -863,7 +868,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -872,8 +877,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -888,7 +893,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -924,7 +929,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -942,7 +947,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -960,7 +965,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -978,13 +983,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -1047,7 +1052,7 @@
       "type": "STRING",
       "defaultValue": "text/plain",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1169,7 +1174,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1190,11 +1195,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "POST",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -1247,8 +1253,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1266,11 +1272,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1293,10 +1299,12 @@
     "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "deprecated": null,
     "description": "The request method to use.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "put",
@@ -1314,7 +1322,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1396,7 +1404,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1428,7 +1436,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1437,8 +1445,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -1467,7 +1475,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1476,8 +1484,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -1509,8 +1517,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1552,8 +1560,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1569,8 +1577,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1588,8 +1596,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1623,8 +1631,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "INPUT_NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1644,8 +1652,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1660,7 +1668,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1679,15 +1687,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -1707,8 +1715,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -1737,7 +1745,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1773,7 +1781,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1791,7 +1799,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1809,7 +1817,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1827,20 +1835,20 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "EXPRESSION",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "EXPRESSION"
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -1869,7 +1877,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1878,8 +1886,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -1894,7 +1902,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1930,7 +1938,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1948,7 +1956,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1966,7 +1974,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1984,13 +1992,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -2053,7 +2061,7 @@
       "type": "STRING",
       "defaultValue": "text/plain",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2175,7 +2183,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2196,11 +2204,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "PUT",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -2253,8 +2262,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2272,11 +2281,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -2299,10 +2308,12 @@
     "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "deprecated": null,
     "description": "The request method to use.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "patch",
@@ -2320,7 +2331,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2402,7 +2413,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2434,7 +2445,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2443,8 +2454,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -2473,7 +2484,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2482,8 +2493,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -2515,8 +2526,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2558,8 +2569,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2575,8 +2586,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2594,8 +2605,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2629,8 +2640,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "INPUT_NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2650,8 +2661,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2666,7 +2677,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2685,15 +2696,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -2713,8 +2724,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -2743,7 +2754,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2779,7 +2790,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2797,7 +2808,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2815,7 +2826,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2833,20 +2844,20 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "EXPRESSION",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "EXPRESSION"
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -2875,7 +2886,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2884,8 +2895,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -2900,7 +2911,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2936,7 +2947,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2954,7 +2965,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2972,7 +2983,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2990,13 +3001,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -3059,7 +3070,7 @@
       "type": "STRING",
       "defaultValue": "text/plain",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3181,7 +3192,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3202,11 +3213,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "PATCH",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -3259,8 +3271,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -3278,11 +3290,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -3305,10 +3317,12 @@
     "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "deprecated": null,
     "description": "The request method to use.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -3326,7 +3340,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3408,7 +3422,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3440,7 +3454,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3449,8 +3463,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3479,7 +3493,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3488,8 +3502,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -3608,7 +3622,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3629,11 +3643,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "DELETE",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -3686,8 +3701,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -3705,11 +3720,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -3732,10 +3747,12 @@
     "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "deprecated": null,
     "description": "The request method to use.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "head",
@@ -3753,7 +3770,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3835,7 +3852,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3867,7 +3884,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3876,8 +3893,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3906,7 +3923,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3915,8 +3932,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -4035,7 +4052,7 @@
       "type": "STRING",
       "defaultValue": "",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -4056,11 +4073,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "HEAD",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -4113,8 +4131,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -4132,11 +4150,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -4179,7 +4197,7 @@
         "type": "STRING",
         "defaultValue": "api_token",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4197,7 +4215,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4238,12 +4256,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4262,7 +4280,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4275,12 +4293,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4299,7 +4317,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4317,7 +4335,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4330,12 +4348,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4354,7 +4372,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4372,7 +4390,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4385,12 +4403,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4409,7 +4427,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4427,7 +4445,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4445,7 +4463,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4463,7 +4481,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4481,7 +4499,7 @@
         "type": "STRING",
         "defaultValue": "Bearer",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4512,12 +4530,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4536,7 +4554,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4554,7 +4572,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4572,7 +4590,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4590,7 +4608,7 @@
         "type": "STRING",
         "defaultValue": "Bearer",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4621,12 +4639,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4645,7 +4663,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4663,7 +4681,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4681,7 +4699,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4699,7 +4717,7 @@
         "type": "STRING",
         "defaultValue": "Bearer",
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4730,14 +4748,17 @@
       "pkce": null,
       "refresh": null,
       "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "clientSecret": null,
+      "clientId": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null
     } ],
     "baseUri": null,
+    "componentName": "httpClient",
+    "componentDescription": "Makes an HTTP request and returns the response data.",
+    "componentTitle": "HTTP Client",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -4752,7 +4773,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null

@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "mysql",
+    "componentDescription": "Query, insert nd update data from MySQL.",
+    "componentTitle": "MySQL",
     "deprecated": null,
     "description": "Execute an SQL query.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "query",
@@ -22,7 +24,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -101,7 +103,7 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "INPUT_NUMBER",
+        "controlType": "NUMBER",
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -117,7 +119,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -150,13 +152,16 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "mysql",
+    "componentDescription": "Query, insert nd update data from MySQL.",
+    "componentTitle": "MySQL",
     "deprecated": null,
     "description": "Insert rows in database.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "insert",
@@ -174,7 +179,7 @@
       "type": "STRING",
       "defaultValue": "public",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -192,7 +197,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -224,7 +229,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -357,7 +362,7 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
+          "controlType": "INTEGER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -392,7 +397,7 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
+          "controlType": "NUMBER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -429,7 +434,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -500,20 +505,23 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
+        "controlType": "INTEGER",
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "mysql",
+    "componentDescription": "Query, insert nd update data from MySQL.",
+    "componentTitle": "MySQL",
     "deprecated": null,
     "description": "Update rows in database.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "update",
@@ -531,7 +539,7 @@
       "type": "STRING",
       "defaultValue": "public",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -549,7 +557,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -581,7 +589,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -604,7 +612,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -732,7 +740,7 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
+          "controlType": "INTEGER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -767,7 +775,7 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
+          "controlType": "NUMBER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -804,7 +812,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -875,20 +883,23 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
+        "controlType": "INTEGER",
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "mysql",
+    "componentDescription": "Query, insert nd update data from MySQL.",
+    "componentTitle": "MySQL",
     "deprecated": null,
     "description": "Delete rows from database.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -906,7 +917,7 @@
       "type": "STRING",
       "defaultValue": "public",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -924,7 +935,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -942,7 +953,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1070,7 +1081,7 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
+          "controlType": "INTEGER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -1105,7 +1116,7 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
+          "controlType": "NUMBER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -1142,7 +1153,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1213,20 +1224,23 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
+        "controlType": "INTEGER",
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "mysql",
+    "componentDescription": "Query, insert nd update data from MySQL.",
+    "componentTitle": "MySQL",
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -1244,7 +1258,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1372,7 +1386,7 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
+          "controlType": "INTEGER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -1407,7 +1421,7 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
+          "controlType": "NUMBER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -1444,7 +1458,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1552,7 +1566,7 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "INPUT_NUMBER",
+        "controlType": "NUMBER",
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -1568,7 +1582,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1617,20 +1631,24 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INPUT_INTEGER",
+        "controlType": "INTEGER",
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
     "authorizationRequired": false,
     "authorizations": null,
     "baseUri": null,
+    "componentName": "mysql",
+    "componentDescription": "Query, insert nd update data from MySQL.",
+    "componentTitle": "MySQL",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -1645,7 +1663,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1666,7 +1684,7 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
+      "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -1682,7 +1700,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1700,7 +1718,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1718,7 +1736,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_PASSWORD",
+      "controlType": "PASSWORD",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null

@@ -56,6 +56,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
 
+    @SuppressFBWarnings("EI")
     public BranchTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {

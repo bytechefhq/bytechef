@@ -113,7 +113,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -148,7 +148,7 @@
       "numberPrecision": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_NUMBER"
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -184,7 +184,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -224,7 +224,7 @@
     "type": "STRING",
     "defaultValue": "item",
     "exampleValue": null,
-    "controlType": "INPUT_TEXT",
+    "controlType": "TEXT",
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -242,7 +242,7 @@
     "type": "STRING",
     "defaultValue": "itemIndex",
     "exampleValue": null,
-    "controlType": "INPUT_TEXT",
+    "controlType": "TEXT",
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -305,6 +305,6 @@
     "minValue": null,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "INPUT_INTEGER"
+    "controlType": "INTEGER"
   } ]
 }

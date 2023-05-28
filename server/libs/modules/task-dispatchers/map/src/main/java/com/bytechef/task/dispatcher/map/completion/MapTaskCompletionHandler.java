@@ -41,10 +41,11 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
     private final CounterService counterService;
 
+    @SuppressFBWarnings("EI")
     public MapTaskCompletionHandler(
-        TaskExecutionService taskExecutionService,
-        TaskCompletionHandler taskCompletionHandler,
+        TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
         CounterService counterService) {
+
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;

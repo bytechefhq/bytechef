@@ -44,10 +44,11 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public ParallelTaskCompletionHandler(
-        CounterService counterService,
-        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService, TaskCompletionHandler taskCompletionHandler,
         TaskExecutionService taskExecutionService) {
+
         this.counterService = counterService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskExecutionService = taskExecutionService;

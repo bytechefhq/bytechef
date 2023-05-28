@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "var",
+    "componentDescription": "Sets a value which can then be referenced in other tasks.",
+    "componentTitle": "Var",
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "set",
@@ -75,8 +77,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -94,8 +96,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -137,8 +139,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -154,8 +156,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -173,8 +175,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -208,8 +210,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "INPUT_NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -229,8 +231,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -245,7 +247,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -264,10 +266,11 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set value",
+    "perform": { },
     "outputSchema": [ ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,

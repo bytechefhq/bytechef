@@ -32,7 +32,7 @@ public class DataStorageComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/data_storage_v1.json", new DataStorageComponentHandler().getDefinition());
+            "definition/datastorage_v1.json", new DataStorageComponentHandler().getDefinition());
     }
 
     @Test

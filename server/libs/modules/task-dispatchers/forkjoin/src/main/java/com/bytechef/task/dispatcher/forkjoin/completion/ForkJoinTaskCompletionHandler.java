@@ -61,6 +61,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
 
+    @SuppressFBWarnings("EI")
     public ForkJoinTaskCompletionHandler(
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
         CounterService counterService, TaskDispatcher<? super Task> taskDispatcher, ContextService contextService) {

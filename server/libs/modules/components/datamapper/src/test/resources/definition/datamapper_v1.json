@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "The action maps values of a given object to fresh keys and returns a new object containing those newly mapped keys.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapKeys",
@@ -27,8 +29,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
@@ -75,7 +77,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -93,21 +95,21 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Map Keys",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -127,19 +129,22 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "Map an array of key value objects to a single object.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapListToObject",
@@ -160,8 +165,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value's key will serve as the key in the newly created object.",
@@ -176,7 +181,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -194,13 +199,13 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Map list to object",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -220,19 +225,22 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "Transform object properties by assigning new values and generate a new object with updated properties.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapMultipleValuesBetweenObjects",
@@ -255,8 +263,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Object containing one or more properties.",
@@ -276,8 +284,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The collection of of \"mappings\" where \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.",
@@ -324,7 +332,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -342,21 +350,21 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Map multiple values between objects\n",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -376,19 +384,22 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "Transform the fields of an object and assign them new keys.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapObjects",
@@ -419,8 +430,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object containing one or more properties.",
@@ -440,8 +451,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array containing one or more properties.",
@@ -459,8 +470,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The collection of of \"mappings\"  where the \"From\" key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.",
@@ -507,7 +518,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -525,18 +536,18 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Should fields from the original object that do not have mappings be included?",
@@ -643,18 +654,18 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Map objects",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -674,8 +685,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -693,19 +704,22 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "Transform an object or array of objects into an array of key-value pairs.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapObjectsToList",
@@ -736,8 +750,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object containing one or more properties.",
@@ -757,8 +771,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array containing one or more properties.",
@@ -776,8 +790,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The key name to which keys should be mapped.",
@@ -792,7 +806,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -810,13 +824,13 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Map objects to list",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -836,8 +850,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -855,19 +869,22 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "The action maps a given value by matching it with the defined mappings, and it returns the outcome of the mapping. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapOneValue",
@@ -938,8 +955,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -957,8 +974,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1000,8 +1017,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1017,8 +1034,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1036,8 +1053,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1071,8 +1088,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "INPUT_NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1092,8 +1109,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value you want to map.",
@@ -1108,7 +1125,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1127,8 +1144,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1146,8 +1163,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1189,8 +1206,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1206,8 +1223,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1225,8 +1242,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1260,8 +1277,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "INPUT_NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1281,8 +1298,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "If there is no existing mapping, assign this value a default mapping.",
@@ -1297,7 +1314,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1316,8 +1333,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
       "description": "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.",
@@ -1367,8 +1384,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1410,8 +1427,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1427,8 +1444,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1446,8 +1463,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1481,8 +1498,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1502,8 +1519,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1518,7 +1535,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1537,8 +1554,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1556,8 +1573,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1599,8 +1616,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1616,8 +1633,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1635,8 +1652,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1670,8 +1687,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1691,8 +1708,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1707,7 +1724,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1726,19 +1743,19 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Map one value",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -1756,8 +1773,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1799,8 +1816,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1816,8 +1833,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1835,8 +1852,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1870,8 +1887,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "INPUT_NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1891,8 +1908,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1907,7 +1924,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1926,19 +1943,22 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "dataMapper",
+    "componentDescription": "The Data Mapper enables you to configure data mappings.",
+    "componentTitle": "Data Mapper",
     "deprecated": null,
     "description": "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and mapped values.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "mapValues",
@@ -1969,8 +1989,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to map.",
@@ -1990,8 +2010,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array of values to map.",
@@ -2009,8 +2029,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
@@ -2060,8 +2080,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2103,8 +2123,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2120,8 +2140,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2139,8 +2159,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2174,8 +2194,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2195,8 +2215,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2211,7 +2231,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2230,8 +2250,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2249,8 +2269,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2292,8 +2312,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2309,8 +2329,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2328,8 +2348,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2363,8 +2383,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2384,8 +2404,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2400,7 +2420,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2419,19 +2439,19 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Map values",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -2451,8 +2471,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -2470,13 +2490,14 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

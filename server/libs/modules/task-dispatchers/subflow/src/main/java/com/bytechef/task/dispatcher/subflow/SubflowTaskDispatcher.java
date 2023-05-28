@@ -29,6 +29,8 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapValueUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Collections;
 import java.util.Objects;
 
@@ -43,6 +45,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     private final JobFactory jobFactory;
 
+    @SuppressFBWarnings("EI")
     public SubflowTaskDispatcher(JobFactory jobFactory) {
         this.jobFactory = jobFactory;
     }

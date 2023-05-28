@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "jira",
+    "componentDescription": "Jira Cloud platform REST API documentation",
+    "componentTitle": "Jira",
     "deprecated": null,
     "description": "Creates an issue or, where the option to create subtasks is enabled in Jira, a subtask. A transition may be applied, to move the issue or subtask to a workflow step other than the default start step, and issue properties set.\n\nThe content of the issue or subtask is defined using `update` and `fields`. The fields that can be set in the issue or subtask are determined using the [ Get create issue metadata](#api-rest-api-3-issue-createmeta-get). These are the same fields that appear on the issue's create screen. Note that the `description`, `environment`, and any `textarea` type custom fields (multi-line text fields) take Atlassian Document Format content. Single line custom fields (`textfield`) accept a string and don't handle Atlassian Document Format content.\n\nCreating a subtask differs from creating an issue as follows:\n\n *  `issueType` must be set to a subtask issue type (use [ Get create issue metadata](#api-rest-api-3-issue-createmeta-get) to find subtask issue types).\n *  `parent` must contain the ID or key of the parent issue.\n\nIn a next-gen project any issue may be made a child providing that the parent and child are members of the same project.\n\n**[Permissions](#permissions) required:** *Browse projects* and *Create issues* [project permissions](https://confluence.atlassian.com/x/yodKLg) for the project in which the issue or subtask is created.",
     "sampleOutput": "{\"id\":\"10000\",\"key\":\"ED-24\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10000\",\"transition\":{\"status\":200,\"errorCollection\":{\"errorMessages\":[],\"errors\":{}}}}",
-    "perform": null,
     "help": null,
     "metadata": {
       "path": "/rest/api/3/issue",
@@ -93,7 +95,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -111,7 +113,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -147,7 +149,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -165,7 +167,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -183,7 +185,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -201,7 +203,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -219,7 +221,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -255,7 +257,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -276,8 +278,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The key of the status category.",
@@ -292,7 +294,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -310,7 +312,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -328,16 +330,16 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Whether there is a screen associated with the issue transition.",
@@ -558,7 +560,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -576,7 +578,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -594,7 +596,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -612,7 +614,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -633,8 +635,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INPUT_INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "If the field is a custom field, the configuration of the field.",
@@ -668,18 +670,18 @@
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The name of the field.",
@@ -694,7 +696,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -712,7 +714,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -730,7 +732,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -788,15 +790,15 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The list of values allowed in the field.",
@@ -830,13 +832,13 @@
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The default value of the field.",
@@ -856,8 +858,8 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The configuration properties.",
@@ -891,25 +893,25 @@
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Expand options that include additional transition details in the response.",
@@ -924,7 +926,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -955,8 +957,8 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "List of issue screen fields to update, specifying the sub-field to update and its value for each field. This field provides a straightforward option when setting a sub-field. When multiple sub-fields or other operations are required, use `update`. Fields included in here cannot be included in `update`.",
@@ -990,15 +992,15 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "A Map containing the field field name and a list of operations to perform on the issue screen field. Note that fields included in here cannot be included in `fields`.",
@@ -1030,15 +1032,15 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Details of issue history metadata.",
@@ -1071,7 +1073,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1089,7 +1091,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1107,7 +1109,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1125,7 +1127,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1143,7 +1145,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1161,7 +1163,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1179,7 +1181,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1215,7 +1217,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1233,7 +1235,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1251,7 +1253,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1269,7 +1271,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1287,7 +1289,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1305,13 +1307,13 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Details of user or system associated with a issue history metadata item.",
@@ -1344,7 +1346,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1362,7 +1364,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1380,7 +1382,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1398,7 +1400,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1416,7 +1418,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1434,13 +1436,13 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Details of user or system associated with a issue history metadata item.",
@@ -1473,7 +1475,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1491,7 +1493,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1509,7 +1511,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1527,7 +1529,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1545,7 +1547,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1563,13 +1565,13 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Additional arbitrary information about the history record.",
@@ -1598,7 +1600,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1607,11 +1609,11 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Details of issue properties to be add or update.",
@@ -1658,7 +1660,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1681,19 +1683,19 @@
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create issue",
     "editorDescriptionDataSource": null,
@@ -1731,7 +1733,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1749,7 +1751,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1767,7 +1769,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1806,8 +1808,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Error messages from an operation.",
@@ -1854,15 +1856,15 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"",
@@ -1891,7 +1893,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1900,8 +1902,8 @@
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1919,26 +1921,29 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": null
   }, {
     "batch": null,
+    "componentName": "jira",
+    "componentDescription": "Jira Cloud platform REST API documentation",
+    "componentTitle": "Jira",
     "deprecated": null,
     "description": "Returns the details for an issue.\n\nThe issue is identified by its ID or key, however, if the identifier doesn't match an issue, a case-insensitive search and check for moved issues is performed. If a matching issue is found its details are returned, a 302 or other redirect is **not** returned. The issue key returned in the response is the key of the issue found.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
     "sampleOutput": "{\"id\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10002\",\"key\":\"ED-1\",\"fields\":{\"watcher\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers\",\"isWatching\":false,\"watchCount\":1,\"watchers\":[{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false}]},\"attachment\":[{\"id\":10000,\"self\":\"https://your-domain.atlassian.net/rest/api/3/attachments/10000\",\"filename\":\"picture.jpg\",\"author\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"key\":\"\",\"accountId\":\"5b10a2844c20165700ede21g\",\"accountType\":\"atlassian\",\"name\":\"\",\"avatarUrls\":{\"48x48\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48\",\"24x24\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24\",\"16x16\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16\",\"32x32\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32\"},\"displayName\":\"Mia Krystof\",\"active\":false},\"created\":\"2022-11-30T07:18:19.441+0000\",\"size\":23123,\"mimeType\":\"image/jpeg\",\"content\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000\",\"thumbnail\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000\"}],\"sub-tasks\":[{\"id\":\"10000\",\"type\":{\"id\":\"10000\",\"name\":\"\",\"inward\":\"Parent\",\"outward\":\"Sub-task\"},\"outwardIssue\":{\"id\":\"10003\",\"key\":\"ED-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/ED-2\",\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}}}}],\"description\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Main order flow broken\"}]}]},\"project\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/project/EX\",\"id\":\"10000\",\"key\":\"EX\",\"name\":\"Example\",\"avatarUrls\":{\"48x48\":\"https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000\",\"24x24\":\"https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000\",\"16x16\":\"https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000\",\"32x32\":\"https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000\"},\"projectCategory\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/projectCategory/10000\",\"id\":\"10000\",\"name\":\"FIRST\",\"description\":\"First Project Category\"},\"simplified\":false,\"style\":\"classic\",\"insight\":{\"totalIssueCount\":100,\"lastIssueUpdateTime\":\"2022-11-30T07:18:17.152+0000\"}},\"comment\":[{\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000\",\"id\":\"10000\",\"author\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"body\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.\"}]}]},\"updateAuthor\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"created\":\"2021-01-17T12:34:00.000+0000\",\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"type\":\"role\",\"value\":\"Administrators\",\"identifier\":\"Administrators\"}}],\"issuelinks\":[{\"id\":\"10001\",\"type\":{\"id\":\"10000\",\"name\":\"Dependent\",\"inward\":\"depends on\",\"outward\":\"is depended by\"},\"outwardIssue\":{\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-2\",\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}}}},{\"id\":\"10002\",\"type\":{\"id\":\"10000\",\"name\":\"Dependent\",\"inward\":\"depends on\",\"outward\":\"is depended by\"},\"inwardIssue\":{\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-3\",\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}}}}],\"worklog\":[{\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000\",\"author\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"updateAuthor\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"comment\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"I did some work here.\"}]}]},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"type\":\"group\",\"value\":\"jira-developers\",\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\"},\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"id\":\"100028\",\"issueId\":\"10002\"}],\"updated\":1,\"timetracking\":{\"originalEstimate\":\"10m\",\"remainingEstimate\":\"3m\",\"timeSpent\":\"6m\",\"originalEstimateSeconds\":600,\"remainingEstimateSeconds\":200,\"timeSpentSeconds\":400}}}",
-    "perform": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1961,7 +1966,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1995,15 +2000,15 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Whether fields in `fields` are referenced by keys rather than IDs. This parameter is useful where fields have been added by a connect app and a field's key may differ from its ID.",
@@ -2048,7 +2053,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2082,15 +2087,15 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Whether the project in which the issue is created is added to the user's **Recently viewed** project list, as shown under **Projects** in Jira. This also populates the [JQL issues search](#api-rest-api-3-search-get) `lastViewed` field.",
@@ -2156,7 +2161,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2174,7 +2179,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2192,7 +2197,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2210,7 +2215,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2247,15 +2252,15 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Details of the issue properties identified in the request.",
@@ -2289,15 +2294,15 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The ID and name of each field present on the issue.",
@@ -2326,7 +2331,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2335,8 +2340,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The schema describing each field present on the issue.",
@@ -2383,7 +2388,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2401,7 +2406,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2419,7 +2424,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2437,7 +2442,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2458,8 +2463,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "If the field is a custom field, the configuration of the field.",
@@ -2493,25 +2498,25 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The transitions that can be performed on the issue.",
@@ -2558,7 +2563,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2576,7 +2581,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2612,7 +2617,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -2630,7 +2635,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -2648,7 +2653,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -2666,7 +2671,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -2684,7 +2689,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -2720,7 +2725,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -2741,8 +2746,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INPUT_INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "The key of the status category.",
@@ -2757,7 +2762,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -2775,7 +2780,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -2793,16 +2798,16 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Whether there is a screen associated with the issue transition.",
@@ -3023,7 +3028,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3041,7 +3046,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3059,7 +3064,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3077,7 +3082,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3098,8 +3103,8 @@
                   "maxValue": null,
                   "minValue": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "INPUT_INTEGER"
+                  "controlType": "INTEGER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "If the field is a custom field, the configuration of the field.",
@@ -3133,18 +3138,18 @@
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
                   "multipleValues": null,
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "The name of the field.",
@@ -3159,7 +3164,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3177,7 +3182,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3195,7 +3200,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3253,15 +3258,15 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "The list of values allowed in the field.",
@@ -3295,13 +3300,13 @@
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "The default value of the field.",
@@ -3321,8 +3326,8 @@
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "The configuration properties.",
@@ -3356,25 +3361,25 @@
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Expand options that include additional transition details in the response.",
@@ -3389,7 +3394,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3420,13 +3425,13 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Details of the operations that can be performed on the issue.",
@@ -3491,7 +3496,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -3509,7 +3514,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -3545,7 +3550,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3563,7 +3568,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3581,7 +3586,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3599,7 +3604,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3617,7 +3622,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3635,7 +3640,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3656,11 +3661,11 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INPUT_INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3678,8 +3683,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3726,7 +3731,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3744,7 +3749,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3762,7 +3767,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3780,7 +3785,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3798,7 +3803,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3816,7 +3821,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -3837,27 +3842,27 @@
                   "maxValue": null,
                   "minValue": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "INPUT_INTEGER"
+                  "controlType": "INTEGER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "A list of editable field details.",
@@ -3966,7 +3971,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -3984,7 +3989,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4002,7 +4007,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4020,7 +4025,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4041,8 +4046,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INPUT_INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "If the field is a custom field, the configuration of the field.",
@@ -4076,18 +4081,18 @@
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The name of the field.",
@@ -4102,7 +4107,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4120,7 +4125,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4138,7 +4143,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4196,15 +4201,15 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The list of values allowed in the field.",
@@ -4238,13 +4243,13 @@
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The default value of the field.",
@@ -4264,8 +4269,8 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The configuration properties.",
@@ -4299,28 +4304,28 @@
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "A page of changelogs.",
@@ -4356,8 +4361,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The maximum number of results that could be on the page.",
@@ -4375,8 +4380,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The number of results on the page.",
@@ -4394,8 +4399,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The list of changelogs.",
@@ -4442,7 +4447,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4478,7 +4483,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4496,7 +4501,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4514,7 +4519,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4532,7 +4537,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4550,7 +4555,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4586,7 +4591,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4604,7 +4609,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4622,7 +4627,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4640,13 +4645,13 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
@@ -4661,7 +4666,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4705,7 +4710,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4723,13 +4728,13 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The date on which the change took place.",
@@ -4745,8 +4750,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "DATE_TIME"
+              "controlType": "DATE_TIME",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The list of items changed.",
@@ -4793,7 +4798,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4811,7 +4816,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4829,7 +4834,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4847,7 +4852,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4865,7 +4870,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4883,7 +4888,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -4901,18 +4906,18 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "Details of issue history metadata.",
@@ -4945,7 +4950,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4963,7 +4968,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4981,7 +4986,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -4999,7 +5004,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5017,7 +5022,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5035,7 +5040,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5053,7 +5058,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5089,7 +5094,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5107,7 +5112,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5125,7 +5130,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5143,7 +5148,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5161,7 +5166,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5179,13 +5184,13 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "Details of user or system associated with a issue history metadata item.",
@@ -5218,7 +5223,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5236,7 +5241,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5254,7 +5259,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5272,7 +5277,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5290,7 +5295,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5308,13 +5313,13 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "Details of user or system associated with a issue history metadata item.",
@@ -5347,7 +5352,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5365,7 +5370,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5383,7 +5388,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5401,7 +5406,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5419,7 +5424,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5437,13 +5442,13 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "Additional arbitrary information about the history record.",
@@ -5472,7 +5477,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5481,22 +5486,22 @@
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The versions of each field on the issue.",
@@ -5530,15 +5535,15 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -5585,15 +5590,15 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -5622,15 +5627,15 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -5659,18 +5664,18 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -5704,27 +5709,30 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": null
   }, {
     "batch": null,
+    "componentName": "jira",
+    "componentDescription": "Jira Cloud platform REST API documentation",
+    "componentTitle": "Jira",
     "deprecated": null,
     "description": "Searches for issues using [JQL](https://confluence.atlassian.com/x/egORLQ).\n\nIf the JQL query expression is too large to be encoded as a query parameter, use the [POST](#api-rest-api-3-search-post) version of this resource.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** Issues are included in the response where the user has:\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the issue.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
     "sampleOutput": "{\"expand\":\"names,schema\",\"startAt\":0,\"maxResults\":50,\"total\":1,\"issues\":[{\"expand\":\"\",\"id\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10002\",\"key\":\"ED-1\",\"fields\":{\"watcher\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers\",\"isWatching\":false,\"watchCount\":1,\"watchers\":[{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false}]},\"attachment\":[{\"id\":10000,\"self\":\"https://your-domain.atlassian.net/rest/api/3/attachments/10000\",\"filename\":\"picture.jpg\",\"author\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"key\":\"\",\"accountId\":\"5b10a2844c20165700ede21g\",\"accountType\":\"atlassian\",\"name\":\"\",\"avatarUrls\":{\"48x48\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48\",\"24x24\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24\",\"16x16\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16\",\"32x32\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32\"},\"displayName\":\"Mia Krystof\",\"active\":false},\"created\":\"2022-11-30T07:18:19.441+0000\",\"size\":23123,\"mimeType\":\"image/jpeg\",\"content\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000\",\"thumbnail\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000\"}],\"sub-tasks\":[{\"id\":\"10000\",\"type\":{\"id\":\"10000\",\"name\":\"\",\"inward\":\"Parent\",\"outward\":\"Sub-task\"},\"outwardIssue\":{\"id\":\"10003\",\"key\":\"ED-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/ED-2\",\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}}}}],\"description\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Main order flow broken\"}]}]},\"project\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/project/EX\",\"id\":\"10000\",\"key\":\"EX\",\"name\":\"Example\",\"avatarUrls\":{\"48x48\":\"https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000\",\"24x24\":\"https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000\",\"16x16\":\"https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000\",\"32x32\":\"https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000\"},\"projectCategory\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/projectCategory/10000\",\"id\":\"10000\",\"name\":\"FIRST\",\"description\":\"First Project Category\"},\"simplified\":false,\"style\":\"classic\",\"insight\":{\"totalIssueCount\":100,\"lastIssueUpdateTime\":\"2022-11-30T07:18:17.152+0000\"}},\"comment\":[{\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000\",\"id\":\"10000\",\"author\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"body\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.\"}]}]},\"updateAuthor\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"created\":\"2021-01-17T12:34:00.000+0000\",\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"type\":\"role\",\"value\":\"Administrators\",\"identifier\":\"Administrators\"}}],\"issuelinks\":[{\"id\":\"10001\",\"type\":{\"id\":\"10000\",\"name\":\"Dependent\",\"inward\":\"depends on\",\"outward\":\"is depended by\"},\"outwardIssue\":{\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-2\",\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}}}},{\"id\":\"10002\",\"type\":{\"id\":\"10000\",\"name\":\"Dependent\",\"inward\":\"depends on\",\"outward\":\"is depended by\"},\"inwardIssue\":{\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-3\",\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}}}}],\"worklog\":[{\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000\",\"author\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"updateAuthor\":{\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\",\"accountId\":\"5b10a2844c20165700ede21g\",\"displayName\":\"Mia Krystof\",\"active\":false},\"comment\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"I did some work here.\"}]}]},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"type\":\"group\",\"value\":\"jira-developers\",\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\"},\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"id\":\"100028\",\"issueId\":\"10002\"}],\"updated\":1,\"timetracking\":{\"originalEstimate\":\"10m\",\"remainingEstimate\":\"3m\",\"timeSpent\":\"6m\",\"originalEstimateSeconds\":600,\"remainingEstimateSeconds\":200,\"timeSpentSeconds\":400}}}],\"warningMessages\":[\"The value 'bar' does not exist for the field 'foo'.\"]}",
-    "perform": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -5747,7 +5755,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": "project = HSP",
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -5770,8 +5778,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum number of items to return per page. To manage page size, Jira may return fewer items per page where a large number of fields are requested. The greatest number of items returned per page is achieved when requesting `id` or `key` only.",
@@ -5791,8 +5799,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Determines how to validate the JQL query and treat the validation results. Supported values are:\n\n *  `strict` Returns a 400 response code if any errors are found, along with a list of all errors (and warnings).\n *  `warn` Returns all errors as warnings.\n *  `none` No validation is performed.\n *  `true` *Deprecated* A legacy synonym for `strict`.\n *  `false` *Deprecated* A legacy synonym for `warn`.\n\nNote: If the JQL is not correctly formed a 400 response code is returned, regardless of the `validateQuery` value.",
@@ -5868,15 +5876,15 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Use [expand](#expansion) to include additional information about issues in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `renderedFields` Returns field values rendered in HTML format.\n *  `names` Returns the display name of each field.\n *  `schema` Returns the schema describing a field type.\n *  `transitions` Returns all possible transitions for the issue.\n *  `operations` Returns all possible operations for the issue.\n *  `editmeta` Returns information about how each field can be edited.\n *  `changelog` Returns a list of recent updates to an issue, sorted by date, starting from the most recent.\n *  `versionedRepresentations` Instead of `fields`, returns `versionedRepresentations` a JSON array containing each version of a field's value, with the highest numbered item representing the most recent version.",
@@ -5893,7 +5901,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -5927,15 +5935,15 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Reference fields by their key (rather than ID).",
@@ -6001,7 +6009,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -6022,8 +6030,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The maximum number of results that could be on the page.",
@@ -6041,8 +6049,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The number of results on the page.",
@@ -6060,8 +6068,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The list of issues found by the search.",
@@ -6108,7 +6116,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -6126,7 +6134,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -6144,7 +6152,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -6162,7 +6170,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -6199,15 +6207,15 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Details of the issue properties identified in the request.",
@@ -6241,15 +6249,15 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "The ID and name of each field present on the issue.",
@@ -6278,7 +6286,7 @@
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
-              "controlType": "INPUT_TEXT",
+              "controlType": "TEXT",
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6287,8 +6295,8 @@
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "The schema describing each field present on the issue.",
@@ -6335,7 +6343,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6353,7 +6361,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6371,7 +6379,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6389,7 +6397,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6410,8 +6418,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INPUT_INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "If the field is a custom field, the configuration of the field.",
@@ -6445,25 +6453,25 @@
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "The transitions that can be performed on the issue.",
@@ -6510,7 +6518,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6528,7 +6536,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6564,7 +6572,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6582,7 +6590,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6600,7 +6608,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6618,7 +6626,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6636,7 +6644,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6672,7 +6680,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -6693,8 +6701,8 @@
                     "maxValue": null,
                     "minValue": null,
                     "options": null,
-                    "optionsDataSource": null,
-                    "controlType": "INPUT_INTEGER"
+                    "controlType": "INTEGER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "The key of the status category.",
@@ -6709,7 +6717,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -6727,7 +6735,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -6745,16 +6753,16 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
                   } ],
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "Whether there is a screen associated with the issue transition.",
@@ -6975,7 +6983,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -6993,7 +7001,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7011,7 +7019,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7029,7 +7037,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7050,8 +7058,8 @@
                       "maxValue": null,
                       "minValue": null,
                       "options": null,
-                      "optionsDataSource": null,
-                      "controlType": "INPUT_INTEGER"
+                      "controlType": "INTEGER",
+                      "optionsDataSource": null
                     }, {
                       "advancedOption": null,
                       "description": "If the field is a custom field, the configuration of the field.",
@@ -7085,18 +7093,18 @@
                         "objectType": null,
                         "options": null,
                         "properties": null,
-                        "optionsDataSource": null,
-                        "controlType": "OBJECT_BUILDER"
+                        "controlType": "OBJECT_BUILDER",
+                        "optionsDataSource": null
                       } ],
                       "multipleValues": null,
                       "objectType": null,
                       "options": null,
                       "properties": null,
-                      "optionsDataSource": null,
-                      "controlType": "OBJECT_BUILDER"
+                      "controlType": "OBJECT_BUILDER",
+                      "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "The name of the field.",
@@ -7111,7 +7119,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7129,7 +7137,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7147,7 +7155,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7205,15 +7213,15 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
                     } ],
                     "multipleValues": null,
                     "options": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "The list of values allowed in the field.",
@@ -7247,13 +7255,13 @@
                       "objectType": null,
                       "options": null,
                       "properties": null,
-                      "optionsDataSource": null,
-                      "controlType": "OBJECT_BUILDER"
+                      "controlType": "OBJECT_BUILDER",
+                      "optionsDataSource": null
                     } ],
                     "multipleValues": null,
                     "options": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "The default value of the field.",
@@ -7273,8 +7281,8 @@
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "The configuration properties.",
@@ -7308,25 +7316,25 @@
                       "objectType": null,
                       "options": null,
                       "properties": null,
-                      "optionsDataSource": null,
-                      "controlType": "OBJECT_BUILDER"
+                      "controlType": "OBJECT_BUILDER",
+                      "optionsDataSource": null
                     } ],
                     "multipleValues": null,
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
                 "multipleValues": null,
                 "objectType": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               }, {
                 "advancedOption": null,
                 "description": "Expand options that include additional transition details in the response.",
@@ -7341,7 +7349,7 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7372,13 +7380,13 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Details of the operations that can be performed on the issue.",
@@ -7443,7 +7451,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7461,7 +7469,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7497,7 +7505,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7515,7 +7523,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7533,7 +7541,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7551,7 +7559,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7569,7 +7577,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7587,7 +7595,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7608,11 +7616,11 @@
                     "maxValue": null,
                     "minValue": null,
                     "options": null,
-                    "optionsDataSource": null,
-                    "controlType": "INPUT_INTEGER"
+                    "controlType": "INTEGER",
+                    "optionsDataSource": null
                   } ],
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": null,
@@ -7630,8 +7638,8 @@
                   "maxValue": null,
                   "minValue": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "INPUT_INTEGER"
+                  "controlType": "INTEGER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": null,
@@ -7678,7 +7686,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7696,7 +7704,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7714,7 +7722,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7732,7 +7740,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7750,7 +7758,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7768,7 +7776,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -7789,27 +7797,27 @@
                       "maxValue": null,
                       "minValue": null,
                       "options": null,
-                      "optionsDataSource": null,
-                      "controlType": "INPUT_INTEGER"
+                      "controlType": "INTEGER",
+                      "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
                   "multipleValues": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "A list of editable field details.",
@@ -7918,7 +7926,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7936,7 +7944,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7954,7 +7962,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7972,7 +7980,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -7993,8 +8001,8 @@
                     "maxValue": null,
                     "minValue": null,
                     "options": null,
-                    "optionsDataSource": null,
-                    "controlType": "INPUT_INTEGER"
+                    "controlType": "INTEGER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "If the field is a custom field, the configuration of the field.",
@@ -8028,18 +8036,18 @@
                       "objectType": null,
                       "options": null,
                       "properties": null,
-                      "optionsDataSource": null,
-                      "controlType": "OBJECT_BUILDER"
+                      "controlType": "OBJECT_BUILDER",
+                      "optionsDataSource": null
                     } ],
                     "multipleValues": null,
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "The name of the field.",
@@ -8054,7 +8062,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8072,7 +8080,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8090,7 +8098,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8148,15 +8156,15 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
                   } ],
                   "multipleValues": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "The list of values allowed in the field.",
@@ -8190,13 +8198,13 @@
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
                   "multipleValues": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "The default value of the field.",
@@ -8216,8 +8224,8 @@
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "The configuration properties.",
@@ -8251,28 +8259,28 @@
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
                   "multipleValues": null,
                   "objectType": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "A page of changelogs.",
@@ -8308,8 +8316,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The maximum number of results that could be on the page.",
@@ -8327,8 +8335,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The number of results on the page.",
@@ -8346,8 +8354,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": "The list of changelogs.",
@@ -8394,7 +8402,7 @@
                   "type": "STRING",
                   "defaultValue": null,
                   "exampleValue": null,
-                  "controlType": "INPUT_TEXT",
+                  "controlType": "TEXT",
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8430,7 +8438,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8448,7 +8456,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8466,7 +8474,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8484,7 +8492,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8502,7 +8510,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8538,7 +8546,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8556,7 +8564,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8574,7 +8582,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8592,13 +8600,13 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
@@ -8613,7 +8621,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8657,7 +8665,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8675,13 +8683,13 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
                   } ],
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "The date on which the change took place.",
@@ -8697,8 +8705,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "DATE_TIME"
+                  "controlType": "DATE_TIME",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "The list of items changed.",
@@ -8745,7 +8753,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8763,7 +8771,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8781,7 +8789,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8799,7 +8807,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8817,7 +8825,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8835,7 +8843,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -8853,18 +8861,18 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
                   "multipleValues": null,
                   "options": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 }, {
                   "advancedOption": null,
                   "description": "Details of issue history metadata.",
@@ -8897,7 +8905,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8915,7 +8923,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8933,7 +8941,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8951,7 +8959,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8969,7 +8977,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -8987,7 +8995,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -9005,7 +9013,7 @@
                     "type": "STRING",
                     "defaultValue": null,
                     "exampleValue": null,
-                    "controlType": "INPUT_TEXT",
+                    "controlType": "TEXT",
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -9041,7 +9049,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9059,7 +9067,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9077,7 +9085,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9095,7 +9103,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9113,7 +9121,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9131,13 +9139,13 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "Details of user or system associated with a issue history metadata item.",
@@ -9170,7 +9178,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9188,7 +9196,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9206,7 +9214,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9224,7 +9232,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9242,7 +9250,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9260,13 +9268,13 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "Details of user or system associated with a issue history metadata item.",
@@ -9299,7 +9307,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9317,7 +9325,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9335,7 +9343,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9353,7 +9361,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9371,7 +9379,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9389,13 +9397,13 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
                     } ],
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   }, {
                     "advancedOption": null,
                     "description": "Additional arbitrary information about the history record.",
@@ -9424,7 +9432,7 @@
                       "type": "STRING",
                       "defaultValue": null,
                       "exampleValue": null,
-                      "controlType": "INPUT_TEXT",
+                      "controlType": "TEXT",
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -9433,22 +9441,22 @@
                     "objectType": null,
                     "options": null,
                     "properties": null,
-                    "optionsDataSource": null,
-                    "controlType": "OBJECT_BUILDER"
+                    "controlType": "OBJECT_BUILDER",
+                    "optionsDataSource": null
                   } ],
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "The versions of each field on the issue.",
@@ -9482,15 +9490,15 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -9537,15 +9545,15 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -9574,15 +9582,15 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -9611,18 +9619,18 @@
                 "type": "STRING",
                 "defaultValue": null,
                 "exampleValue": null,
-                "controlType": "INPUT_TEXT",
+                "controlType": "TEXT",
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -9656,23 +9664,23 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Any warnings related to the JQL query.",
@@ -9701,15 +9709,15 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The ID and name of each field in the search results.",
@@ -9738,7 +9746,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -9747,8 +9755,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The schema describing the field types in the search results.",
@@ -9795,7 +9803,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9813,7 +9821,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9831,7 +9839,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9849,7 +9857,7 @@
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "INPUT_TEXT",
+            "controlType": "TEXT",
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9870,8 +9878,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "If the field is a custom field, the configuration of the field.",
@@ -9905,31 +9913,32 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": null
   } ],
   "category": null,
   "connection": {
@@ -9952,7 +9961,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -9970,7 +9979,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -9979,16 +9988,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "apply": null,
+      "pkce": null,
+      "refresh": null,
+      "scopes": null
     }, {
       "detectOn": null,
       "description": null,
@@ -10007,7 +10016,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -10025,7 +10034,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -10034,18 +10043,21 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": { },
       "authorizationCallback": null,
       "authorizationUrl": { },
       "clientId": null,
       "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "apply": null,
+      "pkce": null,
+      "refresh": null,
+      "scopes": { }
     } ],
     "baseUri": { },
+    "componentName": "jira",
+    "componentDescription": "Jira Cloud platform REST API documentation",
+    "componentTitle": "Jira",
     "properties": null,
     "version": 1,
     "test": null

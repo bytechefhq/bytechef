@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "objectHelper",
+    "componentDescription": "Object Helper allows you to do various operations on objects.",
+    "componentTitle": "Object Helper",
     "deprecated": null,
     "description": "Converts the JSON string to object/array.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "parse",
@@ -22,12 +24,13 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Convert from JSON string",
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -51,10 +54,12 @@
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "objectHelper",
+    "componentDescription": "Object Helper allows you to do various operations on objects.",
+    "componentTitle": "Object Helper",
     "deprecated": null,
     "description": "Writes the object/array to a JSON string.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "stringify",
@@ -85,8 +90,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The data to convert to JSON string.",
@@ -106,8 +111,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The data to convert to JSON string.",
@@ -125,10 +130,11 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Convert to JSON string",
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -143,7 +149,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null

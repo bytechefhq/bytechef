@@ -32,7 +32,7 @@ public class DataMapperComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/data_mapper_v1.json", new DataMapperComponentHandler().getDefinition());
+            "definition/datamapper_v1.json", new DataMapperComponentHandler().getDefinition());
     }
 
     @Test
