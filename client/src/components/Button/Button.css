@@ -14,7 +14,7 @@
     }
 
     .btn-light {
-        @apply border-white bg-white hover:bg-gray-50  hover:border-gray-50 text-gray-900 dark:bg-sky-500 dark:hover:bg-sky-400;
+        @apply border-gray-50 bg-white hover:bg-gray-50  hover:border-gray-50 text-gray-900 dark:bg-sky-500 dark:hover:bg-sky-400;
     }
 
     .btn-light-border {
