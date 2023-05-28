@@ -22,10 +22,8 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
@@ -37,14 +35,8 @@ import org.springframework.util.StringUtils;
  */
 @SpringBootApplication(scanBasePackages = "com.bytechef")
 public class PlatformApplication {
+
     private static final Logger logger = LoggerFactory.getLogger(PlatformApplication.class);
-
-    private static String gitCommitId;
-
-    @SuppressFBWarnings("ST")
-    public PlatformApplication(@Value("${git.commit.id}") String gitCommitId) {
-        this.gitCommitId = gitCommitId;
-    }
 
     /**
      * Main method, used to run the application.
@@ -88,7 +80,6 @@ public class PlatformApplication {
                 \tExternal: \t{}://{}:{}{}
                 \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
-                \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -102,7 +93,6 @@ public class PlatformApplication {
                 .contains("api-docs")
                     ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
                     : "",
-            environment.getActiveProfiles(),
-            gitCommitId);
+            environment.getActiveProfiles());
     }
 }
