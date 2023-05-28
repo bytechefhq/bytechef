@@ -65,6 +65,7 @@ org-springframework-boot-spring-boot-starter-data-redis = { module = "org.spring
 org-springframework-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-test = { module = "org.springframework.boot:spring-boot-test", version.ref = "org-springframework-boot" }
 org-springframework-cloud-spring-cloud-commons = { module = "org.springframework.cloud:spring-cloud-commons", version.ref = "org-springframework-cloud" }
+org-springframework-cloud-spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "org-springframework-cloud" }
 org-springframework-cloud-spring-cloud-starter-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer", version.ref = "org-springframework-cloud" }
 org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry:2.0.1"
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }

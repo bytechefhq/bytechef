@@ -29,7 +29,7 @@ public interface ProjectInstanceFacade {
 
     ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
-    long createProjectInstanceJob(long id, String workflowId);
+    long createJob(long id, String workflowId);
 
     void deleteProjectInstance(long id);
 

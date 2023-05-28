@@ -18,6 +18,8 @@
 package com.bytechef.helios.project.facade;
 
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.project.constant.ProjectConstants;
@@ -27,15 +29,15 @@ import com.bytechef.helios.project.domain.ProjectInstance.Status;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
-import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.coordinator.job.InstanceFacade;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
-import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
+import com.bytechef.hermes.trigger.TriggerLifecycleExecutor;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -47,16 +49,17 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @Transactional
-public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
+public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade, InstanceFacade {
 
     private final ConnectionService connectionService;
-    private final ProjectInstanceJobFactory projectInstanceJobFactory;
+    private final JobFactory jobFactory;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
@@ -66,19 +69,35 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        ConnectionService connectionService, ProjectInstanceJobFactory projectInstanceJobFactory,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor,
-        WorkflowService workflowService) {
+        ConnectionService connectionService, JobFactory jobFactory, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
+        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
-        this.projectInstanceJobFactory = projectInstanceJobFactory;
+        this.jobFactory = jobFactory;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
         this.tagService = tagService;
         this.triggerLifecycleExecutor = triggerLifecycleExecutor;
         this.workflowService = workflowService;
+    }
+
+    @Override
+    // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
+    // the case where a job is finished and completion task executed, but the transaction is not yet committed and
+    // the job id is missing.
+    @Transactional(propagation = Propagation.NEVER)
+    @SuppressFBWarnings("NP")
+    public long createJob(long id, String workflowId) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+            id, workflowId);
+
+        long jobId = jobFactory.create(new JobParameters(projectInstanceWorkflow.getInputs(), workflowId));
+
+        projectInstanceWorkflowService.addJob(Objects.requireNonNull(projectInstanceWorkflow.getId()), jobId);
+
+        return jobId;
     }
 
     @Override
@@ -105,16 +124,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return new ProjectInstanceDTO(
             getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
             projectInstanceWorkflows, projectService.getProject(projectInstance.getProjectId()), tags);
-    }
-
-    @Override
-    // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
-    // the case where a job is finished and completion task executed, but the transaction is not yet committed and
-    // the job id is missing.
-    @Transactional(propagation = Propagation.NEVER)
-    @SuppressFBWarnings("NP")
-    public long createProjectInstanceJob(long id, String workflowId) {
-        return projectInstanceJobFactory.createJob(workflowId, id);
     }
 
     @Override
@@ -155,6 +164,14 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         } else {
             disableWorkflowTriggers(id, List.of(projectInstanceWorkflow));
         }
+    }
+
+    @Override
+    public Map<String, Object> getInputs(long id, String workflowId) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+            id, workflowId);
+
+        return projectInstanceWorkflow.getInputs();
     }
 
     @Override
@@ -286,7 +303,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     workflowTrigger,
                     WorkflowExecutionId.of(
                         workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger.getTriggerName()),
-                    getConnection(workflowTrigger), projectInstanceWorkflow.getInputs());
+                    getConnection(workflowTrigger));
             }
         }
     }
@@ -333,5 +350,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 .flatMap(projectInstance -> CollectionUtils.stream(projectInstance.getTagIds()))
                 .filter(Objects::nonNull)
                 .toList());
+    }
+
+    @Override
+    public String getType() {
+        return ProjectConstants.PROJECT;
     }
 }

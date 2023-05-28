@@ -25,7 +25,8 @@ import com.bytechef.message.broker.MessageRoute;
 public enum TriggerMessageRoute implements MessageRoute {
 
     TRIGGERS(Exchange.MESSAGE, "triggers"),
-    TRIGGERS_COMPLETIONS(Exchange.MESSAGE, "triggers.completions");
+    TRIGGERS_COMPLETIONS(Exchange.MESSAGE, "triggers.completions"),
+    TRIGGERS_REQUESTS(Exchange.MESSAGE, "triggers.requests");
 
     private final Exchange exchange;
     private final String routeName;
@@ -33,14 +34,6 @@ public enum TriggerMessageRoute implements MessageRoute {
     TriggerMessageRoute(Exchange exchange, String routeName) {
         this.exchange = exchange;
         this.routeName = routeName;
-    }
-
-    public static MessageRoute ofRoute(String routName) {
-        return switch (routName) {
-            case "triggers" -> TRIGGERS;
-            case "triggers.completions" -> TRIGGERS_COMPLETIONS;
-            default -> throw new IllegalArgumentException("Route name '%s' does not exist.".formatted(routName));
-        };
     }
 
     @Override

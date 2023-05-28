@@ -67,7 +67,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         return ResponseEntity.ok(
             new CreateProjectInstanceJob200ResponseModel()
                 .jobId(
-                    projectInstanceFacade.createProjectInstanceJob(
+                    projectInstanceFacade.createJob(
                         id, createProjectInstanceJobRequestModel.getWorkflowId())));
     }
 
