@@ -65,11 +65,13 @@ const Projects = () => {
                         <ProjectDialog
                             project={undefined}
                             onClose={(project) => {
-                                navigate(
-                                    `/automation/projects/${
-                                        project?.id
-                                    }/workflow/${project?.workflowIds![0]}`
-                                );
+                                if (project) {
+                                    navigate(
+                                        `/automation/projects/${
+                                            project?.id
+                                        }/workflow/${project?.workflowIds![0]}`
+                                    );
+                                }
                             }}
                         />
                     }
