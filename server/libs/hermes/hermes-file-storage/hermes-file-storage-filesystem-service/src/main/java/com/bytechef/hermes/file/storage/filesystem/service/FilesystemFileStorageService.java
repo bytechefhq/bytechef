@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,9 +48,13 @@ public class FilesystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
         String url = fileEntry.getUrl();
 
-        path.resolve(url.replace("file:", ""))
+        boolean deleted = path.resolve(url.replace("file:", ""))
             .toFile()
             .delete();
+
+        if (!deleted) {
+            throw new FileStorageException("File %s cannot be deleted".formatted(path));
+        }
     }
 
     @Override
@@ -67,7 +72,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         Objects.requireNonNull(fileName, "Filename is required");
         Objects.requireNonNull(data, "Content is required");
 
-        return storeFileContent(fileName, new ByteArrayInputStream(data.getBytes()));
+        return storeFileContent(fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
