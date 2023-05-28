@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "odsFile",
+    "componentDescription": "Reads and writes data from a ODS file.",
+    "componentTitle": "ODS File",
     "deprecated": null,
     "description": "Reads data from a ODS file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "read",
@@ -40,7 +42,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -58,7 +60,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -76,7 +78,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -94,13 +96,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
@@ -170,8 +172,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -189,8 +191,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -231,13 +233,13 @@
       "type": "STRING",
       "defaultValue": "Sheet",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -255,17 +257,20 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "odsFile",
+    "componentDescription": "Reads and writes data from a ODS file.",
+    "componentTitle": "ODS File",
     "deprecated": null,
     "description": "Writes the data to a ODS file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "write",
@@ -314,8 +319,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -357,8 +362,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -374,8 +379,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -393,8 +398,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -428,8 +433,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -449,8 +454,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -465,7 +470,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -484,20 +489,20 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.ods\" will be used.",
@@ -512,7 +517,7 @@
       "type": "STRING",
       "defaultValue": "file.ods",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -530,13 +535,13 @@
       "type": "STRING",
       "defaultValue": "Sheet",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -569,7 +574,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -587,7 +592,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -605,7 +610,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -623,16 +628,17 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

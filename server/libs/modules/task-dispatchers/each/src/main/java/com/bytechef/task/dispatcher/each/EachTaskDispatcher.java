@@ -61,6 +61,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final ContextService contextService;
     private final CounterService counterService;
 
+    @SuppressFBWarnings("EI")
     public EachTaskDispatcher(
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         MessageBroker messageBroker, ContextService contextService, CounterService counterService) {

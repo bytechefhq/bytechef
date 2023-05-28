@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "csvFile",
+    "componentDescription": "Reads and writes data from a csv file.",
+    "componentTitle": "CSV File",
     "deprecated": null,
     "description": "Reads data from a csv file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "read",
@@ -40,7 +42,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -58,7 +60,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -76,7 +78,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -94,7 +96,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -115,7 +117,7 @@
       "type": "STRING",
       "defaultValue": ",",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -189,7 +191,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -208,7 +210,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -237,7 +239,6 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -259,13 +260,17 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "csvFile",
+    "componentDescription": "Reads and writes data from a csv file.",
+    "componentTitle": "CSV File",
     "deprecated": null,
     "description": "Writes the data to a csv file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "write",
@@ -359,7 +364,7 @@
           "numberPrecision": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_NUMBER"
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -374,7 +379,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -404,13 +409,12 @@
       "type": "STRING",
       "defaultValue": "file.csv",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -443,7 +447,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -461,7 +465,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -479,7 +483,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -497,7 +501,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -506,7 +510,9 @@
       "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

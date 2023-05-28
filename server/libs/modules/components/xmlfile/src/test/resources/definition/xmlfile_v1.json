@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "xmlFile",
+    "componentDescription": "Reads and writes data from a XML file.",
+    "componentTitle": "XML File",
     "deprecated": null,
     "description": "Reads data from a XML file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "read",
@@ -40,7 +42,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -58,7 +60,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -76,7 +78,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -94,13 +96,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": null,
       "description": "The object input is array?",
@@ -141,7 +143,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -162,8 +164,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -181,8 +183,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Read from file",
     "editorDescriptionDataSource": null,
@@ -203,8 +205,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -224,19 +226,22 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "xmlFile",
+    "componentDescription": "Reads and writes data from a XML file.",
+    "componentTitle": "XML File",
     "deprecated": null,
     "description": "Writes the data to a XML file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "write",
@@ -267,8 +272,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -288,8 +293,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The aray to write to the file.",
@@ -307,8 +312,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xml\" will be used.",
@@ -323,7 +328,7 @@
       "type": "STRING",
       "defaultValue": "file.xml",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -362,7 +367,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -380,7 +385,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -398,7 +403,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -416,16 +421,17 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

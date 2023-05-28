@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "fileStorage",
+    "componentDescription": "Reads and writes data from a file stored inside the file storage.",
+    "componentTitle": "File Storage",
     "deprecated": null,
     "description": "Reads data from the file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "read",
@@ -40,7 +42,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -58,7 +60,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -76,7 +78,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -94,13 +96,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "title": "Read from file",
     "outputSchema": [ {
@@ -117,20 +119,23 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "fileStorage",
+    "componentDescription": "Reads and writes data from a file stored inside the file storage.",
+    "componentTitle": "File Storage",
     "deprecated": null,
     "description": "Writes the data to the file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "write",
@@ -148,7 +153,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -166,7 +171,7 @@
       "type": "STRING",
       "defaultValue": "file.txt",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -204,7 +209,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -222,7 +227,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -240,7 +245,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -258,23 +263,26 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "fileStorage",
+    "componentDescription": "Reads and writes data from a file stored inside the file storage.",
+    "componentTitle": "File Storage",
     "deprecated": null,
     "description": "Download a file from the URL.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "download",
@@ -292,7 +300,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -310,7 +318,7 @@
       "type": "STRING",
       "defaultValue": "file.txt",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -348,7 +356,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -366,7 +374,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -384,7 +392,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -402,16 +410,17 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,

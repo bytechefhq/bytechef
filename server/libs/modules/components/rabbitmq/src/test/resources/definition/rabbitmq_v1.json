@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "rabbitMQ",
+    "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
+    "componentTitle": "RabbitMQ",
     "deprecated": null,
     "description": "Send a new RabbitMQ message.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "sendMessage",
@@ -22,7 +24,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -45,11 +47,11 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Send Message",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -69,13 +71,17 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
     "authorizationRequired": false,
     "authorizations": null,
     "baseUri": null,
+    "componentName": "rabbitMQ",
+    "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
+    "componentTitle": "RabbitMQ",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -90,7 +96,7 @@
       "type": "STRING",
       "defaultValue": "localhost",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -111,8 +117,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -127,7 +133,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -145,7 +151,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -166,6 +172,9 @@
   "title": "RabbitMQ",
   "triggers": [ {
     "batch": null,
+    "componentName": "rabbitMQ",
+    "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
+    "componentTitle": "RabbitMQ",
     "deduplicate": null,
     "deprecated": null,
     "description": "Triggers on new RabbitMQ messages.",
@@ -193,7 +202,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -204,7 +213,6 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -224,10 +232,11 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ]
 }

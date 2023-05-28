@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "script",
+    "componentDescription": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "componentTitle": "Script",
     "deprecated": null,
     "description": "Executes custom Java code.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "java",
@@ -119,7 +121,7 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -154,7 +156,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -190,7 +192,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -238,7 +240,7 @@
       "optionsDataSource": null
     } ],
     "title": "Java",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -258,13 +260,16 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "script",
+    "componentDescription": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "componentTitle": "Script",
     "deprecated": null,
     "description": "Executes custom JavaScript code.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "javascript",
@@ -379,7 +384,7 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -414,7 +419,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -450,7 +455,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -498,7 +503,7 @@
       "optionsDataSource": null
     } ],
     "title": "JavaScript",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -518,13 +523,16 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "script",
+    "componentDescription": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "componentTitle": "Script",
     "deprecated": null,
     "description": "Executes custom Python code.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "python",
@@ -639,7 +647,7 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -674,7 +682,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -710,7 +718,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -758,7 +766,7 @@
       "optionsDataSource": null
     } ],
     "title": "Python",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -778,13 +786,16 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "script",
+    "componentDescription": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "componentTitle": "Script",
     "deprecated": null,
     "description": "Executes custom R code.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "r",
@@ -899,7 +910,7 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -934,7 +945,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -970,7 +981,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1018,7 +1029,7 @@
       "optionsDataSource": null
     } ],
     "title": "R",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -1038,13 +1049,16 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
+    "componentName": "script",
+    "componentDescription": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "componentTitle": "Script",
     "deprecated": null,
     "description": "Executes custom Ruby code.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "ruby",
@@ -1159,7 +1173,7 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER"
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1194,7 +1208,7 @@
         "numberPrecision": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_NUMBER"
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1230,7 +1244,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1278,7 +1292,7 @@
       "optionsDataSource": null
     } ],
     "title": "Ruby",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -1298,7 +1312,8 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

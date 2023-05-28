@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "jsonFile",
+    "componentDescription": "Reads and writes data from a JSON file.",
+    "componentTitle": "JSON File",
     "deprecated": null,
     "description": "Reads data from a JSON file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "read",
@@ -68,7 +70,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -86,7 +88,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -104,7 +106,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -122,13 +124,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": null,
       "description": "The object input is array?",
@@ -169,7 +171,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -190,8 +192,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -209,10 +211,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Read from file",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -233,13 +236,15 @@
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "jsonFile",
+    "componentDescription": "Reads and writes data from a JSON file.",
+    "componentTitle": "JSON File",
     "deprecated": null,
     "description": "Writes the data to a JSON file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "write",
@@ -298,8 +303,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -319,8 +324,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array to write to the file.",
@@ -338,8 +343,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
@@ -354,12 +359,13 @@
       "type": "STRING",
       "defaultValue": "file.json",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -392,7 +398,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -410,7 +416,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -428,7 +434,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -446,17 +452,17 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

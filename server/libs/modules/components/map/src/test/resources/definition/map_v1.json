@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "map",
+    "componentDescription": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
+    "componentTitle": "Map",
     "deprecated": null,
     "description": null,
     "sampleOutput": null,
-    "perform": null,
     "help": null,
     "metadata": null,
     "name": "map",
@@ -25,8 +27,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The name of the item variable.",
@@ -41,7 +43,7 @@
       "type": "STRING",
       "defaultValue": "item",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -59,12 +61,13 @@
       "type": "STRING",
       "defaultValue": "itemIndex",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": null,
+    "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,

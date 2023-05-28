@@ -54,24 +54,26 @@ public class XlsxFileComponentHandlerIntTest {
     public void testRead() throws IOException, JSONException {
         File sampleFile = getFile("sample_header.xlsx");
 
-        Job job = componentWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
-            Map.of(
-                "fileEntry",
-                fileStorageService
-                    .storeFileContent(sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))
-                    .toMap()));
+        try (FileInputStream fileInputStream = new FileInputStream(sampleFile)) {
+            Job job = componentWorkflowTestSupport.execute(
+                Base64.getEncoder()
+                    .encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+                Map.of(
+                    "fileEntry",
+                    fileStorageService
+                        .storeFileContent(sampleFile.getAbsolutePath(), fileInputStream)
+                        .toMap()));
 
-        Assertions.assertThat(job.getStatus())
-            .isEqualTo(Job.Status.COMPLETED);
+            Assertions.assertThat(job.getStatus())
+                .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+            Map<String, Object> outputs = job.getOutputs();
 
-        JSONAssert.assertEquals(
-            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) outputs.get("readXlsxFile")),
-            true);
+            JSONAssert.assertEquals(
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+                new JSONArray((List<?>) outputs.get("readXlsxFile")),
+                true);
+        }
     }
 
     @Test
@@ -93,21 +95,23 @@ public class XlsxFileComponentHandlerIntTest {
 
         File sampleFile = getFile("sample_header.xlsx");
 
-        job = componentWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
-            Map.of(
-                "fileEntry",
-                fileStorageService
-                    .storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))
-                    .toMap()));
+        try (FileInputStream fileInputStream = new FileInputStream(sampleFile)) {
+            job = componentWorkflowTestSupport.execute(
+                Base64.getEncoder()
+                    .encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+                Map.of(
+                    "fileEntry",
+                    fileStorageService
+                        .storeFileContent(sampleFile.getName(), fileInputStream)
+                        .toMap()));
 
-        outputs = job.getOutputs();
+            outputs = job.getOutputs();
 
-        JSONAssert.assertEquals(
-            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) outputs.get("readXlsxFile")),
-            true);
+            JSONAssert.assertEquals(
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+                new JSONArray((List<?>) outputs.get("readXlsxFile")),
+                true);
+        }
     }
 
     private File getFile(String filename) throws IOException {

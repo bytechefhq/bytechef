@@ -32,7 +32,7 @@ public class RabbitMqComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/rabbit_mq_v1.json", new RabbitMqComponentHandler().getDefinition());
+            "definition/rabbitmq_v1.json", new RabbitMqComponentHandler().getDefinition());
     }
 
     @Test
