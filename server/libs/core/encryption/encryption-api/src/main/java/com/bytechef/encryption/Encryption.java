@@ -29,6 +29,9 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Encryption {
 
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     private final EncryptionKey encryptionKey;
 
     public Encryption(EncryptionKey encryptionKey) {
@@ -39,8 +42,7 @@ public class Encryption {
         try {
             Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
 
-            return Base64.getEncoder()
-                .encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
+            return ENCODER.encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -50,8 +52,7 @@ public class Encryption {
         try {
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
 
-            return new String(cipher.doFinal(Base64.getDecoder()
-                .decode(encryptedString)));
+            return new String(cipher.doFinal(DECODER.decode(encryptedString)), StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -60,7 +61,7 @@ public class Encryption {
     private Cipher getCipher(int encryptMode) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
-        byte[] decodedKey = Base64.getDecoder()
+        byte[] decodedKey = DECODER
             .decode(encryptionKey.getKey());
 
         Key secretKey = new SecretKeySpec(Arrays.copyOf(decodedKey, 16), "AES");
