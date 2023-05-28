@@ -226,9 +226,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion) {
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
-
         return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
             .stream()
             .map(this::toConnectionDefinitionDTO)

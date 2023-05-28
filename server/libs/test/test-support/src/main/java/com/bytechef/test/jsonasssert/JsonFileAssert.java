@@ -21,8 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -55,9 +57,10 @@ public class JsonFileAssert {
     }
 
     private static URI getUri(String path) throws URISyntaxException {
-        return JsonFileAssert.class
-            .getClassLoader()
-            .getResource(path)
-            .toURI();
+        ClassLoader classLoader = JsonFileAssert.class.getClassLoader();
+
+        URL url = Objects.requireNonNull(classLoader.getResource(path));
+
+        return url.toURI();
     }
 }
