@@ -265,9 +265,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
-
         return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
             .stream()
             .map(this::toTriggerDefinitionDTO)
