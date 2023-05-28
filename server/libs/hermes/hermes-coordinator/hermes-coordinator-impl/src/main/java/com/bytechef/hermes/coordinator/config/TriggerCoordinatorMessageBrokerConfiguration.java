@@ -30,6 +30,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 
+/**
+ * @author Ivica Cardic
+ */
 public class TriggerCoordinatorMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;
@@ -45,11 +48,12 @@ public class TriggerCoordinatorMessageBrokerConfiguration {
             TriggerCoordinator triggerCoordinator = applicationContext.getBean(TriggerCoordinator.class);
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                TriggerMessageRoute.TRIGGERS_COMPLETIONS,
-                1,
-                triggerCoordinator,
+                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_COMPLETIONS, 1, triggerCoordinator,
                 "complete");
+
+            messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_REQUESTS, 1, triggerCoordinator,
+                "start");
         };
     }
 }

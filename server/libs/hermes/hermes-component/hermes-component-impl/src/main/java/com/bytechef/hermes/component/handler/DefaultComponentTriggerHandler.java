@@ -65,17 +65,17 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
     private final ComponentDefinitionFactory componentDefinitionFactory;
     private final ContextFactory contextFactory;
-    private final DataStorageService datStorageService;
+    private final DataStorageService dataStorageService;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerHandler(
         ComponentDefinitionFactory componentDefinitionFactory, ContextFactory contextFactory,
-        DataStorageService datStorageService, TriggerDefinition triggerDefinition) {
+        DataStorageService dataStorageService, TriggerDefinition triggerDefinition) {
 
         this.componentDefinitionFactory = componentDefinitionFactory;
         this.contextFactory = contextFactory;
-        this.datStorageService = datStorageService;
+        this.dataStorageService = dataStorageService;
         this.triggerDefinition = triggerDefinition;
     }
 
@@ -112,7 +112,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
-                    datStorageService.fetchValue(
+                    dataStorageService.fetchValue(
                         Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                         workflowExecutionId.toString(), null),
                     triggerContext));
@@ -138,7 +138,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             PollOutput pollOutput = pollFunction.apply(
                 new PollContext(
                     triggerExecution.getParameters(),
-                    datStorageService.fetchValue(
+                    dataStorageService.fetchValue(
                         Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                         workflowExecutionId.toString(), null),
                     triggerContext));
@@ -154,7 +154,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             }
 
             if (pollOutput.closureParameters() != null) {
-                datStorageService.save(
+                dataStorageService.save(
                     Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                     workflowExecutionId.toString(), pollOutput.closureParameters());
             }

@@ -38,16 +38,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionFacadeClient actionDefinitionFacadeClient(
-        DiscoveryClient discoveryClient) {
-
+    ActionDefinitionFacadeClient actionDefinitionFacadeClient(DiscoveryClient discoveryClient) {
         return new ActionDefinitionFacadeClient(discoveryClient);
     }
 
     @Bean
-    ActionDefinitionServiceClient actionDefinitionServiceClient(
-        DiscoveryClient discoveryClient) {
-
+    ActionDefinitionServiceClient actionDefinitionServiceClient(DiscoveryClient discoveryClient) {
         return new ActionDefinitionServiceClient(discoveryClient);
     }
 
@@ -57,16 +53,12 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionServiceClient componentDefinitionServiceClient(
-        DiscoveryClient discoveryClient) {
-
+    ComponentDefinitionServiceClient componentDefinitionServiceClient(DiscoveryClient discoveryClient) {
         return new ComponentDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
-    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
-        DiscoveryClient discoveryClient) {
-
+    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(DiscoveryClient discoveryClient) {
         return new ConnectionDefinitionServiceClient(discoveryClient);
     }
 

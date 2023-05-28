@@ -6,7 +6,6 @@ springBoot {
 }
 
 dependencies {
-    implementation libs.com.github.kagkarlsson.db.scheduler.spring.boot.starter
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
     implementation "org.springframework:spring-webflux"
@@ -46,8 +45,8 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
+    implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-remote-client")
     implementation project(":server:libs:hermes:hermes-service")
-    implementation project(":server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-impl")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-handler-remote-client")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-impl")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-service")

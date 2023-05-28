@@ -20,8 +20,6 @@ package com.bytechef.hermes.data.storage.service;
 import com.bytechef.hermes.data.storage.domain.DataStorage;
 import com.bytechef.hermes.component.Context.DataStorageScope;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
