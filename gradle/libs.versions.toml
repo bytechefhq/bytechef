@@ -1,13 +1,13 @@
 [versions]
 ch-qos-logback = "1.4.7"
 checkstyle = "10.6.0"
-com-github-kagkarlsson = "12.1.0"
+com-github-kagkarlsson = "12.2.0"
 com-google-auto-service = "1.1.0"
 info-picocli = "4.7.3"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.0.1"
 org-springframework-boot = "3.1.0"
-org-springframework-cloud = "4.0.2"
+org-springframework-cloud = "4.0.3"
 org-springframework-cloud-dependencies = "2022.0.3"
 org-testcontainers = "1.18.1"
 pmd = "6.54.0"
@@ -41,7 +41,7 @@ org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-apache-tika-tika-core = "org.apache.tika:tika-core:2.8.0"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r"
-org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.19.0"
+org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.19.1"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:22.3.2"
 org-json = "org.json:json:20230227"
 org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.3"
@@ -63,16 +63,14 @@ org-springframework-boot-spring-boot-starter-cache = { module = "org.springframe
 org-springframework-boot-spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot" }
-org-springframework-boot-spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-test = { module = "org.springframework.boot:spring-boot-test", version.ref = "org-springframework-boot" }
 org-springframework-cloud-spring-cloud-commons = { module = "org.springframework.cloud:spring-cloud-commons", version.ref = "org-springframework-cloud" }
-org-springframework-cloud-spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "org-springframework-cloud" }
 org-springframework-cloud-spring-cloud-starter-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer", version.ref = "org-springframework-cloud" }
 org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry:2.0.1"
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.71"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.74"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.19.0"
@@ -82,5 +80,5 @@ com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.2"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.0"
 org-openapi-generator = "org.openapi.generator:6.6.0"
-org-sonarqube = "org.sonarqube:4.0.0.2929"
+org-sonarqube = "org.sonarqube:4.1.0.3113"
 org-springframework-boot = "org.springframework.boot:3.1.0"
