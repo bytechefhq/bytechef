@@ -20,7 +20,7 @@ package com.bytechef.hermes.worker.handler.remote.web.rest;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class TaskHandlerController {
 
-    private final TaskHandlerAccessor taskHandlerAccessor;
+    private final TaskHandlerRegistry taskHandlerRegistry;
 
-    public TaskHandlerController(TaskHandlerAccessor taskHandlerAccessor) {
-        this.taskHandlerAccessor = taskHandlerAccessor;
+    public TaskHandlerController(TaskHandlerRegistry taskHandlerRegistry) {
+        this.taskHandlerRegistry = taskHandlerRegistry;
     }
 
     @RequestMapping(
@@ -52,7 +52,7 @@ public class TaskHandlerController {
             "application/json"
         })
     public ResponseEntity<Object> handle(@Valid @RequestBody TaskHandlerHandleRequest taskHandlerHandleRequest) {
-        TaskHandler<?> taskHandler = taskHandlerAccessor.getTaskHandler(taskHandlerHandleRequest.type());
+        TaskHandler<?> taskHandler = taskHandlerRegistry.getTaskHandler(taskHandlerHandleRequest.type());
 
         try {
             Object output = taskHandler.handle(taskHandlerHandleRequest.taskExecution());

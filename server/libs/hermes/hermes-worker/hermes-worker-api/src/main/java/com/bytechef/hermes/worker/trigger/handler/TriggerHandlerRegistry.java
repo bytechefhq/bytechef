@@ -20,7 +20,7 @@ package com.bytechef.hermes.worker.trigger.handler;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerHandlerAccessor {
+public interface TriggerHandlerRegistry {
 
     TriggerHandler<?> getTriggerHandler(String type);
 }

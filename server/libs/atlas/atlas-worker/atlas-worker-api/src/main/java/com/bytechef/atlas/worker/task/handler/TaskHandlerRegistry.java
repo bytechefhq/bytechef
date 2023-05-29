@@ -20,7 +20,7 @@ package com.bytechef.atlas.worker.task.handler;
 /**
  * @author Ivica Cardic
  */
-public interface TaskHandlerAccessor {
+public interface TaskHandlerRegistry {
 
     TaskHandler<?> getTaskHandler(String type);
 }

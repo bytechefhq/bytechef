@@ -26,14 +26,14 @@ import com.bytechef.atlas.task.Task;
  */
 public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
-    private final TaskHandlerAccessor taskHandlerAccessor;
+    private final TaskHandlerRegistry taskHandlerRegistry;
 
-    public DefaultTaskHandlerResolver(TaskHandlerAccessor taskHandlerAccessor) {
-        this.taskHandlerAccessor = taskHandlerAccessor;
+    public DefaultTaskHandlerResolver(TaskHandlerRegistry taskHandlerRegistry) {
+        this.taskHandlerRegistry = taskHandlerRegistry;
     }
 
     @Override
     public TaskHandler<?> resolve(Task task) {
-        return taskHandlerAccessor.getTaskHandler(task.getType());
+        return taskHandlerRegistry.getTaskHandler(task.getType());
     }
 }
