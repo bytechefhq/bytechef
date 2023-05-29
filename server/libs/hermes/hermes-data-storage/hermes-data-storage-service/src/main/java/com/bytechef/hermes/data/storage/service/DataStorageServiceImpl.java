@@ -25,8 +25,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
@@ -44,9 +42,10 @@ public class DataStorageServiceImpl implements DataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
+    public <T> T fetchValue(DataStorageScope scope, long scopeId, String key, T defaultValue) {
         return dataStorageRepository.findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
-            .map(dataStorage -> (T) dataStorage.getValue());
+            .map(dataStorage -> (T) dataStorage.getValue())
+            .orElse(defaultValue);
     }
 
     @Override

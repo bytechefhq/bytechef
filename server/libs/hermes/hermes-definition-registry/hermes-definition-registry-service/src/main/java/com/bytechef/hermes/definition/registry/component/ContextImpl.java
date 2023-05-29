@@ -78,7 +78,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     @Override
     public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
-        return dataStorageService.fetchValue(scope, scopeId, key);
+        return dataStorageService.fetchValue(scope, scopeId, key, null);
     }
 
     @Override
