@@ -20,6 +20,7 @@ package com.bytechef.hermes.scheduler.executor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.service.TriggerLifecycleService;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -27,18 +28,19 @@ import com.bytechef.message.broker.MessageBroker;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class ScheduledTriggerExecutor {
+public class ScheduledTaskExecutor {
 
     private final MessageBroker messageBroker;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerLifecycleService triggerLifecycleService;
 
-    public ScheduledTriggerExecutor(
+    public ScheduledTaskExecutor(
         MessageBroker messageBroker, TriggerDefinitionService triggerDefinitionService,
         TriggerLifecycleService triggerLifecycleService) {
 
@@ -47,7 +49,11 @@ public class ScheduledTriggerExecutor {
         this.triggerLifecycleService = triggerLifecycleService;
     }
 
-    public LocalDateTime executeTriggerDynamicWebhookRefresh(
+    public void pollTrigger(WorkflowExecutionId workflowExecutionId) {
+        messageBroker.send(TriggerMessageRoute.TRIGGERS_REQUESTS, workflowExecutionId);
+    }
+
+    public LocalDateTime refreshDynamicWebhookTrigger(
         WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion) {
 
         LocalDateTime webhookExpirationDate = null;
@@ -65,7 +71,12 @@ public class ScheduledTriggerExecutor {
         return webhookExpirationDate;
     }
 
-    public void executeTriggerPoll(WorkflowExecutionId workflowExecutionId) {
-        messageBroker.send(TriggerMessageRoute.TRIGGERS_REQUESTS, workflowExecutionId);
+    public void triggerWorkflow(WorkflowExecutionId workflowExecutionId, Map<String, Object> output) {
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .output(output)
+            .workflowExecutionId(workflowExecutionId)
+            .build();
+
+        messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, triggerExecution);
     }
 }

@@ -95,8 +95,8 @@ public class TriggerWorker {
 
                 List<TriggerExecution> completedTriggerExecutions = doExecuteTrigger(triggerExecution);
 
-                for (TriggerExecution curTriggerExecution : completedTriggerExecutions) {
-                    messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, curTriggerExecution);
+                for (TriggerExecution completedTriggerExecution : completedTriggerExecutions) {
+                    messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, completedTriggerExecution);
                 }
             } catch (InterruptedException e) {
                 // ignore

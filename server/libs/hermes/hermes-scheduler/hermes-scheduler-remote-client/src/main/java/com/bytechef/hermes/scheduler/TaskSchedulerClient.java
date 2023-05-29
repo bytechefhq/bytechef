@@ -23,21 +23,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class TriggerSchedulerClient implements TriggerScheduler {
+public class TaskSchedulerClient implements TaskScheduler {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
-    public TriggerSchedulerClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public TaskSchedulerClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
-    public void cancelDynamicWebhookRefreshTask(WorkflowExecutionId workflowExecutionId) {
+    public void cancelRefreshDynamicWebhookTriggerTask(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -52,7 +53,7 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void cancelPollTask(WorkflowExecutionId workflowExecutionId) {
+    public void cancelPollTriggerTask(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -67,7 +68,22 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleDynamicWebhookRefreshTask(
+    public void cancelTriggerWorkflowTask(String workflowExecutionId) {
+        loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("scheduler-service-app")
+                .path("/trigger-scheduler/cancel-schedule-task")
+                .build())
+            .bodyValue(workflowExecutionId)
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
+
+    @Override
+    public void scheduleRefreshDynamicWebhookTriggerTask(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion) {
 
@@ -78,7 +94,7 @@ public class TriggerSchedulerClient implements TriggerScheduler {
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/schedule-poll-task")
                 .build())
-            .bodyValue(new DynamicWebhookRefreshOneTimeTaskRequest(
+            .bodyValue(new DynamicWebhookRefreshTaskRequest(
                 workflowExecutionId, webhookExpirationDate, componentName, componentVersion))
             .retrieve()
             .toBodilessEntity()
@@ -86,7 +102,7 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void schedulePollTask(WorkflowExecutionId workflowExecutionId) {
+    public void schedulePollTriggerTask(WorkflowExecutionId workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -100,9 +116,31 @@ public class TriggerSchedulerClient implements TriggerScheduler {
             .block();
     }
 
+    @Override
+    public void scheduleTriggerWorkflowTask(
+        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
+
+        loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("scheduler-service-app")
+                .path("/trigger-scheduler/schedule-poll-task")
+                .build())
+            .bodyValue(new ScheduleTaskRequest(workflowExecutionId, pattern, zoneId, output))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
+
     @SuppressFBWarnings("EI")
-    private record DynamicWebhookRefreshOneTimeTaskRequest(
+    private record DynamicWebhookRefreshTaskRequest(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion) {
+    }
+
+    @SuppressFBWarnings("EI")
+    private record ScheduleTaskRequest(
+        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
     }
 }

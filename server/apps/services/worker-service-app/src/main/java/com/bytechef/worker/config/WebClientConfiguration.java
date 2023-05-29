@@ -17,34 +17,23 @@
 
 package com.bytechef.worker.config;
 
-import com.github.kagkarlsson.scheduler.SchedulerName;
-import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
-import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
-import com.github.kagkarlsson.scheduler.serializer.Serializer;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Optional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-public class SchedulerConfiguration {
+@LoadBalancerClients(@LoadBalancerClient("scheduler-service-app"))
+public class WebClientConfiguration {
 
+    @LoadBalanced
     @Bean
-    DbSchedulerCustomizer customizer() {
-        return new DbSchedulerCustomizer() {
-
-            @Override
-            public Optional<SchedulerName> schedulerName() {
-                return Optional.of(new SchedulerName.Fixed("spring-boot-scheduler-1"));
-            }
-
-            @Override
-            public Optional<Serializer> serializer() {
-                return Optional.of(new JacksonSerializer());
-            }
-        };
+    WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
     }
 }
