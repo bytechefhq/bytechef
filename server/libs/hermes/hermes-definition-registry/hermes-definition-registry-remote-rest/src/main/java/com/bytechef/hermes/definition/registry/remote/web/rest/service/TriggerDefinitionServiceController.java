@@ -99,8 +99,8 @@ public class TriggerDefinitionServiceController {
         @Valid @RequestBody DynamicWebhookRefresh dynamicWebhookRefresh) {
 
         return ResponseEntity.ok(triggerDefinitionService.executeDynamicWebhookRefresh(
-            dynamicWebhookRefresh.componentName, dynamicWebhookRefresh.componentVersion,
-            dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.output));
+            dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.componentName,
+            dynamicWebhookRefresh.componentVersion, dynamicWebhookRefresh.output));
     }
 
     @RequestMapping(
