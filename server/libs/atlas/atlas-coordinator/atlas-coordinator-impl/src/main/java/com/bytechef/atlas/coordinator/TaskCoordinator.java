@@ -77,6 +77,11 @@ public class TaskCoordinator {
         return new Builder();
     }
 
+    /**
+     * Start a running job.
+     *
+     * @param jobId The id of the job to start
+     */
     @SuppressFBWarnings("NP")
     public void start(Long jobId) {
         Job job = jobService.setStatusToStarted(jobId);
