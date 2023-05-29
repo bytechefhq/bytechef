@@ -125,10 +125,10 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
                 new StaticWebhookRequestContext(
                     triggerExecution.getParameters(),
-                    MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
-                    MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
-                    MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-                    MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
+                    MapValueUtils.get(triggerExecution.getMetadata(), HEADERS, WebhookHeaders.class),
+                    MapValueUtils.get(triggerExecution.getMetadata(), PARAMETERS, WebhookParameters.class),
+                    MapValueUtils.get(triggerExecution.getMetadata(), BODY, WebhookBody.class),
+                    MapValueUtils.getRequired(triggerExecution.getMetadata(), METHOD, WebhookMethod.class),
                     triggerContext));
 
             output = webhookOutput.getValue();
@@ -148,8 +148,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             while (pollOutput.pollImmediately()) {
                 pollOutput = pollFunction.apply(
-                    new PollContext(
-                        triggerExecution.getParameters(), pollOutput.closureParameters(), triggerContext));
+                    new PollContext(triggerExecution.getParameters(), pollOutput.closureParameters(), triggerContext));
 
                 records.addAll(pollOutput.records());
             }
@@ -157,8 +156,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             if (pollOutput.closureParameters() != null) {
                 datStorageService.save(
                     Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
-                    workflowExecutionId.toString(),
-                    pollOutput.closureParameters());
+                    workflowExecutionId.toString(), pollOutput.closureParameters());
             }
 
             output = records;
