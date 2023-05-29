@@ -25,6 +25,7 @@ import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -42,8 +43,8 @@ import java.util.Optional;
 public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     implements ConnectionDefinitionService {
 
-    public ConnectionDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public ConnectionDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override
@@ -133,7 +134,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion) {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
@@ -151,7 +152,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()

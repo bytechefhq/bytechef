@@ -21,6 +21,7 @@ import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,8 +37,8 @@ import java.util.Map;
  */
 public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implements ComponentDefinitionFacade {
 
-    public ComponentDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public ComponentDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
         Boolean triggerDefinitions) {
 
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()

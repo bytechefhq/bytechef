@@ -21,6 +21,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
@@ -37,13 +38,16 @@ import java.util.Map;
 public class ComponentMetadataRegistryConfiguration implements InitializingBean {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ObjectMapper objectMapper;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
 
     @SuppressFBWarnings("EI2")
     public ComponentMetadataRegistryConfiguration(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ServiceMetadataRegistry serviceMetadataRegistry) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ObjectMapper objectMapper,
+        ServiceMetadataRegistry serviceMetadataRegistry) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.objectMapper = objectMapper;
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
@@ -57,6 +61,7 @@ public class ComponentMetadataRegistryConfiguration implements InitializingBean 
                 JsonUtils.write(
                     componentDefinitions.stream()
                         .map(componentDefinition -> Map.of("name", componentDefinition.getName()))
-                        .toList())));
+                        .toList(),
+                    objectMapper)));
     }
 }

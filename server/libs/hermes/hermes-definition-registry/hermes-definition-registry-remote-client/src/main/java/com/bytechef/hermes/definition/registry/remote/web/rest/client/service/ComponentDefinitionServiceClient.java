@@ -21,6 +21,7 @@ import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import reactor.core.publisher.Mono;
@@ -35,8 +36,8 @@ import java.util.List;
 public class ComponentDefinitionServiceClient extends AbstractWorkerClient
     implements ComponentDefinitionService {
 
-    public ComponentDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public ComponentDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ComponentDefinitionDTO> getComponentDefinitions() {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
@@ -68,7 +69,7 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()

@@ -25,6 +25,7 @@ import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.Co
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.ConnectionDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.TaskDispatcherDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.TriggerDefinitionServiceClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -38,28 +39,38 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionFacadeClient actionDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        return new ActionDefinitionFacadeClient(discoveryClient);
+    ActionDefinitionFacadeClient actionDefinitionFacadeClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ActionDefinitionFacadeClient(discoveryClient, objectMapper);
     }
 
     @Bean
-    ActionDefinitionServiceClient actionDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        return new ActionDefinitionServiceClient(discoveryClient);
+    ActionDefinitionServiceClient actionDefinitionServiceClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ActionDefinitionServiceClient(discoveryClient, objectMapper);
     }
 
     @Bean
-    ComponentDefinitionFacadeClient componentDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        return new ComponentDefinitionFacadeClient(discoveryClient);
+    ComponentDefinitionFacadeClient componentDefinitionFacadeClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ComponentDefinitionFacadeClient(discoveryClient, objectMapper);
     }
 
     @Bean
-    ComponentDefinitionServiceClient componentDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        return new ComponentDefinitionServiceClient(discoveryClient);
+    ComponentDefinitionServiceClient componentDefinitionServiceClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ComponentDefinitionServiceClient(discoveryClient, objectMapper);
     }
 
     @Bean
-    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        return new ConnectionDefinitionServiceClient(discoveryClient);
+    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ConnectionDefinitionServiceClient(discoveryClient, objectMapper);
     }
 
     @Bean
@@ -70,12 +81,16 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    TriggerDefinitionFacadeClient triggerDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        return new TriggerDefinitionFacadeClient(discoveryClient);
+    TriggerDefinitionFacadeClient triggerDefinitionFacadeClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new TriggerDefinitionFacadeClient(discoveryClient, objectMapper);
     }
 
     @Bean
-    TriggerDefinitionServiceClient triggerDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        return new TriggerDefinitionServiceClient(discoveryClient);
+    TriggerDefinitionServiceClient triggerDefinitionServiceClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new TriggerDefinitionServiceClient(discoveryClient, objectMapper);
     }
 }
