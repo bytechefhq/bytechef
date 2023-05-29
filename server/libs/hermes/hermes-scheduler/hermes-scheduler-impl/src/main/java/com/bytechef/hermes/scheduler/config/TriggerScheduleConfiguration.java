@@ -71,7 +71,7 @@ public class TriggerScheduleConfiguration {
                     ScheduledTriggerExecutor.class);
 
                 LocalDateTime webhookExpirationDate = scheduledTriggerExecutor.executeTriggerDynamicWebhookRefresh(
-                    data.workflowTrigger(), workflowExecutionId);
+                    workflowExecutionId, data.componentName(), data.componentVersion());
 
                 if (webhookExpirationDate != null) {
                     SchedulerClient schedulerClient = executionContext.getSchedulerClient();
@@ -79,7 +79,8 @@ public class TriggerScheduleConfiguration {
                     schedulerClient.schedule(
                         TriggerScheduleConstants.TRIGGER_DYNAMIC_WEBHOOK_REFRESH_ONE_TIME_TASK.instance(
                             workflowExecutionId.toString(),
-                            new TriggerScheduleAndData(data.workflowTrigger(), workflowExecutionId)),
+                            new TriggerScheduleAndData(
+                                workflowExecutionId, data.componentName(), data.componentVersion())),
                         InstantUtils.getInstant(webhookExpirationDate));
                 }
             });

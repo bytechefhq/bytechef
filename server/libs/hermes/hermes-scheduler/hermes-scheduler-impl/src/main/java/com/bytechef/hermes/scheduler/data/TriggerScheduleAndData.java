@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.scheduler.data;
 
-import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
@@ -34,14 +33,14 @@ public class TriggerScheduleAndData implements ScheduleAndData {
     private final Schedule schedule;
 
     @SuppressFBWarnings("EI")
-    public TriggerScheduleAndData(WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId) {
-        this.data = new Data(workflowTrigger, workflowExecutionId);
+    public TriggerScheduleAndData(WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion) {
+        this.data = new Data(workflowExecutionId, componentName, componentVersion);
         this.schedule = null;
     }
 
     @SuppressFBWarnings("EI")
     public TriggerScheduleAndData(Schedule schedule, WorkflowExecutionId workflowExecutionId) {
-        this.data = new Data(null, workflowExecutionId);
+        this.data = new Data(workflowExecutionId, null, 0);
         this.schedule = schedule;
     }
 
@@ -64,7 +63,7 @@ public class TriggerScheduleAndData implements ScheduleAndData {
     }
 
     @SuppressFBWarnings("EI")
-    public record Data(WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId)
+    public record Data(WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion)
         implements Serializable {
     }
 }

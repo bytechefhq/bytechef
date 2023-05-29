@@ -18,8 +18,8 @@
 package com.bytechef.hermes.scheduler.web.rest;
 
 import com.bytechef.hermes.scheduler.TriggerScheduler;
-import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,9 +71,10 @@ public class TriggerSchedulerController {
         @Valid @RequestBody DynamicWebhookRefreshOneTimeTaskRequest dynamicWebhookRefreshOneTimeTaskRequest) {
 
         triggerScheduler.scheduleDynamicWebhookRefreshTask(
-            dynamicWebhookRefreshOneTimeTaskRequest.workflowTrigger,
             dynamicWebhookRefreshOneTimeTaskRequest.workflowExecutionId,
-            dynamicWebhookRefreshOneTimeTaskRequest.webhookExpirationDate);
+            dynamicWebhookRefreshOneTimeTaskRequest.webhookExpirationDate,
+            dynamicWebhookRefreshOneTimeTaskRequest.componentName,
+            dynamicWebhookRefreshOneTimeTaskRequest.componentVersion);
     }
 
     @RequestMapping(
@@ -86,7 +87,9 @@ public class TriggerSchedulerController {
         triggerScheduler.schedulePollTask(workflowExecutionId);
     }
 
+    @SuppressFBWarnings("EI")
     private record DynamicWebhookRefreshOneTimeTaskRequest(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate) {
+        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
+        int componentVersion) {
     }
 }

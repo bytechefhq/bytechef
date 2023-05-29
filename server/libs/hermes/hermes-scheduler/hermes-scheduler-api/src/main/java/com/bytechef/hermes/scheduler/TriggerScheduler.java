@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.scheduler;
 
-import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 
 import java.time.LocalDateTime;
@@ -32,7 +31,8 @@ public interface TriggerScheduler {
     void cancelPollTask(WorkflowExecutionId workflowExecutionId);
 
     void scheduleDynamicWebhookRefreshTask(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate);
+        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
+        int componentVersion);
 
     void schedulePollTask(WorkflowExecutionId workflowExecutionId);
 }

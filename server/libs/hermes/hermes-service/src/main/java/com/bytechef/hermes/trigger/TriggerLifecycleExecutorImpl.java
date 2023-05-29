@@ -105,7 +105,8 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookRefreshTask(
-                            workflowTrigger, workflowExecutionId, output.webhookExpirationDate());
+                            workflowExecutionId, output.webhookExpirationDate(), workflowTrigger.getComponentName(),
+                            workflowTrigger.getComponentVersion());
                     }
                 }
             }

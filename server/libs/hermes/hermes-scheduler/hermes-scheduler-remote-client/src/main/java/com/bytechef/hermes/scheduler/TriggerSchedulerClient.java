@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.scheduler;
 
-import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -69,7 +68,8 @@ public class TriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookRefreshTask(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate) {
+        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
+        int componentVersion) {
 
         loadBalancedWebClientBuilder
             .build()
@@ -79,7 +79,7 @@ public class TriggerSchedulerClient implements TriggerScheduler {
                 .path("/trigger-scheduler/schedule-poll-task")
                 .build())
             .bodyValue(new DynamicWebhookRefreshOneTimeTaskRequest(
-                workflowTrigger, workflowExecutionId, webhookExpirationDate))
+                workflowExecutionId, webhookExpirationDate, componentName, componentVersion))
             .retrieve()
             .toBodilessEntity()
             .block();
@@ -102,6 +102,7 @@ public class TriggerSchedulerClient implements TriggerScheduler {
 
     @SuppressFBWarnings("EI")
     private record DynamicWebhookRefreshOneTimeTaskRequest(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate) {
+        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
+        int componentVersion) {
     }
 }
