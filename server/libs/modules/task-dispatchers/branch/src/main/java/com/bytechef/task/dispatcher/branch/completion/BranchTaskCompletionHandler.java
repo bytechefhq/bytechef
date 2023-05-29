@@ -28,6 +28,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.Context.Classname;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.Assert;
@@ -89,15 +91,16 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        TaskExecution branchTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+        TaskExecution branchTaskExecution = taskExecutionService.getTaskExecution(
+            Objects.requireNonNull(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
-                contextService.peek(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
+                contextService.peek(Objects.requireNonNull(branchTaskExecution.getId()), Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
+            contextService.push(branchTaskExecution.getId(), Classname.TASK_EXECUTION, newContext);
         }
 
         List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution);
@@ -114,13 +117,13 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 .build();
 
             Map<String, Object> context = contextService.peek(
-                branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+                Objects.requireNonNull(branchTaskExecution.getId()), Classname.TASK_EXECUTION);
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+            contextService.push(Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         }
