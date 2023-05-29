@@ -29,12 +29,7 @@ const ProjectList = () => {
     const {data: tags} = useGetProjectTagsQuery();
 
     return (
-        <div
-            className={twMerge(
-                'w-full px-2 2xl:mx-auto 2xl:w-4/5',
-                projects?.length === 0 ? 'place-self-center' : ''
-            )}
-        >
+        <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             <ul role="list">
                 {isLoading && <span className="px-2">Loading...</span>}
 
@@ -44,7 +39,7 @@ const ProjectList = () => {
 
                 {!isLoading &&
                     !error &&
-                    (projects?.length === 0 ? (
+                    (!projects?.length ? (
                         <EmptyList
                             button={<ProjectDialog project={undefined} />}
                             icon={
@@ -60,20 +55,14 @@ const ProjectList = () => {
                             );
 
                             return (
-                                <li key={project.id}>
-                                    <div className="group rounded-md border-b border-b-gray-100 bg-white p-2 py-3 hover:bg-gray-50">
-                                        <ProjectListItem
-                                            project={project}
-                                            key={project.id}
-                                            remainingTags={tags?.filter(
-                                                (tag) =>
-                                                    !projectTagIds?.includes(
-                                                        tag.id
-                                                    )
-                                            )}
-                                        />
-                                    </div>
-                                </li>
+                                <ProjectListItem
+                                    key={project.id}
+                                    project={project}
+                                    remainingTags={tags?.filter(
+                                        (tag) =>
+                                            !projectTagIds?.includes(tag.id)
+                                    )}
+                                />
                             );
                         })
                     ))}
