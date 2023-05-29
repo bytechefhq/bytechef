@@ -27,6 +27,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.Context.Classname;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
@@ -102,14 +103,14 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .build();
 
                 Map<String, Object> context = contextService.peek(
-                    Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION);
+                    Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION);
 
                 subTaskExecution.evaluate(context);
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
 
                 contextService.push(
-                    Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION, context);
+                    Objects.requireNonNull(subTaskExecution.getId()), Classname.TASK_EXECUTION, context);
 
                 taskDispatcher.dispatch(subTaskExecution);
             }
