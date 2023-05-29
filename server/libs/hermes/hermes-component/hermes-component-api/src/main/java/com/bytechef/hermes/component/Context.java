@@ -35,7 +35,7 @@ public interface Context {
         ACCOUNT(4, "Account"),
         CURRENT_EXECUTION(1, "Current Execution"),
         WORKFLOW(3, "Workflow"),
-        WORKFLOW_INSTANCE(2, "Workflow instance");
+        INSTANCE(2, "Instance");
 
         private final int id;
         private final String label;
@@ -48,7 +48,7 @@ public interface Context {
         public static DataStorageScope valueOf(int id) {
             return switch (id) {
                 case 1 -> DataStorageScope.CURRENT_EXECUTION;
-                case 2 -> DataStorageScope.WORKFLOW_INSTANCE;
+                case 2 -> DataStorageScope.INSTANCE;
                 case 3 -> DataStorageScope.WORKFLOW;
                 case 4 -> DataStorageScope.ACCOUNT;
                 default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
