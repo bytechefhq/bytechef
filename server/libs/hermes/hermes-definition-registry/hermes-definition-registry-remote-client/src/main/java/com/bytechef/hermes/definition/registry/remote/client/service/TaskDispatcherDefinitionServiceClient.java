@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.remote.web.rest.client.service;
+package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;

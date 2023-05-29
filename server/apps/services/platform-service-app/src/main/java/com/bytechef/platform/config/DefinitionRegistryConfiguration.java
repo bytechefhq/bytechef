@@ -17,14 +17,14 @@
 
 package com.bytechef.platform.config;
 
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.facade.ActionDefinitionFacadeClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.facade.ComponentDefinitionFacadeClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.facade.TriggerDefinitionFacadeClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.ActionDefinitionServiceClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.ComponentDefinitionServiceClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.ConnectionDefinitionServiceClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.TaskDispatcherDefinitionServiceClient;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.TriggerDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.client.facade.ActionDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.remote.client.facade.ComponentDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.remote.client.facade.TriggerDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.ActionDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.ComponentDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.ConnectionDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.TaskDispatcherDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.TriggerDefinitionServiceClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.remote.web.rest.client;
+package com.bytechef.hermes.definition.registry.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
