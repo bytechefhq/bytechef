@@ -17,20 +17,14 @@
 
 package com.bytechef.component.schedule.trigger;
 
-import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
-import com.github.kagkarlsson.scheduler.SchedulerClient;
-import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
-import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
+import com.bytechef.hermes.scheduler.TaskScheduler;;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Map;
 
-import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE_RECURRING_TASK;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DAY_OF_MONTH;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.HOUR;
@@ -88,38 +82,31 @@ public class ScheduleEveryMonthTrigger {
         .listenerEnable(this::listenerEnable)
         .listenerDisable(this::listenerDisable);
 
-    private final SchedulerClient schedulerClient;
+    private final TaskScheduler taskScheduler;
 
-    public ScheduleEveryMonthTrigger(SchedulerClient schedulerClient) {
-        this.schedulerClient = schedulerClient;
+    public ScheduleEveryMonthTrigger(TaskScheduler taskScheduler) {
+        this.taskScheduler = taskScheduler;
     }
 
     protected void listenerEnable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        CronSchedule cronSchedule = new CronSchedule(
+        taskScheduler.scheduleTriggerWorkflowTask(
+            workflowExecutionId,
             "0 %s %s %s * ?".formatted(
                 MapValueUtils.getInteger(inputParameters, MINUTE), MapValueUtils.getInteger(inputParameters, HOUR),
                 MapValueUtils.getInteger(inputParameters, DAY_OF_MONTH)),
-            ZoneId.of(MapValueUtils.getString(inputParameters, TIMEZONE)));
-
-        schedulerClient.schedule(
-            SCHEDULE_RECURRING_TASK.instance(
-                workflowExecutionId,
-                new WorkflowScheduleAndData(
-                    cronSchedule,
-                    Map.of(
-                        HOUR, MapValueUtils.getInteger(inputParameters, HOUR),
-                        MINUTE, MapValueUtils.getInteger(inputParameters, MINUTE),
-                        DAY_OF_MONTH, MapValueUtils.getInteger(inputParameters, DAY_OF_MONTH),
-                        TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
-                    workflowExecutionId)),
-            cronSchedule.getInitialExecutionTime(Instant.now()));
+            MapValueUtils.getString(inputParameters, TIMEZONE),
+            Map.of(
+                HOUR, MapValueUtils.getInteger(inputParameters, HOUR),
+                MINUTE, MapValueUtils.getInteger(inputParameters, MINUTE),
+                DAY_OF_MONTH, MapValueUtils.getInteger(inputParameters, DAY_OF_MONTH),
+                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)));
     }
 
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
+        taskScheduler.cancelTriggerWorkflowTask(workflowExecutionId);
     }
 }

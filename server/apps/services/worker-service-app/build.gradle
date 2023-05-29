@@ -6,13 +6,14 @@ springBoot {
 }
 
 dependencies {
-    implementation libs.com.github.kagkarlsson.db.scheduler.spring.boot.starter
     implementation libs.org.openapitools.jackson.databind.nullable
+    implementation "org.springframework:spring-webflux"
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
     implementation "org.springframework.kafka:spring-kafka"
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
@@ -34,6 +35,7 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-service")
+    implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-remote-client")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-impl")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-handler-remote-rest")
 

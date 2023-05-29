@@ -20,19 +20,25 @@ package com.bytechef.hermes.scheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface TriggerScheduler {
+public interface TaskScheduler {
 
-    void cancelDynamicWebhookRefreshTask(WorkflowExecutionId workflowExecutionId);
+    void cancelRefreshDynamicWebhookTriggerTask(String workflowExecutionId);
 
-    void cancelPollTask(WorkflowExecutionId workflowExecutionId);
+    void cancelPollTriggerTask(String workflowExecutionId);
 
-    void scheduleDynamicWebhookRefreshTask(
+    void cancelTriggerWorkflowTask(String workflowExecutionId);
+
+    void scheduleRefreshDynamicWebhookTriggerTask(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion);
 
-    void schedulePollTask(WorkflowExecutionId workflowExecutionId);
+    void schedulePollTriggerTask(WorkflowExecutionId workflowExecutionId);
+
+    void scheduleTriggerWorkflowTask(
+        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output);
 }

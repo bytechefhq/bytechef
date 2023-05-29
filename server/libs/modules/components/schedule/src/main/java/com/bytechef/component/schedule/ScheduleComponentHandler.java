@@ -24,7 +24,7 @@ import com.bytechef.component.schedule.trigger.ScheduleEveryWeekTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleIntervalTrigger;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.github.kagkarlsson.scheduler.SchedulerClient;
+import com.bytechef.hermes.scheduler.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE;
@@ -38,18 +38,18 @@ public class ScheduleComponentHandler implements ComponentDefinitionFactory {
 
     private final ComponentDefinition componentDefinition;
 
-    public ScheduleComponentHandler(SchedulerClient schedulerClient) {
+    public ScheduleComponentHandler(TaskScheduler taskScheduler) {
         this.componentDefinition = component(SCHEDULE)
             .title("Schedule")
             .description(
                 "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.")
             .icon("path:assets/schedule.svg")
             .triggers(
-                new ScheduleEveryDayTrigger(schedulerClient).triggerDefinition,
-                new ScheduleEveryWeekTrigger(schedulerClient).triggerDefinition,
-                new ScheduleEveryMonthTrigger(schedulerClient).triggerDefinition,
-                new ScheduleIntervalTrigger(schedulerClient).triggerDefinition,
-                new ScheduleCronTrigger(schedulerClient).triggerDefinition);
+                new ScheduleEveryDayTrigger(taskScheduler).triggerDefinition,
+                new ScheduleEveryWeekTrigger(taskScheduler).triggerDefinition,
+                new ScheduleEveryMonthTrigger(taskScheduler).triggerDefinition,
+                new ScheduleIntervalTrigger(taskScheduler).triggerDefinition,
+                new ScheduleCronTrigger(taskScheduler).triggerDefinition);
     }
 
     @Override
