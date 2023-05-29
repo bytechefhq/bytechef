@@ -121,6 +121,6 @@ public class TriggerCoordinator {
 
         return CollectionUtils.getFirst(
             WorkflowTrigger.of(workflow),
-            workflowTrigger -> Objects.equals(workflowTrigger.getTriggerName(), workflowExecutionId.getTriggerName()));
+            workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getWorkflowTriggerName()));
     }
 }
