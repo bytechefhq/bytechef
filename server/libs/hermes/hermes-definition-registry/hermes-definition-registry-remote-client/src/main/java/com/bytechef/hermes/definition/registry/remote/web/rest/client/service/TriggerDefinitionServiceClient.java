@@ -53,7 +53,9 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 new DynamicWebhookDisable(
                     authorizationName, componentName, componentVersion, connectionParameters, output, triggerName,
                     triggerParameters, workflowExecutionId))
-            .retrieve();
+            .retrieve()
+            .toBodilessEntity()
+            .block();
     }
 
     @Override
@@ -107,7 +109,9 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 new ListenerDisable(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
                     triggerParameters, workflowExecutionId))
-            .retrieve();
+            .retrieve()
+            .toBodilessEntity()
+            .block();
     }
 
     @Override
@@ -123,7 +127,9 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 new ListenerEnable(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
                     triggerParameters, workflowExecutionId))
-            .retrieve();
+            .retrieve()
+            .toBodilessEntity()
+            .block();
     }
 
     @Override
