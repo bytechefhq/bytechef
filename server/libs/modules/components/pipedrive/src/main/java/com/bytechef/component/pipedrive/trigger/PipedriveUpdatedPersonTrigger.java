@@ -45,7 +45,7 @@ public class PipedriveUpdatedPersonTrigger {
     public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("updatedPerson")
         .title("Updated Person")
         .description("Trigger off whenever an existing person is updated.")
-        .type(TriggerDefinition.TriggerType.WEBHOOK_DYNAMIC)
+        .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
         .outputSchema(
             object()
                 .properties(

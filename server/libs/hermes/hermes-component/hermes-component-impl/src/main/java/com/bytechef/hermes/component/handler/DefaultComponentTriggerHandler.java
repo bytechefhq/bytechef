@@ -95,13 +95,13 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
         TriggerType triggerType = triggerDefinition.getType();
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        if ((TriggerType.WEBHOOK_DYNAMIC == triggerType || TriggerType.WEBHOOK_STATIC == triggerType) &&
+        if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
             !validateWebhook(triggerContext, triggerExecution)) {
 
             throw new TriggerExecutionException("Invalid trigger signature.");
         }
 
-        if (TriggerType.WEBHOOK_DYNAMIC == triggerType) {
+        if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
             DynamicWebhookRequestFunction dynamicWebhookRequestFunction = OptionalUtils.get(
                 triggerDefinition.getDynamicWebhookRequest());
 
@@ -118,7 +118,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     triggerContext));
 
             output = webhookOutput.getValue();
-        } else if (TriggerType.WEBHOOK_STATIC == triggerType) {
+        } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
             StaticWebhookRequestFunction staticWebhookRequestFunction = OptionalUtils.get(
                 triggerDefinition.getStaticWebhookRequest());
 
@@ -132,7 +132,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     triggerContext));
 
             output = webhookOutput.getValue();
-        } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID_DYNAMIC == triggerType) {
+        } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             PollFunction pollFunction = OptionalUtils.get(triggerDefinition.getPoll());
 
             PollOutput pollOutput = pollFunction.apply(
