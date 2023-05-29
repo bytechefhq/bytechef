@@ -20,7 +20,6 @@ package com.bytechef.hermes.scheduler;
 import com.bytechef.commons.util.InstantUtils;
 import com.bytechef.hermes.scheduler.constant.TriggerScheduleConstants;
 import com.bytechef.hermes.scheduler.data.TriggerScheduleAndData;
-import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
@@ -59,11 +58,13 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookRefreshTask(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate) {
+        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
+        int componentVersion) {
 
         schedulerClient.schedule(
             TriggerScheduleConstants.TRIGGER_DYNAMIC_WEBHOOK_REFRESH_ONE_TIME_TASK.instance(
-                workflowExecutionId.toString(), new TriggerScheduleAndData(workflowTrigger, workflowExecutionId)),
+                workflowExecutionId.toString(),
+                new TriggerScheduleAndData(workflowExecutionId, componentName, componentVersion)),
             InstantUtils.getInstant(webhookExpirationDate));
     }
 
