@@ -27,7 +27,7 @@ import java.util.Optional;
  */
 public interface DataStorageService {
 
-    <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key);
+    <T> T fetchValue(DataStorageScope scope, long scopeId, String key, T defaultValue);
 
     DataStorage getDataStorage(long id);
 
