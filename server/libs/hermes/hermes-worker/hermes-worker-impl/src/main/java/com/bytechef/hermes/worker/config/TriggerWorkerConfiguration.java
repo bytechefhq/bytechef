@@ -21,7 +21,7 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerAccessor;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.broker.MessageBroker;
 import org.springframework.context.annotation.Bean;
@@ -38,13 +38,13 @@ import java.util.concurrent.Executors;
 public class TriggerWorkerConfiguration {
 
     @Bean
-    TriggerHandlerAccessor triggerHandlerAccessor(Map<String, TriggerHandler<?>> triggerHandlerMap) {
+    TriggerHandlerRegistry triggerHandlerAccessor(Map<String, TriggerHandler<?>> triggerHandlerMap) {
         return triggerHandlerMap::get;
     }
 
     @Bean
-    TriggerHandlerResolver triggerHandlerResolver(TriggerHandlerAccessor triggerHandlerAccessor) {
-        return new TriggerHandlerResolver(triggerHandlerAccessor);
+    TriggerHandlerResolver triggerHandlerResolver(TriggerHandlerRegistry triggerHandlerRegistry) {
+        return new TriggerHandlerResolver(triggerHandlerRegistry);
     }
 
     @Bean

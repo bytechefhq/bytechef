@@ -20,7 +20,7 @@ package com.bytechef.hermes.worker.handler.remote.web.rest;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerAccessor;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class TriggerHandlerController {
 
-    private final TriggerHandlerAccessor triggerHandlerAccessor;
+    private final TriggerHandlerRegistry triggerHandlerRegistry;
 
-    public TriggerHandlerController(TriggerHandlerAccessor triggerHandlerAccessor) {
-        this.triggerHandlerAccessor = triggerHandlerAccessor;
+    public TriggerHandlerController(TriggerHandlerRegistry triggerHandlerRegistry) {
+        this.triggerHandlerRegistry = triggerHandlerRegistry;
     }
 
     @RequestMapping(
@@ -52,7 +52,7 @@ public class TriggerHandlerController {
             "application/json"
         })
     public ResponseEntity<Object> handle(@Valid @RequestBody TriggerHandlerHandleRequest triggerHandlerHandleRequest) {
-        TriggerHandler<?> triggerHandler = triggerHandlerAccessor.getTriggerHandler(triggerHandlerHandleRequest.type());
+        TriggerHandler<?> triggerHandler = triggerHandlerRegistry.getTriggerHandler(triggerHandlerHandleRequest.type());
 
         try {
             Object output = triggerHandler.handle(triggerHandlerHandleRequest.triggerExecution());
