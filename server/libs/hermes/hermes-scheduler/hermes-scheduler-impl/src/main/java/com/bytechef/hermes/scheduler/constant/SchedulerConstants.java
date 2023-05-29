@@ -18,8 +18,8 @@
 package com.bytechef.hermes.scheduler.constant;
 
 import com.bytechef.hermes.scheduler.data.PollTriggerScheduleAndData;
-import com.bytechef.hermes.scheduler.data.RefreshDynamicWebhookTriggerData;
 import com.bytechef.hermes.scheduler.data.TriggerWorkflowScheduleAndData;
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
 
 /**
@@ -31,9 +31,9 @@ public class SchedulerConstants {
         new TaskWithDataDescriptor<>(
             "poll-trigger-recurring-task", PollTriggerScheduleAndData.class);
 
-    public static final TaskWithDataDescriptor<RefreshDynamicWebhookTriggerData> REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK =
+    public static final TaskWithDataDescriptor<WorkflowExecutionId> REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK =
         new TaskWithDataDescriptor<>(
-            "dynamic-webhook-trigger-refresh-recurring-task", RefreshDynamicWebhookTriggerData.class);
+            "dynamic-webhook-trigger-refresh-recurring-task", WorkflowExecutionId.class);
 
     public static final TaskWithDataDescriptor<TriggerWorkflowScheduleAndData> TRIGGER_WORKFLOW_RECURRING_TASK =
         new TaskWithDataDescriptor<>("trigger-workflow-recurring-task", TriggerWorkflowScheduleAndData.class);

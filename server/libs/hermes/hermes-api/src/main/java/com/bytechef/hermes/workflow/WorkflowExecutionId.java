@@ -18,8 +18,8 @@
 package com.bytechef.hermes.workflow;
 
 import com.bytechef.commons.util.Base64Utils;
+import com.bytechef.hermes.trigger.WorkflowTrigger;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 
@@ -28,24 +28,47 @@ import java.io.Serializable;
  */
 public class WorkflowExecutionId implements Serializable {
 
+    private final String componentName;
+    private final int componentVersion;
     private final long instanceId;
     private final String instanceType;
     private final String triggerName;
     private final String workflowId;
+    private final String workflowTriggerName;
 
-    private WorkflowExecutionId(String workflowId, long instanceId, String instanceType, String triggerName) {
+    private WorkflowExecutionId(
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String triggerName,
+        String componentName, int componentVersion) {
+
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
         this.instanceId = instanceId;
         this.instanceType = instanceType;
         this.triggerName = triggerName;
         this.workflowId = workflowId;
+        this.workflowTriggerName = workflowTriggerName;
     }
 
-    public static WorkflowExecutionId of(String workflowId, long instanceId, String instanceType, String triggerName) {
+    public static WorkflowExecutionId of(
+        String workflowId, long instanceId, String instanceType, WorkflowTrigger workflowTrigger) {
+
+        return of(
+            workflowId, instanceId, instanceType, workflowTrigger.getName(), workflowTrigger.getTriggerName(),
+            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion());
+    }
+
+    public static WorkflowExecutionId of(
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String triggerName,
+        String componentName, int componentVersion) {
+
         Assert.hasText(workflowId, "'workflowId' must not be null");
         Assert.notNull(instanceType, "'instanceType' must not be null");
+        Assert.hasText(workflowTriggerName, "'workflowTriggerName' must not be null");
         Assert.hasText(triggerName, "'triggerName' must not be null");
+        Assert.hasText(componentName, "'componentName' must not be null");
 
-        return new WorkflowExecutionId(workflowId, instanceId, instanceType, triggerName);
+        return new WorkflowExecutionId(
+            workflowId, instanceId, instanceType, workflowTriggerName, triggerName, componentName, componentVersion);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -54,11 +77,15 @@ public class WorkflowExecutionId implements Serializable {
         String[] items = id.split(":");
 
         return WorkflowExecutionId.of(
-            items[0], Long.parseLong(items[1]), StringUtils.hasText(items[2]) ? items[2] : null, items[3]);
+            items[0], Long.parseLong(items[1]), items[2], items[3], items[4], items[5], Integer.parseInt(items[6]));
     }
 
-    public String getWorkflowId() {
-        return workflowId;
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
     }
 
     public long getInstanceId() {
@@ -73,6 +100,14 @@ public class WorkflowExecutionId implements Serializable {
         return triggerName;
     }
 
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
+    public String getWorkflowTriggerName() {
+        return workflowTriggerName;
+    }
+
     @Override
     public String toString() {
         String id = workflowId +
@@ -81,11 +116,14 @@ public class WorkflowExecutionId implements Serializable {
             ':' +
             (instanceType == null ? "" : instanceType) +
             ':' +
-            (StringUtils.hasText(triggerName) ? triggerName : "");
+            workflowTriggerName +
+            ':' +
+            triggerName +
+            ':' +
+            componentName +
+            ':' +
+            componentVersion;
 
         return Base64Utils.encodeToString(id);
-    }
-
-    public record Instance(long id, String type) {
     }
 }

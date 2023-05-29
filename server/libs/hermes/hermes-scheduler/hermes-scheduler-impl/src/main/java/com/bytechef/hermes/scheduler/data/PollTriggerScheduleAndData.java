@@ -22,24 +22,22 @@ import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.io.Serializable;
-
 /**
  * @author Ivica Cardic
  */
 public class PollTriggerScheduleAndData implements ScheduleAndData {
 
-    private final Data data;
+    private final WorkflowExecutionId data;
     private final Schedule schedule;
 
     @SuppressFBWarnings("EI")
     public PollTriggerScheduleAndData(Schedule schedule, WorkflowExecutionId workflowExecutionId) {
-        this.data = new Data(workflowExecutionId, null, 0);
+        this.data = workflowExecutionId;
         this.schedule = schedule;
     }
 
     @Override
-    public Data getData() {
+    public WorkflowExecutionId getData() {
         return data;
     }
 
@@ -54,10 +52,5 @@ public class PollTriggerScheduleAndData implements ScheduleAndData {
             "data=" + data +
             ", schedule=" + schedule +
             '}';
-    }
-
-    @SuppressFBWarnings("EI")
-    public record Data(WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion)
-        implements Serializable {
     }
 }
