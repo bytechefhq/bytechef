@@ -17,13 +17,9 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -32,6 +28,8 @@ import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.EnumSet;
@@ -42,18 +40,10 @@ import java.util.stream.Stream;
 /**
  * @author Ivica Cardic
  */
+@Component
 public final class JsonMapper implements JsonUtils.JsonMapper {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        }
-    };
+    private static ObjectMapper objectMapper;
 
     static {
         com.jayway.jsonpath.Configuration.setDefaults(new com.jayway.jsonpath.Configuration.Defaults() {
@@ -98,6 +88,11 @@ public final class JsonMapper implements JsonUtils.JsonMapper {
         DocumentContext documentContext = JsonPath.parse(json);
 
         return documentContext.read(path, new TypeRef<T>() {});
+    }
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        JsonMapper.objectMapper = objectMapper;
     }
 
     @Override

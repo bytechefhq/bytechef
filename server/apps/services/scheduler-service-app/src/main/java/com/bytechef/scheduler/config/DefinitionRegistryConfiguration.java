@@ -18,6 +18,7 @@
 package com.bytechef.scheduler.config;
 
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.TriggerDefinitionServiceClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +30,9 @@ import org.springframework.context.annotation.Configuration;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    TriggerDefinitionServiceClient triggerDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        return new TriggerDefinitionServiceClient(discoveryClient);
+    TriggerDefinitionServiceClient triggerDefinitionServiceClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new TriggerDefinitionServiceClient(discoveryClient, objectMapper);
     }
 }

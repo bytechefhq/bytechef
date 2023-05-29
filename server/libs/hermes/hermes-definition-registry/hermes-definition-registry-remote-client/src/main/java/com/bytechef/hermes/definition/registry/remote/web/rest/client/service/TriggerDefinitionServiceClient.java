@@ -22,6 +22,7 @@ import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -36,8 +37,8 @@ import static com.bytechef.hermes.component.definition.TriggerDefinition.Dynamic
 public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     implements TriggerDefinitionService {
 
-    public TriggerDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public TriggerDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override

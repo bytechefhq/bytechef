@@ -22,6 +22,7 @@ import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -34,8 +35,8 @@ import java.util.Map;
 public class ActionDefinitionServiceClient extends AbstractWorkerClient
     implements ActionDefinitionService {
 
-    public ActionDefinitionServiceClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public ActionDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override
