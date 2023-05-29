@@ -20,7 +20,6 @@ package com.bytechef.hermes.scheduler;
 import com.bytechef.commons.util.InstantUtils;
 import com.bytechef.hermes.scheduler.data.PollTriggerScheduleAndData;
 import com.bytechef.hermes.scheduler.data.TriggerWorkflowScheduleAndData;
-import com.bytechef.hermes.scheduler.data.RefreshDynamicWebhookTriggerData;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
@@ -71,9 +70,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
         int componentVersion) {
 
         schedulerClient.schedule(
-            REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK.instance(
-                workflowExecutionId.toString(),
-                new RefreshDynamicWebhookTriggerData(workflowExecutionId, componentName, componentVersion)),
+            REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK.instance(workflowExecutionId.toString(), workflowExecutionId),
             InstantUtils.getInstant(webhookExpirationDate));
     }
 
