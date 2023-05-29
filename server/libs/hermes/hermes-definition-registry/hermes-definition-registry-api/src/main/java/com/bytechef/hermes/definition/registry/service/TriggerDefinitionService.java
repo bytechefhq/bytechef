@@ -41,7 +41,7 @@ public interface TriggerDefinitionService {
         String workflowExecutionId);
 
     DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output);
+        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output);
 
     String executeEditorDescription(
         String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,

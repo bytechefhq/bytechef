@@ -107,7 +107,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
+        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
