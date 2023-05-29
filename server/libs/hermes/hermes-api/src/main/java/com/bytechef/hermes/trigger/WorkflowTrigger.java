@@ -63,7 +63,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
                 this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
-                this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
+                this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
 
                 ComponentUtils.ComponentType componentType = ComponentUtils.getComponentType(type);
 
@@ -74,6 +74,9 @@ public class WorkflowTrigger implements Serializable, Trigger {
                 extensions.put(entry.getKey(), entry.getValue());
             }
         }
+
+        Assert.notNull(name, "'name' must not be null");
+        Assert.notNull(type, "'type' must not be null");
     }
 
     public static WorkflowTrigger of(Map<String, Object> source) {
