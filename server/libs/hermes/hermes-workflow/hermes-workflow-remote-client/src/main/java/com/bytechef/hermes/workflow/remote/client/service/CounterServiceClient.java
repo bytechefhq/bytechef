@@ -18,7 +18,9 @@
 package com.bytechef.hermes.workflow.remote.client.service;
 
 import com.bytechef.atlas.service.CounterService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -26,18 +28,52 @@ import org.springframework.stereotype.Component;
 @Component
 public class CounterServiceClient implements CounterService {
 
-    @Override
-    public void delete(long id) {
+    private final WebClient.Builder loadBalancedWebClientBuilder;
 
+    public CounterServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
+    public void delete(long id) {
+        loadBalancedWebClientBuilder
+            .build()
+            .delete()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/counter-service/delete/{id}")
+                .build(id))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
     public long decrement(long id) {
-        return 0;
+        return loadBalancedWebClientBuilder
+            .build()
+            .put()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/counter-service/decrement/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
     }
 
     @Override
     public void set(long id, long value) {
-
+        loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/counter-service/set/{id}/{value}")
+                .build(id, value))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
     }
 }

@@ -19,7 +19,9 @@ package com.bytechef.hermes.workflow.remote.client.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -29,33 +31,49 @@ import java.util.List;
 @Component
 public class WorkflowServiceClient implements WorkflowService {
 
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    @SuppressFBWarnings("EI")
+    public WorkflowServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    }
+
     @Override
     public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void delete(String id) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Workflow getWorkflow(String id) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/workflow-service/get-workflow/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(Workflow.class)
+            .block();
     }
 
     @Override
     public List<Workflow> getWorkflows() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Workflow update(String id, String definition) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Workflow> getWorkflows(List<String> workflowIds) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
