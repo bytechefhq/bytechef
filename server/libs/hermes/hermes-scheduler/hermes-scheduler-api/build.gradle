@@ -1,3 +1,3 @@
 dependencies {
-    api project(":server:libs:hermes:hermes-api")
+    api project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 }

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.worker.trigger.handler;
 
-import com.bytechef.hermes.domain.TriggerExecution;
+import com.bytechef.hermes.workflow.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 
 /**

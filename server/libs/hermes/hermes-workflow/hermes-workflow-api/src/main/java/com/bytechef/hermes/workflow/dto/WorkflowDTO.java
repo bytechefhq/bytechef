@@ -23,7 +23,7 @@ import com.bytechef.atlas.domain.Workflow.Input;
 import com.bytechef.atlas.domain.Workflow.Output;
 import com.bytechef.atlas.domain.Workflow.SourceType;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;

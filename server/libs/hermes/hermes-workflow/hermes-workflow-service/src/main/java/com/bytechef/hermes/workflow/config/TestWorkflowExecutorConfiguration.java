@@ -49,7 +49,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.workflow.test.executor.TestWorkflowExecutor;
+import com.bytechef.hermes.workflow.executor.TestWorkflowExecutor;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;

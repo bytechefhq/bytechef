@@ -33,7 +33,7 @@ import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.util.ComponentUtils;
+import com.bytechef.hermes.workflow.util.ComponentUtils;
 import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;

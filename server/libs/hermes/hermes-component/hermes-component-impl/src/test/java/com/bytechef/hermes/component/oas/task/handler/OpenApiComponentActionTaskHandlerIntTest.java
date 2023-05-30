@@ -37,7 +37,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.constant.MetadataConstants;
+import com.bytechef.hermes.workflow.constant.MetadataConstants;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;

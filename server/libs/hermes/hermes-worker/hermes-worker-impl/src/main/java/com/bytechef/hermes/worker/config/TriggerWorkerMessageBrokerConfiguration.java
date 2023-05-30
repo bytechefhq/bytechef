@@ -20,7 +20,7 @@ package com.bytechef.hermes.worker.config;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.hermes.message.broker.TriggerMessageRoute;
+import com.bytechef.hermes.workflow.message.broker.TriggerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;

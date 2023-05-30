@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.domain.TriggerExecution;
-import com.bytechef.hermes.message.broker.TriggerMessageRoute;
+import com.bytechef.hermes.workflow.domain.TriggerExecution;
+import com.bytechef.hermes.workflow.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

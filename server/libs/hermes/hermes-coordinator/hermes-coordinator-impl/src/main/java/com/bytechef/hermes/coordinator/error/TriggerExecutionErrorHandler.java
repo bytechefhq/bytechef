@@ -19,8 +19,8 @@ package com.bytechef.hermes.coordinator.error;
 
 import com.bytechef.error.ErrorHandler;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.domain.TriggerExecution;
-import com.bytechef.hermes.service.TriggerExecutionService;
+import com.bytechef.hermes.workflow.domain.TriggerExecution;
+import com.bytechef.hermes.workflow.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
