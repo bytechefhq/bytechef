@@ -98,6 +98,8 @@ spring:
 #####
 
 bytechef:
+  data-storage:
+    provider: db
   discovery-service:
     provider: redis
   file-storage:

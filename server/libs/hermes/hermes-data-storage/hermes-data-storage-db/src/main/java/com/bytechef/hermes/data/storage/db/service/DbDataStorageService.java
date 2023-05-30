@@ -15,27 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.service;
+package com.bytechef.hermes.data.storage.db.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.data.storage.domain.DataStorage;
 import com.bytechef.hermes.component.Context.DataStorageScope;
-import com.bytechef.hermes.data.storage.repository.DataStorageRepository;
+import com.bytechef.hermes.data.storage.db.repository.DataStorageRepository;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Service("dataStorageService")
 @Transactional
-public class DataStorageServiceImpl implements DataStorageService {
+public class DbDataStorageService implements DataStorageService {
 
     private final DataStorageRepository dataStorageRepository;
 
     @SuppressFBWarnings("EI")
-    public DataStorageServiceImpl(DataStorageRepository dataStorageRepository) {
+    public DbDataStorageService(DataStorageRepository dataStorageRepository) {
         this.dataStorageRepository = dataStorageRepository;
     }
 

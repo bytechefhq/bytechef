@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.repository;
+package com.bytechef.hermes.data.storage.db.repository;
 
 import com.bytechef.hermes.data.storage.domain.DataStorage;
 import org.springframework.data.relational.core.sql.LockMode;
