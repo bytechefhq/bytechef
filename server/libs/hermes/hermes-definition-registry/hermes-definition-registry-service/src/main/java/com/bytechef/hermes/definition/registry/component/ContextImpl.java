@@ -77,13 +77,13 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
-        return dataStorageService.fetchValue(scope, scopeId, key, null);
+    public Optional<Connection> fetchConnection(String key) {
+        return fetchConnection(connectionIdMap.get(key)).map(this::toContextConnection);
     }
 
     @Override
-    public Optional<Connection> fetchConnection(String key) {
-        return fetchConnection(connectionIdMap.get(key)).map(this::toContextConnection);
+    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
+        return dataStorageService.fetchValue(scope, scopeId, key, null);
     }
 
     @Override
