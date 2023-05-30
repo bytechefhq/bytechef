@@ -26,7 +26,7 @@ import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
-import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.JobParametersModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobWorkflowConnectionModel;

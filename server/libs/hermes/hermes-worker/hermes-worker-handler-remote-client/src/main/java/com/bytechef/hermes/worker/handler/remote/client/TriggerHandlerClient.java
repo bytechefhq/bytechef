@@ -18,7 +18,7 @@
 package com.bytechef.hermes.worker.handler.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.hermes.domain.TriggerExecution;
+import com.bytechef.hermes.workflow.domain.TriggerExecution;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;

@@ -19,11 +19,11 @@ package com.bytechef.hermes.coordinator.event;
 
 import com.bytechef.event.WorkflowEvent;
 import com.bytechef.event.listener.EventListener;
-import com.bytechef.hermes.domain.TriggerExecution;
-import com.bytechef.hermes.domain.TriggerExecution.Status;
-import com.bytechef.hermes.event.TriggerStartedWorkflowEvent;
-import com.bytechef.hermes.service.TriggerExecutionService;
-import com.bytechef.hermes.trigger.CancelControlTrigger;
+import com.bytechef.hermes.workflow.domain.TriggerExecution;
+import com.bytechef.hermes.workflow.domain.TriggerExecution.Status;
+import com.bytechef.hermes.workflow.event.TriggerStartedWorkflowEvent;
+import com.bytechef.hermes.workflow.service.TriggerExecutionService;
+import com.bytechef.hermes.workflow.trigger.CancelControlTrigger;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

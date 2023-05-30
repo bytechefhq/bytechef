@@ -16,7 +16,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot"
     implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:hermes:hermes-api")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"

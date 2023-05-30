@@ -19,10 +19,10 @@ package com.bytechef.helios.project.trigger.dispatcher;
 
 import com.bytechef.helios.project.dispatcher.AbstractDispatcherPreSendProcessor;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
-import com.bytechef.hermes.connection.WorkflowConnection;
-import com.bytechef.hermes.constant.MetadataConstants;
-import com.bytechef.hermes.trigger.TriggerDispatcherPreSendProcessor;
-import com.bytechef.hermes.domain.TriggerExecution;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.constant.MetadataConstants;
+import com.bytechef.hermes.workflow.trigger.TriggerDispatcherPreSendProcessor;
+import com.bytechef.hermes.workflow.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 

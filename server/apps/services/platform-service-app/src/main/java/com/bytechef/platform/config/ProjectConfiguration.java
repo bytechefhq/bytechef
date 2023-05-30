@@ -33,7 +33,7 @@ import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.trigger.TriggerLifecycleExecutor;
+import com.bytechef.hermes.workflow.trigger.TriggerLifecycleExecutor;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
