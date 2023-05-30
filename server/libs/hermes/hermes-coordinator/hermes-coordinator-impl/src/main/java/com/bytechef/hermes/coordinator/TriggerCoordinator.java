@@ -32,6 +32,7 @@ import com.bytechef.hermes.workflow.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,7 @@ public class TriggerCoordinator {
     private final TriggerExecutionService triggerExecutionService;
     private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         InstanceFacadeRegistry instanceFacadeRegistry, MessageBroker messageBroker,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,

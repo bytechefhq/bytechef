@@ -17,9 +17,12 @@
 
 package com.bytechef.hermes.workflow.remote.client.service;
 
-import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.Context.Classname;
 import com.bytechef.atlas.service.ContextService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
@@ -28,23 +31,69 @@ import java.util.Map;
  */
 @Component
 public class ContextServiceClient implements ContextService {
-    @Override
-    public Map<String, Object> peek(long stackId, Context.Classname classname) {
-        return null;
+
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    @SuppressFBWarnings("EI")
+    public ContextServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
-    public Map<String, Object> peek(long stackId, int subStackId, Context.Classname classname) {
-        return null;
+    public Map<String, Object> peek(long stackId, Classname classname) {
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/context-service/peek/{stackId}/{classname}")
+                .build(stackId, classname))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+            .block();
     }
 
     @Override
-    public void push(long stackId, Context.Classname classname, Map<String, Object> value) {
-
+    public Map<String, Object> peek(long stackId, int subStackId, Classname classname) {
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/context-service/peek/{stackId}/{subStackId}/{classname}")
+                .build(stackId, subStackId, classname))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+            .block();
     }
 
     @Override
-    public void push(long stackId, int subStackId, Context.Classname classname, Map<String, Object> context) {
+    public void push(long stackId, Classname classname, Map<String, Object> context) {
+        loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/context-service/push/{stackId}/{classname}")
+                .build(stackId, classname))
+            .bodyValue(context)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+            .block();
+    }
 
+    @Override
+    public void push(long stackId, int subStackId, Classname classname, Map<String, Object> context) {
+        loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/context-service/push/{stackId}/{subStackId}/{classname}")
+                .build(stackId, classname))
+            .bodyValue(context)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+            .block();
     }
 }

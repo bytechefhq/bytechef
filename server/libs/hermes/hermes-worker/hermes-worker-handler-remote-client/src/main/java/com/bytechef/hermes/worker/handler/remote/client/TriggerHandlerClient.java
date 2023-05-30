@@ -38,6 +38,7 @@ public class TriggerHandlerClient {
     private final DiscoveryClient discoveryClient;
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings("EI")
     public TriggerHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;

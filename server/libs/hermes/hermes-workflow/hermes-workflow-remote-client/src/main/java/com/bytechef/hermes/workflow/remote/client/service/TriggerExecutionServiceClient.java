@@ -19,7 +19,9 @@ package com.bytechef.hermes.workflow.remote.client.service;
 
 import com.bytechef.hermes.workflow.domain.TriggerExecution;
 import com.bytechef.hermes.workflow.service.TriggerExecutionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -27,18 +29,54 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerExecutionServiceClient implements TriggerExecutionService {
 
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    @SuppressFBWarnings("EI")
+    public TriggerExecutionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    }
+
     @Override
     public TriggerExecution create(TriggerExecution triggerExecution) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/trigger-execution-service/create")
+                .build())
+            .bodyValue(triggerExecution)
+            .retrieve()
+            .bodyToMono(TriggerExecution.class)
+            .block();
     }
 
     @Override
     public TriggerExecution getTriggerExecution(long id) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/trigger-execution-service/get-trigger-execution/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(TriggerExecution.class)
+            .block();
     }
 
     @Override
     public TriggerExecution update(TriggerExecution triggerExecution) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .put()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/trigger-execution-service/update")
+                .build())
+            .bodyValue(triggerExecution)
+            .retrieve()
+            .bodyToMono(TriggerExecution.class)
+            .block();
     }
 }

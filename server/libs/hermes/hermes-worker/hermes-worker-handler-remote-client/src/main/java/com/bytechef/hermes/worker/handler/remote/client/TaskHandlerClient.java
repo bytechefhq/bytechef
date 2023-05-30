@@ -38,6 +38,7 @@ public class TaskHandlerClient {
     private final DiscoveryClient discoveryClient;
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings("EI")
     public TaskHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;

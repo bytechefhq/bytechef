@@ -21,6 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.ProjectInstance.Status;
 import com.bytechef.helios.project.repository.ProjectInstanceRepository;
 import com.bytechef.helios.project.domain.ProjectInstance;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +129,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ProjectInstance update(ProjectInstance projectInstance) {
         Assert.notNull(projectInstance, "'projectInstance' must not be notNull");
 

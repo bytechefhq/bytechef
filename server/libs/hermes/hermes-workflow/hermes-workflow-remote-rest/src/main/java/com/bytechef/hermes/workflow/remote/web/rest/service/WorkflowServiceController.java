@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.remote.web.rest.service;
+package com.bytechef.hermes.workflow.remote.web.rest.service;
 
-import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,39 +26,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * @author Ivica Cardic
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
-public class ConnectionServiceController {
+public class WorkflowServiceController {
 
-    private final ConnectionService connectionService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionServiceController(ConnectionService connectionService) {
-        this.connectionService = connectionService;
+    public WorkflowServiceController(WorkflowService workflowService) {
+        this.workflowService = workflowService;
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-service/get-connection/{id}",
+        value = "/workflow-service/get-workflow/{id}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<Connection> getConnection(@PathVariable long id) {
-        return ResponseEntity.ok(connectionService.getConnection(id));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/connection-service/get-connections",
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<List<Connection>> getConnections() {
-        return ResponseEntity.ok(connectionService.getConnections());
+    public ResponseEntity<Workflow> getWorkflow(@PathVariable String id) {
+        return ResponseEntity.ok(workflowService.getWorkflow(id));
     }
 }
