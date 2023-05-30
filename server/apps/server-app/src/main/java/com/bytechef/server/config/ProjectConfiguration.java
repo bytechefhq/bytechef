@@ -17,7 +17,7 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.atlas.job.JobFactory;
+import com.bytechef.atlas.factory.JobFactory;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;

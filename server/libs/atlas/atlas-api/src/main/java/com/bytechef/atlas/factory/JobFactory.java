@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.job;
+package com.bytechef.atlas.factory;
 
 import com.bytechef.atlas.dto.JobParameters;
 

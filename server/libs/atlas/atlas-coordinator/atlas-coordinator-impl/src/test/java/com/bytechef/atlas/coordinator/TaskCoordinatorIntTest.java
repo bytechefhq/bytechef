@@ -21,8 +21,8 @@ package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.job.JobFactoryImpl;
+import com.bytechef.atlas.factory.JobFactory;
+import com.bytechef.atlas.factory.JobFactoryImpl;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
