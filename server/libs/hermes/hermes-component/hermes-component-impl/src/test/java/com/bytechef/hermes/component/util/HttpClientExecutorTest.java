@@ -54,10 +54,8 @@ import org.mockito.Mockito;
  */
 public class HttpClientExecutorTest {
 
+    private static final Context context = Mockito.mock(Context.class);
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
-
-    private final Context context = Mockito.mock(Context.class);
-
     private static final HttpClientExecutor HTTP_CLIENT_EXECUTOR = new HttpClientExecutor();
 
     @BeforeAll

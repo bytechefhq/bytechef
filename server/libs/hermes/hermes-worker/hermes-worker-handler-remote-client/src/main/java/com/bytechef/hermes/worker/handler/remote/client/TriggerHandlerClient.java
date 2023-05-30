@@ -55,7 +55,7 @@ public class TriggerHandlerClient {
                 .scheme("http")
                 .host(serviceInstance.getHost())
                 .port(serviceInstance.getPort())
-                .path("/api/internal/trigger-handler")
+                .path("/api/internal/trigger-handler/handle")
                 .build())
             .bodyValue(Map.of("type", type, "triggerExecution", triggerExecution))
             .retrieve()

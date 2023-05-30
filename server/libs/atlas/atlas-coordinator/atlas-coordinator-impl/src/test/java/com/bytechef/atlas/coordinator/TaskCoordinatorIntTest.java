@@ -126,7 +126,7 @@ public class TaskCoordinatorIntTest {
             .taskCompletionHandlerFactories(List.of())
             .taskDispatcherResolverFactories(List.of())
             .taskExecutionService(taskExecutionService)
-            .taskHandlerAccessor(taskHandlerMap::get)
+            .taskHandlerRegistry(taskHandlerMap::get)
             .workflowService(workflowService)
             .build();
 

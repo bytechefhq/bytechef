@@ -38,6 +38,5 @@ public interface IntegrationService {
 
     Integration update(long id, List<Long> tagIds);
 
-    Integration update(
-        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds);
+    Integration update(Integration integration);
 }

@@ -49,7 +49,7 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/dynamic-webhook-disable",
+        value = "/trigger-definition-service/execute-dynamic-webhook-disable",
         consumes = {
             "application/json"
         })
@@ -57,8 +57,9 @@ public class TriggerDefinitionServiceController {
         @Valid @RequestBody DynamicWebhookDisable dynamicWebhookDisable) {
 
         triggerDefinitionService.executeDynamicWebhookDisable(
-            dynamicWebhookDisable.triggerName, dynamicWebhookDisable.componentName,
-            dynamicWebhookDisable.componentVersion, dynamicWebhookDisable.connectionParameters,
+            dynamicWebhookDisable.componentName, dynamicWebhookDisable.componentVersion,
+            dynamicWebhookDisable.triggerName,
+            dynamicWebhookDisable.connectionParameters,
             dynamicWebhookDisable.authorizationName, dynamicWebhookDisable.triggerParameters,
             dynamicWebhookDisable.workflowExecutionId, dynamicWebhookDisable.output);
 
@@ -68,7 +69,7 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/dynamic-webhook-enable",
+        value = "/trigger-definition-service/execute-dynamic-webhook-enable",
         consumes = {
             "application/json"
         },
@@ -79,8 +80,7 @@ public class TriggerDefinitionServiceController {
         @Valid @RequestBody DynamicWebhookEnable dynamicWebhookEnable) {
 
         return ResponseEntity.ok(triggerDefinitionService.executeDynamicWebhookEnable(
-            dynamicWebhookEnable.triggerName, dynamicWebhookEnable.componentName,
-            dynamicWebhookEnable.componentVersion,
+            dynamicWebhookEnable.componentName, dynamicWebhookEnable.componentVersion, dynamicWebhookEnable.triggerName,
             dynamicWebhookEnable.connectionParameters, dynamicWebhookEnable.authorizationName,
             dynamicWebhookEnable.triggerParameters, dynamicWebhookEnable.webhookUrl,
             dynamicWebhookEnable.workflowExecutionId));
@@ -88,7 +88,7 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/dynamic-webhook-refresh",
+        value = "/trigger-definition-service/execute-dynamic-webhook-refresh",
         consumes = {
             "application/json"
         },
@@ -99,21 +99,20 @@ public class TriggerDefinitionServiceController {
         @Valid @RequestBody DynamicWebhookRefresh dynamicWebhookRefresh) {
 
         return ResponseEntity.ok(triggerDefinitionService.executeDynamicWebhookRefresh(
-            dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.componentName,
-            dynamicWebhookRefresh.componentVersion, dynamicWebhookRefresh.output));
+            dynamicWebhookRefresh.componentName, dynamicWebhookRefresh.componentVersion,
+            dynamicWebhookRefresh.triggerName,
+            dynamicWebhookRefresh.output));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/execute-listener-disable",
+        value = "/trigger-definition-service/execute-listener-disable",
         consumes = {
             "application/json"
         })
-    public ResponseEntity<Void>
-        executeListenerDisable(@Valid @RequestBody ListenerDisable listenerDisable) {
-
+    public ResponseEntity<Void> executeListenerDisable(@Valid @RequestBody ListenerDisable listenerDisable) {
         triggerDefinitionService.executeListenerDisable(
-            listenerDisable.triggerName, listenerDisable.componentName, listenerDisable.componentVersion,
+            listenerDisable.componentName, listenerDisable.componentVersion, listenerDisable.triggerName,
             listenerDisable.connectionParameters, listenerDisable.authorizationName,
             listenerDisable.triggerParameters, listenerDisable.workflowExecutionId);
 
@@ -123,15 +122,13 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/execute-listener-enable",
+        value = "/trigger-definition-service/execute-listener-enable",
         consumes = {
             "application/json"
         })
-    public ResponseEntity<Void>
-        executeListenerEnable(@Valid @RequestBody ListenerEnable listenerEnable) {
-
+    public ResponseEntity<Void> executeListenerEnable(@Valid @RequestBody ListenerEnable listenerEnable) {
         triggerDefinitionService.executeListenerEnable(
-            listenerEnable.triggerName, listenerEnable.componentName, listenerEnable.componentVersion,
+            listenerEnable.componentName, listenerEnable.componentVersion, listenerEnable.triggerName,
             listenerEnable.connectionParameters, listenerEnable.authorizationName, listenerEnable.triggerParameters,
             listenerEnable.workflowExecutionId);
 
@@ -141,7 +138,7 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}",
+        value = "/trigger-definition-service/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
         produces = {
             "application/json"
         })
@@ -150,12 +147,12 @@ public class TriggerDefinitionServiceController {
         @PathVariable("componentVersion") Integer componentVersion, @PathVariable("triggerName") String triggerName) {
 
         return ResponseEntity.ok(
-            triggerDefinitionService.getTriggerDefinition(triggerName, componentName, componentVersion));
+            triggerDefinitionService.getTriggerDefinition(componentName, componentVersion, triggerName));
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions",
+        value = "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
@@ -167,31 +164,32 @@ public class TriggerDefinitionServiceController {
     }
 
     private record DynamicWebhookDisable(
-        String authorizationName, @NotNull String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, DynamicWebhookEnableOutput output, @NotNull String triggerName,
-        Map<String, Object> triggerParameters, @NotNull String workflowExecutionId) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, String authorizationName,
+        Map<String, Object> connectionParameters, DynamicWebhookEnableOutput output,
+        @NotNull String workflowExecutionId) {
     }
 
     private record DynamicWebhookEnable(
-        String authorizationName, @NotNull String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, @NotNull String triggerName, Map<String, Object> triggerParameters,
-        @NotNull String webhookUrl, @NotNull String workflowExecutionId) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, String authorizationName,
+        Map<String, Object> connectionParameters, @NotNull String webhookUrl, @NotNull String workflowExecutionId) {
     }
 
     private record DynamicWebhookRefresh(
-        @NotNull String componentName, int componentVersion, DynamicWebhookEnableOutput output,
-        @NotNull String triggerName) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        DynamicWebhookEnableOutput output) {
     }
 
     private record ListenerDisable(
-        String authorizationName, @NotNull String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, @NotNull String triggerName, Map<String, Object> triggerParameters,
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters,
         @NotNull String workflowExecutionId) {
     }
 
     private record ListenerEnable(
-        String authorizationName, @NotNull String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, @NotNull String triggerName, Map<String, Object> triggerParameters,
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters,
         @NotNull String workflowExecutionId) {
     }
 }

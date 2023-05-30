@@ -63,7 +63,7 @@ public class ComponentWorkflowTestSupport {
             .taskCompletionHandlerFactories(List.of())
             .taskDispatcherResolverFactories(List.of())
             .taskExecutionService(taskExecutionService)
-            .taskHandlerAccessor(taskHandlerMap::get)
+            .taskHandlerRegistry(taskHandlerMap::get)
             .workflowService(workflowService)
             .build();
 
@@ -78,7 +78,7 @@ public class ComponentWorkflowTestSupport {
             .taskCompletionHandlerFactories(List.of())
             .taskDispatcherResolverFactories(List.of())
             .taskExecutionService(taskExecutionService)
-            .taskHandlerAccessor(CollectionUtils.concat(this.taskHandlerMap, taskHandlerMap)::get)
+            .taskHandlerRegistry(CollectionUtils.concat(this.taskHandlerMap, taskHandlerMap)::get)
             .workflowService(workflowService)
             .build();
 

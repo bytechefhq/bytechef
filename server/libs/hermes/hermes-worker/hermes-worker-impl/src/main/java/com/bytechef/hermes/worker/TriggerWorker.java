@@ -166,7 +166,7 @@ public class TriggerWorker {
             ComponentType componentType = ComponentUtils.getComponentType(triggerExecution.getType());
 
             TriggerDefinitionDTO triggerDefinitionDTO = triggerDefinitionService.getTriggerDefinition(
-                componentType.operationName(), componentType.componentName(), componentType.componentVersion());
+                componentType.componentName(), componentType.componentVersion(), componentType.operationName());
 
             if (triggerDefinitionDTO.batch() && output instanceof Collection<?> collectionOutput) {
                 for (Object outputItem : collectionOutput) {

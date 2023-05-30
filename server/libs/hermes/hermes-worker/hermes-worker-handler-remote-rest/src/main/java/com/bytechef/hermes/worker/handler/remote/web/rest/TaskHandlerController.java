@@ -44,7 +44,7 @@ public class TaskHandlerController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/task-handler",
+        value = "/task-handler/handle",
         consumes = {
             "application/json"
         },

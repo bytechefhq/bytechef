@@ -18,7 +18,7 @@
 package com.bytechef.server.config;
 
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.scheduler.TaskScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.workflow.service.TriggerLifecycleService;
 import com.bytechef.hermes.workflow.trigger.TriggerLifecycleExecutor;
 import com.bytechef.hermes.workflow.trigger.TriggerLifecycleExecutorImpl;
@@ -34,10 +34,10 @@ public class TriggerConfiguration {
 
     @Bean
     TriggerLifecycleExecutor triggerLifecycleExecutor(
-        TaskScheduler taskScheduler, TriggerDefinitionService triggerDefinitionService,
+        TriggerScheduler triggerScheduler, TriggerDefinitionService triggerDefinitionService,
         TriggerLifecycleService triggerLifecycleService, @Value("bytechef.webhookUrl") String webhookUrl) {
 
         return new TriggerLifecycleExecutorImpl(
-            taskScheduler, triggerDefinitionService, triggerLifecycleService, webhookUrl);
+            triggerScheduler, triggerDefinitionService, triggerLifecycleService, webhookUrl);
     }
 }

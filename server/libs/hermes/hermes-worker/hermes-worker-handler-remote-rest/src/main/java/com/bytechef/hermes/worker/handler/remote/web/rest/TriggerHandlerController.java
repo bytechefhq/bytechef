@@ -44,7 +44,7 @@ public class TriggerHandlerController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-handler",
+        value = "/trigger-handler/handle",
         consumes = {
             "application/json"
         },

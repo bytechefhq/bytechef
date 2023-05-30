@@ -42,7 +42,8 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
             .get()
             .uri(uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
-                .path("/api/internal/task-dispatcher-definitions/{name}/{version}")
+                .path(
+                    "/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}")
                 .build(name, version))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<TaskDispatcherDefinitionDTO>() {})
@@ -56,7 +57,7 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
             .get()
             .uri(uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
-                .path("/api/internal/task-dispatcher-definitions")
+                .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definitions")
                 .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
@@ -70,7 +71,7 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
             .get()
             .uri(uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
-                .path("/api/internal/task-dispatcher-definitions/{name}/versions")
+                .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}")
                 .build(name))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})

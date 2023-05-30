@@ -96,7 +96,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                actionDefinitionService.getActionDefinition(actionName, componentName, componentVersion),
+                actionDefinitionService.getActionDefinition(componentName, componentVersion, actionName),
                 ActionDefinitionModel.class));
     }
 
@@ -119,7 +119,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeEditorDescription(
-                actionName, componentName, componentVersion, componentOperationRequestModel.getParameters(),
+                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
                 componentOperationRequestModel.getConnectionId()));
     }
 
@@ -130,7 +130,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(CollectionUtils.map(
             actionDefinitionFacade.executeOutputSchema(
-                actionName, componentName, componentVersion, componentOperationRequestModel.getParameters(),
+                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
                 componentOperationRequestModel.getConnectionId()),
             property -> conversionService.convert(property, PropertyModel.class)));
     }
@@ -141,7 +141,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(triggerDefinitionFacade.executeSampleOutput(
-            actionName, componentName, componentVersion, componentOperationRequestModel.getParameters(),
+            componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
             componentOperationRequestModel.getConnectionId()));
     }
 
@@ -152,7 +152,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(CollectionUtils.map(
             actionDefinitionFacade.executeDynamicProperties(
-                propertyName, actionName, componentName, componentVersion,
+                componentName, componentVersion, actionName, propertyName,
                 componentOperationRequestModel.getParameters(),
                 componentOperationRequestModel.getConnectionId()),
             option -> conversionService.convert(option, PropertyModel.class)));
@@ -165,7 +165,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(CollectionUtils.map(
             actionDefinitionFacade.executeOptions(
-                propertyName, actionName, componentName, componentVersion,
+                componentName, componentVersion, actionName, propertyName,
                 componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId()),
             option -> conversionService.convert(option, OptionModel.class)));
     }
@@ -199,7 +199,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         Boolean triggerDefinitions) {
 
         return ResponseEntity.ok(
-            componentDefinitionFacade.searchComponentDefinitions(
+            componentDefinitionFacade.search(
                 actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
@@ -226,7 +226,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                triggerDefinitionService.getTriggerDefinition(triggerName, componentName, componentVersion),
+                triggerDefinitionService.getTriggerDefinition(componentName, componentVersion, triggerName),
                 TriggerDefinitionModel.class));
     }
 
@@ -249,7 +249,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeEditorDescription(
-                triggerName, componentName, componentVersion, componentOperationRequestModel.getParameters(),
+                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
                 componentOperationRequestModel.getConnectionId()));
     }
 
@@ -261,7 +261,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 triggerDefinitionFacade.executeOutputSchema(
-                    triggerName, componentName, componentVersion, componentOperationRequestModel.getParameters(),
+                    componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
                     componentOperationRequestModel.getConnectionId()),
                 property -> conversionService.convert(property, PropertyModel.class)));
     }
@@ -273,7 +273,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeSampleOutput(
-                triggerName, componentName, componentVersion, componentOperationRequestModel.getParameters(),
+                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
                 componentOperationRequestModel.getConnectionId()));
     }
 
@@ -284,7 +284,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return ResponseEntity.ok(CollectionUtils.map(
             triggerDefinitionFacade.executeDynamicProperties(
-                propertyName, triggerName, componentName, componentVersion,
+                componentName, componentVersion, triggerName, propertyName,
                 componentOperationRequestModel.getParameters(),
                 componentOperationRequestModel.getConnectionId()),
             option -> conversionService.convert(option, PropertyModel.class)));
@@ -298,7 +298,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 triggerDefinitionFacade.executeOptions(
-                    propertyName, triggerName, componentName, componentVersion,
+                    componentName, componentVersion, triggerName, propertyName,
                     componentOperationRequestModel.getParameters(),
                     componentOperationRequestModel.getConnectionId()),
                 option -> conversionService.convert(option, OptionModel.class)));

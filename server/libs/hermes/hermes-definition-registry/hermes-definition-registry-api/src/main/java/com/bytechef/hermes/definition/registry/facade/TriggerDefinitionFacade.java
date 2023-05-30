@@ -29,22 +29,22 @@ import java.util.Map;
 public interface TriggerDefinitionFacade {
 
     String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId);
 
     List<OptionDTO> executeOptions(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId);
 
     List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId);
 
     Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId);
 }

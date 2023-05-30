@@ -39,12 +39,13 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
     @Override
     public String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/editor-description"))
+            .uri(
+                uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-editor-description"))
             .bodyValue(
                 new EditorDescription(
                     actionName, actionParameters, componentName, componentVersion, connectionId))
@@ -55,12 +56,12 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/options"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-options"))
             .bodyValue(
                 new Options(
                     actionName, propertyName, actionParameters, componentName, componentVersion, connectionId))
@@ -71,12 +72,12 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/output-schema"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-output-schema"))
             .bodyValue(
                 new OutputSchema(
                     actionName, actionParameters, componentName, componentVersion, connectionId))
@@ -87,12 +88,12 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/properties"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-properties"))
             .bodyValue(
                 new Properties(
                     actionName, actionParameters, componentName, componentVersion, connectionId, propertyName))
@@ -108,7 +109,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definitions/sample-output"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-sample-output"))
             .bodyValue(
                 new SampleOutput(
                     actionName, actionParameters, componentName, componentVersion, connectionId))

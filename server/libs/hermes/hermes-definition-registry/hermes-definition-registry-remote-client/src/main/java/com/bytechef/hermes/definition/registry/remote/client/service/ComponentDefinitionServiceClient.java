@@ -45,7 +45,8 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
         return WORKER_WEB_CLIENT
             .get()
             .uri(uriBuilder -> toUri(
-                uriBuilder, name, "/component-definitions/{name}/{version}", name, checkVersion(version)))
+                uriBuilder, name, "/component-definition-service/get-component-definition/{name}/{version}", name,
+                checkVersion(version)))
             .retrieve()
             .bodyToMono(ComponentDefinitionDTO.class)
             .block();
@@ -58,7 +59,8 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions"))
+                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance,
+                        "/component-definition-service/get-component-definitions"))
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
@@ -73,7 +75,8 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions/{name}", name))
+                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance,
+                        "/component-definition-service/get-component-definitions/{name}", name))
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),

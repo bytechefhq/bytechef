@@ -51,6 +51,10 @@ public class TriggerCompletionHandler {
 
         triggerExecution.setStatus(Status.COMPLETED);
 
-        triggerExecutionService.update(triggerExecution);
+        if (triggerExecution.getId() == null) {
+            triggerExecutionService.create(triggerExecution);
+        } else {
+            triggerExecutionService.update(triggerExecution);
+        }
     }
 }

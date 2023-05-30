@@ -44,26 +44,25 @@ public class ActionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}",
+        value = "/action-definition-service/get-action-definition/{componentName}/{componentVersion}/{actionName}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<ActionDefinitionDTO> getComponentActionDefinition(
+    public ResponseEntity<ActionDefinitionDTO> getActionDefinition(
         @PathVariable("componentName") String componentName,
-        @PathVariable("componentVersion") Integer componentVersion,
-        @PathVariable("actionName") String actionName) {
+        @PathVariable("componentVersion") Integer componentVersion, @PathVariable("actionName") String actionName) {
 
         return ResponseEntity.ok(
-            actionDefinitionService.getActionDefinition(actionName, componentName, componentVersion));
+            actionDefinitionService.getActionDefinition(componentName, componentVersion, actionName));
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions",
+        value = "/action-definition-service/get-action-definitions/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ActionDefinitionDTO>> getComponentActionDefinitions(
+    public ResponseEntity<List<ActionDefinitionDTO>> getActionDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 

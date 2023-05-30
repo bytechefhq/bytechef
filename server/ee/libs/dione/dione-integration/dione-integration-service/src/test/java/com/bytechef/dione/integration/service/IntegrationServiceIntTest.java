@@ -172,10 +172,12 @@ public class IntegrationServiceIntTest {
         Category category2 = categoryRepository.save(new Category("name2"));
 
         integration.setCategory(category2);
+        integration.setDescription("description2");
+        integration.setName("name2");
+        integration.setTagIds(List.of(tag.getId()));
+        integration.setWorkflowIds(List.of("workflow2"));
 
-        integration = integrationService.update(
-            integration.getId(), integration.getCategoryId(), "description2", "name2", List.of(tag.getId()),
-            List.of("workflow2"));
+        integration = integrationService.update(integration);
 
         assertThat(integration)
             .hasFieldOrPropertyWithValue("categoryId", category2.getId())

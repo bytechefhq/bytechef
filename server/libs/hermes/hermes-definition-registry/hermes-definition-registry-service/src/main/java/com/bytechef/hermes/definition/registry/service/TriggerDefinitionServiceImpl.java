@@ -67,7 +67,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeDynamicWebhookDisable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
@@ -87,7 +87,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
         String workflowExecutionId) {
 
@@ -107,7 +107,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output) {
+        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -120,7 +120,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
@@ -142,7 +142,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -165,7 +165,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerDisable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -181,7 +181,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerEnable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -197,7 +197,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
@@ -218,7 +218,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -240,7 +240,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -258,7 +258,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public TriggerDefinitionDTO getTriggerDefinition(String triggerName, String componentName, int componentVersion) {
+    public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         return toTriggerDefinitionDTO(
             componentDefinitionRegistry.getTriggerDefinition(triggerName, componentName, componentVersion));
     }

@@ -149,21 +149,20 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Project update(
-        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds) {
+    public Project update(Project project) {
+        Assert.notNull(project, "'project' must not be null");
 
-        Assert.notEmpty(workflowIds, "'workflowIds' must not be empty");
-        Assert.notNull(name, "'name' must not be null");
+        Assert.notNull(project.getId(), "'id' must not be null");
+        Assert.notNull(project.getName(), "'name' must not be null");
 
-        Project project = getProject(id);
+        Project curProject = getProject(project.getId());
 
-        project.setCategoryId(categoryId);
-        project.setDescription(description);
-        project.setId(id);
-        project.setName(name);
-        project.setTagIds(tagIds);
-        project.setWorkflowIds(workflowIds);
+        curProject.setCategoryId(project.getCategoryId());
+        curProject.setDescription(project.getDescription());
+        curProject.setName(project.getName());
+        curProject.setTagIds(project.getTagIds());
+        curProject.setWorkflowIds(project.getWorkflowIds());
 
-        return projectRepository.save(project);
+        return projectRepository.save(curProject);
     }
 }

@@ -65,7 +65,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -89,7 +89,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        int componentVersion, String componentName, String actionName, String propertyName,
         Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getActionProperty(
@@ -111,7 +111,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
@@ -132,7 +132,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
@@ -153,7 +153,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
@@ -171,7 +171,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public ActionDefinitionDTO getActionDefinition(String actionName, String componentName, int componentVersion) {
+    public ActionDefinitionDTO getActionDefinition(String componentName, int componentVersion, String actionName) {
         ActionDefinition actionDefinition;
 
         if (Objects.equals(actionName, CustomAction.CUSTOM)) {

@@ -45,49 +45,49 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeDynamicProperties(
-            propertyName, actionName, componentName, componentVersion, actionParameters,
+            componentVersion, componentName, actionName, propertyName, actionParameters,
             connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
     public String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeEditorDescription(
-            actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
+            componentName, componentVersion, actionName, actionParameters, connection.getAuthorizationName(),
             connection.getParameters());
     }
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
-            propertyName, actionName, componentName, componentVersion, actionParameters,
+            componentName, componentVersion, actionName, propertyName, actionParameters,
             connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeOutputSchema(
-            actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
+            componentName, componentVersion, actionName, actionParameters, connection.getAuthorizationName(),
             connection.getParameters());
     }
 
@@ -99,7 +99,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         Connection connection = connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeSampleOutput(
-            actionName, componentName, componentVersion, actionParameters, connection.getAuthorizationName(),
+            componentName, componentVersion, actionName, actionParameters, connection.getAuthorizationName(),
             connection.getParameters());
     }
 }

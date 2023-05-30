@@ -55,7 +55,7 @@ public class TaskHandlerClient {
                 .scheme("http")
                 .host(serviceInstance.getHost())
                 .port(serviceInstance.getPort())
-                .path("/api/internal/task-handler")
+                .path("/api/internal/task-handler/handle")
                 .build())
             .bodyValue(Map.of("type", type, "taskExecution", taskExecution))
             .retrieve()

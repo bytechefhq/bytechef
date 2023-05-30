@@ -43,13 +43,14 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public void executeDynamicWebhookDisable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
         WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/dynamic-webhook-disable"))
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-disable"))
             .bodyValue(
                 new DynamicWebhookDisable(
                     authorizationName, componentName, componentVersion, connectionParameters, output, triggerName,
@@ -61,13 +62,14 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
         String workflowExecutionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/dynamic-webhook-enable"))
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-enable"))
             .bodyValue(
                 new DynamicWebhookEnable(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
@@ -79,11 +81,12 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output) {
+        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/dynamic-webhook-enable"))
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-refresh"))
             .bodyValue(new DynamicWebhookRefresh(componentName, componentVersion, output, triggerName))
             .retrieve()
             .bodyToMono(DynamicWebhookEnableOutput.class)
@@ -92,7 +95,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         throw new UnsupportedOperationException();
@@ -100,12 +103,12 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public void executeListenerDisable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
 
         WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/execute-listener-disable"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-listener-disable"))
             .bodyValue(
                 new ListenerDisable(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
@@ -117,13 +120,13 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public void executeListenerEnable(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
         String authorizationName, Map<String, ?> triggerParameters,
         String workflowExecutionId) {
 
         WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/execute-listener-enable"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-listener-enable"))
             .bodyValue(
                 new ListenerEnable(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
@@ -135,7 +138,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         throw new UnsupportedOperationException();
@@ -143,7 +146,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         throw new UnsupportedOperationException();
@@ -151,7 +154,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         throw new UnsupportedOperationException();
@@ -159,21 +162,19 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String authorizationName, Map<String, ?> connectionParameters) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public TriggerDefinitionDTO getTriggerDefinition(
-        String triggerName, String componentName, int componentVersion) {
-
+    public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         return WORKER_WEB_CLIENT
             .get()
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName,
-                "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}",
+                "/trigger-definition-service/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
                 componentName, componentVersion, triggerName))
             .retrieve()
             .bodyToMono(TriggerDefinitionDTO.class)
@@ -186,7 +187,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .get()
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName,
-                "/component-definitions/{componentName}/{componentVersion}/trigger-definitions", componentName,
+                "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}", componentName,
                 componentVersion))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<TriggerDefinitionDTO>>() {})

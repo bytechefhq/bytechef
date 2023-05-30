@@ -45,61 +45,61 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicProperties(
-            propertyName, triggerName, componentName, componentVersion, triggerParameters,
+            componentName, componentVersion, triggerName, propertyName, triggerParameters,
             connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeEditorDescription(
-            triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
+            componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
             connection.getParameters());
     }
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeOptions(
-            propertyName, triggerName, componentName, componentVersion, triggerParameters,
+            componentName, componentVersion, triggerName, propertyName, triggerParameters,
             connection.getAuthorizationName(), connection.getParameters());
     }
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeOutputSchema(
-            triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
+            componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
             connection.getParameters());
     }
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeSampleOutput(
-            triggerName, componentName, componentVersion, triggerParameters, connection.getAuthorizationName(),
+            componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
             connection.getParameters());
     }
 }

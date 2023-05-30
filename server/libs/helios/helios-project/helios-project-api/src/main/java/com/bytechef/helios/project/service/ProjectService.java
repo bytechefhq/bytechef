@@ -51,6 +51,5 @@ public interface ProjectService {
 
     Project update(long id, List<Long> tagIds);
 
-    Project update(
-        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds);
+    Project update(Project project);
 }

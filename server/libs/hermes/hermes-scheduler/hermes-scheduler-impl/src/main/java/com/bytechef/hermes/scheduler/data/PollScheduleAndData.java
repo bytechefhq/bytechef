@@ -25,13 +25,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class PollTriggerScheduleAndData implements ScheduleAndData {
+public class PollScheduleAndData implements ScheduleAndData {
 
     private final WorkflowExecutionId data;
     private final Schedule schedule;
 
     @SuppressFBWarnings("EI")
-    public PollTriggerScheduleAndData(Schedule schedule, WorkflowExecutionId workflowExecutionId) {
+    public PollScheduleAndData(Schedule schedule, WorkflowExecutionId workflowExecutionId) {
         this.data = workflowExecutionId;
         this.schedule = schedule;
     }
@@ -48,7 +48,7 @@ public class PollTriggerScheduleAndData implements ScheduleAndData {
 
     @Override
     public String toString() {
-        return "PollTriggerScheduleAndData{" +
+        return "PollScheduleAndData{" +
             "data=" + data +
             ", schedule=" + schedule +
             '}';

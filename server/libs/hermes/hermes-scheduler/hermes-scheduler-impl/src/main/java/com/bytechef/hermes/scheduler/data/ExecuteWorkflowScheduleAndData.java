@@ -27,13 +27,13 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class TriggerWorkflowScheduleAndData implements ScheduleAndData {
+public class ExecuteWorkflowScheduleAndData implements ScheduleAndData {
 
     private final Data data;
     private final Schedule schedule;
 
     @SuppressFBWarnings("EI")
-    public TriggerWorkflowScheduleAndData(
+    public ExecuteWorkflowScheduleAndData(
         Schedule schedule, String workflowExecutionId, Map<String, Object> output) {
 
         this.data = new Data(workflowExecutionId, output);
@@ -52,7 +52,7 @@ public class TriggerWorkflowScheduleAndData implements ScheduleAndData {
 
     @Override
     public String toString() {
-        return "ScheduleTriggerScheduleAndData{" +
+        return "ExecuteWorkflowScheduleAndData{" +
             "data=" + data +
             ", schedule=" + schedule +
             '}';

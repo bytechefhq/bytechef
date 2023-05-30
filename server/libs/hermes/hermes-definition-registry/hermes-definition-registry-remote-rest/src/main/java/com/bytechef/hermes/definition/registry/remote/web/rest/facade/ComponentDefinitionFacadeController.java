@@ -44,18 +44,18 @@ public class ComponentDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/search",
+        value = "/component-definition-service/search",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ComponentDefinitionDTO>> searchComponentDefinitions(
+    public ResponseEntity<List<ComponentDefinitionDTO>> search(
         @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
         @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
         @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions) {
 
         return ResponseEntity.ok(
-            componentDefinitionFacade.searchComponentDefinitions(
+            componentDefinitionFacade.search(
                 actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions));
     }
 }

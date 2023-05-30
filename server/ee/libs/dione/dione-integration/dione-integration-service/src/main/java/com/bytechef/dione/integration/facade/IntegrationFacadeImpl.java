@@ -210,11 +210,10 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             ? Collections.emptyList()
             : tagService.save(integrationDTO.tags());
 
-        return new IntegrationDTO(
-            integrationService.update(
-                integrationDTO.id(), category == null ? null : category.getId(), integrationDTO.description(),
-                integrationDTO.name(), com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId),
-                integrationDTO.workflowIds()),
-            category, tags);
+        Integration integration = integrationDTO.toIntegration();
+
+        integration.setTags(tags);
+
+        return new IntegrationDTO(integrationService.update(integration), category, tags);
     }
 }
