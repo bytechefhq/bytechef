@@ -49,12 +49,6 @@ public class TriggerLifecycleServiceImpl implements TriggerLifecycleService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public TriggerLifecycle getTriggerLifecycle(long id) {
-        return OptionalUtils.get(triggerLifecycleRepository.findById(id));
-    }
-
-    @Override
     public void save(long instanceId, String workflowExecutionId, Object value) {
         triggerLifecycleRepository
             .findByInstanceIdAndWorkflowExecutionId(instanceId, workflowExecutionId)
