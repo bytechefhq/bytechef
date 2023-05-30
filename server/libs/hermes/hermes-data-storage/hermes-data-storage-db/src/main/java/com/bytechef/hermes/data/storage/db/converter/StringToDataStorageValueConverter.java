@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.converter;
+package com.bytechef.hermes.data.storage.db.converter;
 
 import com.bytechef.hermes.data.storage.domain.DataStorage.DataStorageValue;
 import com.fasterxml.jackson.core.JsonProcessingException;

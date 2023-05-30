@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.repository;
+package com.bytechef.hermes.data.storage.db.repository;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
