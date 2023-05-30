@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.workflow.service;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.workflow.domain.TriggerLifecycle;
 import com.bytechef.hermes.workflow.repository.TriggerLifecycleRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,21 +43,21 @@ public class TriggerLifecycleServiceImpl implements TriggerLifecycleService {
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public <T> Optional<T> fetchValue(long instanceId, String workflowExecutionId) {
-        return triggerLifecycleRepository.findByInstanceIdAndWorkflowExecutionId(instanceId, workflowExecutionId)
+    public <T> Optional<T> fetchValue(String workflowExecutionId) {
+        return triggerLifecycleRepository.findByWorkflowExecutionId(workflowExecutionId)
             .map(dataStorage -> (T) dataStorage.getValue());
     }
 
     @Override
-    public void save(long instanceId, String workflowExecutionId, Object value) {
+    public void save(String workflowExecutionId, DynamicWebhookEnableOutput value) {
         triggerLifecycleRepository
-            .findByInstanceIdAndWorkflowExecutionId(instanceId, workflowExecutionId)
+            .findByWorkflowExecutionId(workflowExecutionId)
             .ifPresentOrElse(
                 triggerLifecycle -> {
                     triggerLifecycle.setValue(value);
 
                     triggerLifecycleRepository.save(triggerLifecycle);
                 },
-                () -> triggerLifecycleRepository.save(new TriggerLifecycle(instanceId, value, workflowExecutionId)));
+                () -> triggerLifecycleRepository.save(new TriggerLifecycle(workflowExecutionId, value)));
     }
 }
