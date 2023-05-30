@@ -55,9 +55,6 @@ public class TriggerLifecycle implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Column("instance_id")
-    private Long instanceId;
-
     @Column
     private TriggerLifecycleValue value;
 
@@ -70,8 +67,7 @@ public class TriggerLifecycle implements Persistable<Long> {
     public TriggerLifecycle() {
     }
 
-    public TriggerLifecycle(long instanceId, Object value, String workflowExecutionId) {
-        this.instanceId = instanceId;
+    public TriggerLifecycle(String workflowExecutionId, Object value) {
         this.value = new TriggerLifecycleValue(value, value.getClass());
         this.workflowExecutionId = workflowExecutionId;
     }
@@ -95,10 +91,6 @@ public class TriggerLifecycle implements Persistable<Long> {
 
     public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
-    }
-
-    public Long getInstanceId() {
-        return instanceId;
     }
 
     public Object getValue() {
@@ -146,10 +138,6 @@ public class TriggerLifecycle implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
-    }
-
     public void setValue(Object value) {
         this.value = new TriggerLifecycleValue(value, value.getClass());
     }
@@ -166,7 +154,6 @@ public class TriggerLifecycle implements Persistable<Long> {
     public String toString() {
         return "DataStorage{" +
             "id=" + id +
-            ", instanceId='" + instanceId + '\'' +
             ", workflowExecutionId='" + workflowExecutionId + '\'' +
             ", value='" + value + '\'' +
             ", createdBy='" + createdBy + '\'' +

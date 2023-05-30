@@ -34,5 +34,5 @@ public interface TriggerLifecycleRepository
     extends ListPagingAndSortingRepository<TriggerLifecycle, Long>, ListCrudRepository<TriggerLifecycle, Long> {
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
-    Optional<TriggerLifecycle> findByInstanceIdAndWorkflowExecutionId(long instanceId, String workflowExecutionId);
+    Optional<TriggerLifecycle> findByWorkflowExecutionId(String workflowExecutionId);
 }
