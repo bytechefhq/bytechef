@@ -48,6 +48,7 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     public ProjectInstanceWorkflowConnection() {
     }
 
+    @Default
     @SuppressFBWarnings("NP")
     public ProjectInstanceWorkflowConnection(Long connectionId, String key, String taskName) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
@@ -105,5 +106,11 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
             ", key='" + key + '\'' +
             ", taskName='" + taskName + '\'' +
             '}';
+    }
+
+    /**
+     * Used by MapStruct.
+     */
+    public @interface Default {
     }
 }
