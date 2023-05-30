@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.worker.config;
+package com.bytechef.hermes.workflow.remote.client.service;
 
-import com.bytechef.encryption.Encryption;
-import com.bytechef.encryption.EncryptionKey;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.bytechef.atlas.service.CounterService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Configuration
-public class EncryptionConfiguration {
+@Component
+public class CounterServiceClient implements CounterService {
 
-    @Bean
-    Encryption encryption(EncryptionKey encryptionKey) {
-        return new Encryption(encryptionKey);
+    @Override
+    public void delete(long id) {
+
+    }
+
+    @Override
+    public long decrement(long id) {
+        return 0;
+    }
+
+    @Override
+    public void set(long id, long value) {
+
     }
 }
