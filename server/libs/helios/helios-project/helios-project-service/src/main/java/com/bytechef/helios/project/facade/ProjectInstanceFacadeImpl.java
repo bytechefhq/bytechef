@@ -19,7 +19,7 @@ package com.bytechef.helios.project.facade;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.job.JobFactory;
+import com.bytechef.atlas.factory.JobFactory;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.project.constant.ProjectConstants;

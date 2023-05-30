@@ -19,6 +19,7 @@ package com.bytechef.atlas.job;
 
 import com.bytechef.atlas.config.WorkflowIntTestConfiguration;
 import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.factory.JobFactory;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
