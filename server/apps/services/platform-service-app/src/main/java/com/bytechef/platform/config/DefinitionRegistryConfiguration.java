@@ -26,7 +26,6 @@ import com.bytechef.hermes.definition.registry.remote.client.service.ConnectionD
 import com.bytechef.hermes.definition.registry.remote.client.service.TaskDispatcherDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.remote.client.service.TriggerDefinitionServiceClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,7 +74,7 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TaskDispatcherDefinitionServiceClient taskDispatcherDefinitionServiceClient(
-        @Qualifier("loadBalancedWebClientBuilder") WebClient.Builder loadBalancedWebClientBuilder) {
+        WebClient.Builder loadBalancedWebClientBuilder) {
 
         return new TaskDispatcherDefinitionServiceClient(loadBalancedWebClientBuilder);
     }
