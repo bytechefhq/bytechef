@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.scheduler.TaskScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.workflow.service.TriggerLifecycleService;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 
@@ -33,16 +33,16 @@ import java.util.Map;
  */
 public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
-    private final TaskScheduler taskScheduler;
+    private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerLifecycleService triggerLifecycleService;
     private final String webhookUrl;
 
     public TriggerLifecycleExecutorImpl(
-        TaskScheduler taskScheduler, TriggerDefinitionService triggerDefinitionService,
+        TriggerScheduler triggerScheduler, TriggerDefinitionService triggerDefinitionService,
         TriggerLifecycleService triggerLifecycleService, String webhookUrl) {
 
-        this.taskScheduler = taskScheduler;
+        this.triggerScheduler = triggerScheduler;
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerLifecycleService = triggerLifecycleService;
         this.webhookUrl = webhookUrl;
@@ -53,31 +53,29 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-            triggerLifecycleService.fetchValue(
-                workflowExecutionId.getInstanceId(), workflowExecutionId.toString()),
-            null);
+            triggerLifecycleService.fetchValue(workflowExecutionId.toString()), null);
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
-            workflowTrigger.getComponentVersion());
+            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+            workflowTrigger.getTriggerName());
 
         switch (triggerDefinition.type()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 triggerDefinitionService.executeDynamicWebhookDisable(
-                    workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
-                    workflowTrigger.getComponentVersion(),
+                    workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+                    workflowTrigger.getTriggerName(),
                     connection == null ? Map.of() : connection.getParameters(),
                     connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                     workflowExecutionId.toString(), output);
 
-                taskScheduler.cancelRefreshDynamicWebhookTriggerTask(workflowExecutionId.toString());
+                triggerScheduler.cancelDynamicWebhookRefreshTask(workflowExecutionId.toString());
             }
             case LISTENER -> triggerDefinitionService.executeListenerDisable(
-                workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
-                workflowTrigger.getComponentVersion(),
+                workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+                workflowTrigger.getTriggerName(),
                 connection == null ? Map.of() : connection.getParameters(),
                 connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                 workflowExecutionId.toString());
-            case POLLING -> taskScheduler.cancelPollTriggerTask(workflowExecutionId.toString());
+            case POLLING -> triggerScheduler.cancelPollTask(workflowExecutionId.toString());
             default -> throw new IllegalArgumentException("Invalid trigger type");
         }
     }
@@ -87,36 +85,35 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
-            workflowTrigger.getComponentVersion());
+            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+            workflowTrigger.getTriggerName());
 
         switch (triggerDefinition.type()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 DynamicWebhookEnableOutput output = triggerDefinitionService.executeDynamicWebhookEnable(
-                    workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
-                    workflowTrigger.getComponentVersion(),
+                    workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+                    workflowTrigger.getTriggerName(),
                     connection == null ? Map.of() : connection.getParameters(),
                     connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                     createWebhookUrl(workflowExecutionId), workflowExecutionId.toString());
 
                 if (output != null) {
-                    triggerLifecycleService.save(
-                        workflowExecutionId.getInstanceId(), workflowExecutionId.toString(), output);
+                    triggerLifecycleService.save(workflowExecutionId.toString(), output);
 
                     if (output.webhookExpirationDate() != null) {
-                        taskScheduler.scheduleRefreshDynamicWebhookTriggerTask(
+                        triggerScheduler.scheduleDynamicWebhookRefreshTask(
                             workflowExecutionId, output.webhookExpirationDate(), workflowTrigger.getComponentName(),
                             workflowTrigger.getComponentVersion());
                     }
                 }
             }
             case LISTENER -> triggerDefinitionService.executeListenerEnable(
-                workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
-                workflowTrigger.getComponentVersion(),
+                workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+                workflowTrigger.getTriggerName(),
                 connection == null ? Map.of() : connection.getParameters(),
                 connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                 workflowExecutionId.toString());
-            case POLLING -> taskScheduler.schedulePollTriggerTask(workflowExecutionId);
+            case POLLING -> triggerScheduler.schedulePollTask(workflowExecutionId);
             default -> throw new IllegalArgumentException("Invalid trigger type");
         }
     }

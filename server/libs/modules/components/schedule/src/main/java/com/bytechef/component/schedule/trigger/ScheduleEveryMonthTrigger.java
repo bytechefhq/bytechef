@@ -21,7 +21,7 @@ import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
-import com.bytechef.hermes.scheduler.TaskScheduler;;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
 
@@ -82,16 +82,16 @@ public class ScheduleEveryMonthTrigger {
         .listenerEnable(this::listenerEnable)
         .listenerDisable(this::listenerDisable);
 
-    private final TaskScheduler taskScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public ScheduleEveryMonthTrigger(TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
+    public ScheduleEveryMonthTrigger(TriggerScheduler triggerScheduler) {
+        this.triggerScheduler = triggerScheduler;
     }
 
     protected void listenerEnable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        taskScheduler.scheduleTriggerWorkflowTask(
+        triggerScheduler.scheduleExecuteWorkflowTask(
             workflowExecutionId,
             "0 %s %s %s * ?".formatted(
                 MapValueUtils.getInteger(inputParameters, MINUTE), MapValueUtils.getInteger(inputParameters, HOUR),
@@ -107,6 +107,6 @@ public class ScheduleEveryMonthTrigger {
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        taskScheduler.cancelTriggerWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
     }
 }

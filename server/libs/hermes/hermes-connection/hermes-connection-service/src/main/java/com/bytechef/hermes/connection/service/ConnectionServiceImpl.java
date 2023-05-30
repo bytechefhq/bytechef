@@ -109,15 +109,16 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Connection update(long id, String name, List<Long> tagIds, int version) {
-        Assert.hasText(name, "'name' must not be empty");
+    public Connection update(Connection connection) {
+        Assert.notNull(connection.getId(), "'id' must not be null");
+        Assert.hasText(connection.getName(), "'name' must not be empty");
 
-        Connection connection = OptionalUtils.get(connectionRepository.findById(id));
+        Connection curConnection = OptionalUtils.get(connectionRepository.findById(connection.getId()));
 
-        connection.setName(name);
-        connection.setTagIds(tagIds);
-        connection.setVersion(version);
+        curConnection.setName(connection.getName());
+        curConnection.setTagIds(connection.getTagIds());
+        curConnection.setVersion(connection.getVersion());
 
-        return connectionRepository.save(connection);
+        return connectionRepository.save(curConnection);
     }
 }

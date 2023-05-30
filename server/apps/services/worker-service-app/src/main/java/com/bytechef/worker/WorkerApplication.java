@@ -21,10 +21,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
@@ -38,13 +36,6 @@ import org.springframework.util.StringUtils;
 public class WorkerApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerApplication.class);
-
-    private static String gitCommitId;
-
-    @SuppressFBWarnings("ST")
-    public WorkerApplication(@Value("${git.commit.id}") String gitCommitId) {
-        this.gitCommitId = gitCommitId;
-    }
 
     /**
      * Main method, used to run the application.
@@ -87,7 +78,6 @@ public class WorkerApplication {
                 \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
                 \tProfile(s): \t{}
-                \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -97,7 +87,6 @@ public class WorkerApplication {
             hostAddress,
             serverPort,
             contextPath,
-            environment.getActiveProfiles(),
-            gitCommitId);
+            environment.getActiveProfiles());
     }
 }

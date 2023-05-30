@@ -39,12 +39,13 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/editor-description"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName,
+                "/trigger-definition-service/execute-editor-description"))
             .bodyValue(
                 new EditorDescription(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
@@ -55,12 +56,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public List<OptionDTO> executeOptions(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/options"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-options"))
             .bodyValue(
                 new Options(
                     triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId))
@@ -71,12 +72,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/output-schema"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-output-schema"))
             .bodyValue(
                 new OutputSchema(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
@@ -87,12 +88,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/properties"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-properties"))
             .bodyValue(
                 new Properties(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
@@ -103,12 +104,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/sample-output"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-sample-output"))
             .bodyValue(
                 new SampleOutput(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))

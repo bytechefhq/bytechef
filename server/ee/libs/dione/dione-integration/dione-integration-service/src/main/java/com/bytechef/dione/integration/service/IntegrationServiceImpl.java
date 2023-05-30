@@ -107,20 +107,19 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Integration update(
-        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds) {
+    public Integration update(Integration integration) {
+        Assert.notNull(integration.getId(), "'id' must not be null");
+        Assert.notNull(integration.getName(), "'name' must not be null");
 
-        Assert.notNull(name, "'name' must not be null");
+        Integration curIntegration = getIntegration(integration.getId());
 
-        Integration integration = getIntegration(id);
+        curIntegration.setCategoryId(integration.getCategoryId());
+        curIntegration.setDescription(integration.getDescription());
+        curIntegration.setId(integration.getId());
+        curIntegration.setName(integration.getName());
+        curIntegration.setTagIds(integration.getTagIds());
+        curIntegration.setWorkflowIds(integration.getWorkflowIds());
 
-        integration.setCategoryId(categoryId);
-        integration.setDescription(description);
-        integration.setId(id);
-        integration.setName(name);
-        integration.setTagIds(tagIds);
-        integration.setWorkflowIds(workflowIds);
-
-        return integrationRepository.save(integration);
+        return integrationRepository.save(curIntegration);
     }
 }

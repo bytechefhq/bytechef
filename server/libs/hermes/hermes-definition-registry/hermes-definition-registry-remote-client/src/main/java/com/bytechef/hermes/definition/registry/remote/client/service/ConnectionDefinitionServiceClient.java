@@ -60,7 +60,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
 
         Map<String, Map<String, List<String>>> authorizationContextMap = WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/connection-definitions/authorization-apply"))
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/connection-definition-service/execute-authorization-apply"))
             .bodyValue(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<Map<String, Map<String, List<String>>>>() {})
@@ -77,7 +78,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/connection-definitions/authorization-callback"))
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/connection-definition-service/execute-authorization-callback"))
             .bodyValue(
                 new AuthorizationCallbackRequest(
                     new Connection(componentName, connectionVersion, connectionParameters, authorizationName),
@@ -94,7 +96,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
         return Optional.ofNullable(
             WORKER_WEB_CLIENT
                 .post()
-                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/connection-definitions/base-uri"))
+                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/connection-definition-service/fetch-base-uri"))
                 .bodyValue(new Connection(componentName, connectionVersion, connectionParameters, null))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -109,8 +111,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
             .get()
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName,
-                "/component-definitions/{componentName}/connection-definitions/{connectionVersion}/" +
-                    "authorizations/{authorizationName}/authorization-type",
+                "/connection-definition-service/get-authorization-type/{componentName}/{connectionVersion}" +
+                    "/{authorizationName}",
                 componentName, connectionVersion,
                 authorizationName))
             .retrieve()
@@ -124,7 +126,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
             .get()
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName,
-                "/component-definitions/{componentName}/{componentVersion}/connection-definition", componentName,
+                "/connection-definition-service/get-connection-definition/{componentName}/{componentVersion}",
+                componentName,
                 componentVersion))
             .retrieve()
             .bodyToMono(ConnectionDefinitionDTO.class)
@@ -140,7 +143,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
                     .get()
                     .uri(uriBuilder -> toUri(
                         uriBuilder, serviceInstance,
-                        "/component-definitions/{componentName}/{componentVersion}/connection-definitions",
+                        "/connection-definition-service/get-connection-definitions/{componentName}/{componentVersion}",
                         componentName, componentVersion))
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
@@ -156,7 +159,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions"))
+                    .uri(uriBuilder -> toUri(
+                        uriBuilder, serviceInstance, "/connection-definition-service/get-connection-definitions"))
                     .retrieve()
                     .bodyToMono(ConnectionDefinitionDTO.class))
                 .toList(),
@@ -170,7 +174,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/connection-definitions/oauth2-parameters"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/connection-definition-service/get-oauth2-parameters"))
             .bodyValue(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
             .retrieve()
             .bodyToMono(OAuth2AuthorizationParametersDTO.class)

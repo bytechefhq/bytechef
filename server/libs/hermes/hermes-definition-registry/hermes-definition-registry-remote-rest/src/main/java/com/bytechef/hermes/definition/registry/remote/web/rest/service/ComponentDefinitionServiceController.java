@@ -44,7 +44,19 @@ public class ComponentDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions",
+        value = "/component-definition-service/get-component-definition/{name}/{version}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<ComponentDefinitionDTO> getComponentDefinition(
+        @PathVariable("name") String name, @PathVariable("version") Integer version) {
+
+        return ResponseEntity.ok(componentDefinitionService.getComponentDefinition(name, version));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/component-definition-service/get-component-definitions",
         produces = {
             "application/json"
         })
@@ -54,23 +66,11 @@ public class ComponentDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{name}",
+        value = "/component-definition-service/get-component-definitions/{name}",
         produces = {
             "application/json"
         })
     public ResponseEntity<List<ComponentDefinitionDTO>> getComponentDefinitions(@PathVariable("name") String name) {
         return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions(name));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/component-definitions/{name}/{version}",
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<ComponentDefinitionDTO> getComponentDefinition(
-        @PathVariable("name") String name, @PathVariable("version") Integer version) {
-
-        return ResponseEntity.ok(componentDefinitionService.getComponentDefinition(name, version));
     }
 }

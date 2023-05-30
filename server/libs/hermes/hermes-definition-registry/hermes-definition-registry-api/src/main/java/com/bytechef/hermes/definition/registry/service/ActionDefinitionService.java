@@ -30,27 +30,27 @@ import java.util.Map;
 public interface ActionDefinitionService {
 
     String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters);
 
     List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        int componentVersion, String componentName, String actionName, String propertyName,
         Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters);
 
     List<OptionDTO> executeOptions(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters);
 
     Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, ?> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         String authorizationName, Map<String, ?> connectionParameters);
 
     ActionDefinitionDTO getActionDefinition(
-        String actionName, String componentName, int componentVersion);
+        String componentName, int componentVersion, String actionName);
 
     List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
 }

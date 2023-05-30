@@ -226,9 +226,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade, Instanc
 
         return new ProjectInstanceDTO(
             getLastExecutionDate(projectInstanceDTO.id()),
-            projectInstanceService.update(
-                projectInstanceDTO.id(), projectInstanceDTO.description(), projectInstanceDTO.name(),
-                projectInstanceDTO.status(), CollectionUtils.map(tags, Tag::getId), projectInstanceDTO.version()),
+            projectInstanceService.update(projectInstanceDTO.toProjectInstance()),
             projectInstanceWorkflows, projectService.getProject(projectInstanceDTO.projectId()), tags);
     }
 

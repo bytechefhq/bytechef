@@ -48,20 +48,20 @@ public class TriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/editor-description",
+        value = "/trigger-definition-service/execute-editor-description",
         consumes = {
             "application/json"
         })
     public ResponseEntity<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeEditorDescription(
-                editorDescription.triggerName, editorDescription.componentName, editorDescription.componentVersion,
+                editorDescription.componentName, editorDescription.componentVersion, editorDescription.triggerName,
                 editorDescription.triggerParameters, editorDescription.connectionId));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/options",
+        value = "/trigger-definition-service/execute-options",
         consumes = {
             "application/json"
         },
@@ -70,13 +70,13 @@ public class TriggerDefinitionFacadeController {
         })
     public List<OptionDTO> executeOptions(@Valid @RequestBody Options options) {
         return triggerDefinitionFacade.executeOptions(
-            options.propertyName, options.triggerName, options.componentName, options.componentVersion,
+            options.componentName, options.componentVersion, options.triggerName, options.propertyName,
             options.triggerParameters, options.connectionId);
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/properties",
+        value = "/trigger-definition-service/execute-properties",
         consumes = {
             "application/json"
         },
@@ -85,13 +85,13 @@ public class TriggerDefinitionFacadeController {
         })
     public List<? extends ValuePropertyDTO<?>> executeProperties(@Valid @RequestBody Properties properties) {
         return triggerDefinitionFacade.executeDynamicProperties(
-            properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
+            properties.componentName, properties.componentVersion, properties.triggerName, properties.propertyName,
             properties.triggerParameters, properties.connectionId);
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/output-schema",
+        value = "/trigger-definition-service/execute-output-schema",
         consumes = {
             "application/json"
         },
@@ -102,13 +102,13 @@ public class TriggerDefinitionFacadeController {
         @Valid @RequestBody OutputSchema outputSchema) {
 
         return triggerDefinitionFacade.executeOutputSchema(
-            outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,
+            outputSchema.componentName, outputSchema.componentVersion, outputSchema.triggerName,
             outputSchema.triggerParameters, outputSchema.connectionId);
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definitions/sample-output",
+        value = "/trigger-definition-service/execute-sample-output",
         consumes = {
             "application/json"
         },
@@ -117,32 +117,32 @@ public class TriggerDefinitionFacadeController {
         })
     public Object executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
         return triggerDefinitionFacade.executeSampleOutput(
-            sampleOutput.triggerName, sampleOutput.componentName, sampleOutput.componentVersion,
+            sampleOutput.componentName, sampleOutput.componentVersion, sampleOutput.triggerName,
             sampleOutput.triggerParameters, sampleOutput.connectionId);
     }
 
     private record EditorDescription(
-        @NotNull String componentName, int componentVersion, long connectionId, String triggerName,
-        Map<String, Object> triggerParameters) {
+        @NotNull String componentName, String triggerName, int componentVersion, Map<String, Object> triggerParameters,
+        long connectionId) {
     }
 
     private record Options(
-        @NotNull String componentName, int componentVersion, long connectionId, @NotNull String propertyName,
-        @NotNull String triggerName, Map<String, Object> triggerParameters) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
+        Map<String, Object> triggerParameters, long connectionId) {
     }
 
     private record OutputSchema(
-        @NotNull String componentName, int componentVersion, long connectionId, @NotNull String triggerName,
-        Map<String, Object> triggerParameters) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, long connectionId) {
     }
 
     private record Properties(
-        @NotNull String componentName, int componentVersion, long connectionId, @NotNull String propertyName,
-        @NotNull String triggerName, Map<String, Object> triggerParameters) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
+        Map<String, Object> triggerParameters, long connectionId) {
     }
 
     private record SampleOutput(
-        @NotNull String componentName, int componentVersion, long connectionId, @NotNull String triggerName,
-        Map<String, Object> triggerParameters) {
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, long connectionId) {
     }
 }

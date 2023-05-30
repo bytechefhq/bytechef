@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.scheduler.remote.web.rest;
 
-import com.bytechef.hermes.scheduler.TaskScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -35,10 +36,10 @@ import java.time.LocalDateTime;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class TriggerSchedulerController {
 
-    private final TaskScheduler taskScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public TriggerSchedulerController(TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
+    public TriggerSchedulerController(TriggerScheduler triggerScheduler) {
+        this.triggerScheduler = triggerScheduler;
     }
 
     @RequestMapping(
@@ -48,7 +49,7 @@ public class TriggerSchedulerController {
             "application/json"
         })
     void cancelDynamicWebhookRefreshTask(@Valid @RequestBody String workflowExecutionId) {
-        taskScheduler.cancelRefreshDynamicWebhookTriggerTask(workflowExecutionId);
+        triggerScheduler.cancelDynamicWebhookRefreshTask(workflowExecutionId);
     }
 
     @RequestMapping(
@@ -58,7 +59,17 @@ public class TriggerSchedulerController {
             "application/json"
         })
     void cancelPollTask(@Valid @RequestBody String workflowExecutionId) {
-        taskScheduler.cancelPollTriggerTask(workflowExecutionId);
+        triggerScheduler.cancelPollTask(workflowExecutionId);
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/trigger-scheduler/cancel-trigger-workflow-task",
+        consumes = {
+            "application/json"
+        })
+    void cancelTriggerWorkflowTask(@Valid @RequestBody String workflowExecutionId) {
+        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
     }
 
     @RequestMapping(
@@ -68,13 +79,13 @@ public class TriggerSchedulerController {
             "application/json"
         })
     void scheduleDynamicWebhookRefreshTask(
-        @Valid @RequestBody DynamicWebhookRefreshOneTimeTaskRequest dynamicWebhookRefreshOneTimeTaskRequest) {
+        @Valid @RequestBody TriggerSchedulerController.DynamicWebhookRefreshTaskRequest dynamicWebhookRefreshTaskRequest) {
 
-        taskScheduler.scheduleRefreshDynamicWebhookTriggerTask(
-            dynamicWebhookRefreshOneTimeTaskRequest.workflowExecutionId,
-            dynamicWebhookRefreshOneTimeTaskRequest.webhookExpirationDate,
-            dynamicWebhookRefreshOneTimeTaskRequest.componentName,
-            dynamicWebhookRefreshOneTimeTaskRequest.componentVersion);
+        triggerScheduler.scheduleDynamicWebhookRefreshTask(
+            dynamicWebhookRefreshTaskRequest.workflowExecutionId,
+            dynamicWebhookRefreshTaskRequest.webhookExpirationDate,
+            dynamicWebhookRefreshTaskRequest.componentName,
+            dynamicWebhookRefreshTaskRequest.componentVersion);
     }
 
     @RequestMapping(
@@ -84,12 +95,29 @@ public class TriggerSchedulerController {
             "application/json"
         })
     void schedulePollTask(@Valid @RequestBody WorkflowExecutionId workflowExecutionId) {
-        taskScheduler.schedulePollTriggerTask(workflowExecutionId);
+        triggerScheduler.schedulePollTask(workflowExecutionId);
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/trigger-scheduler/schedule-trigger-workflow-task",
+        consumes = {
+            "application/json"
+        })
+    void scheduleTriggerWorkflowTask(@Valid @RequestBody TriggerWorkflowTaskRequest triggerWorkflowTaskRequest) {
+        triggerScheduler.scheduleExecuteWorkflowTask(
+            triggerWorkflowTaskRequest.workflowExecutionId, triggerWorkflowTaskRequest.pattern,
+            triggerWorkflowTaskRequest.zoneId, triggerWorkflowTaskRequest.output);
     }
 
     @SuppressFBWarnings("EI")
-    private record DynamicWebhookRefreshOneTimeTaskRequest(
+    private record DynamicWebhookRefreshTaskRequest(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion) {
+    }
+
+    @SuppressFBWarnings("EI")
+    private record TriggerWorkflowTaskRequest(
+        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
     }
 }

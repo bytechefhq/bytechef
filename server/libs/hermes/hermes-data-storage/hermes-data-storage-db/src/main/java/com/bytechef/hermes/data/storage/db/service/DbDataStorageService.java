@@ -17,13 +17,14 @@
 
 package com.bytechef.hermes.data.storage.db.service;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.data.storage.domain.DataStorage;
 import com.bytechef.hermes.component.Context.DataStorageScope;
 import com.bytechef.hermes.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -41,16 +42,9 @@ public class DbDataStorageService implements DataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public <T> T fetchValue(DataStorageScope scope, long scopeId, String key, T defaultValue) {
+    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
         return dataStorageRepository.findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
-            .map(dataStorage -> (T) dataStorage.getValue())
-            .orElse(defaultValue);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public DataStorage getDataStorage(long id) {
-        return OptionalUtils.get(dataStorageRepository.findById(id));
+            .map(dataStorage -> (T) dataStorage.getValue());
     }
 
     @Override

@@ -218,11 +218,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Category category = projectDTO.category() == null ? null : categoryService.save(projectDTO.category());
         List<Tag> tags = checkTags(projectDTO.tags());
 
-        return new ProjectDTO(
-            projectService.update(
-                projectDTO.id(), category == null ? null : category.getId(), projectDTO.description(),
-                projectDTO.name(), CollectionUtils.map(tags, Tag::getId), projectDTO.workflowIds()),
-            category, tags);
+        Project project = projectDTO.toProject();
+
+        project.setTags(tags);
+
+        return new ProjectDTO(projectService.update(project), category, tags);
     }
 
     @Override

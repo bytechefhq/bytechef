@@ -34,13 +34,13 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class ScheduledTaskExecutor {
+public class TriggerSchedulerExecutor {
 
     private final MessageBroker messageBroker;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerLifecycleService triggerLifecycleService;
 
-    public ScheduledTaskExecutor(
+    public TriggerSchedulerExecutor(
         MessageBroker messageBroker, TriggerDefinitionService triggerDefinitionService,
         TriggerLifecycleService triggerLifecycleService) {
 
@@ -49,24 +49,23 @@ public class ScheduledTaskExecutor {
         this.triggerLifecycleService = triggerLifecycleService;
     }
 
-    public void pollTrigger(WorkflowExecutionId workflowExecutionId) {
+    public void poll(WorkflowExecutionId workflowExecutionId) {
         messageBroker.send(TriggerMessageRoute.TRIGGERS_REQUESTS, workflowExecutionId);
     }
 
-    public LocalDateTime refreshDynamicWebhookTrigger(
+    public LocalDateTime refreshDynamicWebhook(
         WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion) {
 
         LocalDateTime webhookExpirationDate = null;
 
         DynamicWebhookEnableOutput output = OptionalUtils.get(
-            triggerLifecycleService.fetchValue(workflowExecutionId.getInstanceId(), workflowExecutionId.toString()));
+            triggerLifecycleService.fetchValue(workflowExecutionId.toString()));
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
-            workflowExecutionId.getTriggerName(), componentName, componentVersion, output);
+            componentName, componentVersion, workflowExecutionId.getTriggerName(), output);
 
         if (output != null) {
-            triggerLifecycleService.save(
-                workflowExecutionId.getInstanceId(), workflowExecutionId.toString(), output);
+            triggerLifecycleService.save(workflowExecutionId.toString(), output);
 
             webhookExpirationDate = output.webhookExpirationDate();
         }
@@ -74,7 +73,7 @@ public class ScheduledTaskExecutor {
         return webhookExpirationDate;
     }
 
-    public void triggerWorkflow(WorkflowExecutionId workflowExecutionId, Map<String, Object> output) {
+    public void executeWorkflow(WorkflowExecutionId workflowExecutionId, Map<String, Object> output) {
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .output(output)
             .workflowExecutionId(workflowExecutionId)

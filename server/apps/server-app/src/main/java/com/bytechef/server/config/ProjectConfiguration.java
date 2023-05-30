@@ -68,8 +68,7 @@ public class ProjectConfiguration {
     @Bean
     WorkflowExecutionFacade workflowExecutionFacade(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
-        com.bytechef.helios.project.service.ProjectInstanceService projectInstanceService,
-        ProjectService projectService,
+        ProjectInstanceService projectInstanceService, ProjectService projectService,
         TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         return new WorkflowExecutionFacadeImpl(

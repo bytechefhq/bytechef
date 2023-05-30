@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.scheduler.remote.client;
 
-import com.bytechef.hermes.scheduler.TaskScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -30,16 +30,16 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class TaskSchedulerClient implements TaskScheduler {
+public class TriggerSchedulerClient implements TriggerScheduler {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
-    public TaskSchedulerClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public TriggerSchedulerClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
-    public void cancelRefreshDynamicWebhookTriggerTask(String workflowExecutionId) {
+    public void cancelDynamicWebhookRefreshTask(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -54,7 +54,7 @@ public class TaskSchedulerClient implements TaskScheduler {
     }
 
     @Override
-    public void cancelPollTriggerTask(String workflowExecutionId) {
+    public void cancelPollTask(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -69,13 +69,13 @@ public class TaskSchedulerClient implements TaskScheduler {
     }
 
     @Override
-    public void cancelTriggerWorkflowTask(String workflowExecutionId) {
+    public void cancelExecuteWorkflowTask(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/cancel-schedule-task")
+                .path("/trigger-scheduler/cancel-trigger-workflow-task")
                 .build())
             .bodyValue(workflowExecutionId)
             .retrieve()
@@ -84,7 +84,7 @@ public class TaskSchedulerClient implements TaskScheduler {
     }
 
     @Override
-    public void scheduleRefreshDynamicWebhookTriggerTask(
+    public void scheduleDynamicWebhookRefreshTask(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion) {
 
@@ -93,7 +93,7 @@ public class TaskSchedulerClient implements TaskScheduler {
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/schedule-poll-task")
+                .path("/trigger-scheduler/schedule-dynamic-webhook-refresh-task")
                 .build())
             .bodyValue(new DynamicWebhookRefreshTaskRequest(
                 workflowExecutionId, webhookExpirationDate, componentName, componentVersion))
@@ -103,7 +103,7 @@ public class TaskSchedulerClient implements TaskScheduler {
     }
 
     @Override
-    public void schedulePollTriggerTask(WorkflowExecutionId workflowExecutionId) {
+    public void schedulePollTask(WorkflowExecutionId workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -118,7 +118,7 @@ public class TaskSchedulerClient implements TaskScheduler {
     }
 
     @Override
-    public void scheduleTriggerWorkflowTask(
+    public void scheduleExecuteWorkflowTask(
         String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
 
         loadBalancedWebClientBuilder
@@ -126,9 +126,9 @@ public class TaskSchedulerClient implements TaskScheduler {
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/schedule-poll-task")
+                .path("/trigger-scheduler/schedule-trigger-workflow-task")
                 .build())
-            .bodyValue(new ScheduleTaskRequest(workflowExecutionId, pattern, zoneId, output))
+            .bodyValue(new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output))
             .retrieve()
             .toBodilessEntity()
             .block();
@@ -141,7 +141,7 @@ public class TaskSchedulerClient implements TaskScheduler {
     }
 
     @SuppressFBWarnings("EI")
-    private record ScheduleTaskRequest(
+    private record TriggerWorkflowTaskRequest(
         String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
     }
 }

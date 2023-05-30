@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.util.MapValueUtils;
-import com.bytechef.hermes.scheduler.TaskScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
 
@@ -62,16 +62,16 @@ public class ScheduleCronTrigger {
         .listenerEnable(this::listenerEnable)
         .listenerDisable(this::listenerDisable);
 
-    private final TaskScheduler taskScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public ScheduleCronTrigger(TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
+    public ScheduleCronTrigger(TriggerScheduler triggerScheduler) {
+        this.triggerScheduler = triggerScheduler;
     }
 
     protected void listenerEnable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        taskScheduler.scheduleTriggerWorkflowTask(
+        triggerScheduler.scheduleExecuteWorkflowTask(
             workflowExecutionId,
             "0 " + MapValueUtils.getString(inputParameters, EXPRESSION),
             MapValueUtils.getString(inputParameters, TIMEZONE),
@@ -83,6 +83,6 @@ public class ScheduleCronTrigger {
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        taskScheduler.cancelTriggerWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
     }
 }

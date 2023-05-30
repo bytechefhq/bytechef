@@ -42,7 +42,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
     }
 
     @Override
-    public List<ComponentDefinitionDTO> searchComponentDefinitions(
+    public List<ComponentDefinitionDTO> search(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 
@@ -52,7 +52,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
                     .uri(uriBuilder -> toUri(
-                        uriBuilder, serviceInstance, "/component-definitions/search", Map.of(),
+                        uriBuilder, serviceInstance, "/component-definition-service/search", Map.of(),
                         new LinkedMultiValueMap<>() {
                             {
                                 if (actionDefinitions != null) {
