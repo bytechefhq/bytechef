@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.worker.config;
+package com.bytechef.scheduler.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
@@ -28,9 +28,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClients({
-    @LoadBalancerClient("platform-service-app"), @LoadBalancerClient("scheduler-service-app")
-})
+@LoadBalancerClients(@LoadBalancerClient("platform-service-app"))
 public class WebClientConfiguration {
 
     @LoadBalanced

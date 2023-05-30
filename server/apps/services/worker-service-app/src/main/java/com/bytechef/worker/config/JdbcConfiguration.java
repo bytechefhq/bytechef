@@ -17,15 +17,8 @@
 
 package com.bytechef.worker.config;
 
-import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
-import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
-import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.encryption.Encryption;
-import com.bytechef.hermes.data.storage.converter.DataStorageValueToStringConverter;
-import com.bytechef.hermes.data.storage.converter.StringToDataStorageValueConverter;
+import com.bytechef.hermes.data.storage.db.converter.DataStorageValueToStringConverter;
+import com.bytechef.hermes.data.storage.db.converter.StringToDataStorageValueConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
@@ -49,12 +42,10 @@ import java.util.Optional;
 @EnableJdbcRepositories(basePackages = "com.bytechef")
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
-    private final Encryption encryption;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public JdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
-        this.encryption = encryption;
+    public JdbcConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -72,12 +63,6 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     protected List<?> userConverters() {
         return Arrays.asList(
             new DataStorageValueToStringConverter(objectMapper),
-            new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
-            new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
-            new MapWrapperToStringConverter(objectMapper),
-            new MapListWrapperToStringConverter(objectMapper),
-            new StringToDataStorageValueConverter(objectMapper),
-            new StringToMapWrapperConverter(objectMapper),
-            new StringToMapListWrapperConverter(objectMapper));
+            new StringToDataStorageValueConverter(objectMapper));
     }
 }

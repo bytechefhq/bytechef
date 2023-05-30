@@ -28,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -39,9 +38,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.atlas.repository.jdbc"
     })
 @EnableAutoConfiguration
-@Import({
-    WorkflowConfiguration.class
-})
 @SpringBootConfiguration
 public class WorkflowIntTestConfiguration {
 
