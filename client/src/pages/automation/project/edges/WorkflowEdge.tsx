@@ -50,12 +50,12 @@ export default function WorkflowEdge({
                             isDropzoneActive && 'fill-gray-500 stroke-white'
                         )}
                         id={id}
-                        height={20}
+                        height={24}
                         rx={4}
                         ry={4}
-                        width={20}
-                        x={-10}
-                        y={-10}
+                        width={24}
+                        x={-12}
+                        y={-12}
                     />
 
                     <text

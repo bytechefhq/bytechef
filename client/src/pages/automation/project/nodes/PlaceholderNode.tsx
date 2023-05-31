@@ -6,14 +6,14 @@ import PopoverMenu from '../components/PopoverMenu';
 import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: NodeProps) => {
-    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
+    const [isDropzoneActive, setDropzoneActive] = useState(false);
 
     return (
         <PopoverMenu id={id}>
             <div
                 className={twMerge(
-                    'mx-[24px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-md bg-gray-300 font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500',
-                    isDropzoneActive && 'bg-gray-500'
+                    'mx-[20px] flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-gray-300 text-lg font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500',
+                    isDropzoneActive && 'scale-150 cursor-pointer bg-gray-500'
                 )}
                 title="Click to add a node"
                 onDrop={() => setDropzoneActive(false)}
@@ -21,7 +21,7 @@ const PlaceholderNode = ({data, id}: NodeProps) => {
                 onDragEnter={() => setDropzoneActive(true)}
                 onDragLeave={() => setDropzoneActive(false)}
             >
-                <span className="text-lg">{data.label}</span>
+                {data.label}
 
                 <Handle
                     className={styles.handle}

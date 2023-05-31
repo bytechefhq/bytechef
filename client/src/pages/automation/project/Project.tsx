@@ -50,6 +50,7 @@ const Project: React.FC = () => {
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
 
     const {projectId, workflowId} = useParams();
+
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();

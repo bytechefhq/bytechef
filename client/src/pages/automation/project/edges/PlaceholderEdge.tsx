@@ -1,4 +1,3 @@
-import React from 'react';
 import {EdgeProps, getBezierPath} from 'reactflow';
 
 import styles from './EdgeTypes.module.css';
