@@ -67,7 +67,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                     connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                     workflowExecutionId.toString(), output);
 
-                triggerScheduler.cancelDynamicWebhookRefreshTask(workflowExecutionId.toString());
+                triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
             }
             case LISTENER -> triggerDefinitionService.executeListenerDisable(
                 workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
@@ -75,7 +75,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                 connection == null ? Map.of() : connection.getParameters(),
                 connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                 workflowExecutionId.toString());
-            case POLLING -> triggerScheduler.cancelPollTask(workflowExecutionId.toString());
+            case POLLING -> triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
             default -> throw new IllegalArgumentException("Invalid trigger type");
         }
     }
@@ -101,9 +101,9 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                     triggerLifecycleService.save(workflowExecutionId.toString(), output);
 
                     if (output.webhookExpirationDate() != null) {
-                        triggerScheduler.scheduleDynamicWebhookRefreshTask(
-                            workflowExecutionId, output.webhookExpirationDate(), workflowTrigger.getComponentName(),
-                            workflowTrigger.getComponentVersion());
+                        triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
+                            output.webhookExpirationDate(), workflowTrigger.getComponentName(),
+                            workflowTrigger.getComponentVersion(), workflowExecutionId);
                     }
                 }
             }
@@ -113,7 +113,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                 connection == null ? Map.of() : connection.getParameters(),
                 connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                 workflowExecutionId.toString());
-            case POLLING -> triggerScheduler.schedulePollTask(workflowExecutionId);
+            case POLLING -> triggerScheduler.schedulePollingTrigger(workflowExecutionId);
             default -> throw new IllegalArgumentException("Invalid trigger type");
         }
     }

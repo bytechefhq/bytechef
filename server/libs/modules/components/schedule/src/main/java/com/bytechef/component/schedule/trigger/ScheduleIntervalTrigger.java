@@ -83,25 +83,23 @@ public class ScheduleIntervalTrigger {
         int interval = MapValueUtils.getInteger(inputParameters, INTERVAL);
         ZoneId zoneId = ZoneId.systemDefault();
 
-        triggerScheduler.scheduleExecuteWorkflowTask(
-            workflowExecutionId,
+        triggerScheduler.scheduleScheduleTrigger(
             switch (MapValueUtils.getInteger(inputParameters, TIME_UNIT)) {
                 case 1 -> "0 */%s * ? * *".formatted(interval);
                 case 2 -> "0 0 */%s ? * *".formatted(interval);
                 case 3 -> "0 0 0 */%s * ?".formatted(interval);
                 case 4 -> "0 0 0 1 */%s ?".formatted(interval);
                 default -> throw new ComponentExecutionException("Unexpected time unit value.");
-            },
-            zoneId.getId(),
-            Map.of(
+            }, zoneId.getId(), Map.of(
                 INTERVAL, MapValueUtils.getInteger(inputParameters, INTERVAL),
-                TIME_UNIT, MapValueUtils.getInteger(inputParameters, TIME_UNIT)));
+                TIME_UNIT, MapValueUtils.getInteger(inputParameters, TIME_UNIT)),
+            workflowExecutionId);
 
     }
 
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 }

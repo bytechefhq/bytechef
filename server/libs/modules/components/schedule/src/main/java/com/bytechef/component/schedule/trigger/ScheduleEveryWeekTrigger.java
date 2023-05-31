@@ -98,22 +98,21 @@ public class ScheduleEveryWeekTrigger {
     protected void listenerEnable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.scheduleExecuteWorkflowTask(
-            workflowExecutionId,
+        triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s ? * %s".formatted(
                 MapValueUtils.getInteger(inputParameters, MINUTE), MapValueUtils.getInteger(inputParameters, HOUR),
                 MapValueUtils.getInteger(inputParameters, DAY_OF_WEEK)),
-            MapValueUtils.getString(inputParameters, TIMEZONE),
-            Map.of(
+            MapValueUtils.getString(inputParameters, TIMEZONE), Map.of(
                 HOUR, MapValueUtils.getInteger(inputParameters, HOUR),
                 MINUTE, MapValueUtils.getInteger(inputParameters, MINUTE),
                 DAY_OF_WEEK, MapValueUtils.getInteger(inputParameters, DAY_OF_WEEK),
-                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)));
+                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
+            workflowExecutionId);
     }
 
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 }

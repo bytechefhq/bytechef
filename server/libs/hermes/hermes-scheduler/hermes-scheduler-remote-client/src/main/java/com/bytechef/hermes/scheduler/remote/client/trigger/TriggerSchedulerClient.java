@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.remote.client;
+package com.bytechef.hermes.scheduler.remote.client.trigger;
 
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -39,13 +39,13 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void cancelDynamicWebhookRefreshTask(String workflowExecutionId) {
+    public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/cancel-dynamic-webhook-refresh-task")
+                .path("/trigger-scheduler/cancel-dynamic-webhook-trigger-refresh")
                 .build())
             .bodyValue(workflowExecutionId)
             .retrieve()
@@ -54,13 +54,13 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void cancelPollTask(String workflowExecutionId) {
+    public void cancelPollingTrigger(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/cancel-poll-task")
+                .path("/trigger-scheduler/cancel-polling-trigger")
                 .build())
             .bodyValue(workflowExecutionId)
             .retrieve()
@@ -69,13 +69,13 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void cancelExecuteWorkflowTask(String workflowExecutionId) {
+    public void cancelScheduleTrigger(String workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/cancel-trigger-workflow-task")
+                .path("/trigger-scheduler/cancel-schedule-trigger")
                 .build())
             .bodyValue(workflowExecutionId)
             .retrieve()
@@ -84,16 +84,16 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleDynamicWebhookRefreshTask(
-        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
-        int componentVersion) {
+    public void scheduleDynamicWebhookTriggerRefresh(
+        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        WorkflowExecutionId workflowExecutionId) {
 
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/schedule-dynamic-webhook-refresh-task")
+                .path("/trigger-scheduler/schedule-dynamic-webhook-trigger-refresh")
                 .build())
             .bodyValue(new DynamicWebhookRefreshTaskRequest(
                 workflowExecutionId, webhookExpirationDate, componentName, componentVersion))
@@ -103,13 +103,13 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void schedulePollTask(WorkflowExecutionId workflowExecutionId) {
+    public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/schedule-poll-task")
+                .path("/trigger-scheduler/schedule-polling-trigger")
                 .build())
             .bodyValue(workflowExecutionId)
             .retrieve()
@@ -118,15 +118,15 @@ public class TriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleExecuteWorkflowTask(
-        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
+    public void scheduleScheduleTrigger(
+        String pattern, String zoneId, Map<String, Object> output, String workflowExecutionId) {
 
         loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
-                .path("/trigger-scheduler/schedule-trigger-workflow-task")
+                .path("/trigger-scheduler/schedule-schedule-trigger")
                 .build())
             .bodyValue(new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output))
             .retrieve()

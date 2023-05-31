@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.executor;
+package com.bytechef.hermes.scheduler.trigger.executor;
 /*
  * Copyright 2021 <your company/name>.
  *
