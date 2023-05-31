@@ -26,7 +26,7 @@ public enum TriggerMessageRoute implements MessageRoute {
 
     TRIGGERS(Exchange.MESSAGE, "triggers"),
     TRIGGERS_COMPLETIONS(Exchange.MESSAGE, "triggers.completions"),
-    TRIGGERS_REQUESTS(Exchange.MESSAGE, "triggers.requests");
+    TRIGGERS_POLLS(Exchange.MESSAGE, "triggers.polls");
 
     private final Exchange exchange;
     private final String routeName;

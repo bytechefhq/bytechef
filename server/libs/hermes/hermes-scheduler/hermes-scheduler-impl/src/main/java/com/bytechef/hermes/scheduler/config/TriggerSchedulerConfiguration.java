@@ -61,7 +61,7 @@ public class TriggerSchedulerConfiguration {
                 TriggerSchedulerExecutor triggerSchedulerExecutor = applicationContext.getBean(
                     TriggerSchedulerExecutor.class);
 
-                triggerSchedulerExecutor.executeWorkflow(
+                triggerSchedulerExecutor.triggerWorkflow(
                     WorkflowExecutionId.parse(data.workflowExecutionId()),
                     CollectionUtils.concat(Map.of("datetime", executionTime.toString()), data.output()));
             });

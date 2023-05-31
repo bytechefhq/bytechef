@@ -86,11 +86,12 @@ public class TriggerCoordinator {
     }
 
     /**
-     * Dispatch a trigger of a given workflow execution.
+     * Invoked every poll interval (5 mins by default) for a given workflow execution to dispatch request for trigger's
+     * handler execution.
      *
      * @param workflowExecutionId The workflowExecutionId.
      */
-    public void start(WorkflowExecutionId workflowExecutionId) {
+    public void poll(WorkflowExecutionId workflowExecutionId) {
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .workflowExecutionId(workflowExecutionId)
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
@@ -114,7 +115,7 @@ public class TriggerCoordinator {
         }
 
         logger.debug(
-            "Trigger id={}, type='{}', name='{}' executed",
+            "Poll interval for trigger id={}, type='{}', name='{}' executed",
             triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName());
     }
 

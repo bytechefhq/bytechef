@@ -48,8 +48,8 @@ public class TriggerCoordinatorMessageBrokerConfiguration {
                 "complete");
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_REQUESTS, 1, triggerCoordinator,
-                "start");
+                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_POLLS, 1, triggerCoordinator,
+                "poll");
         };
     }
 }
