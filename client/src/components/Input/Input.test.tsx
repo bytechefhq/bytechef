@@ -63,4 +63,19 @@ describe('Input', async () => {
             'This field is required'
         );
     });
+    it('should render the asterisk if input is required', () => {
+        render(
+            <Input
+                name="email"
+                type="email"
+                error={undefined}
+                placeholder="Email"
+                required
+                label="Email Address"
+                aria-label="Email Address"
+            />
+        );
+        expect(screen.getByText('Email Address')).toBeInTheDocument();
+        expect(screen.getByText('*')).toBeInTheDocument();
+    });
 });
