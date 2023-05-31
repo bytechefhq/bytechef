@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -410,11 +409,11 @@ public final class HttpClientUtils {
     public static class Executor {
 
         private Configuration configuration = new Configuration();
-        private Map<String, List<String>> headers = Collections.emptyMap();
-        private Map<String, List<String>> queryParameters = Collections.emptyMap();
+        private Map<String, List<String>> headers = new HashMap<>();
+        private Map<String, List<String>> queryParameters = new HashMap<>();
         private Body body;
-        private RequestMethod requestMethod;
-        private String url;
+        private final RequestMethod requestMethod;
+        private final String url;
 
         private Executor(String url, RequestMethod requestMethod) {
             this.url = Objects.requireNonNull(url);
@@ -432,6 +431,12 @@ public final class HttpClientUtils {
             return this;
         }
 
+        public Executor header(String name, String value) {
+            headers.put(name, List.of(value));
+
+            return this;
+        }
+
         /**
          *
          * @param headers
@@ -441,6 +446,12 @@ public final class HttpClientUtils {
             if (headers != null) {
                 this.headers = new HashMap<>(headers);
             }
+
+            return this;
+        }
+
+        public Executor queryParameter(String name, String value) {
+            queryParameters.put(name, List.of(value));
 
             return this;
         }
