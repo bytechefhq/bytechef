@@ -178,8 +178,7 @@ const ProjectInstanceDialog = ({
                             {index !== steps.length - 1 && (
                                 <div
                                     className={twMerge(
-                                        '' +
-                                            'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5',
+                                        'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5',
                                         index < activeStepIndex
                                             ? 'bg-gray-900'
                                             : 'bg-gray-300'
