@@ -29,10 +29,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-
-/**
- * @author Ivica Cardic
- */
 public class TriggerCoordinatorMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;
