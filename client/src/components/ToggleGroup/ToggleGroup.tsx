@@ -1,5 +1,5 @@
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
-import React from 'react';
+import {twMerge} from 'tailwind-merge';
 
 export interface IToggleItem {
     label: string;
@@ -7,19 +7,21 @@ export interface IToggleItem {
 }
 
 type ToggleGroupProps = {
+    containerClassName?: string;
     defaultValue?: string;
     toggleItems: IToggleItem[];
     onValueChange?(value: string): void;
 };
 
 const ToggleGroup = ({
+    containerClassName,
     defaultValue,
     onValueChange,
     toggleItems,
 }: ToggleGroupProps): JSX.Element => (
     <ToggleGroupPrimitive.Root
         aria-label="Items"
-        className="flex px-2 py-4"
+        className={twMerge('flex px-2 py-4', containerClassName)}
         defaultValue={defaultValue}
         type="single"
         onValueChange={onValueChange}
