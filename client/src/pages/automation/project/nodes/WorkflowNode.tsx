@@ -68,10 +68,6 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         }
     };
 
-    const handleEditNodeClick = () => {
-        setShowEditNodeDialog(true);
-    };
-
     const nodes = getNodes();
 
     let isFirstNode;
@@ -95,7 +91,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                             className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
                             displayType="icon"
                             icon={<PencilIcon className="h-4 w-4" />}
-                            onClick={handleEditNodeClick}
+                            onClick={() => setShowEditNodeDialog(true)}
                             title="Edit a node"
                         />
                     ) : (

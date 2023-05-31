@@ -1,7 +1,6 @@
 import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';
 import {
