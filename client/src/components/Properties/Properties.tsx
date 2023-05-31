@@ -127,6 +127,7 @@ export const Property = ({
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    required={required}
                     title={type}
                     type={hidden ? 'hidden' : 'text'}
                 />
@@ -150,6 +151,7 @@ export const Property = ({
                             setIntegerValue(value);
                         }
                     }}
+                    required={required}
                     title={type}
                     type={hidden ? 'hidden' : 'text'}
                     value={integerValue}
@@ -166,6 +168,7 @@ export const Property = ({
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    required={required}
                     title={type}
                     type={hidden ? 'hidden' : 'number'}
                 />
@@ -181,6 +184,7 @@ export const Property = ({
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    required={required}
                     title={type}
                     type={hidden ? 'hidden' : 'password'}
                 />
@@ -196,6 +200,7 @@ export const Property = ({
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    required={required}
                     title={type}
                     type={hidden ? 'hidden' : 'date'}
                 />
@@ -211,6 +216,7 @@ export const Property = ({
                     label={label || name}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     name={name!}
+                    required={required}
                     title={type}
                     type={hidden ? 'hidden' : 'datetime-local'}
                 />
