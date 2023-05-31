@@ -61,7 +61,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public Connection getConnection(long id) {
-        return OptionalUtils.get(connectionRepository.findById(id));
+        return OptionalUtils.get(connectionRepository.findById(id), "Connection does not exist for id=" + id);
     }
 
     @Override
