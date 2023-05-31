@@ -19,10 +19,10 @@ package com.bytechef.hermes.scheduler.config;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.InstantUtils;
-import com.bytechef.hermes.scheduler.constant.TriggerSchedulerConstants;
-import com.bytechef.hermes.scheduler.data.PollScheduleAndData;
-import com.bytechef.hermes.scheduler.data.ExecuteWorkflowScheduleAndData;
-import com.bytechef.hermes.scheduler.executor.TriggerSchedulerExecutor;
+import com.bytechef.hermes.scheduler.trigger.constant.TriggerSchedulerConstants;
+import com.bytechef.hermes.scheduler.trigger.data.PollingTriggerScheduleAndData;
+import com.bytechef.hermes.scheduler.trigger.data.ScheduleTriggerScheduleAndData;
+import com.bytechef.hermes.scheduler.trigger.executor.TriggerSchedulerExecutor;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Execution;
@@ -48,15 +48,15 @@ public class TriggerSchedulerConfiguration {
     }
 
     @Bean
-    Task<ExecuteWorkflowScheduleAndData> executeWorkflowTask() {
-        return Tasks.recurringWithPersistentSchedule(TriggerSchedulerConstants.TRIGGER_EXECUTE_WORKFLOW_RECURRING_TASK)
-            .execute((TaskInstance<ExecuteWorkflowScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
+    Task<ScheduleTriggerScheduleAndData> scheduleTriggerTask() {
+        return Tasks.recurringWithPersistentSchedule(TriggerSchedulerConstants.SCHEDULE_TRIGGER_RECURRING_TASK)
+            .execute((TaskInstance<ScheduleTriggerScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
                 Execution execution = executionContext.getExecution();
                 Instant executionTime = execution.getExecutionTime();
 
-                ExecuteWorkflowScheduleAndData executeWorkflowScheduleAndData = taskInstance.getData();
+                ScheduleTriggerScheduleAndData scheduleTriggerScheduleAndData = taskInstance.getData();
 
-                ExecuteWorkflowScheduleAndData.Data data = executeWorkflowScheduleAndData.getData();
+                ScheduleTriggerScheduleAndData.Data data = scheduleTriggerScheduleAndData.getData();
 
                 TriggerSchedulerExecutor triggerSchedulerExecutor = applicationContext.getBean(
                     TriggerSchedulerExecutor.class);
@@ -68,10 +68,10 @@ public class TriggerSchedulerConfiguration {
     }
 
     @Bean
-    Task<PollScheduleAndData> pollTask() {
-        return Tasks.recurringWithPersistentSchedule(TriggerSchedulerConstants.TRIGGER_POLL_RECURRING_TASK)
-            .execute((TaskInstance<PollScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
-                PollScheduleAndData triggerScheduleAndData = taskInstance.getData();
+    Task<PollingTriggerScheduleAndData> pollingTriggerTask() {
+        return Tasks.recurringWithPersistentSchedule(TriggerSchedulerConstants.POLLING_TRIGGER_RECURRING_TASK)
+            .execute((TaskInstance<PollingTriggerScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
+                PollingTriggerScheduleAndData triggerScheduleAndData = taskInstance.getData();
 
                 TriggerSchedulerExecutor scheduledTriggerExecutor = applicationContext.getBean(
                     TriggerSchedulerExecutor.class);
@@ -81,8 +81,8 @@ public class TriggerSchedulerConfiguration {
     }
 
     @Bean
-    Task<WorkflowExecutionId> refreshDynamicWebhookTask() {
-        return Tasks.oneTime(TriggerSchedulerConstants.TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK)
+    Task<WorkflowExecutionId> dynamicWebhookTriggerRefreshTask() {
+        return Tasks.oneTime(TriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_ONE_TIME_TASK)
             .execute((taskInstance, executionContext) -> {
                 WorkflowExecutionId workflowExecutionId = taskInstance.getData();
 
@@ -97,7 +97,7 @@ public class TriggerSchedulerConfiguration {
                     SchedulerClient schedulerClient = executionContext.getSchedulerClient();
 
                     schedulerClient.reschedule(
-                        TriggerSchedulerConstants.TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK.instance(
+                        TriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_ONE_TIME_TASK.instance(
                             workflowExecutionId.toString(), workflowExecutionId),
                         InstantUtils.getInstant(webhookExpirationDate));
                 }

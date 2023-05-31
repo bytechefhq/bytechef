@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.constant;
+package com.bytechef.hermes.scheduler.trigger.constant;
 
-import com.bytechef.hermes.scheduler.data.PollScheduleAndData;
-import com.bytechef.hermes.scheduler.data.ExecuteWorkflowScheduleAndData;
+import com.bytechef.hermes.scheduler.trigger.data.PollingTriggerScheduleAndData;
+import com.bytechef.hermes.scheduler.trigger.data.ScheduleTriggerScheduleAndData;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
 
@@ -27,15 +27,15 @@ import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
  */
 public class TriggerSchedulerConstants {
 
-    public static final TaskWithDataDescriptor<PollScheduleAndData> TRIGGER_POLL_RECURRING_TASK =
+    public static final TaskWithDataDescriptor<PollingTriggerScheduleAndData> POLLING_TRIGGER_RECURRING_TASK =
         new TaskWithDataDescriptor<>(
-            "trigger-poll-recurring-task", PollScheduleAndData.class);
+            "trigger-poll-recurring-task", PollingTriggerScheduleAndData.class);
 
-    public static final TaskWithDataDescriptor<WorkflowExecutionId> TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK =
+    public static final TaskWithDataDescriptor<WorkflowExecutionId> DYNAMIC_WEBHOOK_TRIGGER_REFRESH_ONE_TIME_TASK =
         new TaskWithDataDescriptor<>(
             "trigger-refresh-dynamic-webhook-recurring-task", WorkflowExecutionId.class);
 
-    public static final TaskWithDataDescriptor<ExecuteWorkflowScheduleAndData> TRIGGER_EXECUTE_WORKFLOW_RECURRING_TASK =
+    public static final TaskWithDataDescriptor<ScheduleTriggerScheduleAndData> SCHEDULE_TRIGGER_RECURRING_TASK =
         new TaskWithDataDescriptor<>(
-            "trigger-execute-workflow-recurring-task", ExecuteWorkflowScheduleAndData.class);
+            "trigger-execute-workflow-recurring-task", ScheduleTriggerScheduleAndData.class);
 }
