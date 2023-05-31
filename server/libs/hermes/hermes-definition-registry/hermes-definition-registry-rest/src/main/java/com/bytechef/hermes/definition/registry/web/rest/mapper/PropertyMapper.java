@@ -43,7 +43,6 @@ import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyMod
 import com.bytechef.hermes.definition.registry.web.rest.model.NullPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
@@ -160,8 +159,6 @@ public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, P
     StringPropertyModel map(StringPropertyDTO stringProperty);
 
     TimePropertyModel map(TimePropertyDTO timeProperty);
-
-    OptionModel map(OptionDTO option);
 
     default List<PropertyModel> map(List<? extends PropertyDTO> properties) {
         if (CollectionUtils.isEmpty(properties)) {
