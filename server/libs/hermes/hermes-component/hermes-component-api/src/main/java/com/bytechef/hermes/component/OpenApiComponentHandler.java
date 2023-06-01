@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.bytechef.hermes.definition.Property.InputProperty;
 
@@ -112,10 +113,10 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
     /**
      *
      * @param actionDefinition
-     * @param result
+     * @param response
      * @return
      */
-    default Object postExecute(ActionDefinition actionDefinition, Object result) {
-        return result;
+    default Response postExecute(ActionDefinition actionDefinition, Response response) {
+        return response;
     }
 }

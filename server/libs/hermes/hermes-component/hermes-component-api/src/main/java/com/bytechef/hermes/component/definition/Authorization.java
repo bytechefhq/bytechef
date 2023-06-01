@@ -360,6 +360,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
     }
 
     interface AuthorizationContext {
+
         void setHeaders(Map<String, List<String>> headers);
 
         void setQueryParameters(Map<String, List<String>> queryParameters);
