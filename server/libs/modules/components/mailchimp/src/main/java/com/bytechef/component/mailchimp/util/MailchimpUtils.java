@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.definition.Authorization.AUTHORIZATION;
@@ -45,19 +44,18 @@ public class MailchimpUtils {
         Map<?, ?> response = (Map<?, ?>) HttpClientUtils
             .get("https://login.mailchimp.com/oauth2/metadata")
             .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
-            .headers(Map.of(AUTHORIZATION, List.of("OAuth " + accessToken)))
+            .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
             .body();
 
         return (String) response.get("dc");
     }
 
-    @SuppressWarnings("unchecked")
     public static ComponentOptionsFunction getListIdOptions() {
         return (connection, inputParameters) -> {
             String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
 
-            Map<?, ?> response = (Map<?, ?>) HttpClientUtils
+            Map<String, ?> response = HttpClientUtils
                 .get("https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken)))
                 .header("Authorization", "Bearer " + accessToken)
                 .queryParameters(
@@ -66,17 +64,15 @@ public class MailchimpUtils {
                         "count", List.of("1000")))
                 .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
                 .execute()
-                .body();
+                .getBody();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Response" + response);
+                logger.debug("Response for path='/lists': " + response);
             }
-
-            Objects.requireNonNull(response.get("lists"), "'lists' must not be null");
 
             List<Option<?>> options = new ArrayList<>();
 
-            for (Map<?, ?> list : (List<Map<?, ?>>) response.get("lists")) {
+            for (Map<?, ?> list : MapValueUtils.getRequiredList(response, "lists", Map.class)) {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 

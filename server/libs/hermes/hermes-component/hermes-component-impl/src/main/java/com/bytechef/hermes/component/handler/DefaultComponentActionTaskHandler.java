@@ -55,7 +55,7 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
             taskExecution.getId());
 
         return ComponentContextSupplier.get(
-            context, componentHandler.getDefinition(),
+            context,
             () -> {
                 try {
                     return actionDefinition.getPerform()

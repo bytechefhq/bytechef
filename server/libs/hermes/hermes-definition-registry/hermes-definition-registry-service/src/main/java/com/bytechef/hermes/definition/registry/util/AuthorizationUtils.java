@@ -24,7 +24,9 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationConte
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,10 +62,20 @@ public class AuthorizationUtils {
                 }
             };
             case BASIC_AUTH, DIGEST_AUTH -> (
-                Map<String, ?> connectionInputParameters,
-                AuthorizationContext authorizationContext) -> authorizationContext.setUsernamePassword(
-                    MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME),
-                    MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD));
+                Map<String, ?> connectionInputParameters, AuthorizationContext authorizationContext) -> {
+
+                final Base64.Encoder ENCODER = Base64.getEncoder();
+
+                String valueToEncode =
+                    MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME) +
+                        ":" +
+                        MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD);
+
+                authorizationContext.setHeaders(
+                    Map.of(
+                        "Authorization",
+                        List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
+            };
             case BEARER_TOKEN -> (
                 Map<String, ?> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext.setHeaders(

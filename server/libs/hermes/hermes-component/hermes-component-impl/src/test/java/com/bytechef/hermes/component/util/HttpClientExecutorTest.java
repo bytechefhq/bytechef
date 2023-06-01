@@ -185,7 +185,7 @@ public class HttpClientExecutorTest {
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testCreateHTTPClient() {
         HttpClient httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
-            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.allowUnauthorizedCerts(true));
+            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.allowUnauthorizedCerts(true));
 
         Assertions.assertTrue(httpClient.authenticator()
             .isEmpty());
@@ -206,7 +206,7 @@ public class HttpClientExecutorTest {
 
         Map<String, List<String>> headers = new HashMap<>();
 
-        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
@@ -225,7 +225,7 @@ public class HttpClientExecutorTest {
         Map<String, List<String>> queryParameters = new HashMap<>();
 
         HTTP_CLIENT_EXECUTOR.createHttpClient(
-            context, null, new HashMap<>(), queryParameters, Configuration.configuration());
+            context, new HashMap<>(), queryParameters, Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
 
@@ -242,7 +242,7 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(
             Map.of(
@@ -263,7 +263,7 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
@@ -280,7 +280,7 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(
             Map.of(
@@ -300,28 +300,28 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        HTTP_CLIENT_EXECUTOR.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
+        HTTP_CLIENT_EXECUTOR.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
         //
 
         httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
-            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.followRedirect(true));
+            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.followRedirect(true));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
         httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
-            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.followAllRedirects(true));
+            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.followAllRedirects(true));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
         httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
-            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.proxy("10.11.12.13:30"));
+            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.proxy("10.11.12.13:30"));
 
         Assertions.assertTrue(httpClient.proxy()
             .isPresent());
@@ -329,7 +329,7 @@ public class HttpClientExecutorTest {
         //
 
         httpClient = HTTP_CLIENT_EXECUTOR.createHttpClient(
-            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.timeout(Duration.ofMillis(2000)));
+            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.timeout(Duration.ofMillis(2000)));
 
         Assertions.assertEquals(
             Duration.ofMillis(2000), httpClient.connectTimeout()

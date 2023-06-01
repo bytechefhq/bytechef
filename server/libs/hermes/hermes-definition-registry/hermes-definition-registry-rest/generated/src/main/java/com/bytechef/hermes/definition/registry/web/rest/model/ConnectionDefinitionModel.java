@@ -28,8 +28,6 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-29T17:06:55.745507+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
 
-  private Boolean authorizationRequired;
-
   @Valid
   private List<@Valid AuthorizationModel> authorizations;
 
@@ -63,26 +61,6 @@ public class ConnectionDefinitionModel {
     this.version = version;
   }
 
-  public ConnectionDefinitionModel authorizationRequired(Boolean authorizationRequired) {
-    this.authorizationRequired = authorizationRequired;
-    return this;
-  }
-
-  /**
-   * If connection requires an authorization to be configured or not.
-   * @return authorizationRequired
-  */
-  
-  @Schema(name = "authorizationRequired", description = "If connection requires an authorization to be configured or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("authorizationRequired")
-  public Boolean getAuthorizationRequired() {
-    return authorizationRequired;
-  }
-
-  public void setAuthorizationRequired(Boolean authorizationRequired) {
-    this.authorizationRequired = authorizationRequired;
-  }
-
   public ConnectionDefinitionModel authorizations(List<@Valid AuthorizationModel> authorizations) {
     this.authorizations = authorizations;
     return this;
@@ -100,7 +78,7 @@ public class ConnectionDefinitionModel {
    * Get authorizations
    * @return authorizations
   */
-  @Valid 
+  @Valid
   @Schema(name = "authorizations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizations")
   public List<@Valid AuthorizationModel> getAuthorizations() {
@@ -120,7 +98,7 @@ public class ConnectionDefinitionModel {
    * Defines the base URI for all future HTTP requests.
    * @return baseUri
   */
-  
+
   @Schema(name = "baseUri", description = "Defines the base URI for all future HTTP requests.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("baseUri")
   public String getBaseUri() {
@@ -140,7 +118,7 @@ public class ConnectionDefinitionModel {
    * The description used from the connection's component.
    * @return componentDescription
   */
-  
+
   @Schema(name = "componentDescription", description = "The description used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentDescription")
   public String getComponentDescription() {
@@ -160,7 +138,7 @@ public class ConnectionDefinitionModel {
    * The connection name used from the connection's component.
    * @return componentName
   */
-  @NotNull 
+  @NotNull
   @Schema(name = "componentName", description = "The connection name used from the connection's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
@@ -188,7 +166,7 @@ public class ConnectionDefinitionModel {
    * The properties of the connection.
    * @return properties
   */
-  @Valid 
+  @Valid
   @Schema(name = "properties", description = "The properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
   public List<@Valid PropertyModel> getProperties() {
@@ -208,7 +186,7 @@ public class ConnectionDefinitionModel {
    * The title used from the connection's component.
    * @return componentTitle
   */
-  
+
   @Schema(name = "componentTitle", description = "The title used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentTitle")
   public String getComponentTitle() {
@@ -228,7 +206,7 @@ public class ConnectionDefinitionModel {
    * The version of a connection.
    * @return version
   */
-  @NotNull 
+  @NotNull
   @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")
   public Integer getVersion() {
@@ -248,8 +226,7 @@ public class ConnectionDefinitionModel {
       return false;
     }
     ConnectionDefinitionModel connectionDefinition = (ConnectionDefinitionModel) o;
-    return Objects.equals(this.authorizationRequired, connectionDefinition.authorizationRequired) &&
-        Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
+    return Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
         Objects.equals(this.baseUri, connectionDefinition.baseUri) &&
         Objects.equals(this.componentDescription, connectionDefinition.componentDescription) &&
         Objects.equals(this.componentName, connectionDefinition.componentName) &&
@@ -260,14 +237,13 @@ public class ConnectionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationRequired, authorizations, baseUri, componentDescription, componentName, properties, componentTitle, version);
+    return Objects.hash(authorizations, baseUri, componentDescription, componentName, properties, componentTitle, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionDefinitionModel {\n");
-    sb.append("    authorizationRequired: ").append(toIndentedString(authorizationRequired)).append("\n");
     sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
     sb.append("    baseUri: ").append(toIndentedString(baseUri)).append("\n");
     sb.append("    componentDescription: ").append(toIndentedString(componentDescription)).append("\n");

@@ -43,8 +43,8 @@ public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentActionTaskHandler(
-        ActionDefinition actionDefinition,
-        ContextFactory contextFactory, OpenApiComponentHandler openApiComponentHandler) {
+        ActionDefinition actionDefinition, ContextFactory contextFactory,
+        OpenApiComponentHandler openApiComponentHandler) {
 
         this.actionDefinition = actionDefinition;
         this.contextFactory = contextFactory;
@@ -58,7 +58,7 @@ public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
             taskExecution.getId());
 
         return ComponentContextSupplier.get(
-            context, openApiComponentHandler.getDefinition(),
+            context,
             () -> {
                 try {
                     return openApiComponentHandler.postExecute(

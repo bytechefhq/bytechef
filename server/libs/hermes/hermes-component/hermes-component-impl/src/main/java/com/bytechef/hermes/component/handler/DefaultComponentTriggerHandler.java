@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.handler;
 
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -63,17 +62,14 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private static final String METHOD = "method";
     private static final String PARAMETERS = "parameters";
 
-    private final ComponentDefinitionFactory componentDefinitionFactory;
     private final ContextFactory contextFactory;
     private final DataStorageService dataStorageService;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerHandler(
-        ComponentDefinitionFactory componentDefinitionFactory, ContextFactory contextFactory,
-        DataStorageService dataStorageService, TriggerDefinition triggerDefinition) {
+        ContextFactory contextFactory, DataStorageService dataStorageService, TriggerDefinition triggerDefinition) {
 
-        this.componentDefinitionFactory = componentDefinitionFactory;
         this.contextFactory = contextFactory;
         this.dataStorageService = dataStorageService;
         this.triggerDefinition = triggerDefinition;
@@ -84,8 +80,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
         TriggerContext context = contextFactory.createTriggerContext(
             MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
 
-        return ComponentContextSupplier.get(
-            context, componentDefinitionFactory.getDefinition(), () -> doHandle(triggerExecution, context));
+        return ComponentContextSupplier.get(context, () -> doHandle(triggerExecution, context));
     }
 
     private Object doHandle(TriggerExecution triggerExecution, TriggerContext triggerContext)
