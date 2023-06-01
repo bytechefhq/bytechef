@@ -112,7 +112,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String searchText) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getActionProperty(propertyName, actionName, componentName, componentVersion);
@@ -124,7 +125,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters)
+            actionParameters, searchText)
             .stream()
             .map(OptionDTO::new)
             .toList();

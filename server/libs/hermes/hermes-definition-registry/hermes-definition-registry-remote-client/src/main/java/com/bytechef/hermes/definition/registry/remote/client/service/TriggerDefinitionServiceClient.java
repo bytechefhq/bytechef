@@ -139,7 +139,8 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String searchText) {
 
         throw new UnsupportedOperationException();
     }

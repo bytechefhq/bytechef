@@ -198,7 +198,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String searchText) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getTriggerProperty(propertyName, triggerName, componentName, componentVersion);
@@ -210,7 +211,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters)
+            triggerParameters, searchText)
             .stream()
             .map(OptionDTO::new)
             .toList();
