@@ -315,6 +315,11 @@ paths:
         in: "path"
         schema:
           type: "string"
+      - name: "searchText"
+        description: "Optional search text used to filter option items"
+        in: "query"
+        schema:
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -692,6 +697,11 @@ paths:
         in: "path"
         schema:
           type: "string"
+      - name: "searchText"
+        description: "Optional search text used to filter option items"
+        in: "query"
+        schema:
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -1038,10 +1048,6 @@ components:
       - "componentName"
       - "version"
       properties:
-        authorizationRequired:
-          description: "If connection requires an authorization to be configured or\
-            \ not."
-          type: "boolean"
         authorizations:
           type: "array"
           items:
