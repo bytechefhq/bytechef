@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 
@@ -269,8 +270,7 @@ public class PipedriveNewDealTrigger {
         PipedriveUtils.unsubscribeWebhook(connection.getBaseUri(), (String) enableOutput.getParameter("id"));
     }
 
-    private static DynamicWebhookEnableOutput
-        dynamicWebhookEnable(TriggerDefinition.DynamicWebhookEnableContext context) {
+    private static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
         Connection connection = context.connection();
 
         return new DynamicWebhookEnableOutput(
