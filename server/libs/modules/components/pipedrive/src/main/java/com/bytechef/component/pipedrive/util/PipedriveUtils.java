@@ -17,18 +17,29 @@
 
 package com.bytechef.component.pipedrive.util;
 
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.definition.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 /**
  * @author Ivica Cardic
  */
 public class PipedriveUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(PipedriveUtils.class);
 
     public static String subscribeWebhook(String serverUrl, String eventObject, String eventAction, String webhookUrl) {
         Map<?, ?> result = (Map<?, ?>) HttpClientUtils
@@ -51,5 +62,34 @@ public class PipedriveUtils {
             .delete("%s/api/v1/webhooks/%s".formatted(serverUrl, webhookId))
             .configuration(responseFormat(ResponseFormat.JSON))
             .execute();
+    }
+
+    public static ComponentOptionsFunction getOptions(String path, String dependsOn) {
+        return (connection, inputParameters, searchText) -> {
+            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
+
+            Map<String, ?> response = HttpClientUtils
+                .get(connection.getBaseUri() + path)
+                .header("Authorization", "Bearer " + accessToken)
+                .queryParameters(
+                    dependsOn == null
+                        ? Map.of()
+                        : Map.of(dependsOn, List.of(MapValueUtils.getString(inputParameters, dependsOn, ""))))
+                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .execute()
+                .getBody();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response for path='%s': ".formatted(path) + response);
+            }
+
+            List<Option<?>> options = new ArrayList<>();
+
+            for (Map<?, ?> list : MapValueUtils.getRequiredList(response, "data", Map.class)) {
+                options.add(option((String) list.get("name"), list.get("id")));
+            }
+
+            return options;
+        };
     }
 }
