@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +67,7 @@ public class ConnectionDefinitionServiceController {
 
         connectionDefinitionService.executeAuthorizationApply(
             connection.componentName, connection.connectionVersion, connection.parameters, connection.authorizationName,
-            new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()));
+            new AuthorizationContextImpl(headers, queryParameters));
 
         return ResponseEntity.ok(Map.of("headers", headers, "queryParameters", queryParameters));
     }
@@ -173,11 +171,8 @@ public class ConnectionDefinitionServiceController {
             connection.authorizationName));
     }
 
-    record AuthorizationContextImpl(
-        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> body)
-        implements Authorization.AuthorizationContext {
-
-        private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    record AuthorizationContextImpl(Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
+        implements AuthorizationContext {
 
         @Override
         public void setHeaders(Map<String, List<String>> headers) {
@@ -187,20 +182,6 @@ public class ConnectionDefinitionServiceController {
         @Override
         public void setQueryParameters(Map<String, List<String>> queryParameters) {
             this.queryParameters.putAll(queryParameters);
-        }
-
-        @Override
-        public void setBody(Map<String, String> body) {
-            this.body.putAll(body);
-        }
-
-        @Override
-        public void setUsernamePassword(String username, String password) {
-            String valueToEncode = username + ":" + password;
-
-            headers.put(
-                "Authorization",
-                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
         }
     }
 

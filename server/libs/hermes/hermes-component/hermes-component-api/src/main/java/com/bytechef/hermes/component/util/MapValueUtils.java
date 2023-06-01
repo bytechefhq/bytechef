@@ -633,6 +633,14 @@ public class MapValueUtils {
         return mapValueReader.getRequiredLocalTime(map, key);
     }
 
+    public static List<?> getRequiredList(Map<String, ?> map, String key) {
+        return mapValueReader.getRequiredList(map, key);
+    }
+
+    public static <T> List<T> getRequiredList(Map<String, ?> map, String key, Class<T> elementType) {
+        return mapValueReader.getRequiredList(map, key, elementType);
+    }
+
     /**
      *
      * @param map

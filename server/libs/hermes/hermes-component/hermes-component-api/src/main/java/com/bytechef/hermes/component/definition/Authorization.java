@@ -364,10 +364,6 @@ public sealed interface Authorization permits ModifiableAuthorization {
         void setHeaders(Map<String, List<String>> headers);
 
         void setQueryParameters(Map<String, List<String>> queryParameters);
-
-        void setBody(Map<String, String> body);
-
-        void setUsernamePassword(String username, String password);
     }
 
     record Pkce(String verifier, String challenge, String challengeMethod) {

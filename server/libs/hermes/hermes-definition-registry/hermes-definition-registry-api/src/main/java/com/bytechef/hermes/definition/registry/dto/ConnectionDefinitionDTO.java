@@ -32,12 +32,11 @@ import java.util.Optional;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDefinitionDTO(
-    boolean authorizationRequired, List<AuthorizationDTO> authorizations, Optional<String> componentDescription,
+    List<AuthorizationDTO> authorizations, Optional<String> componentDescription,
     String componentName, String componentTitle, List<? extends PropertyDTO> properties, int version) {
 
     public ConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
         this(
-            connectionDefinition.isAuthorizationRequired(),
             toAuthorizationDTOs(
                 OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList())),
             connectionDefinition.getComponentDescription(), connectionDefinition.getComponentName(),

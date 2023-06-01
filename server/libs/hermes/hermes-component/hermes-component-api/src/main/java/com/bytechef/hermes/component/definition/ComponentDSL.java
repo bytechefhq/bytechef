@@ -865,7 +865,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private boolean authorizationRequired = true;
         private List<? extends ModifiableAuthorization> authorizations;
         private BaseUriFunction baseUri;
         private String componentName;
@@ -887,12 +886,6 @@ public final class ComponentDSL extends DefinitionDSL {
             }
 
             ((List) this.properties).add(property);
-
-            return this;
-        }
-
-        public ModifiableConnectionDefinition authorizationRequired(boolean authorizationRequired) {
-            this.authorizationRequired = authorizationRequired;
 
             return this;
         }
@@ -935,11 +928,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public boolean containsAuthorizations() {
             return authorizations != null && !authorizations.isEmpty();
-        }
-
-        @Override
-        public boolean isAuthorizationRequired() {
-            return authorizationRequired && containsAuthorizations();
         }
 
         @Override
