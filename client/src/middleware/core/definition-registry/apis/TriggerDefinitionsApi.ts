@@ -72,6 +72,7 @@ export interface GetComponentTriggerPropertyOptionsRequest {
     componentVersion: number;
     triggerName: string;
     propertyName: string;
+    searchText?: string;
     componentOperationRequestModel?: ComponentOperationRequestModel;
 }
 
@@ -322,6 +323,10 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.searchText !== undefined) {
+            queryParameters['searchText'] = requestParameters.searchText;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
