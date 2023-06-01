@@ -35,5 +35,5 @@ public interface ComponentOptionsFunction extends OptionsDataSource.OptionsFunct
      * @param inputParameters
      * @return
      */
-    List<Option<?>> apply(Context.Connection connection, Map<String, ?> inputParameters);
+    List<Option<?>> apply(Context.Connection connection, Map<String, ?> inputParameters, String searchText);
 }

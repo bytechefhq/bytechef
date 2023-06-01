@@ -39,7 +39,8 @@ public interface ActionDefinitionService {
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters);
+        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,

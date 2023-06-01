@@ -57,7 +57,8 @@ public interface TriggerDefinitionService {
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters);
+        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,

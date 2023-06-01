@@ -31,7 +31,7 @@ public interface ActionDefinitionFacade {
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId);
+        Map<String, Object> actionParameters, long connectionId, String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
