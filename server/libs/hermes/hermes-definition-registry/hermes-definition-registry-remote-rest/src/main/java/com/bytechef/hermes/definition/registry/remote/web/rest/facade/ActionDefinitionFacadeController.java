@@ -52,10 +52,13 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
+    public ResponseEntity<String> executeEditorDescription(
+        @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
+
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
-            editorDescription.componentName, editorDescription.componentVersion, editorDescription.actionName,
-            editorDescription.actionParameters, editorDescription.connectionId));
+            editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
+            editorDescriptionRequest.actionName, editorDescriptionRequest.actionParameters,
+            editorDescriptionRequest.connectionId));
     }
 
     @RequestMapping(
@@ -64,12 +67,13 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<OptionDTO>> executeOptions(@Valid @RequestBody Options options) {
+    public ResponseEntity<List<OptionDTO>> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
-                options.componentName, options.componentVersion, options.actionName, options.propertyName,
-                options.actionParameters, options.connectionId));
+                optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
+                optionsRequest.propertyName, optionsRequest.actionParameters, optionsRequest.connectionId,
+                optionsRequest.searchText));
     }
 
     @RequestMapping(
@@ -78,13 +82,13 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValuePropertyDTO<?>>>
-        executeProperties(@Valid @RequestBody Properties properties) {
+    public ResponseEntity<List<? extends ValuePropertyDTO<?>>> executeProperties(
+        @Valid @RequestBody PropertiesRequest propertiesRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
-                properties.componentName, properties.componentVersion, properties.actionName, properties.propertyName,
-                properties.actionParameters, properties.connectionId));
+                propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
+                propertiesRequest.propertyName, propertiesRequest.actionParameters, propertiesRequest.connectionId));
     }
 
     @RequestMapping(
@@ -93,13 +97,13 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValuePropertyDTO<?>>>
-        executeOutputSchema(@Valid @RequestBody OutputSchema outputSchema) {
+    public ResponseEntity<List<? extends ValuePropertyDTO<?>>> executeOutputSchema(
+        @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOutputSchema(
-                outputSchema.componentName, outputSchema.componentVersion, outputSchema.actionName,
-                outputSchema.actionParameters, outputSchema.connectionId));
+                outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.actionName,
+                outputSchemaRequest.actionParameters, outputSchemaRequest.connectionId));
     }
 
     @RequestMapping(
@@ -108,35 +112,34 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<Object> executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
+    public ResponseEntity<Object> executeSampleOutput(@Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeSampleOutput(
-                sampleOutput.actionName, sampleOutput.componentName, sampleOutput.componentVersion,
-                sampleOutput.actionParameters, sampleOutput.connectionId));
+                sampleOutputRequest.actionName, sampleOutputRequest.componentName, sampleOutputRequest.componentVersion,
+                sampleOutputRequest.actionParameters, sampleOutputRequest.connectionId));
     }
 
-    private record EditorDescription(
+    private record EditorDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, long connectionId) {
     }
 
-    private record Options(
+    private record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> actionParameters,
-        long connectionId) {
+        Map<String, Object> actionParameters, long connectionId, String searchText) {
     }
 
-    private record OutputSchema(
+    private record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, long connectionId) {
     }
 
-    private record Properties(
+    private record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         @NotNull String propertyName, Map<String, Object> actionParameters, long connectionId) {
     }
 
-    private record SampleOutput(
+    private record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, long connectionId) {
     }

@@ -52,7 +52,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-disable"))
             .bodyValue(
-                new DynamicWebhookDisable(
+                new DynamicWebhookDisableRequest(
                     authorizationName, componentName, componentVersion, connectionParameters, output, triggerName,
                     triggerParameters, workflowExecutionId))
             .retrieve()
@@ -71,7 +71,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-enable"))
             .bodyValue(
-                new DynamicWebhookEnable(
+                new DynamicWebhookEnableRequest(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
                     triggerParameters, webhookUrl, workflowExecutionId))
             .retrieve()
@@ -110,7 +110,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-listener-disable"))
             .bodyValue(
-                new ListenerDisable(
+                new ListenerDisableRequest(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
                     triggerParameters, workflowExecutionId))
             .retrieve()
@@ -128,7 +128,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-listener-enable"))
             .bodyValue(
-                new ListenerEnable(
+                new ListenerEnableRequest(
                     authorizationName, componentName, componentVersion, connectionParameters, triggerName,
                     triggerParameters, workflowExecutionId))
             .retrieve()
@@ -195,13 +195,13 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .block();
     }
 
-    private record DynamicWebhookDisable(
+    private record DynamicWebhookDisableRequest(
         String authorizationName, String componentName, int componentVersion,
         Map<String, ?> connectionParameters, DynamicWebhookEnableOutput output, String triggerName,
         Map<String, ?> triggerParameters, String workflowExecutionId) {
     }
 
-    private record DynamicWebhookEnable(
+    private record DynamicWebhookEnableRequest(
         String authorizationName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
         String triggerName, Map<String, ?> triggerParameters, String webhookUrl, String workflowExecutionId) {
     }
@@ -210,12 +210,12 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
         String componentName, int componentVersion, DynamicWebhookEnableOutput output, String triggerName) {
     }
 
-    private record ListenerDisable(
+    private record ListenerDisableRequest(
         String authorizationName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
         String triggerName, Map<String, ?> triggerParameters, String workflowExecutionId) {
     }
 
-    private record ListenerEnable(
+    private record ListenerEnableRequest(
         String authorizationName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
         String triggerName, Map<String, ?> triggerParameters, String workflowExecutionId) {
     }

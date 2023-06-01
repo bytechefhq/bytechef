@@ -47,7 +47,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             .uri(uriBuilder -> toUri(uriBuilder, componentName,
                 "/trigger-definition-service/execute-editor-description"))
             .bodyValue(
-                new EditorDescription(
+                new EditorDescriptionRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
             .retrieve()
             .bodyToMono(String.class)
@@ -63,7 +63,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-options"))
             .bodyValue(
-                new Options(
+                new OptionsRequest(
                     triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
                     searchText))
             .retrieve()
@@ -80,7 +80,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-output-schema"))
             .bodyValue(
-                new OutputSchema(
+                new OutputSchemaRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
@@ -96,7 +96,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-properties"))
             .bodyValue(
-                new Properties(
+                new PropertiesRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
@@ -112,35 +112,35 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-sample-output"))
             .bodyValue(
-                new SampleOutput(
+                new SampleOutputRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
             .retrieve()
             .bodyToMono(Object.class)
             .block();
     }
 
-    private record EditorDescription(
+    private record EditorDescriptionRequest(
         String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
         long connectionId) {
     }
 
-    private record Options(
+    private record OptionsRequest(
         String triggerName, String propertyName, Map<String, Object> triggerParameters,
         String componentName, int componentVersion, long connectionId, String searchText) {
     }
 
-    private record OutputSchema(
+    private record OutputSchemaRequest(
         String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
         long connectionId) {
 
     }
 
-    private record Properties(
+    private record PropertiesRequest(
         String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
         long connectionId, String propertyName) {
     }
 
-    private record SampleOutput(
+    private record SampleOutputRequest(
         String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
         long connectionId) {
     }
