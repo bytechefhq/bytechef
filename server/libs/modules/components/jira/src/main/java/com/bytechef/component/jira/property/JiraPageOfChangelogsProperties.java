@@ -21,7 +21,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -30,9 +30,10 @@ import java.util.List;
  * @generated
  */
 public class JiraPageOfChangelogsProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(integer("startAt").label("Start At")
-        .description("The index of the first item returned on the page.")
-        .required(false),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        integer("startAt").label("Start At")
+            .description("The index of the first item returned on the page.")
+            .required(false),
         integer("maxResults").label("Max Results")
             .description("The maximum number of results that could be on the page.")
             .required(false),

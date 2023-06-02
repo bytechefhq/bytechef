@@ -19,7 +19,7 @@ package com.bytechef.component.jira.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -28,9 +28,10 @@ import java.util.List;
  * @generated
  */
 public class JiraAvatarUrlsBeanProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("16x16").label("16 X 16")
-        .description("The URL of the item's 16x16 pixel avatar.")
-        .required(false),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("16x16").label("16 X 16")
+            .description("The URL of the item's 16x16 pixel avatar.")
+            .required(false),
         string("24x24").label("24 X 24")
             .description("The URL of the item's 24x24 pixel avatar.")
             .required(false),
