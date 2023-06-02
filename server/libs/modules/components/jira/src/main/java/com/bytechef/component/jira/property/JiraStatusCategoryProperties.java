@@ -20,7 +20,7 @@ package com.bytechef.component.jira.property;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -29,9 +29,10 @@ import java.util.List;
  * @generated
  */
 public class JiraStatusCategoryProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("self").label("Self")
-        .description("The URL of the status category.")
-        .required(false),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("self").label("Self")
+            .description("The URL of the status category.")
+            .required(false),
         integer("id").label("Id")
             .description("The ID of the status category.")
             .required(false),

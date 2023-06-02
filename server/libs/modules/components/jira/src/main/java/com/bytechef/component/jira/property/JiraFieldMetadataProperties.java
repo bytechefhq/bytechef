@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -31,9 +31,10 @@ import java.util.List;
  * @generated
  */
 public class JiraFieldMetadataProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(bool("required").label("Required")
-        .description("Whether the field is required.")
-        .required(true),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        bool("required").label("Required")
+            .description("Whether the field is required.")
+            .required(true),
         object("schema").properties(JiraJsonTypeBeanProperties.PROPERTIES)
             .label("Schema")
             .description("The schema of a field.")

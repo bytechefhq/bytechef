@@ -21,7 +21,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -30,9 +30,10 @@ import java.util.List;
  * @generated
  */
 public class JiraUserDetailsProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("self").label("Self")
-        .description("The URL of the user.")
-        .required(false),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("self").label("Self")
+            .description("The URL of the user.")
+            .required(false),
         string("name").label("Name")
             .description(
                 "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.")
