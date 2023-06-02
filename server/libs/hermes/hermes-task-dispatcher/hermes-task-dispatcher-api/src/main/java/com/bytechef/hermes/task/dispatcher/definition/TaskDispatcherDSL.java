@@ -18,7 +18,10 @@
 package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
@@ -70,10 +73,10 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         private String description;
         private String icon;
         private final String name;
-        private List<? extends OutputProperty<?>> outputSchemaProperties;
-        private List<? extends InputProperty> properties;
+        private List<? extends ModifiableOutputProperty<?>> outputSchemaProperties;
+        private List<? extends ModifiableInputProperty> properties;
         private Resources resources;
-        private List<? extends ValueProperty<?>> taskProperties;
+        private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
         private String title;
         private int version = 1;
 
@@ -94,8 +97,15 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends OutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(P... properties) {
-            this.outputSchemaProperties = checkPropertyNames(properties == null ? List.of() : List.of(properties));
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        public final <P extends ModifiableOutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(
+            P... properties) {
+
+            if (properties != null) {
+                this.outputSchemaProperties = checkPropertyNames((List) List.of(properties));
+            }
 
             return this;
         }
@@ -121,7 +131,9 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends InputProperty> ModifiableTaskDispatcherDefinition properties(P... properties) {
+        public final <P extends ModifiableInputProperty> ModifiableTaskDispatcherDefinition properties(
+            P... properties) {
+
             this.properties = checkInputProperties(properties);
 
             return this;
@@ -140,7 +152,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends ValueProperty<?>> ModifiableTaskDispatcherDefinition taskProperties(
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition taskProperties(
             P... taskProperties) {
 
             this.taskProperties = List.of(taskProperties);

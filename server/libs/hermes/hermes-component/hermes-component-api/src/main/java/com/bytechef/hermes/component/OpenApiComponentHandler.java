@@ -21,10 +21,10 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
-import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,31 +45,31 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
 
     /**
      *
-     * @param actionDefinitions
      * @return
      */
-    default List<ActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        return Arrays.stream(actionDefinitions)
-            .map(this::modifyAction)
-            .map(actionDefinition -> {
-                InputProperty[] properties = actionDefinition.getProperties()
-                    .orElse(List.of())
-                    .stream()
-                    .map(property -> (InputProperty) modifyProperty(
-                        actionDefinition, (ModifiableProperty<?, ?>) property))
-                    .toArray(InputProperty[]::new);
-
-                return (ActionDefinition) actionDefinition.properties(properties);
-            })
-            .toList();
+    default List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of();
     }
 
     /**
      *
+     * @param actionDefinitions
      * @return
      */
-    default List<TriggerDefinition> getTriggers() {
-        return List.of();
+    default List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+        return Arrays.stream(actionDefinitions)
+            .map(this::modifyAction)
+            .map(actionDefinition -> {
+                ModifiableInputProperty[] properties = actionDefinition.getProperties()
+                    .orElse(List.of())
+                    .stream()
+                    .map(property -> (ModifiableInputProperty) modifyProperty(
+                        actionDefinition, (ModifiableProperty<?>) property))
+                    .toArray(ModifiableInputProperty[]::new);
+
+                return actionDefinition.properties(properties);
+            })
+            .toList();
     }
 
     /**
@@ -104,8 +104,8 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
      * @param property
      * @return
      */
-    default ModifiableProperty<?, ?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?, ?> property) {
+    default ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> property) {
 
         return property;
     }
