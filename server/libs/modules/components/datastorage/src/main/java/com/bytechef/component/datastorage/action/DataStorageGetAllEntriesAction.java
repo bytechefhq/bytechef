@@ -18,7 +18,7 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
@@ -39,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageGetAllEntriesAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("getAllEntries")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getAllEntries")
         .title("Get All Entries(Keys and Values)")
         .description(
             "Retrieve all the currently existing keys from storage, along with their values within the provided scope.")

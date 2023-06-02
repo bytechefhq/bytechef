@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
@@ -44,7 +44,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemWriteFileAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(WRITE_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE_FILE)
         .title("Write to file")
         .properties(
             fileEntry(FILE_ENTRY)

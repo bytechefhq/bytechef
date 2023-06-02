@@ -20,7 +20,7 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
@@ -39,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3GetUrlAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(GET_URL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_URL)
         .title("Get URL")
         .description("Get the url of an AWS S3 object.")
         .properties(

@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.File;
@@ -35,7 +35,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
  */
 public class FilesystemCreateTempDirAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .title("Create Temp Directory")
         .description("Creates a temporary directory on the filesystem.")
         .perform(FilesystemCreateTempDirAction::perform);

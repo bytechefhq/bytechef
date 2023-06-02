@@ -19,7 +19,7 @@ package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
@@ -39,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class ScheduleCronTrigger {
 
-    public final TriggerDefinition triggerDefinition = trigger("cron")
+    public final ModifiableTriggerDefinition triggerDefinition = trigger("cron")
         .title("Cron")
         .description("Trigger off based on a custom schedule.")
         .type(TriggerType.LISTENER)

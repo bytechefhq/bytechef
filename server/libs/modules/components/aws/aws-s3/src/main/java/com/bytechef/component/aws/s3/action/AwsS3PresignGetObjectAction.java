@@ -20,7 +20,7 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -42,7 +42,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3PresignGetObjectAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
         .title("Get Pre-signed Object")
         .description("Get the url of an pre-signed AWS S3 object.")
         .properties(

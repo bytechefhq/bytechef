@@ -18,8 +18,8 @@
 package com.bytechef.component.datamapper.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
@@ -47,7 +47,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class DataMapperMapValuesAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapValues")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapValues")
         .title("Map values")
         .description(
             "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and mapped values.")

@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
@@ -41,7 +41,7 @@ import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKE
 public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler {
 
     @Override
-    public List<TriggerDefinition> getTriggers() {
+    public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(MailchimpSubscribeTrigger.TRIGGER_DEFINITION);
     }
 
@@ -60,8 +60,8 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     }
 
     @Override
-    public ModifiableProperty<?, ?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?, ?> property) {
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> property) {
 
         if (Objects.equals(property.getName(), "listId")) {
             ((ModifiableStringProperty) property).options(MailchimpUtils.getListIdOptions());

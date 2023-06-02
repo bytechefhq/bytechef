@@ -18,7 +18,7 @@
 package com.bytechef.component.bash.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -46,7 +46,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class BashExecuteAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(EXECUTE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(EXECUTE)
         .title("Execute")
         .description("Executes the script.")
         .properties(string(SCRIPT)

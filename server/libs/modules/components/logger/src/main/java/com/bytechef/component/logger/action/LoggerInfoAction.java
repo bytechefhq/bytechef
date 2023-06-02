@@ -18,7 +18,7 @@
 package com.bytechef.component.logger.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class LoggerInfoAction {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerInfoAction.class);
 
-    public static final ActionDefinition ACTION_DEFINITION = action(INFO)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(INFO)
         .title("Info")
         .properties(string(TEXT))
         .perform(LoggerInfoAction::perform);

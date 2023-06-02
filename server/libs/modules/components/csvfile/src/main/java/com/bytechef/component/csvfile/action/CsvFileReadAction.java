@@ -21,7 +21,7 @@ import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -64,7 +64,7 @@ public class CsvFileReadAction {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
 
-    public static final ActionDefinition ACTION_DEFINITION = action(READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
         .title("Read from file")
         .description("Reads data from a csv file.")
         .properties(

@@ -17,8 +17,8 @@
 
 package com.bytechef.component.httpclient.constant;
 
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Arrays;
@@ -69,7 +69,7 @@ public class HttpClientConstants {
     public static final String TIMEOUT = "timeout";
     public static final String URI = "uri";
 
-    public static final List<InputProperty> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
+    public static final List<? extends ModifiableInputProperty> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
             object(BODY_CONTENT)
                 .label("Body Content - JSON")
@@ -105,7 +105,7 @@ public class HttpClientConstants {
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
     @SuppressFBWarnings("MS_MUTABLE_ARRAY")
-    public static final OutputProperty<?>[] OUTPUT_PROPERTIES = new OutputProperty<?>[] {
+    public static final ModifiableOutputProperty<?>[] OUTPUT_PROPERTIES = new ModifiableOutputProperty<?>[] {
         object()
             .properties(any("body"), object("headers"), integer("status"))
             .displayCondition("%s === false".formatted(FULL_RESPONSE)),
@@ -113,7 +113,7 @@ public class HttpClientConstants {
             .displayCondition("%s === true".formatted(FULL_RESPONSE))
     };
 
-    public static final List<InputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
+    public static final List<? extends ModifiableInputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
 
             //

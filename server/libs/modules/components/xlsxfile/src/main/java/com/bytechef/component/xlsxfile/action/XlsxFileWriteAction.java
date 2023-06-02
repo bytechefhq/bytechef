@@ -20,7 +20,7 @@ package com.bytechef.component.xlsxfile.action;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -59,7 +59,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class XlsxFileWriteAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE)
         .title("Write to file")
         .description("Writes the data to a XLS/XLSX file.")
         .properties(
