@@ -24,7 +24,9 @@ import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOut
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
@@ -108,7 +110,7 @@ public final class ComponentDSL extends DefinitionDSL {
         return null;
     }
 
-    private static <P extends OutputProperty<?>> List<P> checkOutputProperties(P[] properties) {
+    private static <P extends ModifiableOutputProperty<?>> List<P> checkOutputProperties(P[] properties) {
         if (properties != null) {
             for (Property property : properties) {
                 String name = property.getName();
@@ -141,17 +143,17 @@ public final class ComponentDSL extends DefinitionDSL {
         private String componentTitle;
         private Boolean deprecated;
         private String description;
+        private EditorDescriptionFunction editorDescriptionFunction;
         private Object sampleOutput;
         private PerformFunction execute;
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private List<? extends OutputProperty<?>> outputSchemaProperties;
-        private List<? extends InputProperty> properties;
+        private List<? extends ModifiableOutputProperty<?>> outputSchemaProperties;
+        private List<? extends ModifiableInputProperty> properties;
         private OutputSchemaFunction outputSchemaFunction;
         private SampleOutputFunction sampleOutputFunction;
         private String title;
-        private EditorDescriptionFunction editorDescriptionFunction;
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -226,7 +228,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends OutputProperty<?>> ModifiableActionDefinition outputSchema(P... properties) {
+        public final <P extends ModifiableOutputProperty<?>> ModifiableActionDefinition outputSchema(P... properties) {
 
             this.outputSchemaProperties = checkOutputProperties(properties);
 
@@ -234,7 +236,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends OutputProperty<?>> ModifiableActionDefinition outputSchema(
+        public final <P extends ModifiableOutputProperty<?>> ModifiableActionDefinition outputSchema(
             OutputSchemaFunction outputSchema, P... properties) {
 
             this.outputSchemaProperties = checkOutputProperties(properties);
@@ -251,7 +253,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends InputProperty> ModifiableActionDefinition properties(P... properties) {
+        public final <P extends ModifiableInputProperty> ModifiableActionDefinition properties(P... properties) {
             this.properties = checkInputProperties(properties);
 
             return this;
@@ -611,9 +613,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<? extends ActionDefinition> actions;
+        private List<? extends ModifiableActionDefinition> actions;
         private String category;
-        private ConnectionDefinition connection;
+        private ModifiableConnectionDefinition connection;
         private Boolean customAction;
         private Help customActionHelp;
         private String description;
@@ -625,13 +627,13 @@ public final class ComponentDSL extends DefinitionDSL {
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<? extends TriggerDefinition> triggers;
+        private List<? extends ModifiableTriggerDefinition> triggers;
 
         private ModifiableComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
         }
 
-        public ModifiableComponentDefinition actions(ActionDefinition... actionDefinitions) {
+        public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(A... actionDefinitions) {
             if (actionDefinitions != null) {
                 return actions(List.of(actionDefinitions));
             }
@@ -639,7 +641,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition actions(List<ActionDefinition> actionDefinitions) {
+        public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
             if (actionDefinitions != null) {
                 this.actions = Collections.unmodifiableList(actionDefinitions);
 
@@ -661,7 +663,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
+        public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition;
 
             ((ModifiableConnectionDefinition) this.connection).componentDescription = this.getDescription()
@@ -756,7 +758,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition triggers(TriggerDefinition... triggerDefinitions) {
+        public <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(T... triggerDefinitions) {
             if (triggerDefinitions != null) {
                 return triggers(List.of(triggerDefinitions));
             }
@@ -764,7 +766,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition triggers(List<TriggerDefinition> triggerDefinitions) {
+        public <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(
+            List<T> triggerDefinitions) {
+
             if (triggerDefinitions != null) {
                 this.triggers = Collections.unmodifiableList(triggerDefinitions);
 
@@ -870,7 +874,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String componentName;
         private String componentDescription;
         private String componentTitle;
-        private List<? extends InputProperty> properties;
+        private List<? extends ModifiableInputProperty> properties;
         private TestConsumer testConsumer;
         private int version = 1;
 
@@ -913,7 +917,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends InputProperty> ModifiableConnectionDefinition properties(P... properties) {
+        public final <P extends ModifiableInputProperty> ModifiableConnectionDefinition properties(P... properties) {
             this.properties = checkInputProperties(properties);
 
             return this;
@@ -1109,23 +1113,23 @@ public final class ComponentDSL extends DefinitionDSL {
         private DynamicWebhookEnableFunction dynamicWebhookEnable;
         private DynamicWebhookRefreshFunction dynamicWebhookRefresh;
         private DynamicWebhookRequestFunction dynamicWebhookRequest;
-        private Object sampleOutput;
+        private EditorDescriptionFunction editorDescriptionFunction;
         private Help help;
         private ListenerEnableConsumer listenerEnable;
         private ListenerDisableConsumer listenerDisable;
         private String name;
-        private List<? extends OutputProperty<?>> outputSchemaProperties;
+        private List<? extends ModifiableOutputProperty<?>> outputSchemaProperties;
         private OutputSchemaFunction outputSchemaFunction;
         private SampleOutputFunction sampleOutputFunction;
         private PollFunction poll;
-        private List<? extends InputProperty> properties;
+        private List<? extends ModifiableInputProperty> properties;
+        private Object sampleOutput;
         private StaticWebhookRequestFunction staticWebhookRequest;
         private String title;
         private TriggerType type;
         private Boolean webhookBodyRaw;
         private WebhookValidateFunction webhookValidate;
         private Boolean workflowSyncExecution;
-        private EditorDescriptionFunction editorDescriptionFunction;
 
         private ModifiableTriggerDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -1221,14 +1225,14 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends OutputProperty<?>> ModifiableTriggerDefinition outputSchema(P... properties) {
+        public <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(P... properties) {
             this.outputSchemaProperties = checkOutputProperties(properties);
 
             return this;
         }
 
         @SafeVarargs
-        public final <P extends OutputProperty<?>> ModifiableTriggerDefinition outputSchema(
+        public final <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(
             OutputSchemaFunction outputSchema, P... properties) {
 
             this.outputSchemaProperties = checkOutputProperties(properties);
@@ -1251,7 +1255,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends InputProperty> ModifiableTriggerDefinition properties(P... properties) {
+        public final <P extends ModifiableInputProperty> ModifiableTriggerDefinition properties(P... properties) {
             this.properties = checkInputProperties(properties);
 
             return this;

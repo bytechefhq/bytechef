@@ -28,9 +28,9 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableTimeProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.OptionsDataSource.OptionsFunction;
 import com.bytechef.hermes.definition.PropertiesDataSource.PropertiesFunction;
-import com.bytechef.hermes.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDate;
@@ -198,7 +198,7 @@ public class DefinitionDSL {
     }
 
     @SafeVarargs
-    protected static <P extends ValueProperty<?>> ModifiableObjectProperty buildObject(
+    protected static <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty buildObject(
         String name, String description, String objectType, P... properties) {
         return new ModifiableObjectProperty(name)
             .description(description)
@@ -206,7 +206,9 @@ public class DefinitionDSL {
             .properties(properties);
     }
 
-    protected static <P extends ValueProperty<?>> List<? extends P> checkPropertyNames(List<? extends P> properties) {
+    protected static <P extends ModifiableValueProperty<?, ?>> List<? extends P> checkPropertyNames(
+        List<? extends P> properties) {
+
         if (properties != null && properties.size() > 0) {
             Property firstProperty = properties.get(0);
 
@@ -234,9 +236,9 @@ public class DefinitionDSL {
     }
 
     // CHECKSTYLE:OFF
-    public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property>
+    public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M>>
         implements Property permits ModifiableProperty.ModifiableDynamicPropertiesProperty,
-        ModifiableProperty.ModifiableValueProperty {
+        ModifiableValueProperty {
 
         private Boolean advancedOption;
         private String description;
@@ -340,7 +342,7 @@ public class DefinitionDSL {
                 return false;
             }
 
-            ModifiableProperty<?, ?> that = (ModifiableProperty<?, ?>) o;
+            ModifiableProperty<?> that = (ModifiableProperty<?>) o;
 
             return Objects.equals(displayCondition, that.displayCondition) && Objects.equals(name, that.name)
                 && type == that.type;
@@ -407,8 +409,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableAnyProperty
-            extends ModifiableValueProperty<Object, ModifiableAnyProperty, AnyProperty>
-            implements Property.AnyProperty {
+            extends ModifiableValueProperty<Object, ModifiableAnyProperty>
+            implements ModifiableOutputProperty<Object>, Property.AnyProperty {
 
             private ModifiableAnyProperty() {
                 this(null);
@@ -425,10 +427,10 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableArrayProperty
-            extends ModifiableValueProperty<Object[], ModifiableArrayProperty, ArrayProperty>
-            implements Property.ArrayProperty {
+            extends ModifiableValueProperty<Object[], ModifiableArrayProperty>
+            implements Property.ArrayProperty, ModifiableInputProperty, ModifiableOutputProperty<Object[]> {
 
-            private List<? extends ValueProperty<?>> items;
+            private List<? extends ModifiableValueProperty<?, ?>> items;
             private Boolean multipleValues;
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -529,11 +531,11 @@ public class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ValueProperty<?>> ModifiableArrayProperty items(P... properties) {
+            public final <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(P... properties) {
                 return items(properties == null ? List.of() : List.of(properties));
             }
 
-            public <P extends ValueProperty<?>> ModifiableArrayProperty items(List<P> properties) {
+            public <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(List<P> properties) {
                 this.items = checkPropertyNames(properties);
 
                 return this;
@@ -602,8 +604,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableBooleanProperty
-            extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty, BooleanProperty>
-            implements Property.BooleanProperty, OptionsProperty {
+            extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<Boolean>, Property.BooleanProperty {
 
             private final List<Option<?>> options = List.of(
                 option("True", true),
@@ -640,8 +642,9 @@ public class DefinitionDSL {
             }
         }
 
-        public static final class ModifiableDateProperty extends
-            ModifiableValueProperty<LocalDate, ModifiableDateProperty, DateProperty> implements Property.DateProperty {
+        public static final class ModifiableDateProperty
+            extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
+            implements ModifiableOutputProperty<LocalDate>, ModifiableInputProperty, Property.DateProperty {
 
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -714,8 +717,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableDateTimeProperty
-            extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty, DateTimeProperty>
-            implements Property.DateTimeProperty {
+            extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<LocalDateTime>, Property.DateTimeProperty {
 
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -788,8 +791,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableDynamicPropertiesProperty
-            extends ModifiableProperty<ModifiableDynamicPropertiesProperty, DynamicPropertiesProperty>
-            implements Property.DynamicPropertiesProperty {
+            extends ModifiableProperty<ModifiableDynamicPropertiesProperty>
+            implements ModifiableInputProperty, Property.DynamicPropertiesProperty {
 
             private List<String> loadPropertiesDependsOn;
             private PropertiesFunction propertiesFunction;
@@ -819,8 +822,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableIntegerProperty
-            extends ModifiableValueProperty<Integer, ModifiableIntegerProperty, IntegerProperty>
-            implements Property.IntegerProperty {
+            extends ModifiableValueProperty<Integer, ModifiableIntegerProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<Integer>, Property.IntegerProperty {
 
             private Integer maxValue;
             private Integer minValue;
@@ -924,9 +927,17 @@ public class DefinitionDSL {
             }
         }
 
+        public sealed interface ModifiableInputProperty extends Property.InputProperty
+            permits ModifiableArrayProperty, ModifiableBooleanProperty, ModifiableDateProperty,
+            ModifiableDateTimeProperty, ModifiableDynamicPropertiesProperty, ModifiableIntegerProperty,
+            ModifiableNullProperty, ModifiableNumberProperty, ModifiableObjectProperty, ModifiableStringProperty,
+            ModifiableTimeProperty {
+
+        }
+
         public static final class ModifiableNullProperty
-            extends ModifiableValueProperty<Void, ModifiableNullProperty, NullProperty>
-            implements Property.NullProperty {
+            extends ModifiableValueProperty<Void, ModifiableNullProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<Void>, Property.NullProperty {
 
             private ModifiableNullProperty() {
                 this(null);
@@ -943,8 +954,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableNumberProperty
-            extends ModifiableValueProperty<Double, ModifiableNumberProperty, NumberProperty>
-            implements Property.NumberProperty {
+            extends ModifiableValueProperty<Double, ModifiableNumberProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<Double>, Property.NumberProperty {
 
             private Integer maxValue;
             private Integer minValue;
@@ -1089,16 +1100,16 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableObjectProperty
-            extends ModifiableValueProperty<Object, ModifiableObjectProperty, ObjectProperty>
-            implements Property.ObjectProperty {
+            extends ModifiableValueProperty<Object, ModifiableObjectProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<Object>, Property.ObjectProperty {
 
-            private List<? extends ValueProperty<?>> additionalProperties;
+            private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
             private List<String> loadOptionsDependsOn;
             private Boolean multipleValues;
             private String objectType;
             private List<Option<?>> options;
             private OptionsFunction optionsFunction;
-            private List<? extends ValueProperty<?>> properties;
+            private List<? extends ModifiableValueProperty<?, ?>> properties;
 
             private ModifiableObjectProperty() {
                 this(null);
@@ -1121,13 +1132,13 @@ public class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
+            public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
                 P... properties) {
 
                 return additionalProperties(properties == null ? List.of() : List.of(properties));
             }
 
-            public <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
+            public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
                 List<? extends P> properties) {
 
                 this.additionalProperties = checkPropertyNames(properties);
@@ -1171,11 +1182,12 @@ public class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ValueProperty<?>> ModifiableObjectProperty properties(P... properties) {
+            public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty
+                properties(P... properties) {
                 return properties(List.of(properties));
             }
 
-            public <P extends ValueProperty<?>> ModifiableObjectProperty properties(List<P> properties) {
+            public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
                 if (properties != null) {
                     for (Property property : properties) {
                         String name = property.getName();
@@ -1240,9 +1252,15 @@ public class DefinitionDSL {
             }
         }
 
+        public sealed interface ModifiableOutputProperty<V> extends Property.OutputProperty<V>
+            permits ModifiableAnyProperty, ModifiableArrayProperty, ModifiableBooleanProperty, ModifiableDateProperty,
+            ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNullProperty, ModifiableNumberProperty,
+            ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
+        }
+
         public static final class ModifiableStringProperty
-            extends ModifiableValueProperty<String, ModifiableStringProperty, StringProperty>
-            implements Property.StringProperty {
+            extends ModifiableValueProperty<String, ModifiableStringProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<String>, Property.StringProperty {
 
             private ControlType controlType;
             private List<String> loadOptionsDependsOn;
@@ -1344,8 +1362,8 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableTimeProperty
-            extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty, TimeProperty>
-            implements Property.TimeProperty {
+            extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty>
+            implements ModifiableInputProperty, ModifiableOutputProperty<LocalTime>, Property.TimeProperty {
 
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -1413,10 +1431,10 @@ public class DefinitionDSL {
             }
         }
 
-        public abstract static sealed class ModifiableValueProperty<V, M extends ModifiableValueProperty<V, M, P>, P extends ValueProperty<V>>
-            extends ModifiableProperty<M, P>
+        public abstract static sealed class ModifiableValueProperty<V, P extends ModifiableValueProperty<V, P>>
+            extends ModifiableProperty<P>
             implements
-            ValueProperty<V> permits ModifiableAnyProperty, ModifiableArrayProperty, ModifiableBooleanProperty,
+            Property.ValueProperty<V> permits ModifiableAnyProperty, ModifiableArrayProperty, ModifiableBooleanProperty,
             ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNullProperty,
             ModifiableNumberProperty, ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
 
