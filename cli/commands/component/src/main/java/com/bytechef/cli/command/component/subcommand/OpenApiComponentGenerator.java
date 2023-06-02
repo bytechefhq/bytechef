@@ -1736,8 +1736,10 @@ public class OpenApiComponentGenerator {
                     ParameterizedTypeName.get(
                         ClassName.get("java.util", "List"),
                         ParameterizedTypeName.get(
-                            ClassName.get("com.bytechef.hermes.definition", "Property", "ValueProperty"),
-                            WildcardTypeName.subtypeOf(Object.class))),
+                            ClassName.get(
+                                "com.bytechef.hermes.definition", "DefinitionDSL", "ModifiableProperty",
+                                "ModifiableValueProperty"),
+                            WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))),
                     "PROPERTIES")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
