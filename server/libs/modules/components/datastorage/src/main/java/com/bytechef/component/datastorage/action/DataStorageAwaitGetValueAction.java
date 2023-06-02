@@ -18,7 +18,7 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 
 import java.util.Map;
 
@@ -39,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageAwaitGetValueAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("awaitGetValue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("awaitGetValue")
         .title("Await Get Value")
         .description("")
         .properties(

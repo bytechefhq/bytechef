@@ -17,6 +17,7 @@
 
 package com.bytechef.component.airtable.trigger;
 
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
@@ -39,7 +40,7 @@ public class NewRecordTrigger {
     private static final String LAST_TIME_CHECKED = "lastTimeChecked";
     private static final String TRIGGER_FIELD = "triggerField";
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = trigger("newRecord")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRecord")
         .title("New Record")
         .description(
             "Trigger off when a new entry is added to the table that you have selected.")

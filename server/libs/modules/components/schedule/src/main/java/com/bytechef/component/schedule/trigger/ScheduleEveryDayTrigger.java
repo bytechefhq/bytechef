@@ -19,7 +19,7 @@ package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
@@ -44,7 +44,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class ScheduleEveryDayTrigger {
 
-    public final TriggerDefinition triggerDefinition = trigger("everyDay")
+    public final ModifiableTriggerDefinition triggerDefinition = trigger("everyDay")
         .title("Every day")
         .description(
             "Trigger off at a specific time either on a daily basis or selected days of the week.")

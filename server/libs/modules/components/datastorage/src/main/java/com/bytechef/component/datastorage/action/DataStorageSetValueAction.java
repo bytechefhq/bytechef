@@ -18,7 +18,7 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 
 import java.util.Map;
 
@@ -46,7 +46,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class DataStorageSetValueAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("setValue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("setValue")
         .title("Set Value")
         .description("Set a value under a key, in the specified scope.")
         .properties(

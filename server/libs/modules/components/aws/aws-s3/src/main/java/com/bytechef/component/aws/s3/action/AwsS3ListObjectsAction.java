@@ -20,7 +20,7 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -49,7 +49,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3ListObjectsAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(LIST_OBJECTS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_OBJECTS)
         .title("List Objects")
         .description("Get the list AWS S3 objects.")
         .properties(

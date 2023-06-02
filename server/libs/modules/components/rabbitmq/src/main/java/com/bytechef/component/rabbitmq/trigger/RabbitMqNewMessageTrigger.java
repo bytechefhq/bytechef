@@ -19,7 +19,7 @@ package com.bytechef.component.rabbitmq.trigger;
 
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.util.ListenerTriggerUtils;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -50,7 +50,7 @@ public class RabbitMqNewMessageTrigger {
 
     private static final Map<String, com.rabbitmq.client.Connection> CONNECTION_MAP = new ConcurrentHashMap<>();
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = trigger("newMessage")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newMessage")
         .title("New Message")
         .description("Triggers on new RabbitMQ messages.")
         .type(TriggerType.LISTENER)

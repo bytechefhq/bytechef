@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.component.util.MapValueUtils;
-import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -58,8 +58,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class HttpClientActionUtils {
 
-    public static List<InputProperty> options(boolean includeBodyContentProperties) {
-        List<InputProperty> properties = new ArrayList<>();
+    public static List<? extends ModifiableInputProperty> options(boolean includeBodyContentProperties) {
+        List<ModifiableInputProperty> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
             properties.add(string(BODY_CONTENT_TYPE)
@@ -155,14 +155,14 @@ public class HttpClientActionUtils {
     }
 
     @SafeVarargs
-    public static InputProperty[] toArray(List<InputProperty>... propertiesArray) {
-        List<InputProperty> allProperties = new ArrayList<>();
+    public static ModifiableInputProperty[] toArray(List<? extends ModifiableInputProperty>... propertiesArray) {
+        List<? super ModifiableInputProperty> allProperties = new ArrayList<>();
 
-        for (List<InputProperty> properties : propertiesArray) {
+        for (List<? extends ModifiableInputProperty> properties : propertiesArray) {
             allProperties.addAll(properties);
         }
 
-        return allProperties.toArray(InputProperty[]::new);
+        return allProperties.toArray(ModifiableInputProperty[]::new);
     }
 
     private static BodyContentType getBodyContentType(Map<String, ?> inputParameters) {

@@ -17,8 +17,8 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
@@ -40,7 +40,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class WebhookAutoRespondWithHTTP200Trigger {
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = trigger("autoRespondWithHTTP200")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("autoRespondWithHTTP200")
         .title("Auto Respond with HTTP 200 status")
         .description(
             "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.")

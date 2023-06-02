@@ -28,7 +28,7 @@ import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
 import com.google.auto.service.AutoService;
@@ -54,7 +54,7 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
     }
 
     @Override
-    public List<TriggerDefinition> getTriggers() {
+    public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(
             PipedriveNewActivityTrigger.TRIGGER_DEFINITION,
             PipedriveNewDealTrigger.TRIGGER_DEFINITION,
@@ -66,8 +66,8 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
     }
 
     @Override
-    public DefinitionDSL.ModifiableProperty<?, ?> modifyProperty(
-        ActionDefinition actionDefinition, DefinitionDSL.ModifiableProperty<?, ?> property) {
+    public DefinitionDSL.ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, DefinitionDSL.ModifiableProperty<?> property) {
 
         if (Objects.equals(property.getName(), "owner_id") || Objects.equals(property.getName(), "user_id")) {
             ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/users", null));

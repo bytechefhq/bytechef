@@ -17,6 +17,7 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
@@ -45,7 +46,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class WebhookValidateAndRespondTrigger {
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = trigger("validateAndRespond")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("validateAndRespond")
         .title("Validate and respond")
         .description(
             "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.")

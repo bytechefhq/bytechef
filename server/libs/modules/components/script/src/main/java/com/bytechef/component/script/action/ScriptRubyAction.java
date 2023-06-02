@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.definition.Property;
 
@@ -46,7 +46,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class ScriptRubyAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(ScriptConstants.RUBY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ScriptConstants.RUBY)
         .title("Ruby")
         .description("Executes custom Ruby code.")
         .properties(

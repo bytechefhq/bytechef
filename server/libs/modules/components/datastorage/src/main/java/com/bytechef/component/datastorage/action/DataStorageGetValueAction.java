@@ -18,7 +18,7 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 
 import java.util.Map;
@@ -47,7 +47,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class DataStorageGetValueAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("getValue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getValue")
         .title("Get Value")
         .description("Retrieve a previously assigned value within the specified scope using its corresponding key.")
         .properties(

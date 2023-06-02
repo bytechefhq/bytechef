@@ -20,7 +20,7 @@ package com.bytechef.component.rabbitmq.action;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
@@ -46,7 +46,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class RabbitMqSendMessageAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("sendMessage")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendMessage")
         .title("Send Message")
         .description("Send a new RabbitMQ message.")
         .properties(

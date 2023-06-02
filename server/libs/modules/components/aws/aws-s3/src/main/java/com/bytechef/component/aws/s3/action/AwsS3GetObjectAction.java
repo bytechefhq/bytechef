@@ -21,7 +21,7 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -43,7 +43,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3GetObjectAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(GET_OBJECT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_OBJECT)
         .title("Get Object")
         .description("Get the AWS S3 object.")
         .properties(

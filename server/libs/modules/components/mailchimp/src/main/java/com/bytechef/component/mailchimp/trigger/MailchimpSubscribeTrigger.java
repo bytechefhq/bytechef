@@ -20,7 +20,7 @@ package com.bytechef.component.mailchimp.trigger;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -50,7 +50,7 @@ public class MailchimpSubscribeTrigger {
     private static final String LIST_ID = "listId";
     private static final String SUBSCRIBE = "subscribe";
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(SUBSCRIBE)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(SUBSCRIBE)
         .title("Subscribe")
         .description("Triggers when an Audience subscriber is added to the list.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

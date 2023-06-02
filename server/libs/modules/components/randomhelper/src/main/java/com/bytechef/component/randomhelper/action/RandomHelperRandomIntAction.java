@@ -19,7 +19,7 @@ package com.bytechef.component.randomhelper.action;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
@@ -37,7 +37,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.integer;
  */
 public class RandomHelperRandomIntAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(RANDOM_INT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(RANDOM_INT)
         .title("Int")
         .description("Generates a random integer value.")
         .properties(

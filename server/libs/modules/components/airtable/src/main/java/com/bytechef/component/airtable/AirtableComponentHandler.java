@@ -21,7 +21,7 @@ import com.bytechef.component.airtable.trigger.NewRecordTrigger;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.google.auto.service.AutoService;
 
@@ -35,7 +35,7 @@ import java.util.Objects;
 public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
 
     @Override
-    public List<TriggerDefinition> getTriggers() {
+    public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(NewRecordTrigger.TRIGGER_DEFINITION);
     }
 
@@ -47,8 +47,8 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     }
 
     @Override
-    public ModifiableProperty<?, ?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?, ?> property) {
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> property) {
 
         if (Objects.equals(property.getName(), "__item")) {
             property.label("Record");

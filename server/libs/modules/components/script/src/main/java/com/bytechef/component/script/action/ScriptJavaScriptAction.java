@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.definition.Property;
 
@@ -47,7 +47,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class ScriptJavaScriptAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(JAVASCRIPT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(JAVASCRIPT)
         .title("JavaScript")
         .description("Executes custom JavaScript code.")
         .properties(
