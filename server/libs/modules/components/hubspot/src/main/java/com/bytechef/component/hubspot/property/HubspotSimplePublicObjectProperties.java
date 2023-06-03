@@ -32,24 +32,23 @@ import java.util.List;
  * @generated
  */
 public class HubspotSimplePublicObjectProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("id").label("Id")
-                .required(true),
-            object("properties").additionalProperties(string())
-                .placeholder("Add to Properties")
-                .label("Properties")
-                .required(true),
-            object("propertiesWithHistory").additionalProperties(array())
-                .placeholder("Add to Properties With History")
-                .label("Properties With History")
-                .required(false),
-            dateTime("createdAt").label("Created At")
-                .required(true),
-            dateTime("updatedAt").label("Updated At")
-                .required(true),
-            bool("archived").label("Archived")
-                .required(false),
-            dateTime("archivedAt").label("Archived At")
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("id").label("Id")
+            .required(true),
+        object("properties").additionalProperties(string())
+            .placeholder("Add to Properties")
+            .label("Properties")
+            .required(true),
+        object("propertiesWithHistory").additionalProperties(array())
+            .placeholder("Add to Properties With History")
+            .label("Properties With History")
+            .required(false),
+        dateTime("createdAt").label("Created At")
+            .required(true),
+        dateTime("updatedAt").label("Updated At")
+            .required(true),
+        bool("archived").label("Archived")
+            .required(false),
+        dateTime("archivedAt").label("Archived At")
+            .required(false));
 }

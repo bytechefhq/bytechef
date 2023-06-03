@@ -29,13 +29,12 @@ import java.util.List;
  * @generated
  */
 public class HubspotPublicAssociationsForObjectProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            object("to").properties(HubspotPublicObjectIdProperties.PROPERTIES)
-                .label("To")
-                .required(true),
-            array("types").items(object().properties(HubspotAssociationSpecProperties.PROPERTIES))
-                .placeholder("Add to Types")
-                .label("Types")
-                .required(true));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        object("to").properties(HubspotPublicObjectIdProperties.PROPERTIES)
+            .label("To")
+            .required(true),
+        array("types").items(object().properties(HubspotAssociationSpecProperties.PROPERTIES))
+            .placeholder("Add to Types")
+            .label("Types")
+            .required(true));
 }
