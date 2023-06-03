@@ -192,6 +192,7 @@ public class OpenApiComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dynamicProperties")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "nullable")
@@ -1361,94 +1362,154 @@ public class OpenApiComponentGenerator {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        if (StringUtils.isEmpty(schema.get$ref())) {
-            String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
+        Map<String, Object> extensionMap = schema.getExtensions();
 
-            switch (type) {
-                case "array" -> {
-                    if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
-                        builder.add(
-                            "array().items($L)",
-                            getSchemaCodeBlock(
-                                null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
-                                openAPI));
-                    } else {
-                        propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
+        if (extensionMap == null) {
+            if (StringUtils.isEmpty(schema.get$ref())) {
+                String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
-                        builder.add(
-                            "array($S).items($L)",
-                            propertyName,
-                            getSchemaCodeBlock(
-                                null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
-                                openAPI));
-                    }
-
-                    if (!outputSchema) {
-                        builder.add(".placeholder($S)", "Add to " + buildPropertyName(propertyName.replace("__", "")));
-                    }
-                }
-                case "boolean" -> builder.add("bool($S)", propertyName);
-                case "integer" -> {
-                    builder.add("integer($S)", propertyName);
-                    if (schema.getMinimum() != null) {
-                        BigDecimal minimum = schema.getMinimum();
-
-                        builder.add(".minValue($L)", minimum.intValue());
-                    }
-                    if (schema.getMaximum() != null) {
-                        BigDecimal maximum = schema.getMaximum();
-
-                        builder.add(".maxValue($L)", maximum.intValue());
-                    }
-                }
-                case "number" -> {
-                    builder.add("number($S)", propertyName);
-                    if (schema.getMinimum() != null) {
-                        BigDecimal minimum = schema.getMinimum();
-
-                        builder.add(".minValue($L)", minimum.doubleValue());
-                    }
-                    if (schema.getMaximum() != null) {
-                        BigDecimal maximum = schema.getMaximum();
-
-                        builder.add(".maxValue($L)", maximum.doubleValue());
-                    }
-                }
-                case "object" -> {
-                    if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
-                        builder.add("object()");
-                    } else {
-                        propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
-
-                        builder.add("object($S)", propertyName);
-                    }
-
-                    if (schema.getProperties() != null || schema.getAllOf() != null) {
-                        builder.add(getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
-                    }
-
-                    if (schema.getAdditionalProperties() != null) {
-                        builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
-                    }
-                }
-                case "string" -> {
-                    if (Objects.equals(schema.getFormat(), "date")) {
-                        builder.add("date($S)", propertyName);
-                    } else if (Objects.equals(schema.getFormat(), "date-time")) {
-                        builder.add("dateTime($S)", propertyName);
-                    } else if (Objects.equals(schema.getFormat(), "binary")) {
-                        builder.add("fileEntry($S)", StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName);
-                    } else {
-                        if (StringUtils.isEmpty(propertyName)) {
-                            builder.add("string()");
+                switch (type) {
+                    case "array" -> {
+                        if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
+                            builder.add(
+                                "array().items($L)",
+                                getSchemaCodeBlock(
+                                    null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
+                                    openAPI));
                         } else {
-                            builder.add("string($S)", propertyName);
+                            propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
+
+                            builder.add(
+                                "array($S).items($L)",
+                                propertyName,
+                                getSchemaCodeBlock(
+                                    null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
+                                    openAPI));
+                        }
+
+                        if (!outputSchema) {
+                            builder.add(
+                                ".placeholder($S)", "Add to " + buildPropertyName(propertyName.replace("__", "")));
                         }
                     }
+                    case "boolean" -> builder.add("bool($S)", propertyName);
+                    case "integer" -> {
+                        builder.add("integer($S)", propertyName);
+                        if (schema.getMinimum() != null) {
+                            BigDecimal minimum = schema.getMinimum();
+
+                            builder.add(".minValue($L)", minimum.intValue());
+                        }
+                        if (schema.getMaximum() != null) {
+                            BigDecimal maximum = schema.getMaximum();
+
+                            builder.add(".maxValue($L)", maximum.intValue());
+                        }
+                    }
+                    case "number" -> {
+                        builder.add("number($S)", propertyName);
+                        if (schema.getMinimum() != null) {
+                            BigDecimal minimum = schema.getMinimum();
+
+                            builder.add(".minValue($L)", minimum.doubleValue());
+                        }
+                        if (schema.getMaximum() != null) {
+                            BigDecimal maximum = schema.getMaximum();
+
+                            builder.add(".maxValue($L)", maximum.doubleValue());
+                        }
+                    }
+                    case "object" -> {
+                        if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
+                            builder.add("object()");
+                        } else {
+                            propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+
+                            builder.add("object($S)", propertyName);
+                        }
+
+                        if (schema.getProperties() != null || schema.getAllOf() != null) {
+                            builder
+                                .add(getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
+                        }
+
+                        if (schema.getAdditionalProperties() != null) {
+                            builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                        }
+                    }
+                    case "string" -> {
+                        if (Objects.equals(schema.getFormat(), "date")) {
+                            builder.add("date($S)", propertyName);
+                        } else if (Objects.equals(schema.getFormat(), "date-time")) {
+                            builder.add("dateTime($S)", propertyName);
+                        } else if (Objects.equals(schema.getFormat(), "binary")) {
+                            builder.add("fileEntry($S)",
+                                StringUtils.isEmpty(propertyName) ? "fileEntry" : propertyName);
+                        } else {
+                            if (StringUtils.isEmpty(propertyName)) {
+                                builder.add("string()");
+                            } else {
+                                builder.add("string($S)", propertyName);
+                            }
+                        }
+                    }
+                    default -> throw new IllegalArgumentException(
+                        "Parameter type %s is not supported.".formatted(schema.getType()));
                 }
-                default -> throw new IllegalArgumentException(
-                    "Parameter type %s is not supported.".formatted(schema.getType()));
+
+                if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
+                    propertyName = buildPropertyName(propertyName.replace("__", ""));
+
+                    builder.add(".label($S)", StringUtils.capitalize(propertyName));
+                }
+
+                if (propertyDescription != null) {
+                    builder.add(".description($S)", propertyDescription);
+                }
+
+                if (schema.getEnum() != null) {
+                    List<CodeBlock> codeBlocks = getEnumOptionsCodeBlocks(schema);
+
+                    if (!Objects.equals(type, "boolean")) {
+                        builder.add(".options($L)", codeBlocks.stream()
+                            .collect(CodeBlock.joining(",")));
+                    }
+                }
+
+                if (required != null) {
+                    builder.add(".required($L)", required);
+                }
+
+                if (schema.getExample() != null) {
+                    if (Objects.equals(type, "string")) {
+                        builder.add(".exampleValue($S)", schema.getExample());
+                    } else {
+                        builder.add(".exampleValue($L)", schema.getExample());
+                    }
+                }
+            } else {
+                String ref = schema.get$ref();
+                Components components = openAPI.getComponents();
+
+                Map<String, Schema> schemaMap = components.getSchemas();
+
+                String curSchemaName = ref.replace("#/components/schemas/", "");
+
+                schemas.add(curSchemaName);
+
+                schema = schemaMap.get(curSchemaName);
+
+                builder.add(
+                    getSchemaCodeBlock(
+                        StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
+                            ? StringUtils.uncapitalize(curSchemaName)
+                            : propertyName,
+                        schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
+                        outputSchema,
+                        openAPI));
             }
+        } else {
+            builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
 
             if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
                 propertyName = buildPropertyName(propertyName.replace("__", ""));
@@ -1460,45 +1521,9 @@ public class OpenApiComponentGenerator {
                 builder.add(".description($S)", propertyDescription);
             }
 
-            if (schema.getEnum() != null) {
-                List<CodeBlock> codeBlocks = getEnumOptionsCodeBlocks(schema);
-
-                if (!Objects.equals(type, "boolean")) {
-                    builder.add(".options($L)", codeBlocks.stream()
-                        .collect(CodeBlock.joining(",")));
-                }
-            }
-
             if (required != null) {
                 builder.add(".required($L)", required);
             }
-
-            if (schema.getExample() != null) {
-                if (Objects.equals(type, "string")) {
-                    builder.add(".exampleValue($S)", schema.getExample());
-                } else {
-                    builder.add(".exampleValue($L)", schema.getExample());
-                }
-            }
-        } else {
-            String ref = schema.get$ref();
-            Components components = openAPI.getComponents();
-
-            Map<String, Schema> schemaMap = components.getSchemas();
-
-            String curSchemaName = ref.replace("#/components/schemas/", "");
-
-            schemas.add(curSchemaName);
-
-            schema = schemaMap.get(curSchemaName);
-
-            builder.add(
-                getSchemaCodeBlock(
-                    StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
-                        ? StringUtils.uncapitalize(curSchemaName)
-                        : propertyName,
-                    schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty, outputSchema,
-                    openAPI));
         }
 
         return builder.build();
