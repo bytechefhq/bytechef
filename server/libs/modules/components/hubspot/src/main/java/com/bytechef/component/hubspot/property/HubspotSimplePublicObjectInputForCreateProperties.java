@@ -30,26 +30,25 @@ import java.util.List;
  * @generated
  */
 public class HubspotSimplePublicObjectInputForCreateProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            object("properties").properties(string("company").label("Company")
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        object("properties").properties(string("company").label("Company")
+            .required(false),
+            string("email").label("Email")
                 .required(false),
-                string("email").label("Email")
-                    .required(false),
-                string("firstname").label("Firstname")
-                    .required(false),
-                string("lastname").label("Lastname")
-                    .required(false),
-                string("phone").label("Phone")
-                    .required(false),
-                string("website").label("Website")
-                    .required(false))
-                .additionalProperties(string())
-                .placeholder("Add to Properties")
-                .label("Properties")
-                .required(true),
-            array("associations").items(object().properties(HubspotPublicAssociationsForObjectProperties.PROPERTIES))
-                .placeholder("Add to Associations")
-                .label("Associations")
-                .required(true));
+            string("firstname").label("Firstname")
+                .required(false),
+            string("lastname").label("Lastname")
+                .required(false),
+            string("phone").label("Phone")
+                .required(false),
+            string("website").label("Website")
+                .required(false))
+            .additionalProperties(string())
+            .placeholder("Add to Properties")
+            .label("Properties")
+            .required(true),
+        array("associations").items(object().properties(HubspotPublicAssociationsForObjectProperties.PROPERTIES))
+            .placeholder("Add to Associations")
+            .label("Associations")
+            .required(true));
 }
