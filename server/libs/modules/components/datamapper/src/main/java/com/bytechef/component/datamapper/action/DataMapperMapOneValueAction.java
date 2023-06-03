@@ -106,6 +106,8 @@ public class DataMapperMapOneValueAction {
                 .label("Value")
                 .description("The value you want to map.")
                 .displayCondition("type === 8")
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .required(true),
             string(VALUE)
                 .label("Value")
