@@ -58,7 +58,7 @@ public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
     public void save(String workflowExecutionId, DynamicWebhookEnableOutput value) {
         loadBalancedWebClientBuilder
             .build()
-            .post()
+            .put()
             .uri(uriBuilder -> uriBuilder
                 .host("platform-service-app")
                 .path("/api/internal/trigger-lifecycle-service/save/{workflowExecutionId}")
