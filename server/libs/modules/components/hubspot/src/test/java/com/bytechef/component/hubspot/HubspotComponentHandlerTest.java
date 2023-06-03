@@ -15,24 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.petstore.property;
-
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-
-import com.bytechef.hermes.definition.DefinitionDSL;
-import java.util.List;
+package com.bytechef.component.hubspot;
 
 /**
- * Provides schema definition.
- *
  * @generated
  */
-public class PetstoreTagProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            integer("id").label("Id")
-                .required(false),
-            string("name").label("Name")
-                .required(false));
+public class HubspotComponentHandlerTest extends AbstractHubspotComponentHandlerTest {
 }

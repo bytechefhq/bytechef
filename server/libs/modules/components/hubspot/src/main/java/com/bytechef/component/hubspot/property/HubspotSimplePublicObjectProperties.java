@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jira.property;
+package com.bytechef.component.hubspot.property;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
@@ -24,23 +27,29 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
-public class JiraCreatedIssueProperties {
+public class HubspotSimplePublicObjectProperties {
     public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
         List.of(
             string("id").label("Id")
-                .description("The ID of the created issue or subtask.")
+                .required(true),
+            object("properties").additionalProperties(string())
+                .placeholder("Add to Properties")
+                .label("Properties")
+                .required(true),
+            object("propertiesWithHistory").additionalProperties(array())
+                .placeholder("Add to Properties With History")
+                .label("Properties With History")
                 .required(false),
-            string("key").label("Key")
-                .description("The key of the created issue or subtask.")
+            dateTime("createdAt").label("Created At")
+                .required(true),
+            dateTime("updatedAt").label("Updated At")
+                .required(true),
+            bool("archived").label("Archived")
                 .required(false),
-            string("self").label("Self")
-                .description("The URL of the created issue or subtask.")
-                .required(false),
-            object("transition").properties(JiraNestedResponseProperties.PROPERTIES)
-                .label("Transition")
+            dateTime("archivedAt").label("Archived At")
                 .required(false));
 }

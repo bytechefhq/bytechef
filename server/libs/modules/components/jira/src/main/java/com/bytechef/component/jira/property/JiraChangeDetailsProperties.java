@@ -28,26 +28,27 @@ import java.util.List;
  * @generated
  */
 public class JiraChangeDetailsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("field").label("Field")
-            .description("The name of the field changed.")
-            .required(false),
-        string("fieldtype").label("Fieldtype")
-            .description("The type of the field changed.")
-            .required(false),
-        string("fieldId").label("Field Id")
-            .description("The ID of the field changed.")
-            .required(false),
-        string("from").label("From")
-            .description("The details of the original value.")
-            .required(false),
-        string("fromString").label("From String")
-            .description("The details of the original value as a string.")
-            .required(false),
-        string("to").label("To")
-            .description("The details of the new value.")
-            .required(false),
-        string("toString").label("To String")
-            .description("The details of the new value as a string.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("field").label("Field")
+                .description("The name of the field changed.")
+                .required(false),
+            string("fieldtype").label("Fieldtype")
+                .description("The type of the field changed.")
+                .required(false),
+            string("fieldId").label("Field Id")
+                .description("The ID of the field changed.")
+                .required(false),
+            string("from").label("From")
+                .description("The details of the original value.")
+                .required(false),
+            string("fromString").label("From String")
+                .description("The details of the original value as a string.")
+                .required(false),
+            string("to").label("To")
+                .description("The details of the new value.")
+                .required(false),
+            string("toString").label("To String")
+                .description("The details of the new value as a string.")
+                .required(false));
 }

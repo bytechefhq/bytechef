@@ -31,20 +31,21 @@ import java.util.List;
  * @generated
  */
 public class JiraLinkGroupProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("id").label("Id")
-            .required(false),
-        string("styleClass").label("Style Class")
-            .required(false),
-        object("header").properties(JiraSimpleLinkProperties.PROPERTIES)
-            .label("Header")
-            .description("Details about the operations available in this version.")
-            .required(false),
-        integer("weight").label("Weight")
-            .required(false),
-        array("links").items(object().properties(JiraSimpleLinkProperties.PROPERTIES)
-            .description("Details about the operations available in this version."))
-            .placeholder("Add to Links")
-            .label("Links")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("id").label("Id")
+                .required(false),
+            string("styleClass").label("Style Class")
+                .required(false),
+            object("header").properties(JiraSimpleLinkProperties.PROPERTIES)
+                .label("Header")
+                .description("Details about the operations available in this version.")
+                .required(false),
+            integer("weight").label("Weight")
+                .required(false),
+            array("links").items(object().properties(JiraSimpleLinkProperties.PROPERTIES)
+                .description("Details about the operations available in this version."))
+                .placeholder("Add to Links")
+                .label("Links")
+                .required(false));
 }

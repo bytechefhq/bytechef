@@ -29,11 +29,12 @@ import java.util.List;
  * @generated
  */
 public class JiraNestedResponseProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        integer("status").label("Status")
-            .required(false),
-        object("errorCollection").properties(JiraErrorCollectionProperties.PROPERTIES)
-            .label("Error Collection")
-            .description("Error messages from an operation.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            integer("status").label("Status")
+                .required(false),
+            object("errorCollection").properties(JiraErrorCollectionProperties.PROPERTIES)
+                .label("Error Collection")
+                .description("Error messages from an operation.")
+                .required(false));
 }
