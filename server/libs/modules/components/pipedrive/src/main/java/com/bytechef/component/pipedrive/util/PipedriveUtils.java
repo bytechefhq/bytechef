@@ -68,8 +68,10 @@ public class PipedriveUtils {
         return (connection, inputParameters, searchText) -> {
             String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
 
+            String url = connection.getBaseUri() + path;
+
             Map<String, ?> response = HttpClientUtils
-                .get(connection.getBaseUri() + path)
+                .get(url)
                 .header("Authorization", "Bearer " + accessToken)
                 .queryParameters(
                     dependsOn == null
@@ -80,7 +82,7 @@ public class PipedriveUtils {
                 .getBody();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Response for path='%s': ".formatted(path) + response);
+                logger.debug("Response for url='%s': %s".formatted(url, response));
             }
 
             List<Option<?>> options = new ArrayList<>();

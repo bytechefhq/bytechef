@@ -55,8 +55,10 @@ public class MailchimpUtils {
         return (connection, inputParameters, searchText) -> {
             String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
 
+            String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken));
+
             Map<String, ?> response = HttpClientUtils
-                .get("https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken)))
+                .get(url)
                 .header("Authorization", "Bearer " + accessToken)
                 .queryParameters(
                     Map.of(
@@ -67,7 +69,7 @@ public class MailchimpUtils {
                 .getBody();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Response for path='/lists': " + response);
+                logger.debug("Response for url='%s': %s".formatted(url, response));
             }
 
             List<Option<?>> options = new ArrayList<>();
