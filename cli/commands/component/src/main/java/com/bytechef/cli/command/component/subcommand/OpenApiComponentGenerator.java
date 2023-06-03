@@ -1425,7 +1425,9 @@ public class OpenApiComponentGenerator {
 
                     if (schema.getProperties() != null || schema.getAllOf() != null) {
                         builder.add(getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
-                    } else if (schema.getAdditionalProperties() != null) {
+                    }
+
+                    if (schema.getAdditionalProperties() != null) {
                         builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
                     }
                 }
@@ -1727,7 +1729,7 @@ public class OpenApiComponentGenerator {
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
                 .addJavadoc("""
-                    Provides schema definition.
+                    Provides properties definition built from OpenAPI schema.
 
                     @generated
                     """)
