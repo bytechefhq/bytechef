@@ -3,13 +3,13 @@ ch-qos-logback = "1.4.7"
 checkstyle = "10.6.0"
 com-github-kagkarlsson = "12.2.0"
 com-google-auto-service = "1.1.0"
-info-picocli = "4.7.3"
+info-picocli = "4.7.4"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.0.1"
 org-springframework-boot = "3.1.0"
 org-springframework-cloud = "4.0.3"
 org-springframework-cloud-dependencies = "2022.0.3"
-org-testcontainers = "1.18.1"
+org-testcontainers = "1.18.3"
 pmd = "6.54.0"
 spotbugs = "4.7.3"
 
@@ -30,8 +30,8 @@ com-zaxxer-HikariCP = "com.zaxxer:HikariCP:5.0.1"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
 io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.6"
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.10"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.14"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.11"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.15"
 jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
@@ -71,7 +71,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.74"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.78"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.19.0"
@@ -81,5 +81,5 @@ com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.2"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.0"
 org-openapi-generator = "org.openapi.generator:6.6.0"
-org-sonarqube = "org.sonarqube:4.1.0.3113"
+org-sonarqube = "org.sonarqube:4.2.0.3129"
 org-springframework-boot = "org.springframework.boot:3.1.0"
