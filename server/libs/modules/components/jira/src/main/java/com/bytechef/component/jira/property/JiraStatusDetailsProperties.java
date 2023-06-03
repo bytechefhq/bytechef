@@ -29,24 +29,25 @@ import java.util.List;
  * @generated
  */
 public class JiraStatusDetailsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("self").label("Self")
-            .description("The URL of the status.")
-            .required(false),
-        string("description").label("Description")
-            .description("The description of the status.")
-            .required(false),
-        string("iconUrl").label("Icon Url")
-            .description("The URL of the icon used to represent the status.")
-            .required(false),
-        string("name").label("Name")
-            .description("The name of the status.")
-            .required(false),
-        string("id").label("Id")
-            .description("The ID of the status.")
-            .required(false),
-        object("statusCategory").properties(JiraStatusCategoryProperties.PROPERTIES)
-            .label("Status Category")
-            .description("A status category.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("self").label("Self")
+                .description("The URL of the status.")
+                .required(false),
+            string("description").label("Description")
+                .description("The description of the status.")
+                .required(false),
+            string("iconUrl").label("Icon Url")
+                .description("The URL of the icon used to represent the status.")
+                .required(false),
+            string("name").label("Name")
+                .description("The name of the status.")
+                .required(false),
+            string("id").label("Id")
+                .description("The ID of the status.")
+                .required(false),
+            object("statusCategory").properties(JiraStatusCategoryProperties.PROPERTIES)
+                .label("Status Category")
+                .description("A status category.")
+                .required(false));
 }

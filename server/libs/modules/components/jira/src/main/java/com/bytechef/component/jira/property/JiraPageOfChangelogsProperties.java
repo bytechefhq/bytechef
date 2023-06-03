@@ -30,20 +30,21 @@ import java.util.List;
  * @generated
  */
 public class JiraPageOfChangelogsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        integer("startAt").label("Start At")
-            .description("The index of the first item returned on the page.")
-            .required(false),
-        integer("maxResults").label("Max Results")
-            .description("The maximum number of results that could be on the page.")
-            .required(false),
-        integer("total").label("Total")
-            .description("The number of results on the page.")
-            .required(false),
-        array("histories").items(object().properties(JiraChangelogProperties.PROPERTIES)
-            .description("A changelog."))
-            .placeholder("Add to Histories")
-            .label("Histories")
-            .description("The list of changelogs.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            integer("startAt").label("Start At")
+                .description("The index of the first item returned on the page.")
+                .required(false),
+            integer("maxResults").label("Max Results")
+                .description("The maximum number of results that could be on the page.")
+                .required(false),
+            integer("total").label("Total")
+                .description("The number of results on the page.")
+                .required(false),
+            array("histories").items(object().properties(JiraChangelogProperties.PROPERTIES)
+                .description("A changelog."))
+                .placeholder("Add to Histories")
+                .label("Histories")
+                .description("The list of changelogs.")
+                .required(false));
 }

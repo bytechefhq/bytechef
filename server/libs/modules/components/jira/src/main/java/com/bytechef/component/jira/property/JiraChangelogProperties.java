@@ -31,30 +31,31 @@ import java.util.List;
  * @generated
  */
 public class JiraChangelogProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("id").label("Id")
-            .description("The ID of the changelog.")
-            .required(false),
-        object("author").properties(JiraUserDetailsProperties.PROPERTIES)
-            .label("Author")
-            .description(
-                "User details permitted by the user's Atlassian Account privacy settings. However, be aware of these exceptions:\n"
-                    + "\n"
-                    + " *  User record deleted from Atlassian: This occurs as the result of a right to be forgotten request. In this case, `displayName` provides an indication and other parameters have default values or are blank (for example, email is blank).\n"
-                    + " *  User record corrupted: This occurs as a results of events such as a server import and can only happen to deleted users. In this case, `accountId` returns *unknown* and all other parameters have fallback values.\n"
-                    + " *  User record unavailable: This usually occurs due to an internal service outage. In this case, all parameters have fallback values.")
-            .required(false),
-        dateTime("created").label("Created")
-            .description("The date on which the change took place.")
-            .required(false),
-        array("items").items(object().properties(JiraChangeDetailsProperties.PROPERTIES)
-            .description("A change item."))
-            .placeholder("Add to Items")
-            .label("Items")
-            .description("The list of items changed.")
-            .required(false),
-        object("historyMetadata").properties(JiraHistoryMetadataProperties.PROPERTIES)
-            .label("History Metadata")
-            .description("Details of issue history metadata.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("id").label("Id")
+                .description("The ID of the changelog.")
+                .required(false),
+            object("author").properties(JiraUserDetailsProperties.PROPERTIES)
+                .label("Author")
+                .description(
+                    "User details permitted by the user's Atlassian Account privacy settings. However, be aware of these exceptions:\n"
+                        + "\n"
+                        + " *  User record deleted from Atlassian: This occurs as the result of a right to be forgotten request. In this case, `displayName` provides an indication and other parameters have default values or are blank (for example, email is blank).\n"
+                        + " *  User record corrupted: This occurs as a results of events such as a server import and can only happen to deleted users. In this case, `accountId` returns *unknown* and all other parameters have fallback values.\n"
+                        + " *  User record unavailable: This usually occurs due to an internal service outage. In this case, all parameters have fallback values.")
+                .required(false),
+            dateTime("created").label("Created")
+                .description("The date on which the change took place.")
+                .required(false),
+            array("items").items(object().properties(JiraChangeDetailsProperties.PROPERTIES)
+                .description("A change item."))
+                .placeholder("Add to Items")
+                .label("Items")
+                .description("The list of items changed.")
+                .required(false),
+            object("historyMetadata").properties(JiraHistoryMetadataProperties.PROPERTIES)
+                .label("History Metadata")
+                .description("Details of issue history metadata.")
+                .required(false));
 }

@@ -29,19 +29,20 @@ import java.util.List;
  * @generated
  */
 public class JiraSimpleLinkProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("id").label("Id")
-            .required(false),
-        string("styleClass").label("Style Class")
-            .required(false),
-        string("iconClass").label("Icon Class")
-            .required(false),
-        string("label").label("Label")
-            .required(false),
-        string("title").label("Title")
-            .required(false),
-        string("href").label("Href")
-            .required(false),
-        integer("weight").label("Weight")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("id").label("Id")
+                .required(false),
+            string("styleClass").label("Style Class")
+                .required(false),
+            string("iconClass").label("Icon Class")
+                .required(false),
+            string("label").label("Label")
+                .required(false),
+            string("title").label("Title")
+                .required(false),
+            string("href").label("Href")
+                .required(false),
+            integer("weight").label("Weight")
+                .required(false));
 }

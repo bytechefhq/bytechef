@@ -30,7 +30,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.definition.DefinitionDSL;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty;
 import com.google.auto.service.AutoService;
 
 import java.util.List;
@@ -70,19 +70,19 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
         ActionDefinition actionDefinition, DefinitionDSL.ModifiableProperty<?> property) {
 
         if (Objects.equals(property.getName(), "owner_id") || Objects.equals(property.getName(), "user_id")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/users", null));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/users", null));
         } else if (Objects.equals(property.getName(), "org_id")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/organizations", null));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/organizations", null));
         } else if (Objects.equals(property.getName(), "person_id")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/persons", null));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/persons", null));
         } else if (Objects.equals(property.getName(), "pipeline_id")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/pipelines", null));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/pipelines", null));
         } else if (Objects.equals(property.getName(), "stage_id")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/stages", "pipeline_id"));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/stages", "pipeline_id"));
         } else if (Objects.equals(property.getName(), "currency")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/currencies", null));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/currencies", null));
         } else if (Objects.equals(property.getName(), "filter_id")) {
-            ((ModifiableStringProperty) property).options(PipedriveUtils.getOptions("/filters", null));
+            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/filters", null));
         }
 
         return property;

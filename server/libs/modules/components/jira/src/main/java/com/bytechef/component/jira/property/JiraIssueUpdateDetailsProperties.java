@@ -29,32 +29,33 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueUpdateDetailsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        object("transition").properties(JiraIssueTransitionProperties.PROPERTIES)
-            .label("Transition")
-            .description("Details of an issue transition.")
-            .required(false),
-        object("fields").additionalProperties(object())
-            .placeholder("Add to Fields")
-            .label("Fields")
-            .description(
-                "List of issue screen fields to update, specifying the sub-field to update and its value for each field. This field provides a straightforward option when setting a sub-field. When multiple sub-fields or other operations are required, use `update`. Fields included in here cannot be included in `update`.")
-            .required(false),
-        object("update").additionalProperties(array())
-            .placeholder("Add to Update")
-            .label("Update")
-            .description(
-                "A Map containing the field field name and a list of operations to perform on the issue screen field. Note that fields included in here cannot be included in `fields`.")
-            .required(false),
-        object("historyMetadata").properties(JiraHistoryMetadataProperties.PROPERTIES)
-            .label("History Metadata")
-            .description("Details of issue history metadata.")
-            .required(false),
-        array("properties").items(object().properties(JiraEntityPropertyProperties.PROPERTIES)
-            .description(
-                "An entity property, for more information see [Entity properties](https://developer.atlassian.com/cloud/jira/platform/jira-entity-properties/)."))
-            .placeholder("Add to Properties")
-            .label("Properties")
-            .description("Details of issue properties to be add or update.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            object("transition").properties(JiraIssueTransitionProperties.PROPERTIES)
+                .label("Transition")
+                .description("Details of an issue transition.")
+                .required(false),
+            object("fields").additionalProperties(object())
+                .placeholder("Add to Fields")
+                .label("Fields")
+                .description(
+                    "List of issue screen fields to update, specifying the sub-field to update and its value for each field. This field provides a straightforward option when setting a sub-field. When multiple sub-fields or other operations are required, use `update`. Fields included in here cannot be included in `update`.")
+                .required(false),
+            object("update").additionalProperties(array())
+                .placeholder("Add to Update")
+                .label("Update")
+                .description(
+                    "A Map containing the field field name and a list of operations to perform on the issue screen field. Note that fields included in here cannot be included in `fields`.")
+                .required(false),
+            object("historyMetadata").properties(JiraHistoryMetadataProperties.PROPERTIES)
+                .label("History Metadata")
+                .description("Details of issue history metadata.")
+                .required(false),
+            array("properties").items(object().properties(JiraEntityPropertyProperties.PROPERTIES)
+                .description(
+                    "An entity property, for more information see [Entity properties](https://developer.atlassian.com/cloud/jira/platform/jira-entity-properties/)."))
+                .placeholder("Add to Properties")
+                .label("Properties")
+                .description("Details of issue properties to be add or update.")
+                .required(false));
 }

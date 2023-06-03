@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jira.property;
+package com.bytechef.component.hubspot.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
@@ -24,23 +24,26 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
-public class JiraCreatedIssueProperties {
+public class HubspotSimplePublicObjectInputProperties {
     public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("id").label("Id")
-                .description("The ID of the created issue or subtask.")
+        List.of(object("properties").properties(string("company").label("Company")
+            .required(false),
+            string("email").label("Email")
                 .required(false),
-            string("key").label("Key")
-                .description("The key of the created issue or subtask.")
+            string("firstname").label("Firstname")
                 .required(false),
-            string("self").label("Self")
-                .description("The URL of the created issue or subtask.")
+            string("lastname").label("Lastname")
                 .required(false),
-            object("transition").properties(JiraNestedResponseProperties.PROPERTIES)
-                .label("Transition")
-                .required(false));
+            string("phone").label("Phone")
+                .required(false),
+            string("website").label("Website")
+                .required(false))
+            .additionalProperties(string())
+            .placeholder("Add to Properties")
+            .label("Properties")
+            .required(true));
 }
