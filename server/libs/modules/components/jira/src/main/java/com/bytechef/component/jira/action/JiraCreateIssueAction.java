@@ -19,8 +19,16 @@ package com.bytechef.component.jira.action;
 
 import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
@@ -64,6 +72,9 @@ public class JiraCreateIssueAction {
                 Map.of(
                     "type", PropertyType.QUERY)),
             object("issueUpdateDetails").properties(JiraIssueUpdateDetailsProperties.PROPERTIES)
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                .placeholder("Add to Issue Update Details")
                 .label("Issue Update Details")
                 .description("Details of an issue update request.")
                 .required(true)
@@ -71,6 +82,8 @@ public class JiraCreateIssueAction {
                     Map.of(
                         "type", PropertyType.BODY)))
         .outputSchema(object().properties(JiraCreatedIssueProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .description("Details about a created issue or subtask.")
             .metadata(
                 Map.of(

@@ -21,10 +21,15 @@ import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.component.jira.property.JiraSearchResultsProperties;
@@ -151,6 +156,8 @@ public class JiraSearchForIssuesUsingJqlAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .outputSchema(object().properties(JiraSearchResultsProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .description("The result of a JQL search.")
             .metadata(
                 Map.of(

@@ -24,17 +24,16 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class PetstoreCategoryProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            integer("id").label("Id")
-                .required(false)
-                .exampleValue(1),
-            string("name").label("Name")
-                .required(false)
-                .exampleValue("Dogs"));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        integer("id").label("Id")
+            .required(false)
+            .exampleValue(1),
+        string("name").label("Name")
+            .required(false)
+            .exampleValue("Dogs"));
 }
