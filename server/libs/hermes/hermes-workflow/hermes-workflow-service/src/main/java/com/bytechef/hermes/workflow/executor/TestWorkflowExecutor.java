@@ -67,7 +67,8 @@ public class TestWorkflowExecutor implements WorkflowExecutor {
         Job job = jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
 
         return new WorkflowResponse(
-            job, CollectionUtils.map(
+            job,
+            CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(job.getId())),
                 taskExecution -> new TaskExecutionDTO(
                     getComponentDefinition(taskExecution),

@@ -176,66 +176,66 @@ public final class HttpClientUtils {
 
     /**
      *
-     * @param uri
+     * @param url
      * @return
      */
-    public static Executor delete(String uri) {
-        return new Executor(uri, RequestMethod.DELETE);
+    public static Executor delete(String url) {
+        return new Executor(url, RequestMethod.DELETE);
     }
 
     /**
      *
-     * @param uri
+     * @param url
      * @param requestMethod
      * @return
      */
-    public static Executor exchange(String uri, RequestMethod requestMethod) {
-        return new Executor(uri, requestMethod);
+    public static Executor exchange(String url, RequestMethod requestMethod) {
+        return new Executor(url, requestMethod);
     }
 
     /**
      *
-     * @param uri
+     * @param url
      * @return
      */
-    public static Executor head(String uri) {
-        return new Executor(uri, RequestMethod.HEAD);
+    public static Executor head(String url) {
+        return new Executor(url, RequestMethod.HEAD);
     }
 
     /**
      *
-     * @param uri
+     * @param url
      * @return
      */
-    public static Executor get(String uri) {
-        return new Executor(uri, RequestMethod.GET);
+    public static Executor get(String url) {
+        return new Executor(url, RequestMethod.GET);
     }
 
     /**
      *
-     * @param uri
+     * @param url
      * @return
      */
-    public static Executor patch(String uri) {
-        return new Executor(uri, RequestMethod.PATCH);
+    public static Executor patch(String url) {
+        return new Executor(url, RequestMethod.PATCH);
     }
 
     /**
      *
-     * @param uri
+     * @param url
      * @return
      */
-    public static Executor post(String uri) {
-        return new Executor(uri, RequestMethod.POST);
+    public static Executor post(String url) {
+        return new Executor(url, RequestMethod.POST);
     }
 
     /**
      *
-     * @param uri
+     * @param url
      * @return
      */
-    public static Executor put(String uri) {
-        return new Executor(uri, RequestMethod.PUT);
+    public static Executor put(String url) {
+        return new Executor(url, RequestMethod.PUT);
     }
 
     /**

@@ -128,6 +128,6 @@ public class MailchimpSubscribeTrigger {
     protected static WebhookOutput dynamicWebhookRequest(DynamicWebhookRequestContext context) {
         WebhookBody webhookBody = context.body();
 
-        return WebhookOutput.map((Map<?, ?>) webhookBody.getContent());
+        return WebhookOutput.map(webhookBody.getContent());
     }
 }
