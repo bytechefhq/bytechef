@@ -39,8 +39,9 @@ public class WebhookBodyImpl implements WebhookBody {
     }
 
     @Override
-    public Object getContent() {
-        return content;
+    @SuppressWarnings("unchecked")
+    public <T> T getContent() {
+        return (T) content;
     }
 
     @Override
