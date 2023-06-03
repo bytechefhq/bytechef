@@ -255,8 +255,8 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record DynamicWebhookDisableContext(
-        Connection connection, Map<String, ?> inputParameters,
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
+        String workflowExecutionId) {
     }
 
     /**
@@ -485,7 +485,7 @@ public interface TriggerDefinition {
          *
          * @return
          */
-        Object getContent();
+        <T> T getContent();
 
         /**
          *

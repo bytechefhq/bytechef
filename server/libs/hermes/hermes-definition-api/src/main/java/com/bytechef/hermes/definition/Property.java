@@ -197,7 +197,7 @@ public sealed interface Property
         /**
          *
          */
-        Optional<List<? extends ValueProperty<?>>> getItems();
+        Optional<List<? extends Property>> getItems();
 
         /**
          *
@@ -293,7 +293,7 @@ public sealed interface Property
         /**
          *
          */
-        Optional<List<? extends ValueProperty<?>>> getAdditionalProperties();
+        Optional<List<? extends Property>> getAdditionalProperties();
 
         /**
          *
@@ -308,7 +308,7 @@ public sealed interface Property
         /**
          *
          */
-        Optional<List<? extends ValueProperty<?>>> getProperties();
+        Optional<List<? extends Property>> getProperties();
     }
 
     sealed interface OutputProperty<V> extends ValueProperty<V>
