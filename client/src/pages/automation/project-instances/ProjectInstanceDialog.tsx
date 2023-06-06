@@ -106,9 +106,9 @@ const ProjectInstanceDialog = ({
                     control={control}
                     touchedFields={touchedFields}
                     register={register}
-                    errors={errors}
                     setValue={setValue}
                     getValues={getValues}
+                    errors={errors}
                 />
             ),
             name: 'Basic',
@@ -252,15 +252,16 @@ const ProjectInstanceDialog = ({
 
                         <Button
                             label="Next"
-                            onClick={() =>
-                                setActiveStepIndex(activeStepIndex + 1)
-                            }
+                            onClick={() => {
+                                handleSubmit(saveProjectInstance);
+                                setActiveStepIndex(activeStepIndex + 1);
+                            }}
                         />
                     </>
                 )}
 
                 {activeStepIndex === 1 && (
-                    <>
+                    <div className="flex items-center justify-end space-x-2 border-t-2 px-4 py-2">
                         <Button
                             displayType="lightBorder"
                             label="Previous"
@@ -273,7 +274,7 @@ const ProjectInstanceDialog = ({
                             label="Save"
                             onClick={handleSubmit(saveProjectInstance)}
                         />
-                    </>
+                    </div>
                 )}
             </div>
         </Dialog>

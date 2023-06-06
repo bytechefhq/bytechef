@@ -8,7 +8,6 @@ import {
 import {
     Control,
     Controller,
-    FieldErrors,
     UseFormGetValues,
     UseFormRegister,
     UseFormReturn,
@@ -21,25 +20,25 @@ import {
     useGetProjectTagsQuery,
     useGetProjectsQuery,
 } from '../../../queries/projects.queries';
+import {useState} from 'react';
 
 interface ProjectDialogProps {
     projectInstance: ProjectInstanceModel | undefined;
     control: Control<ProjectInstanceModel>;
-    errors: FieldErrors<ProjectInstanceModel>;
     register: UseFormRegister<ProjectInstanceModel>;
     setValue: UseFormSetValue<ProjectInstanceModel>;
     getValues: UseFormGetValues<ProjectInstanceModel>;
     touchedFields: UseFormReturn<ProjectInstanceModel>['formState']['touchedFields'];
+    errors: UseFormReturn<ProjectInstanceModel>['formState']['errors'];
 }
 
 const StepBasic = ({
     control,
-    errors,
+    touchedFields,
     getValues,
     projectInstance,
     register,
     setValue,
-    touchedFields,
 }: ProjectDialogProps) => {
     const {
         data: projects,
@@ -57,6 +56,10 @@ const StepBasic = ({
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
+    const [name, setName] = useState<string | undefined>();
+
+    const [projectId, setProjectId] = useState<number | undefined>();
+
     return (
         <div>
             {projectsError && !projectsLoading && (
@@ -71,8 +74,13 @@ const StepBasic = ({
                 <Controller
                     control={control}
                     name="project"
+                    rules={{required: true}}
                     render={({field}) => (
                         <FilterableSelect
+                            error={
+                                touchedFields.projectId &&
+                                projectId === undefined
+                            }
                             field={field}
                             label="Project"
                             options={projects!.map((project: ProjectModel) => ({
@@ -86,6 +94,9 @@ const StepBasic = ({
                                     'projectId',
                                     Number.parseInt(selectedOption!.value!)
                                 );
+                                setProjectId(
+                                    Number.parseInt(selectedOption!.value!)
+                                );
                             }}
                         />
                     )}
@@ -93,10 +104,16 @@ const StepBasic = ({
             )}
 
             <Input
-                error={touchedFields.name && !!errors.name}
+                error={
+                    touchedFields.name &&
+                    (name === undefined || name.length === 0)
+                }
                 label="Name"
                 placeholder="My CRM Project - Production"
                 {...register('name', {required: true})}
+                onChange={(e) => {
+                    setName(e.target.value);
+                }}
             />
 
             <TextArea
@@ -135,5 +152,18 @@ const StepBasic = ({
         </div>
     );
 };
+
+const Errors = ({errors}: {errors: string[]}) => (
+    <ul>
+        {errors.map((error, index) => (
+            <li
+                key={`error_${index}`}
+                className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700"
+            >
+                An error has occurred: {error}
+            </li>
+        ))}
+    </ul>
+);
 
 export default StepBasic;
