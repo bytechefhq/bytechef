@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-29T17:06:53.766054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-06T11:31:50.900288+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "connection-tags", description = "the connection-tags API")
+@Tag(name = "connection-tags", description = "The Automation ConnectioncTags API")
 public interface ConnectionTagsApi {
 
     default Optional<NativeWebRequest> getRequest() {
