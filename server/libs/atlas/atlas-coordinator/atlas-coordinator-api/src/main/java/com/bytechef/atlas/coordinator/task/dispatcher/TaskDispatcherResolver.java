@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.configuration.task.Task;
 
 /**
  * The strategey interface used for resolving the apprpriate {@link TaskDispatcher} instance for a given {@link Task}.

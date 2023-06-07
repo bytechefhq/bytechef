@@ -86,11 +86,11 @@ public class ConnectionController implements ConnectionsApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<List<ConnectionModel>> getConnections(
+    public ResponseEntity<List<ConnectionModel>> searchConnections(
         List<String> componentNames, List<Long> tagIds) {
 
         return ResponseEntity.ok(
-            connectionFacade.getConnections(componentNames, tagIds)
+            connectionFacade.search(componentNames, tagIds)
                 .stream()
                 .map(connection -> conversionService.convert(connection, ConnectionModel.class)
                     .parameters(null))

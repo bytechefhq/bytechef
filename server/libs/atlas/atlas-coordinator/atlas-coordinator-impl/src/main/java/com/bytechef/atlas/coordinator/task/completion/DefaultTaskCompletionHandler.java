@@ -20,18 +20,18 @@
 package com.bytechef.atlas.coordinator.task.completion;
 
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
-import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.domain.TaskExecution.Status;
-import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.execution.domain.Context;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.evaluator.Evaluator;
 
 import java.time.LocalDateTime;

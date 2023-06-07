@@ -23,16 +23,16 @@ import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatc
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.Context;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.CounterService;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.Task;
-import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.CollectionUtils;

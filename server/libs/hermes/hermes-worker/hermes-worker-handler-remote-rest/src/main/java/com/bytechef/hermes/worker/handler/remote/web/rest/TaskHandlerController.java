@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.worker.handler.remote.web.rest;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;

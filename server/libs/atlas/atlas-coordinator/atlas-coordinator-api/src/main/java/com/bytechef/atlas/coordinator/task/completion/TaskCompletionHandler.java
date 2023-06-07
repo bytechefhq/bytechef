@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.coordinator.task.completion;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 
 /**
  * A strategy interface for handling {@link TaskExecution} completions.

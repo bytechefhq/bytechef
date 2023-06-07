@@ -18,7 +18,7 @@
 package com.bytechef.hermes.scheduler.remote.client.trigger;
 
 import com.bytechef.hermes.scheduler.TriggerScheduler;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;

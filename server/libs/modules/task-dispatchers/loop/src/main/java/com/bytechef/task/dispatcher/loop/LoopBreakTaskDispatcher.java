@@ -20,11 +20,11 @@ package com.bytechef.task.dispatcher.loop;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_BREAK;
 
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

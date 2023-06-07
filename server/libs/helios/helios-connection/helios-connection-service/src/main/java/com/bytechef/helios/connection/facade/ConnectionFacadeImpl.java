@@ -17,13 +17,13 @@
 
 package com.bytechef.helios.connection.facade;
 
-import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.workflow.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.oauth2.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -150,14 +150,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds) {
-        List<Connection> connections = connectionService.getConnections(componentNames, tagIds);
-
-        return getConnectionDTOs(connections);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Tag> getConnectionTags() {
         List<Connection> connections = connectionService.getConnections();
 
@@ -165,6 +157,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .map(Connection::getTagIds)
             .flatMap(Collection::stream)
             .toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectionDTO> search(List<String> componentNames, List<Long> tagIds) {
+        List<Connection> connections = connectionService.search(componentNames, tagIds);
+
+        return getConnectionDTOs(connections);
     }
 
     @Override
@@ -207,7 +207,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private boolean containsConnection(WorkflowConnection workflowConnection, long id) {
         return workflowConnection.getConnectionId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(workflowConnection.getKey(), workflowConnection.getTaskName()) != null);
+            .orElseGet(() -> getConnection(workflowConnection.getKey(), workflowConnection.getOperationName()) != null);
     }
 
     private boolean containsConnection(WorkflowTask workflowTask, long id) {

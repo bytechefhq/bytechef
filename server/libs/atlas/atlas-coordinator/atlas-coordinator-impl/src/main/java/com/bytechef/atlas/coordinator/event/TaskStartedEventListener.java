@@ -19,16 +19,16 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.domain.TaskExecution.Status;
-import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.execution.event.TaskStartedWorkflowEvent;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.WorkflowEvent;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.CancelControlTask;
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.task.CancelControlTask;
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;

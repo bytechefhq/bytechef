@@ -1,0 +1,63 @@
+plugins {
+    alias(libs.plugins.org.openapi.generator)
+}
+
+task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    apiPackage = "com.bytechef.helios.configuration.web.rest"
+    configOptions = [
+        "dateLibrary": "java8-localdatetime",
+        "interfaceOnly": "true",
+        "useSpringBoot3": "true"
+    ]
+    generatorName = "spring"
+    importMappings = [
+        "TagModel": "com.bytechef.tag.web.rest.model.TagModel"
+    ]
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    modelPackage = "com.bytechef.helios.configuration.web.rest.model"
+    outputDir = "$projectDir/../helios-configuration-rest-api/generated".toString()
+    schemaMappings = [
+        Category: "com.bytechef.category.web.rest.model.CategoryModel",
+        Connection: "com.bytechef.connection.web.rest.model.ConnectionModel",
+        ExecutionError: "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
+        Input: "com.bytechef.hermes.configuration.web.rest.model.InputModel",
+        Job: "com.bytechef.hermes.execution.web.rest.model.JobModel",
+        Output: "com.bytechef.hermes.configuration.web.rest.model.OutputModel",
+        Page: "org.springframework.data.domain.Page",
+        Tag: "TagModel",
+        TaskExecution: "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel",
+        Workflow: "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel",
+        WorkflowConnection: "com.bytechef.hermes.configuration.web.rest.model.WorkflowConnectionModel",
+        WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
+        WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
+    ]
+}
+
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
+
+task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "typescript-fetch"
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    outputDir = "$rootDir/client/src/middleware/automation/configuration".toString()
+    typeMappings = [
+        DateTime: "Date"
+    ]
+}
+
+tasks.register("generateOpenAPI") {
+    dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
+}
+
+dependencies {
+    api project(":server:libs:core:message-broker:message-broker-api")
+    api project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-web"
+    implementation project(":server:libs:core:commons:commons-util")
+
+    testImplementation "org.springframework:spring-webflux"
+    testImplementation "org.springframework.boot:spring-boot-starter-web"
+}

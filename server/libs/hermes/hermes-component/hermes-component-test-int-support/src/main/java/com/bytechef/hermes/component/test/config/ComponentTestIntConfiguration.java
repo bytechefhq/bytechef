@@ -24,22 +24,22 @@ import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.repository.memory.InMemoryJobRepository;
-import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.ContextServiceImpl;
-import com.bytechef.atlas.service.CounterService;
-import com.bytechef.atlas.service.CounterServiceImpl;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.JobServiceImpl;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.service.WorkflowServiceImpl;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.ContextServiceImpl;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.CounterServiceImpl;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
@@ -159,9 +159,8 @@ public class ComponentTestIntConfiguration {
         }
 
         @Bean
-        JobService jobService(ObjectMapper objectMapper, List<WorkflowRepository> workflowRepositories) {
-            return new JobServiceImpl(
-                new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepositories);
+        JobService jobService(ObjectMapper objectMapper) {
+            return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
         }
 
         @Bean

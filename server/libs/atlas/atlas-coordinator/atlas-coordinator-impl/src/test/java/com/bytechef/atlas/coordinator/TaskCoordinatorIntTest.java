@@ -19,36 +19,31 @@
 
 package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.factory.JobFactory;
-import com.bytechef.atlas.factory.JobFactoryImpl;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.jdbc.JdbcContextRepository;
-import com.bytechef.atlas.repository.jdbc.JdbcJobRepository;
-import com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository;
-import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToWebhooksConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.repository.jdbc.converter.WebhooksToStringConverter;
-import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
-import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.ContextServiceImpl;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.JobServiceImpl;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.service.WorkflowServiceImpl;
-import com.bytechef.atlas.sync.executor.JobSyncExecutor;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.execution.repository.jdbc.JdbcContextRepository;
+import com.bytechef.atlas.execution.repository.jdbc.JdbcJobRepository;
+import com.bytechef.atlas.execution.repository.jdbc.JdbcTaskExecutionRepository;
+import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
+import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
+import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.ContextServiceImpl;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.execution.sync.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.test.annotation.EmbeddedSql;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -89,9 +84,6 @@ public class TaskCoordinatorIntTest {
     private ContextService contextService;
 
     @Autowired
-    private JobFactory jobFactory;
-
-    @Autowired
     private JobService jobService;
 
     @Autowired
@@ -130,7 +122,7 @@ public class TaskCoordinatorIntTest {
             .workflowService(workflowService)
             .build();
 
-        return jobSyncExecutor.execute(new JobParameters(Collections.singletonMap("yourName", "me"), workflowId));
+        return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
     }
 
     @EmbeddedSql
@@ -147,13 +139,8 @@ public class TaskCoordinatorIntTest {
         }
 
         @Bean
-        JobFactory jobFactory(ContextService contextService, JobService jobService) {
-            return new JobFactoryImpl(contextService, e -> {}, jobService, new SyncMessageBroker());
-        }
-
-        @Bean
-        JobService jobService(JdbcJobRepository jdbcJobRepository, List<WorkflowRepository> workflowRepositories) {
-            return new JobServiceImpl(jdbcJobRepository, workflowRepositories);
+        JobService jobService(JdbcJobRepository jdbcJobRepository) {
+            return new JobServiceImpl(jdbcJobRepository);
         }
 
         @Bean
@@ -169,7 +156,9 @@ public class TaskCoordinatorIntTest {
                 new ConcurrentMapCacheManager(), workflowCrudRepositories, workflowRepositories);
         }
 
-        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
+        @EnableJdbcRepositories(basePackages = {
+            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.atlas.execution.repository.jdbc"
+        })
         public static class CoordinatorIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
         }
 
@@ -188,11 +177,9 @@ public class TaskCoordinatorIntTest {
                 return Arrays.asList(
                     new ExecutionErrorToStringConverter(objectMapper),
                     new MapWrapperToStringConverter(objectMapper),
-                    new MapListWrapperToStringConverter(objectMapper),
                     new StringToExecutionErrorConverter(objectMapper),
                     new StringToExecutionErrorConverter(objectMapper),
                     new StringToMapWrapperConverter(objectMapper),
-                    new StringToMapListWrapperConverter(objectMapper),
                     new StringToWebhooksConverter(objectMapper),
                     new StringToWorkflowTaskConverter(objectMapper),
                     new WebhooksToStringConverter(objectMapper),

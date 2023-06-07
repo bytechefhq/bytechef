@@ -19,17 +19,17 @@ package com.bytechef.hermes.task.dispatcher.test.workflow;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.CounterService;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.sync.executor.JobSyncExecutor;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.sync.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -91,7 +91,7 @@ public class TaskDispatcherWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
+        return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }
 
     @FunctionalInterface

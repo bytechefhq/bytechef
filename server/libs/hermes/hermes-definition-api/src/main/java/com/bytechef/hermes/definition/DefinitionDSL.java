@@ -825,6 +825,10 @@ public abstract class DefinitionDSL {
 
             @Override
             public PropertiesDataSource getDynamicPropertiesDataSource() {
+                if (propertiesFunction == null) {
+                    return null;
+                }
+
                 return new PropertiesDataSourceImpl(loadPropertiesDependsOn, propertiesFunction);
             }
         }
@@ -1575,7 +1579,6 @@ public abstract class DefinitionDSL {
         private final PropertiesFunction propertiesFunction;
 
         private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn, PropertiesFunction propertiesFunction) {
-
             if (loadPropertiesDependOn == null || loadPropertiesDependOn.isEmpty()) {
                 throw new IllegalStateException("loadPropertiesDependsOn is not defined.");
             }
