@@ -103,6 +103,8 @@ public class TagServiceImpl implements TagService {
         List<Tag> resultTags = new ArrayList<>();
 
         for (Tag tag : tags) {
+            Assert.notNull(tag.getName(), "'name' must no be null");
+
             if (tag.isNew()) {
                 OptionalUtils.ifPresentOrElse(
                     tagRepository.findByName(tag.getName()),
