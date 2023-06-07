@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.coordinator.trigger.completion;
 
-import com.bytechef.hermes.coordinator.job.InstanceFacadeRegistry;
-import com.bytechef.hermes.workflow.domain.TriggerExecution.Status;
-import com.bytechef.hermes.workflow.domain.TriggerExecution;
-import com.bytechef.hermes.coordinator.job.InstanceFacade;
-import com.bytechef.hermes.workflow.service.TriggerExecutionService;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
+import com.bytechef.hermes.coordinator.instance.registry.InstanceWorkflowManagerRegistry;
+import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,23 +31,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerCompletionHandler {
 
-    private final InstanceFacadeRegistry instanceFacadeRegistry;
+    private final InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry;
     private final TriggerExecutionService triggerExecutionService;
 
     public TriggerCompletionHandler(
-        InstanceFacadeRegistry instanceFacadeRegistry, TriggerExecutionService triggerExecutionService) {
+        InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry,
+        TriggerExecutionService triggerExecutionService) {
 
-        this.instanceFacadeRegistry = instanceFacadeRegistry;
+        this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
         this.triggerExecutionService = triggerExecutionService;
     }
 
     public void handle(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        InstanceFacade instanceFacade = instanceFacadeRegistry.getInstanceFacade(
+        InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
             workflowExecutionId.getInstanceType());
 
-        instanceFacade.createJob(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+        instanceWorkflowManager.createJob(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
 
         triggerExecution.setStatus(Status.COMPLETED);
 

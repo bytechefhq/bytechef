@@ -1,5 +1,7 @@
 dependencies {
     api project(":server:libs:core:error:error-api")
+    api project(":server:libs:atlas:atlas-configuration:atlas-configuration-api")
+    api project(":server:libs:atlas:atlas-execution:atlas-execution-api")
     api project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api")
     api project(":server:libs:core:message-broker:message-broker-api")
 
@@ -12,11 +14,13 @@ dependencies {
     implementation project(":server:libs:core:evaluator")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
-    testImplementation project(":server:libs:atlas:atlas-service")
+    testImplementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc")
+    testImplementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource")
+    testImplementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-service")
+    testImplementation project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc")
+    testImplementation project(":server:libs:atlas:atlas-execution:atlas-execution-service")
     testImplementation project(":server:libs:core:message-broker:message-broker-sync")
-    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
-    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
-    testImplementation project(":server:libs:atlas:atlas-sync-executor")
+    testImplementation project(":server:libs:atlas:atlas-execution:atlas-execution-sync")
     testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     testImplementation project(":server:libs:core:commons:commons-data")
     testImplementation project(":server:libs:db-migration")

@@ -1,8 +1,8 @@
 dependencies {
-    api project(":server:libs:atlas:atlas-api")
+    api project(":server:libs:atlas:atlas-configuration:atlas-configuration-api")
     api project(":server:libs:core:oauth2:oauth2-api")
     api project(":server:libs:helios:helios-connection:helios-connection-api")
-    api project(":server:libs:helios:helios-project:helios-project-api")
+    api project(":server:libs:helios:helios-configuration:helios-configuration-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
     implementation "org.springframework:spring-tx"
@@ -12,7 +12,7 @@ dependencies {
     testImplementation project(":server:libs:core:encryption:encryption-api")
     testImplementation project(":server:libs:core:tag:tag-service")
     testImplementation project(":server:libs:db-migration")
-    testImplementation project(":server:libs:helios:helios-project:helios-project-service")
+    testImplementation project(":server:libs:helios:helios-configuration:helios-configuration-service")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     testImplementation project(":server:libs:test:test-int-support")

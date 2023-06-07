@@ -35,7 +35,7 @@ public interface ConnectionFacade {
 
     List<ConnectionDTO> getConnections(String componentName, Integer componentVersion);
 
-    List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds);
+    List<ConnectionDTO> search(List<String> componentNames, List<Long> tagIds);
 
     List<Tag> getConnectionTags();
 

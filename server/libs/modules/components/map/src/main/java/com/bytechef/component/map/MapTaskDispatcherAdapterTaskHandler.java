@@ -19,21 +19,21 @@
 
 package com.bytechef.component.map;
 
-import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.execution.domain.Context;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.service.ContextServiceImpl;
-import com.bytechef.atlas.service.CounterServiceImpl;
-import com.bytechef.atlas.service.TaskExecutionServiceImpl;
+import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextServiceImpl;
+import com.bytechef.atlas.execution.service.CounterServiceImpl;
+import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;

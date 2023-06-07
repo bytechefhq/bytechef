@@ -36,11 +36,11 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -97,8 +97,7 @@ public class TaskCoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
-            contextService, eventPublisher, jobExecutor(), jobService, taskExecutionService,
-            workflowService);
+            contextService, eventPublisher, jobExecutor(), jobService, taskExecutionService, workflowService);
     }
 
     @Bean

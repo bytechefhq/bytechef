@@ -17,13 +17,13 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.task.CancelControlTask;
-import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.configuration.task.CancelControlTask;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.commons.util.MapValueUtils;
 import java.io.File;

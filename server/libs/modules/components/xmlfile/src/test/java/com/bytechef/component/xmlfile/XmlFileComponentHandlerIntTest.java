@@ -17,7 +17,7 @@
 
 package com.bytechef.component.xmlfile;
 
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.domain.FileEntry;

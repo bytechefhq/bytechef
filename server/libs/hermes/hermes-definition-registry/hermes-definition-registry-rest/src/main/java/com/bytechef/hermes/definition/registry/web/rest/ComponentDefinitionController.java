@@ -195,20 +195,6 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
-    public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions) {
-
-        return ResponseEntity.ok(
-            componentDefinitionFacade.search(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
-                .stream()
-                .map(componentDefinition -> conversionService.convert(
-                    componentDefinition, ComponentDefinitionBasicModel.class))
-                .toList());
-    }
-
-    @Override
     public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitionVersions(
         String componentName) {
 
@@ -303,5 +289,19 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
                     componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
                     searchText),
                 option -> conversionService.convert(option, OptionModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<List<ComponentDefinitionBasicModel>> searchComponentDefinitions(
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions) {
+
+        return ResponseEntity.ok(
+            componentDefinitionFacade.search(
+                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
+                .stream()
+                .map(componentDefinition -> conversionService.convert(
+                    componentDefinition, ComponentDefinitionBasicModel.class))
+                .toList());
     }
 }

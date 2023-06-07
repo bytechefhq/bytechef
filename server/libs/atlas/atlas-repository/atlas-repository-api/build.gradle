@@ -1,6 +1,0 @@
-dependencies {
-    api "org.springframework.data:spring-data-commons"
-    api project(":server:libs:atlas:atlas-api")
-
-    implementation project(":server:libs:core:commons:commons-util")
-}

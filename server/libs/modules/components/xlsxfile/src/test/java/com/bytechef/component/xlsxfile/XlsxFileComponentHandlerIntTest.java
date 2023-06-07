@@ -17,8 +17,8 @@
 
 package com.bytechef.component.xlsxfile;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;

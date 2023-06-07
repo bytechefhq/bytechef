@@ -20,8 +20,8 @@ package com.bytechef.component.csvfile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;

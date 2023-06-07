@@ -21,7 +21,7 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.RAW_EXPRESSION;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
 import java.util.ArrayList;

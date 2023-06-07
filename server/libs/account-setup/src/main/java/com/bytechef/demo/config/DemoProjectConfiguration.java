@@ -17,11 +17,11 @@
 
 package com.bytechef.demo.config;
 
-import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.domain.Workflow.SourceType;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.helios.project.domain.Project;
-import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.helios.configuration.domain.Project;
+import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

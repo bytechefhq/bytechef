@@ -1,0 +1,33 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Core Workflow API"
+  version: "1"
+servers:
+- url: "http://localhost:5173/api/core"
+tags:
+- name: "workflow-tests"
+  description: "The Core Workflow Tests API"
+paths:
+  /workflow-tests:
+    post:
+      description: "Execute a workflow synchronously for testing purposes."
+      summary: "Execute a workflow synchronously for testing purpose"
+      tags:
+      - "workflow-tests"
+      operationId: "testWorkflow"
+      requestBody:
+        description: "Parameters required to run a job, for example '{\"workflowId\"\
+          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
+        content:
+          application/json:
+            schema:
+              $ref: "../hermes-execution/hermes-execution-rest/hermes-execution-rest-impl/openapi.yaml#/components/schemas/JobParameters"
+        required: true
+      responses:
+        "200":
+          description: "The output expected by the workflow."
+          content:
+            application/json:
+              schema:
+                $ref: "../hermes-execution/hermes-execution-rest/hermes-execution-rest-impl/openapi.yaml#/components/schemas/Job"

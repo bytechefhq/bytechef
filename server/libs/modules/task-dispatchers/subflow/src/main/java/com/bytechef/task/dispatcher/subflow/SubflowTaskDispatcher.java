@@ -21,11 +21,11 @@ package com.bytechef.task.dispatcher.subflow;
 
 import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.SUBFLOW;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.factory.JobFactory;
-import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.factory.JobFactory;
+import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapValueUtils;
@@ -53,9 +53,9 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     @Override
     public void dispatch(TaskExecution taskExecution) {
         JobParameters jobParameters = new JobParameters(
-            MapValueUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()),
+            MapValueUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID),
             taskExecution.getId(),
-            MapValueUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
+            MapValueUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 
         jobFactory.create(jobParameters);
     }

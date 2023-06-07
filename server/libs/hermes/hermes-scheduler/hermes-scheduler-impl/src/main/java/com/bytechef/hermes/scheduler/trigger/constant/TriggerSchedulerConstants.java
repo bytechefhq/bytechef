@@ -19,7 +19,7 @@ package com.bytechef.hermes.scheduler.trigger.constant;
 
 import com.bytechef.hermes.scheduler.trigger.data.PollingTriggerScheduleAndData;
 import com.bytechef.hermes.scheduler.trigger.data.ScheduleTriggerScheduleAndData;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
 
 /**

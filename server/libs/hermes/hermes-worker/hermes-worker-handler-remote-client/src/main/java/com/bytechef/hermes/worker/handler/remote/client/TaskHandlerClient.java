@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.worker.handler.remote.client;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

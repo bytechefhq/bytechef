@@ -147,11 +147,11 @@ public class ConnectionControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections((List<String>) null, null)).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.search((List<String>) null, null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
-            .uri("/automation/connections")
+            .uri("/automation/connections/search")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -161,11 +161,11 @@ public class ConnectionControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections(List.of("component1"), null)).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.search(List.of("component1"), null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
-            .uri("/automation/connections?componentNames=component1")
+            .uri("/automation/connections/search?componentNames=component1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -173,11 +173,11 @@ public class ConnectionControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, List.of(1L))).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.search(null, List.of(1L))).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
-            .uri("/automation/connections?tagIds=1")
+            .uri("/automation/connections/search?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -185,11 +185,11 @@ public class ConnectionControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(List.of("component1"), List.of(1L))).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.search(List.of("component1"), List.of(1L))).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
-            .uri("/automation/connections?componentNames=component1&tagIds=1")
+            .uri("/automation/connections/search?componentNames=component1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()

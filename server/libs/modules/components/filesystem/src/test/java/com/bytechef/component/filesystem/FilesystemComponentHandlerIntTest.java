@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.domain.FileEntry;

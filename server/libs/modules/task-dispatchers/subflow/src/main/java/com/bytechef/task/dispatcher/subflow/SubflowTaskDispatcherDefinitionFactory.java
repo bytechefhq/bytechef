@@ -20,7 +20,7 @@ package com.bytechef.task.dispatcher.subflow;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants;

@@ -17,19 +17,19 @@
 
 package com.bytechef.hermes.coordinator;
 
-import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.coordinator.job.InstanceFacade;
-import com.bytechef.hermes.coordinator.job.InstanceFacadeRegistry;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
+import com.bytechef.hermes.coordinator.instance.registry.InstanceWorkflowManagerRegistry;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
-import com.bytechef.hermes.workflow.domain.TriggerExecution;
-import com.bytechef.hermes.workflow.service.TriggerExecutionService;
-import com.bytechef.hermes.workflow.trigger.WorkflowTrigger;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,7 +48,7 @@ public class TriggerCoordinator {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerCoordinator.class);
 
-    private final InstanceFacadeRegistry instanceFacadeRegistry;
+    private final InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry;
     private final MessageBroker messageBroker;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
@@ -57,11 +57,11 @@ public class TriggerCoordinator {
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
-        InstanceFacadeRegistry instanceFacadeRegistry, MessageBroker messageBroker,
+        InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry, MessageBroker messageBroker,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionService triggerExecutionService, WorkflowService workflowService) {
 
-        this.instanceFacadeRegistry = instanceFacadeRegistry;
+        this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
         this.messageBroker = messageBroker;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
@@ -97,11 +97,12 @@ public class TriggerCoordinator {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
             .build();
 
-        InstanceFacade instanceFacade = instanceFacadeRegistry.getInstanceFacade(
+        InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
             workflowExecutionId.getInstanceType());
 
         triggerExecution.evaluate(
-            instanceFacade.getInputs(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId()));
+            instanceWorkflowManager.getInputs(
+                workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId()));
 
         triggerExecutionService.create(triggerExecution);
 

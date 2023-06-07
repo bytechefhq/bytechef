@@ -68,7 +68,7 @@ public class ConnectionIntTestConfiguration {
     }
 
     @EnableJdbcRepositories(basePackages = {
-        "com.bytechef.helios.project.repository", "com.bytechef.hermes.connection.repository",
+        "com.bytechef.helios.configuration.repository", "com.bytechef.hermes.connection.repository",
         "com.bytechef.tag.repository"
     })
     public static class ConnectionIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {

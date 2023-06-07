@@ -17,7 +17,7 @@
 
 package com.bytechef.component.var;
 
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 

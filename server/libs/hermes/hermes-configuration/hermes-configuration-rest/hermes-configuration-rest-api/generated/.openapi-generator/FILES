@@ -1,0 +1,10 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/hermes/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/WorkflowsApi.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/InputModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/OutputModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/WorkflowConnectionModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/WorkflowFormatModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/WorkflowModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/WorkflowTaskModel.java

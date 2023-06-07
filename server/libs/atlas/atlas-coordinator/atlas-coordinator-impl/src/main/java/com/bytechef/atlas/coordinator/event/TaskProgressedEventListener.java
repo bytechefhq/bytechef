@@ -19,11 +19,11 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.event.TaskProgressedWorkflowEvent;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.WorkflowEvent;
-import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

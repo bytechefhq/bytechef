@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.oas;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context.FileEntry;

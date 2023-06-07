@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 
 /**
  * @author Ivica Cardic

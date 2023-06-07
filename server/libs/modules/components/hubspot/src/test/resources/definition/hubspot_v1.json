@@ -2,7 +2,7 @@
   "actions": [ {
     "batch": null,
     "componentName": "hubspot",
-    "componentDescription": null,
+    "componentDescription": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
     "componentTitle": "Hubspot",
     "deprecated": null,
     "description": "Create a contact with the given properties and return a copy of the object, including the ID. Documentation and examples for creating standard contacts is provided.",
@@ -71,9 +71,117 @@
         "multipleValues": null,
         "objectType": null,
         "options": null,
-        "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Company",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "company",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Email",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "email",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Firstname",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "firstname",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Lastname",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "lastname",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Phone",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "phone",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Website",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "website",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        } ],
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -143,8 +251,8 @@
               "sampleDataType": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -227,29 +335,30 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create",
+    "perform": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -325,8 +434,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -358,15 +467,15 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -382,8 +491,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -399,8 +508,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -442,20 +551,19 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "hubspot",
-    "componentDescription": null,
+    "componentDescription": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
     "componentTitle": "Hubspot",
     "deprecated": null,
     "description": "Perform a partial update of an Object identified by `{contactId}`. `{contactId}` refers to the internal object ID. Provided property values will be overwritten. Read-only and non-existent properties will be ignored. Properties values can be cleared by passing an empty string.",
@@ -544,14 +652,123 @@
         "multipleValues": null,
         "objectType": null,
         "options": null,
-        "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Company",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "company",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Email",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "email",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Firstname",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "firstname",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Lastname",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "lastname",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Phone",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "phone",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Website",
+          "metadata": { },
+          "placeholder": null,
+          "required": false,
+          "name": "website",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "TEXT",
+          "options": null,
+          "sampleDataType": null,
+          "optionsDataSource": null
+        } ],
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Update",
+    "perform": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -627,8 +844,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -660,15 +877,15 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -684,8 +901,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -701,8 +918,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -744,93 +961,19 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
     "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
     "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "api_key",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": true,
-        "label": "Key",
-        "metadata": { },
-        "placeholder": null,
-        "required": true,
-        "name": "key",
-        "type": "STRING",
-        "defaultValue": "hapikey",
-        "exampleValue": null,
-        "controlType": "TEXT",
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Value",
-        "metadata": { },
-        "placeholder": null,
-        "required": true,
-        "name": "value",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "controlType": "TEXT",
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": true,
-        "label": "Add to",
-        "metadata": { },
-        "placeholder": null,
-        "required": true,
-        "name": "addTo",
-        "type": "STRING",
-        "defaultValue": "QUERY_PARAMETERS",
-        "exampleValue": null,
-        "controlType": "TEXT",
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "API Key",
-      "type": "API_KEY",
-      "acquire": null,
-      "authorizationUrl": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
-      "authorizationCallback": null,
-      "clientId": null,
-      "clientSecret": null,
-      "scopes": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null
-    }, {
       "detectOn": null,
       "description": null,
       "name": "oauth2_authorization_code",
@@ -875,29 +1018,29 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "tokenUrl": { },
-      "refreshUrl": null,
-      "authorizationCallback": null,
-      "clientId": null,
-      "clientSecret": null,
-      "scopes": { },
       "apply": null,
       "pkce": null,
-      "refresh": null
+      "refresh": null,
+      "scopes": { },
+      "tokenUrl": { },
+      "refreshUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "authorizationUrl": { },
+      "authorizationCallback": null
     } ],
     "baseUri": { },
     "componentName": "hubspot",
-    "componentDescription": null,
+    "componentDescription": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
     "componentTitle": "Hubspot",
     "properties": null,
     "version": 1,
     "test": null
   },
-  "customAction": null,
+  "customAction": true,
   "customActionHelp": null,
-  "description": null,
-  "icon": null,
+  "description": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
+  "icon": "path:assets/hubspot.svg",
   "tags": null,
   "filterCompatibleConnectionDefinitions": null,
   "metadata": null,
@@ -905,5 +1048,596 @@
   "resources": null,
   "version": 1,
   "title": "Hubspot",
-  "triggers": [ ]
+  "triggers": [ {
+    "batch": null,
+    "componentName": "hubspot",
+    "componentDescription": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
+    "componentTitle": "Hubspot",
+    "deduplicate": null,
+    "deprecated": null,
+    "description": "Triggers when an event of the subscribed type happens inside HubSpot.",
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
+    "help": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
+    "name": "subscribe",
+    "poll": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": "The id of a Hubspot app used to register this trigger to. See the <a href=\"https://legacydocs.hubspot.com/docs/faq/integration-platform-api-requirements\">prerequisites documentation</a> for more details about creating an app",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "App Id",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "appId",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "TEXT",
+      "options": null,
+      "sampleDataType": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The list of available event types for which you want to receive events.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Event Type",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "eventType",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "SELECT",
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.creation",
+        "value": "Contact Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.deletion",
+        "value": "Contact Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.merge",
+        "value": "Contact Merge"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.associationChange",
+        "value": "Contact Association Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.restore",
+        "value": "Contact Restore"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.privacyDeletion",
+        "value": "Contact  Privacy Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "contact.propertyChange",
+        "value": "Contact Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "company.creation",
+        "value": "Contact Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "company.deletion",
+        "value": "Company Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "company.propertyChange",
+        "value": "Company Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "company.associationChange",
+        "value": "Company Association Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "company.restore",
+        "value": "Company Restore"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "company.merge",
+        "value": "Company Merge"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "deal.creation",
+        "value": "Deal Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "deal.deletion",
+        "value": "Deal Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "deal.associationChange",
+        "value": "Deal Association Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "deal.restore",
+        "value": "Deal Restore"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "deal.merge",
+        "value": "Deal Merge"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "deal.propertyChange",
+        "value": "Deal Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "ticket.creation",
+        "value": "Ticket Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "ticket.deletion",
+        "value": "Ticket Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "ticket.propertyChange",
+        "value": "Ticket Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "ticket.associationChange",
+        "value": "Ticket Association Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "ticket.restore",
+        "value": "Ticket Restore"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "ticket.merge",
+        "value": "Ticket Merge"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "product.creation",
+        "value": "Product Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "product.deletion",
+        "value": "Product Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "product.restore",
+        "value": "Product Restore"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "product.merge",
+        "value": "Product Merge"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "product.propertyChange",
+        "value": "Product Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "line_item.creation",
+        "value": "Line Item Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "line_item.deletion",
+        "value": "Line Item Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "line_item.associationChange",
+        "value": "Line Item Association Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "line_item.restore",
+        "value": "Line Item Restore"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "line_item.merge",
+        "value": "Line Item Merge"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "line_item.propertyChange",
+        "value": "Line Item Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "conversation.creation",
+        "value": "Conversation Creation"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "conversation.deletion",
+        "value": "Conversation Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "conversation.privacyDeletion",
+        "value": "Conversation Privacy Deletion"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "conversation.propertyChange",
+        "value": "Conversation Property Change"
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "conversation.newMessage",
+        "value": "Conversation New Message"
+      } ],
+      "sampleDataType": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The name of property to listen for change events.",
+      "displayCondition": "eventType.includes('.propertyChange')",
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Property Name",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "propertyName",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "TEXT",
+      "options": null,
+      "sampleDataType": null,
+      "optionsDataSource": null
+    } ],
+    "sampleOutput": "[\n    {\n        \"objectId\": 1246965,\n        \"propertyName\": \"lifecyclestage\",\n        \"propertyValue\": \"subscriber\",\n        \"changeSource\": \"ACADEMY\",\n        \"eventId\": 3816279340,\n        \"subscriptionId\": 25,\n        \"portalId\": 33,\n        \"appId\": 1160452,\n        \"occurredAt\": 1462216307945,\n        \"eventType\":\"contact.propertyChange\",\n        \"attemptNumber\": 0\n   }\n]\n",
+    "staticWebhookRequest": null,
+    "title": "Subscribe",
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null,
+    "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "items": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "placeholder": null,
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "objectType": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "placeholder": null,
+          "required": null,
+          "name": "data",
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "objectType": null,
+          "options": null,
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "objectId",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "propertyName",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "TEXT",
+            "options": null,
+            "sampleDataType": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "propertyValue",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "TEXT",
+            "options": null,
+            "sampleDataType": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "changeSource",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "TEXT",
+            "options": null,
+            "sampleDataType": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "eventId",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "subscriptionId",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "portalId",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "appId",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "occurredAt",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "eventType",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "TEXT",
+            "options": null,
+            "sampleDataType": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "attemptNumber",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "messageId",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "placeholder": null,
+            "required": null,
+            "name": "messageType",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "TEXT",
+            "options": null,
+            "sampleDataType": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
+        } ],
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      } ],
+      "multipleValues": null,
+      "options": null,
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    } ],
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
+  } ]
 }
