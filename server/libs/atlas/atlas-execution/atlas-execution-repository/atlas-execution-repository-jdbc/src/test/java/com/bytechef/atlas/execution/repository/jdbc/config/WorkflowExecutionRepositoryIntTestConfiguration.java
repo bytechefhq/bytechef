@@ -17,6 +17,8 @@
 
 package com.bytechef.atlas.execution.repository.jdbc.config;
 
+import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
@@ -41,7 +43,8 @@ import java.util.List;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.execution.repository.jdbc"
+        "com.bytechef.atlas.configuration.repository.jdbc.converter", "com.bytechef.atlas.execution.repository.jdbc",
+        "com.bytechef.liquibase.config",
     })
 @EnableAutoConfiguration
 @SpringBootConfiguration
@@ -58,12 +61,12 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
-    public static class WorkflowIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
+    public static class WorkflowExecutionIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public WorkflowIntJdbcTestConfiguration(ObjectMapper objectMapper) {
+        public WorkflowExecutionIntJdbcTestConfiguration(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
         }
 
@@ -74,7 +77,9 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
                 new ExecutionErrorToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper),
-                new WebhooksToStringConverter(objectMapper));
+                new StringToWorkflowTaskConverter(objectMapper),
+                new WebhooksToStringConverter(objectMapper),
+                new WorkflowTaskToStringConverter(objectMapper));
         }
     }
 }

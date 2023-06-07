@@ -828,8 +828,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     @ComponentScan(
         basePackages = {
-            "com.bytechef.hermes.component.util",
-            "com.bytechef.hermes.connection"
+            "com.bytechef.hermes.component.util", "com.bytechef.hermes.connection", "com.bytechef.liquibase.config"
         })
     @EnableAutoConfiguration
     @Configuration

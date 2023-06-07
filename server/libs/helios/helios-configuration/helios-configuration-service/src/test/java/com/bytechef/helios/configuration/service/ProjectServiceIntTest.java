@@ -43,9 +43,11 @@ import static org.assertj.core.api.Assertions.assertThatException;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = ProjectIntTestConfiguration.class, properties = {
-    "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc"
-})
+@SpringBootTest(
+    classes = ProjectIntTestConfiguration.class,
+    properties = {
+        "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc"
+    })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProjectServiceIntTest {
 

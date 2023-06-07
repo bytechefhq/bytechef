@@ -56,6 +56,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
@@ -125,6 +126,7 @@ public class TaskCoordinatorIntTest {
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
     }
 
+    @ComponentScan("com.bytechef.liquibase.config")
     @EmbeddedSql
     @EnableAutoConfiguration
     @Import({

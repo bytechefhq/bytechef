@@ -74,8 +74,8 @@ spring:
         - dev
   jmx:
     enabled: false
-#  main:
-#    allow-bean-definition-overriding: true
+  liquibase:
+    contexts: scheduler
   output:
     ansi:
       console-available: true

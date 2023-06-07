@@ -18,16 +18,15 @@ dependencies {
     implementation "org.springframework.boot:spring-boot"
     implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
-//    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
     testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     testImplementation libs.com.github.tomakehurst.wiremock
+    testImplementation project(":server:libs:configs:liquibase-config")
     testImplementation project(":server:libs:core:encryption:encryption-api")
     testImplementation project(":server:libs:core:commons:commons-data")
-    testImplementation project(":server:libs:core:tag:tag-api")
-    testImplementation project(":server:libs:db-migration")
+    testImplementation project(":server:libs:core:tag:tag-service")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")

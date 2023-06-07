@@ -39,8 +39,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.repository.jdbc", "com.bytechef.category", "com.bytechef.dione.configuration",
-        "com.bytechef.tag"
+        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.category", "com.bytechef.dione.configuration",
+        "com.bytechef.liquibase.config", "com.bytechef.tag"
     })
 @EnableAutoConfiguration
 @SpringBootConfiguration
@@ -61,7 +61,7 @@ public class IntegrationIntTestConfiguration {
 
     @EnableJdbcRepositories(
         basePackages = {
-            "com.bytechef.atlas.repository.jdbc", "com.bytechef.category.repository",
+            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.category.repository",
             "com.bytechef.dione.configuration.repository", "com.bytechef.tag.repository"
         })
     public static class IntegrationIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {

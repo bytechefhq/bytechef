@@ -38,7 +38,9 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = "com.bytechef.hermes.connection")
+@ComponentScan(basePackages = {
+    "com.bytechef.liquibase.config", "com.bytechef.hermes.connection"
+})
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class ConnectionIntTestConfiguration {

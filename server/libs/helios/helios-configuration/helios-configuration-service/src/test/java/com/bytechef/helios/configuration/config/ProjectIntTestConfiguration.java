@@ -39,7 +39,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.category", "com.bytechef.helios.configuration",
+        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.category",
+        "com.bytechef.helios.configuration", "com.bytechef.hermes.connection", "com.bytechef.liquibase.config",
         "com.bytechef.tag"
     })
 @EnableAutoConfiguration

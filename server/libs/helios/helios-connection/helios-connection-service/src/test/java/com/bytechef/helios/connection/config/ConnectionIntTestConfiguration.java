@@ -38,7 +38,9 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = "com.bytechef.helios.connection")
+@ComponentScan(basePackages = {
+    "com.bytechef.liquibase.config", "com.bytechef.helios.connection"
+})
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class ConnectionIntTestConfiguration {

@@ -38,7 +38,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = WorkflowRestTestConfiguration.class)
 @WebMvcTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
@@ -96,7 +94,7 @@ public class WorkflowControllerIntTest {
                 .uri("/core/workflows/1")
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isEqualTo(204);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
