@@ -57,11 +57,23 @@ export interface ProjectInstanceWorkflowModel {
      */
     lastExecutionDate?: Date;
     /**
+     * The id of a project instance.
+     * @type {number}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    projectInstanceId?: number;
+    /**
      * The id of a workflow.
      * @type {number}
      * @memberof ProjectInstanceWorkflowModel
      */
     workflowId?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    version?: number;
 }
 
 /**
@@ -88,7 +100,9 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
         'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
+        'projectInstanceId': !exists(json, 'projectInstanceId') ? undefined : json['projectInstanceId'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -105,7 +119,9 @@ export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkfl
         'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(ProjectInstanceWorkflowConnectionModelToJSON)),
         'enabled': value.enabled,
         'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
+        'projectInstanceId': value.projectInstanceId,
         'workflowId': value.workflowId,
+        '__version': value.version,
     };
 }
 

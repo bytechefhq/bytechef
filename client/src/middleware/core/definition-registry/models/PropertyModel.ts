@@ -31,7 +31,8 @@ import {
      NullPropertyModelFromJSONTyped,
      NumberPropertyModelFromJSONTyped,
      ObjectPropertyModelFromJSONTyped,
-     StringPropertyModelFromJSONTyped
+     StringPropertyModelFromJSONTyped,
+     TimePropertyModelFromJSONTyped
 } from './';
 
 /**
@@ -152,6 +153,9 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         }
         if (json['type'] === 'STRING') {
             return StringPropertyModelFromJSONTyped(json, true);
+        }
+        if (json['type'] === 'TIME') {
+            return TimePropertyModelFromJSONTyped(json, true);
         }
     }
     return {
