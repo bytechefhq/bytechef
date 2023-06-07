@@ -8,7 +8,7 @@ import {
     UpdateProjectInstanceTagsRequest,
     UpdateProjectTagsRequest,
     WorkflowModel,
-} from 'middleware/automation/project';
+} from 'middleware/automation/configuration';
 
 type CreateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;

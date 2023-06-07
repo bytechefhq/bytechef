@@ -8,12 +8,12 @@ import {
 import Badge from 'components/Badge/Badge';
 import {
     JobBasicModel,
-    WorkflowExecutionModel,
-} from 'middleware/automation/project';
+    ProjectWorkflowExecutionModel,
+} from 'middleware/automation/execution';
 import useWorkflowExecutionDetailsDialogStore from 'pages/automation/project/stores/useWorkflowExecutionDetailsDialogStore';
 
 const getDuration = (
-    info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>
+    info: CellContext<ProjectWorkflowExecutionModel, JobBasicModel | undefined>
 ) => {
     const infoValue = info.getValue();
 
@@ -25,7 +25,7 @@ const getDuration = (
     }
 };
 
-const columnHelper = createColumnHelper<WorkflowExecutionModel>();
+const columnHelper = createColumnHelper<ProjectWorkflowExecutionModel>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
@@ -72,8 +72,12 @@ const columns = [
     }),
 ];
 
-const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
-    const reactTable = useReactTable<WorkflowExecutionModel>({
+const WorkflowExecutionsTable = ({
+    data,
+}: {
+    data: ProjectWorkflowExecutionModel[];
+}) => {
+    const reactTable = useReactTable<ProjectWorkflowExecutionModel>({
         columns,
         data,
         getCoreRowModel: getCoreRowModel(),

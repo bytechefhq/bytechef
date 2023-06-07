@@ -8,7 +8,7 @@ import TextArea from 'components/TextArea/TextArea';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 
-import {WorkflowModel} from '../../middleware/core/workflow';
+import {WorkflowModel} from '../../middleware/core/workflow/configuration';
 
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */

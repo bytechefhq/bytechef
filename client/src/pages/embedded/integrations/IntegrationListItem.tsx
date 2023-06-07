@@ -14,7 +14,7 @@ import {
     IntegrationModel,
     IntegrationModelStatusEnum,
     TagModel,
-} from '../../../middleware/embedded/integration';
+} from '../../../middleware/embedded/configuration';
 import {
     useCreateIntegrationWorkflowRequestMutation,
     useDeleteIntegrationMutation,

@@ -1,7 +1,7 @@
 import {Switch} from '@headlessui/react';
 import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
-import {WorkflowModel} from 'middleware/automation/project';
+import {WorkflowModel} from 'middleware/automation/configuration';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
