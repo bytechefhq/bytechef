@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-29T17:06:53.766054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-06T11:31:50.900288+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connections", description = "The Automation Connections API")
 public interface ConnectionsApi {
@@ -43,7 +43,7 @@ public interface ConnectionsApi {
     }
 
     /**
-     * POST /connections : Create a new connection
+     * POST /connections/search : Create a new connection
      * Create a new connection.
      *
      * @param connectionModel  (required)
@@ -62,7 +62,7 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connections",
+        value = "/connections/search",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -194,17 +194,17 @@ public interface ConnectionsApi {
 
 
     /**
-     * GET /connections : Get connections
-     * Get connections.
+     * GET /connections/search : Search connections
+     * Search connections.
      *
      * @param componentNames The list of component names used for filtering connections. (optional)
      * @param tagIds The list of tag ids of used for filtering connections. (optional)
      * @return A list of connections. (status code 200)
      */
     @Operation(
-        operationId = "getConnections",
-        summary = "Get connections",
-        description = "Get connections.",
+        operationId = "searchConnections",
+        summary = "Search connections",
+        description = "Search connections.",
         tags = { "connections" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connections.", content = {
@@ -214,10 +214,10 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connections",
+        value = "/connections/search",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<ConnectionModel>> getConnections(
+    default ResponseEntity<List<ConnectionModel>> searchConnections(
         @Parameter(name = "componentNames", description = "The list of component names used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentNames", required = false) List<String> componentNames,
         @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds
     ) {

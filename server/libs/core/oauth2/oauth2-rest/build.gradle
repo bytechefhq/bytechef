@@ -14,9 +14,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.oauth2.web.rest.model"
     outputDir = "$projectDir/generated".toString()
-    schemaMappings = [
-        Tag: "TagModel"
-    ]
 }
 
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
