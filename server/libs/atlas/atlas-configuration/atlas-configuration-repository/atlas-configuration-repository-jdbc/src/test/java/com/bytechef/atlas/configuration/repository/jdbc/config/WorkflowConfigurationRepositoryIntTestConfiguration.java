@@ -40,7 +40,7 @@ import java.util.List;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.repository.jdbc"
+        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.liquibase.config",
     })
 @EnableAutoConfiguration
 @SpringBootConfiguration
@@ -56,13 +56,13 @@ public class WorkflowConfigurationRepositoryIntTestConfiguration {
     public static class CacheConfiguration {
     }
 
-    @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
-    public static class WorkflowIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
+    @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.configuration.repository.jdbc")
+    public static class WorkflowConfigurationIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public WorkflowIntJdbcTestConfiguration(ObjectMapper objectMapper) {
+        public WorkflowConfigurationIntJdbcTestConfiguration(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
         }
 

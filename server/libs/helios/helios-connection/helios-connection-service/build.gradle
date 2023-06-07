@@ -8,10 +8,11 @@ dependencies {
     implementation "org.springframework:spring-tx"
     implementation project(":server:libs:core:commons:commons-util")
 
+    testImplementation project(":server:libs:configs:liquibase-config")
+    testImplementation project(":server:libs:core:category:category-service")
     testImplementation project(":server:libs:core:commons:commons-data")
     testImplementation project(":server:libs:core:encryption:encryption-api")
     testImplementation project(":server:libs:core:tag:tag-service")
-    testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:helios:helios-configuration:helios-configuration-service")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")

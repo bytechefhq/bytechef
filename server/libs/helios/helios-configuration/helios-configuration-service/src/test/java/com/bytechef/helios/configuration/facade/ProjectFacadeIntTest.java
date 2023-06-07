@@ -19,10 +19,12 @@ package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.category.domain.Category;
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
@@ -332,6 +335,14 @@ public class ProjectFacadeIntTest {
             return new ProjectFacadeImpl(
                 categoryService, projectInstanceService,
                 projectService, tagService, workflowService);
+        }
+
+        @Bean
+        WorkflowService workflowService(
+            CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+            List<WorkflowRepository> workflowRepositories) {
+
+            return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
         }
     }
 }

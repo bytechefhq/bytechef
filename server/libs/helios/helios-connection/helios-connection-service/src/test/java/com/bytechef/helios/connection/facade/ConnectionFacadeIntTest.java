@@ -54,9 +54,11 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = ConnectionIntTestConfiguration.class, properties = {
-    "spring.application.name=server-app"
-})
+@SpringBootTest(
+    classes = ConnectionIntTestConfiguration.class,
+    properties = {
+        "spring.application.name=server-app"
+    })
 public class ConnectionFacadeIntTest {
 
     @Autowired

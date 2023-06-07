@@ -17,19 +17,30 @@
 
 package com.bytechef.atlas.execution.factory;
 
-import com.bytechef.atlas.execution.config.WorkflowIntTestConfiguration;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.repository.JobRepository;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 
 import java.util.Collections;
 
 @EmbeddedSql
 @SpringBootTest(
-    classes = WorkflowIntTestConfiguration.class,
+    classes = {
+        WorkflowExecutionIntTestConfiguration.class
+    },
     properties = {
         "bytechef.context-repository.provider=jdbc",
         "bytechef.persistence.provider=jdbc",
@@ -42,7 +53,28 @@ public class JobFactoryIntTest {
 
     @Test
     public void testRequiredParameters() {
-        Assertions.assertThrows(IllegalArgumentException.class,
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
             () -> jobFactory.create(new JobParameters("aGVsbG8x", Collections.emptyMap())));
+    }
+
+    @TestConfiguration
+    public static class JobFactoryIntTestConfiguration {
+
+        @MockBean
+        private ContextService contextService;
+
+        @MockBean
+        private WorkflowService workflowService;
+
+        @Bean
+        JobFactory jobFactory(JobService jobService, MessageBroker messageBroker) {
+            return new JobFactoryImpl(contextService, e -> {}, jobService, messageBroker, workflowService);
+        }
+
+        @Bean
+        JobService jobService(JobRepository jobRepository) {
+            return new JobServiceImpl(jobRepository);
+        }
     }
 }

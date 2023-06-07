@@ -80,8 +80,8 @@ spring:
     time-zone: UTC
   jmx:
     enabled: false
-#  main:
-#    allow-bean-definition-overriding: true
+  liquibase:
+      contexts: platform
   output:
     ansi:
       console-available: true
