@@ -38,6 +38,7 @@ paths:
                 fields:
                   type: "object"
                   additionalProperties: true
+                  x-property-type: "dynamicProperties"
       responses:
         "200":
           description: "Successful operation"
