@@ -12,7 +12,7 @@ import {
     CategoryModel,
     IntegrationModel,
     TagModel,
-} from '../../../middleware/embedded/integration';
+} from '../../../middleware/embedded/configuration';
 import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,

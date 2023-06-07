@@ -1,4 +1,4 @@
-import {ProjectInstanceModel} from 'middleware/automation/project';
+import {ProjectInstanceModel} from 'middleware/automation/configuration';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {UseFormGetValues} from 'react-hook-form';
 

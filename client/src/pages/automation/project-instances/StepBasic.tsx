@@ -4,7 +4,7 @@ import {
     ProjectInstanceModel,
     ProjectModel,
     TagModel,
-} from 'middleware/automation/project';
+} from 'middleware/automation/configuration';
 import {
     Control,
     Controller,

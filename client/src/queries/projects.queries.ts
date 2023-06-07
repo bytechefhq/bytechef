@@ -1,8 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
-    GetWorkflowExecutionRequest,
-    GetWorkflowExecutionsRequest,
     PageModel,
     ProjectCategoriesApi,
     ProjectInstanceModel,
@@ -12,11 +10,15 @@ import {
     ProjectTagsApi,
     ProjectsApi,
     TagModel,
-    WorkflowExecutionModel,
-    WorkflowExecutionsApi,
-} from 'middleware/automation/project';
+} from 'middleware/automation/configuration';
 
-import {WorkflowModel} from '../middleware/core/workflow';
+import {
+    GetProjectWorkflowExecutionRequest,
+    ProjectWorkflowExecutionModel,
+    ProjectWorkflowExecutionsApi,
+    SearchProjectWorkflowExecutionsRequest,
+} from '../middleware/automation/execution';
+import {WorkflowModel} from '../middleware/core/workflow/configuration';
 
 export const ProjectKeys = {
     project: (id: number) => ['project', id],
@@ -37,11 +39,11 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
-    workflowExecution: (request: GetWorkflowExecutionRequest) => [
+    workflowExecution: (request: GetProjectWorkflowExecutionRequest) => [
         'workflowExecution',
         request,
     ],
-    workflowExecutions: (filter: GetWorkflowExecutionsRequest) => [
+    workflowExecutions: (filter: SearchProjectWorkflowExecutionsRequest) => [
         'workflowExecutions',
         filter,
     ],
@@ -95,19 +97,24 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
     );
 
 export const useGetWorkflowExecutionsQuery = (
-    request: GetWorkflowExecutionsRequest
+    request: SearchProjectWorkflowExecutionsRequest
 ) =>
     useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
-        new WorkflowExecutionsApi().getWorkflowExecutions(request)
+        new ProjectWorkflowExecutionsApi().searchProjectWorkflowExecutions(
+            request
+        )
     );
 
 export const useGetWorkflowExecutionQuery = (
-    request: GetWorkflowExecutionRequest,
+    request: GetProjectWorkflowExecutionRequest,
     isEnabled: boolean
 ) =>
-    useQuery<WorkflowExecutionModel, Error>(
+    useQuery<ProjectWorkflowExecutionModel, Error>(
         ProjectKeys.workflowExecution(request),
-        () => new WorkflowExecutionsApi().getWorkflowExecution(request),
+        () =>
+            new ProjectWorkflowExecutionsApi().getProjectWorkflowExecution(
+                request
+            ),
         {
             enabled: isEnabled,
         }

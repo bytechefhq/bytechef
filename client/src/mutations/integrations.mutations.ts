@@ -6,7 +6,7 @@ import {
     IntegrationsApi,
     UpdateIntegrationTagsRequest,
     WorkflowModel,
-} from 'middleware/embedded/integration';
+} from 'middleware/embedded/configuration';
 
 type CreateIntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;

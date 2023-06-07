@@ -3,8 +3,8 @@ import {CheckIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
 import Dialog from 'components/Dialog/Dialog';
-import {TagModel} from 'middleware/automation/project';
-import {ProjectInstanceModel} from 'middleware/automation/project/models/ProjectInstanceModel';
+import {TagModel} from 'middleware/automation/configuration';
+import {ProjectInstanceModel} from 'middleware/automation/configuration/models/ProjectInstanceModel';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
