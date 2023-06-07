@@ -41,12 +41,12 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
             </ul>
 
             {!!additionalProperties?.length && (
-                <div className={
-                    twMerge(
+                <div
+                    className={twMerge(
                         !!properties?.length && 'mt-2',
                         'relative w-full self-start'
-                    )
-                }>
+                    )}
+                >
                     <Button
                         displayType="unstyled"
                         label="Add property"
