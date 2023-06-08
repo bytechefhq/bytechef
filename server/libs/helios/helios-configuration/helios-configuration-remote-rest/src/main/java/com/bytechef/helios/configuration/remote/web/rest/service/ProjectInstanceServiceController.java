@@ -19,6 +19,7 @@ package com.bytechef.helios.configuration.remote.web.rest.service;
 
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ public class ProjectInstanceServiceController {
 
     private final ProjectInstanceService projectInstanceService;
 
+    @SuppressFBWarnings("EI")
     public ProjectInstanceServiceController(ProjectInstanceService projectInstanceService) {
         this.projectInstanceService = projectInstanceService;
     }

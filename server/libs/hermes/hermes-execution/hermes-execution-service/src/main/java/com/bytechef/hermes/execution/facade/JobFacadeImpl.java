@@ -43,6 +43,7 @@ public class JobFacadeImpl implements JobFacade {
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public JobFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
         TaskExecutionService taskExecutionService) {
