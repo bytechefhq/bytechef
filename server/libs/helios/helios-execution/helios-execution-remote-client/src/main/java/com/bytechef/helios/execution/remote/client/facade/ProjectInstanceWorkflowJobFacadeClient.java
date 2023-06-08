@@ -36,6 +36,7 @@ public class ProjectInstanceWorkflowJobFacadeClient implements ProjectInstanceWo
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public long createJob(long instanceId, String workflowId) {
         return loadBalancedWebClientBuilder
             .build()

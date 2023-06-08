@@ -21,6 +21,7 @@ import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.execution.facade.ProjectInstanceWorkflowJobFacade;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -36,6 +37,7 @@ public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
 
     public static final String PROJECT = "PROJECT";
 
+    @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowManager(
         ProjectInstanceWorkflowService projectInstanceWorkflowService,
         ProjectInstanceWorkflowJobFacade projectInstanceWorkflowJobFacade) {
