@@ -17,10 +17,6 @@
 
 package com.bytechef.hermes.execution.dto;
 
-/**
- * @author Ivica Cardic
- */
-
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.atlas.execution.domain.Job.Webhook;

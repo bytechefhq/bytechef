@@ -37,6 +37,8 @@ import java.util.Objects;
  */
 public class AuthorizationUtils {
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     public static Authorization.ApplyConsumer getDefaultApply(Authorization.AuthorizationType type) {
         return switch (type) {
             case API_KEY -> (
@@ -63,8 +65,6 @@ public class AuthorizationUtils {
             };
             case BASIC_AUTH, DIGEST_AUTH -> (
                 Map<String, ?> connectionInputParameters, AuthorizationContext authorizationContext) -> {
-
-                final Base64.Encoder ENCODER = Base64.getEncoder();
 
                 String valueToEncode =
                     MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME) +
