@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest.mapper;
+package com.bytechef.helios.connection.web.rest.mapper;
 
-import com.bytechef.hermes.connection.web.rest.mapper.config.OAuth2MapperSpringConfig;
-import com.bytechef.oauth2.config.OAuth2Properties;
-import com.bytechef.oauth2.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.helios.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
+import com.bytechef.helios.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = OAuth2MapperSpringConfig.class)
+@Mapper(config = ConnectionMapperSpringConfig.class)
 public interface OAuth2PropertiesModelMapper extends Converter<OAuth2Properties, OAuth2PropertiesModel> {
 
     @Override

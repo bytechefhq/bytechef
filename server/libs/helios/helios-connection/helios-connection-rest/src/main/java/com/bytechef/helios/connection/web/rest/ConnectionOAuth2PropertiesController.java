@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest;
+package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.oauth2.config.OAuth2Properties;
-import com.bytechef.oauth2.web.rest.Oauth2PropertiesApi;
-import com.bytechef.oauth2.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.helios.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -31,13 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
-public class OAuth2PropertiesController implements Oauth2PropertiesApi {
+public class ConnectionOAuth2PropertiesController implements ConnectionOauth2PropertiesApi {
 
     private final ConversionService conversionService;
     private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
-    public OAuth2PropertiesController(ConversionService conversionService, OAuth2Properties oAuth2Properties) {
+    public ConnectionOAuth2PropertiesController(ConversionService conversionService,
+        OAuth2Properties oAuth2Properties) {
         this.conversionService = conversionService;
         this.oAuth2Properties = oAuth2Properties;
     }

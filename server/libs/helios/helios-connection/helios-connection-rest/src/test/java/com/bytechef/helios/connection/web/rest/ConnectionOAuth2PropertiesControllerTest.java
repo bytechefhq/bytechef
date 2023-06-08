@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest;
+package com.bytechef.helios.connection.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class OAuth2PropertiesControllerTest {
+public class ConnectionOAuth2PropertiesControllerTest {
 
     @Disabled
     @Test
