@@ -939,6 +939,31 @@ public class OpenApiComponentGenerator {
         return codeBlocks;
     }
 
+    private CodeBlock getExtensionsCodeBlock(
+        String propertyName, String propertyDescription, Boolean required, boolean outputSchema,
+        Map<String, Object> extensionMap) {
+
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
+
+        if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
+            propertyName = buildPropertyName(propertyName.replace("__", ""));
+
+            builder.add(".label($S)", StringUtils.capitalize(propertyName));
+        }
+
+        if (propertyDescription != null) {
+            builder.add(".description($S)", propertyDescription);
+        }
+
+        if (required != null) {
+            builder.add(".required($L)", required);
+        }
+
+        return builder.build();
+    }
+
     private String getMimeType(Set<Map.Entry<String, MediaType>> entries) {
         String mimeType;
 
@@ -1183,6 +1208,30 @@ public class OpenApiComponentGenerator {
         builder.add(".properties($L)", propertiesCodeBlock);
 
         return builder.build();
+    }
+
+    private CodeBlock getRefCodeBlock(
+        String propertyName, Boolean required, Schema<?> schema, boolean excludePropertyNameIfEmpty,
+        boolean outputSchema, OpenAPI openAPI) {
+
+        String ref = schema.get$ref();
+        Components components = openAPI.getComponents();
+
+        Map<String, Schema> schemaMap = components.getSchemas();
+
+        String curSchemaName = ref.replace("#/components/schemas/", "");
+
+        schemas.add(curSchemaName);
+
+        schema = schemaMap.get(curSchemaName);
+
+        return getSchemaCodeBlock(
+            StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
+                ? StringUtils.uncapitalize(curSchemaName)
+                : propertyName,
+            schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
+            outputSchema,
+            openAPI);
     }
 
     @SuppressWarnings({
@@ -1488,42 +1537,12 @@ public class OpenApiComponentGenerator {
                     }
                 }
             } else {
-                String ref = schema.get$ref();
-                Components components = openAPI.getComponents();
-
-                Map<String, Schema> schemaMap = components.getSchemas();
-
-                String curSchemaName = ref.replace("#/components/schemas/", "");
-
-                schemas.add(curSchemaName);
-
-                schema = schemaMap.get(curSchemaName);
-
                 builder.add(
-                    getSchemaCodeBlock(
-                        StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
-                            ? StringUtils.uncapitalize(curSchemaName)
-                            : propertyName,
-                        schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
-                        outputSchema,
-                        openAPI));
+                    getRefCodeBlock(propertyName, required, schema, excludePropertyNameIfEmpty, outputSchema, openAPI));
             }
         } else {
-            builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
-
-            if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
-                propertyName = buildPropertyName(propertyName.replace("__", ""));
-
-                builder.add(".label($S)", StringUtils.capitalize(propertyName));
-            }
-
-            if (propertyDescription != null) {
-                builder.add(".description($S)", propertyDescription);
-            }
-
-            if (required != null) {
-                builder.add(".required($L)", required);
-            }
+            builder.add(
+                getExtensionsCodeBlock(propertyName, propertyDescription, required, outputSchema, extensionMap));
         }
 
         return builder.build();
