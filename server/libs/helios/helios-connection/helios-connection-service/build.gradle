@@ -1,6 +1,5 @@
 dependencies {
     api project(":server:libs:atlas:atlas-configuration:atlas-configuration-api")
-    api project(":server:libs:core:oauth2:oauth2-api")
     api project(":server:libs:helios:helios-connection:helios-connection-api")
     api project(":server:libs:helios:helios-configuration:helios-configuration-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
