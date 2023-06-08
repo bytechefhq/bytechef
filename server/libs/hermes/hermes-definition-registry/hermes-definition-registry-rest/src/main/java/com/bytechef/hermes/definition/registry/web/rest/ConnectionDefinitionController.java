@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OAuth2AuthorizationParametersModel;
+import com.bytechef.hermes.definition.registry.web.rest.oauth2.OAuth2ParameterAccessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class ConnectionDefinitionController implements ConnectionDefinitionsApi {
 
-    private final ConnectionDefinitionFacade connectionDefinitionFacade;
+    private final OAuth2ParameterAccessor oAuth2ParameterAccessor;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionDefinitionController(
-        ConnectionDefinitionFacade connectionDefinitionFacade, ConversionService conversionService) {
+        OAuth2ParameterAccessor oAuth2ParameterAccessor, ConversionService conversionService) {
 
-        this.connectionDefinitionFacade = connectionDefinitionFacade;
+        this.oAuth2ParameterAccessor = oAuth2ParameterAccessor;
         this.conversionService = conversionService;
     }
 
@@ -48,7 +48,7 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectionDefinitionFacade.getOAuth2Parameters(
+                oAuth2ParameterAccessor.getOAuth2Parameters(
                     parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
                     parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
                 OAuth2AuthorizationParametersModel.class));
