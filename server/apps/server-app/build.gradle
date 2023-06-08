@@ -22,6 +22,7 @@ dependencies {
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest")
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-service")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc")
+    implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc-util")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-service")
