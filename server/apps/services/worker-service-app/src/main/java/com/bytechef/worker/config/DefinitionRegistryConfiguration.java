@@ -21,7 +21,6 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
-import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -34,8 +33,6 @@ import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.remote.client.service.ConnectionDefinitionServiceClient;
@@ -92,13 +89,6 @@ public class DefinitionRegistryConfiguration {
     @Bean
     ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
         return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
-    }
-
-    @Bean
-    ConnectionDefinitionFacade connectionDefinitionFacade(
-        ConnectionDefinitionService connectionDefinitionService, OAuth2Properties oAuth2Properties) {
-
-        return new ConnectionDefinitionFacadeImpl(connectionDefinitionService, oAuth2Properties);
     }
 
     @Bean

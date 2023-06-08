@@ -15,32 +15,33 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.facade;
+package com.bytechef.hermes.definition.registry.web.rest.oauth2;
 
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacade {
+@Component
+public class OAuth2ParameterAccessor {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
-    public ConnectionDefinitionFacadeImpl(
+    public OAuth2ParameterAccessor(
         ConnectionDefinitionService connectionDefinitionService, OAuth2Properties oAuth2Properties) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.oAuth2Properties = oAuth2Properties;
     }
 
-    @Override
     public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
