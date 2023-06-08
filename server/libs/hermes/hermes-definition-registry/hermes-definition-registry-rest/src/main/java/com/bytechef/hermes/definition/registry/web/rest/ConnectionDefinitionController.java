@@ -17,8 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
-import com.bytechef.oauth2.config.OAuth2Properties;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OAuth2AuthorizationParametersModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,18 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class ConnectionDefinitionController implements ConnectionDefinitionsApi {
 
-    private final ConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConversionService conversionService;
-    private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
     public ConnectionDefinitionController(
-        ConnectionDefinitionService connectionDefinitionService, ConversionService conversionService,
-        OAuth2Properties oAuth2Properties) {
+        ConnectionDefinitionFacade connectionDefinitionFacade, ConversionService conversionService) {
 
-        this.connectionDefinitionService = connectionDefinitionService;
+        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.conversionService = conversionService;
-        this.oAuth2Properties = oAuth2Properties;
     }
 
     @Override
@@ -52,11 +48,9 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
         return ResponseEntity.ok(
             conversionService.convert(
-                connectionDefinitionService.getOAuth2Parameters(
+                connectionDefinitionFacade.getOAuth2Parameters(
                     parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
-                    oAuth2Properties.checkPredefinedApp(
-                        parametersRequestModel.getComponentName(), parametersRequestModel.getParameters()),
-                    parametersRequestModel.getAuthorizationName()),
+                    parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
                 OAuth2AuthorizationParametersModel.class));
     }
 }
