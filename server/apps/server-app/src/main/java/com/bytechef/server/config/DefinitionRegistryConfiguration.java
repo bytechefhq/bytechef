@@ -19,19 +19,19 @@ package com.bytechef.server.config;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -88,6 +88,13 @@ public class DefinitionRegistryConfiguration {
     @Bean
     ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
         return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
+    }
+
+    @Bean
+    ConnectionDefinitionFacade connectionDefinitionFacade(
+        ConnectionDefinitionService connectionDefinitionService, OAuth2Properties oAuth2Properties) {
+
+        return new ConnectionDefinitionFacadeImpl(connectionDefinitionService, oAuth2Properties);
     }
 
     @Bean
