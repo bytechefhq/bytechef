@@ -62,14 +62,14 @@ public class AwsS3GetObjectAction {
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
 
-        Map<String, Object> connectionInputParameters = connection.getParameters();
+        Map<String, Object> connectionParameters = connection.getParameters();
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             return context.storeFileContent(
                 MapValueUtils.getRequiredString(inputParameters, FILENAME),
                 s3Client.getObject(
                     GetObjectRequest.builder()
-                        .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                        .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
                         .key(MapValueUtils.getRequiredString(inputParameters, KEY))
                         .build(),
                     ResponseTransformer.toInputStream()));

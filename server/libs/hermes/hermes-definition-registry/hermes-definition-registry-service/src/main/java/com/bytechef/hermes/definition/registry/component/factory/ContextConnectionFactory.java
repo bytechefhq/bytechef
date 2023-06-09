@@ -53,8 +53,7 @@ public class ContextConnectionFactory {
             componentDefinitionDTO.connection());
 
         return new ContextConnectionImpl(
-            authorizationName, componentName, connectionDefinitionService,
-            connectionDefinitionBasicDTO.version(),
+            authorizationName, componentName, connectionDefinitionService, connectionDefinitionBasicDTO.version(),
             connectionParameters);
     }
 }

@@ -190,10 +190,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, Object> connectionInputParameters);
+        String apply(Map<String, Object> connectionParameters);
     }
 
     @FunctionalInterface
@@ -201,11 +201,11 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @param authorizationContext
          */
         void accept(
-            Map<String, ?> connectionInputParameters, AuthorizationContext authorizationContext);
+            Map<String, ?> connectionParameters, AuthorizationContext authorizationContext);
     }
 
     /**
@@ -216,14 +216,14 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @param code
          * @param redirectUri
          * @param codeVerifier
          * @return
          */
         AuthorizationCallbackResponse apply(
-            Map<String, ?> connectionInputParameters, String code, String redirectUri, String codeVerifier);
+            Map<String, ?> connectionParameters, String code, String redirectUri, String codeVerifier);
     }
 
     /**
@@ -234,10 +234,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionInputParameters);
+        String apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -248,10 +248,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionInputParameters);
+        String apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -262,10 +262,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionInputParameters);
+        String apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -285,10 +285,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionInputParameters);
+        String apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -299,10 +299,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionInputParameters);
+        String apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -313,10 +313,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        List<String> apply(Map<String, ?> connectionInputParameters);
+        List<String> apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -327,10 +327,10 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
         /**
          *
-         * @param connectionInputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionInputParameters);
+        String apply(Map<String, ?> connectionParameters);
     }
 
     /**

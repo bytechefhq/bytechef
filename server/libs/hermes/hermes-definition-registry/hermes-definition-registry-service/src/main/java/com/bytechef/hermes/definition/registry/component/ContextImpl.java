@@ -77,12 +77,12 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public Optional<Connection> fetchConnection(String key) {
-        return fetchConnection(connectionIdMap.get(key)).map(this::toContextConnection);
+    public Optional<Connection> fetchConnection(String workflowConnectionKey) {
+        return fetchConnection(connectionIdMap.get(workflowConnectionKey)).map(this::toContextConnection);
     }
 
     @Override
-    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
+    public <T> Optional<T> fetchValue(String key, DataStorageScope scope, long scopeId) {
         return dataStorageService.fetchValue(scope, scopeId, key);
     }
 
@@ -100,8 +100,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public Connection getConnection(String key) {
-        return toContextConnection(connectionService.getConnection(connectionIdMap.get(key)));
+    public Connection getConnection(String workflowConnectionKey) {
+        return toContextConnection(connectionService.getConnection(connectionIdMap.get(workflowConnectionKey)));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public void saveValue(DataStorageScope scope, long scopeId, String key, Object value) {
+    public void saveValue(String key, Object value, DataStorageScope scope, long scopeId) {
         dataStorageService.save(scope, scopeId, key, value);
     }
 

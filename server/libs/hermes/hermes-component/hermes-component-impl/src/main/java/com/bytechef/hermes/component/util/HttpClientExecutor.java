@@ -180,7 +180,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
         httpRequestBuilder.uri(
             createURI(
-                getConnectionUri(context, urlString),
+                getConnectionUrl(urlString, context),
                 Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
 
         return httpRequestBuilder.build();
@@ -242,11 +242,11 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
             connection -> connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters)));
     }
 
-    private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
+    private static URI createURI(String urlString, @Nonnull Map<String, List<String>> queryParameters) {
         URI uri;
 
         if (queryParameters.isEmpty()) {
-            uri = URI.create(uriString);
+            uri = URI.create(urlString);
         } else {
             String parameter = queryParameters.entrySet()
                 .stream()
@@ -255,15 +255,15 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
                     .map(value -> entry.getKey() + "=" + value))
                 .collect(Collectors.joining("&"));
 
-            uri = URI.create(uriString + '?' + parameter);
+            uri = URI.create(urlString + '?' + parameter);
         }
 
         return uri;
     }
 
-    private static String getConnectionUri(Context context, String uriString) {
+    private static String getConnectionUrl(String urlString, Context context) {
         if (context == null) {
-            return uriString;
+            return urlString;
         }
 
         return context.fetchConnection()
