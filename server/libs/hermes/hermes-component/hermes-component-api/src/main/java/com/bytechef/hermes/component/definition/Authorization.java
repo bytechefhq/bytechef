@@ -83,7 +83,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
      *
      * @return
      */
-    Optional<ApplyConsumer> getApply();
+    Optional<ApplyFunction> getApply();
 
     /**
      *
@@ -196,16 +196,18 @@ public sealed interface Authorization permits ModifiableAuthorization {
         String apply(Map<String, Object> connectionParameters);
     }
 
+    /**
+     *
+     */
     @FunctionalInterface
-    interface ApplyConsumer {
+    interface ApplyFunction {
 
         /**
          *
          * @param connectionParameters
-         * @param authorizationContext
+         * @return
          */
-        void accept(
-            Map<String, ?> connectionParameters, AuthorizationContext authorizationContext);
+        ApplyResponse apply(Map<String, ?> connectionParameters);
     }
 
     /**
@@ -335,6 +337,53 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
     /**
      *
+     */
+    @SuppressFBWarnings("EI")
+    class ApplyResponse {
+        private final Map<String, List<String>> headers = new HashMap<>();
+        private final Map<String, List<String>> queryParameters = new HashMap<>();
+
+        /**
+         *
+         * @param headers
+         * @return
+         */
+        public static ApplyResponse ofHeaders(Map<String, List<String>> headers) {
+            ApplyResponse applyResponse = new ApplyResponse();
+
+            if (headers != null) {
+                applyResponse.headers.putAll(headers);
+            }
+
+            return applyResponse;
+        }
+
+        /**
+         * 
+         * @param queryParameters
+         * @return
+         */
+        public static ApplyResponse ofQueryParameters(Map<String, List<String>> queryParameters) {
+            ApplyResponse applyResponse = new ApplyResponse();
+
+            if (queryParameters != null) {
+                applyResponse.queryParameters.putAll(queryParameters);
+            }
+
+            return applyResponse;
+        }
+
+        public Map<String, List<String>> getHeaders() {
+            return headers;
+        }
+
+        public Map<String, List<String>> getQueryParameters() {
+            return queryParameters;
+        }
+    }
+
+    /**
+     *
      * @param accessToken
      * @param refreshToken
      * @param additionalParameters
@@ -357,13 +406,6 @@ public sealed interface Authorization permits ModifiableAuthorization {
 
             return map;
         }
-    }
-
-    interface AuthorizationContext {
-
-        void setHeaders(Map<String, List<String>> headers);
-
-        void setQueryParameters(Map<String, List<String>> queryParameters);
     }
 
     record Pkce(String verifier, String challenge, String challengeMethod) {

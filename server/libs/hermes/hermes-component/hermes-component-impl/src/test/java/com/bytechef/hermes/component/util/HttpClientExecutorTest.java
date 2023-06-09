@@ -19,7 +19,8 @@ package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
@@ -486,11 +487,11 @@ public class HttpClientExecutorTest {
         }
 
         @Override
-        public void applyAuthorization(AuthorizationContext authorizationContext) {
+        public ApplyResponse applyAuthorization() {
             // TODO mock ConnectionDefinitionService
-            Authorization.ApplyConsumer applyConsumer = AuthorizationUtils.getDefaultApply(authorization.getType());
+            ApplyFunction applyFunction = AuthorizationUtils.getDefaultApply(authorization.getType());
 
-            applyConsumer.accept(parameters, authorizationContext);
+            return applyFunction.apply(parameters);
         }
 
         @Override

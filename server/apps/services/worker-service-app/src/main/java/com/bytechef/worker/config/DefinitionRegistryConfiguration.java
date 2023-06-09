@@ -20,7 +20,7 @@ package com.bytechef.worker.config;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -166,16 +166,16 @@ public class DefinitionRegistryConfiguration {
          * Called from the Context.Connection instance.
          */
         @Override
-        public void executeAuthorizationApply(
+        public ApplyResponse executeAuthorizationApply(
             String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-            String authorizationName, AuthorizationContext authorizationContext) {
+            String authorizationName) {
 
             if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
-                connectionDefinitionService.executeAuthorizationApply(
-                    componentName, connectionVersion, connectionParameters, authorizationName, authorizationContext);
+                return connectionDefinitionService.executeAuthorizationApply(
+                    componentName, connectionVersion, connectionParameters, authorizationName);
             } else {
-                connectionDefinitionServiceClient.executeAuthorizationApply(
-                    componentName, connectionVersion, connectionParameters, authorizationName, authorizationContext);
+                return connectionDefinitionServiceClient.executeAuthorizationApply(
+                    componentName, connectionVersion, connectionParameters, authorizationName);
             }
         }
 

@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.util;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 
@@ -39,23 +39,21 @@ public class AuthorizationUtils {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-    public static Authorization.ApplyConsumer getDefaultApply(Authorization.AuthorizationType type) {
+    public static Authorization.ApplyFunction getDefaultApply(Authorization.AuthorizationType type) {
         return switch (type) {
-            case API_KEY -> (
-                Map<String, ?> connectionParameters, AuthorizationContext authorizationContext) -> {
-
+            case API_KEY -> (Map<String, ?> connectionParameters) -> {
                 String addTo = MapValueUtils.getString(
                     connectionParameters, Authorization.ADD_TO, ApiTokenLocation.HEADER.name());
 
                 if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
-                    authorizationContext.setHeaders(
+                    return ApplyResponse.ofHeaders(
                         Map.of(
                             MapValueUtils.getString(
                                 connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
                             List.of(
                                 MapValueUtils.getString(connectionParameters, Authorization.VALUE, ""))));
                 } else {
-                    authorizationContext.setQueryParameters(
+                    return ApplyResponse.ofQueryParameters(
                         Map.of(
                             MapValueUtils.getString(
                                 connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
@@ -63,42 +61,35 @@ public class AuthorizationUtils {
                                 MapValueUtils.getString(connectionParameters, Authorization.VALUE, ""))));
                 }
             };
-            case BASIC_AUTH, DIGEST_AUTH -> (
-                Map<String, ?> connectionParameters, AuthorizationContext authorizationContext) -> {
-
+            case BASIC_AUTH, DIGEST_AUTH -> (Map<String, ?> connectionParameters) -> {
                 String valueToEncode =
                     MapValueUtils.getString(connectionParameters, Authorization.USERNAME) +
                         ":" +
                         MapValueUtils.getString(connectionParameters, Authorization.PASSWORD);
 
-                authorizationContext.setHeaders(
+                return ApplyResponse.ofHeaders(
                     Map.of(
                         "Authorization",
                         List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
             };
-            case BEARER_TOKEN -> (
-                Map<String, ?> connectionParameters,
-                AuthorizationContext authorizationContext) -> authorizationContext.setHeaders(
-                    Map.of(
-                        Authorization.AUTHORIZATION,
-                        List.of(
-                            Authorization.BEARER + " " +
-                                MapValueUtils.getString(connectionParameters, Authorization.TOKEN))));
-            case CUSTOM -> (
-                Map<String, ?> connectionParameters, AuthorizationContext authorizationContext) -> {};
+            case BEARER_TOKEN -> (Map<String, ?> connectionParameters) -> ApplyResponse.ofHeaders(
+                Map.of(
+                    Authorization.AUTHORIZATION,
+                    List.of(
+                        Authorization.BEARER + " " +
+                            MapValueUtils.getString(connectionParameters, Authorization.TOKEN))));
+            case CUSTOM -> (Map<String, ?> connectionParameters) -> null;
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
-                    Map<String, ?> connectionParameters,
-                    AuthorizationContext authorizationContext) -> authorizationContext
-                        .setHeaders(
-                            Map.of(
-                                Authorization.AUTHORIZATION,
-                                List.of(
+                    Map<String, ?> connectionParameters) -> ApplyResponse.ofHeaders(
+                        Map.of(
+                            Authorization.AUTHORIZATION,
+                            List.of(
+                                MapValueUtils.getString(
+                                    connectionParameters, Authorization.HEADER_PREFIX, Authorization.BEARER) +
+                                    " " +
                                     MapValueUtils.getString(
-                                        connectionParameters, Authorization.HEADER_PREFIX, Authorization.BEARER) +
-                                        " " +
-                                        MapValueUtils.getString(
-                                            connectionParameters, Authorization.ACCESS_TOKEN))));
+                                        connectionParameters, Authorization.ACCESS_TOKEN))));
         };
     }
 
