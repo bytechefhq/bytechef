@@ -3,7 +3,7 @@ import {useQuery} from '@tanstack/react-query';
 import {
     ConnectionOauth2PropertiesApi,
     OAuth2PropertiesModel,
-} from '../middleware/automation/connection';
+} from '../middleware/core/connection';
 
 export const OAuth2PropertiesKeys = {
     oAuth2Properties: ['oAuth2Properties'] as const,
