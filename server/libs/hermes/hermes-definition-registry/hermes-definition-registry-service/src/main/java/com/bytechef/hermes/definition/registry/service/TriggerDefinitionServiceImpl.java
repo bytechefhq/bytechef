@@ -31,8 +31,10 @@ import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
+import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
+import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -132,11 +134,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentPropertiesFunction propertiesFunction = (ComponentPropertiesFunction) propertiesDataSource
             .getProperties();
 
-        return propertiesFunction.apply(
+        List<? extends Property.ValueProperty<?>> valueProperties = propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters)
-            .stream()
+            triggerParameters);
+
+        return valueProperties.stream()
             .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
             .toList();
     }
@@ -209,11 +212,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         ComponentOptionsFunction optionsFunction = (ComponentOptionsFunction) optionsDataSource.getOptions();
 
-        return optionsFunction.apply(
+        List<Option<?>> options = optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters, searchText)
-            .stream()
+            triggerParameters, searchText);
+
+        return options.stream()
             .map(OptionDTO::new)
             .toList();
     }
