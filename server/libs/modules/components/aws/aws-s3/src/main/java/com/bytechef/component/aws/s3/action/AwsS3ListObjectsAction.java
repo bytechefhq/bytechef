@@ -65,18 +65,18 @@ public class AwsS3ListObjectsAction {
 
         Connection connection = context.getConnection();
 
-        Map<String, Object> connectionInputParameters = connection.getParameters();
+        Map<String, Object> connectionParameters = connection.getParameters();
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
                 .prefix(MapValueUtils.getRequiredString(inputParameters, PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
                 .map(o -> new S3ObjectDescription(
-                    MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME), o))
+                    MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }

@@ -84,10 +84,10 @@ public class MailchimpSubscribeTrigger {
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = context.dynamicWebhookEnableOutput();
         Connection connection = context.connection();
 
-        Map<String, Object> connectionInputParameters = connection.getParameters();
+        Map<String, Object> connectionParameters = connection.getParameters();
 
         String server = MailchimpUtils.getMailChimpServer(
-            MapValueUtils.getRequiredString(connectionInputParameters, ACCESS_TOKEN));
+            MapValueUtils.getRequiredString(connectionParameters, ACCESS_TOKEN));
 
         Map<String, ?> inputParameters = context.inputParameters();
 

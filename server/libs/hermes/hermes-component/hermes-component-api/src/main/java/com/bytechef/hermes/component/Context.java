@@ -71,14 +71,13 @@ public interface Context {
     Optional<Connection> fetchConnection();
 
     /**
-     *
+     * @param <T>
+     * @param key
      * @param scope
      * @param scopeId
-     * @param key
      * @return
-     * @param <T>
      */
-    <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key);
+    <T> Optional<T> fetchValue(String key, DataStorageScope scope, long scopeId);
 
     /**
      *
@@ -107,13 +106,12 @@ public interface Context {
     String readFileToString(FileEntry fileEntry);
 
     /**
-     *
-     * @param scope
-     * @param scopeId
      * @param key
      * @param value
+     * @param scope
+     * @param scopeId
      */
-    void saveValue(DataStorageScope scope, long scopeId, String key, Object value);
+    void saveValue(String key, Object value, DataStorageScope scope, long scopeId);
 
     /**
      *

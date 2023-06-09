@@ -81,14 +81,14 @@ public class AwsS3PutObjectAction {
         FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
-            Map<String, Object> connectionInputParameters = connection.getParameters();
+            Map<String, Object> connectionParameters = connection.getParameters();
             Path tempFilePath = Files.createTempFile("", ".tmp");
 
             Files.copy(context.getFileStream(fileEntry), tempFilePath);
 
             s3Client.putObject(
                 PutObjectRequest.builder()
-                    .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                    .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
                     .key(MapValueUtils.getRequiredString(inputParameters, KEY))
                     .acl(MapValueUtils.getString(inputParameters, ACL) != null
                         ? ObjectCannedACL.fromValue(MapValueUtils.getString(inputParameters, ACL))

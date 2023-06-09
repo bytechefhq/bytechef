@@ -231,9 +231,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .toList();
     }
 
-    private Connection getConnection(String key, String taskName) {
+    private Connection getConnection(String workflowConnectionKey, String taskName) {
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(key, taskName);
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(workflowConnectionKey, taskName);
 
         return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
     }
