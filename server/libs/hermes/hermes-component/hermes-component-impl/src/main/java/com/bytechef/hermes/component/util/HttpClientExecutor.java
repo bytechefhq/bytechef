@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.util;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
@@ -32,7 +32,6 @@ import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
 import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -240,7 +239,12 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
         OptionalUtils.ifPresent(
             context.fetchConnection(),
-            connection -> connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters)));
+            connection -> {
+                ApplyResponse applyResponse = connection.applyAuthorization();
+
+                headers.putAll(applyResponse.getHeaders());
+                queryParameters.putAll(applyResponse.getQueryParameters());
+            });
     }
 
     private static URI createURI(String urlString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -396,22 +400,6 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
         public void checkServerTrusted(
             final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {
-        }
-    }
-
-    @SuppressFBWarnings("EI")
-    private record AuthorizationContextImpl(
-        Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
-        implements AuthorizationContext {
-
-        @Override
-        public void setHeaders(Map<String, List<String>> headers) {
-            this.headers.putAll(headers);
-        }
-
-        @Override
-        public void setQueryParameters(Map<String, List<String>> queryParameters) {
-            this.queryParameters.putAll(queryParameters);
         }
     }
 }

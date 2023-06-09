@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
@@ -54,21 +54,17 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     @SuppressFBWarnings("NP")
-    public void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
-        AuthorizationContext authorizationContext) {
+    public ApplyResponse executeAuthorizationApply(
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
-        Map<String, Map<String, List<String>>> authorizationContextMap = WORKER_WEB_CLIENT
+        return WORKER_WEB_CLIENT
             .post()
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName, "/connection-definition-service/execute-authorization-apply"))
             .bodyValue(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<Map<String, Map<String, List<String>>>>() {})
+            .bodyToMono(ApplyResponse.class)
             .block();
-
-        authorizationContext.setHeaders(authorizationContextMap.get("headers"));
-        authorizationContext.setQueryParameters(authorizationContextMap.get("queryParameters"));
     }
 
     @Override

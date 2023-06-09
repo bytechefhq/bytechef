@@ -374,7 +374,7 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableAuthorization implements Authorization {
 
         private AcquireFunction acquireFunction;
-        private ApplyConsumer applyConsumer;
+        private ApplyFunction applyFunction;
         private AuthorizationCallbackFunction authorizationCallbackFunction;
         private AuthorizationUrlFunction authorizationUrlFunction;
         private ClientIdFunction clientIdFunction;
@@ -408,9 +408,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableAuthorization apply(ApplyConsumer applyConsumer) {
-            if (applyConsumer != null) {
-                this.applyConsumer = applyConsumer;
+        public ModifiableAuthorization apply(ApplyFunction applyFunction) {
+            if (applyFunction != null) {
+                this.applyFunction = applyFunction;
             }
 
             return this;
@@ -526,8 +526,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<ApplyConsumer> getApply() {
-            return Optional.ofNullable(applyConsumer);
+        public Optional<ApplyFunction> getApply() {
+            return Optional.ofNullable(applyFunction);
         }
 
         @Override

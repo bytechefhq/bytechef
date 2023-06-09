@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
@@ -34,9 +34,8 @@ public interface ConnectionDefinitionService {
 
     boolean connectionExists(String componentName, int connectionVersion);
 
-    void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
-        AuthorizationContext authorizationContext);
+    ApplyResponse executeAuthorizationApply(
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,

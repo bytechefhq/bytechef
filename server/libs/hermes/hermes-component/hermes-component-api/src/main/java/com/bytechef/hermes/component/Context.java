@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -136,9 +136,9 @@ public interface Context {
 
         /**
          *
-         * @param authorizationContext
+         * @return
          */
-        void applyAuthorization(AuthorizationContext authorizationContext);
+        ApplyResponse applyAuthorization();
 
         /**
          *
