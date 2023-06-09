@@ -115,13 +115,14 @@ springdoc:
 #####
 
 bytechef:
+  connection:
+    oauth2:
+      redirectUri: ${bytechef.publicUrl}/callback
   data-storage:
     provider: db
   file-storage:
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files
-  oauth2:
-    redirectUri: ${bytechef.publicUrl}/callback
   context-repository:
     provider: jdbc
   message-broker:

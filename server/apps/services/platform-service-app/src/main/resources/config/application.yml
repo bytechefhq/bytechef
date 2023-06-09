@@ -110,10 +110,11 @@ spring:
 #####
 
 bytechef:
+  connection:
+    oauth2:
+      redirectUri: ${bytechef.publicUrl}/callback
   discovery-service:
     provider: redis
-  oauth2:
-    redirectUri: ${bytechef.publicUrl}/callback
   context-repository:
     provider: jdbc
   message-broker:

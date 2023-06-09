@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Arik Cohen
  */
 @Component
-@ConfigurationProperties(prefix = "bytechef.oauth2")
+@ConfigurationProperties(prefix = "bytechef.connection.oauth2")
 @SuppressFBWarnings("EI")
 public class OAuth2Properties {
 
