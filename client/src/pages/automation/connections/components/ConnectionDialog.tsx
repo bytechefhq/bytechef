@@ -628,7 +628,9 @@ const ConnectionDialog = ({
                                     }
                                 />
 
-                                {scopes && <Scopes scopes={scopes} />}
+                                {scopes && scopes.length > 0 && (
+                                    <Scopes scopes={scopes} />
+                                )}
                             </div>
                         )}
 
