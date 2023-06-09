@@ -54,15 +54,20 @@ public class ContextFactoryImpl implements ContextFactory {
 
     @Override
     public ActionContext createActionContext(Map<String, Long> connectionIdMap, Long taskExecutionId) {
-        return createContext(connectionIdMap, taskExecutionId);
+        return createContextImpl(connectionIdMap, taskExecutionId);
+    }
+
+    @Override
+    public ActionContext createActionContext(Map<String, Long> connectionIdMa) {
+        return createContextImpl(connectionIdMa, null);
     }
 
     @Override
     public TriggerContext createTriggerContext(Map<String, Long> connectionIdMap) {
-        return createContext(connectionIdMap, null);
+        return createContextImpl(connectionIdMap, null);
     }
 
-    private ContextImpl createContext(Map<String, Long> connectionIdMap, Long taskExecutionId) {
+    private ContextImpl createContextImpl(Map<String, Long> connectionIdMap, Long taskExecutionId) {
         return new ContextImpl(
             connectionDefinitionService, connectionIdMap, connectionService, dataStorageService, eventPublisher,
             fileStorageService, taskExecutionId);

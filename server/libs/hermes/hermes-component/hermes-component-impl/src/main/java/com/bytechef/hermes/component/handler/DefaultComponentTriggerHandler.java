@@ -35,7 +35,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
-import com.bytechef.hermes.component.util.ComponentContextSupplier;
+import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;

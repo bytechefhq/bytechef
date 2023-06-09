@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
@@ -66,13 +65,10 @@ public class PipedriveUtils {
 
     public static ComponentOptionsFunction getOptions(String path, String dependsOn) {
         return (connection, inputParameters, searchText) -> {
-            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
-
             String url = connection.getBaseUri() + path;
 
             Map<String, ?> response = HttpClientUtils
                 .get(url)
-                .header("Authorization", "Bearer " + accessToken)
                 .queryParameters(
                     dependsOn == null
                         ? Map.of()

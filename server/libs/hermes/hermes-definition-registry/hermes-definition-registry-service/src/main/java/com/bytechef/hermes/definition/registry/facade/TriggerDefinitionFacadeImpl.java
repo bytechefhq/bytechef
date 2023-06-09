@@ -17,8 +17,11 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
+import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
@@ -33,13 +36,16 @@ import java.util.Map;
 public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     private final ConnectionService connectionService;
+    private final ContextFactory contextFactory;
     private final TriggerDefinitionService triggerDefinitionService;
 
     @SuppressFBWarnings("EI")
     public TriggerDefinitionFacadeImpl(
-        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
+        ConnectionService connectionService, ContextFactory contextFactory,
+        TriggerDefinitionService triggerDefinitionService) {
 
         this.connectionService = connectionService;
+        this.contextFactory = contextFactory;
         this.triggerDefinitionService = triggerDefinitionService;
     }
 
@@ -48,11 +54,17 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId) {
 
-        Connection connection = connectionService.getConnection(connectionId);
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
 
-        return triggerDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, triggerName, propertyName, triggerParameters,
-            connection.getAuthorizationName(), connection.getParameters());
+        return ComponentContextSupplier.get(
+            context,
+            () -> {
+                Connection connection = connectionService.getConnection(connectionId);
+
+                return triggerDefinitionService.executeDynamicProperties(
+                    componentName, componentVersion, triggerName, propertyName, triggerParameters,
+                    connection.getAuthorizationName(), connection.getParameters());
+            });
     }
 
     @Override
@@ -60,11 +72,17 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        Connection connection = connectionService.getConnection(connectionId);
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
 
-        return triggerDefinitionService.executeEditorDescription(
-            componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
-            connection.getParameters());
+        return ComponentContextSupplier.get(
+            context,
+            () -> {
+                Connection connection = connectionService.getConnection(connectionId);
+
+                return triggerDefinitionService.executeEditorDescription(
+                    componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
+                    connection.getParameters());
+            });
     }
 
     @Override
@@ -72,11 +90,17 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId, String searchText) {
 
-        Connection connection = connectionService.getConnection(connectionId);
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
 
-        return triggerDefinitionService.executeOptions(
-            componentName, componentVersion, triggerName, propertyName, triggerParameters,
-            connection.getAuthorizationName(), connection.getParameters(), searchText);
+        return ComponentContextSupplier.get(
+            context,
+            () -> {
+                Connection connection = connectionService.getConnection(connectionId);
+
+                return triggerDefinitionService.executeOptions(
+                    componentName, componentVersion, triggerName, propertyName, triggerParameters,
+                    connection.getAuthorizationName(), connection.getParameters(), searchText);
+            });
     }
 
     @Override
@@ -84,11 +108,17 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        Connection connection = connectionService.getConnection(connectionId);
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
 
-        return triggerDefinitionService.executeOutputSchema(
-            componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
-            connection.getParameters());
+        return ComponentContextSupplier.get(
+            context,
+            () -> {
+                Connection connection = connectionService.getConnection(connectionId);
+
+                return triggerDefinitionService.executeOutputSchema(
+                    componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
+                    connection.getParameters());
+            });
     }
 
     @Override
@@ -96,10 +126,16 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        Connection connection = connectionService.getConnection(connectionId);
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
 
-        return triggerDefinitionService.executeSampleOutput(
-            componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
-            connection.getParameters());
+        return ComponentContextSupplier.get(
+            context,
+            () -> {
+                Connection connection = connectionService.getConnection(connectionId);
+
+                return triggerDefinitionService.executeSampleOutput(
+                    componentName, componentVersion, triggerName, triggerParameters, connection.getAuthorizationName(),
+                    connection.getParameters());
+            });
     }
 }

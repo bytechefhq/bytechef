@@ -26,6 +26,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
+import com.bytechef.hermes.definition.registry.component.util.ComponentContextThreadLocal;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -262,14 +263,18 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
     }
 
     private static String getConnectionUrl(String urlString, Context context) {
+        if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
+            return urlString;
+        }
+
         if (context == null) {
             return urlString;
         }
 
         return context.fetchConnection()
             .flatMap(Context.Connection::fetchBaseUri)
-            .map(baseUri -> baseUri + uriString)
-            .orElse(uriString);
+            .map(baseUri -> baseUri + urlString)
+            .orElse(urlString);
     }
 
     private static BodyPublisher getBinaryBodyPublisher(Context context, Body body, FileEntry fileEntry) {

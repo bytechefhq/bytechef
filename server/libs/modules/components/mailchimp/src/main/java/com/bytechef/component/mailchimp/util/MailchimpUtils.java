@@ -59,7 +59,6 @@ public class MailchimpUtils {
 
             Map<String, ?> response = HttpClientUtils
                 .get(url)
-                .header("Authorization", "Bearer " + accessToken)
                 .queryParameters(
                     Map.of(
                         "fields", List.of("lists.id,lists.name,total_items"),
