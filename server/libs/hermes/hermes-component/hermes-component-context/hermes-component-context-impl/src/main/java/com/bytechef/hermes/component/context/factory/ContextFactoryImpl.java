@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.component.factory;
+package com.bytechef.hermes.component.context.factory;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;
+import com.bytechef.hermes.component.context.ContextImpl;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
-import com.bytechef.hermes.definition.registry.component.ContextImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -58,8 +58,8 @@ public class ContextFactoryImpl implements ContextFactory {
     }
 
     @Override
-    public ActionContext createActionContext(Map<String, Long> connectionIdMa) {
-        return createContextImpl(connectionIdMa, null);
+    public ActionContext createActionContext(Map<String, Long> connectionIdMap) {
+        return createContextImpl(connectionIdMap, null);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private ContextImpl createContextImpl(Map<String, Long> connectionIdMap, Long taskExecutionId) {
         return new ContextImpl(
-            connectionDefinitionService, connectionIdMap, connectionService, dataStorageService, eventPublisher,
-            fileStorageService, taskExecutionId);
+            connectionIdMap, taskExecutionId, connectionDefinitionService, connectionService, dataStorageService,
+            fileStorageService, eventPublisher);
     }
 }

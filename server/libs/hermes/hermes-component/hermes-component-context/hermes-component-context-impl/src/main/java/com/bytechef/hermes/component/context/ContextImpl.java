@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.component;
+package com.bytechef.hermes.component.context;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.TaskProgressedWorkflowEvent;
@@ -27,7 +27,6 @@ import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.convert.converter.Converter;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -41,18 +40,18 @@ import java.util.Optional;
 public class ContextImpl implements ActionContext, TriggerContext {
 
     private final ConnectionDefinitionService connectionDefinitionService;
+    private final Map<String, Long> connectionIdMap;
     private final ConnectionService connectionService;
     private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final Long taskExecutionId;
-    private final Map<String, Long> connectionIdMap;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        ConnectionDefinitionService connectionDefinitionService, Map<String, Long> connectionIdMap,
-        ConnectionService connectionService, DataStorageService dataStorageService, EventPublisher eventPublisher,
-        FileStorageService fileStorageService, Long taskExecutionId) {
+        Map<String, Long> connectionIdMap, Long taskExecutionId,
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        DataStorageService dataStorageService, FileStorageService fileStorageService, EventPublisher eventPublisher) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionIdMap = connectionIdMap;
@@ -128,94 +127,25 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     @Override
     public FileEntry storeFileContent(String fileName, String data) {
-        return toContextFileEntry(fileStorageService.storeFileContent(fileName, data));
+        return new ContextFileEntryImpl(fileStorageService.storeFileContent(fileName, data));
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, InputStream inputStream) {
         try {
-            return toContextFileEntry(fileStorageService.storeFileContent(fileName, inputStream));
+            return new ContextFileEntryImpl(fileStorageService.storeFileContent(fileName, inputStream));
         } catch (Exception exception) {
             throw new ComponentExecutionException("Unable to store file " + fileName, exception);
         }
     }
 
-    private Optional<com.bytechef.hermes.connection.domain.Connection> fetchConnection(
-        Long connectionId) {
-
+    private Optional<com.bytechef.hermes.connection.domain.Connection> fetchConnection(Long connectionId) {
         return connectionId == null
             ? Optional.empty()
             : Optional.of(connectionService.getConnection(connectionId));
     }
 
-    private FileEntry toContextFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
-        return new ContextFileEntry(fileEntry);
-    }
-
     private Connection toContextConnection(com.bytechef.hermes.connection.domain.Connection connection) {
-        return new ContextConnectionImpl(
-            connection.getAuthorizationName(), connection.getComponentName(), connectionDefinitionService,
-            connection.getConnectionVersion(), connection.getParameters());
-    }
-
-    public static class ContextFileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
-
-        @Override
-        public FileEntry convert(Map<?, ?> source) {
-            return new ContextFileEntry(
-                (String) source.get("extension"),
-                (String) source.get("mimeType"),
-                (String) source.get("name"),
-                (String) source.get("url"));
-        }
-    }
-
-    private static class ContextFileEntry implements FileEntry {
-
-        private final String extension;
-        private final String mimeType;
-        private final String name;
-        private final String url;
-
-        private ContextFileEntry(String extension, String mimeType, String name, String url) {
-            this.extension = extension;
-            this.mimeType = mimeType;
-            this.name = name;
-            this.url = url;
-        }
-
-        public ContextFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
-            this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
-        }
-
-        @Override
-        public String getExtension() {
-            return extension;
-        }
-
-        @Override
-        public String getMimeType() {
-            return mimeType;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getUrl() {
-            return url;
-        }
-
-        @Override
-        public String toString() {
-            return "ContextFileEntry{" +
-                "extension='" + extension + '\'' +
-                ", mimeType='" + mimeType + '\'' +
-                ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-        }
+        return new ContextConnectionImpl(connection, connectionDefinitionService);
     }
 }

@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
@@ -33,7 +34,6 @@ import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;

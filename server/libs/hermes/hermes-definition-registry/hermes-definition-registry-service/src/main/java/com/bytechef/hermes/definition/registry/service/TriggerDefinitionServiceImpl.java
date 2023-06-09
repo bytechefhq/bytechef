@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
@@ -43,7 +44,6 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnable
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

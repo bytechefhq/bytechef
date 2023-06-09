@@ -104,9 +104,9 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
 
         if (triggerType != TriggerType.LISTENER) {
             beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTriggerHandler.class)
-                .addConstructorArgReference("contextFactory")
-                .addConstructorArgReference("dataStorageService")
                 .addConstructorArgValue(triggerDefinition)
+                .addConstructorArgReference("triggerLifecycleService")
+                .addConstructorArgReference("contextFactory")
                 .getBeanDefinition();
         }
 

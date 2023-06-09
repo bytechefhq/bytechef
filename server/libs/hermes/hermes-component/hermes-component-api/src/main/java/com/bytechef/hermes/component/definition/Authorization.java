@@ -359,7 +359,7 @@ public sealed interface Authorization permits ModifiableAuthorization {
         }
 
         /**
-         * 
+         *
          * @param queryParameters
          * @return
          */

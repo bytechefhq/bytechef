@@ -18,6 +18,7 @@
 package com.bytechef.hermes.configuration.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import com.bytechef.hermes.configuration.service.TriggerLifecycleService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class TriggerLifecycleServiceController {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(@PathVariable String workflowExecutionId) {
-        return triggerLifecycleService.fetchValue(workflowExecutionId)
+        return triggerLifecycleService.fetchValue(WorkflowExecutionId.parse(workflowExecutionId))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
                 .build());
@@ -60,7 +61,7 @@ public class TriggerLifecycleServiceController {
             "application/json"
         })
     public ResponseEntity<Void> save(@PathVariable String workflowExecutionId, DynamicWebhookEnableOutput value) {
-        triggerLifecycleService.save(workflowExecutionId, value);
+        triggerLifecycleService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
 
         return ResponseEntity.noContent()
             .build();

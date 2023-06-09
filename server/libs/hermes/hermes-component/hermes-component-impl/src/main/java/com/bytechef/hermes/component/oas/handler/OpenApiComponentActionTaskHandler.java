@@ -27,7 +27,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.oas.OpenApiClient;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

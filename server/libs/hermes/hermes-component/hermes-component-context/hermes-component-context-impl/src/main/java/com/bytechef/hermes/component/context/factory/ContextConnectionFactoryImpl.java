@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.component.factory;
+package com.bytechef.hermes.component.context.factory;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.definition.registry.component.ContextConnectionImpl;
+import com.bytechef.hermes.component.context.ContextConnectionImpl;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -30,12 +30,12 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ContextConnectionFactory {
+public class ContextConnectionFactoryImpl implements ContextConnectionFactory {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectionDefinitionService connectionDefinitionService;
 
-    public ContextConnectionFactory(
+    public ContextConnectionFactoryImpl(
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService) {
 
@@ -43,6 +43,7 @@ public class ContextConnectionFactory {
         this.connectionDefinitionService = connectionDefinitionService;
     }
 
+    @Override
     public Context.Connection createConnection(
         String componentName, int componentVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -53,7 +54,7 @@ public class ContextConnectionFactory {
             componentDefinitionDTO.connection());
 
         return new ContextConnectionImpl(
-            authorizationName, componentName, connectionDefinitionService, connectionDefinitionBasicDTO.version(),
-            connectionParameters);
+            componentName, connectionDefinitionBasicDTO.version(), connectionParameters, authorizationName,
+            connectionDefinitionService);
     }
 }

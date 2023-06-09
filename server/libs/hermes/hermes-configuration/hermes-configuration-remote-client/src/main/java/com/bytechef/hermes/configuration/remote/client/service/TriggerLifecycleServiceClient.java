@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.remote.client.service;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import com.bytechef.hermes.configuration.service.TriggerLifecycleService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -29,7 +29,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Component
+@Component("triggerLifecycleService")
 public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
@@ -40,7 +40,7 @@ public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
     }
 
     @Override
-    public <T> Optional<T> fetchValue(String workflowExecutionId) {
+    public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
         return Optional.ofNullable(
             loadBalancedWebClientBuilder
                 .build()
@@ -55,7 +55,7 @@ public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
     }
 
     @Override
-    public void save(String workflowExecutionId, DynamicWebhookEnableOutput value) {
+    public void save(WorkflowExecutionId workflowExecutionId, Object value) {
         loadBalancedWebClientBuilder
             .build()
             .put()

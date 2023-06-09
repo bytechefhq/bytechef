@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.handler;
 
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
@@ -35,10 +34,10 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
+import com.bytechef.hermes.configuration.service.TriggerLifecycleService;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -63,15 +62,16 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private static final String PARAMETERS = "parameters";
 
     private final ContextFactory contextFactory;
-    private final DataStorageService dataStorageService;
+    private final TriggerLifecycleService triggerLifecycleService;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerHandler(
-        ContextFactory contextFactory, DataStorageService dataStorageService, TriggerDefinition triggerDefinition) {
+        TriggerDefinition triggerDefinition, TriggerLifecycleService triggerLifecycleService,
+        ContextFactory contextFactory) {
 
         this.contextFactory = contextFactory;
-        this.dataStorageService = dataStorageService;
+        this.triggerLifecycleService = triggerLifecycleService;
         this.triggerDefinition = triggerDefinition;
     }
 
@@ -107,11 +107,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
-                    OptionalUtils.orElse(
-                        dataStorageService.fetchValue(
-                            Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
-                            workflowExecutionId.toString()),
-                        null),
+                    OptionalUtils.orElse(triggerLifecycleService.fetchValue(workflowExecutionId), null),
                     triggerContext));
 
             output = webhookOutput.getValue();
@@ -135,11 +131,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             PollOutput pollOutput = pollFunction.apply(
                 new PollContext(
                     triggerExecution.getParameters(),
-                    OptionalUtils.orElse(
-                        dataStorageService.fetchValue(
-                            Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
-                            workflowExecutionId.toString()),
-                        null),
+                    OptionalUtils.orElse(triggerLifecycleService.fetchValue(workflowExecutionId), null),
                     triggerContext));
 
             List<Map<?, ?>> records = new ArrayList<>(
@@ -153,9 +145,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             }
 
             if (pollOutput.closureParameters() != null) {
-                dataStorageService.save(
-                    Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
-                    workflowExecutionId.toString(), pollOutput.closureParameters());
+                triggerLifecycleService.save(workflowExecutionId, pollOutput.closureParameters());
             }
 
             output = records;

@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.jdbc.handler;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.handler.DefaultComponentActionTaskHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 
