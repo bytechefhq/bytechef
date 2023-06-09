@@ -27,6 +27,8 @@ import java.util.Map;
  */
 public interface ContextFactory {
 
+    ActionContext createActionContext(Map<String, Long> connectionIdMa);
+
     ActionContext createActionContext(Map<String, Long> connectionIdMap, Long taskExecutionId);
 
     TriggerContext createTriggerContext(Map<String, Long> connectionIdMap);

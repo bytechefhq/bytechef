@@ -37,7 +37,6 @@ import java.util.Objects;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
@@ -57,11 +56,8 @@ public class AirtableUtils {
 
     public static ComponentOptionsFunction getBaseIdOptions() {
         return (connection, inputParameters, searchText) -> {
-            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
-
             Map<String, ?> response = HttpClientUtils
                 .get("https://api.airtable.com/v0/meta/bases")
-                .header("Authorization", "Bearer " + accessToken)
                 .configuration(responseFormat(ResponseFormat.JSON))
                 .execute()
                 .getBody();
@@ -78,15 +74,12 @@ public class AirtableUtils {
         return (connection, inputParameters) -> {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
-            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
-
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 MapValueUtils.getRequiredString(inputParameters, BASE_ID));
 
             List<AirtableTable> tables = JsonUtils.read(
                 HttpClientUtils
                     .get(url)
-                    .header("Authorization", "Bearer " + accessToken)
                     .configuration(responseFormat(ResponseFormat.TEXT))
                     .execute()
                     .getBody());
@@ -145,14 +138,11 @@ public class AirtableUtils {
 
     public static ComponentOptionsFunction getTableIdOptions() {
         return (connection, inputParameters, searchText) -> {
-            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
-
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 MapValueUtils.getRequiredString(inputParameters, BASE_ID));
 
             Map<String, ?> response = HttpClientUtils
                 .get(url)
-                .header("Authorization", "Bearer " + accessToken)
                 .configuration(responseFormat(ResponseFormat.JSON))
                 .execute()
                 .getBody();

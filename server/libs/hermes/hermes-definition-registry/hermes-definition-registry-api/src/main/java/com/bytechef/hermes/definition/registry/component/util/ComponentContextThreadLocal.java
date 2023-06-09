@@ -15,34 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.util;
+package com.bytechef.hermes.definition.registry.component.util;
 
 import com.bytechef.hermes.component.Context;
-
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public final class ComponentContextSupplier {
+public final class ComponentContextThreadLocal {
 
-    public static <T, E extends Exception> T get(Context context, Supplier<T, E> supplier) throws E {
+    private static final ThreadLocal<Context> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
 
-        Objects.requireNonNull(context, "'context' must not be null");
-        Objects.requireNonNull(supplier, "'supplier' must not be null");
-
-        ComponentContextThreadLocal.set(context);
-
-        try {
-            return supplier.get();
-        } finally {
-            ComponentContextThreadLocal.remove();
-        }
+    public static Context get() {
+        return CONTEXT_THREAD_LOCAL.get();
     }
 
-    @FunctionalInterface
-    public interface Supplier<T, E extends Exception> {
+    static void set(Context context) {
+        CONTEXT_THREAD_LOCAL.set(context);
+    }
 
-        T get() throws E;
+    static void remove() {
+        CONTEXT_THREAD_LOCAL.remove();
     }
 }
