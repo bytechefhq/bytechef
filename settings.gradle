@@ -108,6 +108,7 @@ include("server:libs:hermes:hermes-definition-registry:hermes-definition-registr
 include("server:libs:hermes:hermes-connection:hermes-connection-api")
 include("server:libs:hermes:hermes-connection:hermes-connection-remote-client")
 include("server:libs:hermes:hermes-connection:hermes-connection-remote-rest")
+include("server:libs:hermes:hermes-connection:hermes-connection-rest")
 include("server:libs:hermes:hermes-connection:hermes-connection-service")
 include("server:libs:hermes:hermes-configuration:hermes-configuration-api")
 include("server:libs:hermes:hermes-configuration:hermes-configuration-remote-client")
