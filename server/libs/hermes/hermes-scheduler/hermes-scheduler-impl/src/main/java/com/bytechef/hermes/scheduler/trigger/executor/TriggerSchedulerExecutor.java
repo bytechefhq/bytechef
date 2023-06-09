@@ -59,13 +59,13 @@ public class TriggerSchedulerExecutor {
         LocalDateTime webhookExpirationDate = null;
 
         DynamicWebhookEnableOutput output = OptionalUtils.get(
-            triggerLifecycleService.fetchValue(workflowExecutionId.toString()));
+            triggerLifecycleService.fetchValue(workflowExecutionId));
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
             componentName, componentVersion, workflowExecutionId.getTriggerName(), output);
 
         if (output != null) {
-            triggerLifecycleService.save(workflowExecutionId.toString(), output);
+            triggerLifecycleService.save(workflowExecutionId, output);
 
             webhookExpirationDate = output.webhookExpirationDate();
         }

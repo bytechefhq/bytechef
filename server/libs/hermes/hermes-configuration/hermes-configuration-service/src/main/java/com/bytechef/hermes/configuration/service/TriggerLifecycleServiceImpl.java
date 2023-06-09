@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.service;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import com.bytechef.hermes.configuration.domain.TriggerLifecycle;
 import com.bytechef.hermes.configuration.repository.TriggerLifecycleRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,7 +29,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Service
+@Service("triggerLifecycleService")
 @Transactional
 public class TriggerLifecycleServiceImpl implements TriggerLifecycleService {
 
@@ -43,15 +43,15 @@ public class TriggerLifecycleServiceImpl implements TriggerLifecycleService {
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public <T> Optional<T> fetchValue(String workflowExecutionId) {
-        return triggerLifecycleRepository.findByWorkflowExecutionId(workflowExecutionId)
+    public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
+        return triggerLifecycleRepository.findByWorkflowExecutionId(workflowExecutionId.getWorkflowId())
             .map(dataStorage -> (T) dataStorage.getValue());
     }
 
     @Override
-    public void save(String workflowExecutionId, DynamicWebhookEnableOutput value) {
+    public void save(WorkflowExecutionId workflowExecutionId, Object value) {
         triggerLifecycleRepository
-            .findByWorkflowExecutionId(workflowExecutionId)
+            .findByWorkflowExecutionId(workflowExecutionId.toString())
             .ifPresentOrElse(
                 triggerLifecycle -> {
                     triggerLifecycle.setValue(value);

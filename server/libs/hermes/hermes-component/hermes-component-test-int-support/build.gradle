@@ -18,6 +18,7 @@ dependencies {
     implementation project(":server:libs:core:encryption:encryption-api")
     implementation project(":server:libs:core:event:event-listener:event-listener-impl")
     implementation project(":server:libs:core:message-broker:message-broker-sync")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-impl")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")

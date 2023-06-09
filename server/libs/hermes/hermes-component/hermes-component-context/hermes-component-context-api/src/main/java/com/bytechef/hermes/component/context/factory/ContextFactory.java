@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.component.factory;
+package com.bytechef.hermes.component.context.factory;
 
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;

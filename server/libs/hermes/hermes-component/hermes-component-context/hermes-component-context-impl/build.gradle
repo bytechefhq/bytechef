@@ -1,8 +1,10 @@
 dependencies {
+    api project(":server:libs:atlas:atlas-execution:atlas-execution-api")
     api project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-api")
     api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
+    api project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
-    implementation "org.springframework:spring-context"
     implementation project(":server:libs:core:commons:commons-util")
 }

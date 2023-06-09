@@ -67,12 +67,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public boolean connectionExists(String componentName, int connectionVersion) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .anyMatch(componentDefinition -> {
-                ConnectionDefinition connectionDefinition = OptionalUtils.get(componentDefinition.getConnection());
-
-                return componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    connectionDefinition.getVersion() == connectionVersion;
-            });
+            .anyMatch(componentDefinition -> componentDefinition.getConnection()
+                .map(connectionDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                    connectionDefinition.getVersion() == connectionVersion)
+                .orElse(false));
     }
 
     @Override

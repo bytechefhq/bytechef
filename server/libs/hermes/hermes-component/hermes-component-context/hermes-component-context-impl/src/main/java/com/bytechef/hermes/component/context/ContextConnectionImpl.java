@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.component;
+package com.bytechef.hermes.component.context;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
+import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -26,9 +27,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * @author Ivica Cardic
- */
 public class ContextConnectionImpl implements Context.Connection {
 
     private final String authorizationName;
@@ -38,19 +36,28 @@ public class ContextConnectionImpl implements Context.Connection {
     private final Map<String, ?> parameters;
 
     @SuppressFBWarnings("EI")
+    public ContextConnectionImpl(Connection connection, ConnectionDefinitionService connectionDefinitionService) {
+        this.authorizationName = connection.getAuthorizationName();
+        this.componentName = connection.getComponentName();
+        this.connectionVersion = connection.getConnectionVersion();
+        this.parameters = connection.getParameters();
+        this.connectionDefinitionService = connectionDefinitionService;
+    }
+
+    @SuppressFBWarnings("EI")
     public ContextConnectionImpl(
-        String authorizationName, String componentName, ConnectionDefinitionService connectionDefinitionService,
-        int connectionVersion, Map<String, ?> parameters) {
+        String componentName, int connectionVersion, Map<String, ?> parameters, String authorizationName,
+        ConnectionDefinitionService connectionDefinitionService) {
 
         this.authorizationName = authorizationName;
         this.componentName = componentName;
-        this.connectionDefinitionService = connectionDefinitionService;
         this.connectionVersion = connectionVersion;
         this.parameters = parameters;
+        this.connectionDefinitionService = connectionDefinitionService;
     }
 
     @Override
-    public ApplyResponse applyAuthorization() {
+    public Authorization.ApplyResponse applyAuthorization() {
         return connectionDefinitionService.executeAuthorizationApply(
             componentName, connectionVersion, parameters, authorizationName);
     }

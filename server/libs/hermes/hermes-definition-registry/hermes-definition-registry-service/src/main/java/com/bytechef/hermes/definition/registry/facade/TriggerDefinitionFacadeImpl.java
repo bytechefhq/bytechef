@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.facade;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
@@ -54,7 +54,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId) {
 
-        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -72,7 +72,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -90,7 +90,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, long connectionId, String searchText) {
 
-        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -108,7 +108,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -126,7 +126,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
         long connectionId) {
 
-        TriggerContext context = contextFactory.createTriggerContext(Map.of(triggerName, connectionId));
+        TriggerContext context = contextFactory.createTriggerContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,

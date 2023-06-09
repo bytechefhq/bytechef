@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
@@ -54,7 +54,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId) {
 
-        ActionContext context = contextFactory.createActionContext(Map.of(actionName, connectionId));
+        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -72,7 +72,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId) {
 
-        ActionContext context = contextFactory.createActionContext(Map.of(actionName, connectionId));
+        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -90,7 +90,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId, String searchText) {
 
-        ActionContext context = contextFactory.createActionContext(Map.of(actionName, connectionId));
+        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,
@@ -108,7 +108,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId) {
 
-        ActionContext context = contextFactory.createActionContext(Map.of(actionName, connectionId));
+        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
 
         return ComponentContextSupplier.get(
             context,

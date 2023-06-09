@@ -1,7 +1,7 @@
 dependencies {
     api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     api project(":server:libs:hermes:hermes-component:hermes-component-api")
-    api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
+    api project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     api project(":server:libs:hermes:hermes-worker:hermes-worker-api")
 
@@ -27,6 +27,7 @@ dependencies {
     testImplementation project(":server:libs:core:encryption:encryption-api")
     testImplementation project(":server:libs:core:commons:commons-data")
     testImplementation project(":server:libs:core:tag:tag-service")
+    testImplementation project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-impl")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
