@@ -67,10 +67,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public boolean connectionExists(String componentName, int connectionVersion) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .anyMatch(componentDefinition -> componentDefinition.getConnection()
-                .map(connectionDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    connectionDefinition.getVersion() == connectionVersion)
-                .orElse(false));
+            .map(ComponentDefinition::getConnection)
+            .flatMap(Optional::stream)
+            .anyMatch(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()) &&
+                connectionDefinition.getVersion() == connectionVersion);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            authorizationName, componentName, connectionVersion);
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
@@ -92,7 +92,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            authorizationName, componentName, connectionVersion);
 
         AuthorizationCallbackFunction authorizationCallbackFunction =
             OptionalUtils.orElse(
@@ -138,7 +138,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String authorizationName, String componentName, int connectionVersion) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            authorizationName, componentName, connectionVersion);
 
         return authorization.getType();
     }
@@ -169,7 +169,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            authorizationName, componentName, connectionVersion);
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
             authorization.getAuthorizationUrl(), AuthorizationUtils::getDefaultAuthorizationUrl);

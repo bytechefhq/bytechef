@@ -28,15 +28,13 @@ import java.util.List;
 
 public interface ComponentDefinitionRegistry {
 
-    ActionDefinition getActionDefinition(
-        String actionName, String componentName, int componentVersion);
+    ActionDefinition getActionDefinition(String actionName, String componentName, int componentVersion);
 
     List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
 
-    Property getActionProperty(
-        String propertyName, String actionName, String componentName, int componentVersion);
+    Property getActionProperty(String propertyName, String actionName, String componentName, int componentVersion);
 
-    Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName);
+    Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion);
 
     ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion);
 
@@ -46,17 +44,11 @@ public interface ComponentDefinitionRegistry {
 
     List<ComponentDefinition> getComponentDefinitions();
 
-    ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion);
-
-    List<ConnectionDefinition> getConnectionDefinitions();
-
-    List<ConnectionDefinition> getConnectionDefinitions(
-        String componentName, int componentVersion);
+    List<ConnectionDefinition> getConnectionDefinitions(String componentName, int componentVersion);
 
     TriggerDefinition getTriggerDefinition(String triggerName, String componentName, int componentVersion);
 
     List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion);
 
-    Property getTriggerProperty(
-        String propertyName, String actionName, String componentName, int componentVersion);
+    Property getTriggerProperty(String propertyName, String actionName, String componentName, int componentVersion);
 }

@@ -102,7 +102,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     }
 
     @Override
-    public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
+    public Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
         ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
 
         return connectionDefinition.getAuthorization(authorizationName);
@@ -148,20 +148,6 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
         return componentDefinitions;
-    }
-
-    @Override
-    public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
-        return CollectionUtils.getFirst(
-            getComponentDefinitions(),
-            componentDefinition -> Objects.equals(componentName, componentDefinition.getName()) &&
-                componentDefinition.getVersion() == componentVersion,
-            componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
-    }
-
-    @Override
-    public List<ConnectionDefinition> getConnectionDefinitions() {
-        return connectionDefinitions;
     }
 
     @Override
