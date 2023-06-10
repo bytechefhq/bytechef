@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -104,13 +105,10 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<List<Map<String, Object>>> branches = (List) MapValueUtils.getRequiredList(
-            taskExecution.getParameters(), BRANCHES, List.class);
+        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
+            taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(source -> CollectionUtils.map(source, WorkflowTask::of))
