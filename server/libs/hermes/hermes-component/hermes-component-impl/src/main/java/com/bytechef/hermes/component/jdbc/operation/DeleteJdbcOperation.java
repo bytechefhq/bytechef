@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -40,15 +41,12 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
     public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
         Map<String, Integer> result;
 
         String deleteKey = MapValueUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
-        List<Map<String, ?>> rows = (List) MapValueUtils.getList(
-            inputParameters, JdbcConstants.ROWS, Map.class, Collections.emptyList());
+        List<Map<String, ?>> rows = MapValueUtils.getList(
+            inputParameters, JdbcConstants.ROWS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         String schema = MapValueUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 

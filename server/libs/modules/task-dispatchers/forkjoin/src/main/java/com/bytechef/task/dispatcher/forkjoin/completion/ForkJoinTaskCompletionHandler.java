@@ -32,6 +32,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
@@ -100,12 +101,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
-
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
-        List<List<Map<String, Object>>> branches = (List) MapValueUtils.getRequiredList(
-            forkJoinTaskExecution.getParameters(), BRANCHES, List.class);
+        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
+            forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))

@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
@@ -47,28 +49,24 @@ public class ConditionTaskUtils {
                 .parseExpression(MapValueUtils.getString(conditionTaskExecution.getParameters(), EXPRESSION))
                 .getValue(Boolean.class);
         } else {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> conditions = (List) MapValueUtils.getList(
-                conditionTaskExecution.getParameters(),
-                ConditionTaskDispatcherConstants.CONDITIONS,
-                Map.class,
-                Collections.emptyList());
-            String combineOperation = MapValueUtils.getRequiredString(conditionTaskExecution.getParameters(),
-                COMBINE_OPERATION);
+            List<Map<String, Map<String, ?>>> conditions = MapValueUtils.getList(
+                conditionTaskExecution.getParameters(), ConditionTaskDispatcherConstants.CONDITIONS,
+                new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            String combineOperation = MapValueUtils.getRequiredString(
+                conditionTaskExecution.getParameters(), COMBINE_OPERATION);
 
             result = expressionParser
-                .parseExpression(
-                    String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
+                .parseExpression(String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
                 .getValue(Boolean.class);
         }
 
         return result != null && result;
     }
 
-    private static List<String> getConditionExpressions(List<Map<String, Object>> conditions) {
+    private static List<String> getConditionExpressions(List<Map<String, Map<String, ?>>> conditions) {
         List<String> conditionExpressions = new ArrayList<>();
 
-        for (Map<String, Object> condition : conditions) {
+        for (Map<String, Map<String, ?>> condition : conditions) {
             for (String operandType : condition.keySet()) {
                 Map<String, ?> conditionParts = MapValueUtils.getMap(condition, operandType);
 
