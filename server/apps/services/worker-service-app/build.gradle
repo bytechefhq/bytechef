@@ -31,7 +31,7 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-remote-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-remote-client")
-    implementation project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-db")
+    implementation project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-db-service")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-rest")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
