@@ -34,11 +34,11 @@ paths:
           application/json:
             schema:
               type: "object"
+              x-property-type: "dynamicProperties"
               properties:
                 fields:
                   type: "object"
                   additionalProperties: true
-                  x-property-type: "dynamicProperties"
       responses:
         "200":
           description: "Successful operation"
