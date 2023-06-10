@@ -207,7 +207,7 @@ public class OpenApiComponentGenerator {
             .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
     }
 
-    private static String buildPropertyName(String propertyName) {
+    private static String buildPropertyLabel(String propertyName) {
         return Arrays.stream(StringUtils.split(propertyName, '_'))
             .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
             .map(StringUtils::capitalize)
@@ -945,12 +945,14 @@ public class OpenApiComponentGenerator {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
+        propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+
+        builder.add(
+            "$L($S)",
+            extensionMap.get("x-property-type"), propertyName);
 
         if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
-            propertyName = buildPropertyName(propertyName.replace("__", ""));
-
-            builder.add(".label($S)", StringUtils.capitalize(propertyName));
+            builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
         }
 
         if (propertyDescription != null) {
@@ -1314,7 +1316,7 @@ public class OpenApiComponentGenerator {
         }
 
         if (!outputSchema) {
-            builder.add(".placeholder($S)", "Add to " + buildPropertyName(propertyName.replace("__", "")));
+            builder.add(".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
         }
 
         return builder.build();
@@ -1438,7 +1440,7 @@ public class OpenApiComponentGenerator {
 
                         if (!outputSchema) {
                             builder.add(
-                                ".placeholder($S)", "Add to " + buildPropertyName(propertyName.replace("__", "")));
+                                ".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
                         }
                     }
                     case "boolean" -> builder.add("bool($S)", propertyName);
@@ -1507,9 +1509,7 @@ public class OpenApiComponentGenerator {
                 }
 
                 if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
-                    propertyName = buildPropertyName(propertyName.replace("__", ""));
-
-                    builder.add(".label($S)", StringUtils.capitalize(propertyName));
+                    builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
                 }
 
                 if (propertyDescription != null) {
