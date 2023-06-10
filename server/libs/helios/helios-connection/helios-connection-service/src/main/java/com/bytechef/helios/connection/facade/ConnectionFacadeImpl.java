@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
@@ -88,11 +89,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-                Authorization.AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionService
+                AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionService
                     .executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
-                        oAuth2Properties.checkPredefinedApp(connection.getComponentName(),
-                            connection.getParameters()),
+                        oAuth2Properties.checkPredefinedApp(
+                            connection.getComponentName(), connection.getParameters()),
                         connection.getAuthorizationName(), oAuth2Properties.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.toMap());

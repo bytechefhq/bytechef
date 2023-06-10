@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.context.factory;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.context.ContextConnectionImpl;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
@@ -44,7 +44,7 @@ public class ContextConnectionFactoryImpl implements ContextConnectionFactory {
     }
 
     @Override
-    public Context.Connection createConnection(
+    public Connection createConnection(
         String componentName, int componentVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         ComponentDefinitionDTO componentDefinitionDTO = componentDefinitionService.getComponentDefinition(
