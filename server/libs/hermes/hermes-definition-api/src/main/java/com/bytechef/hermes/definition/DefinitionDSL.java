@@ -432,7 +432,7 @@ public abstract class DefinitionDSL {
             extends ModifiableValueProperty<Object[], ModifiableArrayProperty>
             implements Property.ArrayProperty, ModifiableInputProperty, ModifiableOutputProperty<Object[]> {
 
-            private List<? extends ModifiableProperty<?>> items;
+            private List<? extends ModifiableValueProperty<?, ?>> items;
             private Boolean multipleValues;
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -533,11 +533,11 @@ public abstract class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ModifiableProperty<?>> ModifiableArrayProperty items(P... properties) {
+            public final <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(P... properties) {
                 return items(properties == null ? List.of() : List.of(properties));
             }
 
-            public <P extends ModifiableProperty<?>> ModifiableArrayProperty items(List<P> properties) {
+            public <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(List<P> properties) {
                 this.items = checkPropertyNames(properties);
 
                 return this;
@@ -588,7 +588,7 @@ public abstract class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends Property>> getItems() {
+            public Optional<List<? extends ValueProperty<?>>> getItems() {
                 return Optional.ofNullable(items);
             }
 
@@ -1115,13 +1115,13 @@ public abstract class DefinitionDSL {
             extends ModifiableValueProperty<Object, ModifiableObjectProperty>
             implements ModifiableInputProperty, ModifiableOutputProperty<Object>, Property.ObjectProperty {
 
-            private List<? extends ModifiableProperty<?>> additionalProperties;
+            private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
             private List<String> loadOptionsDependsOn;
             private Boolean multipleValues;
             private String objectType;
             private List<Option<?>> options;
             private OptionsFunction optionsFunction;
-            private List<? extends ModifiableProperty<?>> properties;
+            private List<? extends ModifiableValueProperty<?, ?>> properties;
 
             private ModifiableObjectProperty() {
                 this(null);
@@ -1144,13 +1144,13 @@ public abstract class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ModifiableProperty<?>> ModifiableObjectProperty additionalProperties(
+            public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
                 P... properties) {
 
                 return additionalProperties(properties == null ? List.of() : List.of(properties));
             }
 
-            public <P extends ModifiableProperty<?>> ModifiableObjectProperty additionalProperties(
+            public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
                 List<? extends P> properties) {
 
                 this.additionalProperties = checkPropertyNames(properties);
@@ -1194,13 +1194,13 @@ public abstract class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ModifiableProperty<?>> ModifiableObjectProperty properties(
+            public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(
                 P... properties) {
 
                 return properties(List.of(properties));
             }
 
-            public <P extends ModifiableProperty<?>> ModifiableObjectProperty properties(List<P> properties) {
+            public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
                 if (properties != null) {
                     for (Property property : properties) {
                         String name = property.getName();
@@ -1219,7 +1219,7 @@ public abstract class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends Property>> getAdditionalProperties() {
+            public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
                 return Optional.ofNullable(
                     additionalProperties == null ? null : new ArrayList<>(additionalProperties));
             }
@@ -1260,7 +1260,7 @@ public abstract class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends Property>> getProperties() {
+            public Optional<List<? extends ValueProperty<?>>> getProperties() {
                 return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
             }
         }
