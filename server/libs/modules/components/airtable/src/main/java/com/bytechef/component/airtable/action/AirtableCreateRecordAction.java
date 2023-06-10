@@ -63,8 +63,7 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            dynamicProperties("__item")
-                .label("Item")
+            dynamicProperties("__item").label("Item")
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
