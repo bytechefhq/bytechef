@@ -67,38 +67,21 @@
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Record",
+      "label": "Item",
       "metadata": {
         "type": "BODY"
       },
       "placeholder": null,
       "required": null,
       "name": "__item",
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Fields",
-        "metadata": { },
-        "placeholder": null,
-        "required": false,
-        "name": "fields",
-        "type": "DYNAMIC_PROPERTIES",
-        "dynamicPropertiesDataSource": null
-      } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "type": "DYNAMIC_PROPERTIES",
+      "dynamicPropertiesDataSource": {
+        "loadPropertiesDependsOn": [ "baseId", "tableId" ],
+        "properties": { }
+      }
     } ],
     "title": "Creates a record",
+    "editorDescriptionDataSource": null,
     "perform": null,
     "outputSchema": [ {
       "advancedOption": null,
@@ -352,8 +335,7 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -493,9 +475,9 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
+    "editorDescriptionDataSource": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ]
 }

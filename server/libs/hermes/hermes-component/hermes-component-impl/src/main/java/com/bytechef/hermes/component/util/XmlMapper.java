@@ -76,6 +76,24 @@ public final class XmlMapper implements XmlUtils.XmlMapper {
     }
 
     @Override
+    public <T> T read(String xml, Class<T> valueType) {
+        try {
+            return xmlMapper.convertValue(xmlMapper.readTree(xml), valueType);
+        } catch (Exception exception) {
+            throw new ComponentExecutionException("Unable to convert xml value", exception);
+        }
+    }
+
+    @Override
+    public <T> T read(String xml, TypeReference<T> valueTypeRef) {
+        try {
+            return xmlMapper.convertValue(xmlMapper.readTree(xml), valueTypeRef);
+        } catch (Exception exception) {
+            throw new ComponentExecutionException("Unable to convert xml value", exception);
+        }
+    }
+
+    @Override
     public <T> T read(InputStream inputStream, String path) {
         try {
             return xmlMapper.readValue(
