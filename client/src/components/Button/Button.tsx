@@ -44,6 +44,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {
             children,
             className,
+            disabled,
             displayType = 'primary',
             icon,
             iconPosition,
@@ -59,10 +60,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             className={twMerge(
                 'btn',
                 displayTypes[displayType],
+                disabled && 'cursor-not-allowed bg-gray-200 text-gray-500',
                 link && 'bg-transparent text-blue-600 hover:underline',
                 size && sizes[size],
                 className
             )}
+            disabled={disabled}
             onClick={onClick}
             ref={ref}
             type="button"

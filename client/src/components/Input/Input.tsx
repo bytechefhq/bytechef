@@ -68,17 +68,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
             <div
                 className={twMerge([
-                    'relative',
                     label && type !== 'hidden' && 'mt-1',
+                    leadingIcon && 'relative',
                 ])}
                 title={title}
             >
                 <div
                     className={twMerge(
-                        'relative',
                         trailing &&
                             'flex flex-grow items-stretch focus-within:z-10',
-                        leadingIcon && 'rounded-md border border-gray-300',
+                        leadingIcon &&
+                            'relative rounded-md border border-gray-300',
                         type === 'hidden' && 'border-0'
                     )}
                 >
@@ -90,7 +90,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                     <input
                         className={twMerge(
-                            'block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800 sm:text-sm',
+                            'block w-full rounded-md border p-2 focus:outline-none focus:ring-1 dark:bg-gray-800 sm:text-sm',
                             error
                                 ? 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500 dark:text-rose-500'
                                 : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:placeholder:text-gray-600 dark:focus:ring-sky-500',

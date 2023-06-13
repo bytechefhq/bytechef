@@ -60,9 +60,7 @@ const ProjectInstances = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={
-                        <ProjectInstanceDialog projectInstance={undefined} />
-                    }
+                    right={<ProjectInstanceDialog />}
                     title={title}
                 />
             }
