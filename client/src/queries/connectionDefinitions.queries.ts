@@ -4,13 +4,17 @@ import {
     ConnectionDefinitionModel,
     ConnectionDefinitionsApi,
     GetComponentConnectionDefinitionRequest,
+    GetComponentConnectionDefinitionsRequest,
 } from '../middleware/core/definition-registry';
 
 export const ConnectDefinitionKeys = {
-    connectionDefinition: ['connectionDefinition'] as const,
+    connectionDefinition: ['connectionDefinition'],
     connectionDefinitionDetails: (
         request?: GetComponentConnectionDefinitionRequest
     ) => [...ConnectDefinitionKeys.connectionDefinition, request],
+    connectionDefinitions: (
+        request: GetComponentConnectionDefinitionsRequest
+    ) => ['connectionDefinitions', request],
 };
 
 export const useGetConnectionDefinitionQuery = (
@@ -25,4 +29,17 @@ export const useGetConnectionDefinitionQuery = (
         {
             enabled: !!request?.componentName,
         }
+    );
+
+export const useGetConnectionDefinitionsQuery = (
+    request: GetComponentConnectionDefinitionsRequest,
+    enabledCondition?: boolean
+) =>
+    useQuery<ConnectionDefinitionModel[], Error>(
+        ConnectDefinitionKeys.connectionDefinitions(request),
+        () =>
+            new ConnectionDefinitionsApi().getComponentConnectionDefinitions(
+                request
+            ),
+        {enabled: false || enabledCondition}
     );
