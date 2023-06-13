@@ -23,6 +23,7 @@ type CreatableSelectProps<
     TFieldValues extends FieldValues = FieldValues,
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > = {
+    fieldsetClassName?: string;
     defaultValue?: ISelectOption;
     error?: boolean;
     field?: ControllerRenderProps<TFieldValues, TName>;
@@ -41,6 +42,7 @@ const CreatableSelect = <
 >({
     error,
     field,
+    fieldsetClassName,
     isMulti,
     label,
     name,
@@ -53,7 +55,7 @@ const CreatableSelect = <
     TName
 >): JSX.Element => {
     return (
-        <fieldset className={label ? 'mb-3' : ''}>
+        <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
             {label && (
                 <label
                     htmlFor={name || field?.name}

@@ -3,6 +3,7 @@
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
+import TextArea from 'components/TextArea/TextArea';
 import Tooltip from 'components/Tooltip/Tooltip';
 import {TagModel} from 'middleware/core/tag/models/TagModel';
 import {useState} from 'react';
@@ -14,7 +15,21 @@ import {PropertyType} from 'types/projectTypes';
 
 import Input from '../Input/Input';
 import ArrayProperty from './ArrayProperty';
+import InputProperty from './InputProperty';
 import ObjectProperty from './ObjectProperty';
+
+const inputPropertyControlTypes = [
+    'DATE',
+    'DATE_TIME',
+    'EMAIL',
+    'PASSWORD',
+    'PHONE',
+    'TEXT',
+    'TIME',
+    'URL',
+];
+
+const inputPropertyTypes = ['NUMBER'];
 
 export interface PropertyFormProps {
     authorizationName: string;
@@ -60,7 +75,7 @@ export const Property = ({
         type,
     } = property;
 
-    const hasError = (propertyName: string) =>
+    const hasError = (propertyName: string): boolean =>
         formState?.touchedFields[path] &&
         formState?.touchedFields[path]![propertyName] &&
         formState?.errors[path] &&
@@ -77,7 +92,7 @@ export const Property = ({
     return (
         <li
             className={twMerge(
-                'mb-4 flex',
+                'mb-4 flex last:mb-0',
                 controlType === 'CODE_EDITOR' && 'h-5/6',
                 hidden && 'mb-0',
                 type === 'OBJECT' && 'flex-col',
@@ -117,21 +132,25 @@ export const Property = ({
                 />
             )}
 
-            {!register && controlType === 'TEXT' && (
-                <Input
-                    description={description}
-                    defaultValue={defaultValue as string}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1 mb-0"
-                    key={name}
-                    label={label || name}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    name={name!}
-                    required={required}
-                    title={type}
-                    type={hidden ? 'hidden' : 'text'}
-                />
-            )}
+            {!register &&
+                (inputPropertyControlTypes.includes(controlType!) ||
+                    inputPropertyTypes.includes(type!)) && (
+                    <InputProperty
+                        controlType={controlType}
+                        description={description}
+                        defaultValue={defaultValue as string}
+                        error={hasError(name!)}
+                        fieldsetClassName="flex-1 mb-0"
+                        key={name}
+                        label={label || name}
+                        leadingIcon={
+                            TYPE_ICONS[type as keyof typeof TYPE_ICONS]
+                        }
+                        name={name!}
+                        required={required}
+                        title={type}
+                    />
+                )}
 
             {controlType === 'INTEGER' && (
                 <Input
@@ -158,70 +177,6 @@ export const Property = ({
                 />
             )}
 
-            {controlType === 'NUMBER' && (
-                <Input
-                    description={description}
-                    defaultValue={defaultValue as string}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1 mb-0"
-                    key={name}
-                    label={label || name}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    name={name!}
-                    required={required}
-                    title={type}
-                    type={hidden ? 'hidden' : 'number'}
-                />
-            )}
-
-            {controlType === 'PASSWORD' && (
-                <Input
-                    description={description}
-                    defaultValue={defaultValue as string}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1"
-                    key={name}
-                    label={label || name}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    name={name!}
-                    required={required}
-                    title={type}
-                    type={hidden ? 'hidden' : 'password'}
-                />
-            )}
-
-            {controlType === 'DATE' && (
-                <Input
-                    description={description}
-                    defaultValue={defaultValue as string}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1 mb-0"
-                    key={name}
-                    label={label || name}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    name={name!}
-                    required={required}
-                    title={type}
-                    type={hidden ? 'hidden' : 'date'}
-                />
-            )}
-
-            {controlType === 'DATE_TIME' && (
-                <Input
-                    description={description}
-                    defaultValue={defaultValue as string}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1 mb-0"
-                    key={name}
-                    label={label || name}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    name={name!}
-                    required={required}
-                    title={type}
-                    type={hidden ? 'hidden' : 'datetime-local'}
-                />
-            )}
-
             {controlType === 'SELECT' && (
                 <Select
                     description={description}
@@ -233,7 +188,7 @@ export const Property = ({
             )}
 
             {controlType === 'CODE_EDITOR' && (
-                <div className="h-full border-2">
+                <div className="h-full w-full border-2">
                     <Editor
                         defaultValue="// Add your custom code here..."
                         language={actionName}
@@ -258,15 +213,20 @@ export const Property = ({
                 </div>
             )}
 
-            {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
-
-            {!controlType && type === 'ANY' && (
-                <span>
-                    {controlType} - {type}
-                </span>
+            {controlType === 'TEXT_AREA' && (
+                <TextArea
+                    description={description}
+                    fieldsetClassName="w-full"
+                    key={name}
+                    required={required}
+                    label={label}
+                    name={name!}
+                />
             )}
 
-            {type === 'ARRAY' && <ArrayProperty property={property} />}
+            {(type === 'ARRAY' || controlType === 'MULTI_SELECT') && (
+                <ArrayProperty property={property} />
+            )}
 
             {type === 'BOOLEAN' && (
                 <Select
@@ -282,6 +242,16 @@ export const Property = ({
             )}
 
             {type === 'OBJECT' && <ObjectProperty property={property} />}
+
+            {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
+
+            {!controlType && type === 'ANY' && (
+                <span>
+                    {controlType} - {type}
+                </span>
+            )}
+
+            {type === 'NULL' && <span>NULL</span>}
         </li>
     );
 };
