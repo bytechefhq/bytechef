@@ -46,11 +46,7 @@ const ProjectInstanceList = () => {
                     !error &&
                     (projectsInstances?.length === 0 ? (
                         <EmptyList
-                            button={
-                                <ProjectInstanceDialog
-                                    projectInstance={undefined}
-                                />
-                            }
+                            button={<ProjectInstanceDialog />}
                             icon={
                                 <FolderPlusIcon className="h-12 w-12 text-gray-400" />
                             }

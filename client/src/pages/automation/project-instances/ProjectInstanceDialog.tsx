@@ -3,8 +3,7 @@ import {CheckIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
 import Dialog from 'components/Dialog/Dialog';
-import {TagModel} from 'middleware/automation/configuration';
-import {ProjectInstanceModel} from 'middleware/automation/configuration/models/ProjectInstanceModel';
+import {ProjectInstanceModel} from 'middleware/automation/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
@@ -14,11 +13,11 @@ import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
-import InstanceDialogWorkflowList from './InstanceDialogWorkflowList';
-import StepBasic from './StepBasic';
+import InstanceDialogBasicStep from './InstanceDialogBasicStep';
+import InstanceDialogWorkflowsStep from './InstanceDialogWorkflowsStep';
 
 interface ProjectDialogProps {
-    projectInstance: ProjectInstanceModel | undefined;
+    projectInstance?: ProjectInstanceModel;
     showTrigger?: boolean;
     visible?: boolean;
     onClose?: () => void;
@@ -31,7 +30,6 @@ const ProjectInstanceDialog = ({
     visible = false,
 }: ProjectDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
-
     const [isOpen, setIsOpen] = useState(visible);
 
     const {
@@ -46,12 +44,8 @@ const ProjectInstanceDialog = ({
         defaultValues: {
             description: projectInstance?.description || '',
             name: projectInstance?.name || '',
-            project: projectInstance?.project
-                ? {
-                      label: projectInstance?.project?.name,
-                      ...projectInstance?.project,
-                  }
-                : undefined,
+            project: projectInstance?.project || null,
+            projectId: projectInstance?.id || 0,
             tags:
                 projectInstance?.tags?.map((tag) => ({
                     ...tag,
@@ -92,32 +86,24 @@ const ProjectInstanceDialog = ({
         }
     }
 
-    const handleStepClick = (
-        event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-    ) => {
-        event.preventDefault();
-    };
-
-    const steps = [
+    const projectInstanceDialogSteps = [
         {
             content: (
-                <StepBasic
+                <InstanceDialogBasicStep
                     projectInstance={projectInstance}
                     control={control}
                     touchedFields={touchedFields}
                     register={register}
-                    errors={errors}
                     setValue={setValue}
                     getValues={getValues}
+                    errors={errors}
                 />
             ),
             name: 'Basic',
-            onClick: handleStepClick,
         },
         {
-            content: <InstanceDialogWorkflowList getValues={getValues} />,
+            content: <InstanceDialogWorkflowsStep getValues={getValues} />,
             name: 'Workflows',
-            onClick: handleStepClick,
         },
     ];
 
@@ -128,37 +114,23 @@ const ProjectInstanceDialog = ({
             return;
         }
 
-        const tagValues = formData.tags?.map((tag: TagModel) => {
-            return {id: tag.id, name: tag.name, version: tag.version};
-        });
-
-        const project = formData?.project?.name ? formData?.project : undefined;
-
         if (projectInstance?.id) {
             updateProjectInstanceMutation.mutate({
                 ...projectInstance,
                 ...formData,
                 projectId: formData?.project?.id,
-            } as ProjectInstanceModel);
+            });
         } else {
-            createProjectInstanceMutation.mutate({
-                ...formData,
-                projectId: project?.id,
-                tags: tagValues,
-            } as ProjectInstanceModel);
+            createProjectInstanceMutation.mutate(formData);
         }
     }
 
     return (
         <Dialog
             isOpen={isOpen}
-            onOpenChange={(isOpen) => {
-                if (isOpen) {
-                    setIsOpen(isOpen);
-                } else {
-                    closeDialog();
-                }
-            }}
+            onOpenChange={(isOpen) =>
+                isOpen ? setIsOpen(isOpen) : closeDialog()
+            }
             triggerLabel={
                 showTrigger
                     ? `${projectInstance?.id ? 'Edit' : 'Create'} Instance`
@@ -167,24 +139,23 @@ const ProjectInstanceDialog = ({
             large={true}
             wizard
         >
-            <div className="flex h-full w-full">
-                <div className="w-1/3 bg-gray-100 p-4 font-semibold">
-                    <h3>{`${
+            <div className="flex h-full w-full rounded-l-lg">
+                <div className="w-1/3 rounded-l-lg bg-gray-100 p-4 font-semibold">
+                    <h2>{`${
                         projectInstance?.id ? 'Edit' : 'New'
-                    } Instance`}</h3>
+                    } Instance`}</h2>
 
-                    {steps.map((step, index) => (
+                    {projectInstanceDialogSteps.map((step, index) => (
                         <div key={step.name} className="relative pb-10">
-                            {index !== steps.length - 1 && (
+                            {index !==
+                                projectInstanceDialogSteps.length - 1 && (
                                 <div
                                     className={twMerge(
-                                        'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5',
-                                        index < activeStepIndex
-                                            ? 'bg-gray-900'
-                                            : 'bg-gray-300'
+                                        'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300',
+                                        index < activeStepIndex && 'bg-gray-900'
                                     )}
                                     aria-hidden="true"
-                                ></div>
+                                />
                             )}
 
                             <div className="group relative mt-4 flex items-center">
@@ -194,10 +165,9 @@ const ProjectInstanceDialog = ({
                                 >
                                     <span
                                         className={twMerge(
-                                            'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white',
-                                            index <= activeStepIndex
-                                                ? 'border-gray-900'
-                                                : 'border-gray-300'
+                                            'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-gray-300 bg-white',
+                                            index <= activeStepIndex &&
+                                                'border-gray-900'
                                         )}
                                     >
                                         {index < activeStepIndex && (
@@ -234,47 +204,60 @@ const ProjectInstanceDialog = ({
                     ))}
                 </div>
 
-                <div className="w-2/3 overflow-auto p-4">
-                    <h3 className="pb-3 font-semibold">
-                        {steps[activeStepIndex].name}
-                    </h3>
+                <div className="flex w-2/3 flex-col">
+                    <header className="flex items-center border-b border-gray-200 p-4">
+                        <h2 className="font-semibold">
+                            {projectInstanceDialogSteps[activeStepIndex].name}
+                        </h2>
+                    </header>
 
-                    {steps[activeStepIndex].content}
+                    <main className="h-full overflow-y-scroll p-4">
+                        {projectInstanceDialogSteps[activeStepIndex].content}
+                    </main>
+
+                    <footer className="flex w-full justify-end space-x-2 self-end border-t border-gray-200 p-4">
+                        {activeStepIndex === 0 && (
+                            <>
+                                <Close asChild>
+                                    <Button
+                                        displayType="lightBorder"
+                                        label="Cancel"
+                                    />
+                                </Close>
+
+                                <Button
+                                    disabled={
+                                        !getValues('project') ||
+                                        !getValues('name')
+                                    }
+                                    label="Next"
+                                    onClick={() => {
+                                        handleSubmit(saveProjectInstance);
+
+                                        setActiveStepIndex(activeStepIndex + 1);
+                                    }}
+                                />
+                            </>
+                        )}
+
+                        {activeStepIndex === 1 && (
+                            <>
+                                <Button
+                                    displayType="lightBorder"
+                                    label="Previous"
+                                    onClick={() => {
+                                        setActiveStepIndex(activeStepIndex - 1);
+                                    }}
+                                />
+
+                                <Button
+                                    label="Save"
+                                    onClick={handleSubmit(saveProjectInstance)}
+                                />
+                            </>
+                        )}
+                    </footer>
                 </div>
-            </div>
-
-            <div className="absolute bottom-4 right-4 mt-8 justify-end space-x-1">
-                {activeStepIndex === 0 && (
-                    <>
-                        <Close asChild>
-                            <Button displayType="lightBorder" label="Cancel" />
-                        </Close>
-
-                        <Button
-                            label="Next"
-                            onClick={() =>
-                                setActiveStepIndex(activeStepIndex + 1)
-                            }
-                        />
-                    </>
-                )}
-
-                {activeStepIndex === 1 && (
-                    <>
-                        <Button
-                            displayType="lightBorder"
-                            label="Previous"
-                            onClick={() =>
-                                setActiveStepIndex(activeStepIndex - 1)
-                            }
-                        />
-
-                        <Button
-                            label="Save"
-                            onClick={handleSubmit(saveProjectInstance)}
-                        />
-                    </>
-                )}
             </div>
         </Dialog>
     );

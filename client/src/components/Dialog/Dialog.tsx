@@ -77,7 +77,7 @@ const Dialog = ({
                         forceMount
                         className={twMerge(
                             'fixed left-[50%] top-[50%] z-50 max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 dark:bg-gray-800 md:w-full',
-                            large && 'h-[700px] w-[800px] md:max-w-2xl',
+                            large && 'h-[800px] w-[900px] md:max-w-2xl',
                             !wizard && 'p-4'
                         )}
                     >
