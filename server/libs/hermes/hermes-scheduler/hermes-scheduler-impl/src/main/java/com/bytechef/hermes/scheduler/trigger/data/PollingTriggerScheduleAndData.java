@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.scheduler.trigger.data;
 
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

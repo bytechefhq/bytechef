@@ -19,7 +19,6 @@ dependencies {
     implementation project(":server:libs:core:message-broker:message-broker-amqp")
     implementation project(":server:libs:core:message-broker:message-broker-kafka")
     implementation project(":server:libs:core:message-broker:message-broker-redis")
-    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-remote-client")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
     implementation project(":server:libs:hermes:hermes-execution:hermes-execution-remote-client")
     implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl")

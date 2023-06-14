@@ -9,39 +9,6 @@ tags:
 - name: "project-workflow-executions"
   description: "The Automation Project Workflow Executions API"
 paths:
-  /project-instances/{id}/workflows/{workflowId}/jobs:
-    post:
-      description: "Create a request for running a new job."
-      summary: "Create a request for running a new job"
-      tags:
-      - "project-instance-workflow-jobs"
-      operationId: "createProjectInstanceWorkflowJob"
-      parameters:
-      - name: "id"
-        description: "The id of a project instance."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "workflowId"
-        description: "The id of the workflow to execute."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "The id of a created job."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  jobId:
-                    description: "The id of an executed job."
-                    type: "integer"
-                    format: "int64"
   /project-workflow-executions:
     get:
       description: "Get project workflow executions."

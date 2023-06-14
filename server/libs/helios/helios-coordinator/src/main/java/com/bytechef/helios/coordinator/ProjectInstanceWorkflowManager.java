@@ -19,7 +19,7 @@ package com.bytechef.helios.coordinator;
 
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.helios.execution.facade.ProjectInstanceWorkflowJobFacade;
+import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -33,22 +33,22 @@ import java.util.Map;
 public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
 
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
-    private final ProjectInstanceWorkflowJobFacade projectInstanceWorkflowJobFacade;
+    private final ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory;
 
     public static final String PROJECT = "PROJECT";
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowManager(
         ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectInstanceWorkflowJobFacade projectInstanceWorkflowJobFacade) {
+        ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory) {
 
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
-        this.projectInstanceWorkflowJobFacade = projectInstanceWorkflowJobFacade;
+        this.projectInstanceWorkflowJobFactory = projectInstanceWorkflowJobFactory;
     }
 
     @Override
     public long createJob(long instanceId, String workflowId) {
-        return projectInstanceWorkflowJobFacade.createJob(instanceId, workflowId);
+        return projectInstanceWorkflowJobFactory.createJob(instanceId, workflowId);
     }
 
     @Override

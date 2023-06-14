@@ -1,3 +1,3 @@
 dependencies {
-    api project(":server:libs:hermes:hermes-configuration:hermes-configuration-api")
+    api project(":server:libs:hermes:hermes-execution:hermes-execution-api")
 }
