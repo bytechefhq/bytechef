@@ -69,11 +69,6 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
-    public ProjectInstance getJobProjectInstance(long jobId) {
-        return OptionalUtils.get(projectInstanceRepository.findByJobId(jobId));
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public ProjectInstance getProjectInstance(long id) {
         return OptionalUtils.get(projectInstanceRepository.findById(id));

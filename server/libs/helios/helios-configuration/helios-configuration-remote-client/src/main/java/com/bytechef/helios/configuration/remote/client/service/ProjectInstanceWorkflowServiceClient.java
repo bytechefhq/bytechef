@@ -50,11 +50,6 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     }
 
     @Override
-    public ProjectInstanceWorkflow getProjectInstanceWorkflow(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName) {
         throw new UnsupportedOperationException();
     }
