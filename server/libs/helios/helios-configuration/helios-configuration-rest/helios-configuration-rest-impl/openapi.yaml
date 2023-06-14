@@ -174,38 +174,38 @@ paths:
         "200":
           description: "Successful operation."
   /project-instances/{id}/workflows/{workflowId}/jobs:
-      post:
-          description: "Create a request for running a new job."
-          summary: "Create a request for running a new job"
-          tags:
-              - "project-instance-workflows"
-          operationId: "createProjectInstanceWorkflowJob"
-          parameters:
-              - name: "id"
-                description: "The id of a project instance."
-                in: "path"
-                required: true
-                schema:
+    post:
+      description: "Create a request for running a new job."
+      summary: "Create a request for running a new job"
+      tags:
+      - "project-instance-workflows"
+      operationId: "createProjectInstanceWorkflowJob"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of the workflow to execute."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "The id of a created job."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  jobId:
+                    description: "The id of an executed job."
                     type: "integer"
                     format: "int64"
-              - name: "workflowId"
-                description: "The id of the workflow to execute."
-                in: "path"
-                required: true
-                schema:
-                    type: "string"
-          responses:
-              "200":
-                  description: "The id of a created job."
-                  content:
-                      application/json:
-                          schema:
-                              type: "object"
-                              properties:
-                                  jobId:
-                                      description: "The id of an executed job."
-                                      type: "integer"
-                                      format: "int64"
   /project-instances/{id}/tags:
     put:
       description: "Updates tags of an existing project instance."

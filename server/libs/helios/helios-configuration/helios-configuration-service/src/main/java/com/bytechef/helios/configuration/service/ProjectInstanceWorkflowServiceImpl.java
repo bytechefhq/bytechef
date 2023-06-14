@@ -68,11 +68,6 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    public ProjectInstanceWorkflow getProjectInstanceWorkflow(long id) {
-        return OptionalUtils.get(projectInstanceWorkflowRepository.findById(id));
-    }
-
-    @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
         String workflowConnectionKey, String taskName) {
 
