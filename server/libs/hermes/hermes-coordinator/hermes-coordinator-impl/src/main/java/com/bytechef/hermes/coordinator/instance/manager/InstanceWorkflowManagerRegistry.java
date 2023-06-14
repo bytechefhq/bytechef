@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance.registry;
+package com.bytechef.hermes.coordinator.instance.manager;
 
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

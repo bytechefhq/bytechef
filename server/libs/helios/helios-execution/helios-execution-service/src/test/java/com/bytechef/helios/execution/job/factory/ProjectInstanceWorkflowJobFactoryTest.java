@@ -15,14 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.job;
+package com.bytechef.helios.execution.job.factory;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobFactory {
+public class ProjectInstanceWorkflowJobFactoryTest {
 
-    long createJob(JobParameters jobParameters);
+    @Disabled
+    @Test
+    public void testCreateJob() {
+        // TODO
+    }
 }

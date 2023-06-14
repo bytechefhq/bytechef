@@ -22,7 +22,7 @@ import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
