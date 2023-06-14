@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
-
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
@@ -133,12 +131,6 @@ public interface Context {
      *
      */
     interface Connection {
-
-        /**
-         *
-         * @return
-         */
-        ApplyResponse applyAuthorization();
 
         /**
          *
