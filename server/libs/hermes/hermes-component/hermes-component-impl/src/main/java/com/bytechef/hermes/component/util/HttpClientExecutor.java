@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.context.factory.AuthorizationContextConnection;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
@@ -237,10 +237,9 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
             return;
         }
 
-        OptionalUtils.ifPresent(
-            context.fetchConnection(),
-            connection -> {
-                ApplyResponse applyResponse = connection.applyAuthorization();
+        context.fetchConnection()
+            .ifPresent(connection -> {
+                ApplyResponse applyResponse = ((AuthorizationContextConnection) connection).applyAuthorization();
 
                 headers.putAll(applyResponse.getHeaders());
                 queryParameters.putAll(applyResponse.getQueryParameters());
