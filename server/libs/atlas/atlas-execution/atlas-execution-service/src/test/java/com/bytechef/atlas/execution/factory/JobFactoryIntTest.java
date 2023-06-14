@@ -20,6 +20,8 @@ package com.bytechef.atlas.execution.factory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.job.JobFactory;
+import com.bytechef.atlas.execution.job.JobFactoryImpl;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -55,7 +57,7 @@ public class JobFactoryIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> jobFactory.create(new JobParameters("aGVsbG8x", Collections.emptyMap())));
+            () -> jobFactory.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
     }
 
     @TestConfiguration

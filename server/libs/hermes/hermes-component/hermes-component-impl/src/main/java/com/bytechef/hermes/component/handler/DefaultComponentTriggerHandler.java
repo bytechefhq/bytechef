@@ -34,14 +34,14 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
-import com.bytechef.hermes.configuration.service.TriggerLifecycleService;
+import com.bytechef.hermes.execution.service.TriggerLifecycleService;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;

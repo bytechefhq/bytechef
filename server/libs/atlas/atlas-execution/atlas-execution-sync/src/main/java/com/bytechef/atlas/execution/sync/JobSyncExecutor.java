@@ -32,8 +32,8 @@ import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.factory.JobFactory;
-import com.bytechef.atlas.execution.factory.JobFactoryImpl;
+import com.bytechef.atlas.execution.job.JobFactory;
+import com.bytechef.atlas.execution.job.JobFactoryImpl;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -145,7 +145,7 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParameters jobParameters) {
-        long jobId = jobFactory.create(jobParameters);
+        long jobId = jobFactory.createJob(jobParameters);
 
         return jobService.getJob(jobId);
     }

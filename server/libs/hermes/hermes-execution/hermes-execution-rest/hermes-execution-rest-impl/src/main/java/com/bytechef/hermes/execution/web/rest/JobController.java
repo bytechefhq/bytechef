@@ -20,7 +20,7 @@
 package com.bytechef.hermes.execution.web.rest;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.factory.JobFactory;
+import com.bytechef.atlas.execution.job.JobFactory;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.hermes.execution.web.rest.model.JobBasicModel;
 import com.bytechef.message.broker.MessageBroker;
@@ -67,7 +67,7 @@ public class JobController implements JobsApi {
 
         return ResponseEntity.ok(
             new CreateJob200ResponseModel()
-                .jobId(jobFactory.create(conversionService.convert(jobParametersModel, JobParameters.class))));
+                .jobId(jobFactory.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
     }
 
     @Override

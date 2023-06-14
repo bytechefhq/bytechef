@@ -34,8 +34,8 @@ import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
-import com.bytechef.hermes.configuration.trigger.TriggerLifecycleManager;
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.trigger.lifecycle.TriggerLifecycleManager;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -75,23 +75,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         this.triggerLifecycleManager = triggerLifecycleManager;
         this.workflowService = workflowService;
     }
-
-//    @Override
-    // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
-    // the case where a job is finished and completion task executed, but the transaction is not yet committed and
-    // the job id is missing.
-//    @Transactional(propagation = Propagation.NEVER)
-//    @SuppressFBWarnings("NP")
-//    public long createJob(long id, String workflowId) {
-//        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-//            id, workflowId);
-//
-//        long jobId = jobFactory.create(new JobParameters(projectInstanceWorkflow.getInputs(), workflowId));
-//
-//        projectInstanceWorkflowService.addJob(Objects.requireNonNull(projectInstanceWorkflow.getId()), jobId);
-//
-//        return jobId;
-//    }
 
     @Override
     @SuppressFBWarnings("NP")
@@ -276,6 +259,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private void enableWorkflowTriggers(long id, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            if (!projectInstanceWorkflow.isEnabled()) {
+                continue;
+            }
+
             Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
             List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);

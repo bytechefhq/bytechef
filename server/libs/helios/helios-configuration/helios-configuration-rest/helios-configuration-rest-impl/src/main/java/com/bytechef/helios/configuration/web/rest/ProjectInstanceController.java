@@ -19,8 +19,10 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
+import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,11 +43,16 @@ public class ProjectInstanceController implements ProjectInstancesApi {
 
     private final ConversionService conversionService;
     private final ProjectInstanceFacade projectInstanceFacade;
+    private final ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceController(ConversionService conversionService, ProjectInstanceFacade projectInstanceFacade) {
+    public ProjectInstanceController(
+        ConversionService conversionService, ProjectInstanceFacade projectInstanceFacade,
+        ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory) {
+
         this.conversionService = conversionService;
         this.projectInstanceFacade = projectInstanceFacade;
+        this.projectInstanceWorkflowJobFactory = projectInstanceWorkflowJobFactory;
     }
 
     @Override
@@ -56,6 +63,15 @@ public class ProjectInstanceController implements ProjectInstancesApi {
                 projectInstanceFacade.createProjectInstance(
                     conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)),
                 ProjectInstanceModel.class));
+    }
+
+    @Override
+    public ResponseEntity<CreateProjectInstanceWorkflowJob200ResponseModel> createProjectInstanceWorkflowJob(
+        Long id, String workflowId) {
+
+        return ResponseEntity.ok(
+            new CreateProjectInstanceWorkflowJob200ResponseModel()
+                .jobId(projectInstanceWorkflowJobFactory.createJob(id, workflowId)));
     }
 
     @Override
