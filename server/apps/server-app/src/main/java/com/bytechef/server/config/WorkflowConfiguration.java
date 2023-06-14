@@ -18,8 +18,8 @@
 package com.bytechef.server.config;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.job.JobFactory;
-import com.bytechef.atlas.execution.job.JobFactoryImpl;
+import com.bytechef.atlas.execution.job.factory.JobFactory;
+import com.bytechef.atlas.execution.job.factory.JobFactoryImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.atlas.execution.repository.CounterRepository;

@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.factory;
+package com.bytechef.atlas.execution.job.factory;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.job.JobFactory;
-import com.bytechef.atlas.execution.job.JobFactoryImpl;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;

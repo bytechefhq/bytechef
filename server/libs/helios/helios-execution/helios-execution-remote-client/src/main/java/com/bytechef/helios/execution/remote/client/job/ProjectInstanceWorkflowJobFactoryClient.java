@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.execution.remote.client.job;
 
-import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;

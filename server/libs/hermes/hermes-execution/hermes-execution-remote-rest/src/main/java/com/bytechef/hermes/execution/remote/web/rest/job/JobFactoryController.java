@@ -18,7 +18,7 @@
 package com.bytechef.hermes.execution.remote.web.rest.job;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.job.JobFactory;
+import com.bytechef.atlas.execution.job.factory.JobFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

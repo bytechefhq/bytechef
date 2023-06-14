@@ -17,7 +17,7 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.atlas.execution.job.JobFactory;
+import com.bytechef.atlas.execution.job.factory.JobFactory;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
@@ -25,8 +25,8 @@ import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectFacadeImpl;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacadeImpl;
-import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
-import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactoryImpl;
+import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactoryImpl;
 import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacadeImpl;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;

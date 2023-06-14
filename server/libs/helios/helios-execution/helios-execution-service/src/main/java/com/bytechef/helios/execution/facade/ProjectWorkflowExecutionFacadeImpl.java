@@ -38,6 +38,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author Ivica Cardic
+ */
 public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
 
     private final JobFacade jobFacade;

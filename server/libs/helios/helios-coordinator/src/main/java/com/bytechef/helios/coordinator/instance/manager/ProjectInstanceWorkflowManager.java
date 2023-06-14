@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.coordinator;
+package com.bytechef.helios.coordinator.instance.manager;
 
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
+import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.hermes.coordinator.instance.manager.InstanceWorkflowManager;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
