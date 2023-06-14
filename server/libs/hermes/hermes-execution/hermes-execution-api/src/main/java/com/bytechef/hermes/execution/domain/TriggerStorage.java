@@ -34,8 +34,8 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@Table("trigger_lifecycle")
-public class TriggerLifecycle implements Persistable<Long> {
+@Table("trigger_storage")
+public class TriggerStorage implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
@@ -57,7 +57,7 @@ public class TriggerLifecycle implements Persistable<Long> {
     private LocalDateTime lastModifiedDate;
 
     @Column
-    private TriggerLifecycleValue value;
+    private TriggerStorageValue value;
 
     @Version
     private int version;
@@ -65,11 +65,11 @@ public class TriggerLifecycle implements Persistable<Long> {
     @Column("workflow_execution_id")
     private WorkflowExecutionId workflowExecutionId;
 
-    public TriggerLifecycle() {
+    public TriggerStorage() {
     }
 
-    public TriggerLifecycle(WorkflowExecutionId workflowExecutionId, Object value) {
-        this.value = new TriggerLifecycleValue(value, value.getClass());
+    public TriggerStorage(WorkflowExecutionId workflowExecutionId, Object value) {
+        this.value = new TriggerStorageValue(value, value.getClass());
         this.workflowExecutionId = workflowExecutionId;
     }
 
@@ -120,9 +120,9 @@ public class TriggerLifecycle implements Persistable<Long> {
             return false;
         }
 
-        TriggerLifecycle triggerLifecycle = (TriggerLifecycle) o;
+        TriggerStorage triggerStorage = (TriggerStorage) o;
 
-        return Objects.equals(id, triggerLifecycle.id);
+        return Objects.equals(id, triggerStorage.id);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class TriggerLifecycle implements Persistable<Long> {
     }
 
     public void setValue(Object value) {
-        this.value = new TriggerLifecycleValue(value, value.getClass());
+        this.value = new TriggerStorageValue(value, value.getClass());
     }
 
     public void setVersion(int version) {
@@ -165,8 +165,8 @@ public class TriggerLifecycle implements Persistable<Long> {
             '}';
     }
 
-    public record TriggerLifecycleValue(Object value, String classname) {
-        public TriggerLifecycleValue(Object value, Class<?> classValue) {
+    public record TriggerStorageValue(Object value, String classname) {
+        public TriggerStorageValue(Object value, Class<?> classValue) {
             this(value, classValue.getName());
         }
     }

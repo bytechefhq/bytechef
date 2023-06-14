@@ -23,7 +23,7 @@ import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.execution.service.TriggerLifecycleService;
+import com.bytechef.hermes.execution.service.TriggerStorageService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 
@@ -36,16 +36,16 @@ public class TriggerLifecycleManagerImpl implements TriggerLifecycleManager {
 
     private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final TriggerLifecycleService triggerLifecycleService;
+    private final TriggerStorageService triggerStorageService;
     private final String webhookUrl;
 
     public TriggerLifecycleManagerImpl(
         TriggerScheduler triggerScheduler, TriggerDefinitionService triggerDefinitionService,
-        TriggerLifecycleService triggerLifecycleService, String webhookUrl) {
+        TriggerStorageService triggerStorageService, String webhookUrl) {
 
         this.triggerScheduler = triggerScheduler;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.triggerLifecycleService = triggerLifecycleService;
+        this.triggerStorageService = triggerStorageService;
         this.webhookUrl = webhookUrl;
     }
 
@@ -54,7 +54,7 @@ public class TriggerLifecycleManagerImpl implements TriggerLifecycleManager {
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-            triggerLifecycleService.fetchValue(workflowExecutionId), null);
+            triggerStorageService.fetchValue(workflowExecutionId), null);
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
             workflowTrigger.getTriggerName());
@@ -99,7 +99,7 @@ public class TriggerLifecycleManagerImpl implements TriggerLifecycleManager {
                     createWebhookUrl(workflowExecutionId), workflowExecutionId.toString());
 
                 if (output != null) {
-                    triggerLifecycleService.save(workflowExecutionId, output);
+                    triggerStorageService.save(workflowExecutionId, output);
 
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(

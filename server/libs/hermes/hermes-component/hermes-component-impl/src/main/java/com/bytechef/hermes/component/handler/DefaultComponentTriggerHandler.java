@@ -34,7 +34,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
-import com.bytechef.hermes.execution.service.TriggerLifecycleService;
+import com.bytechef.hermes.execution.service.TriggerStorageService;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
@@ -62,16 +62,16 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private static final String PARAMETERS = "parameters";
 
     private final ContextFactory contextFactory;
-    private final TriggerLifecycleService triggerLifecycleService;
+    private final TriggerStorageService triggerStorageService;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerHandler(
-        TriggerDefinition triggerDefinition, TriggerLifecycleService triggerLifecycleService,
+        TriggerDefinition triggerDefinition, TriggerStorageService triggerStorageService,
         ContextFactory contextFactory) {
 
         this.contextFactory = contextFactory;
-        this.triggerLifecycleService = triggerLifecycleService;
+        this.triggerStorageService = triggerStorageService;
         this.triggerDefinition = triggerDefinition;
     }
 
@@ -107,7 +107,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
-                    OptionalUtils.orElse(triggerLifecycleService.fetchValue(workflowExecutionId), null),
+                    OptionalUtils.orElse(triggerStorageService.fetchValue(workflowExecutionId), null),
                     triggerContext));
 
             output = webhookOutput.getValue();
@@ -131,7 +131,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             PollOutput pollOutput = pollFunction.apply(
                 new PollContext(
                     triggerExecution.getParameters(),
-                    OptionalUtils.orElse(triggerLifecycleService.fetchValue(workflowExecutionId), null),
+                    OptionalUtils.orElse(triggerStorageService.fetchValue(workflowExecutionId), null),
                     triggerContext));
 
             List<Map<?, ?>> records = new ArrayList<>(
@@ -145,7 +145,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             }
 
             if (pollOutput.closureParameters() != null) {
-                triggerLifecycleService.save(workflowExecutionId, pollOutput.closureParameters());
+                triggerStorageService.save(workflowExecutionId, pollOutput.closureParameters());
             }
 
             output = records;

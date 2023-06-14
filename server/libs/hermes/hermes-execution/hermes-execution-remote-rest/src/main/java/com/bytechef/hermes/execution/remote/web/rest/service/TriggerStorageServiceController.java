@@ -19,7 +19,7 @@ package com.bytechef.hermes.execution.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.TriggerLifecycleService;
+import com.bytechef.hermes.execution.service.TriggerStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,23 +32,23 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
-public class TriggerLifecycleServiceController {
+public class TriggerStorageServiceController {
 
-    private final TriggerLifecycleService triggerLifecycleService;
+    private final TriggerStorageService triggerStorageService;
 
     @SuppressFBWarnings("EI")
-    public TriggerLifecycleServiceController(TriggerLifecycleService triggerLifecycleService) {
-        this.triggerLifecycleService = triggerLifecycleService;
+    public TriggerStorageServiceController(TriggerStorageService triggerStorageService) {
+        this.triggerStorageService = triggerStorageService;
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/trigger-lifecycle-service/fetch-value/{workflowExecutionId}",
+        value = "/trigger-storage-service/fetch-value/{workflowExecutionId}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(@PathVariable String workflowExecutionId) {
-        return triggerLifecycleService.fetchValue(WorkflowExecutionId.parse(workflowExecutionId))
+        return triggerStorageService.fetchValue(WorkflowExecutionId.parse(workflowExecutionId))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
                 .build());
@@ -56,12 +56,12 @@ public class TriggerLifecycleServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/trigger-lifecycle-service/save/{workflowExecutionId}",
+        value = "/trigger-storage-service/save/{workflowExecutionId}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Void> save(@PathVariable String workflowExecutionId, DynamicWebhookEnableOutput value) {
-        triggerLifecycleService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
+        triggerStorageService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
 
         return ResponseEntity.noContent()
             .build();

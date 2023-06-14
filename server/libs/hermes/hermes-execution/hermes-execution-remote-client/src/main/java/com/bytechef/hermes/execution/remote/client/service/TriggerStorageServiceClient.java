@@ -18,7 +18,7 @@
 package com.bytechef.hermes.execution.remote.client.service;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.TriggerLifecycleService;
+import com.bytechef.hermes.execution.service.TriggerStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -30,12 +30,12 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Component("triggerLifecycleService")
-public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
+public class TriggerStorageServiceClient implements TriggerStorageService {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
     @SuppressFBWarnings("EI")
-    public TriggerLifecycleServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public TriggerStorageServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
@@ -47,7 +47,7 @@ public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
                 .get()
                 .uri(uriBuilder -> uriBuilder
                     .host("platform-service-app")
-                    .path("/api/internal/trigger-lifecycle-service/fetch-value/{workflowExecutionId}")
+                    .path("/api/internal/trigger-storage-service/fetch-value/{workflowExecutionId}")
                     .build(workflowExecutionId))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<T>() {})
@@ -61,7 +61,7 @@ public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
             .put()
             .uri(uriBuilder -> uriBuilder
                 .host("platform-service-app")
-                .path("/api/internal/trigger-lifecycle-service/save/{workflowExecutionId}")
+                .path("/api/internal/trigger-storage-service/save/{workflowExecutionId}")
                 .build(workflowExecutionId))
             .bodyValue(value)
             .retrieve()
