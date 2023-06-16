@@ -17,7 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.task.dispatcher;
 
-import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.definition.registry.util.PropertyUtils;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,14 +45,19 @@ public class TaskDispatcherDefinitionRegistryImpl implements TaskDispatcherDefin
                 return o1Name.compareTo(o2.getName());
             })
             .toList();
+
+        // Validate
+
+        validate(taskDispatcherDefinitions);
     }
 
     @Override
     public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
-        return CollectionUtils.getFirst(
-            taskDispatcherDefinitions,
-            taskDispatcherDefinition -> name.equalsIgnoreCase(taskDispatcherDefinition.getName())
-                && version == taskDispatcherDefinition.getVersion());
+        return taskDispatcherDefinitions.stream()
+            .filter(taskDispatcherDefinition -> name.equalsIgnoreCase(taskDispatcherDefinition.getName()) &&
+                version == taskDispatcherDefinition.getVersion())
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
     }
 
     @Override
@@ -65,5 +71,13 @@ public class TaskDispatcherDefinitionRegistryImpl implements TaskDispatcherDefin
         return taskDispatcherDefinitions.stream()
             .filter(taskDispatcherDefinition -> Objects.equals(taskDispatcherDefinition.getName(), name))
             .toList();
+    }
+
+    private void validate(List<TaskDispatcherDefinition> taskDispatcherDefinitions) {
+        for (TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitions) {
+            PropertyUtils.checkInputProperties(
+                OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()));
+            PropertyUtils.checkOutputProperty(OptionalUtils.orElse(taskDispatcherDefinition.getOutputSchema(), null));
+        }
     }
 }
