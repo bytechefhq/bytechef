@@ -1,6 +1,5 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import {PropertyModel} from 'middleware/core/definition-registry';
 import {TYPE_ICONS} from 'shared/typeIcons';
 
 import {PropertyType} from '../../../../../types/projectTypes';
@@ -35,35 +34,37 @@ const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
     </ul>
 );
 
-const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
+const OutputTab = ({outputSchema}: {outputSchema: PropertyType}) => {
     const {currentNode} = useNodeDetailsDialogStore();
 
     return (
         <div className="max-h-full flex-[1_1_1px] p-4">
-            {outputSchema.map((schema: PropertyType, index) => (
-                <div key={`${schema.name}_${index}`}>
-                    <div className="mb-1 flex items-center">
-                        <span title={schema.type}>
-                            {TYPE_ICONS[schema.type as keyof typeof TYPE_ICONS]}
-                        </span>
+            <div>
+                <div className="mb-1 flex items-center">
+                    <span title={outputSchema.type}>
+                        {
+                            TYPE_ICONS[
+                                outputSchema.type as keyof typeof TYPE_ICONS
+                            ]
+                        }
+                    </span>
 
-                        <span className="ml-2 text-sm text-gray-800">
-                            {currentNode.name}
-                        </span>
-                    </div>
-
-                    {schema.properties && (
-                        <SchemaProperties properties={schema.properties} />
-                    )}
-
-                    {!schema.properties && !!schema.controlType && (
-                        <PropertyField
-                            data={schema}
-                            label={schema.controlType!}
-                        />
-                    )}
+                    <span className="ml-2 text-sm text-gray-800">
+                        {currentNode.name}
+                    </span>
                 </div>
-            ))}
+
+                {outputSchema.properties && (
+                    <SchemaProperties properties={outputSchema.properties} />
+                )}
+
+                {!outputSchema.properties && !!outputSchema.controlType && (
+                    <PropertyField
+                        data={outputSchema}
+                        label={outputSchema.controlType!}
+                    />
+                )}
+            </div>
         </div>
     );
 };
