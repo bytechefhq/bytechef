@@ -57,11 +57,11 @@ export interface ActionDefinitionModel {
      */
     name: string;
     /**
-     * The output schema of an execution result.
-     * @type {Array<PropertyModel>}
+     * 
+     * @type {PropertyModel}
      * @memberof ActionDefinitionModel
      */
-    outputSchema?: Array<PropertyModel>;
+    outputSchema?: PropertyModel;
     /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
@@ -100,7 +100,7 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
+        'outputSchema': !exists(json, 'outputSchema') ? undefined : PropertyModelFromJSON(json['outputSchema']),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': !exists(json, 'title') ? undefined : json['title'],
     };
@@ -119,7 +119,7 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'sampleOutput': value.sampleOutput,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
-        'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),
+        'outputSchema': PropertyModelToJSON(value.outputSchema),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'title': value.title,
     };

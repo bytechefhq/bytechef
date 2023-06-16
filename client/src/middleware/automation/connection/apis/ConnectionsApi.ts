@@ -42,7 +42,7 @@ export interface GetConnectionRequest {
     id: number;
 }
 
-export interface SearchConnectionsRequest {
+export interface GetConnectionsRequest {
     componentNames?: Array<string>;
     tagIds?: Array<number>;
 }
@@ -78,7 +78,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/connections/search`,
+            path: `/connections`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -197,10 +197,10 @@ export class ConnectionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Search connections.
-     * Search connections
+     * Get all connections.
+     * Get all connections
      */
-    async searchConnectionsRaw(requestParameters: SearchConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
+    async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
         const queryParameters: any = {};
 
         if (requestParameters.componentNames) {
@@ -214,7 +214,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/connections/search`,
+            path: `/connections`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -224,11 +224,11 @@ export class ConnectionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Search connections.
-     * Search connections
+     * Get all connections.
+     * Get all connections
      */
-    async searchConnections(requestParameters: SearchConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
-        const response = await this.searchConnectionsRaw(requestParameters, initOverrides);
+    async getConnections(requestParameters: GetConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
+        const response = await this.getConnectionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

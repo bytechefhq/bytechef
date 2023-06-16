@@ -34,11 +34,12 @@ export interface GetComponentDefinitionVersionsRequest {
     componentName: string;
 }
 
-export interface SearchComponentDefinitionsRequest {
+export interface GetComponentDefinitionsRequest {
     actionDefinitions?: boolean;
     connectionDefinitions?: boolean;
     connectionInstances?: boolean;
     triggerDefinitions?: boolean;
+    include?: Array<string>;
 }
 
 /**
@@ -118,7 +119,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
      * Get all component definitions.
      * Get all component definitions
      */
-    async searchComponentDefinitionsRaw(requestParameters: SearchComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
+    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
         const queryParameters: any = {};
 
         if (requestParameters.actionDefinitions !== undefined) {
@@ -137,6 +138,10 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
             queryParameters['triggerDefinitions'] = requestParameters.triggerDefinitions;
         }
 
+        if (requestParameters.include) {
+            queryParameters['include'] = requestParameters.include;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
@@ -153,8 +158,8 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
      * Get all component definitions.
      * Get all component definitions
      */
-    async searchComponentDefinitions(requestParameters: SearchComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
-        const response = await this.searchComponentDefinitionsRaw(requestParameters, initOverrides);
+    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
+        const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
