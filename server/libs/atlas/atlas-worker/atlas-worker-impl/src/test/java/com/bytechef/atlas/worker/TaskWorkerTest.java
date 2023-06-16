@@ -57,7 +57,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -84,7 +84,7 @@ public class TaskWorkerTest {
             .eventPublisher(e -> {})
             .build();
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -120,11 +120,16 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution task = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(
-                "pre",
-                List.of(Map.of("name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
-                "type", "var",
-                WorkflowConstants.PARAMETERS, Map.of("value", "${myVar}"))))
+            .workflowTask(
+                WorkflowTask.of(
+                    Map.of(
+                        WorkflowConstants.NAME, "name",
+                        "pre",
+                        List.of(
+                            Map.of(
+                                "name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
+                        "type", "var",
+                        WorkflowConstants.PARAMETERS, Map.of("value", "${myVar}"))))
             .build();
 
         task.setId(1234L);
@@ -157,6 +162,7 @@ public class TaskWorkerTest {
                         .deleteRecursively(new File(MapValueUtils.getString(t2.getParameters(), "path")));
                 } else if ("pass".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
+
                     return t2 -> null;
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
@@ -167,10 +173,21 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(
-                "post", List.of(Map.of("type", "rm", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
-                "pre", List.of(Map.of("type", "mkdir", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
-                "type", "pass")))
+            .workflowTask(
+                WorkflowTask.of(
+                    Map.of(
+                        WorkflowConstants.NAME, "name",
+                        "post", List.of(
+                            Map.of(
+                                WorkflowConstants.NAME, "name",
+                                "type", "rm",
+                                WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
+                        "pre", List.of(
+                            Map.of(
+                                WorkflowConstants.NAME, "name",
+                                "type", "mkdir",
+                                WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
+                        "type", "pass")))
             .build();
 
         taskExecution.setId(1234L);
@@ -199,10 +216,11 @@ public class TaskWorkerTest {
                 } else if ("mkdir".equals(type)) {
                     return t2 -> new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs();
                 } else if ("rm".equals(type)) {
-                    return t2 -> FileSystemUtils
-                        .deleteRecursively(new File(MapValueUtils.getString(t2.getParameters(), "path")));
+                    return t2 -> FileSystemUtils.deleteRecursively(
+                        new File(MapValueUtils.getString(t2.getParameters(), "path")));
                 } else if ("rogue".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
+
                     return t2 -> {
                         throw new TaskExecutionException("Unexpected task type: rogue");
                     };
@@ -215,10 +233,13 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(
-                "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
-                "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
-                "type", "rogue")))
+            .workflowTask(
+                WorkflowTask.of(
+                    Map.of(
+                        WorkflowConstants.NAME, "name",
+                        "finalize", List.of(Map.of(WorkflowConstants.NAME, "name", "type", "rm", "path", tempDir)),
+                        "pre", List.of(Map.of(WorkflowConstants.NAME, "name", "type", "mkdir", "path", tempDir)),
+                        "type", "rogue")))
             .build();
 
         taskExecution.setId(1234L);
@@ -247,7 +268,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -291,7 +312,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution1.setId(1111L);
@@ -301,7 +322,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.handle(taskExecution1));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution2.setId(3333L);
@@ -345,7 +366,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
         taskExecution1.setId(1111L);
         taskExecution1.setJobId(2222L);
@@ -353,7 +374,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.handle(taskExecution1));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
             .build();
         taskExecution2.setId(3333L);
         taskExecution2.setJobId(2222L);

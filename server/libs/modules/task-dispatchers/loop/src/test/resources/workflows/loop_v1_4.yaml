@@ -1,11 +1,13 @@
 ---
 label: "loop 4"
 tasks:
-- type: "loop/v1"
+- name: "loop-1"
+  type: "loop/v1"
   parameters:
     list: "${range(1,10)}"
     itemVar: "item1"
     iteratee:
+      name: "sequence-1"
       type: "sequence/v1"
       parameters:
         tasks:
@@ -13,7 +15,8 @@ tasks:
           type: "var"
           parameters:
             value: "${1 + item1}"
-        - type: "condition/v1"
+        - name: "condition-1"
+          type: "condition/v1"
           parameters:
             conditions:
             - number:

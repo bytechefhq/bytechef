@@ -8,7 +8,8 @@ inputs:
   type: "string"
   required: true
 tasks:
-- type: "condition/v1"
+- name: "condition-1"
+  type: "condition/v1"
   parameters:
     rawExpression: true
     expression: "${value1 == value2 or value1 gt value2}"

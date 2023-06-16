@@ -1,11 +1,13 @@
 ---
 label: "Hello for-each"
 tasks:
-- type: "each/v1"
+- name: "each-1"
+  type: "each/v1"
   parameters:
     list: "${range(1,25)}"
     itemVar: "item1"
     iteratee:
+      name: "each-1"
       type: "each/v1"
       parameters:
         list: "${range(1,25)}"

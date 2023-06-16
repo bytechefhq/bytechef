@@ -21,7 +21,8 @@ tasks:
     script: "function perform(input) {\n  print('My random number ' + input.randomNum);\n\
       \  print('My random input ' + input.randomInput);\n  print('My random input\
       \ x ' + input.randomInputX);\n\n  return 2 * input.randomNum;\n}\n"
-- label: "Print result from the JavaScript script"
+- name: "printJavaScriptResult"
+  label: "Print result from the JavaScript script"
   type: "logger/v1/info"
   parameters:
     text: "Result from script1: ${script1}"
@@ -35,7 +36,8 @@ tasks:
       \  print('My random input ' + input.randomInput)\n  print('My random input x\
       \ ' + ('undefined' if hasattr(input, 'randomInputX') == False else input.randomInputX))\n\
       \n  return 2 * input.randomNum\n"
-- label: "Print result from the Python script"
+- name: "printPythonResult"
+  label: "Print result from the Python script"
   type: "logger/v1/info"
   parameters:
     text: "Result from script2: ${script2}"
@@ -46,7 +48,8 @@ tasks:
       randomNum: "${randomNumber}"
       randomInput: "${yourName}"
     script: "perform <- function(input) {\n  return (2 * input$randomNum)\n}\n"
-- label: "Print result from the R script"
+- name: "printRResult"
+  label: "Print result from the R script"
   type: "logger/v1/info"
   parameters:
     text: "Result from script3: ${script3}"
@@ -57,7 +60,8 @@ tasks:
       randomNum: "${randomNumber}"
       randomInput: "${yourName}"
     script: "def perform(input)\n  return 2 * input.randomNum;\nend\n"
-- label: "Print result from the Ruby script"
+- name: "printRubyResult"
+  label: "Print result from the Ruby script"
   type: "logger/v1/info"
   parameters:
     text: "Result from script4: ${script4}"

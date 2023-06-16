@@ -42,7 +42,9 @@ public class DefaultTaskDispatcherTest {
 
         defaultTaskDispatcher.dispatch(
             TaskExecution.builder()
-                .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type", "test", "value")))
+                .workflowTask(
+                    WorkflowTask.of(
+                        Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type", "test", "value")))
                 .build());
     }
 
@@ -50,7 +52,9 @@ public class DefaultTaskDispatcherTest {
     public void test2() {
         TaskExecution taskExecution =
             TaskExecution.builder()
-                .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "test", "node", "encoder")))
+                .workflowTask(
+                    WorkflowTask.of(
+                        Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "test", "node", "encoder")))
                 .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
@@ -63,7 +67,10 @@ public class DefaultTaskDispatcherTest {
     public void test3() {
         TaskExecution taskExecution =
             TaskExecution.builder()
-                .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "test", "node", "encoder.xlarge")))
+                .workflowTask(
+                    WorkflowTask.of(
+                        Map.of(
+                            WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "test", "node", "encoder.xlarge")))
                 .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
