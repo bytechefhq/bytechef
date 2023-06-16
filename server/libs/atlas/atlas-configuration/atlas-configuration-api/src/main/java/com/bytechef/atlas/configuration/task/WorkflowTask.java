@@ -84,6 +84,7 @@ public class WorkflowTask implements Task {
             }
         }
 
+        Assert.notNull(name, "'name' must not be null");
         Assert.notNull(type, "'type' must not be null");
     }
 
