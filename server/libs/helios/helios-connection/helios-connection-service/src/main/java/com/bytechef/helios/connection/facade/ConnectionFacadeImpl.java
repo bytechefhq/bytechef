@@ -162,8 +162,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> search(List<String> componentNames, List<Long> tagIds) {
-        List<Connection> connections = connectionService.search(componentNames, tagIds);
+    public List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds) {
+        List<Connection> connections = connectionService.getConnections(componentNames, tagIds);
 
         return getConnectionDTOs(connections);
     }

@@ -57,13 +57,13 @@ public class ProjectWorkflowExecutionController implements ProjectWorkflowExecut
     }
 
     @Override
-    public ResponseEntity<Page> searchProjectWorkflowExecutions(
+    public ResponseEntity<Page> getProjectWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
         return ResponseEntity.ok(
             projectWorkflowExecutionFacade
-                .searchProjectWorkflowExecutions(
+                .getProjectWorkflowExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
                     workflowExecutionDTO, ProjectWorkflowExecutionBasicModel.class)));
