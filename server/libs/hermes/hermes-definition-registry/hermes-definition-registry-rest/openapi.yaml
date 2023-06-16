@@ -23,7 +23,7 @@ paths:
       summary: "Get all component definitions"
       tags:
       - "component-definitions"
-      operationId: "searchComponentDefinitions"
+      operationId: "getComponentDefinitions"
       parameters:
       - name: "actionDefinitions"
         description: "Use for filtering components which define action definitions."
@@ -50,6 +50,14 @@ paths:
         required: false
         schema:
           type: "boolean"
+      - name: "include"
+        description: "The list of component names to include in the result."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
       responses:
         "200":
           description: "Successful operation."
