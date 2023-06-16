@@ -92,7 +92,7 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return
      */
-    Optional<List<? extends OutputProperty<?>>> getOutputSchema();
+    Optional<OutputProperty<?>> getOutputSchema();
 
     /**
      *
