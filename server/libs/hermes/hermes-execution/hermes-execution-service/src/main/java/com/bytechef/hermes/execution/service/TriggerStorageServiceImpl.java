@@ -29,7 +29,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Service("triggerLifecycleService")
+@Service("triggerStorageService")
 @Transactional
 public class TriggerStorageServiceImpl implements TriggerStorageService {
 

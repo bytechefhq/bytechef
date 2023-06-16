@@ -1,6 +1,0 @@
-bootJar.enabled = false
-
-subprojects {
-    dependencies {
-    }
-}
