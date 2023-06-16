@@ -1,0 +1,70 @@
+group = "com.bytechef.platform"
+description = ""
+
+springBoot {
+    mainClassName = "com.bytechef.platform.PlatformApplication"
+}
+
+dependencies {
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
+    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+    implementation project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
+    implementation project(":server:ee:libs:atlas:atlas-worker:atlas-worker-remote-client")
+    implementation project(":server:ee:libs:core:discovery:discovery-redis")
+    implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest")
+    implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-service")
+    implementation project(":server:ee:libs:helios:helios-configuration:helios-configuration-remote-rest")
+    implementation project(":server:ee:libs:helios:helios-execution:helios-execution-remote-rest")
+    implementation project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-rest")
+    implementation project(":server:ee:libs:hermes:hermes-connection:hermes-connection-remote-rest")
+    implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
+    implementation project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-rest")
+    implementation project(":server:ee:libs:hermes:hermes-scheduler:hermes-scheduler-remote-client")
+    implementation project(":server:ee:libs:hermes:hermes-worker:hermes-worker-remote-client")
+
+    implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc")
+    implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc-util")
+    implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git")
+    implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource")
+    implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-service")
+    implementation project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc")
+    implementation project(":server:libs:atlas:atlas-execution:atlas-execution-service")
+    implementation project(":server:libs:configs:account-config")
+    implementation project(":server:libs:configs:liquibase-config")
+    implementation project(":server:libs:core:message-broker:message-broker-amqp")
+    implementation project(":server:libs:core:message-broker:message-broker-kafka")
+    implementation project(":server:libs:core:message-broker:message-broker-redis")
+    implementation project(":server:libs:core:category:category-rest:category-rest-impl")
+    implementation project(":server:libs:core:category:category-service")
+    implementation project(":server:libs:core:commons:commons-data")
+    implementation project(":server:libs:core:encryption:encryption-filesystem")
+    implementation project(":server:libs:core:event:event-impl")
+    implementation project(":server:libs:core:rest:rest-impl")
+    implementation project(":server:libs:core:tag:tag-rest:tag-rest-impl")
+    implementation project(":server:libs:core:tag:tag-service")
+    implementation project(":server:libs:core:config-post-processor")
+    implementation project(":server:libs:helios:helios-connection:helios-connection-rest")
+    implementation project(":server:libs:helios:helios-connection:helios-connection-service")
+    implementation project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-impl")
+    implementation project(":server:libs:helios:helios-configuration:helios-configuration-service")
+    implementation project(":server:libs:helios:helios-execution:helios-execution-rest")
+    implementation project(":server:libs:helios:helios-execution:helios-execution-service")
+    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-impl")
+    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-service")
+    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
+    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
+    implementation project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-impl")
+    implementation project(":server:libs:hermes:hermes-execution:hermes-execution-service")
+
+    testImplementation project(":server:libs:test:test-int-support")
+}

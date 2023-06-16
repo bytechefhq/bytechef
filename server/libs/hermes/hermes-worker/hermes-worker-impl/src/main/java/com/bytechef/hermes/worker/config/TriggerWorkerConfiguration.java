@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 public class TriggerWorkerConfiguration {
 
     @Bean
-    TriggerHandlerRegistry triggerHandlerAccessor(Map<String, TriggerHandler<?>> triggerHandlerMap) {
+    TriggerHandlerRegistry triggerHandlerRegistry(Map<String, TriggerHandler<?>> triggerHandlerMap) {
         return triggerHandlerMap::get;
     }
 
