@@ -208,35 +208,6 @@ public abstract class DefinitionDSL {
             .properties(properties);
     }
 
-    protected static <P extends ModifiableProperty<?>> List<? extends P> checkPropertyNames(
-        List<? extends P> properties) {
-
-        if (properties != null && properties.size() > 0) {
-            Property firstProperty = properties.get(0);
-
-            String firstName = firstProperty.getName();
-
-            boolean emptyName = firstName == null || firstName.isEmpty();
-
-            for (Property property : properties) {
-                String name = property.getName();
-
-                if (emptyName && !(name == null || name.isEmpty()) ||
-                    !emptyName && (name == null || name.isEmpty())) {
-
-                    throw new IllegalArgumentException(
-                        "Defined items either have to have all names defined or no defined names.");
-                }
-            }
-
-            return properties.stream()
-                .distinct()
-                .toList();
-        }
-
-        return null;
-    }
-
     // CHECKSTYLE:OFF
     public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M>>
         implements Property permits ModifiableProperty.ModifiableDynamicPropertiesProperty,

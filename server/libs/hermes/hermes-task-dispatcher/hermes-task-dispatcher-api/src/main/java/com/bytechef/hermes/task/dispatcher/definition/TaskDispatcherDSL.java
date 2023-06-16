@@ -22,7 +22,6 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
@@ -31,7 +30,6 @@ import com.bytechef.hermes.definition.Resources;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -48,24 +46,6 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
 
     public static ModifiableObjectProperty task(String name) {
         return buildObject(name, "The task or task dispatcher to use.", "TASK");
-    }
-
-    private static <P extends InputProperty> List<P> checkInputProperties(P[] properties) {
-        if (properties != null) {
-            for (Property property : properties) {
-                String name = property.getName();
-
-                if (name == null || name.isEmpty()) {
-                    throw new IllegalArgumentException("Defined properties cannot to have empty names.");
-                }
-            }
-
-            return Stream.of(properties)
-                .distinct()
-                .toList();
-        }
-
-        return null;
     }
 
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {

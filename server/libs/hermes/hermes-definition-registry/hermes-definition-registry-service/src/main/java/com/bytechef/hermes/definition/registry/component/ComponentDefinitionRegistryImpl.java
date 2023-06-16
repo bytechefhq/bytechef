@@ -26,6 +26,7 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
@@ -49,18 +50,19 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     private final List<ConnectionDefinition> connectionDefinitions;
 
     public ComponentDefinitionRegistryImpl(List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        this.componentDefinitions = CollectionUtils.concat(
+        List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
             componentDefinitionFactories.stream()
                 .map(ComponentDefinitionFactory::getDefinition)
                 .toList(),
-            MANUAL_COMPONENT_DEFINITION)
-            .stream()
-            .sorted((o1, o2) -> {
-                String o1Name = o1.getName();
+            MANUAL_COMPONENT_DEFINITION);
 
-                return o1Name.compareTo(o2.getName());
-            })
+        this.componentDefinitions = componentDefinitions.stream()
+            .sorted(this::compare)
             .toList();
+
+        // Validate
+
+        validate(componentDefinitions);
 
         this.connectionDefinitions = componentDefinitions.stream()
             .map(componentDefinition -> OptionalUtils.orElse(componentDefinition.getConnection(), null))
@@ -74,7 +76,8 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
         String actionName, String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList())
+        return componentDefinition.getActions()
+            .orElse(Collections.emptyList())
             .stream()
             .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
             .findFirst()
@@ -87,7 +90,8 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     public List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList());
+        return componentDefinition.getActions()
+            .orElse(Collections.emptyList());
     }
 
     @Override
@@ -96,9 +100,12 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
         ActionDefinition actionDefinition = getActionDefinition(actionName, componentName, componentVersion);
 
-        return CollectionUtils.getFirst(
-            OptionalUtils.get(actionDefinition.getProperties()),
-            property -> Objects.equals(propertyName, property.getName()));
+        return actionDefinition.getProperties()
+            .orElseThrow(IllegalStateException::new)
+            .stream()
+            .filter(property -> Objects.equals(propertyName, property.getName()))
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
     }
 
     @Override
@@ -110,13 +117,14 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
     @Override
     public ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion) {
-        return CollectionUtils.getFirst(
-            componentDefinitions,
-            componentDefinition -> componentDefinition.getConnection()
+        return componentDefinitions.stream()
+            .filter(componentDefinition -> componentDefinition.getConnection()
                 .map(connectionDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     connectionDefinition.getVersion() == connectionVersion)
-                .orElse(false),
-            componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
+                .orElse(false))
+            .findFirst()
+            .flatMap(ComponentDefinition::getConnection)
+            .orElseThrow(IllegalStateException::new);
     }
 
     @Override
@@ -130,9 +138,10 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
         if (version == null) {
             componentDefinition = filteredComponentDefinitions.get(filteredComponentDefinitions.size() - 1);
         } else {
-            componentDefinition = CollectionUtils.getFirst(
-                filteredComponentDefinitions,
-                curComponentDefinition -> version == curComponentDefinition.getVersion());
+            componentDefinition = filteredComponentDefinitions.stream()
+                .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
         }
 
         return componentDefinition;
@@ -165,7 +174,8 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     public TriggerDefinition getTriggerDefinition(String triggerName, String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return OptionalUtils.orElse(componentDefinition.getTriggers(), Collections.emptyList())
+        return componentDefinition.getTriggers()
+            .orElse(Collections.emptyList())
             .stream()
             .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
             .findFirst()
@@ -188,9 +198,12 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(actionName, componentName, componentVersion);
 
-        return CollectionUtils.getFirst(
-            OptionalUtils.get(triggerDefinition.getProperties()),
-            property -> Objects.equals(propertyName, property.getName()));
+        return triggerDefinition.getProperties()
+            .orElseThrow(IllegalStateException::new)
+            .stream()
+            .filter(property -> Objects.equals(propertyName, property.getName()))
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
     }
 
     private List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
@@ -200,5 +213,37 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
             .map(filterCompatibleConnectionDefinitionsFunction -> filterCompatibleConnectionDefinitionsFunction
                 .apply(componentDefinition, connectionDefinitions))
             .orElse(Collections.emptyList());
+    }
+
+    private int compare(ComponentDefinition o1, ComponentDefinition o2) {
+        String o1Name = o1.getName();
+
+        return o1Name.compareTo(o2.getName());
+    }
+
+    private void validate(List<ComponentDefinition> componentDefinitions) {
+        for (ComponentDefinition componentDefinition : componentDefinitions) {
+            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
+                .orElse(List.of());
+
+            for (ActionDefinition actionDefinition : actionDefinitions) {
+                PropertyUtils.checkInputProperties(OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
+                PropertyUtils.checkOutputProperty(OptionalUtils.orElse(actionDefinition.getOutputSchema(), null));
+
+                if (OptionalUtils.isPresent(actionDefinition.getOutputSchema()) &&
+                    OptionalUtils.isPresent(actionDefinition.getOutputSchemaDataSource())) {
+
+                    throw new IllegalStateException("Output schema can be define either as a property or function");
+                }
+            }
+
+            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers()
+                .orElse(List.of());
+
+            for (TriggerDefinition triggerDefinition : triggerDefinitions) {
+                PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
+                PropertyUtils.checkOutputProperty(OptionalUtils.orElse(triggerDefinition.getOutputSchema(), null));
+            }
+        }
     }
 }
