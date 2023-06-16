@@ -23,12 +23,8 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.a
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
@@ -51,14 +47,6 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .properties(
             array(LIST).label("List of items")
                 .description("List of items to iterate over."),
-            string(ITEM_VAR)
-                .label("Item Var")
-                .description("The name of the item variable.")
-                .defaultValue(ITEM),
-            string(ITEM_INDEX)
-                .label("Item Index")
-                .description("The name of the index variable.")
-                .defaultValue(ITEM_INDEX),
             bool(LOOP_FOREVER)
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")

@@ -4,19 +4,17 @@ outputs:
 - name: "sumResult"
   value: "${sumResult}"
 tasks:
-- name: "loop-1"
+- name: "loop_1"
   type: "loop/v1"
   parameters:
     list: "${range(1,10)}"
-    itemVar: "item1"
     iteratee:
-      name: "loop-1"
+      name: "loop_2"
       type: "loop/v1"
       parameters:
-        list: "${range(1,item1)}"
-        itemVar: "item2"
+        list: "${range(1,loop_1.item)}"
         iteratee:
           name: "var1"
           type: "var"
           parameters:
-            value: "${item1 + '_' + item2}"
+            value: "${loop_1.item + '_' + loop_2.item}"

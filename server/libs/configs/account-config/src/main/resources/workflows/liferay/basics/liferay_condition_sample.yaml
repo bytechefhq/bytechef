@@ -50,7 +50,7 @@ tasks:
   description: "Print received input arguments in log with INFO log level"
   parameters:
     text: "Received ${liferayObjectApiGet}"
-- name: "condition-1"
+- name: "condition_1"
   type: "condition/v1"
   parameters:
     conditions:
