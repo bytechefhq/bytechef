@@ -29,8 +29,8 @@ export interface GetProjectWorkflowExecutionRequest {
     id: number;
 }
 
-export interface SearchProjectWorkflowExecutionsRequest {
-    jobStatus?: SearchProjectWorkflowExecutionsJobStatusEnum;
+export interface GetProjectWorkflowExecutionsRequest {
+    jobStatus?: GetProjectWorkflowExecutionsJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
     projectId?: number;
@@ -80,7 +80,7 @@ export class ProjectWorkflowExecutionsApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async searchProjectWorkflowExecutionsRaw(requestParameters: SearchProjectWorkflowExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
+    async getProjectWorkflowExecutionsRaw(requestParameters: GetProjectWorkflowExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.jobStatus !== undefined) {
@@ -127,8 +127,8 @@ export class ProjectWorkflowExecutionsApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async searchProjectWorkflowExecutions(requestParameters: SearchProjectWorkflowExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
-        const response = await this.searchProjectWorkflowExecutionsRaw(requestParameters, initOverrides);
+    async getProjectWorkflowExecutions(requestParameters: GetProjectWorkflowExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
+        const response = await this.getProjectWorkflowExecutionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -137,11 +137,11 @@ export class ProjectWorkflowExecutionsApi extends runtime.BaseAPI {
 /**
  * @export
  */
-export const SearchProjectWorkflowExecutionsJobStatusEnum = {
+export const GetProjectWorkflowExecutionsJobStatusEnum = {
     Created: 'CREATED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
     Completed: 'COMPLETED'
 } as const;
-export type SearchProjectWorkflowExecutionsJobStatusEnum = typeof SearchProjectWorkflowExecutionsJobStatusEnum[keyof typeof SearchProjectWorkflowExecutionsJobStatusEnum];
+export type GetProjectWorkflowExecutionsJobStatusEnum = typeof GetProjectWorkflowExecutionsJobStatusEnum[keyof typeof GetProjectWorkflowExecutionsJobStatusEnum];
