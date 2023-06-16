@@ -57,13 +57,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
-  /connections/search:
+  /connections:
     get:
-      description: "Search connections."
-      summary: "Search connections"
+      description: "Get all connections."
+      summary: "Get all connections"
       tags:
       - "connections"
-      operationId: "searchConnections"
+      operationId: "getConnections"
       parameters:
       - name: "componentNames"
         description: "The list of component names used for filtering connections."
