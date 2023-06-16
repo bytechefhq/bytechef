@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-14T09:50:58.397821+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:40.379371+02:00[Europe/Zagreb]")
 public class ProjectModel {
 
   private com.bytechef.category.web.rest.model.CategoryModel category;

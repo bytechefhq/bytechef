@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-07T12:23:18.516687+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:40.939072+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflows", description = "The Core Workflows API")
 public interface WorkflowsApi {

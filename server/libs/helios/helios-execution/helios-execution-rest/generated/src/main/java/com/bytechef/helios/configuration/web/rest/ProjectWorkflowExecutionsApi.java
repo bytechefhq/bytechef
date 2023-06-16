@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-14T09:22:28.470279+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:37.768123+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-workflow-executions", description = "The Automation Project Workflow Executions API")
 public interface ProjectWorkflowExecutionsApi {
@@ -97,7 +97,7 @@ public interface ProjectWorkflowExecutionsApi {
      * @return The page of workflow executions. (status code 200)
      */
     @Operation(
-        operationId = "searchProjectWorkflowExecutions",
+        operationId = "getProjectWorkflowExecutions",
         summary = "Get project workflow executions",
         description = "Get project workflow executions.",
         tags = { "project-workflow-executions" },
@@ -112,7 +112,7 @@ public interface ProjectWorkflowExecutionsApi {
         value = "/project-workflow-executions",
         produces = { "application/json" }
     )
-    default ResponseEntity<org.springframework.data.domain.Page> searchProjectWorkflowExecutions(
+    default ResponseEntity<org.springframework.data.domain.Page> getProjectWorkflowExecutions(
         @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) String jobStatus,
         @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobStartDate,
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobEndDate,
