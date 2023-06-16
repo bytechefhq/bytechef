@@ -31,10 +31,10 @@
     } ],
     "title": "Debug",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "logger",
@@ -67,10 +67,10 @@
     } ],
     "title": "Error",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "logger",
@@ -103,10 +103,10 @@
     } ],
     "title": "Info",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "logger",
@@ -139,10 +139,10 @@
     } ],
     "title": "Warn",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

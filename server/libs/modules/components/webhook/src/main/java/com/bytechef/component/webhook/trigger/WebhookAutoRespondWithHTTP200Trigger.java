@@ -46,13 +46,7 @@ public class WebhookAutoRespondWithHTTP200Trigger {
             "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.")
         .type(TriggerType.STATIC_WEBHOOK)
         .outputSchema(
-            object()
-                .properties(
-                    string(METHOD),
-                    object(HEADERS),
-                    object(PARAMETERS),
-                    any(BODY)))
-        .outputSchema(getOutputSchemaFunction())
+            getOutputSchemaFunction())
         .staticWebhookRequest(WebhookAutoRespondWithHTTP200Trigger::staticWebhookRequest);
 
     protected static WebhookOutput staticWebhookRequest(StaticWebhookRequestContext context) {
@@ -68,6 +62,11 @@ public class WebhookAutoRespondWithHTTP200Trigger {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> object()
+            .properties(
+                string(METHOD),
+                object(HEADERS),
+                object(PARAMETERS),
+                any(BODY));
     }
 }

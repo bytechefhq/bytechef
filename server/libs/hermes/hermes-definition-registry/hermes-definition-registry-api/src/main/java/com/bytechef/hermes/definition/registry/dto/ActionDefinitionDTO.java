@@ -32,7 +32,7 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public record ActionDefinitionDTO(
     boolean batch, String description, boolean editorDescriptionDataSource, Optional<HelpDTO> help,
-    String name, List<? extends PropertyDTO> outputSchema, boolean outputSchemaDataSource,
+    String name, PropertyDTO outputSchema, boolean outputSchemaDataSource,
     List<? extends PropertyDTO> properties, Optional<Object> sampleOutput, boolean sampleOutputDataSource,
     String title) {
 
@@ -43,9 +43,7 @@ public record ActionDefinitionDTO(
             OptionalUtils.mapOrElse(
                 actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
             OptionalUtils.mapOptional(actionDefinition.getHelp(), HelpDTO::new), actionDefinition.getName(),
-            CollectionUtils.map(
-                OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList()),
-                PropertyDTO::toPropertyDTO),
+            OptionalUtils.mapOrElse(actionDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null),
             OptionalUtils.mapOrElse(
                 actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
             CollectionUtils.map(

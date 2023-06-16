@@ -49,15 +49,7 @@ public class DataStorageGetAllEntriesAction {
                 .description("The namespace to get keys from.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .outputSchema(
-            getOutputSchemaFunction(),
-            object()
-                .properties(
-                    array("item")
-                        .items(
-                            dateTime("created"),
-                            string("key"),
-                            any("key"))))
+        .outputSchema(getOutputSchemaFunction())
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
@@ -68,6 +60,12 @@ public class DataStorageGetAllEntriesAction {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> object()
+            .properties(
+                array("item")
+                    .items(
+                        dateTime("created"),
+                        string("key"),
+                        any("key")));
     }
 }

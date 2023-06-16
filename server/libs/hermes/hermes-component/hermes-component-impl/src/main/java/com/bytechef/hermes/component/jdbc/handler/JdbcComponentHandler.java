@@ -27,7 +27,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
 import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
@@ -149,7 +148,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description(
                                 "The list of properties which should be used as query parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
-                    .outputSchema(getOutputSchemaFunction(), any())
+                    .outputSchema(getOutputSchemaFunction())
                     .perform((inputParameters, context) -> performQuery(context, inputParameters)),
                 action(JdbcConstants.INSERT)
                     .title("Insert")

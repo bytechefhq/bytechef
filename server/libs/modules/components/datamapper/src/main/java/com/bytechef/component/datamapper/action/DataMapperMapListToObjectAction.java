@@ -53,7 +53,7 @@ public class DataMapperMapListToObjectAction {
                 .label("Field Key")
                 .description("The value of the key will become the value in the new object.")
                 .required(true))
-        .outputSchema(getOutputSchemaFunction(), object())
+        .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapListToObjectAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
@@ -63,6 +63,8 @@ public class DataMapperMapListToObjectAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> {
+            return object();
+        };
     }
 }

@@ -29,7 +29,6 @@ import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.Type;
-import com.bytechef.hermes.definition.Property.ValueProperty;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -132,17 +131,10 @@ public class OpenApiClient {
     }
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
-        ResponseFormat responseFormat = null;
-        List<? extends ValueProperty<?>> outputProperties = OptionalUtils.orElse(
-            actionDefinition.getOutputSchema(), Collections.emptyList());
-
-        if (!outputProperties.isEmpty()) {
-            ValueProperty<?> outputProperty = outputProperties.get(0);
-
-            responseFormat = MapValueUtils.get(outputProperty.getMetadata(), "responseFormat", ResponseFormat.class);
-        }
-
-        return responseFormat;
+        return actionDefinition.getOutputSchema()
+            .map(outputProperty -> MapValueUtils.get(
+                outputProperty.getMetadata(), "responseFormat", ResponseFormat.class))
+            .orElse(null);
     }
 
     private Map<String, List<String>> getValuesMap(

@@ -235,13 +235,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         OutputSchemaFunction outputSchemaFunction = outputSchemaDataSource.getOutputSchema();
 
-        return outputSchemaFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters)
-            .stream()
-            .map(outputProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(outputProperty))
-            .toList();
+        return PropertyDTO.toPropertyDTO(
+            outputSchemaFunction.apply(
+                contextConnectionFactory.createConnection(
+                    componentName, componentVersion, connectionParameters, authorizationName),
+                triggerParameters));
     }
 
     @Override

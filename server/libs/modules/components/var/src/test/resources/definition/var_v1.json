@@ -270,10 +270,25 @@
       "controlType": "TIME"
     } ],
     "title": "Set value",
-    "perform": { },
-    "outputSchema": [ ],
+    "outputSchema": {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "ANY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": null
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,

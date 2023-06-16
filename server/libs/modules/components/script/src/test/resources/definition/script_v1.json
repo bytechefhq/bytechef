@@ -240,28 +240,13 @@
       "optionsDataSource": null
     } ],
     "title": "Java",
-    "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -503,28 +488,13 @@
       "optionsDataSource": null
     } ],
     "title": "JavaScript",
-    "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -766,28 +736,13 @@
       "optionsDataSource": null
     } ],
     "title": "Python",
-    "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -1029,28 +984,13 @@
       "optionsDataSource": null
     } ],
     "title": "R",
-    "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -1292,28 +1232,13 @@
       "optionsDataSource": null
     } ],
     "title": "Ruby",
-    "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

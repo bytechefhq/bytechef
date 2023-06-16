@@ -20,7 +20,6 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 
 import java.util.Map;
 
@@ -53,15 +52,10 @@ public class HttpClientPutAction {
                 //
 
                 HttpClientActionUtils.options(true)))
-        .outputSchema(getOutputSchemaFunction(), HttpClientConstants.OUTPUT_PROPERTIES)
+        .outputSchema(HttpClientConstants.OUTPUT_PROPERTIES)
         .perform((inputParameters, actionContext) -> perform(inputParameters));
 
     protected static Object perform(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.PUT);
-    }
-
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (connection, inputParameters) -> null;
     }
 }

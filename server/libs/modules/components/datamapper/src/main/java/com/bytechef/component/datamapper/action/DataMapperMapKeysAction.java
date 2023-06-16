@@ -20,7 +20,7 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public class DataMapperMapKeysAction {
                         string(TO)
                             .label("To")))
                 .required(true))
-        .outputSchema(getOutputSchemaFunction(), object())
+        .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapKeysAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
@@ -66,8 +66,8 @@ public class DataMapperMapKeysAction {
         return null;
     }
 
-    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> object();
     }
 }

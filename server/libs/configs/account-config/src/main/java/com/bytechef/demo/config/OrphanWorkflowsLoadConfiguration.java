@@ -30,6 +30,7 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -65,6 +66,7 @@ public class OrphanWorkflowsLoadConfiguration implements InitializingBean {
 
     @Override
     @SuppressFBWarnings("NP")
+    @Transactional
     public void afterPropertiesSet() {
         List<Project> projects = projectService.getProjects();
         List<Workflow> workflows = workflowService.getWorkflows();

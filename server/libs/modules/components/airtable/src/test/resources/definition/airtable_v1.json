@@ -82,8 +82,7 @@
     } ],
     "title": "Creates a record",
     "editorDescriptionDataSource": null,
-    "perform": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -118,8 +117,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -151,8 +150,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -194,8 +193,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -211,8 +210,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -230,8 +229,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -265,8 +264,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -286,8 +285,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -321,21 +320,22 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
-    } ],
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": null
   } ],
   "category": null,
   "connection": {
@@ -366,16 +366,16 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "apply": null,
+      "pkce": null,
+      "refresh": null,
+      "scopes": null
     } ],
     "baseUri": { },
     "componentName": "airtable",

@@ -17,9 +17,9 @@
 
 package com.bytechef.component.httpclient.constant;
 
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -104,14 +104,16 @@ public class HttpClientConstants {
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
-    @SuppressFBWarnings("MS_MUTABLE_ARRAY")
-    public static final ModifiableOutputProperty<?>[] OUTPUT_PROPERTIES = new ModifiableOutputProperty<?>[] {
-        object()
-            .properties(any("body"), object("headers"), integer("status"))
-            .displayCondition("%s === false".formatted(FULL_RESPONSE)),
-        any()
-            .displayCondition("%s === true".formatted(FULL_RESPONSE))
-    };
+    public static final OutputSchemaDataSource.OutputSchemaFunction OUTPUT_PROPERTIES =
+        (connection, inputParameters) -> {
+            if (MapValueUtils.getBoolean(inputParameters, FULL_RESPONSE, false)) {
+                return object()
+                    .properties(any("body"), object("headers"), integer("status"));
+            } else {
+                return any()
+                    .displayCondition("%s === true".formatted(FULL_RESPONSE));
+            }
+        };
 
     public static final List<? extends ModifiableInputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(

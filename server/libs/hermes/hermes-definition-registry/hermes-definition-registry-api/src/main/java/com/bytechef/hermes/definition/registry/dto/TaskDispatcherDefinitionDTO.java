@@ -31,13 +31,13 @@ import java.util.Optional;
  */
 @SuppressFBWarnings("EI")
 public record TaskDispatcherDefinitionDTO(
-    Optional<String> description, Optional<String> icon, String name, List<? extends PropertyDTO> outputSchema,
+    Optional<String> description, Optional<String> icon, String name, PropertyDTO outputSchema,
     List<? extends PropertyDTO> properties, Optional<ResourcesDTO> resources,
     List<? extends PropertyDTO> taskProperties, String title, int version) {
 
     public TaskDispatcherDefinitionDTO(String name) {
         this(
-            Optional.empty(), Optional.empty(), name, List.of(), List.of(), Optional.empty(), List.of(),
+            Optional.empty(), Optional.empty(), name, null, List.of(), Optional.empty(), List.of(),
             null, 1);
     }
 
@@ -45,9 +45,7 @@ public record TaskDispatcherDefinitionDTO(
         this(
             taskDispatcherDefinition.getDescription(), getIcon(taskDispatcherDefinition),
             taskDispatcherDefinition.getName(),
-            CollectionUtils.map(
-                OptionalUtils.orElse(taskDispatcherDefinition.getOutputSchema(), List.of()),
-                valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
+            OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null),
             CollectionUtils.map(
                 OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), PropertyDTO::toPropertyDTO),
             getResources(taskDispatcherDefinition),

@@ -239,8 +239,7 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -259,10 +258,11 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "xlsxFile",
@@ -541,8 +541,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -635,10 +634,11 @@
       } ],
       "optionsDataSource": null,
       "controlType": "EXPRESSION"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

@@ -379,11 +379,11 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Append Value to List",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -473,8 +473,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Atomic Increment",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -514,10 +514,10 @@
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -607,8 +607,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Await Get Value",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -663,10 +663,10 @@
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -737,11 +737,11 @@
       "controlType": "SELECT"
     } ],
     "title": "Delete Value",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -831,11 +831,11 @@
       "controlType": "INTEGER"
     } ],
     "title": "Delete Value from List",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -888,103 +888,13 @@
       "controlType": "SELECT"
     } ],
     "title": "Get All Entries(Keys and Values)",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "item",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": { },
-          "placeholder": null,
-          "required": null,
-          "name": "created",
-          "type": "DATE_TIME",
-          "defaultValue": null,
-          "exampleValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": { },
-          "placeholder": null,
-          "required": null,
-          "name": "key",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": "TEXT",
-          "options": null,
-          "sampleDataType": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": { },
-          "placeholder": null,
-          "required": null,
-          "name": "key",
-          "type": "ANY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "controlType": null
-        } ],
-        "multipleValues": null,
-        "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
-    } ],
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1313,202 +1223,13 @@
       "controlType": "TIME"
     } ],
     "title": "Get Value",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 1",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ARRAY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "items": null,
-      "multipleValues": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 2",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "BOOLEAN",
-      "defaultValue": null,
-      "exampleValue": null,
-      "options": [ {
-        "description": null,
-        "displayCondition": null,
-        "name": "True",
-        "value": true
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "name": "False",
-        "value": true
-      } ],
-      "controlType": "CHECKBOX"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 3",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "DATE",
-      "defaultValue": null,
-      "exampleValue": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 4",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "DATE_TIME",
-      "defaultValue": null,
-      "exampleValue": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 5",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "INTEGER",
-      "defaultValue": null,
-      "exampleValue": null,
-      "maxValue": null,
-      "minValue": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 6",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "NULL",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 7",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "NUMBER",
-      "defaultValue": null,
-      "exampleValue": null,
-      "maxValue": null,
-      "minValue": null,
-      "numberPrecision": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 8",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 9",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": "TEXT",
-      "options": null,
-      "sampleDataType": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": "type === 10",
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "TIME",
-      "defaultValue": null,
-      "exampleValue": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
-    } ],
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1837,11 +1558,11 @@
       "controlType": "TIME"
     } ],
     "title": "Set Value",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -2189,11 +1910,11 @@
       "controlType": "TIME"
     } ],
     "title": "Set Value in List",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

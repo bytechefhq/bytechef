@@ -48,7 +48,9 @@
       "optionsDataSource": null
     } ],
     "title": "Get Object",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -141,11 +143,9 @@
       } ],
       "controlType": "EXPRESSION",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -177,7 +177,9 @@
       "optionsDataSource": null
     } ],
     "title": "Get URL",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -195,11 +197,9 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -231,7 +231,9 @@
       "optionsDataSource": null
     } ],
     "title": "List Objects",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -325,11 +327,9 @@
       "options": null,
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -379,7 +379,9 @@
       "optionsDataSource": null
     } ],
     "title": "Get Pre-signed Object",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -397,11 +399,9 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -579,7 +579,9 @@
       "optionsDataSource": null
     } ],
     "title": "Put Object",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -597,11 +599,9 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
