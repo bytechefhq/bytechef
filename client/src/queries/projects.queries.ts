@@ -14,9 +14,9 @@ import {
 
 import {
     GetProjectWorkflowExecutionRequest,
+    GetProjectWorkflowExecutionsRequest,
     ProjectWorkflowExecutionModel,
     ProjectWorkflowExecutionsApi,
-    SearchProjectWorkflowExecutionsRequest,
 } from '../middleware/automation/execution';
 import {WorkflowModel} from '../middleware/core/workflow/configuration';
 
@@ -43,7 +43,7 @@ export const ProjectKeys = {
         'workflowExecution',
         request,
     ],
-    workflowExecutions: (filter: SearchProjectWorkflowExecutionsRequest) => [
+    workflowExecutions: (filter: GetProjectWorkflowExecutionsRequest) => [
         'workflowExecutions',
         filter,
     ],
@@ -97,12 +97,10 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
     );
 
 export const useGetWorkflowExecutionsQuery = (
-    request: SearchProjectWorkflowExecutionsRequest
+    request: GetProjectWorkflowExecutionsRequest
 ) =>
     useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
-        new ProjectWorkflowExecutionsApi().searchProjectWorkflowExecutions(
-            request
-        )
+        new ProjectWorkflowExecutionsApi().getProjectWorkflowExecutions(request)
     );
 
 export const useGetWorkflowExecutionQuery = (
