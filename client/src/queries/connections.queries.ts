@@ -5,7 +5,7 @@ import {
     ConnectionTagsApi,
     ConnectionsApi,
     GetComponentConnectionsRequest,
-    SearchConnectionsRequest,
+    GetConnectionsRequest,
     TagModel,
 } from '../middleware/automation/connection';
 import {
@@ -20,7 +20,7 @@ export const ConnectionKeys = {
         request,
     ],
     connection: (id: number) => [...ConnectionKeys.connections, id],
-    connectionList: (filters: SearchConnectionsRequest) => [
+    connectionList: (filters: GetConnectionsRequest) => [
         ...ConnectionKeys.connections,
         filters,
     ],
@@ -42,12 +42,12 @@ export const useGetComponentConnectionsQuery = (
     );
 
 export const useGetConnectionsQuery = (
-    filters: SearchConnectionsRequest,
+    filters: GetConnectionsRequest,
     enabledCondition?: boolean
 ) =>
     useQuery<ConnectionModel[], Error>(
         ConnectionKeys.connectionList(filters),
-        () => new ConnectionsApi().searchConnections(filters),
+        () => new ConnectionsApi().getConnections(filters),
         {enabled: false || enabledCondition}
     );
 
