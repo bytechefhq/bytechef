@@ -20,7 +20,8 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.util.Map;
 
@@ -256,18 +257,7 @@ public class DataMapperMapOneValueAction {
                             .displayCondition("type === 10")
                             .required(true)))
                 .required(true))
-        .outputSchema(
-            getOutputSchemaFunction(),
-            array().displayCondition("type === 1"),
-            bool().displayCondition("type === 2"),
-            date().displayCondition("type === 3"),
-            dateTime().displayCondition("type === 4"),
-            integer().displayCondition("type === 5"),
-            nullable().displayCondition("type === 6"),
-            number().displayCondition("type === 7"),
-            object().displayCondition("type === 8"),
-            string().displayCondition("type === 9"),
-            time().displayCondition("type === 10"))
+        .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapOneValueAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
@@ -275,8 +265,20 @@ public class DataMapperMapOneValueAction {
         return null;
     }
 
-    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> switch (MapValueUtils.getRequiredInteger(inputParameters, TYPE)) {
+            case 1 -> array();
+            case 2 -> bool();
+            case 3 -> date();
+            case 4 -> dateTime();
+            case 5 -> integer();
+            case 6 -> nullable();
+            case 7 -> number();
+            case 8 -> object();
+            case 9 -> string();
+            case 10 -> time();
+            default -> throw new IllegalArgumentException("Type does not exist");
+        };
     }
 }

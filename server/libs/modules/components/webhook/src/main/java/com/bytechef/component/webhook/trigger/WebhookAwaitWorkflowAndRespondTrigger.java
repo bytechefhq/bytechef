@@ -61,13 +61,6 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
                 .label("Timeout (ms)")
                 .description(
                     "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
-        .outputSchema(
-            object()
-                .properties(
-                    string(METHOD),
-                    object(HEADERS),
-                    object(PARAMETERS),
-                    any(BODY)))
         .outputSchema(getOutputSchemaFunction())
         .staticWebhookRequest(WebhookAwaitWorkflowAndRespondTrigger::staticWebhookRequest)
         .webhookValidate(WebhookAwaitWorkflowAndRespondTrigger::webhookValidate);
@@ -92,6 +85,11 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> object()
+            .properties(
+                string(METHOD),
+                object(HEADERS),
+                object(PARAMETERS),
+                any(BODY));
     }
 }

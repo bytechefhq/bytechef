@@ -101,11 +101,13 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -123,11 +125,9 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -177,7 +177,9 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -268,13 +270,11 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
-    } ],
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -324,7 +324,9 @@
       "optionsDataSource": null
     } ],
     "title": "Download file",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -415,13 +417,11 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
-    } ],
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

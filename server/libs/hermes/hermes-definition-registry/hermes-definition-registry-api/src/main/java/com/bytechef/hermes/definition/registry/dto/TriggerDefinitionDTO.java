@@ -33,7 +33,7 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public record TriggerDefinitionDTO(
     boolean batch, String description, boolean editorDescriptionDataSource, Optional<HelpDTO> help, String name,
-    List<? extends PropertyDTO> outputSchema, boolean outputSchemaDataSource, List<? extends PropertyDTO> properties,
+    PropertyDTO outputSchema, boolean outputSchemaDataSource, List<? extends PropertyDTO> properties,
     Optional<Object> sampleOutput, boolean sampleOutputDataSource, String title, TriggerType type) {
 
     public TriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
@@ -43,9 +43,7 @@ public record TriggerDefinitionDTO(
             OptionalUtils.mapOrElse(
                 triggerDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
             OptionalUtils.mapOptional(triggerDefinition.getHelp(), HelpDTO::new), triggerDefinition.getName(),
-            CollectionUtils.map(
-                OptionalUtils.orElse(triggerDefinition.getOutputSchema(), Collections.emptyList()),
-                PropertyDTO::toPropertyDTO),
+            OptionalUtils.mapOrElse(triggerDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null),
             OptionalUtils.mapOrElse(
                 triggerDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
             CollectionUtils.map(

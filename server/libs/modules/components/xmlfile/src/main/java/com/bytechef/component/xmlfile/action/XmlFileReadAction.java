@@ -78,10 +78,7 @@ public class XmlFileReadAction {
                 .description("The page number to get.")
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
-        .outputSchema(
-            getOutputSchemaFunction(),
-            array().displayCondition("%s === true".formatted(IS_ARRAY)),
-            object().displayCondition("%s === false".formatted(IS_ARRAY)))
+        .outputSchema(getOutputSchemaFunction())
         .perform(XmlFileReadAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
@@ -128,6 +125,12 @@ public class XmlFileReadAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> {
+            if (MapValueUtils.getBoolean(inputParameters, IS_ARRAY, false)) {
+                return object();
+            } else {
+                return array();
+            }
+        };
     }
 }

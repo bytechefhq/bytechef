@@ -19,8 +19,8 @@
     "items": null,
     "multipleValues": null,
     "options": null,
-    "controlType": "OBJECT_BUILDER",
-    "optionsDataSource": null
+    "optionsDataSource": null,
+    "controlType": "OBJECT_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The name of the item variable.",
@@ -104,12 +104,12 @@
     "objectType": "TASK",
     "options": null,
     "properties": null,
-    "controlType": "EXPRESSION",
-    "optionsDataSource": null
+    "optionsDataSource": null,
+    "controlType": "EXPRESSION"
   } ],
   "title": "Loop",
   "version": 1,
-  "outputSchema": [ {
+  "outputSchema": {
     "advancedOption": null,
     "description": null,
     "displayCondition": null,
@@ -119,7 +119,7 @@
     "metadata": { },
     "placeholder": null,
     "required": null,
-    "name": "item",
+    "name": null,
     "type": "OBJECT",
     "defaultValue": null,
     "exampleValue": null,
@@ -127,27 +127,42 @@
     "multipleValues": null,
     "objectType": null,
     "options": null,
-    "properties": null,
-    "controlType": "OBJECT_BUILDER",
-    "optionsDataSource": null
-  }, {
-    "advancedOption": null,
-    "description": null,
-    "displayCondition": null,
-    "expressionEnabled": null,
-    "hidden": null,
-    "label": null,
-    "metadata": { },
-    "placeholder": null,
-    "required": null,
-    "name": "itemIndex",
-    "type": "INTEGER",
-    "defaultValue": null,
-    "exampleValue": null,
-    "maxValue": null,
-    "minValue": null,
-    "options": null,
-    "controlType": "INTEGER",
-    "optionsDataSource": null
-  } ]
+    "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "item",
+      "type": "ANY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "itemIndex",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
+    } ],
+    "optionsDataSource": null,
+    "controlType": "OBJECT_BUILDER"
+  }
 }

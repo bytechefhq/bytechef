@@ -147,13 +147,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         OutputSchemaFunction outputSchemaFunction = outputSchemaDataSource.getOutputSchema();
 
-        return outputSchemaFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters)
-            .stream()
-            .map(outputProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(outputProperty))
-            .toList();
+        return PropertyDTO.toPropertyDTO(
+            outputSchemaFunction.apply(
+                contextConnectionFactory.createConnection(
+                    componentName, componentVersion, connectionParameters, authorizationName),
+                actionParameters));
     }
 
     @Override

@@ -215,28 +215,13 @@
       "controlType": "INTEGER"
     } ],
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "jsonFile",
@@ -365,8 +350,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -459,10 +443,11 @@
       } ],
       "optionsDataSource": null,
       "controlType": "EXPRESSION"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

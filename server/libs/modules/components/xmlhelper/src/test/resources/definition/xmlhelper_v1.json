@@ -30,8 +30,8 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from XML string",
-    "perform": { },
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -50,12 +50,12 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
-    } ],
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "xmlHelper",
@@ -94,8 +94,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to convert to XML string.",
@@ -115,8 +115,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The array to convert to XML string.",
@@ -134,12 +134,12 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Convert to XML string",
-    "perform": { },
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -157,10 +157,10 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

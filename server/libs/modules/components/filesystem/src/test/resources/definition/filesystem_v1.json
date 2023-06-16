@@ -30,9 +30,7 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -125,9 +123,11 @@
       } ],
       "controlType": "EXPRESSION",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -252,9 +252,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -294,9 +292,11 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -310,11 +310,11 @@
     "name": "createTempDir",
     "properties": null,
     "title": "Create Temp Directory",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -346,9 +346,7 @@
       "optionsDataSource": null
     } ],
     "title": "File Path",
-    "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -366,9 +364,11 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -426,11 +426,11 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "List",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -462,11 +462,11 @@
       "optionsDataSource": null
     } ],
     "title": "Create",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -498,11 +498,11 @@
       "optionsDataSource": null
     } ],
     "title": "Remove",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

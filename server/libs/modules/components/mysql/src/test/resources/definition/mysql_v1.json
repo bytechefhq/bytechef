@@ -133,22 +133,7 @@
     } ],
     "title": "Query",
     "editorDescriptionDataSource": null,
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
@@ -470,7 +455,7 @@
     } ],
     "title": "Insert",
     "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -510,7 +495,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "perform": { }
@@ -848,7 +833,7 @@
     } ],
     "title": "Update",
     "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -888,7 +873,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "perform": { }
@@ -1189,7 +1174,7 @@
     } ],
     "title": "Delete",
     "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1229,7 +1214,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "perform": { }
@@ -1596,7 +1581,7 @@
     } ],
     "title": "Execute",
     "editorDescriptionDataSource": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1636,7 +1621,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "perform": { }

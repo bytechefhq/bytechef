@@ -30,7 +30,8 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -48,11 +49,10 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,
