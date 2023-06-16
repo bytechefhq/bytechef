@@ -292,13 +292,13 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
-    public ResponseEntity<List<ComponentDefinitionBasicModel>> searchComponentDefinitions(
+    public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions) {
+        Boolean triggerDefinitions, List<String> include) {
 
         return ResponseEntity.ok(
-            componentDefinitionFacade.search(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
+            componentDefinitionFacade.getComponentDefinitions(
+                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, include)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))
