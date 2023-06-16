@@ -55,7 +55,7 @@ public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.Modif
      *
      * @return
      */
-    Optional<List<? extends OutputProperty<?>>> getOutputSchema();
+    Optional<OutputProperty<?>> getOutputSchema();
 
     /**
      *

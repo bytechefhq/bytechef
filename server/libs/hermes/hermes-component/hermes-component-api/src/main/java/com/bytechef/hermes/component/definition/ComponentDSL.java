@@ -149,7 +149,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private List<? extends ModifiableOutputProperty<?>> outputSchemaProperties;
+        private ModifiableOutputProperty<?> outputSchemaProperty;
         private List<? extends ModifiableInputProperty> properties;
         private OutputSchemaFunction outputSchemaFunction;
         private SampleOutputFunction sampleOutputFunction;
@@ -227,34 +227,24 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        @SafeVarargs
-        public final <P extends ModifiableOutputProperty<?>> ModifiableActionDefinition outputSchema(P... properties) {
+        public <P extends ModifiableOutputProperty<?>> ModifiableActionDefinition outputSchema(P property) {
 
-            this.outputSchemaProperties = checkOutputProperties(properties);
-
-            return this;
-        }
-
-        @SafeVarargs
-        public final <P extends ModifiableOutputProperty<?>> ModifiableActionDefinition outputSchema(
-            OutputSchemaFunction outputSchema, P... properties) {
-
-            this.outputSchemaProperties = checkOutputProperties(properties);
-            this.outputSchemaFunction = outputSchema;
+            this.outputSchemaProperty = property;
 
             return this;
         }
 
         public ModifiableActionDefinition outputSchema(OutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
-            this.outputSchemaProperties = List.of(any());
 
             return this;
         }
 
         @SafeVarargs
         public final <P extends ModifiableInputProperty> ModifiableActionDefinition properties(P... properties) {
-            this.properties = checkInputProperties(properties);
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -336,8 +326,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends OutputProperty<?>>> getOutputSchema() {
-            return Optional.ofNullable(outputSchemaProperties);
+        public Optional<OutputProperty<?>> getOutputSchema() {
+            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override
@@ -381,7 +371,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private ClientSecretFunction clientSecretFunction;
         private List<Object> detectOn;
         private String description;
-        private String name;
+        private final String name;
         private List<? extends InputProperty> properties;
         private RefreshFunction refreshFunction;
         private List<Object> refreshOn;
@@ -390,10 +380,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private PkceFunction pkceFunction;
         private String title;
         private TokenUrlFunction tokenUrlFunction;
-        private AuthorizationType type;
-
-        private ModifiableAuthorization() {
-        }
+        private final AuthorizationType type;
 
         private ModifiableAuthorization(String name, AuthorizationType type) {
             this.name = Objects.requireNonNull(name);
@@ -479,7 +466,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @SafeVarargs
         public final <P extends InputProperty> ModifiableAuthorization properties(P... properties) {
-            this.properties = checkInputProperties(properties);
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -633,7 +622,10 @@ public final class ComponentDSL extends DefinitionDSL {
             this.name = Objects.requireNonNull(name);
         }
 
-        public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(A... actionDefinitions) {
+        @SafeVarargs
+        public final <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(
+            A... actionDefinitions) {
+
             if (actionDefinitions != null) {
                 return actions(List.of(actionDefinitions));
             }
@@ -645,11 +637,11 @@ public final class ComponentDSL extends DefinitionDSL {
             if (actionDefinitions != null) {
                 this.actions = Collections.unmodifiableList(actionDefinitions);
 
-                for (ActionDefinition actionDefinition : actions) {
-                    ((ModifiableActionDefinition) actionDefinition).componentDescription = this.getDescription()
+                for (ModifiableActionDefinition actionDefinition : actions) {
+                    actionDefinition.componentDescription = this.getDescription()
                         .orElse(null);
-                    ((ModifiableActionDefinition) actionDefinition).componentName = this.getName();
-                    ((ModifiableActionDefinition) actionDefinition).componentTitle = this.getTitle()
+                    actionDefinition.componentName = this.getName();
+                    actionDefinition.componentTitle = this.getTitle()
                         .orElse(null);
                 }
             }
@@ -725,13 +717,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableComponentDefinition resources(String documentationUrl) {
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, null, null);
 
             return this;
         }
 
         public ModifiableComponentDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, categories, null);
 
             return this;
         }
@@ -739,7 +731,7 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition resources(
             String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
 
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, categories, additionalUrls);
 
             return this;
         }
@@ -758,7 +750,10 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(T... triggerDefinitions) {
+        @SafeVarargs
+        public final <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(
+            T... triggerDefinitions) {
+
             if (triggerDefinitions != null) {
                 return triggers(List.of(triggerDefinitions));
             }
@@ -772,11 +767,11 @@ public final class ComponentDSL extends DefinitionDSL {
             if (triggerDefinitions != null) {
                 this.triggers = Collections.unmodifiableList(triggerDefinitions);
 
-                for (TriggerDefinition triggerDefinition : triggers) {
-                    ((ModifiableTriggerDefinition) triggerDefinition).componentDescription = this.getDescription()
+                for (ModifiableTriggerDefinition triggerDefinition : triggers) {
+                    triggerDefinition.componentDescription = this.getDescription()
                         .orElse(null);
-                    ((ModifiableTriggerDefinition) triggerDefinition).componentName = this.getName();
-                    ((ModifiableTriggerDefinition) triggerDefinition).componentTitle = this.getTitle()
+                    triggerDefinition.componentName = this.getName();
+                    triggerDefinition.componentTitle = this.getTitle()
                         .orElse(null);
                 }
             }
@@ -918,7 +913,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @SafeVarargs
         public final <P extends ModifiableInputProperty> ModifiableConnectionDefinition properties(P... properties) {
-            this.properties = checkInputProperties(properties);
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -1027,13 +1024,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableJdbcComponentDefinition resources(String documentationUrl) {
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, null, null);
 
             return this;
         }
 
         public ModifiableJdbcComponentDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, null, null);
 
             return this;
         }
@@ -1041,7 +1038,7 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableJdbcComponentDefinition resources(
             String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
 
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, null, null);
 
             return this;
         }
@@ -1118,7 +1115,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private ListenerEnableConsumer listenerEnable;
         private ListenerDisableConsumer listenerDisable;
         private String name;
-        private List<? extends ModifiableOutputProperty<?>> outputSchemaProperties;
+        private ModifiableOutputProperty<?> outputSchemaProperty;
         private OutputSchemaFunction outputSchemaFunction;
         private SampleOutputFunction sampleOutputFunction;
         private PollFunction poll;
@@ -1225,25 +1222,22 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(P... properties) {
-            this.outputSchemaProperties = checkOutputProperties(properties);
+        public <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(P property) {
+            if (outputSchemaFunction != null) {
+                throw new IllegalArgumentException("Output schema function is already set.");
+            }
 
-            return this;
-        }
-
-        @SafeVarargs
-        public final <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(
-            OutputSchemaFunction outputSchema, P... properties) {
-
-            this.outputSchemaProperties = checkOutputProperties(properties);
-            this.outputSchemaFunction = outputSchema;
+            this.outputSchemaProperty = property;
 
             return this;
         }
 
         public ModifiableTriggerDefinition outputSchema(OutputSchemaFunction outputSchema) {
+            if (outputSchemaProperty != null) {
+                throw new IllegalArgumentException("Output schema properties are already set.");
+            }
+
             this.outputSchemaFunction = outputSchema;
-            this.outputSchemaProperties = List.of(any());
 
             return this;
         }
@@ -1256,7 +1250,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @SafeVarargs
         public final <P extends ModifiableInputProperty> ModifiableTriggerDefinition properties(P... properties) {
-            this.properties = checkInputProperties(properties);
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -1387,8 +1383,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends OutputProperty<?>>> getOutputSchema() {
-            return Optional.ofNullable(outputSchemaProperties);
+        public Optional<OutputProperty<?>> getOutputSchema() {
+            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override
