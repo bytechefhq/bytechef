@@ -1,7 +1,7 @@
 ---
 label: "Sum Sequence"
 tasks:
-- name: "sequence-1"
+- name: "sequence_1"
   type: "sequence/v1"
   parameters:
     tasks:
@@ -17,7 +17,7 @@ tasks:
       type: "var"
       parameters:
         value: "${value2 + 1}"
-    - name: "sequence-1"
+    - name: "sequence_1"
       type: "sequence/v1"
       parameters:
         tasks:

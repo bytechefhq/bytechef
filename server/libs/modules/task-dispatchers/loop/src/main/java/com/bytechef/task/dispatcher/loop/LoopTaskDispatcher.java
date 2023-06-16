@@ -19,7 +19,6 @@ package com.bytechef.task.dispatcher.loop;
 
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
@@ -73,7 +72,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapValueUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        WorkflowTask iteratee = MapValueUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
         List<?> list = MapValueUtils.getList(taskExecution.getParameters(), LIST, Collections.emptyList());
 
         taskExecution.setStartDate(LocalDateTime.now());
@@ -87,23 +86,28 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(1)
-                .workflowTask(WorkflowTask.of(iteratee))
+                .workflowTask(iteratee)
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
-                contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
+                contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION));
+
+            WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+            Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
             if (!list.isEmpty()) {
-                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
+                workflowTaskNameMap.put(ITEM, list.get(0));
             }
 
-            newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
+            workflowTaskNameMap.put(ITEM_INDEX, 0);
 
-            subTaskExecution.evaluate(newContext);
+            newContext.put(workflowTask.getName(), workflowTaskNameMap);
 
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
+            contextService.push(
+                Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

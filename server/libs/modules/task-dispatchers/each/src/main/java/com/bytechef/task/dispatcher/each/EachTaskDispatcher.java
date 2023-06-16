@@ -19,9 +19,6 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
@@ -55,6 +52,9 @@ import java.util.Objects;
  */
 public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    private static final String ITEM_INDEX = "itemIndex";
+    private static final String ITEM = "item";
+
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final MessageBroker messageBroker;
@@ -76,7 +76,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        WorkflowTask iteratee = MapValueUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
         List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
         taskExecution.setStartDate(LocalDateTime.now());
@@ -100,18 +100,17 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(i + 1)
-                    .workflowTask(WorkflowTask.of(iteratee))
+                    .workflowTask(iteratee)
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
                     contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
-                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
-                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
+                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-                iterateeTaskExecution.evaluate(newContext);
+                newContext.put(workflowTask.getName(), Map.of(ITEM, item, ITEM_INDEX, i));
 
-                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
+                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution.evaluate(newContext));
 
                 contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 

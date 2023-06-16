@@ -1,29 +1,28 @@
 ---
 label: "Loop 5"
 tasks:
-- name: "loop-1"
+- name: "loop_1"
   type: "loop/v1"
   parameters:
     list: "${range(1,10)}"
-    itemVar: "item1"
     iteratee:
-      name: "condition-1"
+      name: "condition_1"
       type: "condition/v1"
       parameters:
         conditions:
         - number:
-            value1: "${item1}"
+            value1: "${loop_1.item}"
             operation: "GREATER"
             value2: 5
         combineOperation: "ANY"
         caseTrue:
-        - name: "loop-break-1"
+        - name: "loop-break_1"
           type: "loop-break/v1"
         caseFalse:
         - name: "sumVar1"
           type: "var"
           parameters:
-            value: "${1 + item1}"
+            value: "${1 + loop_1.item}"
         - name: "sumVar2"
           type: "var"
           parameters:

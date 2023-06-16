@@ -32,9 +32,6 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.s
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
@@ -58,15 +55,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("List of items")
                 .description("List of items to iterate over.")
                 .items(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()),
-            string(ITEM_VAR)
-                .label("Item Var")
-                .description("The name of the item variable.")
-                .defaultValue(ITEM),
-            string(ITEM_INDEX)
-                .label("Item Index")
-                .description("The name of the index variable.")
-                .defaultValue(ITEM_INDEX))
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
         .outputSchema(
             object()
                 .properties(

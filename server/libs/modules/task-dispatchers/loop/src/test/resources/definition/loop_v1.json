@@ -19,43 +19,7 @@
     "items": null,
     "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
-  }, {
-    "advancedOption": null,
-    "description": "The name of the item variable.",
-    "displayCondition": null,
-    "expressionEnabled": null,
-    "hidden": null,
-    "label": "Item Var",
-    "metadata": { },
-    "placeholder": null,
-    "required": null,
-    "name": "itemVar",
-    "type": "STRING",
-    "defaultValue": "item",
-    "exampleValue": null,
-    "controlType": "TEXT",
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
-  }, {
-    "advancedOption": null,
-    "description": "The name of the index variable.",
-    "displayCondition": null,
-    "expressionEnabled": null,
-    "hidden": null,
-    "label": "Item Index",
-    "metadata": { },
-    "placeholder": null,
-    "required": null,
-    "name": "itemIndex",
-    "type": "STRING",
-    "defaultValue": "itemIndex",
-    "exampleValue": null,
-    "controlType": "TEXT",
-    "options": null,
-    "sampleDataType": null,
+    "controlType": "OBJECT_BUILDER",
     "optionsDataSource": null
   }, {
     "advancedOption": null,
@@ -104,8 +68,8 @@
     "objectType": "TASK",
     "options": null,
     "properties": null,
-    "optionsDataSource": null,
-    "controlType": "EXPRESSION"
+    "controlType": "EXPRESSION",
+    "optionsDataSource": null
   } ],
   "title": "Loop",
   "version": 1,
@@ -159,10 +123,10 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
   }
 }

@@ -42,7 +42,7 @@ tasks:
   parameters:
     description: "Print created Json object `jsonObject1` in log with INFO log level"
     text: "Payload in the file ${jsonObject1}"
-- name: "condition-1"
+- name: "condition_1"
   type: "condition/v1"
   parameters:
     conditions:
@@ -72,7 +72,7 @@ tasks:
   parameters:
     fileEntry: "${jsonFileEntry2}"
     isArray: true
-- name: "each-1"
+- name: "each_1"
   type: "each/v1"
   parameters:
     list: "${jsonArray}"
@@ -82,7 +82,7 @@ tasks:
       description: "Print json array content in log with INFO log level"
       parameters:
         text: "Array ${itemIndex} element ${item}"
-- name: "loop-1"
+- name: "loop_1"
   type: "loop/v1"
   parameters:
     list: "${jsonArray}"

@@ -10,12 +10,12 @@ inputs:
   type: "string"
   required: true
 tasks:
-- name: "print-1"
+- name: "print_1"
   label: "Print a greeting"
   type: "io/print"
   parameters:
     text: "Hello ${yourName}"
-- name: "print-2"
+- name: "print_2"
   label: "Print a farewell"
   type: "io/print"
   parameters:
