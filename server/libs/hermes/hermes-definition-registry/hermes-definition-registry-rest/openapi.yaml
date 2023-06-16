@@ -849,10 +849,7 @@ components:
           description: "The action name."
           type: "string"
         outputSchema:
-          description: "The output schema of an execution result."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Property"
+          $ref: "#/components/schemas/Property"
         properties:
           description: "The list of action properties."
           type: "array"
@@ -1400,10 +1397,7 @@ components:
           description: "The task dispatcher name.."
           type: "string"
         outputSchema:
-          description: "The output schema of a task dispatching result."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Property"
+          $ref: "#/components/schemas/Property"
         properties:
           description: "The list of task dispatcher properties."
           type: "array"
@@ -1477,10 +1471,7 @@ components:
           description: "The action name."
           type: "string"
         outputSchema:
-          description: "The output schema of an execution result."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Property"
+          $ref: "#/components/schemas/Property"
         properties:
           description: "The list of action properties."
           type: "array"
