@@ -15,15 +15,18 @@ tasks:
   parameters:
     startInclusive: 0
     endInclusive: 5000
-- label: "Print a greeting"
+- name: "printGreeting"
+  label: "Print a greeting"
   type: "logger/v1/info"
   parameters:
     text: "Hello ${yourName}"
-- label: "Sleep a little"
+- name: "sleepLittle"
+  label: "Sleep a little"
   type: "delay/v1/sleep"
   parameters:
     millis: "${randomNumber}"
-- label: "Print a farewell"
+- name: "printFarewell"
+  label: "Print a farewell"
   type: "logger/v1/info"
   parameters:
     text: "Goodbye ${yourName}"

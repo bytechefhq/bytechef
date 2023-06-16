@@ -1,7 +1,8 @@
 ---
 label: "Loop 1"
 tasks:
-- type: "loop/v1"
+- name: "loop-1"
+  type: "loop/v1"
   parameters:
     list: "${range(1,10)}"
     itemVar: "item1"

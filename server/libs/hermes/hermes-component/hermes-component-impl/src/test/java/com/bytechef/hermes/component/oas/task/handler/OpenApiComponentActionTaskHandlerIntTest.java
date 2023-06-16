@@ -822,7 +822,11 @@ public class OpenApiComponentActionTaskHandlerIntTest {
                     ? Map.of()
                     : Map.of(MetadataConstants.CONNECTION_IDS, Map.of("petstore", connection.getId())))
             .workflowTask(
-                WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type", WorkflowConstants.PARAMETERS, parameters)))
+                WorkflowTask.of(
+                    Map.of(
+                        WorkflowConstants.NAME, "name",
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS, parameters)))
             .build();
     }
 

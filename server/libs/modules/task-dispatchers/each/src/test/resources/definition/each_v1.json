@@ -33,8 +33,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -76,8 +76,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -93,8 +93,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -112,8 +112,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -147,8 +147,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -168,8 +168,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -203,13 +203,13 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
+      "controlType": "TIME",
+      "optionsDataSource": null
     } ],
     "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
   }, {
     "advancedOption": null,
     "description": "The name of the item variable.",
@@ -267,12 +267,12 @@
     "objectType": "TASK",
     "options": null,
     "properties": null,
-    "optionsDataSource": null,
-    "controlType": "EXPRESSION"
+    "controlType": "EXPRESSION",
+    "optionsDataSource": null
   } ],
   "title": "Each",
   "version": 1,
-  "outputSchema": [ {
+  "outputSchema": {
     "advancedOption": null,
     "description": null,
     "displayCondition": null,
@@ -282,29 +282,50 @@
     "metadata": { },
     "placeholder": null,
     "required": null,
-    "name": "item",
-    "type": "ANY",
+    "name": null,
+    "type": "OBJECT",
     "defaultValue": null,
     "exampleValue": null,
-    "controlType": null
-  }, {
-    "advancedOption": null,
-    "description": null,
-    "displayCondition": null,
-    "expressionEnabled": null,
-    "hidden": null,
-    "label": null,
-    "metadata": { },
-    "placeholder": null,
-    "required": null,
-    "name": "itemIndex",
-    "type": "INTEGER",
-    "defaultValue": null,
-    "exampleValue": null,
-    "maxValue": null,
-    "minValue": null,
+    "additionalProperties": null,
+    "multipleValues": null,
+    "objectType": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "INTEGER"
-  } ]
+    "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "item",
+      "type": "ANY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "itemIndex",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "controlType": "INTEGER",
+      "optionsDataSource": null
+    } ],
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
+  }
 }
