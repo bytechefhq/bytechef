@@ -15,7 +15,7 @@ paths:
       summary: "Get project workflow executions"
       tags:
       - "project-workflow-executions"
-      operationId: "searchProjectWorkflowExecutions"
+      operationId: "getProjectWorkflowExecutions"
       parameters:
       - name: "jobStatus"
         description: "The status of an executed job"
