@@ -15,12 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.config;
+package com.bytechef.hermes.configuration.facade;
 
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 
-@ComponentScan(basePackages = "com.bytechef.hermes.definition.registry.web.rest")
-@SpringBootConfiguration
-public class RegistryDefinitionRestTestConfiguration {
+import java.util.Map;
+
+/**
+ * @author Ivica Cardic
+ */
+public interface OAuth2ParameterFacade {
+
+    OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
 }

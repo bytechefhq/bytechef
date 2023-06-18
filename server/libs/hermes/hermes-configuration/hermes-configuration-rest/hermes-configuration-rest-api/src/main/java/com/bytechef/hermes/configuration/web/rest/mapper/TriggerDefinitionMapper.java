@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.HelpDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.HelpModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionModel;
+import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
+import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
+import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 public class TriggerDefinitionMapper {
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionModelMapper
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionModel> {
 
@@ -52,7 +52,7 @@ public class TriggerDefinitionMapper {
         }
     }
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionBasicModel> {
 

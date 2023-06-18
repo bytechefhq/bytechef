@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationModel;
+import com.bytechef.hermes.configuration.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -30,7 +30,7 @@ import java.util.Optional;
  */
 public class AuthorizationMapper {
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface AuthorizationToAuthorizationModelMapper extends Converter<AuthorizationDTO, AuthorizationModel> {
 
         @Override

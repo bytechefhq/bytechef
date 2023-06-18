@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
 public interface OptionMapper extends Converter<OptionDTO, OptionModel> {
 
     @Override
