@@ -5,7 +5,6 @@
  */
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:40.379371+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T12:57:16.891651+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
@@ -74,48 +73,6 @@ public interface ProjectInstancesApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"projectInstanceId\" : 5, \"__version\" : 7, \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 1, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 1, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 }, { \"projectInstanceId\" : 5, \"__version\" : 7, \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 1, \"taskName\" : \"taskName\", \"key\" : \"key\" }, { \"connectionId\" : 1, \"taskName\" : \"taskName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : 2 } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 0, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 6, \"status\" : \"DISABLED\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /project-instances/{id}/workflows/{workflowId}/jobs : Create a request for running a new job
-     * Create a request for running a new job.
-     *
-     * @param id The id of a project instance. (required)
-     * @param workflowId The id of the workflow to execute. (required)
-     * @return The id of a created job. (status code 200)
-     */
-    @Operation(
-        operationId = "createProjectInstanceWorkflowJob",
-        summary = "Create a request for running a new job",
-        description = "Create a request for running a new job.",
-        tags = { "project-instance-workflows" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CreateProjectInstanceWorkflowJob200ResponseModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/project-instances/{id}/workflows/{workflowId}/jobs",
-        produces = { "application/json" }
-    )
-    default ResponseEntity<CreateProjectInstanceWorkflowJob200ResponseModel> createProjectInstanceWorkflowJob(
-        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowId", description = "The id of the workflow to execute.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"jobId\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -178,38 +135,6 @@ public interface ProjectInstancesApi {
     default ResponseEntity<Void> enableProjectInstance(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "enable", description = "Enable/disable the project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
-    ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /project-instances/{id}/workflows/{workflowId}/enable/{enable} : Enable/disable a workflow of a project instance
-     * Enable/disable a workflow of a project instance.
-     *
-     * @param id The id of a project instance. (required)
-     * @param workflowId The id of a project workflow. (required)
-     * @param enable Enable/disable the workflow of a project instance. (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "enableProjectInstanceWorkflow",
-        summary = "Enable/disable a workflow of a project instance",
-        description = "Enable/disable a workflow of a project instance.",
-        tags = { "project-instance-workflows" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/project-instances/{id}/workflows/{workflowId}/enable/{enable}"
-    )
-    default ResponseEntity<Void> enableProjectInstanceWorkflow(
-        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowId", description = "The id of a project workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @Parameter(name = "enable", description = "Enable/disable the workflow of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

@@ -6,7 +6,6 @@ src/main/java/com/bytechef/helios/configuration/web/rest/ProjectInstanceTagsApi.
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectInstancesApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectTagsApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectsApi.java
-src/main/java/com/bytechef/helios/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/CreateProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/OAuth2AuthorizationParametersModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectBasicModel.java
