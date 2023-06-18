@@ -36,7 +36,7 @@ export interface EnableProjectInstanceWorkflowRequest {
 /**
  * 
  */
-export class ProjectInstanceWorkflowsApi extends runtime.BaseAPI {
+export class ProjectInstanceRequestersApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.
