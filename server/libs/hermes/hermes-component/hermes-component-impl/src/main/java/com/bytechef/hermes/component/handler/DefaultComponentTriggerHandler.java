@@ -22,12 +22,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders;
@@ -97,58 +94,63 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
         }
 
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
-            DynamicWebhookRequestFunction dynamicWebhookRequestFunction = OptionalUtils.get(
-                triggerDefinition.getDynamicWebhookRequest());
+            output = triggerDefinition.getDynamicWebhookRequest()
+                .map(dynamicWebhookRequestFunction -> {
+                    WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
+                        new DynamicWebhookRequestContext(
+                            triggerExecution.getParameters(),
+                            MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
+                            MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
+                            MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
+                            MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
+                            OptionalUtils.orElse(triggerStorageService.fetchValue(workflowExecutionId), null),
+                            triggerContext));
 
-            WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
-                new DynamicWebhookRequestContext(
-                    triggerExecution.getParameters(),
-                    MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
-                    MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
-                    MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-                    MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
-                    OptionalUtils.orElse(triggerStorageService.fetchValue(workflowExecutionId), null),
-                    triggerContext));
-
-            output = webhookOutput.getValue();
+                    return webhookOutput.getValue();
+                })
+                .orElseThrow();
         } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
-            StaticWebhookRequestFunction staticWebhookRequestFunction = OptionalUtils.get(
-                triggerDefinition.getStaticWebhookRequest());
+            output = triggerDefinition.getStaticWebhookRequest()
+                .map(staticWebhookRequestFunction -> {
+                    WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
+                        new StaticWebhookRequestContext(
+                            triggerExecution.getParameters(),
+                            MapValueUtils.get(triggerExecution.getMetadata(), HEADERS, WebhookHeaders.class),
+                            MapValueUtils.get(triggerExecution.getMetadata(), PARAMETERS, WebhookParameters.class),
+                            MapValueUtils.get(triggerExecution.getMetadata(), BODY, WebhookBody.class),
+                            MapValueUtils.getRequired(triggerExecution.getMetadata(), METHOD, WebhookMethod.class),
+                            triggerContext));
 
-            WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
-                new StaticWebhookRequestContext(
-                    triggerExecution.getParameters(),
-                    MapValueUtils.get(triggerExecution.getMetadata(), HEADERS, WebhookHeaders.class),
-                    MapValueUtils.get(triggerExecution.getMetadata(), PARAMETERS, WebhookParameters.class),
-                    MapValueUtils.get(triggerExecution.getMetadata(), BODY, WebhookBody.class),
-                    MapValueUtils.getRequired(triggerExecution.getMetadata(), METHOD, WebhookMethod.class),
-                    triggerContext));
-
-            output = webhookOutput.getValue();
+                    return webhookOutput.getValue();
+                })
+                .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
-            PollFunction pollFunction = OptionalUtils.get(triggerDefinition.getPoll());
+            output = triggerDefinition.getPoll()
+                .map(pollFunction -> {
+                    PollOutput pollOutput = pollFunction.apply(
+                        new PollContext(
+                            triggerExecution.getParameters(),
+                            OptionalUtils.orElse(triggerStorageService.fetchValue(workflowExecutionId), null),
+                            triggerContext));
 
-            PollOutput pollOutput = pollFunction.apply(
-                new PollContext(
-                    triggerExecution.getParameters(),
-                    OptionalUtils.orElse(triggerStorageService.fetchValue(workflowExecutionId), null),
-                    triggerContext));
+                    List<Map<?, ?>> records = new ArrayList<>(
+                        pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
 
-            List<Map<?, ?>> records = new ArrayList<>(
-                pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
+                    while (pollOutput.pollImmediately()) {
+                        pollOutput = pollFunction.apply(
+                            new PollContext(
+                                triggerExecution.getParameters(), pollOutput.closureParameters(), triggerContext));
 
-            while (pollOutput.pollImmediately()) {
-                pollOutput = pollFunction.apply(
-                    new PollContext(triggerExecution.getParameters(), pollOutput.closureParameters(), triggerContext));
+                        records.addAll(pollOutput.records());
+                    }
 
-                records.addAll(pollOutput.records());
-            }
+                    if (pollOutput.closureParameters() != null) {
+                        triggerStorageService.save(workflowExecutionId, pollOutput.closureParameters());
+                    }
 
-            if (pollOutput.closureParameters() != null) {
-                triggerStorageService.save(workflowExecutionId, pollOutput.closureParameters());
-            }
-
-            output = records;
+                    return records;
+                })
+                .orElseThrow();
         } else {
             throw new TriggerExecutionException("Unknown trigger type: " + triggerType);
         }

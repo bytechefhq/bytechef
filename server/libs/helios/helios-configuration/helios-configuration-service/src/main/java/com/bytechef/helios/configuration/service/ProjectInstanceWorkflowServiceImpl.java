@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -107,7 +108,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             ProjectInstanceWorkflow curProjectInstanceWorkflow = OptionalUtils.get(
-                projectInstanceWorkflowRepository.findById(projectInstanceWorkflow.getId()));
+                projectInstanceWorkflowRepository.findById(Objects.requireNonNull(projectInstanceWorkflow.getId())));
 
             curProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
             curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
@@ -118,5 +119,15 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
         }
 
         return updatedProjectInstanceWorkflows;
+    }
+
+    @Override
+    public void updateEnabled(Long id, boolean enabled) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowRepository.findById(id)
+            .orElseThrow();
+
+        projectInstanceWorkflow.setEnabled(enabled);
+
+        projectInstanceWorkflowRepository.save(projectInstanceWorkflow);
     }
 }

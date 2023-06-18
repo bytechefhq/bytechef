@@ -90,12 +90,22 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
     }
 
     @Override
-    public ProjectInstance update(long id, ProjectInstance.Status status) {
+    public ProjectInstance update(ProjectInstance projectInstance) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ProjectInstance update(ProjectInstance projectInstance) {
-        throw new UnsupportedOperationException();
+    public void updateEnabled(long id, boolean enabled) {
+        loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path(
+                    "/api/internal/project-instance-service/update-enabled/{id}/{enable}")
+                .build(id, enabled))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
     }
 }

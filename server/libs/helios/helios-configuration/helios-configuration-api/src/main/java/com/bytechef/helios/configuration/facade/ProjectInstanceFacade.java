@@ -31,9 +31,7 @@ public interface ProjectInstanceFacade {
 
     void deleteProjectInstance(long id);
 
-    void enableProjectInstance(long id, boolean enable);
-
-    void enableProjectInstanceWorkflow(long id, String workflowId, boolean enable);
+    void enableProjectInstance(long id, boolean enabled);
 
     ProjectInstanceDTO getProjectInstance(long id);
 

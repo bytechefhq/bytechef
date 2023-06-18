@@ -41,7 +41,7 @@ public class ProjectInstanceServiceController {
     }
 
     @RequestMapping(
-        method = RequestMethod.GET,
+        method = RequestMethod.POST,
         value = "/project-instance-service/fetch-project-instance/{jobId}",
         produces = {
             "application/json"
@@ -51,5 +51,18 @@ public class ProjectInstanceServiceController {
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.noContent()
                 .build());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/project-instance-service/update-enabled/{id}/{enabled}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Void> updateEnabled(@PathVariable long id, @PathVariable boolean enabled) {
+        projectInstanceService.updateEnabled(id, enabled);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

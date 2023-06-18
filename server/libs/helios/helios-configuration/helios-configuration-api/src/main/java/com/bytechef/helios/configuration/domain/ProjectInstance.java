@@ -29,7 +29,6 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -45,28 +44,6 @@ import java.util.Set;
 @Table("project_instance")
 public class ProjectInstance implements Persistable<Long> {
 
-    public enum Status {
-        DISABLED(0), ENABLED(1);
-
-        private final int id;
-
-        Status(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static Status valueOf(int id) {
-            return switch (id) {
-                case 0 -> Status.DISABLED;
-                case 1 -> Status.ENABLED;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
-            };
-        }
-    }
-
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -79,7 +56,7 @@ public class ProjectInstance implements Persistable<Long> {
     private String description;
 
     @Column
-    private int status;
+    private boolean enabled;
 
     @Id
     private Long id;
@@ -139,6 +116,10 @@ public class ProjectInstance implements Persistable<Long> {
         return description;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -158,10 +139,6 @@ public class ProjectInstance implements Persistable<Long> {
 
     public Long getProjectId() {
         return projectId == null ? null : projectId.getId();
-    }
-
-    public Status getStatus() {
-        return Status.valueOf(status);
     }
 
     public List<Long> getTagIds() {
@@ -184,6 +161,10 @@ public class ProjectInstance implements Persistable<Long> {
         this.description = description;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -194,12 +175,6 @@ public class ProjectInstance implements Persistable<Long> {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId == null ? null : AggregateReference.to(projectId);
-    }
-
-    public void setStatus(Status status) {
-        Assert.notNull(status, "'status' must not be null");
-
-        this.status = status.getId();
     }
 
     public void setTagIds(List<Long> tagIds) {
@@ -227,7 +202,7 @@ public class ProjectInstance implements Persistable<Long> {
         return "ProjectInstance{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", enabled='" + status +
+            ", enabled='" + enabled +
             ", projectId=" + projectId +
             ", description='" + description + '\'' +
             ", projectInstanceTags=" + projectInstanceTags +

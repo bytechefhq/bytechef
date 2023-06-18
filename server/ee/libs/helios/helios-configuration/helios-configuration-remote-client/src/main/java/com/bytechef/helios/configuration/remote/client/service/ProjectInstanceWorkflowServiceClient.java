@@ -90,4 +90,19 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     public List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void updateEnabled(Long id, boolean enabled) {
+        loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path(
+                    "/api/internal/project-instance-workflow-service/update-enabled/{id}/{enable}")
+                .build(id, enabled))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
 }
