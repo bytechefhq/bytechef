@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.coordinator.instance.manager;
+package com.bytechef.helios.coordinator.instance;
 
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
-import com.bytechef.hermes.coordinator.instance.manager.InstanceWorkflowManager;
+import com.bytechef.helios.execution.facade.ProjectInstanceRequesterFacade;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -33,22 +33,22 @@ import java.util.Map;
 public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
 
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
-    private final ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory;
+    private final ProjectInstanceRequesterFacade projectInstanceRequesterFacade;
 
     public static final String PROJECT = "PROJECT";
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowManager(
         ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory) {
+        ProjectInstanceRequesterFacade projectInstanceRequesterFacade) {
 
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
-        this.projectInstanceWorkflowJobFactory = projectInstanceWorkflowJobFactory;
+        this.projectInstanceRequesterFacade = projectInstanceRequesterFacade;
     }
 
     @Override
     public long createJob(long instanceId, String workflowId) {
-        return projectInstanceWorkflowJobFactory.createJob(instanceId, workflowId);
+        return projectInstanceRequesterFacade.createJob(instanceId, workflowId);
     }
 
     @Override

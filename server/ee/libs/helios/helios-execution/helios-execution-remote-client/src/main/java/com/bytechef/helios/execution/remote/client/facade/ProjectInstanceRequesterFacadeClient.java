@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.remote.client.job;
+package com.bytechef.helios.execution.remote.client.facade;
 
-import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.helios.execution.facade.ProjectInstanceRequesterFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,27 +26,37 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Component
-public class ProjectInstanceWorkflowJobFactoryClient implements ProjectInstanceWorkflowJobFactory {
+public class ProjectInstanceRequesterFacadeClient implements ProjectInstanceRequesterFacade {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceWorkflowJobFactoryClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public ProjectInstanceRequesterFacadeClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public long createJob(long instanceId, String workflowId) {
+    public long createJob(long projectInstanceId, String workflowId) {
         return loadBalancedWebClientBuilder
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("platform-service-app")
-                .path("/api/internal/project-instance-workflow-job-factory/create-job/{instanceId}/{workflowId}")
-                .build(instanceId, workflowId))
+                .path("/api/internal/project-instance-requester-facade/create-job/{instanceId}/{workflowId}")
+                .build(projectInstanceId, workflowId))
             .retrieve()
             .bodyToMono(Long.class)
             .block();
+    }
+
+    @Override
+    public void enableProjectInstance(long projectInstanceId, boolean enabled) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void enableProjectInstanceWorkflow(long projectInstanceId, String workflowId, boolean enabled) {
+        throw new UnsupportedOperationException();
     }
 }

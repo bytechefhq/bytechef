@@ -23,7 +23,7 @@ import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatche
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.job.factory.JobFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -43,11 +43,11 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final JobFactory jobFactory;
+    private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public SubflowTaskDispatcher(JobFactory jobFactory) {
-        this.jobFactory = jobFactory;
+    public SubflowTaskDispatcher(JobFacade jobFacade) {
+        this.jobFacade = jobFacade;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution.getId(),
             MapValueUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 
-        jobFactory.createJob(jobParameters);
+        jobFacade.createJob(jobParameters);
     }
 
     @Override

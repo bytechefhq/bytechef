@@ -29,6 +29,7 @@ import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -66,7 +67,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Map<String, WorkflowConnection> taskConnectionMap;
 
         if (jobTaskConnectionMap.containsKey(taskExecution.getName())) {
-            // directly coming from /core/jobs POST endpoint
+            // directly coming from .../jobs POST endpoint
             taskConnectionMap = jobTaskConnectionMap.get(taskExecution.getName());
         } else {
             // defined in the workflow definition
@@ -85,16 +86,21 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         return taskExecution;
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Map<String, WorkflowConnection>> getJobTaskConnectionMap(Job job) {
-        Map<String, Map<String, Map<String, Object>>> connectionMap = MapValueUtils.get(
-            job.getMetadata(), WorkflowConnection.CONNECTIONS, Map.class, Map.of());
+        Map<String, Map<String, Map<String, Object>>> connectionMap = MapValueUtils.getMap(
+            job.getMetadata(), WorkflowConnection.CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of());
 
         return connectionMap.entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> toWorkflowConnectionMap(entry.getValue())));
+    }
+
+    private static Map<String, WorkflowConnection> toWorkflowConnectionMap(Map<String, Map<String, Object>> map) {
+        return map.entrySet()
             .stream()
             .collect(
                 Collectors.toMap(
                     Map.Entry::getKey,
-                    entry -> WorkflowConnection.toMap(entry.getValue(), entry.getKey())));
+                    entry -> MapValueUtils.getRequired(entry.getValue(), entry.getKey(), WorkflowConnection.class)));
     }
 }

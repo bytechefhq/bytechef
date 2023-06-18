@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.remote.web.rest.job.factory;
+package com.bytechef.atlas.execution.remote.web.rest.facade;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.job.factory.JobFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -32,19 +32,19 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
-public class JobFactoryController {
+public class JobFacadeController {
 
-    private final JobFactory jobFactory;
+    private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public JobFactoryController(JobFactory jobFactory) {
-        this.jobFactory = jobFactory;
+    public JobFacadeController(JobFacade jobFacade) {
+        this.jobFacade = jobFacade;
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/job-factory/create-job")
+        value = "/job-facade/create-job")
     public ResponseEntity<Long> create(@Valid @RequestBody JobParameters jobParameters) {
-        return ResponseEntity.ok(jobFactory.createJob(jobParameters));
+        return ResponseEntity.ok(jobFacade.createJob(jobParameters));
     }
 }
