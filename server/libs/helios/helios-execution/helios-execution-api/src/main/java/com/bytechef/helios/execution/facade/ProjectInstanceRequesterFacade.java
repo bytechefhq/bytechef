@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance.manager;
-
-import java.util.Map;
+package com.bytechef.helios.execution.facade;
 
 /**
  * @author Ivica Cardic
+ *
+ *
  */
-public interface InstanceWorkflowManager {
+public interface ProjectInstanceRequesterFacade {
 
-    long createJob(long instanceId, String workflowId);
+    long createJob(long projectInstanceId, String workflowId);
 
-    Map<String, Object> getInputs(long instanceId, String workflowId);
+    void enableProjectInstance(long projectInstanceId, boolean enabled);
 
-    String getType();
+    void enableProjectInstanceWorkflow(long projectInstanceId, String workflowId, boolean enabled);
 }

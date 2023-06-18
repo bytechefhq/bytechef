@@ -319,17 +319,18 @@ public final class MapValueUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(Map<String, ?> map, String key, ParameterizedTypeReference<T> elementType) {
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
 
-        return getList(map, key, (Class<T>) ResolvableType.forType(elementType)
-            .getRawClass());
+        return getList(map, key, (Class<T>) resolvableType.getRawClass());
     }
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(
         Map<String, ?> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
 
-        List<T> list = getList(map, key, (Class<T>) ResolvableType.forType(elementType)
-            .getRawClass(), defaultValue);
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        List<T> list = getList(map, key, (Class<T>) resolvableType.getRawClass(), defaultValue);
 
         return list != null ? list : defaultValue;
     }
@@ -462,6 +463,15 @@ public final class MapValueUtils {
         return mapValue;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <V> Map<String, V> getMap(
+        Map<String, ?> map, String key, ParameterizedTypeReference<V> elementType, Map<String, V> defaultValue) {
+
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        return getMap(map, key, (Class<V>) resolvableType.getRawClass(), defaultValue);
+    }
+
     public static Object getRequired(Map<String, ?> map, String key) {
         Object value = get(map, key);
 
@@ -591,6 +601,19 @@ public final class MapValueUtils {
         return value;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <V> Map<String, V> getRequiredMap(
+        Map<String, ?> map, String key, ParameterizedTypeReference<V> elementType, Map<String, V> defaultValue) {
+
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        Map<String, V> value = getMap(map, key, (Class<V>) resolvableType.getRawClass());
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
     public static Map<String, ?> getRequiredMap(Map<String, ?> map, String key) {
         Map<String, ?> value = getMap(map, key);
 
@@ -634,4 +657,5 @@ public final class MapValueUtils {
 
         return value;
     }
+
 }

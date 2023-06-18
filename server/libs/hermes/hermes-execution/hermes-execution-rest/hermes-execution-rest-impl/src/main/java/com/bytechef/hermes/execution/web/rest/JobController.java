@@ -20,7 +20,7 @@
 package com.bytechef.hermes.execution.web.rest;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.job.factory.JobFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.hermes.execution.web.rest.model.JobBasicModel;
 import com.bytechef.message.broker.MessageBroker;
@@ -46,17 +46,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobController implements JobsApi {
 
     private final ConversionService conversionService;
-    private final JobFactory jobFactory;
+    private final JobFacade jobFacade;
     private final JobService jobService;
     private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
     public JobController(
-        ConversionService conversionService, JobFactory jobFactory, JobService jobService,
+        ConversionService conversionService, JobFacade jobFacade, JobService jobService,
         MessageBroker messageBroker) {
 
         this.conversionService = conversionService;
-        this.jobFactory = jobFactory;
+        this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
     }
@@ -67,7 +67,7 @@ public class JobController implements JobsApi {
 
         return ResponseEntity.ok(
             new CreateJob200ResponseModel()
-                .jobId(jobFactory.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
+                .jobId(jobFacade.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
     }
 
     @Override

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.job.factory;
+package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
@@ -46,16 +46,16 @@ import java.util.Collections;
         "bytechef.persistence.provider=jdbc",
         "bytechef.workflow-repository.jdbc.enabled=true"
     })
-public class JobFactoryIntTest {
+public class JobFacadeIntTest {
 
     @Autowired
-    private JobFactory jobFactory;
+    private JobFacade jobFacade;
 
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> jobFactory.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
+            () -> jobFacade.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
     }
 
     @TestConfiguration
@@ -68,8 +68,8 @@ public class JobFactoryIntTest {
         private WorkflowService workflowService;
 
         @Bean
-        JobFactory jobFactory(JobService jobService, MessageBroker messageBroker) {
-            return new JobFactoryImpl(contextService, e -> {}, jobService, messageBroker, workflowService);
+        JobFacade jobFactory(JobService jobService, MessageBroker messageBroker) {
+            return new JobFacadeImpl(contextService, e -> {}, jobService, messageBroker, workflowService);
         }
 
         @Bean

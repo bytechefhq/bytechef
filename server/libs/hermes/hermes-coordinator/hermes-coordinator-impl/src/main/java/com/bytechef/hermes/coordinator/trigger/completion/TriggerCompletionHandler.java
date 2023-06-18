@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.coordinator.trigger.completion;
 
-import com.bytechef.hermes.coordinator.instance.manager.InstanceWorkflowManager;
-import com.bytechef.hermes.coordinator.instance.manager.InstanceWorkflowManagerRegistry;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;

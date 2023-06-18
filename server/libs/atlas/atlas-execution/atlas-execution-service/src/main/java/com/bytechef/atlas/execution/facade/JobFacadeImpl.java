@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.job.factory;
+package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
@@ -32,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-public class JobFactoryImpl implements JobFactory {
+public class JobFacadeImpl implements JobFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobFactoryImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -43,7 +43,7 @@ public class JobFactoryImpl implements JobFactory {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public JobFactoryImpl(
+    public JobFacadeImpl(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker, WorkflowService workflowService) {
 

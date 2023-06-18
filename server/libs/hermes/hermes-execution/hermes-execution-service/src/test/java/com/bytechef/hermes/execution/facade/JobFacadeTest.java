@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.trigger.lifecycle;
+package com.bytechef.hermes.execution.facade;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,17 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class TriggerLifecycleManagerTest {
+public class JobFacadeTest {
 
     @Disabled
     @Test
-    public void testPerformTriggerDisable() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testPerformTriggerEnable() {
+    public void testGetJob() {
         // TODO
     }
 }

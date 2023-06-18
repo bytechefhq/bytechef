@@ -15,14 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.job.factory;
+package com.bytechef.hermes.execution.facade;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobFactory {
+public interface TriggerLifecycleFacade {
 
-    long createJob(JobParameters jobParameters);
+    void executeTriggerDisable(
+        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection);
+
+    void executeTriggerEnable(
+        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection);
 }
