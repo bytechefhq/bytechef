@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T12:57:16.891651+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T22:39:21.980039+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
@@ -112,11 +112,11 @@ public class ProjectInstanceWorkflowModel {
   }
 
   /**
-   * If a workflow is enabled or not in the project instance.
+   * If a workflow is enabled or not in the project instance workflow.
    * @return enabled
   */
   
-  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
     return enabled;

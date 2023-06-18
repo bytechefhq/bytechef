@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -24,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T12:57:16.891651+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T22:39:21.980039+02:00[Europe/Zagreb]")
 public class ProjectInstanceBasicModel {
 
   private String description;
@@ -47,42 +46,7 @@ public class ProjectInstanceBasicModel {
 
   private Long projectId;
 
-  /**
-   * The status of a project instance.
-   */
-  public enum StatusEnum {
-    DISABLED("DISABLED"),
-    
-    ENABLED("ENABLED");
-
-    private String value;
-
-    StatusEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static StatusEnum fromValue(String value) {
-      for (StatusEnum b : StatusEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  private StatusEnum status;
+  private Boolean enabled;
 
   /**
    * Default constructor
@@ -280,24 +244,24 @@ public class ProjectInstanceBasicModel {
     this.projectId = projectId;
   }
 
-  public ProjectInstanceBasicModel status(StatusEnum status) {
-    this.status = status;
+  public ProjectInstanceBasicModel enabled(Boolean enabled) {
+    this.enabled = enabled;
     return this;
   }
 
   /**
-   * The status of a project instance.
-   * @return status
+   * If a workflow is enabled or not in the project instance.
+   * @return enabled
   */
   
-  @Schema(name = "status", description = "The status of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("status")
-  public StatusEnum getStatus() {
-    return status;
+  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
   }
 
-  public void setStatus(StatusEnum status) {
-    this.status = status;
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
   @Override
@@ -318,12 +282,12 @@ public class ProjectInstanceBasicModel {
         Objects.equals(this.lastModifiedDate, projectInstanceBasic.lastModifiedDate) &&
         Objects.equals(this.name, projectInstanceBasic.name) &&
         Objects.equals(this.projectId, projectInstanceBasic.projectId) &&
-        Objects.equals(this.status, projectInstanceBasic.status);
+        Objects.equals(this.enabled, projectInstanceBasic.enabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, status);
+    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, enabled);
   }
 
   @Override
@@ -339,7 +303,7 @@ public class ProjectInstanceBasicModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }
