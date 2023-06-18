@@ -105,11 +105,11 @@ export interface ProjectInstanceModel {
      */
     projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
     /**
-     * The status of a project instance.
-     * @type {string}
+     * If a workflow is enabled or not in the project instance.
+     * @type {boolean}
      * @memberof ProjectInstanceModel
      */
-    status?: ProjectInstanceModelStatusEnum;
+    enabled?: boolean;
     /**
      * 
      * @type {Array<TagModel>}
@@ -123,17 +123,6 @@ export interface ProjectInstanceModel {
      */
     version?: number;
 }
-
-
-/**
- * @export
- */
-export const ProjectInstanceModelStatusEnum = {
-    Disabled: 'DISABLED',
-    Enabled: 'ENABLED'
-} as const;
-export type ProjectInstanceModelStatusEnum = typeof ProjectInstanceModelStatusEnum[keyof typeof ProjectInstanceModelStatusEnum];
-
 
 /**
  * Check if a given object implements the ProjectInstanceModel interface.
@@ -166,7 +155,7 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
         'project': !exists(json, 'project') ? undefined : ProjectInstanceProjectModelFromJSON(json['project']),
         'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
         'projectInstanceWorkflows': !exists(json, 'projectInstanceWorkflows') ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': !exists(json, '__version') ? undefined : json['__version'],
     };
@@ -186,7 +175,7 @@ export function ProjectInstanceModelToJSON(value?: ProjectInstanceModel | null):
         'project': ProjectInstanceProjectModelToJSON(value.project),
         'projectId': value.projectId,
         'projectInstanceWorkflows': value.projectInstanceWorkflows === undefined ? undefined : ((value.projectInstanceWorkflows as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
-        'status': value.status,
+        'enabled': value.enabled,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         '__version': value.version,
     };
