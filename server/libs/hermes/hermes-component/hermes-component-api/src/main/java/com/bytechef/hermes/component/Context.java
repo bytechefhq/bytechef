@@ -136,18 +136,6 @@ public interface Context {
          *
          * @return
          */
-        Optional<String> fetchBaseUri();
-
-        /**
-         *
-         * @return
-         */
-        String getBaseUri();
-
-        /**
-         *
-         * @return
-         */
         Map<String, Object> getParameters();
     }
 

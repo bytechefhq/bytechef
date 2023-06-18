@@ -40,9 +40,9 @@ public class PipedriveUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PipedriveUtils.class);
 
-    public static String subscribeWebhook(String serverUrl, String eventObject, String eventAction, String webhookUrl) {
+    public static String subscribeWebhook(String eventObject, String eventAction, String webhookUrl) {
         Map<?, ?> result = (Map<?, ?>) HttpClientUtils
-            .post("%s/api/v1/webhooks".formatted(serverUrl))
+            .post("/api/v1/webhooks")
             .body(
                 Body.of(
                     Map.of(
@@ -56,19 +56,17 @@ public class PipedriveUtils {
         return (String) result.get("id");
     }
 
-    public static void unsubscribeWebhook(String serverUrl, String webhookId) {
+    public static void unsubscribeWebhook(String webhookId) {
         HttpClientUtils
-            .delete("%s/api/v1/webhooks/%s".formatted(serverUrl, webhookId))
+            .delete("/api/v1/webhooks/%s".formatted(webhookId))
             .configuration(responseFormat(ResponseFormat.JSON))
             .execute();
     }
 
     public static ComponentOptionsFunction getOptions(String path, String dependsOn) {
         return (connection, inputParameters, searchText) -> {
-            String url = connection.getBaseUri() + path;
-
             Map<String, ?> response = HttpClientUtils
-                .get(url)
+                .get(path)
                 .queryParameters(
                     dependsOn == null
                         ? Map.of()
@@ -78,7 +76,7 @@ public class PipedriveUtils {
                 .getBody();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Response for url='%s': %s".formatted(url, response));
+                logger.debug("Response for path='%s': %s".formatted(path, response));
             }
 
             List<Option<?>> options = new ArrayList<>();

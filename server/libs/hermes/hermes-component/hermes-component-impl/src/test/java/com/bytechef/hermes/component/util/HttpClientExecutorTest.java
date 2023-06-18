@@ -501,11 +501,6 @@ public class HttpClientExecutorTest {
         }
 
         @Override
-        public String getBaseUri() {
-            return null;
-        }
-
-        @Override
         public Map<String, Object> getParameters() {
             return null;
         }
