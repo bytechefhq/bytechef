@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS project_instance (
     project_id               BIGINT       NULL,
     name                     VARCHAR(256) NOT NULL,
     description              TEXT         NULL,
-    status                   INT          NOT NULL,
+    enabled                  BOOLEAN      NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
     last_modified_date       TIMESTAMP    NOT NULL,

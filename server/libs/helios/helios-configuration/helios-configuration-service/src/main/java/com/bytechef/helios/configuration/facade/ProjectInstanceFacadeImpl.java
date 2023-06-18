@@ -17,25 +17,14 @@
 
 package com.bytechef.helios.configuration.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
-import com.bytechef.helios.configuration.domain.ProjectInstance.Status;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
-import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
-import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
-import com.bytechef.hermes.execution.trigger.lifecycle.TriggerLifecycleManager;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,27 +42,20 @@ import java.util.Objects;
 @Transactional
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
-    private final ConnectionService connectionService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
     private final TagService tagService;
-    private final TriggerLifecycleManager triggerLifecycleManager;
-    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        ConnectionService connectionService, ProjectInstanceService projectInstanceService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleManager triggerLifecycleManager, WorkflowService workflowService) {
+        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectService projectService, TagService tagService) {
 
-        this.connectionService = connectionService;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
         this.tagService = tagService;
-        this.triggerLifecycleManager = triggerLifecycleManager;
-        this.workflowService = workflowService;
     }
 
     @Override
@@ -93,10 +75,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         projectInstance = projectInstanceService.create(projectInstance);
 
-        // TODO activate only enabled workflows
-
-        enableWorkflowTriggers(Objects.requireNonNull(projectInstance.getId()), projectInstanceWorkflows);
-
         return new ProjectInstanceDTO(
             getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
             projectInstanceWorkflows, projectService.getProject(projectInstance.getProjectId()), tags);
@@ -109,7 +87,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(id);
 
-        disableWorkflowTriggers(id, projectInstanceWorkflows);
+        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            if (projectInstanceWorkflow.isEnabled()) {
+                throw new IllegalStateException(
+                    "ProjectInstanceWorkflow with id=%s must be disabled.".formatted(projectInstanceWorkflow.getId()));
+            }
+        }
 
 // TODO find a way to delete ll tags not referenced anymore
 //        project.getTagIds()
@@ -117,29 +100,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public void enableProjectInstance(long id, boolean enable) {
-        projectInstanceService.update(id, enable ? Status.ENABLED : Status.DISABLED);
-
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-            .getProjectInstanceWorkflows(id);
-
-        if (enable) {
-            enableWorkflowTriggers(id, projectInstanceWorkflows);
-        } else {
-            disableWorkflowTriggers(id, projectInstanceWorkflows);
-        }
-    }
-
-    @Override
-    public void enableProjectInstanceWorkflow(long id, String workflowId, boolean enable) {
-        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            id, workflowId);
-
-        if (enable) {
-            enableWorkflowTriggers(id, List.of(projectInstanceWorkflow));
-        } else {
-            disableWorkflowTriggers(id, List.of(projectInstanceWorkflow));
-        }
+    public void enableProjectInstance(long id, boolean enabled) {
+        projectInstanceService.updateEnabled(id, enabled);
     }
 
     @Override
@@ -242,66 +204,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return curTagIds.contains(tag.getId());
     }
 
-    private void disableWorkflowTriggers(long id, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
-        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
-
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-                triggerLifecycleManager.executeTriggerDisable(
-                    workflowTrigger,
-                    WorkflowExecutionId.of(workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger),
-                    getConnection(workflowTrigger));
-            }
-        }
-    }
-
-    private void enableWorkflowTriggers(long id, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
-        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            if (!projectInstanceWorkflow.isEnabled()) {
-                continue;
-            }
-
-            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
-
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-                triggerLifecycleManager.executeTriggerEnable(
-                    workflowTrigger,
-                    WorkflowExecutionId.of(workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger),
-                    getConnection(workflowTrigger));
-            }
-        }
-    }
-
     private List<Tag> filterTags(List<Tag> tags, ProjectInstance projectInstance) {
         return tags.stream()
             .filter(tag -> containsTag(projectInstance, tag))
             .toList();
-    }
-
-    private Connection getConnection(WorkflowConnection workflowConnection) {
-        return workflowConnection.getConnectionId()
-            .map(connectionService::getConnection)
-            .orElseGet(() -> getConnection(workflowConnection.getKey(), workflowConnection.getOperationName()));
-    }
-
-    private Connection getConnection(WorkflowTrigger workflowTrigger) {
-        return WorkflowConnection.of(workflowTrigger)
-            .values()
-            .stream()
-            .findFirst()
-            .map(this::getConnection)
-            .orElse(null);
-    }
-
-    private Connection getConnection(String workflowConnectionKey, String taskName) {
-        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(workflowConnectionKey, taskName);
-
-        return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
     }
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {

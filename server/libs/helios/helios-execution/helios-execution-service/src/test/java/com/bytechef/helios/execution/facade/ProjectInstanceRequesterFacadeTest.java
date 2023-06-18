@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.job.factory;
+package com.bytechef.helios.execution.facade;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ProjectInstanceWorkflowJobFactoryTest {
+public class ProjectInstanceRequesterFacadeTest {
 
     @Disabled
     @Test

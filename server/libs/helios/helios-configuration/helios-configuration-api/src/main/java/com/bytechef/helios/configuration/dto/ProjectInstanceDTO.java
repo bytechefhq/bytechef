@@ -17,7 +17,6 @@
 
 package com.bytechef.helios.configuration.dto;
 
-import com.bytechef.helios.configuration.domain.ProjectInstance.Status;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
@@ -32,10 +31,9 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectInstanceDTO(
-    String createdBy, LocalDateTime createdDate, String description, Long id, String name,
+    String createdBy, LocalDateTime createdDate, String description, boolean enabled, Long id, String name,
     LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate, Project project,
-    Long projectId, List<ProjectInstanceWorkflow> projectInstanceWorkflows, Status status, List<Tag> tags,
-    int version) {
+    Long projectId, List<ProjectInstanceWorkflow> projectInstanceWorkflows, List<Tag> tags, int version) {
 
     public ProjectInstanceDTO(
         LocalDateTime lastExecutionDate, ProjectInstance projectInstance,
@@ -43,9 +41,9 @@ public record ProjectInstanceDTO(
 
         this(
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
-            projectInstance.getId(), projectInstance.getName(), lastExecutionDate, projectInstance.getLastModifiedBy(),
-            projectInstance.getLastModifiedDate(), project, projectInstance.getProjectId(), projectInstanceWorkflows,
-            projectInstance.getStatus(), tags, projectInstance.getVersion());
+            projectInstance.isEnabled(), projectInstance.getId(), projectInstance.getName(), lastExecutionDate,
+            projectInstance.getLastModifiedBy(), projectInstance.getLastModifiedDate(), project,
+            projectInstance.getProjectId(), projectInstanceWorkflows, tags, projectInstance.getVersion());
     }
 
     public static Builder builder() {
@@ -56,10 +54,10 @@ public record ProjectInstanceDTO(
         ProjectInstance projectInstance = new ProjectInstance();
 
         projectInstance.setDescription(description);
+        projectInstance.setEnabled(enabled);
         projectInstance.setId(id);
         projectInstance.setName(name);
         projectInstance.setProjectId(projectId);
-        projectInstance.setStatus(status == null ? Status.DISABLED : status);
         projectInstance.setTags(tags);
         projectInstance.setVersion(version);
 
@@ -70,6 +68,7 @@ public record ProjectInstanceDTO(
         private String createdBy;
         private LocalDateTime createdDate;
         private String description;
+        private boolean enabled;
         private Long id;
         private String name;
         private LocalDateTime lastExecutionDate;
@@ -78,7 +77,6 @@ public record ProjectInstanceDTO(
         private Project project;
         private Long projectId;
         private List<ProjectInstanceWorkflow> projectInstanceWorkflows;
-        private Status status;
         private List<Tag> tags;
         private int version;
 
@@ -97,6 +95,11 @@ public record ProjectInstanceDTO(
 
         public Builder description(String description) {
             this.description = description;
+            return this;
+        }
+
+        public Builder enabled(boolean enabled) {
+            this.enabled = enabled;
             return this;
         }
 
@@ -140,11 +143,6 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder status(Status status) {
-            this.status = status;
-            return this;
-        }
-
         public Builder tags(List<Tag> tags) {
             this.tags = tags;
             return this;
@@ -157,8 +155,8 @@ public record ProjectInstanceDTO(
 
         public ProjectInstanceDTO build() {
             return new ProjectInstanceDTO(
-                createdBy, createdDate, description, id, name, lastExecutionDate, lastModifiedBy, lastModifiedDate,
-                project, projectId, projectInstanceWorkflows, status, tags, version);
+                createdBy, createdDate, description, enabled, id, name, lastExecutionDate, lastModifiedBy,
+                lastModifiedDate, project, projectId, projectInstanceWorkflows, tags, version);
         }
     }
 }
