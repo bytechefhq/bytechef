@@ -26,7 +26,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = "com.bytechef.hermes.configuration.web.rest")
 @SpringBootConfiguration
-public class WorkflowRestTestConfiguration {
+public class WorkflowConfigurationRestTestConfiguration {
 
     @MockBean
     private MessageBroker messageBroker;

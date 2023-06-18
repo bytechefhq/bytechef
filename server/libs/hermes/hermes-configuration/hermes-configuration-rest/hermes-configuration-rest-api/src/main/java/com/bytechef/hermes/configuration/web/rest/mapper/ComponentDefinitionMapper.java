@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.HelpDTO;
 import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.HelpModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
+import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
+import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionModel;
+import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
+import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
+import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -34,7 +34,7 @@ import java.util.Optional;
 
 public class ComponentDefinitionMapper {
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionModelMapper
         extends Converter<ComponentDefinitionDTO, ComponentDefinitionModel> {
 
@@ -68,7 +68,7 @@ public class ComponentDefinitionMapper {
         }
     }
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinitionDTO, ComponentDefinitionBasicModel> {
 

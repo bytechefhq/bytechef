@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest;
+package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
+import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
+import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
