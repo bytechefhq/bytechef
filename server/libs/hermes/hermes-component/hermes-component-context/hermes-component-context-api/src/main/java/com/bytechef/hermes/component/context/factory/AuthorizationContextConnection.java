@@ -20,6 +20,8 @@ package com.bytechef.hermes.component.context.factory;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
@@ -30,4 +32,10 @@ public interface AuthorizationContextConnection extends Context.Connection {
      * @return
      */
     ApplyResponse applyAuthorization();
+
+    /**
+     *
+     * @return
+     */
+    Optional<String> fetchBaseUri();
 }

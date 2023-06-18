@@ -275,7 +275,8 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         }
 
         return context.fetchConnection()
-            .flatMap(Context.Connection::fetchBaseUri)
+            .map(connection -> (AuthorizationContextConnection) connection)
+            .flatMap(AuthorizationContextConnection::fetchBaseUri)
             .map(baseUri -> baseUri + urlString)
             .orElse(urlString);
     }

@@ -17,7 +17,6 @@
 
 package com.bytechef.component.hubspot.trigger;
 
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
@@ -149,22 +148,15 @@ public class HubspotSubscribeTrigger {
         .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
 
     protected static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
-        Context.Connection connection = context.connection();
-
         HttpClientUtils
-            .delete(
-                "https://%s/webhooks/v3/%s/settings".formatted(
-                    connection.getBaseUri(), MapValueUtils.getString(context.inputParameters(), APP_ID)))
+            .delete("/webhooks/v3/%s/settings".formatted(MapValueUtils.getString(context.inputParameters(), APP_ID)))
             .execute();
     }
 
     @SuppressFBWarnings("RV")
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
-        Context.Connection connection = context.connection();
-
         HttpClientUtils
-            .put("https://%s/webhooks/v3/%s/settings".formatted(
-                connection.getBaseUri(), MapValueUtils.getString(context.inputParameters(), APP_ID)))
+            .put("/webhooks/v3/%s/settings".formatted(MapValueUtils.getString(context.inputParameters(), APP_ID)))
             .body(HttpClientUtils.Body.of(
                 Map.of(
                     "throttling", Map.of(
@@ -176,8 +168,7 @@ public class HubspotSubscribeTrigger {
             .body();
 
         HttpClientUtils
-            .put("https://%s/webhooks/v3/%s/subscriptions".formatted(
-                connection.getBaseUri(), MapValueUtils.getString(context.inputParameters(), APP_ID)))
+            .put("/webhooks/v3/%s/subscriptions".formatted(MapValueUtils.getString(context.inputParameters(), APP_ID)))
             .body(HttpClientUtils.Body.of(
                 Map.of(
                     "eventType", MapValueUtils.getString(context.inputParameters(), EVENT_TYPE),

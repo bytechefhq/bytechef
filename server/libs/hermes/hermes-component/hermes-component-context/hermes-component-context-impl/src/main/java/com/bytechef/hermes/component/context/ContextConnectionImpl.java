@@ -69,11 +69,6 @@ public class ContextConnectionImpl implements Context.Connection, AuthorizationC
     }
 
     @Override
-    public String getBaseUri() {
-        return fetchBaseUri().orElseThrow();
-    }
-
-    @Override
     public Map<String, Object> getParameters() {
         return Collections.unmodifiableMap(parameters);
     }

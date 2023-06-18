@@ -18,7 +18,6 @@
 package com.bytechef.component.pipedrive.trigger;
 
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
-import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -200,20 +199,13 @@ public class PipedriveNewOrganizationTrigger {
     }
 
     private static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
-        Connection connection = context.connection();
         DynamicWebhookEnableOutput enableOutput = context.dynamicWebhookEnableOutput();
 
-        PipedriveUtils.unsubscribeWebhook(connection.getBaseUri(), (String) enableOutput.getParameter("id"));
+        PipedriveUtils.unsubscribeWebhook((String) enableOutput.getParameter("id"));
     }
 
     private static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
-        Connection connection = context.connection();
-
         return new DynamicWebhookEnableOutput(
-            Map.of(
-                "id",
-                PipedriveUtils.subscribeWebhook(
-                    connection.getBaseUri(), "organization", "added", context.webhookUrl())),
-            null);
+            Map.of("id", PipedriveUtils.subscribeWebhook("organization", "added", context.webhookUrl())), null);
     }
 }
