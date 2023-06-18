@@ -17,19 +17,39 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets WorkflowFormat
+ * A type of property.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T21:42:43.525064+02:00[Europe/Zagreb]")
-public enum WorkflowFormatModel {
+public enum PropertyTypeModel {
   
-  JSON("JSON"),
+  ANY("ANY"),
   
-  YAML("YAML");
+  ARRAY("ARRAY"),
+  
+  BOOLEAN("BOOLEAN"),
+  
+  DATE("DATE"),
+  
+  DATE_TIME("DATE_TIME"),
+  
+  DYNAMIC_PROPERTIES("DYNAMIC_PROPERTIES"),
+  
+  INTEGER("INTEGER"),
+  
+  NULL("NULL"),
+  
+  NUMBER("NUMBER"),
+  
+  STRING("STRING"),
+  
+  OBJECT("OBJECT"),
+  
+  TIME("TIME");
 
   private String value;
 
-  WorkflowFormatModel(String value) {
+  PropertyTypeModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +64,8 @@ public enum WorkflowFormatModel {
   }
 
   @JsonCreator
-  public static WorkflowFormatModel fromValue(String value) {
-    for (WorkflowFormatModel b : WorkflowFormatModel.values()) {
+  public static PropertyTypeModel fromValue(String value) {
+    for (PropertyTypeModel b : PropertyTypeModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
