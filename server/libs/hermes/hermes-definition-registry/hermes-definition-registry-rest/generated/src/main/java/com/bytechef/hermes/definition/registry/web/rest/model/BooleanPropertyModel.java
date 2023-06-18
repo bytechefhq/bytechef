@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BooleanProperty", description = "A boolean property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:38.370689+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T12:54:59.380828+02:00[Europe/Zagreb]")
 public class BooleanPropertyModel extends ValuePropertyModel {
 
   public BooleanPropertyModel controlType(ControlTypeModel controlType) {
