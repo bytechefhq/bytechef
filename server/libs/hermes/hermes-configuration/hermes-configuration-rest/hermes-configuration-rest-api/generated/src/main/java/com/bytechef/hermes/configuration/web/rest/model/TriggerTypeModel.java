@@ -17,19 +17,25 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets WorkflowFormat
+ * Gets or Sets TriggerType
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T21:42:43.525064+02:00[Europe/Zagreb]")
-public enum WorkflowFormatModel {
+public enum TriggerTypeModel {
   
-  JSON("JSON"),
+  STATIC_WEBHOOK("STATIC_WEBHOOK"),
   
-  YAML("YAML");
+  HYBRID("HYBRID"),
+  
+  LISTENER("LISTENER"),
+  
+  POLLING("POLLING"),
+  
+  DYNAMIC_WEBHOOK("DYNAMIC_WEBHOOK");
 
   private String value;
 
-  WorkflowFormatModel(String value) {
+  TriggerTypeModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +50,8 @@ public enum WorkflowFormatModel {
   }
 
   @JsonCreator
-  public static WorkflowFormatModel fromValue(String value) {
-    for (WorkflowFormatModel b : WorkflowFormatModel.values()) {
+  public static TriggerTypeModel fromValue(String value) {
+    for (TriggerTypeModel b : TriggerTypeModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
