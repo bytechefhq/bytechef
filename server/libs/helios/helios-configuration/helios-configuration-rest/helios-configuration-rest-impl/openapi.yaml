@@ -736,12 +736,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ProjectInstanceWorkflow"
-        status:
-          description: "The status of a project instance."
-          type: "string"
-          enum:
-          - "DISABLED"
-          - "ENABLED"
+        enabled:
+          description: "If a workflow is enabled or not in the project instance."
+          type: "boolean"
         tags:
           type: "array"
           items:
@@ -793,12 +790,9 @@ components:
           type: "integer"
           format: "int64"
           writeOnly: true
-        status:
-          description: "The status of a project instance."
-          type: "string"
-          enum:
-          - "DISABLED"
-          - "ENABLED"
+        enabled:
+          description: "If a workflow is enabled or not in the project instance."
+          type: "boolean"
     ProjectInstanceWorkflow:
       description: "Contains configuration and connections required for the execution\
         \ of a particular project workflow."
@@ -818,7 +812,7 @@ components:
           items:
             $ref: "#/components/schemas/ProjectInstanceWorkflowConnection"
         enabled:
-          description: "If a workflow is enabled or not in the project instance."
+          description: "If a workflow is enabled or not in the project instance workflow."
           type: "boolean"
         id:
           description: "The id of a project instance."
