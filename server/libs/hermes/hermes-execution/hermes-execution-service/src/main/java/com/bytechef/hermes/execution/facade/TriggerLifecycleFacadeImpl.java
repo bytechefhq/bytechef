@@ -23,7 +23,7 @@ import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.execution.service.TriggerStorageService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 
@@ -36,16 +36,16 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final TriggerStorageService triggerStorageService;
+    private final TriggerStateService triggerStateService;
     private final String webhookUrl;
 
     public TriggerLifecycleFacadeImpl(
         TriggerScheduler triggerScheduler, TriggerDefinitionService triggerDefinitionService,
-        TriggerStorageService triggerStorageService, String webhookUrl) {
+        TriggerStateService triggerStateService, String webhookUrl) {
 
         this.triggerScheduler = triggerScheduler;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.triggerStorageService = triggerStorageService;
+        this.triggerStateService = triggerStateService;
         this.webhookUrl = webhookUrl;
     }
 
@@ -54,7 +54,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-            triggerStorageService.fetchValue(workflowExecutionId), null);
+            triggerStateService.fetchValue(workflowExecutionId), null);
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
             workflowTrigger.getTriggerName());
@@ -99,7 +99,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                     createWebhookUrl(workflowExecutionId), workflowExecutionId.toString());
 
                 if (output != null) {
-                    triggerStorageService.save(workflowExecutionId, output);
+                    triggerStateService.save(workflowExecutionId, output);
 
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(

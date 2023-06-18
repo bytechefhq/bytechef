@@ -17,34 +17,35 @@
 
 package com.bytechef.hermes.execution.converter;
 
-import com.bytechef.hermes.execution.domain.TriggerStorage.TriggerStorageValue;
+import com.bytechef.hermes.execution.domain.TriggerState.TriggerStateValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.convert.ReadingConverter;
 
 /**
  * @author Ivica Cardic
  */
-@WritingConverter
-public class TriggerStorageValueToStringConverter implements Converter<TriggerStorageValue, String> {
+@ReadingConverter
+public class StringToTriggerStateValueConverter implements Converter<String, TriggerStateValue> {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public TriggerStorageValueToStringConverter(ObjectMapper objectMapper) {
+    public StringToTriggerStateValueConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convert(TriggerStorageValue workflowTask) {
-        return write(objectMapper, workflowTask);
+    public TriggerStateValue convert(String source) {
+        return source == null ? null : read(objectMapper, source);
     }
 
-    private String write(ObjectMapper objectMapper, Object object) {
+    private TriggerStateValue read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
+            return objectMapper.readValue(json, TriggerStateValue.class);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
