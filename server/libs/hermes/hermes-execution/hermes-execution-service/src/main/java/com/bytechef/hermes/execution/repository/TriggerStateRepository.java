@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.execution.repository;
 
-import com.bytechef.hermes.execution.domain.TriggerStorage;
+import com.bytechef.hermes.execution.domain.TriggerState;
 import org.springframework.data.relational.core.sql.LockMode;
 import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.ListCrudRepository;
@@ -30,9 +30,9 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Repository
-public interface TriggerStorageRepository
-    extends ListPagingAndSortingRepository<TriggerStorage, Long>, ListCrudRepository<TriggerStorage, Long> {
+public interface TriggerStateRepository
+    extends ListPagingAndSortingRepository<TriggerState, Long>, ListCrudRepository<TriggerState, Long> {
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
-    Optional<TriggerStorage> findByWorkflowExecutionId(String workflowExecutionId);
+    Optional<TriggerState> findByWorkflowExecutionId(String workflowExecutionId);
 }

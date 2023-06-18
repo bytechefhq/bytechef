@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS trigger_execution (
     last_modified_by         VARCHAR(256) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS trigger_storage (
+CREATE TABLE IF NOT EXISTS trigger_state (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     workflowExecutionId      VARCHAR(256) NOT NULL,
     value                    TEXT         NOT NULL,

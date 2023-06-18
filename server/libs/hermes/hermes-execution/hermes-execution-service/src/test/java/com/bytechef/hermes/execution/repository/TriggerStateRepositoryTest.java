@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.service;
+package com.bytechef.hermes.execution.repository;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,23 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class TriggerStorageServiceTest {
+public class TriggerStateRepositoryTest {
 
     @Disabled
     @Test
-    public void testFetchValue() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testGetTriggerLifecycle() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testSave() {
+    public void test() {
         // TODO
     }
 }

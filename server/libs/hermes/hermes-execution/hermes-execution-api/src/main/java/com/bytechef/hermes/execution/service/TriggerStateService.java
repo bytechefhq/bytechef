@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.repository;
+package com.bytechef.hermes.execution.service;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public class TriggerStorageRepositoryTest {
+public interface TriggerStateService {
 
-    @Disabled
-    @Test
-    public void test() {
-        // TODO
-    }
+    <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId);
+
+    void save(WorkflowExecutionId workflowExecutionId, Object value);
 }

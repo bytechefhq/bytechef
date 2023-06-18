@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import com.bytechef.hermes.execution.service.TriggerStorageService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import org.springframework.stereotype.Component;
@@ -38,15 +38,15 @@ public class TriggerSchedulerExecutor {
 
     private final MessageBroker messageBroker;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final TriggerStorageService triggerStorageService;
+    private final TriggerStateService triggerStateService;
 
     public TriggerSchedulerExecutor(
         MessageBroker messageBroker, TriggerDefinitionService triggerDefinitionService,
-        TriggerStorageService triggerStorageService) {
+        TriggerStateService triggerStateService) {
 
         this.messageBroker = messageBroker;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.triggerStorageService = triggerStorageService;
+        this.triggerStateService = triggerStateService;
     }
 
     public void poll(WorkflowExecutionId workflowExecutionId) {
@@ -59,13 +59,13 @@ public class TriggerSchedulerExecutor {
         LocalDateTime webhookExpirationDate = null;
 
         DynamicWebhookEnableOutput output = OptionalUtils.get(
-            triggerStorageService.fetchValue(workflowExecutionId));
+            triggerStateService.fetchValue(workflowExecutionId));
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
             componentName, componentVersion, workflowExecutionId.getTriggerName(), output);
 
         if (output != null) {
-            triggerStorageService.save(workflowExecutionId, output);
+            triggerStateService.save(workflowExecutionId, output);
 
             webhookExpirationDate = output.webhookExpirationDate();
         }
