@@ -77,7 +77,7 @@ public class ProjectInstanceRequesterFacadeImpl implements ProjectInstanceReques
 
         long jobId = jobFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
 
-        projectInstanceWorkflowService.addJob(Objects.requireNonNull(projectInstanceWorkflow.getId()), jobId);
+        projectInstanceWorkflowService.linkJob(Objects.requireNonNull(projectInstanceWorkflow.getId()), jobId);
 
         return jobId;
     }

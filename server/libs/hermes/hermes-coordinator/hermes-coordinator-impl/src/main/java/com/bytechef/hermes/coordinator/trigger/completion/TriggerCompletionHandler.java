@@ -21,7 +21,6 @@ import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import org.springframework.stereotype.Component;
 
@@ -32,14 +31,9 @@ import org.springframework.stereotype.Component;
 public class TriggerCompletionHandler {
 
     private final InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry;
-    private final TriggerExecutionService triggerExecutionService;
 
-    public TriggerCompletionHandler(
-        InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry,
-        TriggerExecutionService triggerExecutionService) {
-
+    public TriggerCompletionHandler(InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry) {
         this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
-        this.triggerExecutionService = triggerExecutionService;
     }
 
     public void handle(TriggerExecution triggerExecution) {
@@ -48,14 +42,10 @@ public class TriggerCompletionHandler {
         InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
             workflowExecutionId.getInstanceType());
 
-        instanceWorkflowManager.createJob(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
-
         triggerExecution.setStatus(Status.COMPLETED);
 
-        if (triggerExecution.getId() == null) {
-            triggerExecutionService.create(triggerExecution);
-        } else {
-            triggerExecutionService.update(triggerExecution);
-        }
+        instanceWorkflowManager.saveTriggerExecution(triggerExecution, workflowExecutionId);
+
+        instanceWorkflowManager.createJob(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
     }
 }

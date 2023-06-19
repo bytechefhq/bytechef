@@ -27,8 +27,6 @@ import java.util.List;
  */
 public interface ProjectInstanceWorkflowService {
 
-    void addJob(long projectInstanceWorkflowId, long jobId);
-
     List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
     ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName);
@@ -40,6 +38,10 @@ public interface ProjectInstanceWorkflowService {
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds);
+
+    void linkJob(long projectInstanceWorkflowId, long jobId);
+
+    void linkTriggerExecution(long projectInstanceWorkflowId, long triggerExecutionId);
 
     List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 

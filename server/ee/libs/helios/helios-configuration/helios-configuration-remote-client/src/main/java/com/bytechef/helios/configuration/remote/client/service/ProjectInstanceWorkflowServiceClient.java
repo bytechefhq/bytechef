@@ -40,11 +40,6 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     }
 
     @Override
-    public void addJob(long projectInstanceWorkflowId, long jobId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
         throw new UnsupportedOperationException();
     }
@@ -83,6 +78,16 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
 
     @Override
     public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void linkJob(long projectInstanceWorkflowId, long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void linkTriggerExecution(long projectInstanceWorkflowId, long triggerExecutionId) {
         throw new UnsupportedOperationException();
     }
 

@@ -18,9 +18,11 @@
 package com.bytechef.helios.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowTriggerExecutionRepository;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowJob;
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowTrigerExecution;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowJobRepository;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
@@ -42,25 +44,20 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
     private final ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository;
     private final ProjectInstanceWorkflowJobRepository projectInstanceWorkflowJobRepository;
+    private final ProjectInstanceWorkflowTriggerExecutionRepository projectInstanceWorkflowTriggerExecutionRepository;
     private final ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowServiceImpl(
         ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository,
         ProjectInstanceWorkflowJobRepository projectInstanceWorkflowJobRepository,
+        ProjectInstanceWorkflowTriggerExecutionRepository projectInstanceWorkflowTriggerExecutionRepository,
         ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository) {
 
         this.projectInstanceWorkflowConnectionRepository = projectInstanceWorkflowConnectionRepository;
         this.projectInstanceWorkflowJobRepository = projectInstanceWorkflowJobRepository;
+        this.projectInstanceWorkflowTriggerExecutionRepository = projectInstanceWorkflowTriggerExecutionRepository;
         this.projectInstanceWorkflowRepository = projectInstanceWorkflowRepository;
-    }
-
-    @Override
-    public void addJob(long projectInstanceWorkflowId, long jobId) {
-        ProjectInstanceWorkflowJob projectInstanceWorkflowJob = new ProjectInstanceWorkflowJob(
-            projectInstanceWorkflowId, jobId);
-
-        projectInstanceWorkflowJobRepository.save(projectInstanceWorkflowJob);
     }
 
     @Override
@@ -97,6 +94,22 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds) {
         return projectInstanceWorkflowRepository.findAllByProjectInstanceIdIn(projectInstanceIds);
+    }
+
+    @Override
+    public void linkJob(long projectInstanceWorkflowId, long jobId) {
+        ProjectInstanceWorkflowJob projectInstanceWorkflowJob = new ProjectInstanceWorkflowJob(
+            projectInstanceWorkflowId, jobId);
+
+        projectInstanceWorkflowJobRepository.save(projectInstanceWorkflowJob);
+    }
+
+    @Override
+    public void linkTriggerExecution(long projectInstanceWorkflowId, long triggerExecutionId) {
+        ProjectInstanceWorkflowTrigerExecution projectInstanceWorkflowTrigerExecution =
+            new ProjectInstanceWorkflowTrigerExecution(projectInstanceWorkflowId, triggerExecutionId);
+
+        projectInstanceWorkflowTriggerExecutionRepository.save(projectInstanceWorkflowTrigerExecution);
     }
 
     @Override

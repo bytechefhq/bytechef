@@ -15,23 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance;
+package com.bytechef.helios.configuration.repository;
 
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
-
-import java.util.Map;
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowTrigerExecution;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceWorkflowManager {
-
-    long createJob(long instanceId, String workflowId);
-
-    Map<String, Object> getInputs(long instanceId, String workflowId);
-
-    String getType();
-
-    TriggerExecution saveTriggerExecution(TriggerExecution triggerExecution, WorkflowExecutionId workflowExecutionId);
+@Repository
+public interface ProjectInstanceWorkflowTriggerExecutionRepository
+    extends ListCrudRepository<ProjectInstanceWorkflowTrigerExecution, Long> {
 }
