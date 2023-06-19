@@ -25,7 +25,7 @@ import com.bytechef.atlas.coordinator.event.JobStatusWebhookEventListener;
 import com.bytechef.atlas.coordinator.event.TaskProgressedEventListener;
 import com.bytechef.atlas.coordinator.event.TaskStartedEventListener;
 import com.bytechef.atlas.coordinator.event.TaskStartedWebhookEventListener;
-import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
+import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain;

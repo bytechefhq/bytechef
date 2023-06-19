@@ -27,7 +27,6 @@ import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
@@ -52,20 +51,18 @@ public class TriggerCoordinator {
     private final MessageBroker messageBroker;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
-    private final TriggerExecutionService triggerExecutionService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry, MessageBroker messageBroker,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
-        TriggerExecutionService triggerExecutionService, WorkflowService workflowService) {
+        WorkflowService workflowService) {
 
         this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
         this.messageBroker = messageBroker;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
-        this.triggerExecutionService = triggerExecutionService;
         this.workflowService = workflowService;
     }
 
@@ -100,11 +97,11 @@ public class TriggerCoordinator {
         InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
             workflowExecutionId.getInstanceType());
 
-        triggerExecution.evaluate(
-            instanceWorkflowManager.getInputs(
-                workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId()));
-
-        triggerExecutionService.create(triggerExecution);
+        triggerExecution = instanceWorkflowManager.saveTriggerExecution(
+            triggerExecution.evaluate(
+                instanceWorkflowManager.getInputs(
+                    workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())),
+            workflowExecutionId);
 
         try {
             triggerDispatcher.dispatch(triggerExecution);
