@@ -62,19 +62,30 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
 
-        Map<String, Map<String, WorkflowConnection>> jobTaskConnectionMap = getJobTaskConnectionMap(job);
-
-        Map<String, WorkflowConnection> taskConnectionMap;
+        Map<String, Map<String, Map<String, Long>>> jobTaskConnectionMap = getJobTaskConnectionMap(job);
 
         if (jobTaskConnectionMap.containsKey(taskExecution.getName())) {
-            // directly coming from .../jobs POST endpoint
-            taskConnectionMap = jobTaskConnectionMap.get(taskExecution.getName());
-        } else {
-            // defined in the workflow definition
-            taskConnectionMap = WorkflowConnection.of(taskExecution.getWorkflowTask());
-        }
 
-        taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, getConnectionIdMap(taskConnectionMap));
+            // directly coming from .../jobs POST endpoint
+
+            Map<String, Map<String, Long>> taskConnectionMap = jobTaskConnectionMap.get(taskExecution.getName());
+
+            taskExecution.putMetadata(
+                MetadataConstants.CONNECTION_IDS,
+                taskConnectionMap.entrySet()
+                    .stream()
+                    .collect(
+                        Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> MapValueUtils.getLong(entry.getValue(), WorkflowConnection.ID))));
+        } else {
+
+            // defined in the workflow definition
+
+            taskExecution.putMetadata(
+                MetadataConstants.CONNECTION_IDS,
+                getConnectionIdMap(WorkflowConnection.of(taskExecution.getWorkflowTask())));
+        }
 
         projectInstanceService.fetchJobProjectInstance(Objects.requireNonNull(taskExecution.getJobId()))
             .ifPresent(projectInstance -> taskExecution
@@ -86,21 +97,8 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         return taskExecution;
     }
 
-    private static Map<String, Map<String, WorkflowConnection>> getJobTaskConnectionMap(Job job) {
-        Map<String, Map<String, Map<String, Object>>> connectionMap = MapValueUtils.getMap(
+    private static Map<String, Map<String, Map<String, Long>>> getJobTaskConnectionMap(Job job) {
+        return MapValueUtils.getMap(
             job.getMetadata(), WorkflowConnection.CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of());
-
-        return connectionMap.entrySet()
-            .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, entry -> toWorkflowConnectionMap(entry.getValue())));
-    }
-
-    private static Map<String, WorkflowConnection> toWorkflowConnectionMap(Map<String, Map<String, Object>> map) {
-        return map.entrySet()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    Map.Entry::getKey,
-                    entry -> MapValueUtils.getRequired(entry.getValue(), entry.getKey(), WorkflowConnection.class)));
     }
 }
