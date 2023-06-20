@@ -46,9 +46,9 @@ public class ActionDefinitionController implements ActionDefinitionsApi {
     }
 
     @Override
-    public ResponseEntity<List<ActionDefinitionModel>> getActionDefinitions(List<String> types) {
+    public ResponseEntity<List<ActionDefinitionModel>> getActionDefinitions(List<String> taskTypes) {
         return ResponseEntity.ok(
-            actionDefinitionService.getActionDefinitions(types)
+            actionDefinitionService.getActionDefinitions(taskTypes)
                 .stream()
                 .map(action -> conversionService.convert(action, ActionDefinitionModel.class))
                 .toList());

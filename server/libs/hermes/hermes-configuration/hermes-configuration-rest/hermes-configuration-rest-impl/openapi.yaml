@@ -27,8 +27,8 @@ paths:
       - "action-definitions"
       operationId: "getActionDefinitions"
       parameters:
-      - name: "types"
-        description: "The list of action types defiened in worrkflows."
+      - name: "taskTypes"
+        description: "The list of task types defined in workflows."
         in: "path"
         required: true
         schema:

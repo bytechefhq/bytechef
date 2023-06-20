@@ -213,8 +213,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<String> types) {
-        return types.stream()
+    public List<ActionDefinitionDTO> getActionDefinitions(List<String> taskTypes) {
+        return taskTypes.stream()
             .map(ComponentUtils::getComponentType)
             .map(componentType -> getActionDefinition(
                 componentType.componentName(), componentType.componentVersion(), componentType.operationName()))
