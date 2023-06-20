@@ -35,7 +35,7 @@ import {
 } from '../models';
 
 export interface GetActionDefinitionsRequest {
-    types: Array<string>;
+    taskTypes: Array<string>;
 }
 
 export interface GetComponentActionDefinitionRequest {
@@ -97,8 +97,8 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
      * Get all component definitions
      */
     async getActionDefinitionsRaw(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionModel>>> {
-        if (requestParameters.types === null || requestParameters.types === undefined) {
-            throw new runtime.RequiredError('types','Required parameter requestParameters.types was null or undefined when calling getActionDefinitions.');
+        if (requestParameters.taskTypes === null || requestParameters.taskTypes === undefined) {
+            throw new runtime.RequiredError('taskTypes','Required parameter requestParameters.taskTypes was null or undefined when calling getActionDefinitions.');
         }
 
         const queryParameters: any = {};
@@ -106,7 +106,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/action-definitions`.replace(`{${"types"}}`, encodeURIComponent(String(requestParameters.types))),
+            path: `/action-definitions`.replace(`{${"taskTypes"}}`, encodeURIComponent(String(requestParameters.taskTypes))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
