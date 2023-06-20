@@ -11,7 +11,7 @@ import {
     ObjectPropertyModel,
     StringPropertyModel,
     TimePropertyModel,
-} from 'middleware/core/definition-registry';
+} from 'middleware/core/workflow/configuration';
 
 export type PropertyType = AnyPropertyModel &
     ArrayPropertyModel &

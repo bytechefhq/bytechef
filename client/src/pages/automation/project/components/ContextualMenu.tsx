@@ -7,7 +7,7 @@ import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '../../../../middleware/core/definition-registry';
+} from '../../../../middleware/core/workflow/configuration';
 import WorkflowNodesList from '../components/WorkflowNodesList';
 import getFormattedName from '../utils/getFormattedName';
 import getRandomId from '../utils/getRandomId';

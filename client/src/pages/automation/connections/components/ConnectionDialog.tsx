@@ -21,7 +21,7 @@ import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
     GetOAuth2AuthorizationParametersRequestModel,
-} from 'middleware/core/definition-registry';
+} from 'middleware/core/workflow/configuration';
 import {
     useCreateConnectionMutation,
     useUpdateConnectionMutation,
