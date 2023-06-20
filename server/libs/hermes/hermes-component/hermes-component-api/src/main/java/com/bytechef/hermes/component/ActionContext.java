@@ -26,17 +26,17 @@ public interface ActionContext extends Context {
 
     /**
      *
-     * @param workflowConnectionKey
+     * @param taskConnectionKey
      * @return
      */
-    Optional<Connection> fetchConnection(String workflowConnectionKey);
+    Optional<Connection> fetchConnection(String taskConnectionKey);
 
     /**
      *
-     * @param workflowConnectionKey
+     * @param taskConnectionKey
      * @return
      */
-    Connection getConnection(String workflowConnectionKey);
+    Connection getConnection(String taskConnectionKey);
 
     /**
      *
