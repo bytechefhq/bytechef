@@ -152,7 +152,7 @@ const ProjectInstanceDialog = ({
                                 <div
                                     className={twMerge(
                                         'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300',
-                                        index < activeStepIndex && 'bg-gray-900'
+                                        index < activeStepIndex && 'bg-blue-600'
                                     )}
                                     aria-hidden="true"
                                 />
@@ -167,20 +167,20 @@ const ProjectInstanceDialog = ({
                                         className={twMerge(
                                             'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-gray-300 bg-white',
                                             index <= activeStepIndex &&
-                                                'border-gray-900'
+                                                'border-blue-600'
                                         )}
                                     >
                                         {index < activeStepIndex && (
-                                            <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full">
+                                            <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
                                                 <CheckIcon
-                                                    className="h-5 w-5 text-gray-900"
+                                                    className="h-5 w-5 text-white"
                                                     aria-hidden="true"
                                                 />
                                             </span>
                                         )}
 
                                         {index === activeStepIndex && (
-                                            <span className="h-2.5 w-2.5 rounded-full bg-gray-900" />
+                                            <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
                                         )}
 
                                         {index > activeStepIndex && (
