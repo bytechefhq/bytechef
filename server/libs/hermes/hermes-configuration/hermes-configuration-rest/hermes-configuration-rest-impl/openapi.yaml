@@ -19,6 +19,31 @@ tags:
 - name: "workflows"
   description: "The Core Workflows API"
 paths:
+  /action-definitions:
+    get:
+      description: "Get all component definitions."
+      summary: "Get all component definitions"
+      tags:
+      - "action-definitions"
+      operationId: "getActionDefinitions"
+      parameters:
+      - name: "types"
+        description: "The list of action types defiened in worrkflows."
+        in: "path"
+        required: true
+        schema:
+          type: "array"
+          items:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ActionDefinition"
   /component-definitions:
     get:
       description: "Get all component definitions."
