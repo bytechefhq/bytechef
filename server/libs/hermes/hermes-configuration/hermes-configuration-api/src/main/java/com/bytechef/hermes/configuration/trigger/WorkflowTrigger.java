@@ -20,7 +20,7 @@ package com.bytechef.hermes.configuration.trigger;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.configuration.util.ComponentUtils;
+import com.bytechef.hermes.definition.registry.util.ComponentUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;

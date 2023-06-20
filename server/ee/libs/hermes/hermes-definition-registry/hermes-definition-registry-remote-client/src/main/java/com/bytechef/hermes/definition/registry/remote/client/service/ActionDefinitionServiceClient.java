@@ -107,4 +107,11 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
             .bodyToMono(new ParameterizedTypeReference<List<ActionDefinitionDTO>>() {})
             .block();
     }
+
+    @Override
+    public List<ActionDefinitionDTO> getActionDefinitions(List<String> types) {
+        // TODO
+
+        throw new UnsupportedOperationException();
+    }
 }

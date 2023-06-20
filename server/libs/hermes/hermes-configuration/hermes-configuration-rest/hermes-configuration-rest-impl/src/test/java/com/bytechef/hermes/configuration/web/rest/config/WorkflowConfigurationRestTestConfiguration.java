@@ -33,6 +33,9 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 
+/**
+ * @author Ivica Cardic
+ */
 @ComponentScan(basePackages = {
     "com.bytechef.hermes.configuration.web.rest", "com.bytechef.hermes.definition.registry"
 })
