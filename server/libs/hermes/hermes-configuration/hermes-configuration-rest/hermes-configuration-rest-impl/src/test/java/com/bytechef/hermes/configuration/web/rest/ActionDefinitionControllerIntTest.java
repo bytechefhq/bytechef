@@ -15,19 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.util;
+package com.bytechef.hermes.configuration.web.rest;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentUtils {
+@Disabled
+@WebMvcTest(ActionDefinitionController.class)
+public class ActionDefinitionControllerIntTest {
 
-    public static ComponentType getComponentType(String type) {
-        String[] typeItems = type.split("/");
-
-        return new ComponentType(typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems[2]);
-    }
-
-    public record ComponentType(String componentName, int componentVersion, String operationName) {
+    @Test
+    public void getActionDefinitions() {
+        // TODO
     }
 }

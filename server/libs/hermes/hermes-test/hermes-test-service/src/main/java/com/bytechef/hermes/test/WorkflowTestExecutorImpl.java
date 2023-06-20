@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.configuration.util.ComponentUtils;
+import com.bytechef.hermes.definition.registry.util.ComponentUtils;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
