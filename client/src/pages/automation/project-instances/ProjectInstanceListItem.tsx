@@ -11,7 +11,6 @@ import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
 import {
     ProjectInstanceModel,
-    ProjectInstanceModelStatusEnum,
     TagModel,
 } from '../../../middleware/automation/configuration';
 import {
@@ -93,14 +92,12 @@ const ProjectInstanceListItem = ({
                         <div className="ml-2 flex shrink-0">
                             <Badge
                                 color={
-                                    projectInstance.status ===
-                                    ProjectInstanceModelStatusEnum.Enabled
+                                    projectInstance.enabled
                                         ? 'green'
                                         : 'default'
                                 }
                                 text={
-                                    projectInstance.status ===
-                                    ProjectInstanceModelStatusEnum.Enabled
+                                    projectInstance.enabled
                                         ? 'Enabled'
                                         : 'Disabled'
                                 }
@@ -132,8 +129,7 @@ const ProjectInstanceListItem = ({
                         </div>
 
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                            {projectInstance.status ===
-                            ProjectInstanceModelStatusEnum.Enabled ? (
+                            {projectInstance.enabled ? (
                                 <>
                                     <CalendarIcon
                                         className="mr-1 h-5 w-5 shrink-0 text-gray-400"

@@ -1,7 +1,7 @@
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select from 'components/Select/Select';
 import Tooltip from 'components/Tooltip/Tooltip';
-import {ActionDefinitionBasicModel} from 'middleware/core/definition-registry';
+import {ActionDefinitionBasicModel} from 'middleware/core/workflow/configuration';
 
 const CurrentActionSelect = ({
     actions,
