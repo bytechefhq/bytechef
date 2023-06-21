@@ -18,6 +18,7 @@ import type {
   ActionDefinitionBasicModel,
   ActionDefinitionModel,
   ComponentOperationRequestModel,
+  GetActionDefinitionsTaskTypesParameterInnerModel,
   OptionModel,
   PropertyModel,
 } from '../models';
@@ -28,6 +29,8 @@ import {
     ActionDefinitionModelToJSON,
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
+    GetActionDefinitionsTaskTypesParameterInnerModelFromJSON,
+    GetActionDefinitionsTaskTypesParameterInnerModelToJSON,
     OptionModelFromJSON,
     OptionModelToJSON,
     PropertyModelFromJSON,
@@ -35,7 +38,7 @@ import {
 } from '../models';
 
 export interface GetActionDefinitionsRequest {
-    taskTypes: Array<string>;
+    taskTypes: Array<GetActionDefinitionsTaskTypesParameterInnerModel>;
 }
 
 export interface GetComponentActionDefinitionRequest {
@@ -93,8 +96,8 @@ export interface GetComponentActionSampleOutputRequest {
 export class ActionDefinitionsApi extends runtime.BaseAPI {
 
     /**
-     * Get all component definitions.
-     * Get all component definitions
+     * Get all action definitions.
+     * Get all action definitions
      */
     async getActionDefinitionsRaw(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionModel>>> {
         if (requestParameters.taskTypes === null || requestParameters.taskTypes === undefined) {
@@ -103,10 +106,14 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.taskTypes) {
+            queryParameters['taskTypes'] = requestParameters.taskTypes;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/action-definitions`.replace(`{${"taskTypes"}}`, encodeURIComponent(String(requestParameters.taskTypes))),
+            path: `/action-definitions`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -116,8 +123,8 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all component definitions.
-     * Get all component definitions
+     * Get all action definitions.
+     * Get all action definitions
      */
     async getActionDefinitions(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionModel>> {
         const response = await this.getActionDefinitionsRaw(requestParameters, initOverrides);

@@ -19,6 +19,7 @@ export * from './DatePropertyModel';
 export * from './DateTimePropertyModel';
 export * from './DynamicPropertiesPropertyAllOfModel';
 export * from './DynamicPropertiesPropertyModel';
+export * from './GetActionDefinitionsTaskTypesParameterInnerModel';
 export * from './GetOAuth2AuthorizationParametersRequestModel';
 export * from './HelpModel';
 export * from './InputModel';
