@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,12 +27,12 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Component
-public class JobFacadeClient implements JobFacade {
+public class JobFactoryFacadeClient implements JobFactoryFacade {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
     @SuppressFBWarnings("EI")
-    public JobFacadeClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public JobFactoryFacadeClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
@@ -44,7 +44,7 @@ public class JobFacadeClient implements JobFacade {
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("platform-service-app")
-                .path("/api/internal/job-facade/create-job")
+                .path("/api/internal/job-factory-facade/create-job")
                 .build())
             .bodyValue(jobParameters)
             .retrieve()

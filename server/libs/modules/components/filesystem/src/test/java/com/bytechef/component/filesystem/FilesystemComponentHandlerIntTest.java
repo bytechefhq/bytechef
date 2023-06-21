@@ -56,7 +56,7 @@ public class FilesystemComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         FileEntry fileEntry = fileStorageService.storeFileContent("sample.txt",
             Files.contentOf(getFile(), StandardCharsets.UTF_8));
@@ -88,7 +88,7 @@ public class FilesystemComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         assertThat((Map<?, ?>) outputs.get("writeLocalFile")).hasFieldOrPropertyWithValue("bytes", 5);
     }

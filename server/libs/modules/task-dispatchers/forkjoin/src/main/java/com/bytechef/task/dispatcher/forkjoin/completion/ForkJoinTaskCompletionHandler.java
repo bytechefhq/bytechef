@@ -129,7 +129,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                             branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, branch))))
                 .build();
 
-            Map<String, Object> context = contextService.peek(
+            Map<String, ?> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
 
             branchTaskExecution.evaluate(context);

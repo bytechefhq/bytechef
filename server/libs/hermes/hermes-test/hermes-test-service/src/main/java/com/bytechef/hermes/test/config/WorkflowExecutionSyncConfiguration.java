@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.test.config;
 
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.facade.JobFacadeImpl;
+import com.bytechef.atlas.execution.facade.JobFactoryFacade;
+import com.bytechef.atlas.execution.facade.JobFactoryFacadeImpl;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -103,7 +103,7 @@ public class WorkflowExecutionSyncConfiguration {
         WorkflowService workflowService = new WorkflowServiceImpl(
             new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
 
-        JobFacade jobFacade = new JobFacadeImpl(
+        JobFactoryFacade jobFactoryFacade = new JobFactoryFacadeImpl(
             contextService, eventPublisher, jobService, syncMessageBroker, workflowService);
 
         return new WorkflowTestExecutorImpl(
@@ -118,7 +118,7 @@ public class WorkflowExecutionSyncConfiguration {
                 .taskDispatcherAdapterFactories(getTaskDispatcherAdapterFactories())
                 .taskDispatcherResolverFactories(
                     getTaskDispatcherResolverFactories(
-                        contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService))
+                        contextService, counterService, jobFactoryFacade, syncMessageBroker, taskExecutionService))
                 .taskExecutionService(taskExecutionService)
                 .taskHandlerRegistry(taskHandlerRegistry)
                 .workflowService(workflowService)
@@ -178,7 +178,7 @@ public class WorkflowExecutionSyncConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, JobFacade jobFacade,
+        ContextService contextService, CounterService counterService, JobFactoryFacade jobFactoryFacade,
         MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         return List.of(
@@ -204,6 +204,6 @@ public class WorkflowExecutionSyncConfiguration {
                 contextService, counterService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new SequenceTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService),
-            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade));
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobFactoryFacade));
     }
 }

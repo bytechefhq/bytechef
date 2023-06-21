@@ -150,7 +150,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                                 branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, i))))
                     .build();
 
-                Map<String, Object> context = contextService.peek(
+                Map<String, ?> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
                 branchTaskExecution.evaluate(context);

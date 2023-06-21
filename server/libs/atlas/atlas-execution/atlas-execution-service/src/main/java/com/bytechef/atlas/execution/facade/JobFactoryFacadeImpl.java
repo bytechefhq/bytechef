@@ -30,11 +30,13 @@ import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-public class JobFacadeImpl implements JobFacade {
+public class JobFactoryFacadeImpl implements JobFactoryFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobFactoryFacadeImpl.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -43,7 +45,7 @@ public class JobFacadeImpl implements JobFacade {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public JobFacadeImpl(
+    public JobFactoryFacadeImpl(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker, WorkflowService workflowService) {
 
@@ -54,7 +56,11 @@ public class JobFacadeImpl implements JobFacade {
         this.workflowService = workflowService;
     }
 
+    // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
+    // the case where a job is finished and completion task executed, but the transaction is not yet committed and
+    // the job id is missing.
     @Override
+    @Transactional(propagation = Propagation.NEVER)
     @SuppressFBWarnings("NP")
     public long createJob(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));

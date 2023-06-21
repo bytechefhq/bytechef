@@ -19,6 +19,7 @@ package com.bytechef.hermes.remote.client.worker.trigger.handler;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler.TriggerOutput;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
@@ -45,7 +46,7 @@ public class TriggerHandlerClient {
     }
 
     @SuppressFBWarnings("NP")
-    public Object handle(String type, TriggerExecution triggerExecution) {
+    public TriggerOutput handle(String type, TriggerExecution triggerExecution) {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
             discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0],
             objectMapper);
@@ -60,7 +61,7 @@ public class TriggerHandlerClient {
                 .build())
             .bodyValue(Map.of("type", type, "triggerExecution", triggerExecution))
             .retrieve()
-            .bodyToMono(Object.class)
+            .bodyToMono(TriggerOutput.class)
             .block();
     }
 }

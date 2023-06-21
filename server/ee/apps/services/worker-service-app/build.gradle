@@ -22,7 +22,6 @@ dependencies {
     implementation project(":server:ee:libs:hermes:hermes-connection:hermes-connection-remote-client")
     implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-rest")
     implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
-    implementation project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-client")
     implementation project(":server:ee:libs:hermes:hermes-scheduler:hermes-scheduler-remote-client")
     implementation project(":server:ee:libs:hermes:hermes-worker:hermes-worker-remote-rest")
 
