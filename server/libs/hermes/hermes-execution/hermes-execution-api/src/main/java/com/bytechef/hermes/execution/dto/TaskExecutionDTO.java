@@ -32,13 +32,13 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record TaskExecutionDTO(
     ComponentDefinitionDTO component, String createdBy, LocalDateTime createdDate, LocalDateTime endDate,
-    ExecutionError error, long executionTime, Long id, Map<String, Object> input, Long jobId, String lastModifiedBy,
+    ExecutionError error, long executionTime, Long id, Map<String, ?> input, Long jobId, String lastModifiedBy,
     LocalDateTime lastModifiedDate, int maxRetries, Object output, Long parentId, int priority, int progress,
     int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
     TaskExecution.Status status, int taskNumber, String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(
-        ComponentDefinitionDTO component, Map<String, Object> input, TaskExecution taskExecution) {
+        ComponentDefinitionDTO component, Map<String, ?> input, TaskExecution taskExecution) {
 
         this(
             component, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),

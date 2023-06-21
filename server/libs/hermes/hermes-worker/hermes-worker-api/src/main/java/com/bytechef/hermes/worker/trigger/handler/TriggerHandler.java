@@ -27,5 +27,8 @@ import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
  */
 public interface TriggerHandler<O> {
 
-    O handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
+    TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
+
+    record TriggerOutput(Object value, Object state, boolean batch) {
+    }
 }

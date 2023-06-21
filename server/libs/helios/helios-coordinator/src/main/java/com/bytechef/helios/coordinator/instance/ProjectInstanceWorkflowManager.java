@@ -21,14 +21,10 @@ import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.execution.facade.ProjectInstanceRequesterFacade;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -38,19 +34,16 @@ public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
 
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectInstanceRequesterFacade projectInstanceRequesterFacade;
-    private final TriggerExecutionService triggerExecutionService;
 
     public static final String PROJECT = "PROJECT";
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowManager(
         ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectInstanceRequesterFacade projectInstanceRequesterFacade,
-        TriggerExecutionService triggerExecutionService) {
+        ProjectInstanceRequesterFacade projectInstanceRequesterFacade) {
 
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectInstanceRequesterFacade = projectInstanceRequesterFacade;
-        this.triggerExecutionService = triggerExecutionService;
     }
 
     @Override
@@ -59,7 +52,7 @@ public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
     }
 
     @Override
-    public Map<String, Object> getInputs(long instanceId, String workflowId) {
+    public Map<String, ?> getInputs(long instanceId, String workflowId) {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             instanceId, workflowId);
 
@@ -69,22 +62,5 @@ public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
     @Override
     public String getType() {
         return PROJECT;
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public TriggerExecution saveTriggerExecution(
-        TriggerExecution triggerExecution, WorkflowExecutionId workflowExecutionId) {
-
-        if (triggerExecution.getId() == null) {
-            triggerExecution = triggerExecutionService.create(triggerExecution);
-
-            projectInstanceWorkflowService.linkTriggerExecution(
-                workflowExecutionId.getInstanceId(), Objects.requireNonNull(triggerExecution.getId()));
-        } else {
-            triggerExecution = triggerExecutionService.update(triggerExecution);
-        }
-
-        return triggerExecution;
     }
 }

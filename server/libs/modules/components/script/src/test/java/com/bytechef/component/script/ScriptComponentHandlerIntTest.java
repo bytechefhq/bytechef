@@ -62,7 +62,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }
@@ -75,7 +75,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }
@@ -88,7 +88,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }
@@ -101,7 +101,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }

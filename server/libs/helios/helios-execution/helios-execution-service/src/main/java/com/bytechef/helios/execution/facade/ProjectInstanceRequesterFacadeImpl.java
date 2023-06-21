@@ -20,7 +20,7 @@ package com.bytechef.helios.execution.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
@@ -45,7 +45,7 @@ import java.util.Objects;
 public class ProjectInstanceRequesterFacadeImpl implements ProjectInstanceRequesterFacade {
 
     private final ConnectionService connectionService;
-    private final JobFacade jobFacade;
+    private final JobFactoryFacade jobFactoryFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
@@ -53,12 +53,12 @@ public class ProjectInstanceRequesterFacadeImpl implements ProjectInstanceReques
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceRequesterFacadeImpl(
-        ConnectionService connectionService, JobFacade jobFacade,
+        ConnectionService connectionService, JobFactoryFacade jobFactoryFacade,
         ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
         TriggerLifecycleFacade triggerLifecycleFacade, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
-        this.jobFacade = jobFacade;
+        this.jobFactoryFacade = jobFactoryFacade;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
@@ -75,7 +75,7 @@ public class ProjectInstanceRequesterFacadeImpl implements ProjectInstanceReques
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             projectInstanceId, workflowId);
 
-        long jobId = jobFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
+        long jobId = jobFactoryFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
 
         projectInstanceWorkflowService.linkJob(Objects.requireNonNull(projectInstanceWorkflow.getId()), jobId);
 

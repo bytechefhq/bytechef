@@ -65,7 +65,7 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertThat(Map.of(
             "Flower",
@@ -96,7 +96,7 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeXMLFile");
 

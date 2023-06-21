@@ -17,12 +17,21 @@
 
 package com.bytechef.hermes.coordinator.trigger.completion;
 
+import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.facade.JobFactoryFacade;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -31,11 +40,22 @@ import org.springframework.stereotype.Component;
 public class TriggerCompletionHandler {
 
     private final InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry;
+    private final JobFactoryFacade jobFactoryFacade;
+    private final TriggerExecutionService triggerExecutionService;
+    private final TriggerStateService triggerStateService;
 
-    public TriggerCompletionHandler(InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry) {
+    public TriggerCompletionHandler(
+        InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry, JobFactoryFacade jobFactoryFacade,
+        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService) {
+
         this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
+        this.jobFactoryFacade = jobFactoryFacade;
+        this.triggerExecutionService = triggerExecutionService;
+        this.triggerStateService = triggerStateService;
     }
 
+    @Transactional
+    @SuppressWarnings("unchecked")
     public void handle(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
@@ -44,8 +64,33 @@ public class TriggerCompletionHandler {
 
         triggerExecution.setStatus(Status.COMPLETED);
 
-        instanceWorkflowManager.saveTriggerExecution(triggerExecution, workflowExecutionId);
+        if (triggerExecution.getId() == null) {
+            triggerExecutionService.create(triggerExecution);
+        } else {
+            triggerExecutionService.update(triggerExecution);
+        }
 
-        instanceWorkflowManager.createJob(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+        if (triggerExecution.getState() != null) {
+            triggerStateService.save(workflowExecutionId, triggerExecution.getState());
+        }
+
+        Map<String, Object> inputs = (Map<String, Object>) instanceWorkflowManager.getInputs(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+
+        if (!triggerExecution.isBatch() && triggerExecution.getOutput() instanceof Collection<?> collectionOutput) {
+            for (Object outputItem : collectionOutput) {
+                createJob(
+                    workflowExecutionId,
+                    CollectionUtils.concat(inputs, Map.of(triggerExecution.getName(), outputItem)));
+            }
+        } else {
+            createJob(
+                workflowExecutionId,
+                CollectionUtils.concat(inputs, Map.of(triggerExecution.getName(), triggerExecution.getOutput())));
+        }
+    }
+
+    private void createJob(WorkflowExecutionId workflowExecutionId, Map<String, ?> inputs) {
+        jobFactoryFacade.createJob(new JobParameters(workflowExecutionId.getWorkflowId(), inputs));
     }
 }

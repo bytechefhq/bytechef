@@ -65,7 +65,7 @@ public class CsvFileComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -84,7 +84,7 @@ public class CsvFileComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         assertThat(((Map) outputs.get("writeCsvFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.csv");

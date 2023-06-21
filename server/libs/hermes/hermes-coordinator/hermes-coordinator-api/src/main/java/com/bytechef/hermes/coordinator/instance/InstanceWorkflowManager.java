@@ -17,9 +17,6 @@
 
 package com.bytechef.hermes.coordinator.instance;
 
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
-
 import java.util.Map;
 
 /**
@@ -29,9 +26,7 @@ public interface InstanceWorkflowManager {
 
     long createJob(long instanceId, String workflowId);
 
-    Map<String, Object> getInputs(long instanceId, String workflowId);
+    Map<String, ?> getInputs(long instanceId, String workflowId);
 
     String getType();
-
-    TriggerExecution saveTriggerExecution(TriggerExecution triggerExecution, WorkflowExecutionId workflowExecutionId);
 }

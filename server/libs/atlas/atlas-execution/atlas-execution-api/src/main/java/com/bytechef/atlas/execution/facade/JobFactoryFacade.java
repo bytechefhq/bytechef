@@ -15,19 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.facade;
+package com.bytechef.atlas.execution.facade;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.atlas.execution.dto.JobParameters;
 
 /**
  * @author Ivica Cardic
  */
-public class JobFacadeTest {
+public interface JobFactoryFacade {
 
-    @Disabled
-    @Test
-    public void testGetJob() {
-        // TODO
-    }
+    long createJob(JobParameters jobParameters);
 }

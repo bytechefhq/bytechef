@@ -44,7 +44,7 @@ public class VarComponentHandlerIntTest {
                 .encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
             Map.of());
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertEquals("1234", outputs.get("stringNumber"));
         Assertions.assertEquals(1234, (Integer) outputs.get("intNumber"));

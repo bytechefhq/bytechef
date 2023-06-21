@@ -79,7 +79,7 @@ public class JobExecutor {
     private void executeNextTask(Job job, Workflow workflow) {
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
+        Map<String, ?> context = contextService.peek(job.getId(), Context.Classname.JOB);
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);

@@ -102,7 +102,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .workflowTask(subWorkflowTask)
                     .build();
 
-                Map<String, Object> context = contextService.peek(
+                Map<String, ?> context = contextService.peek(
                     Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION);
 
                 subTaskExecution.evaluate(context);

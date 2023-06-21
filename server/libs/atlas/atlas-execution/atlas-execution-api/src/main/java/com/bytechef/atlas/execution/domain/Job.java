@@ -207,9 +207,9 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     /**
      * Get the key-value map of inputs passed to the job when it was created.
      *
-     * @return {@link Map<String, Object>}
+     * @return {@link Map<String, ?>}
      */
-    public Map<String, Object> getInputs() {
+    public Map<String, ?> getInputs() {
         return Collections.unmodifiableMap(inputs.getMap());
     }
 
@@ -268,7 +268,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      *
      * @return {@link Map<String, Object>}
      */
-    public Map<String, Object> getOutputs() {
+    public Map<String, ?> getOutputs() {
         return Collections.unmodifiableMap(outputs.getMap());
     }
 
@@ -323,7 +323,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.id = id;
     }
 
-    public void setInputs(Map<String, Object> inputs) {
+    public void setInputs(Map<String, ?> inputs) {
         this.inputs = new MapWrapper(inputs);
     }
 
@@ -331,11 +331,11 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.label = label;
     }
 
-    public void setMetadata(Map<String, Object> metadata) {
+    public void setMetadata(Map<String, ?> metadata) {
         this.metadata = new MapWrapper(metadata);
     }
 
-    public void setOutputs(Map<String, Object> outputs) {
+    public void setOutputs(Map<String, ?> outputs) {
         this.outputs = new MapWrapper(outputs);
     }
 

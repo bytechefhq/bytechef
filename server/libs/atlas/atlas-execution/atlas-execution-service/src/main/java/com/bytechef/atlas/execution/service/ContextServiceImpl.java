@@ -37,7 +37,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, Context.Classname classname, Map<String, Object> value) {
+    public void push(long stackId, Context.Classname classname, Map<String, ?> value) {
         Assert.notNull(classname, "'classname' must not be null");
         Assert.notNull(value, "'value' must not be null");
 
@@ -48,7 +48,7 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     public void push(
-        long stackId, int subStackId, Context.Classname classname, @NonNull Map<String, Object> value) {
+        long stackId, int subStackId, Context.Classname classname, @NonNull Map<String, ?> value) {
         Assert.notNull(classname, "'classname' must not be null");
         Assert.notNull(value, "'value' must not be null");
 
@@ -59,7 +59,7 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<String, Object> peek(long stackId, Context.Classname classname) {
+    public Map<String, ?> peek(long stackId, Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
             stackId, classname.getId());
 
@@ -67,7 +67,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public Map<String, Object> peek(long stackId, int subStackId, Context.Classname classname) {
+    public Map<String, ?> peek(long stackId, int subStackId, Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
             stackId, subStackId, classname.getId());
 

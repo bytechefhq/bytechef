@@ -92,7 +92,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            Map<String, Object> context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, ?> context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             subTaskExecution.evaluate(context);
 

@@ -34,7 +34,7 @@ public class MapWrapper {
     public MapWrapper() {
     }
 
-    public MapWrapper(Map<String, Object> map) {
+    public MapWrapper(Map<String, ?> map) {
         this.map = new HashMap<>(map);
     }
 

@@ -77,11 +77,11 @@ public class Evaluator {
         METHOD_EXECUTOR_MAP.put("uuid", new Uuid());
     }
 
-    public static Map<String, Object> evaluate(Map<String, Object> map, Map<String, Object> context) {
+    public static Map<String, Object> evaluate(Map<String, Object> map, Map<String, ?> context) {
         return evaluateInternal(map, context);
     }
 
-    private static StandardEvaluationContext createEvaluationContext(Map<String, Object> context) {
+    private static StandardEvaluationContext createEvaluationContext(Map<String, ?> context) {
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
@@ -90,7 +90,7 @@ public class Evaluator {
         return evaluationContext;
     }
 
-    private static String evaluate(CompositeStringExpression compositeStringExpression, Map<String, Object> context) {
+    private static String evaluate(CompositeStringExpression compositeStringExpression, Map<String, ?> context) {
         StringBuilder stringBuilder = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
@@ -113,7 +113,7 @@ public class Evaluator {
         return stringBuilder.toString();
     }
 
-    private static Object evaluate(Object value, Map<String, Object> context) {
+    private static Object evaluate(Object value, Map<String, ?> context) {
         if (value instanceof String) {
             Expression expression =
                 EXPRESSION_PARSER.parseExpression((String) value, new TemplateParserContext(PREFIX, SUFFIX));
@@ -146,7 +146,7 @@ public class Evaluator {
         return value;
     }
 
-    private static Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, Object> context) {
+    private static Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context) {
         Map<String, Object> newMap = new HashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
