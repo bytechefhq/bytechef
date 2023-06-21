@@ -6,6 +6,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
+import com.bytechef.hermes.configuration.web.rest.model.GetActionDefinitionsTaskTypesParameterInnerModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-20T12:12:25.798021+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-21T17:25:58.576295+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ActionDefinitionsApi {
@@ -42,16 +43,16 @@ public interface ActionDefinitionsApi {
     }
 
     /**
-     * GET /action-definitions : Get all component definitions
-     * Get all component definitions.
+     * GET /action-definitions : Get all action definitions
+     * Get all action definitions.
      *
      * @param taskTypes The list of task types defined in workflows. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getActionDefinitions",
-        summary = "Get all component definitions",
-        description = "Get all component definitions.",
+        summary = "Get all action definitions",
+        description = "Get all action definitions.",
         tags = { "action-definitions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
@@ -65,7 +66,7 @@ public interface ActionDefinitionsApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<ActionDefinitionModel>> getActionDefinitions(
-        @Parameter(name = "taskTypes", description = "The list of task types defined in workflows.", required = true, in = ParameterIn.PATH) @PathVariable("taskTypes") List<String> taskTypes
+        @NotNull @Parameter(name = "taskTypes", description = "The list of task types defined in workflows.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "taskTypes", required = true) List<@Valid GetActionDefinitionsTaskTypesParameterInnerModel> taskTypes
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
