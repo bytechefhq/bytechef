@@ -21,20 +21,27 @@ tags:
 paths:
   /action-definitions:
     get:
-      description: "Get all component definitions."
-      summary: "Get all component definitions"
+      description: "Get all action definitions."
+      summary: "Get all action definitions"
       tags:
       - "action-definitions"
       operationId: "getActionDefinitions"
       parameters:
       - name: "taskTypes"
         description: "The list of task types defined in workflows."
-        in: "path"
+        in: "query"
         required: true
         schema:
           type: "array"
           items:
-            type: "string"
+            type: "object"
+            properties:
+              componentName:
+                type: "string"
+              componentVersion:
+                type: "integer"
+              actionName:
+                type: "string"
       responses:
         "200":
           description: "Successful operation."
