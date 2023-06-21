@@ -22,8 +22,8 @@ import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.event.TriggerStartedWorkflowEvent;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
-import com.bytechef.hermes.definition.registry.util.ComponentUtils;
-import com.bytechef.hermes.definition.registry.util.ComponentUtils.ComponentType;
+import com.bytechef.hermes.definition.registry.util.WorkflowTaskUtils;
+import com.bytechef.hermes.definition.registry.dto.TaskType;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.Controllable;
@@ -163,12 +163,12 @@ public class TriggerWorker {
         if (output == null) {
             triggerExecutions.add(createCompletedTriggerExecution(triggerExecution.clone(), startTime, endTime));
         } else {
-            ComponentType componentType = ComponentUtils.getComponentType(triggerExecution.getType());
+            TaskType taskType = WorkflowTaskUtils.getTaskType(triggerExecution.getType());
 
             TriggerDefinitionDTO triggerDefinitionDTO = triggerDefinitionService.getTriggerDefinition(
-                componentType.componentName(), componentType.componentVersion(), componentType.operationName());
+                taskType.componentName(), taskType.componentVersion(), taskType.operationName());
 
-            if (triggerDefinitionDTO.batch() && output instanceof Collection<?> collectionOutput) {
+            if (!triggerDefinitionDTO.batch() && output instanceof Collection<?> collectionOutput) {
                 for (Object outputItem : collectionOutput) {
                     triggerExecution = createCompletedTriggerExecution(triggerExecution.clone(), startTime, endTime);
 

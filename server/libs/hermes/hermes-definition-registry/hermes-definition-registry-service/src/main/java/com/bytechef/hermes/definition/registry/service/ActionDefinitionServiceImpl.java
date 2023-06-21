@@ -41,8 +41,8 @@ import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.TaskType;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
-import com.bytechef.hermes.definition.registry.util.ComponentUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -213,11 +213,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<String> taskTypes) {
+    public List<ActionDefinitionDTO> getActionDefinitions(List<TaskType> taskTypes) {
         return taskTypes.stream()
-            .map(ComponentUtils::getComponentType)
-            .map(componentType -> getActionDefinition(
-                componentType.componentName(), componentType.componentVersion(), componentType.operationName()))
+            .map(taskTypeDTO -> getActionDefinition(
+                taskTypeDTO.componentName(), taskTypeDTO.componentVersion(), taskTypeDTO.operationName()))
             .toList();
     }
 

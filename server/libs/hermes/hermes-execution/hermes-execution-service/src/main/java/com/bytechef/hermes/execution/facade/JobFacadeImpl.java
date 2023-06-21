@@ -22,7 +22,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.hermes.definition.registry.util.ComponentUtils;
+import com.bytechef.hermes.definition.registry.dto.TaskType;
+import com.bytechef.hermes.definition.registry.util.WorkflowTaskUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.execution.dto.JobDTO;
@@ -71,9 +72,9 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
-        ComponentUtils.ComponentType componentType = ComponentUtils.getComponentType(taskExecution.getType());
+        TaskType taskType = WorkflowTaskUtils.getTaskType(taskExecution.getType());
 
         return componentDefinitionService.getComponentDefinition(
-            componentType.componentName(), componentType.componentVersion());
+            taskType.componentName(), taskType.componentVersion());
     }
 }
