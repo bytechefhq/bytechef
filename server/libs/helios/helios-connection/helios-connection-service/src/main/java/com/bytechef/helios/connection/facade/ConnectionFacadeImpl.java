@@ -232,9 +232,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .toList();
     }
 
-    private Connection getConnection(String workflowConnectionKey, String taskName) {
+    private Connection getConnection(String workflowConnectionKey, String operationName) {
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(workflowConnectionKey, taskName);
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(workflowConnectionKey, operationName);
 
         return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
     }

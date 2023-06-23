@@ -29,15 +29,19 @@ public interface ProjectInstanceFacade {
 
     ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
+    void createProjectInstanceWorkflowJob(Long id, String workflowId);
+
     void deleteProjectInstance(long id);
 
-    void enableProjectInstance(long id, boolean enabled);
+    void enableProjectInstance(long id, boolean enable);
+
+    void enableProjectInstanceWorkflow(long projectInstanceId, String workflowId, boolean enable);
 
     ProjectInstanceDTO getProjectInstance(long id);
 
     List<Tag> getProjectInstanceTags();
 
-    List<ProjectInstanceDTO> searchProjectInstances(List<Long> projectIds, List<Long> tagIds);
+    List<ProjectInstanceDTO> getProjectInstances(List<Long> projectIds, List<Long> tagIds);
 
     ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 

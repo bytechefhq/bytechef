@@ -98,7 +98,7 @@ public class ProjectController implements ProjectsApi {
         List<Long> categoryIds, Boolean projectInstances, List<Long> tagIds) {
 
         return ResponseEntity.ok(
-            projectFacade.searchProjects(categoryIds, projectInstances != null, tagIds)
+            projectFacade.getProjects(categoryIds, projectInstances != null, tagIds)
                 .stream()
                 .map(project -> conversionService.convert(project, ProjectModel.class))
                 .toList());

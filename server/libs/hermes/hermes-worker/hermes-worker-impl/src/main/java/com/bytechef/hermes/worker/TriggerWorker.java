@@ -18,7 +18,6 @@
 package com.bytechef.hermes.worker;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.event.TriggerStartedWorkflowEvent;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -63,17 +62,15 @@ public class TriggerWorker {
     private final ExecutorService executorService;
     private final MessageBroker messageBroker;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
-    private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerHandlerResolver triggerHandlerResolver;
 
     public TriggerWorker(
         EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
-        TriggerDefinitionService triggerDefinitionService, TriggerHandlerResolver triggerHandlerResolver) {
+        TriggerHandlerResolver triggerHandlerResolver) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
         this.messageBroker = messageBroker;
-        this.triggerDefinitionService = triggerDefinitionService;
         this.triggerHandlerResolver = triggerHandlerResolver;
     }
 

@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS project_instance_workflow_connection (
     project_instance_workflow_id      BIGSERIAL    NOT NULL,
     connection_id                     BIGSERIAL    NOT NULL,
     key                               VARCHAR(256) NOT NULL,
-    task_name                         VARCHAR(256) NOT NULL
+    operation_name                    VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS project_tag (

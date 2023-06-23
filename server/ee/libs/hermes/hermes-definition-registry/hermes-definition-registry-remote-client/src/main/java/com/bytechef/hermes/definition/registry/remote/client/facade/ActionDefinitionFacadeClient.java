@@ -40,7 +40,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
     @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        long connectionId) {
+        Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
@@ -57,7 +57,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId, String searchText) {
+        Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
         return WORKER_WEB_CLIENT
             .post()
@@ -74,7 +74,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        long connectionId) {
+        Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
@@ -90,7 +90,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId) {
+        Map<String, Object> actionParameters, Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
@@ -106,7 +106,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
     @Override
     public Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        long connectionId) {
+        Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
@@ -121,26 +121,26 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
     private record EditorDescriptionRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
-        long connectionId) {
+        Long connectionId) {
     }
 
     private record OptionsRequest(
         String actionName, String propertyName, Map<String, Object> actionParameters, String componentName,
-        int componentVersion, long connectionId, String searchText) {
+        int componentVersion, Long connectionId, String searchText) {
     }
 
     private record OutputSchemaRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
-        long connectionId) {
+        Long connectionId) {
     }
 
     private record PropertiesRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
-        long connectionId, String propertyName) {
+        Long connectionId, String propertyName) {
     }
 
     private record SampleOutputRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
-        long connectionId) {
+        Long connectionId) {
     }
 }

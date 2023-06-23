@@ -44,12 +44,15 @@ public class ConnectionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-service/get-connection/{id}",
+        value = "/connection-service/fetch-connection/{id}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<Connection> getConnection(@PathVariable long id) {
-        return ResponseEntity.ok(connectionService.getConnection(id));
+    public ResponseEntity<Connection> fetchConnection(@PathVariable long id) {
+        return connectionService.fetchConnection(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent()
+                .build());
     }
 
     @RequestMapping(

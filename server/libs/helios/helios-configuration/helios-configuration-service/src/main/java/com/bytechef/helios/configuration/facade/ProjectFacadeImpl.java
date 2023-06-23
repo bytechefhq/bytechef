@@ -147,6 +147,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> getProjectCategories() {
         List<Project> projects = projectService.getProjects();
 
@@ -183,7 +184,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectDTO> searchProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds) {
+    public List<ProjectDTO> getProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds) {
         List<Long> projectIds = null;
 
         if (projectInstances) {

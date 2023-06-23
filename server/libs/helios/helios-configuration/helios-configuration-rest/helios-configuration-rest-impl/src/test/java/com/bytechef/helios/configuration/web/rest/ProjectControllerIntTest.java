@@ -159,7 +159,7 @@ public class ProjectControllerIntTest {
     public void testGetProjects() {
         ProjectDTO projectDTO = getProjectDTO();
 
-        when(projectFacade.searchProjects(null, false, null)).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(null, false, null)).thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -172,7 +172,7 @@ public class ProjectControllerIntTest {
             .contains(projectMapper.convert(projectDTO))
             .hasSize(1);
 
-        when(projectFacade.searchProjects(List.of(1L), false, null)).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(List.of(1L), false, null)).thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -184,7 +184,7 @@ public class ProjectControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.searchProjects(null, false, List.of(1L))).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(null, false, List.of(1L))).thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -196,7 +196,7 @@ public class ProjectControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.searchProjects(List.of(1L), false, List.of(1L))).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(List.of(1L), false, List.of(1L))).thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()

@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.TaskType;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
@@ -110,7 +110,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<TaskType> taskTypes) {
+    public List<ActionDefinitionDTO> getActionDefinitions(List<ComponentOperation> componentOperations) {
         // TODO implement this method
 
         throw new UnsupportedOperationException();

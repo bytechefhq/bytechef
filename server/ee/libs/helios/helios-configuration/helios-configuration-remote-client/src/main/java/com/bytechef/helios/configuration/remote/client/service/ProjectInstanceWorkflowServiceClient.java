@@ -45,13 +45,13 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     }
 
     @Override
-    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName) {
+    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String operationName) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public long getProjectInstanceWorkflowConnectionId(String key, String taskName) {
+    public long getProjectInstanceWorkflowConnectionId(String key, String operationName) {
         return loadBalancedWebClientBuilder
             .build()
             .get()
@@ -60,7 +60,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
                 .path(
                     "/api/internal/project-instance-workflow-service/get-project-instance-workflow-connection-id" +
                         "/{key}/{taskName}")
-                .build(key, taskName))
+                .build(key, operationName))
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -82,16 +82,6 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     }
 
     @Override
-    public void linkJob(long projectInstanceWorkflowId, long jobId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void linkTriggerExecution(long projectInstanceWorkflowId, long triggerExecutionId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
         throw new UnsupportedOperationException();
     }
@@ -104,7 +94,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
             .uri(uriBuilder -> uriBuilder
                 .host("platform-service-app")
                 .path(
-                    "/api/internal/project-instance-workflow-service/update-enabled/{id}/{enable}")
+                    "/api/internal/project-instance-workflow-service/update-enabled/{id}/{enabled}")
                 .build(id, enabled))
             .retrieve()
             .toBodilessEntity()

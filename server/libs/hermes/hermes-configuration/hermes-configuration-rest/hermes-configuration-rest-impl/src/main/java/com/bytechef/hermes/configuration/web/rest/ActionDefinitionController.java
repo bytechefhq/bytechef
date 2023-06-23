@@ -19,7 +19,7 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.GetActionDefinitionsTaskTypesParameterInnerModel;
-import com.bytechef.hermes.definition.registry.dto.TaskType;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -70,7 +70,7 @@ public class ActionDefinitionController implements ActionDefinitionsApi {
         return ResponseEntity.ok(
             actionDefinitionService.getActionDefinitions(
                 taskTypesParameterInnerModels.stream()
-                    .map(taskTypesParameterInnerModel -> new TaskType(
+                    .map(taskTypesParameterInnerModel -> new ComponentOperation(
                         taskTypesParameterInnerModel.getComponentName(),
                         taskTypesParameterInnerModel.getComponentVersion(),
                         taskTypesParameterInnerModel.getActionName()))

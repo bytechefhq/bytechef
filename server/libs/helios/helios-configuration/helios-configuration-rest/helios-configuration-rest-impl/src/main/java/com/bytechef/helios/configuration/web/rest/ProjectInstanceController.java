@@ -19,6 +19,7 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
+import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
@@ -61,6 +62,16 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     }
 
     @Override
+    public ResponseEntity<CreateProjectInstanceWorkflowJob200ResponseModel> createProjectInstanceWorkflowJob(
+        Long id, String workflowId) {
+
+        projectInstanceFacade.createProjectInstanceWorkflowJob(id, workflowId);
+
+        return ResponseEntity.ok()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> deleteProjectInstance(Long id) {
         projectInstanceFacade.deleteProjectInstance(id);
 
@@ -71,6 +82,14 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     @Override
     public ResponseEntity<Void> enableProjectInstance(Long id, Boolean enable) {
         projectInstanceFacade.enableProjectInstance(id, enable);
+
+        return ResponseEntity.ok()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> enableProjectInstanceWorkflow(Long id, String workflowId, Boolean enable) {
+        projectInstanceFacade.enableProjectInstanceWorkflow(id, workflowId, enable);
 
         return ResponseEntity.ok()
             .build();
@@ -88,7 +107,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         List<Long> projectIds, List<Long> tagIds) {
 
         return ResponseEntity.ok(
-            projectInstanceFacade.searchProjectInstances(projectIds, tagIds)
+            projectInstanceFacade.getProjectInstances(projectIds, tagIds)
                 .stream()
                 .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
                 .toList());
@@ -101,8 +120,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
 
         return ResponseEntity.ok(conversionService.convert(
             projectInstanceFacade.updateProjectInstance(
-                conversionService.convert(
-                    projectInstanceModel.id(id), ProjectInstanceDTO.class)),
+                conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
             ProjectInstanceModel.class));
     }
 

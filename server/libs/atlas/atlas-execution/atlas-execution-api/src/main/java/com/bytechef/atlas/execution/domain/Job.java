@@ -290,7 +290,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      * @return {@link List}
      */
     public List<Webhook> getWebhooks() {
-        return webhooks == null ? null : webhooks.list;
+        return webhooks == null ? List.of() : webhooks.list;
     }
 
     /**

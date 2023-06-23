@@ -22,8 +22,8 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.definition.registry.dto.TaskType;
-import com.bytechef.hermes.definition.registry.util.WorkflowTaskUtils;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
+import com.bytechef.hermes.definition.registry.util.WorkflowUtils;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -73,9 +73,9 @@ public class WorkflowTestExecutorImpl implements WorkflowTestExecutor {
     }
 
     private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
-        TaskType taskType = WorkflowTaskUtils.getTaskType(taskExecution.getType());
+        ComponentOperation componentOperation = WorkflowUtils.getComponentOperation(taskExecution.getType());
 
         return componentDefinitionService.getComponentDefinition(
-            taskType.componentName(), taskType.componentVersion());
+            componentOperation.componentName(), componentOperation.componentVersion());
     }
 }

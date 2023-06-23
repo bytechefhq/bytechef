@@ -31,13 +31,13 @@ import java.util.Map;
 public interface TriggerDefinitionService {
 
     void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId,
         DynamicWebhookEnableOutput output);
 
     DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String webhookUrl,
         String workflowExecutionId);
 
     DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
@@ -45,32 +45,32 @@ public interface TriggerDefinitionService {
 
     String executeEditorDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters);
+        Map<String, ?> connectionParameters, String authorizationName);
 
     void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId);
 
     void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId);
 
     List<OptionDTO> executeOptions(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Map<String, ?> connectionParameters, String authorizationName,
         String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters);
+        Map<String, ?> connectionParameters, String authorizationName);
 
     List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Map<String, ?> connectionParameters, String authorizationName);
 
     Object executeSampleOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters);
+        Map<String, ?> connectionParameters, String authorizationName);
 
     TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName);
 
