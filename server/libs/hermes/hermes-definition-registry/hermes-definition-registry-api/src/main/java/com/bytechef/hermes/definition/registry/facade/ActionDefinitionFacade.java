@@ -27,21 +27,21 @@ public interface ActionDefinitionFacade {
 
     String executeEditorDescription(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        long connectionId);
+        Long connectionId);
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId, String searchText);
+        Map<String, Object> actionParameters, Long connectionId, String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        long connectionId);
+        Long connectionId);
 
     Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        long connectionId);
+        Long connectionId);
 
     List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId);
+        Map<String, Object> actionParameters, Long connectionId);
 }

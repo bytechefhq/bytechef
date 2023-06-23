@@ -20,8 +20,8 @@ package com.bytechef.hermes.configuration.trigger;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.definition.registry.dto.TaskType;
-import com.bytechef.hermes.definition.registry.util.WorkflowTaskUtils;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
+import com.bytechef.hermes.definition.registry.util.WorkflowUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
@@ -41,14 +41,13 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     private String componentName;
     private int componentVersion;
-
+    private String componentTriggerName;
     private final Map<String, Object> extensions = new HashMap<>();
     private String name;
     private String label;
     private Map<String, ?> parameters;
     private String timeout;
     private String type;
-    private String triggerName;
 
     private WorkflowTrigger() {
     }
@@ -66,11 +65,11 @@ public class WorkflowTrigger implements Serializable, Trigger {
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
                 this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
 
-                TaskType taskType = WorkflowTaskUtils.getTaskType(type);
+                ComponentOperation componentOperation = WorkflowUtils.getComponentOperation(type);
 
-                this.componentName = taskType.componentName();
-                this.componentVersion = taskType.componentVersion();
-                this.triggerName = taskType.operationName();
+                this.componentName = componentOperation.componentName();
+                this.componentVersion = componentOperation.componentVersion();
+                this.componentTriggerName = componentOperation.componentOperationName();
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
             }
@@ -148,8 +147,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return timeout;
     }
 
-    public String getTriggerName() {
-        return triggerName;
+    public String getComponentTriggerName() {
+        return componentTriggerName;
     }
 
     public String getType() {

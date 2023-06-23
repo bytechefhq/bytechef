@@ -82,12 +82,12 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances() {
-        return searchProjectInstances(List.of(), List.of());
+        return getProjectInstances(List.of(), List.of());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectInstance> searchProjectInstances(List<Long> projectIds, List<Long> tagIds) {
+    public List<ProjectInstance> getProjectInstances(List<Long> projectIds, List<Long> tagIds) {
         Iterable<ProjectInstance> projectInstanceIterable;
 
         if (CollectionUtils.isEmpty(projectIds) && CollectionUtils.isEmpty(tagIds)) {

@@ -44,8 +44,12 @@ public class StringToDataStorageValueConverter implements Converter<String, Data
 
     private DataStorageValue read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.readValue(json, DataStorageValue.class);
-        } catch (JsonProcessingException e) {
+            DataStorageValue dataStorageValue = objectMapper.readValue(json, DataStorageValue.class);
+
+            return new DataStorageValue(
+                objectMapper.convertValue(dataStorageValue.value(), Class.forName(dataStorageValue.classname())),
+                dataStorageValue.classname());
+        } catch (JsonProcessingException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

@@ -18,7 +18,6 @@
 package com.bytechef.hermes.execution.facade;
 
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 
 /**
@@ -27,8 +26,8 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 public interface TriggerLifecycleFacade {
 
     void executeTriggerDisable(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection);
+        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, long connectionId);
 
     void executeTriggerEnable(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection);
+        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, long connectionId);
 }

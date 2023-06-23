@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.client.facade;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -39,13 +40,13 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
-        long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName,
-                "/trigger-definition-service/execute-editor-description"))
+                "/trigger-definition-facade/execute-editor-description"))
             .bodyValue(
                 new EditorDescriptionRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
@@ -55,13 +56,45 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     }
 
     @Override
+    public void executeListenerDisable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId) {
+
+        WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-disable"))
+            .bodyValue(
+                new ListenerDisableRequest(
+                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
+
+    @Override
+    public void executeListenerEnable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId) {
+
+        WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-enable"))
+            .bodyValue(
+                new ListenerEnableRequest(
+                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
+
+    @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId, String searchText) {
+        Map<String, ?> triggerParameters, Long connectionId, String searchText) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-options"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-options"))
             .bodyValue(
                 new OptionsRequest(
                     triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
@@ -73,12 +106,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
-        long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-output-schema"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-output-schema"))
             .bodyValue(
                 new OutputSchemaRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
@@ -90,11 +123,11 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId) {
+        Map<String, Object> triggerParameters, Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-properties"))
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-properties"))
             .bodyValue(
                 new PropertiesRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
@@ -104,13 +137,48 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     }
 
     @Override
-    public Object executeSampleOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
-        long connectionId) {
+    public void executeDynamicWebhookDisable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, DynamicWebhookEnableOutput output, Long connectionId) {
+
+        WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-disable"))
+            .bodyValue(
+                new DynamicWebhookDisableRequest(
+                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, output,
+                    connectionId))
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    }
+
+    @Override
+    public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId) {
 
         return WORKER_WEB_CLIENT
             .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-sample-output"))
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-enable"))
+            .bodyValue(
+                new DynamicWebhookEnableRequest(
+                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId))
+            .retrieve()
+            .bodyToMono(DynamicWebhookEnableOutput.class)
+            .block();
+    }
+
+    @Override
+    public Object executeSampleOutput(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId) {
+
+        return WORKER_WEB_CLIENT
+            .post()
+            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-sample-output"))
             .bodyValue(
                 new SampleOutputRequest(
                     triggerName, triggerParameters, componentName, componentVersion, connectionId))
@@ -120,28 +188,47 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     }
 
     private record EditorDescriptionRequest(
-        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
-        long connectionId) {
+        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        Long connectionId) {
     }
 
     private record OptionsRequest(
-        String triggerName, String propertyName, Map<String, Object> triggerParameters,
-        String componentName, int componentVersion, long connectionId, String searchText) {
+        String triggerName, String propertyName, Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, Long connectionId, String searchText) {
     }
 
     private record OutputSchemaRequest(
-        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
-        long connectionId) {
-
+        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        Long connectionId) {
     }
 
     private record PropertiesRequest(
-        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
-        long connectionId, String propertyName) {
+        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        Long connectionId, String propertyName) {
     }
 
     private record SampleOutputRequest(
-        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
-        long connectionId) {
+        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        Long connectionId) {
+    }
+
+    private record DynamicWebhookDisableRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, DynamicWebhookEnableOutput output, Long connectionIdd) {
+    }
+
+    private record DynamicWebhookEnableRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId) {
+    }
+
+    private record ListenerDisableRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId) {
+    }
+
+    private record ListenerEnableRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionI) {
     }
 }

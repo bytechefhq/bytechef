@@ -56,10 +56,9 @@ public interface ProjectInstanceRepository
     List<ProjectInstance> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
 
     @Query("""
-            SELECT project_instance.* FROM project_instance
+            SELECT DISTINCT project_instance.* FROM project_instance
             JOIN project_instance_workflow ON project_instance.id = project_instance_workflow.project_instance_id
-            JOIN project_instance_workflow_job ON project_instance_workflow.id = project_instance_workflow_job.project_instance_workflow_id
-            WHERE project_instance_workflow_job.job_id = :jobId
+            WHERE project_instance_workflow.workflow_id = (select workflow_id from job where job.id = :jobId)
         """)
     Optional<ProjectInstance> findByJobId(@Param("jobId") long jobId);
 }

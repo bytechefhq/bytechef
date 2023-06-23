@@ -18,7 +18,6 @@
 package com.bytechef.hermes.worker.config;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
@@ -48,11 +47,11 @@ public class TriggerWorkerConfiguration {
 
     @Bean
     TriggerWorker triggerWorker(
-        EventPublisher eventPublisher, MessageBroker messageBroker, TriggerDefinitionService triggerDefinitionService,
+        EventPublisher eventPublisher, MessageBroker messageBroker,
         TriggerHandlerResolver triggerHandlerResolver) {
 
         return new TriggerWorker(
-            eventPublisher, Executors.newCachedThreadPool(), messageBroker, triggerDefinitionService,
+            eventPublisher, Executors.newCachedThreadPool(), messageBroker,
             triggerHandlerResolver);
     }
 }

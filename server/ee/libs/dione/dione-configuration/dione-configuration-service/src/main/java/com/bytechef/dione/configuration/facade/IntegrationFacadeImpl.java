@@ -130,7 +130,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Category> getIntegrationCategories() {
-        List<Integration> integrations = integrationService.searchIntegrations(null, null);
+        List<Integration> integrations = integrationService.getIntegrations(null, null);
 
         List<Long> categoryIds = integrations.stream()
             .map(Integration::getCategoryId)
@@ -142,8 +142,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<IntegrationDTO> searchIntegrations(List<Long> categoryIds, List<Long> tagIds) {
-        List<Integration> integrations = integrationService.searchIntegrations(categoryIds, tagIds);
+    public List<IntegrationDTO> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
+        List<Integration> integrations = integrationService.getIntegrations(categoryIds, tagIds);
 
         return com.bytechef.commons.util.CollectionUtils.map(
             integrations,
@@ -170,7 +170,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getIntegrationTags() {
-        List<Integration> integrations = integrationService.searchIntegrations(null, null);
+        List<Integration> integrations = integrationService.getIntegrations(null, null);
 
         List<Long> tagIds = integrations.stream()
             .map(Integration::getTagIds)

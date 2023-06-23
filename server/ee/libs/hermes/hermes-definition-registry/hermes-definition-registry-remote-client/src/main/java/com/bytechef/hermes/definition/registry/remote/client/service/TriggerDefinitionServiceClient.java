@@ -43,40 +43,19 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
-        WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(
-                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-disable"))
-            .bodyValue(
-                new DynamicWebhookDisableRequest(
-                    authorizationName, componentName, componentVersion, connectionParameters, output, triggerName,
-                    triggerParameters, workflowExecutionId))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
-        String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String webhookUrl, String workflowExecutionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(
-                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-enable"))
-            .bodyValue(
-                new DynamicWebhookEnableRequest(
-                    authorizationName, componentName, componentVersion, connectionParameters, triggerName,
-                    triggerParameters, webhookUrl, workflowExecutionId))
-            .retrieve()
-            .bodyToMono(DynamicWebhookEnableOutput.class)
-            .block();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -87,7 +66,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .post()
             .uri(uriBuilder -> toUri(
                 uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-refresh"))
-            .bodyValue(new DynamicWebhookRefresh(componentName, componentVersion, output, triggerName))
+            .bodyValue(new DynamicWebhookRefresh(componentName, componentVersion, triggerName, output))
             .retrieve()
             .bodyToMono(DynamicWebhookEnableOutput.class)
             .block();
@@ -96,51 +75,31 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
 
-        WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-listener-disable"))
-            .bodyValue(
-                new ListenerDisableRequest(
-                    authorizationName, componentName, componentVersion, connectionParameters, triggerName,
-                    triggerParameters, workflowExecutionId))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters,
-        String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
 
-        WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-listener-enable"))
-            .bodyValue(
-                new ListenerEnableRequest(
-                    authorizationName, componentName, componentVersion, connectionParameters, triggerName,
-                    triggerParameters, workflowExecutionId))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<OptionDTO> executeOptions(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters,
-        String searchText) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Map<String, ?> connectionParameters, String authorizationName, String searchText) {
 
         throw new UnsupportedOperationException();
     }
@@ -148,15 +107,15 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -164,7 +123,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public Object executeSampleOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -195,28 +154,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
             .block();
     }
 
-    private record DynamicWebhookDisableRequest(
-        String authorizationName, String componentName, int componentVersion,
-        Map<String, ?> connectionParameters, DynamicWebhookEnableOutput output, String triggerName,
-        Map<String, ?> triggerParameters, String workflowExecutionId) {
-    }
-
-    private record DynamicWebhookEnableRequest(
-        String authorizationName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
-        String triggerName, Map<String, ?> triggerParameters, String webhookUrl, String workflowExecutionId) {
-    }
-
     private record DynamicWebhookRefresh(
-        String componentName, int componentVersion, DynamicWebhookEnableOutput output, String triggerName) {
-    }
-
-    private record ListenerDisableRequest(
-        String authorizationName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
-        String triggerName, Map<String, ?> triggerParameters, String workflowExecutionId) {
-    }
-
-    private record ListenerEnableRequest(
-        String authorizationName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
-        String triggerName, Map<String, ?> triggerParameters, String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
     }
 }

@@ -68,7 +68,7 @@ public class IntegrationController implements IntegrationsApi {
     public ResponseEntity<List<IntegrationModel>> getIntegrations(
         List<Long> categoryIds, List<Long> tagIds) {
         return ResponseEntity.ok(
-            integrationFacade.searchIntegrations(categoryIds, tagIds)
+            integrationFacade.getIntegrations(categoryIds, tagIds)
                 .stream()
                 .map(integration -> conversionService.convert(integration, IntegrationModel.class))
                 .toList());

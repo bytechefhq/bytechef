@@ -94,6 +94,12 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Id
     private Long id;
 
+    @Column("instance_id")
+    private long instanceId;
+
+    @Column("instance_type")
+    private String instanceType;
+
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -122,6 +128,9 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     @Column
     private WorkflowExecutionId workflowExecutionId;
+
+    @Column("workflow_id")
+    private String workflowId;
 
     @Column("workflow_trigger")
     private WorkflowTrigger workflowTrigger;
@@ -221,6 +230,14 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return this.id;
     }
 
+    public long getInstanceId() {
+        return instanceId;
+    }
+
+    public String getInstanceType() {
+        return instanceType;
+    }
+
     public Map<String, Object> getMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
@@ -297,6 +314,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return workflowExecutionId;
     }
 
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
     public WorkflowTrigger getWorkflowTrigger() {
         return workflowTrigger;
     }
@@ -364,6 +385,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     public void setWorkflowExecutionId(WorkflowExecutionId workflowExecutionId) {
         this.workflowExecutionId = workflowExecutionId;
+
+        this.instanceId = workflowExecutionId.getInstanceId();
+        this.instanceType = workflowExecutionId.getInstanceType();
+        this.workflowId = workflowExecutionId.getWorkflowId();
     }
 
     public void setWorkflowTrigger(WorkflowTrigger workflowTrigger) {

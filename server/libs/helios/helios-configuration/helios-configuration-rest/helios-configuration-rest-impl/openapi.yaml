@@ -447,6 +447,69 @@ paths:
             application/json:
               schema:
                 $ref: "../../../../../libs/hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+  /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
+    post:
+      description: "Enable/disable a workflow of a project instance."
+      summary: "Enable/disable a workflow of a project instance"
+      tags:
+      - "project-instance-requesters"
+      operationId: "enableProjectInstanceWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of a project workflow."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      - name: "enable"
+        description: "Enable/disable the workflow of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
+  /project-instances/{id}/workflows/{workflowId}/jobs:
+    post:
+      description: "Create a request for running a new job."
+      summary: "Create a request for running a new job"
+      tags:
+      - "project-instance-requesters"
+      operationId: "createProjectInstanceWorkflowJob"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of the workflow to execute."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "The id of a created job."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  jobId:
+                    description: "The id of an executed job."
+                    type: "integer"
+                    format: "int64"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."

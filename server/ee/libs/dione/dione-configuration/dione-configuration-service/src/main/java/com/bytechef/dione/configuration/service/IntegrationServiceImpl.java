@@ -80,7 +80,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds) {
+    public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
         Iterable<Integration> integrationIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {

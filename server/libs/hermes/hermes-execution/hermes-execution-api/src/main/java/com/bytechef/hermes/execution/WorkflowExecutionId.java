@@ -30,21 +30,21 @@ public class WorkflowExecutionId implements Serializable {
 
     private final String componentName;
     private final int componentVersion;
+    private final String componentTriggerName;
     private final long instanceId;
     private final String instanceType;
-    private final String triggerName;
     private final String workflowId;
     private final String workflowTriggerName;
 
     private WorkflowExecutionId(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String triggerName,
-        String componentName, int componentVersion) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName,
+        String componentTriggerName, String componentName, int componentVersion) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.instanceId = instanceId;
         this.instanceType = instanceType;
-        this.triggerName = triggerName;
+        this.componentTriggerName = componentTriggerName;
         this.workflowId = workflowId;
         this.workflowTriggerName = workflowTriggerName;
     }
@@ -53,22 +53,23 @@ public class WorkflowExecutionId implements Serializable {
         String workflowId, long instanceId, String instanceType, WorkflowTrigger workflowTrigger) {
 
         return of(
-            workflowId, instanceId, instanceType, workflowTrigger.getName(), workflowTrigger.getTriggerName(),
+            workflowId, instanceId, instanceType, workflowTrigger.getName(), workflowTrigger.getComponentTriggerName(),
             workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion());
     }
 
     public static WorkflowExecutionId of(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String triggerName,
-        String componentName, int componentVersion) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName,
+        String componentTriggerName, String componentName, int componentVersion) {
 
         Assert.hasText(workflowId, "'workflowId' must not be null");
         Assert.notNull(instanceType, "'instanceType' must not be null");
         Assert.hasText(workflowTriggerName, "'workflowTriggerName' must not be null");
-        Assert.hasText(triggerName, "'triggerName' must not be null");
+        Assert.hasText(componentTriggerName, "'componentTriggerName' must not be null");
         Assert.hasText(componentName, "'componentName' must not be null");
 
         return new WorkflowExecutionId(
-            workflowId, instanceId, instanceType, workflowTriggerName, triggerName, componentName, componentVersion);
+            workflowId, instanceId, instanceType, workflowTriggerName, componentTriggerName, componentName,
+            componentVersion);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -96,8 +97,8 @@ public class WorkflowExecutionId implements Serializable {
         return instanceType;
     }
 
-    public String getTriggerName() {
-        return triggerName;
+    public String getComponentTriggerName() {
+        return componentTriggerName;
     }
 
     public String getWorkflowId() {
@@ -118,7 +119,7 @@ public class WorkflowExecutionId implements Serializable {
             ':' +
             workflowTriggerName +
             ':' +
-            triggerName +
+            componentTriggerName +
             ':' +
             componentName +
             ':' +

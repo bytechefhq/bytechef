@@ -62,13 +62,12 @@ public class JobStatusWebhookEventListener implements EventListener {
     }
 
     private void handleEvent(JobStatusWorkflowEvent workflowEvent) {
-        Long jobId = workflowEvent.getJobId();
+        long jobId = workflowEvent.getJobId();
 
         Job job = jobService.getJob(jobId);
 
         for (Job.Webhook webhook : job.getWebhooks()) {
             if (JobStatusWorkflowEvent.JOB_STATUS.equals(webhook.type())) {
-
                 Map<String, Object> webhookEvent = webhook.toMap();
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);

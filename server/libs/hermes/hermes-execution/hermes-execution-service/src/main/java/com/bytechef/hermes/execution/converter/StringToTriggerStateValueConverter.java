@@ -44,8 +44,12 @@ public class StringToTriggerStateValueConverter implements Converter<String, Tri
 
     private TriggerStateValue read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.readValue(json, TriggerStateValue.class);
-        } catch (JsonProcessingException e) {
+            TriggerStateValue triggerStateValue = objectMapper.readValue(json, TriggerStateValue.class);
+
+            return new TriggerStateValue(
+                objectMapper.convertValue(triggerStateValue.value(), Class.forName(triggerStateValue.classname())),
+                triggerStateValue.classname());
+        } catch (JsonProcessingException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

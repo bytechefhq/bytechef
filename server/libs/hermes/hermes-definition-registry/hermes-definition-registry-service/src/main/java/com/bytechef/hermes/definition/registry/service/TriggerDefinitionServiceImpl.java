@@ -30,6 +30,8 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSch
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
@@ -70,8 +72,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -90,9 +92,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
-        String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String webhookUrl, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -100,7 +101,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         DynamicWebhookEnableFunction dynamicWebhookEnableFunction = OptionalUtils.get(
             triggerDefinition.getDynamicWebhookEnable());
 
-        TriggerDefinition.DynamicWebhookEnableContext context = new TriggerDefinition.DynamicWebhookEnableContext(
+        DynamicWebhookEnableContext context = new DynamicWebhookEnableContext(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
             triggerParameters, webhookUrl, workflowExecutionId);
@@ -115,7 +116,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
 
-        TriggerDefinition.DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = OptionalUtils.get(
+        DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = OptionalUtils.get(
             triggerDefinition.getDynamicWebhookRefresh());
 
         return dynamicWebhookRefreshFunction.apply(output);
@@ -123,8 +124,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Map<String, ?> connectionParameters, String authorizationName) {
 
         DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
             propertyName, triggerName, componentName, componentVersion);
@@ -147,7 +148,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> connectionParameters, String authorizationName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -169,8 +170,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters,
+        String authorizationName, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -185,8 +187,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> connectionParameters,
-        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -201,9 +203,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<OptionDTO> executeOptions(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters,
-        String searchText) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Map<String, ?> connectionParameters, String authorizationName, String searchText) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getTriggerProperty(propertyName, triggerName, componentName, componentVersion);
@@ -225,7 +226,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> connectionParameters, String authorizationName) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -245,7 +246,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public Object executeSampleOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> connectionParameters, String authorizationName) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);

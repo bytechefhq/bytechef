@@ -215,7 +215,7 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        List<ProjectDTO> projectsDTOs = projectFacade.searchProjects(null, false, null);
+        List<ProjectDTO> projectsDTOs = projectFacade.getProjects(null, false, null);
 
         assertThat(CollectionUtils.map(projectsDTOs, ProjectDTO::toProject)).isEqualTo(List.of(project));
 

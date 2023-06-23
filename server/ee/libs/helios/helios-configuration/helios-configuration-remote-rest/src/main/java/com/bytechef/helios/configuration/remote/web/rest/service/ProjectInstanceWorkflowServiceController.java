@@ -41,14 +41,15 @@ public class ProjectInstanceWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-instance-workflow-service/get-project-instance-workflow-connection-id/{key}/{taskName}",
+        value = "/project-instance-workflow-service/get-project-instance-workflow-connection-id/{key}/{operationName}",
         produces = {
             "application/json"
         })
     public ResponseEntity<Long> getProjectInstanceWorkflowConnectionId(
-        @PathVariable String key, @PathVariable String taskName) {
+        @PathVariable String key, @PathVariable String operationName) {
 
-        return ResponseEntity.ok(projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(key, taskName));
+        return ResponseEntity.ok(projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
+            key, operationName));
     }
 
     @RequestMapping(

@@ -17,17 +17,17 @@
 
 package com.bytechef.hermes.definition.registry.util;
 
-import com.bytechef.hermes.definition.registry.dto.TaskType;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowTaskUtils {
+public class WorkflowUtils {
 
-    public static TaskType getTaskType(String type) {
+    public static ComponentOperation getComponentOperation(String type) {
         String[] typeItems = type.split("/");
 
-        return new TaskType(typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems[2]);
+        return new ComponentOperation(typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems[2]);
     }
 
 }

@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.facade;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -48,7 +49,44 @@ public class TriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definition-service/execute-editor-description",
+        value = "/trigger-definition-facade/execute-dynamic-webhook-disable",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Void> executeDynamicWebhookDisable(
+        @Valid @RequestBody DynamicWebhookDisableRequest dynamicWebhookDisableRequest) {
+
+        triggerDefinitionFacade.executeDynamicWebhookDisable(
+            dynamicWebhookDisableRequest.componentName, dynamicWebhookDisableRequest.componentVersion,
+            dynamicWebhookDisableRequest.triggerName, dynamicWebhookDisableRequest.triggerParameters,
+            dynamicWebhookDisableRequest.workflowExecutionId, dynamicWebhookDisableRequest.output,
+            dynamicWebhookDisableRequest.connectionId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/trigger-definition-facade/execute-dynamic-webhook-enable",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<DynamicWebhookEnableOutput> executeDynamicWebhookEnable(
+        @Valid @RequestBody DynamicWebhookEnableRequest dynamicWebhookEnableRequest) {
+
+        return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookEnable(
+            dynamicWebhookEnableRequest.componentName, dynamicWebhookEnableRequest.componentVersion,
+            dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.triggerParameters,
+            dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/trigger-definition-facade/execute-editor-description",
         consumes = {
             "application/json"
         })
@@ -64,7 +102,41 @@ public class TriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definition-service/execute-options",
+        value = "/trigger-definition-facade/execute-listener-disable",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Void>
+        executeListenerDisable(@Valid @RequestBody ListenerDisableRequest listenerDisableRequest) {
+
+        triggerDefinitionFacade.executeListenerDisable(
+            listenerDisableRequest.componentName, listenerDisableRequest.componentVersion,
+            listenerDisableRequest.triggerName, listenerDisableRequest.triggerParameters,
+            listenerDisableRequest.workflowExecutionId, listenerDisableRequest.connectionId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/trigger-definition-facade/execute-listener-enable",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Void> executeListenerEnable(@Valid @RequestBody ListenerEnableRequest listenerEnableRequest) {
+        triggerDefinitionFacade.executeListenerEnable(
+            listenerEnableRequest.componentName, listenerEnableRequest.componentVersion,
+            listenerEnableRequest.triggerName, listenerEnableRequest.triggerParameters,
+            listenerEnableRequest.workflowExecutionId, listenerEnableRequest.connectionId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/trigger-definition-facade/execute-options",
         consumes = {
             "application/json"
         },
@@ -80,7 +152,7 @@ public class TriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definition-service/execute-properties",
+        value = "/trigger-definition-facade/execute-properties",
         consumes = {
             "application/json"
         },
@@ -96,7 +168,7 @@ public class TriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definition-service/execute-output-schema",
+        value = "/trigger-definition-facade/execute-output-schema",
         consumes = {
             "application/json"
         },
@@ -113,7 +185,7 @@ public class TriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definition-service/execute-sample-output",
+        value = "/trigger-definition-facade/execute-sample-output",
         consumes = {
             "application/json"
         },
@@ -126,28 +198,49 @@ public class TriggerDefinitionFacadeController {
             sampleOutputRequest.triggerParameters, sampleOutputRequest.connectionId);
     }
 
+    private record DynamicWebhookDisableRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, DynamicWebhookEnableOutput output, @NotNull String workflowExecutionId,
+        Long connectionId) {
+    }
+
+    private record DynamicWebhookEnableRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+    }
+
     private record EditorDescriptionRequest(
-        @NotNull String componentName, String triggerName, int componentVersion, Map<String, Object> triggerParameters,
+        @NotNull String componentName, String triggerName, int componentVersion, Map<String, ?> triggerParameters,
         long connectionId) {
+    }
+
+    private record ListenerDisableRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+    }
+
+    private record ListenerEnableRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     private record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        Map<String, Object> triggerParameters, long connectionId, String searchText) {
+        Map<String, ?> triggerParameters, Long connectionId, String searchText) {
     }
 
     private record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, Object> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, Long connectionId) {
     }
 
     private record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        Map<String, Object> triggerParameters, long connectionId) {
+        Map<String, Object> triggerParameters, Long connectionId) {
     }
 
     private record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, Object> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, Long connectionId) {
     }
 }

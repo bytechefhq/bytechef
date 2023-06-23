@@ -19,7 +19,6 @@
     <!-- execution -->
     <includeAll path="classpath:config/liquibase/changelog/atlas/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or platform" />
     <includeAll path="classpath:config/liquibase/changelog/hermes/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or platform" />
-    <includeAll path="classpath:config/liquibase/changelog/helios/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or platform" />
 
     <!-- scheduler -->
     <includeAll path="classpath:config/liquibase/changelog/scheduler/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />

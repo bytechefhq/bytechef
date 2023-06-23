@@ -41,7 +41,7 @@ import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.TaskType;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -213,10 +213,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<TaskType> taskTypes) {
-        return taskTypes.stream()
+    public List<ActionDefinitionDTO> getActionDefinitions(List<ComponentOperation> componentOperations) {
+        return componentOperations.stream()
             .map(taskTypeDTO -> getActionDefinition(
-                taskTypeDTO.componentName(), taskTypeDTO.componentVersion(), taskTypeDTO.operationName()))
+                taskTypeDTO.componentName(), taskTypeDTO.componentVersion(), taskTypeDTO.componentOperationName()))
             .toList();
     }
 
