@@ -1,4 +1,5 @@
 import Input from 'components/Input/Input';
+import {useDataPillPanelStore} from 'pages/automation/project/stores/useDataPillPanelStore';
 import {ReactNode} from 'react';
 
 interface InputPropertyProps {
@@ -27,6 +28,8 @@ const InputProperty = ({
     required,
     title,
 }: InputPropertyProps) => {
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
+
     const getInputType = () => {
         switch (controlType) {
             case 'DATE':
@@ -63,6 +66,7 @@ const InputProperty = ({
             required={required}
             title={title}
             type={hidden ? 'hidden' : getInputType()}
+            onFocus={() => setDataPillPanelOpen(true)}
         />
     );
 };
