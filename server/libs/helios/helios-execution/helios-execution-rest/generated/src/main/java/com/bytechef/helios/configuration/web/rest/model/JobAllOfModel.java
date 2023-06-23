@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Job_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T13:01:38.823093+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-22T07:40:18.848827+02:00[Europe/Zagreb]")
 public class JobAllOfModel {
 
   @Valid
