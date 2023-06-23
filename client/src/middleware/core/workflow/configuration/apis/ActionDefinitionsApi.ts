@@ -18,7 +18,6 @@ import type {
   ActionDefinitionBasicModel,
   ActionDefinitionModel,
   ComponentOperationRequestModel,
-  GetActionDefinitionsTaskTypesParameterInnerModel,
   OptionModel,
   PropertyModel,
 } from '../models';
@@ -29,8 +28,6 @@ import {
     ActionDefinitionModelToJSON,
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
-    GetActionDefinitionsTaskTypesParameterInnerModelFromJSON,
-    GetActionDefinitionsTaskTypesParameterInnerModelToJSON,
     OptionModelFromJSON,
     OptionModelToJSON,
     PropertyModelFromJSON,
@@ -38,7 +35,7 @@ import {
 } from '../models';
 
 export interface GetActionDefinitionsRequest {
-    taskTypes: Array<GetActionDefinitionsTaskTypesParameterInnerModel>;
+    taskTypes: Array<string>;
 }
 
 export interface GetComponentActionDefinitionRequest {
