@@ -39,7 +39,7 @@ export interface ProjectInstanceWorkflowModel {
      */
     connections?: Array<ProjectInstanceWorkflowConnectionModel>;
     /**
-     * If a workflow is enabled or not in the project instance.
+     * If a workflow is enabled or not in the project instance workflow.
      * @type {boolean}
      * @memberof ProjectInstanceWorkflowModel
      */
