@@ -1,10 +1,9 @@
-apis/ProjectInstanceRequestersApi.ts
+.openapi-generator-ignore
 apis/ProjectWorkflowExecutionsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/ComponentDefinitionModel.ts
-models/CreateProjectInstanceWorkflowJob200ResponseModel.ts
 models/ExecutionErrorModel.ts
 models/JobAllOfModel.ts
 models/JobBasicModel.ts

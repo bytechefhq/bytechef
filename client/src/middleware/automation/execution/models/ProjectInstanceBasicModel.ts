@@ -74,23 +74,12 @@ export interface ProjectInstanceBasicModel {
      */
     projectId?: number;
     /**
-     * The status of a project instance.
-     * @type {string}
+     * If a workflow is enabled or not in the project instance.
+     * @type {boolean}
      * @memberof ProjectInstanceBasicModel
      */
-    status?: ProjectInstanceBasicModelStatusEnum;
+    enabled?: boolean;
 }
-
-
-/**
- * @export
- */
-export const ProjectInstanceBasicModelStatusEnum = {
-    Disabled: 'DISABLED',
-    Enabled: 'ENABLED'
-} as const;
-export type ProjectInstanceBasicModelStatusEnum = typeof ProjectInstanceBasicModelStatusEnum[keyof typeof ProjectInstanceBasicModelStatusEnum];
-
 
 /**
  * Check if a given object implements the ProjectInstanceBasicModel interface.
@@ -121,7 +110,7 @@ export function ProjectInstanceBasicModelFromJSONTyped(json: any, ignoreDiscrimi
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
         'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
     };
 }
 
@@ -137,7 +126,7 @@ export function ProjectInstanceBasicModelToJSON(value?: ProjectInstanceBasicMode
         'description': value.description,
         'name': value.name,
         'projectId': value.projectId,
-        'status': value.status,
+        'enabled': value.enabled,
     };
 }
 

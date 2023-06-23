@@ -1,4 +1,6 @@
+.openapi-generator-ignore
 apis/ProjectCategoriesApi.ts
+apis/ProjectInstanceRequestersApi.ts
 apis/ProjectInstanceTagsApi.ts
 apis/ProjectInstancesApi.ts
 apis/ProjectTagsApi.ts
@@ -7,6 +9,7 @@ apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/ConnectionModel.ts
+models/CreateProjectInstanceWorkflowJob200ResponseModel.ts
 models/CreateProjectWorkflowRequestModel.ts
 models/InputModel.ts
 models/OAuth2AuthorizationParametersModel.ts
