@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "target": "esnext",
+    "incremental": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
