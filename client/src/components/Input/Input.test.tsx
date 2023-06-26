@@ -22,12 +22,11 @@ describe('Input', async () => {
             })
         ).toBeInTheDocument();
     });
-    it('should change input value', () => {
+    it('should change input value', async () => {
         render(
             <Input
                 name="email"
                 type="email"
-                error={undefined}
                 placeholder="Email"
                 label="Email Address"
                 aria-label="Email Address"
@@ -39,9 +38,12 @@ describe('Input', async () => {
         const input = screen.getByRole('textbox', {
             name: /email address/i,
         });
+
         expect(input).toBeInTheDocument();
-        userEvent.type(input, '1337');
-        expect(input).toHaveValue('1337');
+
+        await userEvent.type(input, 'foo@bar.com');
+
+        expect(input).toHaveValue('foo@bar.com');
     });
     it('should render the input with error', () => {
         render(
