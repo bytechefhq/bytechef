@@ -12,27 +12,44 @@ import {useGetActionDefinitionsQuery} from 'queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import InlineSVG from 'react-inlinesvg';
 import {TYPE_ICONS} from 'shared/typeIcons';
+import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 
-const DataPill = ({property}: {property: PropertyType}) => (
-    <li
-        draggable
-        onDragStart={(event) =>
-            event.dataTransfer.setData('name', property.name!)
-        }
-        className="mr-auto flex cursor-pointer items-center rounded-xl border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
-    >
-        <span className="mr-2" title={property.type}>
-            {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
-        </span>
+const DataPill = ({property}: {property: PropertyType}) => {
+    const hasSubProperties = !!property.properties?.length;
 
-        {property.label}
-    </li>
-);
+    return (
+        <li
+            draggable
+            onDragStart={(event) =>
+                event.dataTransfer.setData('name', property.name!)
+            }
+            className={twMerge(
+                'mr-auto flex cursor-pointer items-center rounded-xl border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50',
+                hasSubProperties &&
+                    'flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
+            )}
+        >
+            {hasSubProperties ? (
+                property.properties?.map((subProperty) => (
+                    <DataPill key={subProperty.name} property={subProperty} />
+                ))
+            ) : (
+                <>
+                    <span className="mr-2" title={property.type}>
+                        {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
+                    </span>
+
+                    {property.label}
+                </>
+            )}
+        </li>
+    );
+};
 
 const DataPillPanel = () => {
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
@@ -97,8 +114,8 @@ const DataPillPanel = () => {
                             </Dialog.Description>
                         </header>
 
-                        <main className="flex h-full flex-col">
-                            <Accordion type="multiple">
+                        <main className="flex   flex-col">
+                            <Accordion className="" type="multiple">
                                 {previousComponents?.map((component, index) => {
                                     const {icon, name, title} = component;
 
@@ -109,8 +126,14 @@ const DataPillPanel = () => {
                                     const outputSchema: PropertyType =
                                         actionData[index].outputSchema!;
 
+                                    console.log('outputSchema: ', outputSchema);
+
                                     return (
-                                        <AccordionItem key={name} value={name}>
+                                        <AccordionItem
+                                            className=" "
+                                            key={name}
+                                            value={name}
+                                        >
                                             {outputSchema && (
                                                 <>
                                                     <AccordionTrigger className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 radix-state-closed:border-b">
@@ -133,7 +156,7 @@ const DataPillPanel = () => {
                                                         <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
                                                     </AccordionTrigger>
 
-                                                    <AccordionContent className="space-y-4 border-b border-gray-100 bg-gray-100 p-2">
+                                                    <AccordionContent className="space-y-4 border-b border-gray-100 bg-gray-100 p-2 group-data-[state=open]:h-full">
                                                         <ul className="flex flex-col space-y-2">
                                                             {outputSchema.properties?.map(
                                                                 (
@@ -149,6 +172,22 @@ const DataPillPanel = () => {
                                                                     />
                                                                 )
                                                             )}
+
+                                                            {!outputSchema
+                                                                ?.properties
+                                                                ?.length &&
+                                                                outputSchema.items?.map(
+                                                                    (item) => (
+                                                                        <DataPill
+                                                                            key={
+                                                                                item.name
+                                                                            }
+                                                                            property={
+                                                                                item
+                                                                            }
+                                                                        />
+                                                                    )
+                                                                )}
                                                         </ul>
                                                     </AccordionContent>
                                                 </>
