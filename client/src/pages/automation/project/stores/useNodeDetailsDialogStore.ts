@@ -13,11 +13,14 @@ interface Node {
 }
 
 interface NodeDetailsState {
-    nodeDetailsOpen: boolean;
-    setNodeDetailsOpen: (nodeDetailsOpen: boolean) => void;
+    nodeDetailsDialogOpen: boolean;
+    setNodeDetailsDialogOpen: (nodeDetailsDialogOpen: boolean) => void;
 
     currentNode: Node;
     setCurrentNode: (currentNode: Node) => void;
+
+    focusedInput: HTMLInputElement | null;
+    setFocusedInput: (focusedInput: HTMLInputElement) => void;
 }
 
 interface ConnectionNoteState {
@@ -26,12 +29,16 @@ interface ConnectionNoteState {
 }
 
 export const useNodeDetailsDialogStore = create<NodeDetailsState>()((set) => ({
-    nodeDetailsOpen: false,
-    setNodeDetailsOpen: (nodeDetailsOpen) =>
-        set((state) => ({...state, nodeDetailsOpen})),
+    nodeDetailsDialogOpen: false,
+    setNodeDetailsDialogOpen: (nodeDetailsDialogOpen) =>
+        set((state) => ({...state, nodeDetailsDialogOpen})),
 
     currentNode: {name: '', type: 'component', version: 1},
     setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
+
+    focusedInput: null,
+    setFocusedInput: (focusedInput) =>
+        set((state) => ({...state, focusedInput})),
 }));
 
 export const useConnectionNoteStore = create<ConnectionNoteState>()(

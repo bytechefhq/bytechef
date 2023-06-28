@@ -1,6 +1,7 @@
 import Input from 'components/Input/Input';
 import {useDataPillPanelStore} from 'pages/automation/project/stores/useDataPillPanelStore';
-import {ReactNode} from 'react';
+import {useNodeDetailsDialogStore} from 'pages/automation/project/stores/useNodeDetailsDialogStore';
+import {ReactNode, useRef} from 'react';
 
 interface InputPropertyProps {
     controlType?: string;
@@ -29,6 +30,7 @@ const InputProperty = ({
     title,
 }: InputPropertyProps) => {
     const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {setFocusedInput} = useNodeDetailsDialogStore();
 
     const getInputType = () => {
         switch (controlType) {
@@ -53,6 +55,8 @@ const InputProperty = ({
         }
     };
 
+    const inputRef = useRef(null);
+
     return (
         <Input
             description={description}
@@ -66,7 +70,14 @@ const InputProperty = ({
             required={required}
             title={title}
             type={hidden ? 'hidden' : getInputType()}
-            onFocus={() => setDataPillPanelOpen(true)}
+            onFocus={() => {
+                setDataPillPanelOpen(true);
+
+                if (inputRef.current) {
+                    setFocusedInput(inputRef.current);
+                }
+            }}
+            ref={inputRef}
         />
     );
 };

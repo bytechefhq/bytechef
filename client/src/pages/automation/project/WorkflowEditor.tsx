@@ -35,7 +35,7 @@ type WorkflowProps = {
 const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const {nodeDetailsOpen} = useNodeDetailsDialogStore();
+    const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
 
     const nodeTypes = useMemo(
         () => ({
@@ -106,7 +106,7 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     useEffect(() => {
         setViewportWidth(width);
 
-        const adaptedViewportWidth = nodeDetailsOpen
+        const adaptedViewportWidth = nodeDetailsDialogOpen
             ? width / 2 - window.innerWidth / 6
             : width / 2;
 
@@ -115,7 +115,7 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
             y: 50,
             zoom: 1,
         });
-    }, [nodeDetailsOpen, setViewport, width]);
+    }, [nodeDetailsDialogOpen, setViewport, width]);
 
     useLayout();
 

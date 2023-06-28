@@ -42,7 +42,7 @@ const NodeDetailsDialog = () => {
     const [activeTab, setActiveTab] = useState('description');
     const [currentActionName, setCurrentActionName] = useState('');
 
-    const {currentNode, nodeDetailsOpen, setNodeDetailsOpen} =
+    const {currentNode, nodeDetailsDialogOpen, setNodeDetailsDialogOpen} =
         useNodeDetailsDialogStore();
 
     const {componentActions, setComponentActions} =
@@ -146,8 +146,10 @@ const NodeDetailsDialog = () => {
 
     return (
         <Dialog.Root
-            open={nodeDetailsOpen}
-            onOpenChange={() => setNodeDetailsOpen(!nodeDetailsOpen)}
+            open={nodeDetailsDialogOpen}
+            onOpenChange={() =>
+                setNodeDetailsDialogOpen(!nodeDetailsDialogOpen)
+            }
             modal={false}
         >
             <Dialog.Portal>
@@ -182,7 +184,9 @@ const NodeDetailsDialog = () => {
                                             aria-hidden="true"
                                         />
                                     }
-                                    onClick={() => setNodeDetailsOpen(false)}
+                                    onClick={() =>
+                                        setNodeDetailsDialogOpen(false)
+                                    }
                                 />
                             </Dialog.Title>
 

@@ -7,7 +7,8 @@ export default function useNodeClick(
     data: NodeProps['data'],
     id: NodeProps['id']
 ) {
-    const {setCurrentNode, setNodeDetailsOpen} = useNodeDetailsDialogStore();
+    const {setCurrentNode, setNodeDetailsDialogOpen} =
+        useNodeDetailsDialogStore();
 
     const {getNode} = useReactFlow();
 
@@ -18,10 +19,10 @@ export default function useNodeClick(
             return;
         }
 
-        setNodeDetailsOpen(true);
+        setNodeDetailsDialogOpen(true);
 
         setCurrentNode(data);
-    }, [data, getNode, id, setCurrentNode, setNodeDetailsOpen]);
+    }, [data, getNode, id, setCurrentNode, setNodeDetailsDialogOpen]);
 
     return onClick;
 }

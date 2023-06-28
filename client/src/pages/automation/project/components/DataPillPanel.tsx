@@ -11,50 +11,16 @@ import Button from 'components/Button/Button';
 import {useGetActionDefinitionsQuery} from 'queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import InlineSVG from 'react-inlinesvg';
-import {TYPE_ICONS} from 'shared/typeIcons';
-import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import DataPill from './DataPill';
 
-const DataPill = ({property}: {property: PropertyType}) => {
-    const hasSubProperties = !!property.properties?.length;
-
-    return (
-        <li
-            draggable
-            onDragStart={(event) =>
-                event.dataTransfer.setData('name', property.name!)
-            }
-            className={twMerge(
-                'mr-auto flex cursor-pointer items-center rounded-xl border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50',
-                hasSubProperties &&
-                    'flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
-            )}
-        >
-            {hasSubProperties ? (
-                property.properties?.map((subProperty) => (
-                    <DataPill key={subProperty.name} property={subProperty} />
-                ))
-            ) : (
-                <>
-                    <span className="mr-2" title={property.type}>
-                        {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
-                    </span>
-
-                    {property.label}
-                </>
-            )}
-        </li>
-    );
-};
-
-const DataPillPanel = () => {
-    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
+const DataPillPanelBody = () => {
     const {componentActions, componentNames} = useWorkflowDefinitionStore();
-    const {nodeDetailsOpen} = useNodeDetailsDialogStore();
+    const {focusedInput} = useNodeDetailsDialogStore();
 
     const taskTypes = componentActions?.map(
         (componentAction) =>
@@ -78,9 +44,85 @@ const DataPillPanel = () => {
         !!componentActions?.length
     );
 
+    const handleDataPillClick = (property: PropertyType) => {
+        const dataPillData = property.label || property.name;
+
+        if (focusedInput && dataPillData) {
+            focusedInput.value = dataPillData;
+        }
+    };
+
+    return (
+        <Accordion type="multiple">
+            {previousComponents?.map((component, index) => {
+                const {icon, name, title} = component;
+
+                if (!actionData?.length) {
+                    return;
+                }
+
+                const outputSchema: PropertyType | undefined =
+                    actionData[index].outputSchema;
+
+                const properties = outputSchema?.properties?.length
+                    ? outputSchema.properties
+                    : outputSchema?.items;
+
+                const existingProperties = properties?.filter(
+                    (datum) => !!datum.name
+                );
+
+                return (
+                    <AccordionItem className="group" key={name} value={name}>
+                        {!!existingProperties?.length && (
+                            <>
+                                <AccordionTrigger className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b">
+                                    <div className="flex items-center space-x-4">
+                                        {icon && (
+                                            <div className="flex h-5 w-5 items-center">
+                                                <InlineSVG src={icon} />
+                                            </div>
+                                        )}
+
+                                        <span className="text-sm">{title}</span>
+                                    </div>
+
+                                    <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
+                                </AccordionTrigger>
+
+                                <AccordionContent className="w-full space-y-4 border-b border-gray-100 bg-gray-100 p-2 group-data-[state=open]:h-full">
+                                    <ul className="flex w-full flex-col space-y-2">
+                                        {existingProperties?.map(
+                                            (property: PropertyType) => (
+                                                <DataPill
+                                                    key={property.name}
+                                                    onClick={() =>
+                                                        handleDataPillClick(
+                                                            property
+                                                        )
+                                                    }
+                                                    property={property}
+                                                />
+                                            )
+                                        )}
+                                    </ul>
+                                </AccordionContent>
+                            </>
+                        )}
+                    </AccordionItem>
+                );
+            })}
+        </Accordion>
+    );
+};
+
+const DataPillPanel = () => {
+    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
+    const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
+
     return (
         <Dialog.Root
-            open={dataPillPanelOpen && nodeDetailsOpen}
+            open={dataPillPanelOpen && nodeDetailsDialogOpen}
             onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
             modal={false}
         >
@@ -114,88 +156,8 @@ const DataPillPanel = () => {
                             </Dialog.Description>
                         </header>
 
-                        <main className="flex   flex-col">
-                            <Accordion className="" type="multiple">
-                                {previousComponents?.map((component, index) => {
-                                    const {icon, name, title} = component;
-
-                                    if (!actionData?.length) {
-                                        return;
-                                    }
-
-                                    const outputSchema: PropertyType =
-                                        actionData[index].outputSchema!;
-
-                                    console.log('outputSchema: ', outputSchema);
-
-                                    return (
-                                        <AccordionItem
-                                            className=" "
-                                            key={name}
-                                            value={name}
-                                        >
-                                            {outputSchema && (
-                                                <>
-                                                    <AccordionTrigger className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 radix-state-closed:border-b">
-                                                        <div className="flex items-center space-x-4">
-                                                            {icon && (
-                                                                <div className="flex h-5 w-5 items-center">
-                                                                    <InlineSVG
-                                                                        src={
-                                                                            icon
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            )}
-
-                                                            <span className="text-sm">
-                                                                {title}
-                                                            </span>
-                                                        </div>
-
-                                                        <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
-                                                    </AccordionTrigger>
-
-                                                    <AccordionContent className="space-y-4 border-b border-gray-100 bg-gray-100 p-2 group-data-[state=open]:h-full">
-                                                        <ul className="flex flex-col space-y-2">
-                                                            {outputSchema.properties?.map(
-                                                                (
-                                                                    property: PropertyType
-                                                                ) => (
-                                                                    <DataPill
-                                                                        key={
-                                                                            property.name
-                                                                        }
-                                                                        property={
-                                                                            property
-                                                                        }
-                                                                    />
-                                                                )
-                                                            )}
-
-                                                            {!outputSchema
-                                                                ?.properties
-                                                                ?.length &&
-                                                                outputSchema.items?.map(
-                                                                    (item) => (
-                                                                        <DataPill
-                                                                            key={
-                                                                                item.name
-                                                                            }
-                                                                            property={
-                                                                                item
-                                                                            }
-                                                                        />
-                                                                    )
-                                                                )}
-                                                        </ul>
-                                                    </AccordionContent>
-                                                </>
-                                            )}
-                                        </AccordionItem>
-                                    );
-                                })}
-                            </Accordion>
+                        <main className="flex flex-col">
+                            <DataPillPanelBody />
                         </main>
                     </div>
                 </Dialog.Content>
