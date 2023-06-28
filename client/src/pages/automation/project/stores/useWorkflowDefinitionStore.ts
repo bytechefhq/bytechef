@@ -8,7 +8,7 @@ type ComponentActionsType = Array<{
 
 interface WorkflowDefinitionState {
     componentNames: string[];
-    setComponents: (componentNames: string[]) => void;
+    setComponentNames: (componentNames: string[]) => void;
 
     componentActions: ComponentActionsType;
     setComponentActions: (componentActions: ComponentActionsType) => void;
@@ -16,10 +16,10 @@ interface WorkflowDefinitionState {
 
 const useWorkflowDefinitionStore = create<WorkflowDefinitionState>((set) => ({
     componentNames: [],
-    componentActions: [],
-
-    setComponents: (componentNames) =>
+    setComponentNames: (componentNames) =>
         set((state) => ({...state, componentNames})),
+
+    componentActions: [],
     setComponentActions: (componentActions) =>
         set((state) => ({...state, componentActions})),
 }));
