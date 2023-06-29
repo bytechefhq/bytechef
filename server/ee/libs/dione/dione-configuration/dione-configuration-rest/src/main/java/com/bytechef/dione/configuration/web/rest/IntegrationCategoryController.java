@@ -17,8 +17,8 @@
 
 package com.bytechef.dione.configuration.web.rest;
 
-import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
+import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

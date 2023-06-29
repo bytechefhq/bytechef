@@ -31,12 +31,13 @@ import com.bytechef.helios.configuration.web.rest.mapper.ProjectMapper;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
+import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.jupiter.api.Assertions;
@@ -127,6 +128,50 @@ public class ProjectControllerIntTest {
                 .isOk()
                 .expectBody(ProjectModel.class)
                 .isEqualTo(projectMapper.convert(projectDTO));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    public void testGetProjectCategories() {
+        try {
+            when(projectFacade.getProjectCategories()).thenReturn(List.of(new Category(1, "name")));
+
+            this.webTestClient
+                .get()
+                .uri("/automation/project-categories")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(CategoryModel.class)
+                .hasSize(1);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    public void testGetProjectTags() {
+        when(projectFacade.getProjectTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
+
+        try {
+            this.webTestClient
+                .get()
+                .uri("/automation/project-tags")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.[0].id")
+                .isEqualTo(1)
+                .jsonPath("$.[1].id")
+                .isEqualTo(2)
+                .jsonPath("$.[0].name")
+                .isEqualTo("tag1")
+                .jsonPath("$.[1].name")
+                .isEqualTo("tag2");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

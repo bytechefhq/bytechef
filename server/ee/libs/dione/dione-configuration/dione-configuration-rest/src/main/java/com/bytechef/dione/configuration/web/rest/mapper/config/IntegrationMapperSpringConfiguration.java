@@ -17,20 +17,13 @@
 
 package com.bytechef.dione.configuration.web.rest.mapper.config;
 
-import com.bytechef.hermes.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
-import com.bytechef.category.web.rest.mapper.adapter.CategoryConversionServiceAdapter;
-import com.bytechef.dione.configuration.web.rest.adapter.IntegrationConversionServiceAdapter;
-import com.bytechef.tag.web.rest.mapper.adapter.TagConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = {
-    CategoryConversionServiceAdapter.class, IntegrationConversionServiceAdapter.class,
-    TagConversionServiceAdapter.class, WorkflowConfigurationConversionServiceAdapter.class
-})
+@MapperConfig(componentModel = "spring")
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.dione.configuration.web.rest.adapter",
     conversionServiceAdapterClassName = "IntegrationConversionServiceAdapter")

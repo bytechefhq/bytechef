@@ -12,7 +12,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     ]
     generatorName = "spring"
     importMappings = [
-        "TagModel": "com.bytechef.tag.web.rest.model.TagModel",
         "TaskExecutionModel": "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel"
     ]
     inputSpec = "$projectDir/openapi.yaml".toString()
@@ -20,7 +19,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelPackage = "com.bytechef.helios.configuration.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
-        Category: "com.bytechef.category.web.rest.model.CategoryModel",
         ComponentDefinition: "com.bytechef.helios.configuration.web.rest.model.ComponentDefinitionModel",
         ExecutionError: "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
         Job: "com.bytechef.hermes.execution.web.rest.model.JobModel",
@@ -33,7 +31,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         ProjectInstanceWorkflowConnection: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel",
         ProjectInstanceWorkflow: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel",
         Project: "com.bytechef.helios.configuration.web.rest.model.ProjectModel",
-        Tag: "TagModel",
         TaskExecution: "TaskExecutionModel",
         Webhook: "com.bytechef.hermes.execution.web.rest.model.WebhookModel",
         Webhook_retry: "com.bytechef.hermes.execution.web.rest.model.WebhookRetryModel",
@@ -62,8 +59,6 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
-    api project(":server:libs:core:category:category-rest:category-rest-api")
-    api project(":server:libs:core:tag:tag-rest:tag-rest-api")
     api project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api")
     api project(":server:libs:helios:helios-execution:helios-execution-api")
     api project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-api")

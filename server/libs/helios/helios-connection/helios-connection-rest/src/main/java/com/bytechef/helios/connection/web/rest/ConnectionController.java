@@ -18,11 +18,11 @@
 package com.bytechef.helios.connection.web.rest;
 
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
+import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -101,8 +101,7 @@ public class ConnectionController implements ConnectionsApi {
     public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                connectionFacade.update(
-                    conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
+                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
                 ConnectionModel.class));
     }
 
