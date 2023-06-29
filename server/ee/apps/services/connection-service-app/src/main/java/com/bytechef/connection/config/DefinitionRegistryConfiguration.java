@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.connection.config;
 
-import com.bytechef.encryption.Encryption;
-import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.hermes.definition.registry.remote.client.service.ConnectionDefinitionServiceClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,10 +27,12 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class EncryptionConfiguration {
+public class DefinitionRegistryConfiguration {
 
     @Bean
-    Encryption encryption(EncryptionKey encryptionKey) {
-        return new Encryption(encryptionKey);
+    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ConnectionDefinitionServiceClient(discoveryClient, objectMapper);
     }
 }

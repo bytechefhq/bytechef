@@ -55,7 +55,7 @@ public class ConnectionServiceClient implements ConnectionService {
                 .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                    .host("platform-service-app")
+                    .host("connection-service-app")
                     .path("/api/internal/connection-service/fetch-connection/{id}")
                     .build(id))
                 .retrieve()
@@ -74,7 +74,7 @@ public class ConnectionServiceClient implements ConnectionService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("connection-service-app")
                 .path("/api/internal/connection-service/get-connections")
                 .build())
             .retrieve()
