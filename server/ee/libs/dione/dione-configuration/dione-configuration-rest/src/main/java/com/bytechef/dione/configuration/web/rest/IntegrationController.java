@@ -17,6 +17,7 @@
 
 package com.bytechef.dione.configuration.web.rest;
 
+import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
@@ -24,7 +25,6 @@ import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflow
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

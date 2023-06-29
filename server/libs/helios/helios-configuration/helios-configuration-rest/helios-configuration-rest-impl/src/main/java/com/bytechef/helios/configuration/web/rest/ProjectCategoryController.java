@@ -17,8 +17,8 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

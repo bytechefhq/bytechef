@@ -24,11 +24,11 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.helios.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
+import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Iterator;

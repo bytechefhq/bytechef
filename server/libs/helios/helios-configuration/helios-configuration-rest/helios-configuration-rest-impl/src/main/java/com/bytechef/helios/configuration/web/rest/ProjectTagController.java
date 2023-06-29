@@ -18,7 +18,7 @@
 package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.facade.ProjectFacade;
-import com.bytechef.tag.web.rest.model.TagModel;
+import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
