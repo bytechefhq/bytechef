@@ -1,4 +1,4 @@
-package com.bytechef.helios.configuration.web.rest.model;
+package com.bytechef.dione.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -18,31 +18,47 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The blueprint that describe the execution of a job.
+ * A tag.
  */
 
-@Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
-@JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T21:55:48.528500+02:00[Europe/Zagreb]")
-public class WorkflowModel {
+@Schema(name = "Tag", description = "A tag.")
+@JsonTypeName("Tag")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T21:55:50.306851+02:00[Europe/Zagreb]")
+public class TagModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  private String description;
-
-  private String id;
-
-  private String label;
+  private Long id;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  public WorkflowModel createdBy(String createdBy) {
+  private String name;
+
+  private Integer version;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link TagModel#TagModel(String)}
+   */
+  @Deprecated
+  public TagModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public TagModel(String name) {
+    this.name = name;
+  }
+
+  public TagModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -62,7 +78,7 @@ public class WorkflowModel {
     this.createdBy = createdBy;
   }
 
-  public WorkflowModel createdDate(LocalDateTime createdDate) {
+  public TagModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -82,67 +98,27 @@ public class WorkflowModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowModel description(String description) {
-    this.description = description;
-    return this;
-  }
-
-  /**
-   * The description of a workflow.
-   * @return description
-  */
-  
-  @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public WorkflowModel id(String id) {
+  public TagModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of the workflow.
+   * The id of the tag.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", description = "The id of the tag.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public WorkflowModel label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  /**
-   * The descriptive name for the workflow
-   * @return label
-  */
-  
-  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("label")
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public WorkflowModel lastModifiedBy(String lastModifiedBy) {
+  public TagModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -162,7 +138,7 @@ public class WorkflowModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public WorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public TagModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -182,6 +158,46 @@ public class WorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public TagModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of the tag.
+   * @return name
+  */
+  @NotNull 
+  @Schema(name = "name", description = "The name of the tag.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public TagModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -190,32 +206,32 @@ public class WorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.createdBy, workflow.createdBy) &&
-        Objects.equals(this.createdDate, workflow.createdDate) &&
-        Objects.equals(this.description, workflow.description) &&
-        Objects.equals(this.id, workflow.id) &&
-        Objects.equals(this.label, workflow.label) &&
-        Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate);
+    TagModel tag = (TagModel) o;
+    return Objects.equals(this.createdBy, tag.createdBy) &&
+        Objects.equals(this.createdDate, tag.createdDate) &&
+        Objects.equals(this.id, tag.id) &&
+        Objects.equals(this.lastModifiedBy, tag.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, tag.lastModifiedDate) &&
+        Objects.equals(this.name, tag.name) &&
+        Objects.equals(this.version, tag.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate);
+    return Objects.hash(createdBy, createdDate, id, lastModifiedBy, lastModifiedDate, name, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowModel {\n");
+    sb.append("class TagModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -2,7 +2,8 @@ package com.bytechef.helios.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.tag.web.rest.model.TagModel;
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
+import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,10 +28,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-23T07:56:51.273947+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T22:05:18.177079+02:00[Europe/Zagreb]")
 public class ProjectModel {
 
-  private com.bytechef.category.web.rest.model.CategoryModel category;
+  private CategoryModel category;
 
   private String createdBy;
 
@@ -114,7 +115,7 @@ public class ProjectModel {
     this.name = name;
   }
 
-  public ProjectModel category(com.bytechef.category.web.rest.model.CategoryModel category) {
+  public ProjectModel category(CategoryModel category) {
     this.category = category;
     return this;
   }
@@ -126,11 +127,11 @@ public class ProjectModel {
   @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("category")
-  public com.bytechef.category.web.rest.model.CategoryModel getCategory() {
+  public CategoryModel getCategory() {
     return category;
   }
 
-  public void setCategory(com.bytechef.category.web.rest.model.CategoryModel category) {
+  public void setCategory(CategoryModel category) {
     this.category = category;
   }
 

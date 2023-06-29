@@ -5,6 +5,7 @@
  */
 package com.bytechef.dione.configuration.web.rest;
 
+import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:39.734351+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T21:55:50.306851+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integration-categories", description = "The Embedded Integrations Categories API")
 public interface IntegrationCategoriesApi {
@@ -53,7 +54,7 @@ public interface IntegrationCategoriesApi {
         tags = { "integration-categories" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.category.web.rest.model.CategoryModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
             })
         }
     )
@@ -62,7 +63,7 @@ public interface IntegrationCategoriesApi {
         value = "/integration-categories",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<com.bytechef.category.web.rest.model.CategoryModel>> getIntegrationCategories(
+    default ResponseEntity<List<CategoryModel>> getIntegrationCategories(
         
     ) {
         getRequest().ifPresent(request -> {

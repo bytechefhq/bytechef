@@ -21,14 +21,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular task.")
 @JsonTypeName("ProjectInstanceWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-23T07:56:51.273947+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T22:05:18.177079+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowConnectionModel {
 
   private Long connectionId;
 
   private String key;
 
-  private String taskName;
+  private String operationName;
 
   public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
@@ -70,24 +70,24 @@ public class ProjectInstanceWorkflowConnectionModel {
     this.key = key;
   }
 
-  public ProjectInstanceWorkflowConnectionModel taskName(String taskName) {
-    this.taskName = taskName;
+  public ProjectInstanceWorkflowConnectionModel operationName(String operationName) {
+    this.operationName = operationName;
     return this;
   }
 
   /**
-   * The task name to which a connection belongs.
-   * @return taskName
+   * The action/trigger name to which a connection belongs.
+   * @return operationName
   */
   
-  @Schema(name = "taskName", description = "The task name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("taskName")
-  public String getTaskName() {
-    return taskName;
+  @Schema(name = "operationName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("operationName")
+  public String getOperationName() {
+    return operationName;
   }
 
-  public void setTaskName(String taskName) {
-    this.taskName = taskName;
+  public void setOperationName(String operationName) {
+    this.operationName = operationName;
   }
 
   @Override
@@ -101,12 +101,12 @@ public class ProjectInstanceWorkflowConnectionModel {
     ProjectInstanceWorkflowConnectionModel projectInstanceWorkflowConnection = (ProjectInstanceWorkflowConnectionModel) o;
     return Objects.equals(this.connectionId, projectInstanceWorkflowConnection.connectionId) &&
         Objects.equals(this.key, projectInstanceWorkflowConnection.key) &&
-        Objects.equals(this.taskName, projectInstanceWorkflowConnection.taskName);
+        Objects.equals(this.operationName, projectInstanceWorkflowConnection.operationName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, key, taskName);
+    return Objects.hash(connectionId, key, operationName);
   }
 
   @Override
@@ -115,7 +115,7 @@ public class ProjectInstanceWorkflowConnectionModel {
     sb.append("class ProjectInstanceWorkflowConnectionModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
-    sb.append("    taskName: ").append(toIndentedString(taskName)).append("\n");
+    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

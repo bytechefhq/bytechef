@@ -17,10 +17,8 @@
 
 package com.bytechef.helios.execution.web.rest.mapper.config;
 
-import com.bytechef.category.web.rest.mapper.adapter.CategoryConversionServiceAdapter;
 import com.bytechef.hermes.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
 import com.bytechef.hermes.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
-import com.bytechef.tag.web.rest.mapper.adapter.TagConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -28,7 +26,6 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    CategoryConversionServiceAdapter.class, TagConversionServiceAdapter.class,
     com.bytechef.helios.configuration.web.rest.adapter.ProjectWorkflowExecutionConversionServiceAdapter.class,
     WorkflowConfigurationConversionServiceAdapter.class,
     WorkflowExecutionConversionServiceAdapter.class
