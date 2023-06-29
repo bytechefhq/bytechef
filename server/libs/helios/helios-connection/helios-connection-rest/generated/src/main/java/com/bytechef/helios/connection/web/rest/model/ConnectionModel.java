@@ -2,7 +2,7 @@ package com.bytechef.helios.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.tag.web.rest.model.TagModel;
+import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:37.311699+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T21:55:47.675278+02:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   private Boolean active;

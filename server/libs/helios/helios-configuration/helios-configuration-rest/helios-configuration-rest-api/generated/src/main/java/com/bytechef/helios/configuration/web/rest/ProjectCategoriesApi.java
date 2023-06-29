@@ -5,6 +5,7 @@
  */
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-23T07:56:51.273947+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T22:05:18.177079+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-categories", description = "The Automation Project Categories API")
 public interface ProjectCategoriesApi {
@@ -53,7 +54,7 @@ public interface ProjectCategoriesApi {
         tags = { "project-categories" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.category.web.rest.model.CategoryModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
             })
         }
     )
@@ -62,7 +63,7 @@ public interface ProjectCategoriesApi {
         value = "/project-categories",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<com.bytechef.category.web.rest.model.CategoryModel>> getProjectCategories(
+    default ResponseEntity<List<CategoryModel>> getProjectCategories(
         
     ) {
         getRequest().ifPresent(request -> {
