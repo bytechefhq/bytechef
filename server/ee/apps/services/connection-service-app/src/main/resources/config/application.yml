@@ -1,0 +1,135 @@
+---
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  health:
+    rabbit:
+      enabled: false # When using Rabbit, will be set to true via post-processor
+  metrics:
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
+
+openapi:
+  openAPIDefinition:
+    base-path: /api
+
+spring:
+  application:
+    name: connection-service-app
+  cloud:
+    redis:
+      discovery:
+        instanceId: ${spring.application.name}:${random.value}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      indent-output: false
+      write-dates-as-timestamps: false
+      write-null-map-values: false
+    date-format: ${bytechef.serialization.date-format}
+    time-zone: UTC
+  jmx:
+    enabled: false
+  liquibase:
+      contexts: connection
+  output:
+    ansi:
+      console-available: true
+  profiles:
+    active: #spring.profiles.active#
+    group:
+      dev:
+        - dev
+        - api-docs
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
+  task:
+    execution:
+      thread-name-prefix: connection-service-app-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: connection-service-app-scheduling-
+      pool:
+        size: 2
+
+#####
+
+bytechef:
+  connection:
+    oauth2:
+      redirectUri: ${bytechef.publicUrl}/callback
+  discovery-service:
+    provider: redis
+  context-repository:
+    provider: jdbc
+  message-broker:
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+    provider: redis
+  persistence:
+    provider: jdbc
+  publicUrl: http://127.0.0.1:5173
+  serialization:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  workflow-repository:
+    classpath:
+      enabled: true
+    filesystem:
+      enabled: true
+      location-pattern: ${user.home}/bytechef/**/*.yaml
+    jdbc:
+      enabled: true

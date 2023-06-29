@@ -167,10 +167,11 @@ include("server:libs:modules:task-dispatchers:subflow")
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
+include("server:ee:apps:services:connection-service-app")
 include("server:ee:apps:services:coordinator-service-app")
+include("server:ee:apps:services:platform-service-app")
 include("server:ee:apps:services:scheduler-service-app")
 include("server:ee:apps:services:worker-service-app")
-include("server:ee:apps:services:platform-service-app")
 
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")

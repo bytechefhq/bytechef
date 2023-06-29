@@ -15,27 +15,32 @@
  * limitations under the License.
  */
 
-package com.bytechef.worker.config;
+package com.bytechef.connection.config;
 
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClients({
-    @LoadBalancerClient("connection-service-app"), @LoadBalancerClient("scheduler-service-app")
-})
-public class WebClientConfiguration {
+public class JacksonConfiguration {
 
-    @LoadBalanced
     @Bean
-    WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    JavaTimeModule javaTimeModule() {
+        return new JavaTimeModule();
+    }
+
+    @Bean
+    Jdk8Module jdk8Module() {
+        return new Jdk8Module();
+    }
+
+    @Bean
+    JsonNullableModule jsonNullableModule() {
+        return new JsonNullableModule();
     }
 }

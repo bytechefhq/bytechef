@@ -15,27 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.worker.config;
+package com.bytechef.connection.config;
 
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionKey;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClients({
-    @LoadBalancerClient("connection-service-app"), @LoadBalancerClient("scheduler-service-app")
-})
-public class WebClientConfiguration {
+public class EncryptionConfiguration {
 
-    @LoadBalanced
     @Bean
-    WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    Encryption encryption(EncryptionKey encryptionKey) {
+        return new Encryption(encryptionKey);
     }
 }
