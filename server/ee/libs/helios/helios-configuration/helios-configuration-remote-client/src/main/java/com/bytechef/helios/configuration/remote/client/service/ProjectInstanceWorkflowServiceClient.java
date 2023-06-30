@@ -56,7 +56,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-workflow-service/get-project-instance-workflow-connection-id" +
                         "/{key}/{taskName}")
@@ -92,7 +92,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-workflow-service/update-enabled/{id}/{enabled}")
                 .build(id, enabled))

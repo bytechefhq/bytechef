@@ -46,7 +46,7 @@ public class TriggerStateServiceClient implements TriggerStateService {
                 .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                    .host("platform-service-app")
+                    .host("execution-service-app")
                     .path("/api/internal/trigger-storage-service/fetch-value/{workflowExecutionId}")
                     .build(workflowExecutionId))
                 .retrieve()
@@ -60,7 +60,7 @@ public class TriggerStateServiceClient implements TriggerStateService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/trigger-storage-service/save/{workflowExecutionId}")
                 .build(workflowExecutionId))
             .bodyValue(value)

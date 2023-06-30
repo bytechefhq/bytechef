@@ -1,8 +1,8 @@
-group = "com.bytechef.platform"
+group = "com.bytechef.connection"
 description = ""
 
 springBoot {
-    mainClassName = "com.bytechef.platform.PlatformApplication"
+    mainClassName = "com.bytechef.connection.ConnectionApplication"
 }
 
 dependencies {

@@ -42,7 +42,7 @@ public class TriggerExecutionServiceClient implements TriggerExecutionService {
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/trigger-execution-service/create")
                 .build())
             .bodyValue(triggerExecution)
@@ -57,7 +57,7 @@ public class TriggerExecutionServiceClient implements TriggerExecutionService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/trigger-execution-service/get-trigger-execution/{id}")
                 .build(id))
             .retrieve()
@@ -71,7 +71,7 @@ public class TriggerExecutionServiceClient implements TriggerExecutionService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/trigger-execution-service/update")
                 .build())
             .bodyValue(triggerExecution)

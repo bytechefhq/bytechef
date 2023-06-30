@@ -43,7 +43,7 @@ public class JobFactoryFacadeClient implements JobFactoryFacade {
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/job-factory-facade/create-job")
                 .build())
             .bodyValue(jobParameters)

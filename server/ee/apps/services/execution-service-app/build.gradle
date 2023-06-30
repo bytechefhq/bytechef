@@ -1,8 +1,8 @@
-group = "com.bytechef.platform"
+group = "com.bytechef.execution"
 description = ""
 
 springBoot {
-    mainClassName = "com.bytechef.platform.PlatformApplication"
+    mainClassName = "com.bytechef.execution.ExecutionApplication"
 }
 
 dependencies {

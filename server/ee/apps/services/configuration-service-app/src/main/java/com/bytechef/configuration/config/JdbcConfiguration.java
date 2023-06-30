@@ -15,22 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.configuration.config;
 
-import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.hermes.execution.converter.StringToTriggerStateValueConverter;
-import com.bytechef.hermes.execution.converter.StringToWorkflowExecutionIdConverter;
-import com.bytechef.hermes.execution.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.hermes.execution.converter.TriggerStateValueToStringConverter;
-import com.bytechef.hermes.execution.converter.WorkflowExecutionIdToStringConverter;
-import com.bytechef.hermes.execution.converter.WorkflowTriggerToStringConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
@@ -74,19 +64,9 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-            new ExecutionErrorToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
-            new StringToExecutionErrorConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
-            new StringToWebhooksConverter(objectMapper),
-            new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),
-            new StringToWorkflowTriggerConverter(objectMapper),
-            new StringToTriggerStateValueConverter(objectMapper),
-            new TriggerStateValueToStringConverter(objectMapper),
-            new WebhooksToStringConverter(objectMapper),
-            new WorkflowExecutionIdToStringConverter(),
-            new WorkflowTaskToStringConverter(objectMapper),
-            new WorkflowTriggerToStringConverter(objectMapper));
+            new WorkflowTaskToStringConverter(objectMapper));
     }
 }

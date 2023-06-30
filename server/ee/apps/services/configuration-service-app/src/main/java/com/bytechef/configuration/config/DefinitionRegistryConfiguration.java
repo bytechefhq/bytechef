@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.configuration.config;
 
 import com.bytechef.hermes.definition.registry.remote.client.facade.ActionDefinitionFacadeClient;
 import com.bytechef.hermes.definition.registry.remote.client.facade.ComponentDefinitionFacadeClient;
