@@ -149,7 +149,11 @@ const ProjectInstances = () => {
                 />
             }
         >
-            <ProjectInstanceList />
+            <div className="w-full">
+                {projects?.map((project) => (
+                    <ProjectInstanceList key={project.id} project={project} />
+                ))}
+            </div>
         </LayoutContainer>
     );
 };
