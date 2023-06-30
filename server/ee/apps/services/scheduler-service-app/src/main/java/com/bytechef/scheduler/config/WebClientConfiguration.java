@@ -28,7 +28,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClients(@LoadBalancerClient("platform-service-app"))
+@LoadBalancerClients(@LoadBalancerClient("configuration-service-app"))
 public class WebClientConfiguration {
 
     @LoadBalanced

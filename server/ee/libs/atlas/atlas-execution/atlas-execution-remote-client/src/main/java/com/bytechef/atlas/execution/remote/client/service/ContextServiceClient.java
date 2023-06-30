@@ -45,7 +45,7 @@ public class ContextServiceClient implements ContextService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/context-service/peek/{stackId}/{classname}")
                 .build(stackId, classname))
             .retrieve()
@@ -59,7 +59,7 @@ public class ContextServiceClient implements ContextService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/context-service/peek/{stackId}/{subStackId}/{classname}")
                 .build(stackId, subStackId, classname))
             .retrieve()
@@ -73,7 +73,7 @@ public class ContextServiceClient implements ContextService {
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/context-service/push/{stackId}/{classname}")
                 .build(stackId, classname))
             .bodyValue(context)
@@ -88,7 +88,7 @@ public class ContextServiceClient implements ContextService {
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/context-service/push/{stackId}/{subStackId}/{classname}")
                 .build(stackId, classname))
             .bodyValue(context)

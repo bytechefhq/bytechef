@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform;
+package com.bytechef.configuration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -34,9 +34,9 @@ import org.springframework.util.StringUtils;
  * @author Ivica Cardic
  */
 @SpringBootApplication(scanBasePackages = "com.bytechef")
-public class PlatformApplication {
+public class ConfigurationApplication {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlatformApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationApplication.class);
 
     /**
      * Main method, used to run the application.
@@ -44,7 +44,7 @@ public class PlatformApplication {
      * @param args the command line arguments.
      */
     public static void main(String[] args) {
-        SpringApplication springApplication = new SpringApplication(PlatformApplication.class);
+        SpringApplication springApplication = new SpringApplication(ConfigurationApplication.class);
 
         springApplication.addListeners(new ApplicationPidFileWriter());
 

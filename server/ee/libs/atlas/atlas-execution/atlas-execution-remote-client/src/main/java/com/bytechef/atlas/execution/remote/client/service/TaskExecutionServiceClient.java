@@ -45,7 +45,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/task-execution-service/create")
                 .build())
             .bodyValue(taskExecution)
@@ -60,7 +60,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/task-execution-service/get-task-execution/{id}")
                 .build(id))
             .retrieve()
@@ -84,7 +84,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/task-execution-service/get-parent-task-executions/{parentId}")
                 .build(parentId))
             .retrieve()
@@ -98,7 +98,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/task-execution-service/update")
                 .build())
             .bodyValue(taskExecution)

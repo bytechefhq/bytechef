@@ -15,27 +15,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.configuration.config;
 
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.configuration.service.WorkflowServiceImpl;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-public class EnvironmentConfiguration {
+public class WorkflowConfiguration {
 
     @Bean
-    public PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
-        PropertySourcesPlaceholderConfigurer placeholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+    WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
 
-        placeholderConfigurer.setLocation(new ClassPathResource("git.properties"));
-        placeholderConfigurer.setIgnoreResourceNotFound(true);
-        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(true);
-
-        return placeholderConfigurer;
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 }

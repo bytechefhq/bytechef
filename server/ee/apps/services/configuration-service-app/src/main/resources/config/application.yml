@@ -65,7 +65,7 @@ openapi:
 
 spring:
   application:
-    name: platform-service-app
+    name: configuration-service-app
   cloud:
     redis:
       discovery:
@@ -81,7 +81,7 @@ spring:
   jmx:
     enabled: false
   liquibase:
-      contexts: platform
+      contexts: configuration
   output:
     ansi:
       console-available: true
@@ -97,13 +97,13 @@ spring:
         prefetch: 1
   task:
     execution:
-      thread-name-prefix: platform-service-app-task-
+      thread-name-prefix: configuration-service-app-task-
       pool:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: platform-service-app-scheduling-
+      thread-name-prefix: configuration-service-app-scheduling-
       pool:
         size: 2
 
@@ -115,8 +115,6 @@ bytechef:
       redirectUri: ${bytechef.publicUrl}/callback
   discovery-service:
     provider: redis
-  context-repository:
-    provider: jdbc
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis

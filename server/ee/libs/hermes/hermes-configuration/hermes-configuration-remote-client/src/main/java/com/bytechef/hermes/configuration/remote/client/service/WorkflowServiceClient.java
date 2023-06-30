@@ -54,7 +54,7 @@ public class WorkflowServiceClient implements WorkflowService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("configuration-service-app")
                 .path("/api/internal/workflow-service/get-workflow/{id}")
                 .build(id))
             .retrieve()

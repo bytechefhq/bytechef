@@ -40,7 +40,7 @@ public class CounterServiceClient implements CounterService {
             .build()
             .delete()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/counter-service/delete/{id}")
                 .build(id))
             .retrieve()
@@ -55,7 +55,7 @@ public class CounterServiceClient implements CounterService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/counter-service/decrement/{id}")
                 .build(id))
             .retrieve()
@@ -69,7 +69,7 @@ public class CounterServiceClient implements CounterService {
             .build()
             .post()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/counter-service/set/{id}/{value}")
                 .build(id, value))
             .retrieve()

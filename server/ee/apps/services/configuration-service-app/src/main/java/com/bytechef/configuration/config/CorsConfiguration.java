@@ -15,25 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.coordinator.config;
+package com.bytechef.configuration.config;
 
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClients(@LoadBalancerClient("configuration-service-app"))
-public class WebClientConfiguration {
+@Profile("dev")
+public class CorsConfiguration implements WebMvcConfigurer {
 
-    @LoadBalanced
-    @Bean
-    WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    @Override
+    public void addCorsMappings(CorsRegistry corsRegistry) {
+        corsRegistry.addMapping("/**");
     }
 }
