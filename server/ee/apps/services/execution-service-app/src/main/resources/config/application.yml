@@ -65,7 +65,7 @@ openapi:
 
 spring:
   application:
-    name: connection-service-app
+    name: execution-service-app
   cloud:
     redis:
       discovery:
@@ -81,7 +81,7 @@ spring:
   jmx:
     enabled: false
   liquibase:
-      contexts: connection
+      contexts: execution
   output:
     ansi:
       console-available: true
@@ -97,13 +97,13 @@ spring:
         prefetch: 1
   task:
     execution:
-      thread-name-prefix: connection-service-app-task-
+      thread-name-prefix: execution-service-app-task-
       pool:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: connection-service-app-scheduling-
+      thread-name-prefix: execution-service-app-scheduling-
       pool:
         size: 2
 
@@ -114,7 +114,11 @@ bytechef:
     provider: redis
   context-repository:
     provider: jdbc
+  message-broker:
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+    provider: redis
   persistence:
     provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+

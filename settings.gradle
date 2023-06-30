@@ -169,6 +169,7 @@ include("server:libs:test:test-int-support")
 
 include("server:ee:apps:services:connection-service-app")
 include("server:ee:apps:services:coordinator-service-app")
+include("server:ee:apps:services:execution-service-app")
 include("server:ee:apps:services:platform-service-app")
 include("server:ee:apps:services:scheduler-service-app")
 include("server:ee:apps:services:worker-service-app")
