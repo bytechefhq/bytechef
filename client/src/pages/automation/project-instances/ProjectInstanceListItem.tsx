@@ -1,6 +1,7 @@
-import {CalendarIcon} from '@heroicons/react/24/outline';
+import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useState} from 'react';
+import Switch from 'components/Switch/Switch';
+import {useState} from 'react';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import Badge from '../../../components/Badge/Badge';
@@ -11,6 +12,7 @@ import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
 import {
     ProjectInstanceModel,
+    ProjectModel,
     TagModel,
 } from '../../../middleware/automation/configuration';
 import {
@@ -23,9 +25,11 @@ import ProjectInstanceDialog from './ProjectInstanceDialog';
 interface ProjectItemProps {
     projectInstance: ProjectInstanceModel;
     remainingTags?: TagModel[];
+    project: ProjectModel;
 }
 
 const ProjectInstanceListItem = ({
+    project,
     projectInstance,
     remainingTags,
 }: ProjectItemProps) => {
@@ -69,7 +73,7 @@ const ProjectInstanceListItem = ({
             <div className="flex items-center">
                 <div className="flex-1 pr-8">
                     <div className="flex items-center justify-between">
-                        <div className="relative flex items-center">
+                        <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
                                 <HoverCard text={projectInstance.description}>
                                     <span className="mr-2 text-base font-semibold text-gray-900">
@@ -82,11 +86,9 @@ const ProjectInstanceListItem = ({
                                 </span>
                             )}
 
-                            {projectInstance.project && (
-                                <span className="text-xs uppercase text-gray-700">
-                                    {`${projectInstance.project.name} V${projectInstance.project.projectVersion}`}
-                                </span>
-                            )}
+                            <div className="flex items-center">
+                                <Switch />
+                            </div>
                         </div>
 
                         <div className="ml-2 flex shrink-0">
@@ -106,26 +108,35 @@ const ProjectInstanceListItem = ({
                     </div>
 
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                        <div
-                            className="flex h-[38px] items-center"
-                            onClick={(event) => event.preventDefault()}
-                        >
-                            {projectInstance.tags && (
-                                <TagList
-                                    id={projectInstance.id!}
-                                    remainingTags={remainingTags}
-                                    tags={projectInstance.tags}
-                                    updateTagsMutation={
-                                        updateProjectInstanceTagsMutation
-                                    }
-                                    getRequest={(id, tags) => ({
-                                        id: id!,
-                                        updateTagsRequestModel: {
-                                            tags: tags || [],
-                                        },
-                                    })}
-                                />
-                            )}
+                        <div className="flex items-center">
+                            <div className="mr-4 flex text-xs font-semibold text-gray-700">
+                                <span className="mr-1">
+                                    {project.workflowIds?.length === 1
+                                        ? `1 workflow`
+                                        : `${project.workflowIds?.length} workflows`}
+                                </span>
+
+                                <ChevronDownIcon className="h-4 w-4 duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
+                            </div>
+
+                            <div onClick={(event) => event.preventDefault()}>
+                                {projectInstance.tags && (
+                                    <TagList
+                                        id={projectInstance.id!}
+                                        remainingTags={remainingTags}
+                                        tags={projectInstance.tags}
+                                        updateTagsMutation={
+                                            updateProjectInstanceTagsMutation
+                                        }
+                                        getRequest={(id, tags) => ({
+                                            id: id!,
+                                            updateTagsRequestModel: {
+                                                tags: tags || [],
+                                            },
+                                        })}
+                                    />
+                                )}
+                            </div>
                         </div>
 
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">

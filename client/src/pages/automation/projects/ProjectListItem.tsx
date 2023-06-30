@@ -139,7 +139,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     </div>
 
                     <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                        <div className="flex h-[38px] items-center">
+                        <div className="flex items-center">
                             <div className="mr-4 flex text-xs font-semibold text-gray-700">
                                 <div className="mr-1">
                                     {project.workflowIds?.length === 1
