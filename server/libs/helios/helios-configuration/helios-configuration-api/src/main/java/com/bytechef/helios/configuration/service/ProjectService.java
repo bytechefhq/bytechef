@@ -37,15 +37,15 @@ public interface ProjectService {
 
     Optional<Project> fetchProject(String name);
 
-    Project getWorkflowProject(String workflowId);
-
     Project getProject(long id);
 
     List<Project> getProjects();
 
     List<Project> getProjects(List<Long> ids);
 
-    List<Project> searchProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds);
+    Project getWorkflowProject(String workflowId);
+
+    List<Project> getProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds);
 
     Project update(long id, List<Long> tagIds);
 

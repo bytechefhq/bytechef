@@ -56,7 +56,7 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
                 .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                    .host("platform-service-app")
+                    .host("configuration-service-app")
                     .path("/api/internal/project-instance-service/fetch-project-instance/{jobId}")
                     .build(jobId))
                 .retrieve()
@@ -100,7 +100,7 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-service/update-enabled/{id}/{enable}")
                 .build(id, enabled))

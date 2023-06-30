@@ -46,7 +46,7 @@ public interface JobService {
 
     Job resumeToStatusStarted(long id);
 
-    Page<Job> searchJobs(
+    Page<Job> getJobs(
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber);
 

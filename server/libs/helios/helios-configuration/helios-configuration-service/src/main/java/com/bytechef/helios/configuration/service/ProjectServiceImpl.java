@@ -109,7 +109,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> searchProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds) {
+    public List<Project> getProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds) {
         Iterable<Project> projectIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
