@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -78,6 +79,7 @@ public class ExecutionApplication {
                 \tApplication '{}' is running! Access URLs:
                 \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
+                \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
@@ -88,6 +90,10 @@ public class ExecutionApplication {
             hostAddress,
             serverPort,
             contextPath,
+            Arrays.asList(environment.getActiveProfiles())
+                .contains("api-docs")
+                    ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
+                    : "",
             environment.getActiveProfiles());
     }
 }

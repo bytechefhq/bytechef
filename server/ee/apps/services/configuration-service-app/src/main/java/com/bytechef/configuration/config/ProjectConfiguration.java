@@ -18,7 +18,6 @@
 package com.bytechef.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFactoryFacade;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
@@ -28,7 +27,6 @@ import com.bytechef.helios.configuration.facade.ProjectInstanceFacadeImpl;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.hermes.execution.facade.JobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;

@@ -19,7 +19,6 @@ package com.bytechef.api.gateway;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +82,6 @@ public class ApiGatewayApplication {
                 \tApplication '{}' is running! Access URLs:
                 \tLocal: \t\t{}://localhost:{}{}
                 \tExternal: \t{}://{}:{}{}
-                \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
@@ -94,10 +92,6 @@ public class ApiGatewayApplication {
             hostAddress,
             serverPort,
             contextPath,
-            Arrays.asList(environment.getActiveProfiles())
-                .contains("api-docs")
-                    ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
-                    : "",
             environment.getActiveProfiles());
     }
 }

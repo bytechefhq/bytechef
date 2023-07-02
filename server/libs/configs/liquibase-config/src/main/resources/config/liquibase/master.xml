@@ -7,14 +7,14 @@
     <!-- ce -->
 
     <!-- core -->
-    <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or platform" />
+    <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection" />
 
     <!-- connection -->
     <includeAll path="classpath:config/liquibase/changelog/hermes/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection" />
 
     <!-- configuration -->
-    <includeAll path="classpath:config/liquibase/changelog/atlas/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or platform" />
-    <includeAll path="classpath:config/liquibase/changelog/helios/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or platform" />
+    <includeAll path="classpath:config/liquibase/changelog/atlas/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
+    <includeAll path="classpath:config/liquibase/changelog/helios/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
 
     <!-- execution -->
     <includeAll path="classpath:config/liquibase/changelog/atlas/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution" />
@@ -29,5 +29,5 @@
     <!-- ee -->
 
     <!-- configuration -->
-    <includeAll path="classpath:config/liquibase/changelog/dione/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="ee and (mono or platform)" />
+    <includeAll path="classpath:config/liquibase/changelog/dione/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="ee and (mono or configuration)" />
 </databaseChangeLog>

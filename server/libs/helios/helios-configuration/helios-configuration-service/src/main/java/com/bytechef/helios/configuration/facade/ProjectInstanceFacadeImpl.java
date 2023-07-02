@@ -293,11 +293,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerDisable(
-                workflowTrigger,
                 WorkflowExecutionId.of(
                     workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
                     workflowTrigger),
-                getConnectionId(workflowTrigger));
+                workflowTrigger.getParameters(), getConnectionId(workflowTrigger));
         }
     }
 
@@ -308,11 +307,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerEnable(
-                workflowTrigger,
                 WorkflowExecutionId.of(
                     workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
                     workflowTrigger),
-                getConnectionId(workflowTrigger));
+                workflowTrigger.getParameters(), getConnectionId(workflowTrigger));
         }
     }
 
