@@ -20,9 +20,9 @@ package com.bytechef.configuration.config;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.remote.client.task.handler.TaskHandlerClient;
-import com.bytechef.hermes.remote.client.worker.trigger.handler.TriggerHandlerClient;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
+//import com.bytechef.hermes.remote.client.worker.trigger.handler.TriggerHandlerClient;
+//import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+//import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,11 +33,13 @@ import org.springframework.context.annotation.Configuration;
 public class WorkerHandlerConfiguration {
 
     private final TaskHandlerClient taskHandlerClient;
-    private final TriggerHandlerClient triggerHandlerClient;
+//    private final TriggerHandlerClient triggerHandlerClient;
 
-    public WorkerHandlerConfiguration(TaskHandlerClient taskHandlerClient, TriggerHandlerClient triggerHandlerClient) {
+    public WorkerHandlerConfiguration(TaskHandlerClient taskHandlerClient/*
+                                                                          * , TriggerHandlerClient triggerHandlerClient
+                                                                          */) {
         this.taskHandlerClient = taskHandlerClient;
-        this.triggerHandlerClient = triggerHandlerClient;
+//        this.triggerHandlerClient = triggerHandlerClient;
     }
 
     @Bean
@@ -45,8 +47,8 @@ public class WorkerHandlerConfiguration {
         return type -> (TaskHandler<?>) taskExecution -> taskHandlerClient.handle(type, taskExecution);
     }
 
-    @Bean
-    TriggerHandlerRegistry triggerHandlerRegistry() {
-        return type -> (TriggerHandler<?>) triggerExecution -> triggerHandlerClient.handle(type, triggerExecution);
-    }
+//    @Bean
+//    TriggerHandlerRegistry triggerHandlerRegistry() {
+//        return type -> (TriggerHandler<?>) triggerExecution -> triggerHandlerClient.handle(type, triggerExecution);
+//    }
 }
