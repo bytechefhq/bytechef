@@ -6,23 +6,71 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "project-categories"
-  description: "The Automation Project Categories API"
-- name: "project-instance-tags"
-  description: "The Automation Project Instance Tags API"
 - name: "project-instances"
   description: "The Automation Project Instances API"
-- name: "project-tags"
-  description: "The Automation Project Tags API"
 - name: "projects"
   description: "The Automation Projects API"
 paths:
-  /project-categories:
+  /project-instances:
+    get:
+      description: "Get project instances."
+      summary: "Get project instances"
+      tags:
+      - "project-instances"
+      operationId: "getProjectInstances"
+      parameters:
+      - name: "projectIds"
+        description: "The list of the project ids used for filtering project instances."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      - name: "tagIds"
+        description: "The list of tag ids of used for filtering project instances."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "A list of project instances."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProjectInstance"
+    post:
+      description: "Create a new project instance."
+      summary: "Create a new project instance"
+      tags:
+      - "project-instances"
+      operationId: "createProjectInstance"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInstance"
+        required: true
+      responses:
+        "200":
+          description: "The project instance object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInstance"
+  /projects/categories:
     get:
       description: "Get categories."
       summary: "Get categories"
       tags:
-      - "project-categories"
+      - "projects"
       operationId: "getProjectCategories"
       responses:
         "200":
@@ -34,12 +82,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Category"
-  /project-instance-tags:
+  /project-instances/tags:
     get:
       description: "Get project instance tags."
       summary: "Get project instance tags"
       tags:
-      - "project-instance-tags"
+      - "project-instances"
       operationId: "getProjectInstanceTags"
       responses:
         "200":
@@ -165,77 +213,6 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /project-instances:
-    get:
-      description: "Get project instances."
-      summary: "Get project instances"
-      tags:
-      - "project-instances"
-      operationId: "getProjectInstances"
-      parameters:
-      - name: "projectIds"
-        description: "The list of the project ids used for filtering project instances."
-        in: "query"
-        required: false
-        schema:
-          type: "array"
-          items:
-            type: "integer"
-            format: "int64"
-      - name: "tagIds"
-        description: "The list of tag ids of used for filtering project instances."
-        in: "query"
-        required: false
-        schema:
-          type: "array"
-          items:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "A list of project instances."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ProjectInstance"
-    post:
-      description: "Create a new project instance."
-      summary: "Create a new project instance"
-      tags:
-      - "project-instances"
-      operationId: "createProjectInstance"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ProjectInstance"
-        required: true
-      responses:
-        "200":
-          description: "The project instance object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProjectInstance"
-  /project-tags:
-    get:
-      description: "Get project tags."
-      summary: "Get project tags."
-      tags:
-      - "project-tags"
-      operationId: "getProjectTags"
-      responses:
-        "200":
-          description: "A list of project tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
   /projects:
     get:
       description: "Get projects."
@@ -296,6 +273,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
+  /projects/tags:
+    get:
+      description: "Get project tags."
+      summary: "Get project tags."
+      tags:
+      - "projects"
+      operationId: "getProjectTags"
+      responses:
+        "200":
+          description: "A list of project tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
   /projects/{id}:
     delete:
       description: "Delete a project."
@@ -452,7 +446,7 @@ paths:
       description: "Enable/disable a workflow of a project instance."
       summary: "Enable/disable a workflow of a project instance"
       tags:
-      - "project-instance-requesters"
+      - "project-instances"
       operationId: "enableProjectInstanceWorkflow"
       parameters:
       - name: "id"
@@ -482,7 +476,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "project-instance-requesters"
+      - "project-instances"
       operationId: "createProjectInstanceWorkflowJob"
       parameters:
       - name: "id"
