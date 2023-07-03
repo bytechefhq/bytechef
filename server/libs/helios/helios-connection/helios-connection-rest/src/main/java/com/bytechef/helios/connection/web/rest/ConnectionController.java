@@ -73,6 +73,15 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
+    public ResponseEntity<List<TagModel>> getConnectionTags() {
+        return ResponseEntity.ok(
+            connectionFacade.getConnectionTags()
+                .stream()
+                .map(tag -> conversionService.convert(tag, TagModel.class))
+                .toList());
+    }
+
+    @Override
     public ResponseEntity<List<ConnectionModel>> getComponentConnections(
         String componentName, Integer componentVersion) {
 

@@ -103,6 +103,14 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     }
 
     @Override
+    public ResponseEntity<List<TagModel>> getProjectInstanceTags() {
+        return ResponseEntity.ok(projectInstanceFacade.getProjectInstanceTags()
+            .stream()
+            .map(tag -> conversionService.convert(tag, TagModel.class))
+            .toList());
+    }
+
+    @Override
     public ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
         List<Long> projectIds, List<Long> tagIds) {
 
