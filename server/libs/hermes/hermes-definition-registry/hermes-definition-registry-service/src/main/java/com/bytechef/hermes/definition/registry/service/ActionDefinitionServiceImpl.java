@@ -215,8 +215,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<ActionDefinitionDTO> getActionDefinitions(List<ComponentOperation> componentOperations) {
         return componentOperations.stream()
-            .map(taskTypeDTO -> getActionDefinition(
-                taskTypeDTO.componentName(), taskTypeDTO.componentVersion(), taskTypeDTO.componentOperationName()))
+            .map(componentOperation -> getActionDefinition(
+                componentOperation.componentName(), componentOperation.componentVersion(),
+                componentOperation.componentOperationName()))
             .toList();
     }
 
