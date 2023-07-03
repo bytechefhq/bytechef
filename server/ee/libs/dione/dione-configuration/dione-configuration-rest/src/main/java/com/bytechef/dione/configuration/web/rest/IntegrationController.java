@@ -17,6 +17,7 @@
 
 package com.bytechef.dione.configuration.web.rest;
 
+import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
 import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
@@ -71,6 +72,23 @@ public class IntegrationController implements IntegrationsApi {
             integrationFacade.getIntegrations(categoryIds, tagIds)
                 .stream()
                 .map(integration -> conversionService.convert(integration, IntegrationModel.class))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<CategoryModel>> getIntegrationCategories() {
+        return ResponseEntity.ok(integrationFacade.getIntegrationCategories()
+            .stream()
+            .map(category -> conversionService.convert(category, CategoryModel.class))
+            .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<TagModel>> getIntegrationTags() {
+        return ResponseEntity.ok(
+            integrationFacade.getIntegrationTags()
+                .stream()
+                .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
     }
 
