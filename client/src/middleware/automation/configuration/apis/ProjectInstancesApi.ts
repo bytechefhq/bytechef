@@ -15,12 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateProjectInstanceWorkflowJob200ResponseModel,
   ProjectInstanceModel,
+  TagModel,
   UpdateTagsRequestModel,
 } from '../models';
 import {
+    CreateProjectInstanceWorkflowJob200ResponseModelFromJSON,
+    CreateProjectInstanceWorkflowJob200ResponseModelToJSON,
     ProjectInstanceModelFromJSON,
     ProjectInstanceModelToJSON,
+    TagModelFromJSON,
+    TagModelToJSON,
     UpdateTagsRequestModelFromJSON,
     UpdateTagsRequestModelToJSON,
 } from '../models';
@@ -29,12 +35,23 @@ export interface CreateProjectInstanceRequest {
     projectInstanceModel: ProjectInstanceModel;
 }
 
+export interface CreateProjectInstanceWorkflowJobRequest {
+    id: number;
+    workflowId: string;
+}
+
 export interface DeleteProjectInstanceRequest {
     id: number;
 }
 
 export interface EnableProjectInstanceRequest {
     id: number;
+    enable: boolean;
+}
+
+export interface EnableProjectInstanceWorkflowRequest {
+    id: number;
+    workflowId: string;
     enable: boolean;
 }
 
@@ -94,6 +111,42 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
      */
     async createProjectInstance(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.createProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job
+     */
+    async createProjectInstanceWorkflowJobRaw(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectInstanceWorkflowJob200ResponseModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createProjectInstanceWorkflowJob.');
+        }
+
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling createProjectInstanceWorkflowJob.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/project-instances/{id}/workflows/{workflowId}/jobs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateProjectInstanceWorkflowJob200ResponseModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job
+     */
+    async createProjectInstanceWorkflowJob(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateProjectInstanceWorkflowJob200ResponseModel> {
+        const response = await this.createProjectInstanceWorkflowJobRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -164,6 +217,45 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Enable/disable a workflow of a project instance.
+     * Enable/disable a workflow of a project instance
+     */
+    async enableProjectInstanceWorkflowRaw(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling enableProjectInstanceWorkflow.');
+        }
+
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling enableProjectInstanceWorkflow.');
+        }
+
+        if (requestParameters.enable === null || requestParameters.enable === undefined) {
+            throw new runtime.RequiredError('enable','Required parameter requestParameters.enable was null or undefined when calling enableProjectInstanceWorkflow.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/project-instances/{id}/workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters.enable))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Enable/disable a workflow of a project instance.
+     * Enable/disable a workflow of a project instance
+     */
+    async enableProjectInstanceWorkflow(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.enableProjectInstanceWorkflowRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * Get a project instance by id.
      * Get a project instance by id
      */
@@ -192,6 +284,34 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
      */
     async getProjectInstance(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.getProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get project instance tags.
+     * Get project instance tags
+     */
+    async getProjectInstanceTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/project-instances/tags`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
+    }
+
+    /**
+     * Get project instance tags.
+     * Get project instance tags
+     */
+    async getProjectInstanceTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
+        const response = await this.getProjectInstanceTagsRaw(initOverrides);
         return await response.value();
     }
 

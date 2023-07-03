@@ -16,11 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   ConnectionModel,
+  TagModel,
   UpdateTagsRequestModel,
 } from '../models';
 import {
     ConnectionModelFromJSON,
     ConnectionModelToJSON,
+    TagModelFromJSON,
+    TagModelToJSON,
     UpdateTagsRequestModelFromJSON,
     UpdateTagsRequestModelToJSON,
 } from '../models';
@@ -193,6 +196,34 @@ export class ConnectionsApi extends runtime.BaseAPI {
      */
     async getConnection(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.getConnectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get connection tags.
+     * Get connection tags
+     */
+    async getConnectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/connections/tags`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
+    }
+
+    /**
+     * Get connection tags.
+     * Get connection tags
+     */
+    async getConnectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
+        const response = await this.getConnectionTagsRaw(initOverrides);
         return await response.value();
     }
 
