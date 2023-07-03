@@ -25,6 +25,8 @@ import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServic
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -52,13 +54,23 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
 
         List<Connection> connections = connectionService.getConnections();
 
-        return componentDefinitionService.getComponentDefinitions()
+        List<ComponentDefinitionDTO> componentDefinitionDTOs = componentDefinitionService.getComponentDefinitions()
             .stream()
-            .filter(filter(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, include,
-                connections))
+            .filter(
+                filter(
+                    actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, include,
+                    connections))
             .distinct()
             .toList();
+
+        if (include != null && !include.isEmpty()) {
+            componentDefinitionDTOs = new ArrayList<>(componentDefinitionDTOs);
+
+            componentDefinitionDTOs.sort(
+                Comparator.comparing(componentDefinitionDTO -> include.indexOf(componentDefinitionDTO.name())));
+        }
+
+        return componentDefinitionDTOs;
     }
 
     private static Predicate<ComponentDefinitionDTO> filter(
