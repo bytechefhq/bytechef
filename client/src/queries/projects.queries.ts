@@ -2,12 +2,9 @@ import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
     PageModel,
-    ProjectCategoriesApi,
     ProjectInstanceModel,
-    ProjectInstanceTagsApi,
     ProjectInstancesApi,
     ProjectModel,
-    ProjectTagsApi,
     ProjectsApi,
     TagModel,
 } from 'middleware/automation/configuration';
@@ -51,7 +48,7 @@ export const ProjectKeys = {
 
 export const useGetProjectCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
-        new ProjectCategoriesApi().getProjectCategories()
+        new ProjectsApi().getProjectCategories()
     );
 
 export const useGetProjectInstancesQuery = (filters: {
@@ -65,12 +62,12 @@ export const useGetProjectInstancesQuery = (filters: {
 
 export const useGetProjectInstanceTagsQuery = () =>
     useQuery<TagModel[], Error>(ProjectKeys.projectInstanceTags, () =>
-        new ProjectInstanceTagsApi().getProjectInstanceTags()
+        new ProjectInstancesApi().getProjectInstanceTags()
     );
 
 export const useGetProjectTagsQuery = () =>
     useQuery<TagModel[], Error>(ProjectKeys.projectTags, () =>
-        new ProjectTagsApi().getProjectTags()
+        new ProjectsApi().getProjectTags()
     );
 
 export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
