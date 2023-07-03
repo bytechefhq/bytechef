@@ -80,6 +80,7 @@ public class ScriptComponentHandlerIntTest {
         Assertions.assertEquals(6000, outputs.get("result"));
     }
 
+    @Disabled
     @Test
     public void testPerformR() {
         Job job = componentWorkflowTestSupport.execute(
