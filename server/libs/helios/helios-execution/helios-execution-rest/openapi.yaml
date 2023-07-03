@@ -6,8 +6,6 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "project-instance-requesters"
-  description: "The Automation Project Instance Requester API"
 - name: "project-workflow-executions"
   description: "The Automation Project Workflow Executions API"
 paths:
