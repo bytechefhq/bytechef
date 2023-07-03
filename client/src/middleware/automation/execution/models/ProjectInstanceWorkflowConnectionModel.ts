@@ -32,11 +32,11 @@ export interface ProjectInstanceWorkflowConnectionModel {
      */
     key?: string;
     /**
-     * The task name to which a connection belongs.
+     * The action/trigger name to which a connection belongs.
      * @type {string}
      * @memberof ProjectInstanceWorkflowConnectionModel
      */
-    taskName?: string;
+    operationName?: string;
 }
 
 /**
@@ -60,7 +60,7 @@ export function ProjectInstanceWorkflowConnectionModelFromJSONTyped(json: any, i
         
         'connectionId': !exists(json, 'connectionId') ? undefined : json['connectionId'],
         'key': !exists(json, 'key') ? undefined : json['key'],
-        'taskName': !exists(json, 'taskName') ? undefined : json['taskName'],
+        'operationName': !exists(json, 'operationName') ? undefined : json['operationName'],
     };
 }
 
@@ -75,7 +75,7 @@ export function ProjectInstanceWorkflowConnectionModelToJSON(value?: ProjectInst
         
         'connectionId': value.connectionId,
         'key': value.key,
-        'taskName': value.taskName,
+        'operationName': value.operationName,
     };
 }
 
