@@ -1,10 +1,7 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/helios/configuration/web/rest/ApiUtil.java
-src/main/java/com/bytechef/helios/configuration/web/rest/ProjectCategoriesApi.java
-src/main/java/com/bytechef/helios/configuration/web/rest/ProjectInstanceTagsApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectInstancesApi.java
-src/main/java/com/bytechef/helios/configuration/web/rest/ProjectTagsApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectsApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
