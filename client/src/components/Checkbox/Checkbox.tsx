@@ -49,7 +49,7 @@ const Checkbox = ({
             id={id}
             defaultChecked={defaultChecked}
             disabled={disabled}
-            className="flex h-5 w-5 items-center justify-center rounded focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 radix-state-checked:bg-blue-600 radix-state-unchecked:bg-gray-100 dark:radix-state-unchecked:bg-gray-900"
+            className="radix-state-checked:bg-blue-600 radix-state-unchecked:bg-gray-100 flex h-5 w-5 items-center justify-center rounded focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75"
         >
             <Indicator>
                 <CheckIcon className="h-4 w-4 self-center text-white" />

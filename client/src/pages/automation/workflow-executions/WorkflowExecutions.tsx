@@ -114,7 +114,6 @@ export const WorkflowExecutions = () => {
             loading={projectsLoading}
         >
             <LayoutContainer
-                bodyClassName="bg-white"
                 footer={
                     WorkflowExecutionsPage?.content &&
                     WorkflowExecutionsPage.content.length > 0 && (

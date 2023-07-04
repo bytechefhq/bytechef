@@ -55,7 +55,7 @@ const FilterableSelect = <
         {label && (
             <label
                 htmlFor={name || field?.name}
-                className="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                className="block text-sm font-medium text-gray-700"
             >
                 {label}
             </label>

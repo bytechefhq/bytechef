@@ -8,7 +8,7 @@ interface LabelProps {
 const Label = ({htmlFor, value}: LabelProps) => (
     <LabelPrimitive
         htmlFor={htmlFor}
-        className="ml-3 select-none text-sm font-medium text-gray-900 dark:text-gray-100"
+        className="ml-3 select-none text-sm font-medium text-gray-900"
     >
         {value}
     </LabelPrimitive>
