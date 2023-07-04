@@ -27,9 +27,9 @@ const PopoverMenu = ({children, edge = false, id}: PopoverMenuProps) => {
                     align="start"
                     sideOffset={4}
                     side="right"
-                    className="relative z-[9999] w-112 animate-slide-down rounded-lg bg-white shadow-md will-change-auto dark:bg-gray-800"
+                    className="w-112 animate-slide-down relative z-[9999] rounded-lg bg-white shadow-md will-change-auto"
                 >
-                    <Arrow className="fill-current text-white dark:text-gray-800" />
+                    <Arrow className="fill-current text-white" />
 
                     {id && (
                         <ContextualMenu

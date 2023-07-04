@@ -60,13 +60,13 @@ const AlertDialog = ({
                     >
                         <Content
                             forceMount
-                            className="fixed left-[50%] top-[50%] z-50 w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-4 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75 dark:bg-gray-800 md:w-full"
+                            className="fixed left-[50%] top-[50%] z-50 w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-4 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75 md:w-full"
                         >
-                            <Title className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <Title className="text-sm font-medium text-gray-900">
                                 {title}
                             </Title>
 
-                            <Description className="mt-2 text-sm font-normal text-gray-700 dark:text-gray-400">
+                            <Description className="mt-2 text-sm font-normal text-gray-700">
                                 {message}
                             </Description>
 

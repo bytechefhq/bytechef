@@ -57,7 +57,6 @@ const Projects = () => {
 
     return (
         <LayoutContainer
-            bodyClassName="bg-white"
             header={
                 <PageHeader
                     position="main"

@@ -37,7 +37,7 @@ const DropdownMenu = ({
                 customTriggerComponent
             ) : (
                 <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-gray-100">
-                    <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer dark:text-white" />
+                    <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
                 </div>
             )}
         </Trigger>
@@ -45,7 +45,7 @@ const DropdownMenu = ({
         <Portal>
             <Content
                 align="end"
-                className="z-50 rounded-lg border border-gray-50 bg-white p-1.5 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-800"
+                className="radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up z-50 rounded-lg border border-gray-50 bg-white p-1.5 shadow-md"
                 id={id.toString()}
             >
                 {menuItems.map((menuItem, i) => {
@@ -54,11 +54,11 @@ const DropdownMenu = ({
                     return (
                         <div key={`menu-item-${label || 'separator'}-${i}`}>
                             {separator ? (
-                                <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+                                <Separator className="my-1 h-px bg-gray-200" />
                             ) : (
                                 <Item
                                     className={twMerge(
-                                        'flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-700 outline-none hover:cursor-pointer hover:bg-gray-50 dark:text-gray-300',
+                                        'flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-700 outline-none hover:cursor-pointer hover:bg-gray-50',
                                         danger &&
                                             'text-red-600 hover:bg-red-600 hover:text-white'
                                     )}

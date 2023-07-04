@@ -76,17 +76,17 @@ const Dialog = ({
                     <Content
                         forceMount
                         className={twMerge(
-                            'fixed left-[50%] top-[50%] z-50 max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 dark:bg-gray-800 md:w-full',
+                            'fixed left-[50%] top-[50%] z-50 max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 md:w-full',
                             large && 'h-[800px] w-[900px] md:max-w-2xl',
                             !wizard && 'p-4'
                         )}
                     >
-                        <Title className="text-base font-medium text-gray-900 dark:text-gray-100">
+                        <Title className="text-base font-medium text-gray-900">
                             {title}
                         </Title>
 
                         {description && (
-                            <Description className="my-4 text-sm font-normal text-gray-700 dark:text-gray-400">
+                            <Description className="my-4 text-sm font-normal text-gray-700">
                                 {description}
                             </Description>
                         )}
@@ -94,7 +94,7 @@ const Dialog = ({
                         {children}
 
                         <Close className="absolute right-3 top-4 inline-flex items-center justify-center rounded-full p-1 focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75">
-                            <Cross1Icon className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-400" />
+                            <Cross1Icon className="h-4 w-4 text-gray-500 hover:text-gray-700" />
                         </Close>
                     </Content>
                 </Transition.Child>
