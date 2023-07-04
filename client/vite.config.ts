@@ -14,7 +14,7 @@ export default defineConfig({
             target: 'es2020',
         },
     },
-    plugins: [viteSvgr(), react(), tsconfigPaths()],
+    plugins: [react(), tsconfigPaths(), viteSvgr()],
     server: {
         proxy: {
             '/api': {
