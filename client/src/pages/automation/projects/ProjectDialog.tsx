@@ -1,3 +1,17 @@
+import {
+    CategoryModel,
+    ProjectModel,
+    TagModel,
+} from '@/middleware/automation/configuration';
+import {
+    useCreateProjectMutation,
+    useUpdateProjectMutation,
+} from '@/mutations/projects.mutations';
+import {
+    ProjectKeys,
+    useGetProjectCategoriesQuery,
+    useGetProjectTagsQuery,
+} from '@/queries/projects.queries';
 import {Close} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
@@ -7,21 +21,6 @@ import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
 import {useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
-
-import {
-    CategoryModel,
-    ProjectModel,
-    TagModel,
-} from '../../../middleware/automation/configuration';
-import {
-    useCreateProjectMutation,
-    useUpdateProjectMutation,
-} from '../../../mutations/projects.mutations';
-import {
-    ProjectKeys,
-    useGetProjectCategoriesQuery,
-    useGetProjectTagsQuery,
-} from '../../../queries/projects.queries';
 
 interface ProjectDialogProps {
     project: ProjectModel | undefined;

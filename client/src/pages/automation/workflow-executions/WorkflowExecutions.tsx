@@ -1,14 +1,14 @@
-import {QueueListIcon} from '@heroicons/react/24/outline';
-import DatePicker from 'components/DatePicker/DatePicker';
-import EmptyList from 'components/EmptyList/EmptyList';
+import DatePicker from '@/components/DatePicker/DatePicker';
+import EmptyList from '@/components/EmptyList/EmptyList';
 import FilterableSelect, {
     ISelectOption,
-} from 'components/FilterableSelect/FilterableSelect';
 import PageFooter from 'components/PageFooter/PageFooter';
 import PageHeader from 'components/PageHeader/PageHeader';
 import PageLoader from 'components/PageLoader/PageLoader';
-import Pagination from 'components/Pagination/Pagination';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
+} from '@/components/FilterableSelect/FilterableSelect';
+import PageLoader from '@/components/PageLoader/PageLoader';
+import Pagination from '@/components/Pagination/Pagination';
 import {
     GetProjectWorkflowExecutionsJobStatusEnum,
     ProjectWorkflowExecutionModel,

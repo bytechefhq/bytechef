@@ -1,3 +1,7 @@
+import {
+    useGetProjectInstanceTagsQuery,
+    useGetProjectInstancesQuery,
+} from '@/queries/projects.queries';
 import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import {
     Accordion,
@@ -9,10 +13,6 @@ import {ProjectModel} from 'middleware/automation/configuration';
 import {useSearchParams} from 'react-router-dom';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';
-import {
-    useGetProjectInstanceTagsQuery,
-    useGetProjectInstancesQuery,
-} from '../../../queries/projects.queries';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 import ProjectInstanceListItem from './ProjectInstanceListItem';
 import ProjectInstanceWorkflowList from './ProjectInstanceWorkflowList';

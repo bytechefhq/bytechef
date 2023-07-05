@@ -1,3 +1,15 @@
+import {
+    ProjectModel,
+    ProjectModelStatusEnum,
+    TagModel,
+} from '@/middleware/automation/configuration';
+import {
+    useCreateProjectWorkflowRequestMutation,
+    useDeleteProjectMutation,
+    useDuplicateProjectMutation,
+    useUpdateProjectTagsMutation,
+} from '@/mutations/projects.mutations';
+import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon} from '@heroicons/react/24/outline';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -12,18 +24,6 @@ import DropdownMenu, {
 import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
-import {
-    ProjectModel,
-    ProjectModelStatusEnum,
-    TagModel,
-} from '../../../middleware/automation/configuration';
-import {
-    useCreateProjectWorkflowRequestMutation,
-    useDeleteProjectMutation,
-    useDuplicateProjectMutation,
-    useUpdateProjectTagsMutation,
-} from '../../../mutations/projects.mutations';
-import {ProjectKeys} from '../../../queries/projects.queries';
 import ProjectDialog from './ProjectDialog';
 
 interface ProjectItemProps {

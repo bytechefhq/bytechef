@@ -1,3 +1,17 @@
+import {
+    CategoryModel,
+    IntegrationModel,
+    TagModel,
+} from '@/middleware/embedded/configuration';
+import {
+    useCreateIntegrationMutation,
+    useUpdateIntegrationMutation,
+} from '@/mutations/integrations.mutations';
+import {
+    IntegrationKeys,
+    useGetIntegrationCategoriesQuery,
+    useGetIntegrationTagsQuery,
+} from '@/queries/integrations.queries';
 import {Close} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
@@ -7,21 +21,6 @@ import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
 import React, {useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
-
-import {
-    CategoryModel,
-    IntegrationModel,
-    TagModel,
-} from '../../../middleware/embedded/configuration';
-import {
-    useCreateIntegrationMutation,
-    useUpdateIntegrationMutation,
-} from '../../../mutations/integrations.mutations';
-import {
-    IntegrationKeys,
-    useGetIntegrationCategoriesQuery,
-    useGetIntegrationTagsQuery,
-} from '../../../queries/integrations.queries';
 
 interface IntegrationDialogProps {
     integration: IntegrationModel | undefined;

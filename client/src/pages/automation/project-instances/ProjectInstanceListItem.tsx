@@ -1,3 +1,13 @@
+import {
+    ProjectInstanceModel,
+    ProjectModel,
+    TagModel,
+} from '@/middleware/automation/configuration';
+import {
+    useDeleteProjectInstanceMutation,
+    useUpdateProjectInstanceTagsMutation,
+} from '@/mutations/projects.mutations';
+import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
 import Switch from 'components/Switch/Switch';
@@ -10,16 +20,6 @@ import DropdownMenu, {
 } from '../../../components/DropdownMenu/DropdownMenu';
 import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
-import {
-    ProjectInstanceModel,
-    ProjectModel,
-    TagModel,
-} from '../../../middleware/automation/configuration';
-import {
-    useDeleteProjectInstanceMutation,
-    useUpdateProjectInstanceTagsMutation,
-} from '../../../mutations/projects.mutations';
-import {ProjectKeys} from '../../../queries/projects.queries';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 
 interface ProjectItemProps {
