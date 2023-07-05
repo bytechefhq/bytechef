@@ -1,62 +1,45 @@
-import {CogIcon} from '@heroicons/react/24/outline';
-import React from 'react';
-import {twMerge} from 'tailwind-merge';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import PageHeader from '@/layouts/PageHeader';
+import {Outlet, useLocation} from 'react-router-dom';
 
-import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher';
-
-const navigation = [{current: true, href: '#', icon: CogIcon, name: 'Display'}];
+const sidebarNavItems = [
+    {
+        href: '/settings/account',
+        title: 'Account',
+    },
+    {
+        href: '/settings/appearance',
+        title: 'Appearance',
+    },
+];
 
 export default function Settings() {
+    const location = useLocation();
+
     return (
         <LayoutContainer
-            header={<PageHeader title="Display" />}
+            header={<PageHeader title="Account" />}
             leftSidebarHeader={
-                <h1
-                    aria-labelledby="primary-heading"
-                    className="px-2 py-4 text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-200"
-                >
-                    Settings
-                </h1>
+                <PageHeader position="sidebar" title="Settings" />
             }
             leftSidebarBody={
-                <div className="px-2">
-                    {navigation.map((item) => (
-                        <a
-                            key={item.name}
-                            href={item.href}
-                            className={twMerge(
-                                item.current
-                                    ? 'text-black dark:bg-gray-600 dark:text-gray-300'
-                                    : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                'group flex items-center px-2 py-2 text-sm font-medium',
-                                'rounded-md'
-                            )}
-                        >
-                            {item.name}
-                        </a>
+                <LeftSidebarNav
+                    topBody={sidebarNavItems.map((item) => (
+                        <LeftSidebarNavItem
+                            key={item.href}
+                            item={{
+                                current: location.pathname === item.href,
+                                name: item.title,
+                            }}
+                            toLink={item.href}
+                        />
                     ))}
-                </div>
+                />
             }
         >
-            <div className="divide-y divide-gray-200 px-4">
-                <div>
-                    <dl className="divide-y divide-gray-200">
-                        <div className="items-center py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                            <dt className="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                Appearance
-                            </dt>
-
-                            <dd className="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                <span className="grow">
-                                    <ThemeSwitcher />
-                                </span>
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
+            <div className="px-4">
+                <Outlet />
             </div>
         </LayoutContainer>
     );
