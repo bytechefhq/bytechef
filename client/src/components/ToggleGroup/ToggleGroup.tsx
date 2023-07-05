@@ -29,7 +29,7 @@ const ToggleGroup = ({
         {toggleItems.map(({label, value}) => (
             <ToggleGroupPrimitive.Item
                 aria-label={label}
-                className="radix-state-on:pointer-events-none radix-state-on:bg-gray-50 border-y border-gray-100 bg-white px-2.5 py-2 first:rounded-l-md first:border-x last:rounded-r-md last:border-x-2 focus:relative focus:outline-none focus-visible:z-20 focus-visible:ring focus-visible:ring-purple-500/75 [&:not(:last-child)]:border-r-transparent"
+                className="border-y border-gray-100 bg-white px-2.5 py-2 first:rounded-l-md first:border-x last:rounded-r-md last:border-x-2 focus:relative focus:outline-none focus-visible:z-20 focus-visible:ring focus-visible:ring-purple-500/75 data-[state=on]:pointer-events-none data-[state=on]:bg-gray-50 [&:not(:last-child)]:border-r-transparent"
                 key={`group-item-${value}-${label}`}
                 value={value}
             >
