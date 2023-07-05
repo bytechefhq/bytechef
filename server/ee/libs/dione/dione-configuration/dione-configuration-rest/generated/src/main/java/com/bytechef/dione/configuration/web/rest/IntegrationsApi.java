@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-03T12:13:56.953931+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:44.171332+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "The Embedded Integrations API")
 public interface IntegrationsApi {
@@ -319,8 +319,8 @@ public interface IntegrationsApi {
      * GET /integrations : Get integrations
      * Get integrations.
      *
-     * @param categoryIds The list of the category ids used for filtering integrations. (optional)
-     * @param tagIds The list of tag ids of used for filtering integrations. (optional)
+     * @param categoryId The category id used for filtering integrations. (optional)
+     * @param tagId The tag id of used for filtering integrations. (optional)
      * @return A list of integrations. (status code 200)
      */
     @Operation(
@@ -340,8 +340,8 @@ public interface IntegrationsApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
-        @Parameter(name = "categoryIds", description = "The list of the category ids used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
-        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds
+        @Parameter(name = "categoryId", description = "The category id used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
+        @Parameter(name = "tagId", description = "The tag id of used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

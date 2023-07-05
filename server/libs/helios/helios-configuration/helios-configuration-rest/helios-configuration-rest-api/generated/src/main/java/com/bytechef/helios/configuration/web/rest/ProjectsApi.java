@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-03T12:13:58.765927+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:45.187993+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "projects", description = "The Automation Projects API")
 public interface ProjectsApi {
@@ -359,9 +359,9 @@ public interface ProjectsApi {
      * GET /projects : Get projects.
      * Get projects.
      *
-     * @param categoryIds The list of the category ids used for filtering projects. (optional)
+     * @param categoryId The category id used for filtering projects. (optional)
      * @param projectInstances Use for filtering projects for which project instances exist. (optional)
-     * @param tagIds The list of tag ids of used for filtering projects. (optional)
+     * @param tagId The tag id of used for filtering projects. (optional)
      * @return A list of projects. (status code 200)
      */
     @Operation(
@@ -381,9 +381,9 @@ public interface ProjectsApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<ProjectModel>> getProjects(
-        @Parameter(name = "categoryIds", description = "The list of the category ids used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+        @Parameter(name = "categoryId", description = "The category id used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "projectInstances", description = "Use for filtering projects for which project instances exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectInstances", required = false) Boolean projectInstances,
-        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds
+        @Parameter(name = "tagId", description = "The tag id of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

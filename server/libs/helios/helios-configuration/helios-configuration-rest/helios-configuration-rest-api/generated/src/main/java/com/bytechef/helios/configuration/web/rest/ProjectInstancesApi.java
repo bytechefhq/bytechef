@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-03T12:13:58.765927+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:45.187993+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
@@ -300,8 +300,8 @@ public interface ProjectInstancesApi {
      * GET /project-instances : Get project instances
      * Get project instances.
      *
-     * @param projectIds The list of the project ids used for filtering project instances. (optional)
-     * @param tagIds The list of tag ids of used for filtering project instances. (optional)
+     * @param projectId The project ids used for filtering project instances. (optional)
+     * @param tagIds The tag id of used for filtering project instances. (optional)
      * @return A list of project instances. (status code 200)
      */
     @Operation(
@@ -321,8 +321,8 @@ public interface ProjectInstancesApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
-        @Parameter(name = "projectIds", description = "The list of the project ids used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectIds", required = false) List<Long> projectIds,
-        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds
+        @Parameter(name = "projectId", description = "The project ids used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectId", required = false) Long projectId,
+        @Parameter(name = "tagIds", description = "The tag id of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) Long tagIds
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
