@@ -108,7 +108,7 @@ const Project: React.FC = () => {
             }
         >
             <LayoutContainer
-                className="border-l border-gray-200"
+                className="bg-muted dark:bg-background"
                 header={
                     <header className="flex items-center">
                         <Button
