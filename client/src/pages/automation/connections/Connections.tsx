@@ -1,13 +1,12 @@
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {useGetConnectionTagsQuery} from '@/queries/connections.queries';
 import {TagIcon} from '@heroicons/react/20/solid';
 import React, {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import PageHeader from '../../../components/PageHeader/PageHeader';
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
-import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import LayoutContainer from '../../../layouts/LayoutContainer';
+import PageHeader from '../../../layouts/PageHeader';
 import ConnectionList from './ConnectionList';
 import ConnectionDialog from './components/ConnectionDialog';
 
@@ -69,13 +68,15 @@ const Connections = () => {
                     title={title}
                 />
             }
-            leftSidebarHeader={<PageHeader leftSidebar title="Connections" />}
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Connections" />
+            }
             leftSidebarBody={
-                <LeftSidebarMenu
+                <LeftSidebarNav
                     topTitle="Components"
                     topBody={
                         <>
-                            <LeftSidebarMenuItem
+                            <LeftSidebarNavItem
                                 item={{
                                     current:
                                         !current?.id &&
@@ -90,7 +91,7 @@ const Connections = () => {
 
                             {!componentsLoading &&
                                 components?.map((item) => (
-                                    <LeftSidebarMenuItem
+                                    <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
                                             current:
@@ -120,7 +121,7 @@ const Connections = () => {
                                     <p className="px-3 text-xs">No tags.</p>
                                 ) : (
                                     tags?.map((item) => (
-                                        <LeftSidebarMenuItem
+                                        <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
                                                 current:

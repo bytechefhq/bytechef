@@ -1,9 +1,9 @@
+import Button from '@/components/Button/Button';
 import {Dialog, Transition} from '@headlessui/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
-import Button from 'components/Button/Button';
 import {Fragment} from 'react';
 
-import reactLogo from '../../assets/logo.svg';
+import reactLogo from '../assets/logo.svg';
 
 type Props = {
     user: {name: string; email: string; imageUrl: string};

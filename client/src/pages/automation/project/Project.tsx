@@ -25,7 +25,7 @@ import ToggleGroup, {
     IToggleItem,
 } from '../../../components/ToggleGroup/ToggleGroup';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
+import LayoutContainer from '../../../layouts/LayoutContainer';
 import WorkflowEditor from './WorkflowEditor';
 import LeftSidebar from './components/LeftSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';

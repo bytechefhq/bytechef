@@ -1,10 +1,11 @@
 import {CogIcon} from '@heroicons/react/24/outline';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
+import LayoutContainer from '@/layouts/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
+import PageHeader from '@/layouts/PageHeader';
 
-import PageHeader from '../../components/PageHeader/PageHeader';
 import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher';
-import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 
 const navigation = [{current: true, href: '#', icon: CogIcon, name: 'Display'}];
 
