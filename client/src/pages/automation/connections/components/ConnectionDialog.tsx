@@ -1,3 +1,9 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {ClipboardIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -13,7 +19,6 @@ import Input from 'components/Input/Input';
 import Label from 'components/Label/Label';
 import NativeSelect from 'components/NativeSelect/NativeSelect';
 import Properties, {PropertyFormProps} from 'components/Properties/Properties';
-import Tooltip from 'components/Tooltip/Tooltip';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ConnectionModel, TagModel} from 'middleware/automation/connection';
 import {
@@ -816,9 +821,17 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
         <div className="flex">
             <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
 
-            <Tooltip text="OAuth permission scopes used for this connection.">
-                <QuestionMarkCircledIcon />
-            </Tooltip>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <QuestionMarkCircledIcon />
+                    </TooltipTrigger>
+
+                    <TooltipContent>
+                        OAuth permission scopes used for this connection.
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
         </div>
 
         <div className="space-y-1">

@@ -1,4 +1,10 @@
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
     CheckIcon,
     ChevronDownIcon,
     ChevronUpIcon,
@@ -20,7 +26,6 @@ import {
     Value,
     Viewport,
 } from '@radix-ui/react-select';
-import Tooltip from 'components/Tooltip/Tooltip';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -70,9 +75,15 @@ const Select = ({
                 <span>{label}</span>
 
                 {description && (
-                    <Tooltip text={description}>
-                        <QuestionMarkCircledIcon />
-                    </Tooltip>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <QuestionMarkCircledIcon />
+                            </TooltipTrigger>
+
+                            <TooltipContent>{description}</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 )}
             </Label>
         )}
