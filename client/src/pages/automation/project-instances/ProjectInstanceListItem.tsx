@@ -116,7 +116,7 @@ const ProjectInstanceListItem = ({
                                         : `${project.workflowIds?.length} workflows`}
                                 </span>
 
-                                <ChevronDownIcon className="h-4 w-4 duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
+                                <ChevronDownIcon className="ease-[cubic-bezier(0.87,_0,_0.13,_1)] h-4 w-4 duration-300 group-data-[state=open]:rotate-180" />
                             </div>
 
                             <div onClick={(event) => event.preventDefault()}>
