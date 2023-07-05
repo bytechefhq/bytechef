@@ -1,10 +1,17 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {TagModel} from '@/middleware/automation/configuration';
+
 /// <reference types="vite-plugin-svgr/client" />
 
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
-import Tooltip from 'components/Tooltip/Tooltip';
 import {useState} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
@@ -109,9 +116,15 @@ export const Property = ({
                     <span className="text-sm font-medium">{label}</span>
 
                     {description && (
-                        <Tooltip text={description}>
-                            <QuestionMarkCircledIcon className="ml-1" />
-                        </Tooltip>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon className="ml-1" />
+                                </TooltipTrigger>
+
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
             )}

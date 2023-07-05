@@ -1,6 +1,11 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import Tooltip from 'components/Tooltip/Tooltip';
 import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -47,9 +52,15 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                     {required && <span className="pr-1 text-red-500">*</span>}
 
                     {description && (
-                        <Tooltip text={description}>
-                            <QuestionMarkCircledIcon />
-                        </Tooltip>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon />
+                                </TooltipTrigger>
+
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
             )}

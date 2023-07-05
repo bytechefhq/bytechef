@@ -1,3 +1,9 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {
@@ -7,8 +13,6 @@ import {
     forwardRef,
 } from 'react';
 import {twMerge} from 'tailwind-merge';
-
-import Tooltip from '../Tooltip/Tooltip';
 
 type InputProps = {
     dataPills?: Array<string>;
@@ -64,9 +68,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     {required && <span className="pr-1 text-red-500">*</span>}
 
                     {description && (
-                        <Tooltip text={description}>
-                            <QuestionMarkCircledIcon />
-                        </Tooltip>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon />
+                                </TooltipTrigger>
+
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
             )}

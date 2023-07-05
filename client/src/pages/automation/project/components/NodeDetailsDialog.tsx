@@ -1,3 +1,9 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -11,7 +17,6 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
-import Tooltip from '../../../../components/Tooltip/Tooltip';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import CurrentActionSelect from './CurrentActionSelect';
@@ -167,11 +172,17 @@ const NodeDetailsDialog = () => {
                                 </span>
 
                                 {currentComponent?.description && (
-                                    <Tooltip
-                                        text={currentComponent?.description}
-                                    >
-                                        <InfoCircledIcon className="h-4 w-4" />
-                                    </Tooltip>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <InfoCircledIcon className="h-4 w-4" />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>
+                                                {currentComponent?.description}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 )}
 
                                 <Button
