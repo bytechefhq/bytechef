@@ -23,7 +23,7 @@ import {useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 
 interface ProjectDialogProps {
-    project: ProjectModel | undefined;
+    project?: ProjectModel;
     showTrigger?: boolean;
     visible?: boolean;
     onClose?: (project?: ProjectModel) => void;
