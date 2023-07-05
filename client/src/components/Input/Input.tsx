@@ -1,11 +1,17 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import React, {ReactNode, forwardRef} from 'react';
+import {
+    DetailedHTMLProps,
+    InputHTMLAttributes,
+    ReactNode,
+    forwardRef,
+} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Tooltip from '../Tooltip/Tooltip';
 
 type InputProps = {
+    dataPills?: Array<string>;
     description?: string;
     fieldsetClassName?: string;
     error?: boolean;
@@ -15,19 +21,18 @@ type InputProps = {
     name: string;
     trailing?: ReactNode;
     type?: string;
-} & React.DetailedHTMLProps<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
->;
+} & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     (
         {
             className,
+            dataPills,
             description,
             disabled,
             error,
             fieldsetClassName,
+            id,
             label,
             labelClassName,
             leadingIcon,
@@ -88,6 +93,24 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         </div>
                     )}
 
+                    {!!dataPills?.length && (
+                        <div
+                            className={twMerge(
+                                'absolute left-0 top-1/2 -translate-y-1/2 space-x-2',
+                                leadingIcon && 'left-10'
+                            )}
+                        >
+                            {dataPills.map((pill) => (
+                                <span
+                                    key={pill}
+                                    className="inline-flex rounded-full border bg-gray-100 px-2 py-1 text-xs"
+                                >
+                                    {pill}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
                     <input
                         className={twMerge(
                             'block w-full rounded-md border p-2 focus:outline-none focus:ring-1 dark:bg-gray-800 sm:text-sm',
@@ -102,7 +125,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             className
                         )}
                         disabled={disabled}
-                        id={name}
+                        id={id || name}
                         name={name}
                         ref={ref}
                         type={type}

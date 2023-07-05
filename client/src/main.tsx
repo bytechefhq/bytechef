@@ -23,15 +23,10 @@ function renderApp() {
     const queryClient = new QueryClient();
 
     root.render(
-        <React.StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
 
-                <ReactQueryDevtools
-                    initialIsOpen={false}
-                    position="bottom-right"
-                />
-            </QueryClientProvider>
-        </React.StrictMode>
+            <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+        </QueryClientProvider>
     );
 }
