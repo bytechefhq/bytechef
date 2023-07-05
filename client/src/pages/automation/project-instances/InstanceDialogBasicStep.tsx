@@ -1,3 +1,7 @@
+import {
+    useGetProjectTagsQuery,
+    useGetProjectsQuery,
+} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Input from 'components/Input/Input';
 import {ProjectInstanceModel} from 'middleware/automation/configuration';
@@ -12,10 +16,6 @@ import {
 
 import FilterableSelect from '../../../components/FilterableSelect/FilterableSelect';
 import TextArea from '../../../components/TextArea/TextArea';
-import {
-    useGetProjectTagsQuery,
-    useGetProjectsQuery,
-} from '../../../queries/projects.queries';
 
 interface ProjectDialogProps {
     control: Control<ProjectInstanceModel>;

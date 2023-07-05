@@ -1,12 +1,12 @@
+import {
+    useGetIntegrationTagsQuery,
+    useGetIntegrationsQuery,
+} from '@/queries/integrations.queries';
 import {Square3Stack3DIcon} from '@heroicons/react/24/outline';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';
-import {
-    useGetIntegrationTagsQuery,
-    useGetIntegrationsQuery,
-} from '../../../queries/integrations.queries';
 import IntegrationDialog from './IntegrationDialog';
 import IntegrationListItem from './IntegrationListItem';
 

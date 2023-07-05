@@ -1,3 +1,13 @@
+import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
+import {
+    useDeleteConnectionMutation,
+    useUpdateConnectionTagsMutation,
+} from '@/mutations/connections.mutations';
+import {
+    ComponentDefinitionKeys,
+    useGetComponentDefinitionQuery,
+} from '@/queries/componentDefinitions.queries';
+import {ConnectionKeys} from '@/queries/connections.queries';
 import {CalendarIcon} from '@heroicons/react/24/outline';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -10,19 +20,6 @@ import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
 import TagList from '../../../components/TagList/TagList';
-import {
-    ConnectionModel,
-    TagModel,
-} from '../../../middleware/automation/connection';
-import {
-    useDeleteConnectionMutation,
-    useUpdateConnectionTagsMutation,
-} from '../../../mutations/connections.mutations';
-import {
-    ComponentDefinitionKeys,
-    useGetComponentDefinitionQuery,
-} from '../../../queries/componentDefinitions.queries';
-import {ConnectionKeys} from '../../../queries/connections.queries';
 import ConnectionDialog from './components/ConnectionDialog';
 
 interface ConnectionListItemProps {

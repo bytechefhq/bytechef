@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '../../../../middleware/core/workflow/configuration';
+} from '@/middleware/core/workflow/configuration';
+import React, {useEffect, useState} from 'react';
+
 import WorkflowNodesList from './WorkflowNodesList';
 
 interface SidebarProps {

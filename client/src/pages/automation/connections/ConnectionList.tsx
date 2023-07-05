@@ -1,12 +1,12 @@
+import {
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/queries/connections.queries';
 import {LinkIcon} from '@heroicons/react/24/outline';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';
-import {
-    useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
-} from '../../../queries/connections.queries';
 import ConnectionListItem from './ConnectionListItem';
 import ConnectionDialog from './components/ConnectionDialog';
 
