@@ -147,7 +147,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                         : `${project.workflowIds?.length} workflows`}
                                 </div>
 
-                                <ChevronDownIcon className="duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
+                                <ChevronDownIcon className="ease-[cubic-bezier(0.87,_0,_0.13,_1)] duration-300 group-data-[state=open]:rotate-180" />
                             </div>
 
                             <div onClick={(event) => event.preventDefault()}>
