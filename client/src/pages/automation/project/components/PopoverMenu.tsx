@@ -1,6 +1,6 @@
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {Arrow, Content, Portal, Root, Trigger} from '@radix-ui/react-popover';
 import {ReactNode} from 'react';
 
 import ContextualMenu from '../components/ContextualMenu';
@@ -19,29 +19,39 @@ const PopoverMenu = ({children, edge = false, id}: PopoverMenuProps) => {
     const {data: flowControls} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
-        <Root>
-            <Trigger asChild>{children}</Trigger>
+        <Popover>
+            <PopoverTrigger asChild>{children}</PopoverTrigger>
 
-            <Portal>
-                <Content
-                    align="start"
-                    sideOffset={4}
-                    side="right"
-                    className="w-112 animate-slide-down relative z-[9999] rounded-lg bg-white shadow-md will-change-auto"
-                >
-                    <Arrow className="fill-current text-white" />
-
-                    {id && (
-                        <ContextualMenu
-                            id={id}
-                            components={components}
-                            flowControls={flowControls}
-                            edge={edge}
-                        />
-                    )}
-                </Content>
-            </Portal>
-        </Root>
+            <PopoverContent
+                align="start"
+                className="w-[500px] p-0 will-change-auto"
+                sideOffset={4}
+                side="right"
+            >
+                {id && (
+                    <ContextualMenu
+                        id={id}
+                        components={components}
+                        flowControls={flowControls}
+                        edge={edge}
+                    />
+                )}
+            </PopoverContent>
+        </Popover>
+        // <Root>
+        //     <Trigger asChild>{children}</Trigger>
+        //
+        //     <Portal>
+        //         <Content
+        //             align="start"
+        //             sideOffset={4}
+        //             side="right"
+        //             className="w-112 animate-slide-down relative z-[9999] rounded-lg bg-white shadow-md will-change-auto"
+        //         >
+        //
+        //         </Content>
+        //     </Portal>
+        // </Root>
     );
 };
 
