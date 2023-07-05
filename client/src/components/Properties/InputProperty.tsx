@@ -1,6 +1,7 @@
 import Input from 'components/Input/Input';
 import {useDataPillPanelStore} from 'pages/automation/project/stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from 'pages/automation/project/stores/useNodeDetailsDialogStore';
+import useWorkflowDefinitionStore from 'pages/automation/project/stores/useWorkflowDefinitionStore';
 import {ReactNode, useRef} from 'react';
 
 interface InputPropertyProps {
@@ -31,6 +32,11 @@ const InputProperty = ({
 }: InputPropertyProps) => {
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {setFocusedInput} = useNodeDetailsDialogStore();
+    const {dataPills} = useWorkflowDefinitionStore();
+
+    const inputRef = useRef(null);
+
+    const dataPill = dataPills.find((dataPill) => dataPill.name === name);
 
     const getInputType = () => {
         switch (controlType) {
@@ -55,10 +61,9 @@ const InputProperty = ({
         }
     };
 
-    const inputRef = useRef(null);
-
     return (
         <Input
+            dataPills={dataPill?.value}
             description={description}
             defaultValue={defaultValue as string}
             error={error}

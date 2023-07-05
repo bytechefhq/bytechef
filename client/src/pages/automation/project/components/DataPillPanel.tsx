@@ -19,7 +19,9 @@ import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import DataPill from './DataPill';
 
 const DataPillPanelBody = () => {
-    const {componentActions, componentNames} = useWorkflowDefinitionStore();
+    const {componentActions, componentNames, dataPills, setDataPills} =
+        useWorkflowDefinitionStore();
+
     const {focusedInput} = useNodeDetailsDialogStore();
 
     const taskTypes = componentActions?.map(
@@ -48,7 +50,31 @@ const DataPillPanelBody = () => {
         const dataPillData = property.label || property.name;
 
         if (focusedInput && dataPillData) {
-            focusedInput.value = dataPillData;
+            const existingDataPill = dataPills.find(
+                (pill) => pill.name === focusedInput.name
+            );
+
+            if (existingDataPill) {
+                const remainingDataPills = dataPills.filter(
+                    (pill) => pill.name !== focusedInput.name
+                );
+
+                setDataPills([
+                    ...remainingDataPills,
+                    {
+                        name: focusedInput.name,
+                        value: [...existingDataPill.value, dataPillData],
+                    },
+                ]);
+            } else {
+                setDataPills([
+                    ...dataPills,
+                    {
+                        name: focusedInput.name,
+                        value: [dataPillData],
+                    },
+                ]);
+            }
         }
     };
 
