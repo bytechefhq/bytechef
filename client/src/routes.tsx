@@ -1,3 +1,6 @@
+import IntegrationConfiguration from '@/pages/embedded/integration/IntegrationConfiguration';
+import IntegrationSettings from '@/pages/embedded/integration/IntegrationSettings';
+import IntegrationWorkflowEditor from '@/pages/embedded/integration/IntegrationWorkflowEditor';
 import Account from '@/pages/settings/Account';
 import Appearance from '@/pages/settings/Appearance';
 import Settings from '@/pages/settings/Settings';
@@ -86,7 +89,28 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         element: <Integrations />,
+                        path: '',
+                    },
+                    {
+                        element: <Integrations />,
                         path: 'integrations',
+                    },
+                    {
+                        children: [
+                            {
+                                element: <IntegrationConfiguration />,
+                                path: 'configuration',
+                            },
+                            {
+                                element: <IntegrationWorkflowEditor />,
+                                path: 'workflows',
+                            },
+                            {
+                                element: <IntegrationSettings />,
+                                path: 'settings',
+                            },
+                        ],
+                        path: 'integrations/:integrationId',
                     },
                 ],
                 path: 'embedded',
