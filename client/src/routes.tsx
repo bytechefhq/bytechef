@@ -1,3 +1,6 @@
+import Account from '@/pages/settings/Account';
+import Appearance from '@/pages/settings/Appearance';
+import Settings from '@/pages/settings/Settings';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter} from 'react-router-dom';
 
@@ -11,7 +14,6 @@ import Project from './pages/automation/project/Project';
 import Projects from './pages/automation/projects/Projects';
 import WorkflowExecutions from './pages/automation/workflow-executions/WorkflowExecutions';
 import Integrations from './pages/embedded/integrations/Integrations';
-import Settings from './pages/settings/Settings';
 import {ProjectKeys} from './queries/projects.queries';
 
 const queryClient = new QueryClient();
@@ -63,6 +65,20 @@ export const router = createBrowserRouter([
                 path: 'automation',
             },
             {
+                children: [
+                    {
+                        element: <Account />,
+                        path: '',
+                    },
+                    {
+                        element: <Account />,
+                        path: 'account',
+                    },
+                    {
+                        element: <Appearance />,
+                        path: 'appearance',
+                    },
+                ],
                 element: <Settings />,
                 path: 'settings',
             },
