@@ -52,8 +52,8 @@ const IntegrationList = () => {
                             icon={
                                 <Square3Stack3DIcon className="h-12 w-12 text-gray-400" />
                             }
-                            message="Get started by creating a new project."
-                            title="No projects"
+                            message="Get started by creating a new integrations."
+                            title="No integrations"
                         />
                     ) : (
                         integrations.map((integration) => {
