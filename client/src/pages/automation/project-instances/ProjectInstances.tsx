@@ -154,8 +154,9 @@ const ProjectInstances = () => {
         >
             <div
                 className={twMerge(
-                    'w-full px-2 2xl:mx-auto 2xl:w-4/5',
-                    !projects?.length && 'place-self-center'
+                    'w-full',
+                    !projects?.length &&
+                        'place-self-center px-2 2xl:mx-auto 2xl:w-4/5'
                 )}
             >
                 {!projectsLoading && !projects?.length ? (
