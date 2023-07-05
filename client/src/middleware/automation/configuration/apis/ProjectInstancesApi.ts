@@ -60,8 +60,8 @@ export interface GetProjectInstanceRequest {
 }
 
 export interface GetProjectInstancesRequest {
-    projectIds?: Array<number>;
-    tagIds?: Array<number>;
+    projectId?: number;
+    tagIds?: number;
 }
 
 export interface UpdateProjectInstanceRequest {
@@ -322,11 +322,11 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
     async getProjectInstancesRaw(requestParameters: GetProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
         const queryParameters: any = {};
 
-        if (requestParameters.projectIds) {
-            queryParameters['projectIds'] = requestParameters.projectIds;
+        if (requestParameters.projectId !== undefined) {
+            queryParameters['projectId'] = requestParameters.projectId;
         }
 
-        if (requestParameters.tagIds) {
+        if (requestParameters.tagIds !== undefined) {
             queryParameters['tagIds'] = requestParameters.tagIds;
         }
 
