@@ -1,4 +1,4 @@
-import {Switch} from '@headlessui/react';
+import {Switch} from '@/components/ui/switch';
 import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
 import Properties from 'components/Properties/Properties';
