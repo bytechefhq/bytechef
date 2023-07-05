@@ -1,3 +1,10 @@
+import {
+    GetProjectWorkflowExecutionRequest,
+    GetProjectWorkflowExecutionsRequest,
+    ProjectWorkflowExecutionModel,
+    ProjectWorkflowExecutionsApi,
+} from '@/middleware/automation/execution';
+import {WorkflowModel} from '@/middleware/core/workflow/configuration';
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
@@ -9,21 +16,13 @@ import {
     TagModel,
 } from 'middleware/automation/configuration';
 
-import {
-    GetProjectWorkflowExecutionRequest,
-    GetProjectWorkflowExecutionsRequest,
-    ProjectWorkflowExecutionModel,
-    ProjectWorkflowExecutionsApi,
-} from '../middleware/automation/execution';
-import {WorkflowModel} from '../middleware/core/workflow/configuration';
-
 export const ProjectKeys = {
     project: (id: number) => ['project', id],
     projectCategories: ['projectCategories'] as const,
-    projectInstanceList: (filters: {
-        projectIds?: number[];
-        tagIds?: number[];
-    }) => [...ProjectKeys.projectInstances, filters],
+    projectInstanceList: (filters: {projectId?: number; tagId?: number}) => [
+        ...ProjectKeys.projectInstances,
+        filters,
+    ],
     projectInstanceTags: ['projectInstanceTags'] as const,
     projectInstances: ['projectInstances'] as const,
     projectList: (
@@ -52,8 +51,8 @@ export const useGetProjectCategoriesQuery = () =>
     );
 
 export const useGetProjectInstancesQuery = (filters: {
-    projectIds?: number[];
-    tagIds?: number[];
+    projectId?: number;
+    tagId?: number;
 }) =>
     useQuery<ProjectInstanceModel[], Error>(
         ProjectKeys.projectInstanceList(filters),

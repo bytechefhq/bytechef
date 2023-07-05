@@ -10,7 +10,7 @@ import {
 export const IntegrationKeys = {
     integration: (id: number) => ['integration', id],
     integrationCategories: ['integrationCategories'] as const,
-    integrationList: (filters: {categoryIds?: number[]; tagIds?: number[]}) => [
+    integrationList: (filters: {categoryId?: number; tagId?: number}) => [
         ...IntegrationKeys.integrations,
         filters,
     ],
@@ -47,8 +47,8 @@ export const useGetIntegrationQuery = (
     );
 
 export const useGetIntegrationsQuery = (filters: {
-    categoryIds?: number[];
-    tagIds?: number[];
+    categoryId?: number;
+    tagId?: number;
 }) =>
     useQuery<IntegrationModel[], Error>(
         IntegrationKeys.integrationList(filters),
