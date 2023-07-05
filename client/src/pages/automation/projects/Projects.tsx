@@ -1,3 +1,4 @@
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {
     useGetProjectCategoriesQuery,
     useGetProjectTagsQuery,
@@ -6,10 +7,8 @@ import {TagIcon} from '@heroicons/react/20/solid';
 import React, {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
-import PageHeader from '../../../components/PageHeader/PageHeader';
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
-import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import LayoutContainer from '../../../layouts/LayoutContainer';
+import PageHeader from '../../../layouts/PageHeader';
 import ProjectDialog from './ProjectDialog';
 import ProjectList from './ProjectList';
 
@@ -77,13 +76,15 @@ const Projects = () => {
                     title={title}
                 />
             }
-            leftSidebarHeader={<PageHeader leftSidebar title="Projects" />}
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Projects" />
+            }
             leftSidebarBody={
-                <LeftSidebarMenu
+                <LeftSidebarNav
                     topTitle="Categories"
                     topBody={
                         <>
-                            <LeftSidebarMenuItem
+                            <LeftSidebarNavItem
                                 item={{
                                     current:
                                         !current?.id &&
@@ -101,7 +102,7 @@ const Projects = () => {
 
                             {!categoriesLoading &&
                                 categories?.map((item) => (
-                                    <LeftSidebarMenuItem
+                                    <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
                                             current:
@@ -129,7 +130,7 @@ const Projects = () => {
                             {!tagsLoading &&
                                 (tags && !!tags.length ? (
                                     tags?.map((item) => (
-                                        <LeftSidebarMenuItem
+                                        <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
                                                 current:

@@ -1,3 +1,4 @@
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {
     useGetProjectInstanceTagsQuery,
     useGetProjectsQuery,
@@ -6,10 +7,8 @@ import {TagIcon} from '@heroicons/react/20/solid';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import PageHeader from '../../../components/PageHeader/PageHeader';
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
-import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import LayoutContainer from '../../../layouts/LayoutContainer';
+import PageHeader from '../../../layouts/PageHeader';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 import ProjectInstanceList from './ProjectInstanceList';
 import EmptyList from "@/components/EmptyList/EmptyList";
@@ -66,13 +65,15 @@ const ProjectInstances = () => {
                     title={title}
                 />
             }
-            leftSidebarHeader={<PageHeader leftSidebar title="Instances" />}
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Instances" />
+            }
             leftSidebarBody={
-                <LeftSidebarMenu
+                <LeftSidebarNav
                     topTitle="Projects"
                     topBody={
                         <>
-                            <LeftSidebarMenuItem
+                            <LeftSidebarNavItem
                                 item={{
                                     current:
                                         !current?.id &&
@@ -90,7 +91,7 @@ const ProjectInstances = () => {
 
                             {!projectsLoading &&
                                 projects?.map((item) => (
-                                    <LeftSidebarMenuItem
+                                    <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
                                             current:
@@ -118,7 +119,7 @@ const ProjectInstances = () => {
                             {!tagsLoading &&
                                 (tags && !!tags.length ? (
                                     tags?.map((item) => (
-                                        <LeftSidebarMenuItem
+                                        <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
                                                 current:

@@ -107,8 +107,8 @@ const LayoutContainer = ({
             </Transition.Root>
 
             {leftSidebarOpen && (
-                <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                    <nav className="flex h-full flex-col dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                <aside className="hidden border-r md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
+                    <nav className="flex h-full flex-col">
                         {leftSidebarHeader}
 
                         <div className="overflow-y-auto">{leftSidebarBody}</div>
@@ -137,7 +137,7 @@ const LayoutContainer = ({
 
                     {rightToolbarOpen && !!rightToolbarBody && (
                         <aside className="flex">
-                            <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                            <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100">
                                 <div className="overflow-y-auto">
                                     {rightToolbarBody}
                                 </div>

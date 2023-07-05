@@ -1,3 +1,4 @@
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
@@ -6,10 +7,8 @@ import {TagIcon} from '@heroicons/react/20/solid';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import PageHeader from '../../../components/PageHeader/PageHeader';
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
-import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import LayoutContainer from '../../../layouts/LayoutContainer';
+import PageHeader from '../../../layouts/PageHeader';
 import IntegrationDialog from './IntegrationDialog';
 import IntegrationList from './IntegrationList';
 
@@ -62,13 +61,15 @@ const Integrations = () => {
                     title={title}
                 />
             }
-            leftSidebarHeader={<PageHeader leftSidebar title="Integrations" />}
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Integrations" />
+            }
             leftSidebarBody={
-                <LeftSidebarMenu
+                <LeftSidebarNav
                     topTitle="Categories"
                     topBody={
                         <>
-                            <LeftSidebarMenuItem
+                            <LeftSidebarNavItem
                                 item={{
                                     current:
                                         !current?.id &&
@@ -86,7 +87,7 @@ const Integrations = () => {
 
                             {!categoriesLoading &&
                                 categories?.map((item) => (
-                                    <LeftSidebarMenuItem
+                                    <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
                                             current:
@@ -116,7 +117,7 @@ const Integrations = () => {
                                     <p className="px-3 text-xs">No tags.</p>
                                 ) : (
                                     tags?.map((item) => (
-                                        <LeftSidebarMenuItem
+                                        <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
                                                 current:

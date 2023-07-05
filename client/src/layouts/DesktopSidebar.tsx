@@ -1,8 +1,8 @@
+import Avatar from '@/components/Avatar/Avatar';
+import Tooltip from '@/components/Tooltip/Tooltip';
 import {Link} from 'react-router-dom';
 
-import reactLogo from '../../assets/logo.svg';
-import Avatar from '../Avatar/Avatar';
-import Tooltip from '../Tooltip/Tooltip';
+import reactLogo from '../assets/logo.svg';
 
 export function DesktopSidebar({
     navigation,
@@ -16,9 +16,9 @@ export function DesktopSidebar({
     }[];
 }) {
     return (
-        <div className="hidden border-r border-gray-200 lg:flex lg:shrink-0">
+        <div className="hidden border-r border-muted bg-muted lg:flex lg:shrink-0">
             <div className="flex w-[64px]">
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto dark:bg-gray-800">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                     <div className="flex-1">
                         <Link to="">
                             <div className="flex items-center justify-center py-4">
@@ -38,7 +38,7 @@ export function DesktopSidebar({
                                 <Link
                                     key={item.name}
                                     to={item.href}
-                                    className="flex items-center rounded-lg p-4 hover:text-blue-600 dark:text-gray-400 dark:hover:text-sky-500"
+                                    className="flex items-center rounded-lg p-4 hover:text-blue-600"
                                 >
                                     <Tooltip side="right" text={item.name}>
                                         <item.icon
