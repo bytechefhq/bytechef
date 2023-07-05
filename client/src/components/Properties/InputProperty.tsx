@@ -3,6 +3,7 @@ import {useDataPillPanelStore} from 'pages/automation/project/stores/useDataPill
 import {useNodeDetailsDialogStore} from 'pages/automation/project/stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from 'pages/automation/project/stores/useWorkflowDefinitionStore';
 import {ReactNode, useRef} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 interface InputPropertyProps {
     controlType?: string;
@@ -30,8 +31,9 @@ const InputProperty = ({
     required,
     title,
 }: InputPropertyProps) => {
-    const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {setFocusedInput} = useNodeDetailsDialogStore();
+    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
+    const {focusedInput, nodeDetailsDialogOpen, setFocusedInput} =
+        useNodeDetailsDialogStore();
     const {dataPills} = useWorkflowDefinitionStore();
 
     const inputRef = useRef(null);
@@ -63,6 +65,11 @@ const InputProperty = ({
 
     return (
         <Input
+            className={twMerge(
+                dataPillPanelOpen &&
+                    focusedInput?.name === name &&
+                    'shadow-lg shadow-blue-200 ring ring-blue-500'
+            )}
             dataPills={dataPill?.value}
             description={description}
             defaultValue={defaultValue as string}
@@ -76,10 +83,12 @@ const InputProperty = ({
             title={title}
             type={hidden ? 'hidden' : getInputType()}
             onFocus={() => {
-                setDataPillPanelOpen(true);
+                if (nodeDetailsDialogOpen) {
+                    setDataPillPanelOpen(true);
 
-                if (inputRef.current) {
-                    setFocusedInput(inputRef.current);
+                    if (inputRef.current) {
+                        setFocusedInput(inputRef.current);
+                    }
                 }
             }}
             ref={inputRef}
