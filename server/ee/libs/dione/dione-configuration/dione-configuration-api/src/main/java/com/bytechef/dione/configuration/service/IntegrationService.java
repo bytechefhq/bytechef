@@ -34,7 +34,7 @@ public interface IntegrationService {
 
     Integration getIntegration(long id);
 
-    List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds);
+    List<Integration> getIntegrations(Long categoryId, Long tagId);
 
     Integration update(long id, List<Long> tagIds);
 

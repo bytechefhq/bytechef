@@ -33,25 +33,38 @@ import java.util.List;
 public interface ConnectionRepository
     extends ListPagingAndSortingRepository<Connection, Long>, ListCrudRepository<Connection, Long> {
 
-    List<Connection> findAllByComponentNameInOrderByName(List<String> componentNames);
+    List<Connection> findAllByComponentNameOrderByName(String componentName);
 
-    List<Connection> findAllByComponentNameAndConnectionVersion(String componentName, int version);
-
-    @Query("""
-            SELECT connection.* FROM connection
-            JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection.component_name IN (:componentNames)
-            AND connection_tag.tag_id IN (:tagIds)
-            ORDER BY connection.name
-        """)
-    List<Connection> findAllByComponentNamesAndTagIds(
-        @Param("componentNames") List<String> componentNames, @Param("tagIds") List<Long> tagIds);
+    List<Connection> findAllByComponentNameAndConnectionVersionOrderByName(
+        String componentName, int connectionVersion);
 
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection_tag.tag_id IN (:tagIds)
+            WHERE connection.component_name == :componentName
+            AND connection_tag.tag_id == :tagId
             ORDER BY connection.name
         """)
-    List<Connection> findAllByTagIdIn(@Param("tagIds") List<Long> tagIds);
+    List<Connection> findAllByComponentNameAndTagId(
+        @Param("componentName") String componentName, @Param("tagId") long tagId);
+
+    @Query("""
+            SELECT connection.* FROM connection
+            JOIN connection_tag ON connection.id = connection_tag.connection_id
+            WHERE connection.component_name == :componentName
+            AND connection.connection_version == :connectionVersion
+            AND connection_tag.tag_id == :tagId
+            ORDER BY connection.name
+        """)
+    Iterable<Connection> findAllByCN_CV_TI(
+        @Param("componentName") String componentName, @Param("connectionVersion") int connectionVersion,
+        @Param("tagId") long tagId);
+
+    @Query("""
+            SELECT connection.* FROM connection
+            JOIN connection_tag ON connection.id = connection_tag.connection_id
+            WHERE connection_tag.tag_id == :tagId
+            ORDER BY connection.name
+        """)
+    List<Connection> findAllByTagId(@Param("tagId") long tagId);
 }

@@ -41,7 +41,7 @@ public interface ProjectInstanceFacade {
 
     List<Tag> getProjectInstanceTags();
 
-    List<ProjectInstanceDTO> getProjectInstances(List<Long> projectIds, List<Long> tagIds);
+    List<ProjectInstanceDTO> getProjectInstances(Long projectId, Long tagId);
 
     ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 

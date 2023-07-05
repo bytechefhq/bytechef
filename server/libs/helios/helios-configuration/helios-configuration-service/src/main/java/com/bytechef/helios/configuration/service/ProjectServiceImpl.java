@@ -29,7 +29,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -109,17 +108,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> getProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds) {
+    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId) {
         Iterable<Project> projectIterable;
 
-        if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
+        if (categoryId == null && tagId == null) {
             projectIterable = projectRepository.findAll(Sort.by("name"));
-        } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            projectIterable = projectRepository.findAllByCategoryIdInOrderByName(categoryIds);
-        } else if (CollectionUtils.isEmpty(categoryIds)) {
-            projectIterable = projectRepository.findAllByTagIdInOrderByName(tagIds);
+        } else if (categoryId != null && tagId == null) {
+            projectIterable = projectRepository.findAllByCategoryIdOrderByName(categoryId);
+        } else if (categoryId == null) {
+            projectIterable = projectRepository.findAllByTagIdOrderByName(tagId);
         } else {
-            projectIterable = projectRepository.findAllByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
+            projectIterable = projectRepository.findAllByCategoryIdAndTagIdOrderByName(categoryId, tagId);
         }
 
         List<Project> projects = com.bytechef.commons.util.CollectionUtils.toList(projectIterable);

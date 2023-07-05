@@ -37,23 +37,23 @@ public interface ProjectInstanceRepository
     @Query("SELECT project_instance.project_id FROM project_instance")
     List<Long> findAllProjectId();
 
-    List<ProjectInstance> findAllByProjectIdInOrderByName(List<Long> projectIds);
+    List<ProjectInstance> findAllByProjectIdOrderByName(long projectId);
 
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
-            WHERE project_instance.project_id IN (:projectIds)
-            AND project_instance_tag.tag_id IN (:tagId)
+            WHERE project_instance.project_id == :projectId
+            AND project_instance_tag.tag_id == :tagId
         """)
-    List<ProjectInstance> findAllByProjectIdsAndTagIdsOrderByName(
-        @Param("projectIds") List<Long> projectIds, @Param("tagIds") List<Long> tagIds);
+    List<ProjectInstance> findAllByProjectIdAndTagIdOrderByName(
+        @Param("projectId") long projectId, @Param("tagId") long tagId);
 
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
-            WHERE project_instance_tag.tag_id in (:tagIds)
+            WHERE project_instance_tag.tag_id == :tagId
         """)
-    List<ProjectInstance> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+    List<ProjectInstance> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
     @Query("""
             SELECT DISTINCT project_instance.* FROM project_instance

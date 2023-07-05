@@ -151,6 +151,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId) {
+        List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId);
+
+        return getConnectionDTOs(connections);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Tag> getConnectionTags() {
         List<Connection> connections = connectionService.getConnections();
 
@@ -158,14 +166,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .map(Connection::getTagIds)
             .flatMap(Collection::stream)
             .toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds) {
-        List<Connection> connections = connectionService.getConnections(componentNames, tagIds);
-
-        return getConnectionDTOs(connections);
     }
 
     @Override

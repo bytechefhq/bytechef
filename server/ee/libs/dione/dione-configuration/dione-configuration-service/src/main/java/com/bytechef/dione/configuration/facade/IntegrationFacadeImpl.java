@@ -142,8 +142,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<IntegrationDTO> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
-        List<Integration> integrations = integrationService.getIntegrations(categoryIds, tagIds);
+    public List<IntegrationDTO> getIntegrations(Long categoryId, Long tagId) {
+        List<Integration> integrations = integrationService.getIntegrations(categoryId, tagId);
 
         return com.bytechef.commons.util.CollectionUtils.map(
             integrations,

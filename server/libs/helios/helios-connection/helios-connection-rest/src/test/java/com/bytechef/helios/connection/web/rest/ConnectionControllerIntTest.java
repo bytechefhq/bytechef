@@ -147,7 +147,7 @@ public class ConnectionControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections((List<String>) null, null)).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections((String) null, null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -161,7 +161,7 @@ public class ConnectionControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections(List.of("component1"), null)).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections("component1", null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -173,7 +173,7 @@ public class ConnectionControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, List.of(1L))).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections(null, 1)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -185,7 +185,7 @@ public class ConnectionControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(List.of("component1"), List.of(1L))).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections("component1", 1)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -315,9 +315,7 @@ public class ConnectionControllerIntTest {
             .build();
     }
 
-    @ComponentScan(basePackages = {
-        "com.bytechef.helios.connection.web.rest", "com.bytechef.tag.web.rest.mapper"
-    })
+    @ComponentScan(basePackages = "com.bytechef.helios.connection.web.rest")
     @SpringBootConfiguration
     public static class ConnectionRestTestConfiguration {
     }

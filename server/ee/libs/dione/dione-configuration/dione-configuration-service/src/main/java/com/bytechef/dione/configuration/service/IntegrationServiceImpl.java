@@ -28,7 +28,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -80,17 +79,17 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
+    public List<Integration> getIntegrations(Long categoryId, Long tagId) {
         Iterable<Integration> integrationIterable;
 
-        if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
+        if (categoryId == null && tagId == null) {
             integrationIterable = integrationRepository.findAll(Sort.by("name"));
-        } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            integrationIterable = integrationRepository.findAllByCategoryIdInOrderByName(categoryIds);
-        } else if (CollectionUtils.isEmpty(categoryIds)) {
-            integrationIterable = integrationRepository.findAllByTagIdInOrderByName(tagIds);
+        } else if (categoryId != null && tagId != null) {
+            integrationIterable = integrationRepository.findAllByCategoryIdOrderByName(categoryId);
+        } else if (categoryId == null) {
+            integrationIterable = integrationRepository.findAllByTagIdOrderByName(tagId);
         } else {
-            integrationIterable = integrationRepository.findAllByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
+            integrationIterable = integrationRepository.findAllByCategoryIdAndTagIdOrderByName(categoryId, tagId);
         }
 
         return com.bytechef.commons.util.CollectionUtils.toList(integrationIterable);

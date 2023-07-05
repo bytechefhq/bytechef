@@ -25,7 +25,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -82,23 +81,22 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances() {
-        return getProjectInstances(List.of(), List.of());
+        return getProjectInstances(null, null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectInstance> getProjectInstances(List<Long> projectIds, List<Long> tagIds) {
+    public List<ProjectInstance> getProjectInstances(Long projectId, Long tagId) {
         Iterable<ProjectInstance> projectInstanceIterable;
 
-        if (CollectionUtils.isEmpty(projectIds) && CollectionUtils.isEmpty(tagIds)) {
+        if (projectId == null && tagId == null) {
             projectInstanceIterable = projectInstanceRepository.findAll(Sort.by("name"));
-        } else if (!CollectionUtils.isEmpty(projectIds) && CollectionUtils.isEmpty(tagIds)) {
-            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdInOrderByName(projectIds);
-        } else if (CollectionUtils.isEmpty(projectIds)) {
-            projectInstanceIterable = projectInstanceRepository.findAllByTagIdInOrderByName(tagIds);
+        } else if (projectId != null && tagId == null) {
+            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdOrderByName(projectId);
+        } else if (projectId == null) {
+            projectInstanceIterable = projectInstanceRepository.findAllByTagIdOrderByName(tagId);
         } else {
-            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdsAndTagIdsOrderByName(
-                projectIds, tagIds);
+            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdAndTagIdOrderByName(projectId, tagId);
         }
 
         return com.bytechef.commons.util.CollectionUtils.toList(projectInstanceIterable);

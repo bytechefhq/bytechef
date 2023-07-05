@@ -45,7 +45,7 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
-    List<Project> getProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds);
+    List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId);
 
     Project update(long id, List<Long> tagIds);
 

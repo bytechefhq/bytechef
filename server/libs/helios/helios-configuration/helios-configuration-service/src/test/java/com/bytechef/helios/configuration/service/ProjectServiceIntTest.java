@@ -141,9 +141,9 @@ public class ProjectServiceIntTest {
 
         project = projectRepository.save(project);
 
-        assertThat(projectService.getProjects(List.of(category.getId()), null, null)).hasSize(1);
+        assertThat(projectService.getProjects(category.getId(), null, null)).hasSize(1);
 
-        assertThat(projectService.getProjects(List.of(Long.MAX_VALUE), null, null)).hasSize(0);
+        assertThat(projectService.getProjects(Long.MAX_VALUE, null, null)).hasSize(0);
 
         Tag tag = new Tag("tag1");
 
@@ -153,13 +153,12 @@ public class ProjectServiceIntTest {
 
         projectRepository.save(project);
 
-        assertThat(projectService.getProjects(null, null, List.of(tag.getId()))).hasSize(1);
+        assertThat(projectService.getProjects(null, null, tag.getId())).hasSize(1);
 
-        assertThat(projectService.getProjects(null, null, List.of(Long.MAX_VALUE))).hasSize(0);
+        assertThat(projectService.getProjects(null, null, Long.MAX_VALUE)).hasSize(0);
 
         assertThatException()
-            .isThrownBy(() -> projectService.getProjects(
-                List.of(Long.MAX_VALUE), null, List.of(Long.MAX_VALUE)));
+            .isThrownBy(() -> projectService.getProjects(Long.MAX_VALUE, null, Long.MAX_VALUE));
     }
 
     @Test

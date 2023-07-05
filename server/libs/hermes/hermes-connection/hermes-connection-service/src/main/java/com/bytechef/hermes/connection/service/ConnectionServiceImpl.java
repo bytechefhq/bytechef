@@ -28,7 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -83,22 +83,32 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(String componentName, int version) {
-        return connectionRepository.findAllByComponentNameAndConnectionVersion(componentName, version);
+        return connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(componentName, version);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
+    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId) {
         Iterable<Connection> connectionIterable;
 
-        if (CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
+        if (!StringUtils.hasText(componentName) && tagId == null) {
             connectionIterable = connectionRepository.findAll(Sort.by("name"));
-        } else if (!CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
-            connectionIterable = connectionRepository.findAllByComponentNameInOrderByName(componentNames);
-        } else if (CollectionUtils.isEmpty(componentNames)) {
-            connectionIterable = connectionRepository.findAllByTagIdIn(tagIds);
+        } else if (StringUtils.hasText(componentName) && tagId == null) {
+            if (connectionVersion == null) {
+                connectionIterable = connectionRepository.findAllByComponentNameOrderByName(componentName);
+            } else {
+                connectionIterable = connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(
+                    componentName, connectionVersion);
+            }
+        } else if (!StringUtils.hasText(componentName)) {
+            connectionIterable = connectionRepository.findAllByTagId(tagId);
         } else {
-            connectionIterable = connectionRepository.findAllByComponentNamesAndTagIds(componentNames, tagIds);
+            if (connectionVersion == null) {
+                connectionIterable = connectionRepository.findAllByComponentNameAndTagId(componentName, tagId);
+            } else {
+                connectionIterable = connectionRepository.findAllByCN_CV_TI(componentName, connectionVersion, tagId);
+            }
+
         }
 
         return com.bytechef.commons.util.CollectionUtils.toList(connectionIterable);

@@ -213,7 +213,7 @@ public class IntegrationControllerIntTest {
             .contains(integrationMapper.convert(integrationDTO))
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(List.of(1L), null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(1L, null)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -225,7 +225,7 @@ public class IntegrationControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(null, List.of(1L))).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(null, 1L)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -237,7 +237,7 @@ public class IntegrationControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(List.of(1L), List.of(1L))).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(1L, 1L)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()

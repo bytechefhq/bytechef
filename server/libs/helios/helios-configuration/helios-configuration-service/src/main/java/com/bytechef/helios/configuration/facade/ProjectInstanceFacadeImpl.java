@@ -185,8 +185,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectInstanceDTO> getProjectInstances(List<Long> projectIds, List<Long> tagIds) {
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(projectIds, tagIds);
+    public List<ProjectInstanceDTO> getProjectInstances(Long projectId, Long tagId) {
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(projectId, tagId);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(CollectionUtils.map(projectInstances, ProjectInstance::getId));
