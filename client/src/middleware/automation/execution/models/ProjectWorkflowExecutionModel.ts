@@ -31,12 +31,12 @@ import {
     ProjectModelFromJSONTyped,
     ProjectModelToJSON,
 } from './ProjectModel';
-import type { WorkflowModel } from './WorkflowModel';
+import type { WorkflowBasicModel } from './WorkflowBasicModel';
 import {
-    WorkflowModelFromJSON,
-    WorkflowModelFromJSONTyped,
-    WorkflowModelToJSON,
-} from './WorkflowModel';
+    WorkflowBasicModelFromJSON,
+    WorkflowBasicModelFromJSONTyped,
+    WorkflowBasicModelToJSON,
+} from './WorkflowBasicModel';
 
 /**
  * Contains information about execution of one of project workflows.
@@ -70,10 +70,10 @@ export interface ProjectWorkflowExecutionModel {
     project?: ProjectModel;
     /**
      * 
-     * @type {WorkflowModel}
+     * @type {WorkflowBasicModel}
      * @memberof ProjectWorkflowExecutionModel
      */
-    workflow?: WorkflowModel;
+    workflow?: WorkflowBasicModel;
 }
 
 /**
@@ -99,7 +99,7 @@ export function ProjectWorkflowExecutionModelFromJSONTyped(json: any, ignoreDisc
         'instance': !exists(json, 'instance') ? undefined : ProjectInstanceModelFromJSON(json['instance']),
         'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
-        'workflow': !exists(json, 'workflow') ? undefined : WorkflowModelFromJSON(json['workflow']),
+        'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
 }
 
@@ -115,7 +115,7 @@ export function ProjectWorkflowExecutionModelToJSON(value?: ProjectWorkflowExecu
         'instance': ProjectInstanceModelToJSON(value.instance),
         'job': JobModelToJSON(value.job),
         'project': ProjectModelToJSON(value.project),
-        'workflow': WorkflowModelToJSON(value.workflow),
+        'workflow': WorkflowBasicModelToJSON(value.workflow),
     };
 }
 

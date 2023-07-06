@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/ProjectInstancesApi.ts
 apis/ProjectsApi.ts
 apis/index.ts
