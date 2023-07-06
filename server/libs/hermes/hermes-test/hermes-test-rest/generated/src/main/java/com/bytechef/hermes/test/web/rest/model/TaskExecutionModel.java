@@ -1,9 +1,9 @@
-package com.bytechef.hermes.execution.web.rest.model;
+package com.bytechef.hermes.test.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.execution.web.rest.model.ComponentDefinitionModel;
-import com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel;
+import com.bytechef.hermes.test.web.rest.model.ComponentDefinitionModel;
+import com.bytechef.hermes.test.web.rest.model.ExecutionErrorModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:49.491777+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:57.875357+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private ComponentDefinitionModel component;

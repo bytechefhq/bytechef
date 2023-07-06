@@ -1,4 +1,4 @@
-package com.bytechef.hermes.execution.web.rest.model;
+package com.bytechef.hermes.test.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:49.491777+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:57.875357+02:00[Europe/Zagreb]")
 public class ComponentDefinitionModel {
 
   private String icon;

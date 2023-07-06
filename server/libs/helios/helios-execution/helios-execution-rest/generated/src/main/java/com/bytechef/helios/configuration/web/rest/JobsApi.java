@@ -3,11 +3,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.hermes.execution.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.hermes.execution.web.rest.model.CreateJob200ResponseModel;
-import com.bytechef.hermes.execution.web.rest.model.JobModel;
-import com.bytechef.hermes.execution.web.rest.model.JobParametersModel;
+import com.bytechef.helios.configuration.web.rest.model.CreateJob200ResponseModel;
+import com.bytechef.helios.configuration.web.rest.model.JobModel;
+import com.bytechef.helios.configuration.web.rest.model.JobParametersModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:49.491777+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:56.772964+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "jobs", description = "The Core Jobs API")
+@Tag(name = "jobs", description = "the jobs API")
 public interface JobsApi {
 
     default Optional<NativeWebRequest> getRequest() {
