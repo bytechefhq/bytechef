@@ -5,7 +5,6 @@ export * from './ConnectionModel';
 export * from './CreateProjectInstanceWorkflowJob200ResponseModel';
 export * from './CreateProjectWorkflowRequestModel';
 export * from './InputModel';
-export * from './OAuth2AuthorizationParametersModel';
 export * from './OutputModel';
 export * from './PageModel';
 export * from './ProjectBasicModel';
