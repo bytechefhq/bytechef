@@ -33,7 +33,6 @@ dependencies {
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:event:event-impl")
     implementation project(":server:libs:core:rest:rest-impl")
-    implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:helios:helios-execution:helios-execution-rest")
     implementation project(":server:libs:helios:helios-execution:helios-execution-service")
     implementation project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-client")

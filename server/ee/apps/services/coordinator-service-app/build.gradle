@@ -25,7 +25,6 @@ dependencies {
     implementation project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-client")
 
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config")
-    implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:error:error-impl")
     implementation project(":server:libs:core:event:event-impl")
