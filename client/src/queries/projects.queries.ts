@@ -4,7 +4,6 @@ import {
     ProjectWorkflowExecutionModel,
     ProjectWorkflowExecutionsApi,
 } from '@/middleware/automation/execution';
-import {WorkflowModel} from '@/middleware/core/workflow/configuration';
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
@@ -14,6 +13,8 @@ import {
     ProjectModel,
     ProjectsApi,
     TagModel,
+    WorkflowModel,
+    WorkflowsApi,
 } from 'middleware/automation/configuration';
 
 export const ProjectKeys = {
@@ -43,6 +44,11 @@ export const ProjectKeys = {
         'workflowExecutions',
         filter,
     ],
+};
+
+export const WorkflowKeys = {
+    workflow: (id: number) => ['workflow', id],
+    workflows: ['workflows'] as const,
 };
 
 export const useGetProjectCategoriesQuery = () =>
@@ -92,7 +98,7 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
         new ProjectsApi().getProjectWorkflows({id})
     );
 
-export const useGetWorkflowExecutionsQuery = (
+export const useGetProjectWorkflowExecutionsQuery = (
     request: GetProjectWorkflowExecutionsRequest
 ) =>
     useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
@@ -112,4 +118,9 @@ export const useGetWorkflowExecutionQuery = (
         {
             enabled: isEnabled,
         }
+    );
+
+export const useGetWorkflowsQuery = () =>
+    useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
+        new WorkflowsApi().getWorkflows()
     );

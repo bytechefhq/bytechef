@@ -2,8 +2,10 @@ import {Switch} from '@headlessui/react';
 import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
 import Properties from 'components/Properties/Properties';
-import {ProjectInstanceModel} from 'middleware/automation/configuration';
-import {WorkflowModel} from 'middleware/core/workflow/configuration/models';
+import {
+    ProjectInstanceModel,
+    WorkflowModel,
+} from 'middleware/automation/configuration';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {UseFormGetValues} from 'react-hook-form';
