@@ -8,6 +8,8 @@ servers:
 tags:
 - name: "integrations"
   description: "The Embedded Integrations API"
+- name: "workflows"
+  description: "The Embedded Workflows API"
 paths:
   /integrations:
     get:
@@ -182,7 +184,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../../libs/hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                  $ref: "#/components/schemas/Workflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
@@ -221,7 +223,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../../libs/hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                $ref: "#/components/schemas/Workflow"
   /integrations/{id}/tags:
     put:
       description: "Updates tags of an existing integration."
@@ -246,6 +248,86 @@ paths:
       responses:
         "200":
           description: "Successful operation."
+  /workflows:
+    get:
+      description: "Get workflow definitions."
+      summary: "Get workflow definitions"
+      tags:
+      - "workflows"
+      operationId: "getWorkflows"
+      responses:
+        "200":
+          description: "A list of workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
+  /workflows/{id}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+      - "workflows"
+      operationId: "deleteWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of the workflow to delete."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get a workflow by id."
+      summary: "Get a workflow by id"
+      tags:
+      - "workflows"
+      operationId: "getWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of the workflow to get."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+      - "workflows"
+      operationId: "updateWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of the workflow to update."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        description: "The workflow object that needs to updated."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Workflow"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
 components:
   schemas:
     Category:
@@ -281,6 +363,25 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    Input:
+      type: "object"
+      required:
+      - "name"
+      - "value"
+      properties:
+        label:
+          description: "The string of an input"
+          type: "string"
+        name:
+          description: "The name of an output"
+          type: "string"
+        required:
+          description: "If an input is required, or not"
+          type: "boolean"
+          default: false
+        type:
+          description: "The type of an input, for example \\\"string\\\""
+          type: "string"
     Integration:
       description: "A group of workflows that make one logical integration."
       type: "object"
@@ -343,14 +444,18 @@ components:
             readOnly: true
         __version:
           type: "integer"
-    UpdateTagsRequest:
-      description: "The request object that contains the array of tags."
+    Output:
       type: "object"
+      required:
+      - "name"
+      - "value"
       properties:
-        tags:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
+        name:
+          description: "The name of an output"
+          type: "string"
+        value:
+          description: "The value of an output"
+          type: "object"
     Tag:
       description: "A tag."
       required:
@@ -383,3 +488,159 @@ components:
           type: "string"
         __version:
           type: "integer"
+    UpdateTagsRequest:
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+    Workflow:
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        definition:
+          description: "The definition of a workflow."
+          type: "string"
+          writeOnly: true
+        description:
+          description: "The description of a workflow."
+          type: "string"
+          writeOnly: true
+        format:
+          $ref: "#/components/schemas/WorkflowFormat"
+        id:
+          description: "The id of the workflow."
+          type: "string"
+          readOnly: true
+        inputs:
+          description: "The workflow's expected list of inputs."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Input"
+          readOnly: true
+        label:
+          description: "The descriptive name for the workflow"
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        outputs:
+          description: "The workflow's list of expected outputs."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Output"
+          readOnly: true
+        sourceType:
+          description: "The type of the source which stores the workflow definition."
+          type: "string"
+          enum:
+          - "CLASSPATH"
+          - "FILESYSTEM"
+          - "GIT"
+          - "JDBC"
+        maxRetries:
+          description: "The maximum number of times a task may retry."
+          type: "integer"
+          format: "int32"
+          readOnly: true
+        tasks:
+          description: "The steps that make up the workflow."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+          readOnly: true
+        __version:
+          type: "integer"
+    WorkflowConnection:
+      type: "object"
+      required:
+      - "componentName"
+      - "componentVersion"
+      - "key"
+      - "operationName"
+      properties:
+        componentName:
+          type: "string"
+        componentVersion:
+          type: "integer"
+        key:
+          type: "string"
+        operationName:
+          type: "string"
+    WorkflowFormat:
+      type: "string"
+      enum:
+      - "JSON"
+      - "YAML"
+    WorkflowTask:
+      description: "Represents a definition of the task."
+      type: "object"
+      required:
+      - "name"
+      - "type"
+      properties:
+        finalize:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ execution of a task -- regardless of whether it had failed or not."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        node:
+          description: "Defines the name of the type of the node that the task execution\
+            \ will be routed to. For instance, if the node value is \"encoder\", then\
+            \ the task will be routed to the \"encoder\" queue which is presumably\
+            \ subscribed to by worker nodes of \"encoder\" type."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        post:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ the successful execution of a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        pre:
+          description: "The (optional) list of tasks that are to be executed prior\
+            \ to a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        timeout:
+          description: "The timeout expression which describes when a task should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "Type of the task."
+          type: "string"
