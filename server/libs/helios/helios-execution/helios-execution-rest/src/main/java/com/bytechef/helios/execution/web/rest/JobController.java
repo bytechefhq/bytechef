@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class JobController implements JobsApi {
 
     private final ConversionService conversionService;

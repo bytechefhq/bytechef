@@ -21,11 +21,8 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = {
-    "com.bytechef.hermes.workflow.web.rest",
-    "com.bytechef.category.web.rest",
     "com.bytechef.helios.configuration.web.rest",
-    "com.bytechef.tag.web.rest"
 })
 @SpringBootConfiguration
-public class ProjectRestTestConfiguration {
+public class ProjectConfigurationRestTestConfiguration {
 }

@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.web.rest.mapper;
+package com.bytechef.helios.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
-public interface WorkflowMapper extends Converter<WorkflowDTO, WorkflowModel> {
+public interface ProjectWorkflowMapper extends Converter<WorkflowDTO, WorkflowModel> {
 
     @Override
     WorkflowModel convert(WorkflowDTO workflowDTO);

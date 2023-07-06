@@ -24,8 +24,7 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         ProjectInstanceWorkflowConnection: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel",
         ProjectInstanceWorkflow: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel",
         Project: "com.bytechef.helios.configuration.web.rest.model.ProjectModel",
-        WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
-        WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
+        WorkflowTask: "com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel"
     ]
 }
 

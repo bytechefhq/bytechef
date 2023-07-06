@@ -14,14 +14,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.dione.configuration.web.rest.model"
     outputDir = "$projectDir/generated".toString()
-    schemaMappings = [
-        Input: "com.bytechef.hermes.configuration.web.rest.model.InputModel",
-        Output: "com.bytechef.hermes.configuration.web.rest.model.OutputModel",
-        Workflow: "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel",
-        WorkflowConnection: "com.bytechef.hermes.configuration.web.rest.model.WorkflowConnectionModel",
-        WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
-        WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
-    ]
 }
 
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"

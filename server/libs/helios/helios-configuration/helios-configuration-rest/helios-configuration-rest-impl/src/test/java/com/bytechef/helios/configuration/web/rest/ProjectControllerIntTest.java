@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
-import com.bytechef.helios.configuration.web.rest.config.ProjectRestTestConfiguration;
+import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.helios.configuration.web.rest.mapper.ProjectMapper;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
@@ -63,7 +63,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Disabled
-@ContextConfiguration(classes = ProjectRestTestConfiguration.class)
+@ContextConfiguration(classes = ProjectConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = ProjectController.class)
 public class ProjectControllerIntTest {
 

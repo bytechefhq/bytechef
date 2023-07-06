@@ -19,7 +19,7 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
