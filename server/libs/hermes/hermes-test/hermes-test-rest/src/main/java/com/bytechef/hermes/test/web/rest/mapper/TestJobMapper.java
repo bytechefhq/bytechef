@@ -15,26 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.web.rest.mapper;
+package com.bytechef.hermes.test.web.rest.mapper;
 
-import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
-import com.bytechef.hermes.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
-import com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel;
+import com.bytechef.hermes.execution.dto.JobDTO;
+import com.bytechef.hermes.test.web.rest.mapper.config.WorkflowTestMapperSpringConfig;
+import com.bytechef.hermes.test.web.rest.model.JobModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
-
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowExecutionMapperSpringConfig.class)
-public interface TaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
+@Mapper(config = WorkflowTestMapperSpringConfig.class)
+public interface TestJobMapper extends Converter<JobDTO, JobModel> {
 
     @Override
-    TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
-
-    default String map(Optional<String> optional) {
-        return optional.orElse(null);
-    }
+    JobModel convert(JobDTO jobDTO);
 }

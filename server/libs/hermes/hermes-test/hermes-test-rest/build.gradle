@@ -10,26 +10,14 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
-    importMappings = [
-        "TaskExecutionModel": "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel"
-    ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.hermes.test.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         "Page": "org.springframework.data.domain.Page",
-        ComponentDefinition: "com.bytechef.hermes.execution.web.rest.model.ComponentDefinitionModel",
-        ExecutionError: "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
-        Job: "com.bytechef.hermes.execution.web.rest.model.JobModel",
-        JobBasic: "com.bytechef.hermes.execution.web.rest.model.JobBasicModel",
-        JobConnection: "com.bytechef.hermes.execution.web.rest.model.JobConnectionModel",
-        JobParameters: "com.bytechef.hermes.execution.web.rest.model.JobParametersModel",
         Page: "org.springframework.data.domain.Page",
         Tag: "com.bytechef.tag.web.rest.model.TagModel",
-        TaskExecution: "TaskExecutionModel",
-        Webhook: "com.bytechef.hermes.execution.web.rest.model.WebhookModel",
-        Webhook_retry: "com.bytechef.hermes.execution.web.rest.model.WebhookRetryModel",
         Workflow: "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel",
         WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
         WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
@@ -57,8 +45,8 @@ dependencies {
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
     api "org.springframework.data:spring-data-commons"
-    api project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-api")
     api project(":server:libs:hermes:hermes-test:hermes-test-api")
+    api project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api")
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 

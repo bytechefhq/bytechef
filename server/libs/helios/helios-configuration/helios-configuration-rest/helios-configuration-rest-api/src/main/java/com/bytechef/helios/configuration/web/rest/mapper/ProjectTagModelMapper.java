@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectWorkflowConfigurationMapperSpringConfig;
+import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
 import org.mapstruct.Mapper;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectWorkflowConfigurationMapperSpringConfig.class)
+@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
 public interface ProjectTagModelMapper extends Converter<TagModel, Tag> {
 
     Tag convert(TagModel tagModel);

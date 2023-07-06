@@ -19,8 +19,8 @@ package com.bytechef.hermes.test.web.rest;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.hermes.test.WorkflowTestExecutor;
-import com.bytechef.hermes.execution.web.rest.model.JobModel;
-import com.bytechef.hermes.execution.web.rest.model.JobParametersModel;
+import com.bytechef.hermes.test.web.rest.model.JobModel;
+import com.bytechef.hermes.test.web.rest.model.JobParametersModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

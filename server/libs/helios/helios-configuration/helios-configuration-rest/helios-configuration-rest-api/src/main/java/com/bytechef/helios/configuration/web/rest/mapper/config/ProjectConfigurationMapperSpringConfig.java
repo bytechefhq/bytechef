@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.web.rest.mapper.config;
+package com.bytechef.helios.configuration.web.rest.mapper.config;
 
-import com.bytechef.hermes.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
+import com.bytechef.helios.configuration.web.rest.adapter.ProjectConfigurationConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = WorkflowExecutionConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = {
+    ProjectConfigurationConversionServiceAdapter.class
+})
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.hermes.execution.web.rest.adapter",
-    conversionServiceAdapterClassName = "WorkflowExecutionConversionServiceAdapter")
-public interface WorkflowExecutionMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.helios.configuration.web.rest.adapter",
+    conversionServiceAdapterClassName = "ProjectConfigurationConversionServiceAdapter")
+public interface ProjectConfigurationMapperSpringConfig {
 }

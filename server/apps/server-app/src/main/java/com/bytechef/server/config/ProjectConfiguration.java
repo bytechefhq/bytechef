@@ -65,8 +65,7 @@ public class ProjectConfiguration {
     @Bean
     ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade(
         com.bytechef.hermes.execution.facade.JobFacade jobFacade, JobService jobService,
-        ProjectInstanceService projectInstanceService,
-        ProjectService projectService, WorkflowService workflowService) {
+        ProjectInstanceService projectInstanceService, ProjectService projectService, WorkflowService workflowService) {
 
         return new ProjectWorkflowExecutionFacadeImpl(
             jobFacade, jobService, projectInstanceService, projectService, workflowService);

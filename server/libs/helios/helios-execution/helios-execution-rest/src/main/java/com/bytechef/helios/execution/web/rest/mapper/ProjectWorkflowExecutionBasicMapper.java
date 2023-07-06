@@ -18,10 +18,10 @@
 package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.helios.configuration.domain.ProjectInstance;
-import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectWorkflowConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.ProjectWorkflowExecutionBasicModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.helios.execution.dto.ProjectWorkflowExecutionDTO;
+import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -29,7 +29,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectWorkflowConfigurationMapperSpringConfig.class)
+@Mapper(config = ProjectExecutionMapperSpringConfig.class)
 public interface ProjectWorkflowExecutionBasicMapper
     extends Converter<ProjectWorkflowExecutionDTO, ProjectWorkflowExecutionBasicModel> {
 
