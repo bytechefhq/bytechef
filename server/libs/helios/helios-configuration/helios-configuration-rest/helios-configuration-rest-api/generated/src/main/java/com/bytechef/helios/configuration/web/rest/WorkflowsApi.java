@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.hermes.configuration.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,55 +32,14 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:46.440360+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:31.578949+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "workflows", description = "The Core Workflows API")
+@Tag(name = "workflows", description = "The Automation Workflows API")
 public interface WorkflowsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
-
-    /**
-     * POST /workflows : Create a new workflow
-     * Create a new workflow.
-     *
-     * @param workflowModel The workflow object that needs to be created. (required)
-     * @return The workflow object. (status code 200)
-     */
-    @Operation(
-        operationId = "createWorkflow",
-        summary = "Create a new workflow",
-        description = "Create a new workflow.",
-        tags = { "workflows" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workflows",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<WorkflowModel> createWorkflow(
-        @Parameter(name = "WorkflowModel", description = "The workflow object that needs to be created.", required = true) @Valid @RequestBody WorkflowModel workflowModel
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"__version\" : 1, \"maxRetries\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"connections\" : [ { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"key\" : \"key\" }, { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"key\" : \"key\" } ], \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
 
     /**
      * DELETE /workflows/{id} : Delete a workflow

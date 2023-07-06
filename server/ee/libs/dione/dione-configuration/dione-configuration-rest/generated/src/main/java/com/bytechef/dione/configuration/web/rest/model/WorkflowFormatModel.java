@@ -1,4 +1,4 @@
-package com.bytechef.hermes.configuration.web.rest.model;
+package com.bytechef.dione.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,39 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A type of property.
+ * Gets or Sets WorkflowFormat
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:33.068832+02:00[Europe/Zagreb]")
-public enum PropertyTypeModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:30.497811+02:00[Europe/Zagreb]")
+public enum WorkflowFormatModel {
   
-  ANY("ANY"),
+  JSON("JSON"),
   
-  ARRAY("ARRAY"),
-  
-  BOOLEAN("BOOLEAN"),
-  
-  DATE("DATE"),
-  
-  DATE_TIME("DATE_TIME"),
-  
-  DYNAMIC_PROPERTIES("DYNAMIC_PROPERTIES"),
-  
-  INTEGER("INTEGER"),
-  
-  NULL("NULL"),
-  
-  NUMBER("NUMBER"),
-  
-  STRING("STRING"),
-  
-  OBJECT("OBJECT"),
-  
-  TIME("TIME");
+  YAML("YAML");
 
   private String value;
 
-  PropertyTypeModel(String value) {
+  WorkflowFormatModel(String value) {
     this.value = value;
   }
 
@@ -64,8 +44,8 @@ public enum PropertyTypeModel {
   }
 
   @JsonCreator
-  public static PropertyTypeModel fromValue(String value) {
-    for (PropertyTypeModel b : PropertyTypeModel.values()) {
+  public static WorkflowFormatModel fromValue(String value) {
+    for (WorkflowFormatModel b : WorkflowFormatModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:56.772964+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:29.411054+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private ComponentDefinitionModel component;
@@ -123,7 +123,7 @@ public class TaskExecutionModel {
 
   private Long retryDelayMillis;
 
-  private com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel workflowTask;
+  private com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel workflowTask;
 
   private String type;
 
@@ -614,7 +614,7 @@ public class TaskExecutionModel {
     this.retryDelayMillis = retryDelayMillis;
   }
 
-  public TaskExecutionModel workflowTask(com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
+  public TaskExecutionModel workflowTask(com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
     return this;
   }
@@ -626,11 +626,11 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTask")
-  public com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel getWorkflowTask() {
+  public com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel getWorkflowTask() {
     return workflowTask;
   }
 
-  public void setWorkflowTask(com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
+  public void setWorkflowTask(com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
   }
 

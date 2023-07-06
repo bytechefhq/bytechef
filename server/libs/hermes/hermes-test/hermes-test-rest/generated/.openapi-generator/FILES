@@ -8,3 +8,4 @@ src/main/java/com/bytechef/hermes/test/web/rest/model/JobConnectionModel.java
 src/main/java/com/bytechef/hermes/test/web/rest/model/JobModel.java
 src/main/java/com/bytechef/hermes/test/web/rest/model/JobParametersModel.java
 src/main/java/com/bytechef/hermes/test/web/rest/model/TaskExecutionModel.java
+src/main/java/com/bytechef/hermes/test/web/rest/model/WorkflowTaskModel.java

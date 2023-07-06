@@ -10,6 +10,7 @@ import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflow
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:44.171332+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:30.497811+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "The Embedded Integrations API")
 public interface IntegrationsApi {
@@ -101,7 +102,7 @@ public interface IntegrationsApi {
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
             })
         }
     )
@@ -111,7 +112,7 @@ public interface IntegrationsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel> createIntegrationWorkflow(
+    default ResponseEntity<WorkflowModel> createIntegrationWorkflow(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "CreateIntegrationWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel
     ) {
@@ -289,7 +290,7 @@ public interface IntegrationsApi {
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
             })
         }
     )
@@ -298,7 +299,7 @@ public interface IntegrationsApi {
         value = "/integrations/{id}/workflows",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel>> getIntegrationWorkflows(
+    default ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
