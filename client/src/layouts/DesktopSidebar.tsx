@@ -21,7 +21,7 @@ export function DesktopSidebar({
     }[];
 }) {
     return (
-        <div className="hidden border-r bg-muted lg:flex lg:shrink-0">
+        <aside className="hidden bg-muted lg:flex lg:shrink-0">
             <div className="flex w-[64px]">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                     <div className="flex-1">
@@ -73,6 +73,6 @@ export function DesktopSidebar({
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
     );
 }
