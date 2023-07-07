@@ -41,8 +41,8 @@ public interface ConnectionRepository
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection.component_name == :componentName
-            AND connection_tag.tag_id == :tagId
+            WHERE connection.component_name = :componentName
+            AND connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
     List<Connection> findAllByComponentNameAndTagId(
@@ -51,9 +51,9 @@ public interface ConnectionRepository
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection.component_name == :componentName
-            AND connection.connection_version == :connectionVersion
-            AND connection_tag.tag_id == :tagId
+            WHERE connection.component_name = :componentName
+            AND connection.connection_version = :connectionVersion
+            AND connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
     Iterable<Connection> findAllByCN_CV_TI(
@@ -63,7 +63,7 @@ public interface ConnectionRepository
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection_tag.tag_id == :tagId
+            WHERE connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
     List<Connection> findAllByTagId(@Param("tagId") long tagId);

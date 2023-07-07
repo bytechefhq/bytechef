@@ -39,8 +39,8 @@ public interface ProjectRepository
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project.category_id == :categoryId
-            AND project_tag.tag_id == :tagId
+            WHERE project.category_id = :categoryId
+            AND project_tag.tag_id = :tagId
         """)
     List<Project> findAllByCategoryIdAndTagIdOrderByName(
         @Param("categoryId") long categoryId, @Param("tagId") long tagId);
@@ -48,7 +48,7 @@ public interface ProjectRepository
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project_tag.tag_id == :tagId
+            WHERE project_tag.tag_id = :tagId
         """)
     List<Project> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 

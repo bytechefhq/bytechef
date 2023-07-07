@@ -42,8 +42,8 @@ public interface ProjectInstanceRepository
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
-            WHERE project_instance.project_id == :projectId
-            AND project_instance_tag.tag_id == :tagId
+            WHERE project_instance.project_id = :projectId
+            AND project_instance_tag.tag_id = :tagId
         """)
     List<ProjectInstance> findAllByProjectIdAndTagIdOrderByName(
         @Param("projectId") long projectId, @Param("tagId") long tagId);
@@ -51,7 +51,7 @@ public interface ProjectInstanceRepository
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
-            WHERE project_instance_tag.tag_id == :tagId
+            WHERE project_instance_tag.tag_id = :tagId
         """)
     List<ProjectInstance> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 

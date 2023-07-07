@@ -38,7 +38,7 @@ public interface IntegrationRepository
     @Query("""
             SELECT integration.* FROM integration
             JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration_tag.tag_id == :tagId
+            WHERE integration_tag.tag_id = :tagId
             ORDER BY name
         """)
     List<Integration> findAllByTagIdOrderByName(@Param("tagId") long tagId);
@@ -46,8 +46,8 @@ public interface IntegrationRepository
     @Query("""
             SELECT integration.* FROM integration
             JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration.category_id == :categoryId
-            AND integration_tag.tag_id == :tagId
+            WHERE integration.category_id = :categoryId
+            AND integration_tag.tag_id = :tagId
             ORDER BY name
         """)
     List<Integration> findAllByCategoryIdAndTagIdOrderByName(
