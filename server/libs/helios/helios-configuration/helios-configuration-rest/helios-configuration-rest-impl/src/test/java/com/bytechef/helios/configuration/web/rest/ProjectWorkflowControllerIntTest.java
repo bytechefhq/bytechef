@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.helios.configuration.facade.ProjectFacade;
+import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
@@ -41,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -70,12 +73,18 @@ public class ProjectWorkflowControllerIntTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private ProjectInstanceFacade projectInstanceFacade;
+
+    @MockBean
+    private ProjectFacade projectFacade;
+
     private WebTestClient webTestClient;
 
-    @Autowired
+    @MockBean
     private WorkflowFacade workflowFacade;
 
-    @Autowired
+    @MockBean
     private WorkflowService workflowService;
 
     @BeforeEach
@@ -90,7 +99,7 @@ public class ProjectWorkflowControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/core/workflows/1")
+                .uri("/automation/workflows/1")
                 .exchange()
                 .expectStatus()
                 .isEqualTo(204);
@@ -112,7 +121,7 @@ public class ProjectWorkflowControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/core/workflows/1")
+                .uri("/automation/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -131,7 +140,7 @@ public class ProjectWorkflowControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/core/workflows")
+                .uri("/automation/workflows")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -157,7 +166,7 @@ public class ProjectWorkflowControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/core/workflows/1")
+                .uri("/automation/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)

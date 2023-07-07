@@ -131,7 +131,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion) {
+    public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, Integer componentVersion) {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()

@@ -84,7 +84,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
         if (categoryId == null && tagId == null) {
             integrationIterable = integrationRepository.findAll(Sort.by("name"));
-        } else if (categoryId != null && tagId != null) {
+        } else if (categoryId != null && tagId == null) {
             integrationIterable = integrationRepository.findAllByCategoryIdOrderByName(categoryId);
         } else if (categoryId == null) {
             integrationIterable = integrationRepository.findAllByTagIdOrderByName(tagId);

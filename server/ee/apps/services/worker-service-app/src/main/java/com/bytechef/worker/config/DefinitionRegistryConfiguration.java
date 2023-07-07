@@ -223,7 +223,7 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion) {
+        public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, Integer componentVersion) {
             return connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion);
         }
 

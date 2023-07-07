@@ -70,6 +70,9 @@ public class ProjectControllerIntTest {
     @MockBean
     private CategoryService categoryService;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @MockBean
     private ProjectInstanceFacade projectInstanceFacade;
 
@@ -78,9 +81,6 @@ public class ProjectControllerIntTest {
 
     @Autowired
     private ProjectMapper projectMapper;
-
-    @Autowired
-    private MockMvc mockMvc;
 
     private WebTestClient webTestClient;
 
