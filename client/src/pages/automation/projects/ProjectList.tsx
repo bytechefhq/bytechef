@@ -66,7 +66,7 @@ const ProjectList = () => {
                                 >
                                     <AccordionTrigger
                                         className={twMerge(
-                                            'group w-full rounded-md p-2 py-3 hover:bg-gray-50 data-[state=closed]:border-b data-[state=closed]:border-b-gray-100'
+                                            'group w-full rounded-md px-2 py-3 hover:bg-gray-50 data-[state=closed]:border-b data-[state=closed]:border-b-gray-100'
                                         )}
                                     >
                                         <ProjectListItem
