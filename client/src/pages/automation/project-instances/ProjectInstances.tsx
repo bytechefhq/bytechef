@@ -155,10 +155,10 @@ const ProjectInstances = () => {
             <div
                 className={twMerge(
                     'w-full px-2 2xl:mx-auto 2xl:w-4/5',
-                    projects?.length === 0 ? 'place-self-center' : ''
+                    !projects?.length && 'place-self-center'
                 )}
             >
-                {!projectsLoading && projects?.length === 0 ? (
+                {!projectsLoading && !projects?.length ? (
                     <EmptyList
                         button={<ProjectInstanceDialog />}
                         icon={
