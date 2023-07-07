@@ -195,6 +195,7 @@ const Project: React.FC = () => {
                     </>
                 }
                 leftSidebarOpen={leftSidebarOpen}
+                leftSidebarWidth="72"
             >
                 {components && !!flowControls && (
                     <WorkflowEditor

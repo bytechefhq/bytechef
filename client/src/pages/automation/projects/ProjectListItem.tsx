@@ -97,8 +97,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     return (
         <>
-            <div className="flex items-center">
-                <div className="flex-1 pr-8">
+            <div className="flex items-center justify-between">
+                <div className="w-10/12">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
                             {project.description ? (
