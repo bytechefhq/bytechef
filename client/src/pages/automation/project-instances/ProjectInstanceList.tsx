@@ -7,7 +7,6 @@ import {
     Accordion,
     AccordionContent,
     AccordionItem,
-    AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import {ProjectModel} from 'middleware/automation/configuration';
 import {useSearchParams} from 'react-router-dom';
@@ -52,7 +51,7 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
                     />
                 ) : (
                     <Accordion type="multiple" className="mb-8">
-                        <h3 className="px-2 text-xl font-semibold text-gray-900">
+                        <h3 className="mb-1 px-2 text-xl font-semibold text-gray-900">
                             {project.name}
                         </h3>
 
@@ -70,7 +69,7 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
                                     value={projectInstance.id!.toString()}
                                     key={projectInstance.id}
                                 >
-                                    <AccordionTrigger className="group w-full rounded-md p-2 py-3 hover:bg-gray-50 data-[state=closed]:border-b data-[state=closed]:border-b-gray-100">
+                                    <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50 data-[state=closed]:border-b data-[state=closed]:border-b-gray-100">
                                         <ProjectInstanceListItem
                                             projectInstance={projectInstance}
                                             key={projectInstance.id}
@@ -82,7 +81,7 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
                                             )}
                                             project={project}
                                         />
-                                    </AccordionTrigger>
+                                    </div>
 
                                     <AccordionContent>
                                         <ProjectInstanceWorkflowList
