@@ -26,7 +26,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                 Workflows
             </h3>
 
-            <ul className="space-y-2">
+            <ul>
                 {workflows?.map((workflow) => {
                     const componentNames = workflow.tasks?.map(
                         (task) => task.type.split('/')[0]
@@ -52,7 +52,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                             key={workflow.id}
                             className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                         >
-                            <div className="w-10/12">
+                            <div className="w-9/12">
                                 <Link
                                     className="flex items-center"
                                     to={`/automation/projects/${projectId}/workflow/${workflow.id}`}
@@ -101,12 +101,14 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                                             }
                                         )}
                                     </div>
-
-                                    <div className="flex flex-1 justify-end text-sm">
-                                        <Switch />
-                                    </div>
                                 </Link>
                             </div>
+
+                            <div className="flex w-2/12 items-center justify-center">
+                                <Switch />
+                            </div>
+
+                            <div className="flex w-1/12"></div>
                         </li>
                     );
                 })}
