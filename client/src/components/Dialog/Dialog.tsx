@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {Transition} from '@headlessui/react';
 import {
     Close,
@@ -12,8 +13,6 @@ import {
 import {Cross1Icon} from '@radix-ui/react-icons';
 import {Dispatch, Fragment, ReactNode, SetStateAction} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-import Button from '../Button/Button';
 
 type DialogProps = {
     children: ReactNode;
@@ -43,7 +42,7 @@ const Dialog = ({
 
         {!customTrigger && !!triggerLabel && (
             <Trigger asChild>
-                <Button label={triggerLabel} />
+                <Button>{triggerLabel}</Button>
             </Trigger>
         )}
 
