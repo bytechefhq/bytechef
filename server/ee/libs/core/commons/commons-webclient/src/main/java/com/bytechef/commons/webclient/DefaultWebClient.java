@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.worker.trigger.excepton;
+package com.bytechef.commons.webclient;
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
- * @author Ivica cardic
+ * @author Ivica Cardic
  */
-public class TriggerExecutionException extends Exception {
+@Component
+public class DefaultWebClient extends AbstractWebClient {
 
-    public TriggerExecutionException(String message) {
-        super(message);
-    }
-
-    public TriggerExecutionException(String message, Throwable cause) {
-        super(message, cause);
+    public DefaultWebClient() {
+        super(WebClient.builder());
     }
 }

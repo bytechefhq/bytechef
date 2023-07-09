@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.remote.client.facade;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
@@ -37,8 +38,10 @@ import java.util.Map;
  */
 public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implements ComponentDefinitionFacade {
 
-    public ComponentDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-        super(discoveryClient, objectMapper);
+    public ComponentDefinitionFacadeClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        super(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -49,9 +52,8 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
-                .map(serviceInstance -> WORKER_WEB_CLIENT
-                    .get()
-                    .uri(uriBuilder -> toUri(
+                .map(serviceInstance -> defaultWebClient.getMono(
+                    uriBuilder -> toUri(
                         uriBuilder, serviceInstance, "/component-definition-facade/get-component-definitions", Map.of(),
                         new LinkedMultiValueMap<>() {
                             {
@@ -71,9 +73,8 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
                                     put("triggerDefinitions", List.of(triggerDefinitions.toString()));
                                 }
                             }
-                        }))
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                        }),
+                    new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
             this::toComponentDefinitions)
             .block();

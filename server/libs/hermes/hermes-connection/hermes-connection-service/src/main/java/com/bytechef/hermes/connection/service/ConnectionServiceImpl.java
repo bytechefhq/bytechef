@@ -106,7 +106,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             if (connectionVersion == null) {
                 connectionIterable = connectionRepository.findAllByComponentNameAndTagId(componentName, tagId);
             } else {
-                connectionIterable = connectionRepository.findAllByCN_CV_TI(componentName, connectionVersion, tagId);
+                connectionIterable = connectionRepository.findAllByCNCVTI(componentName, connectionVersion, tagId);
             }
 
         }

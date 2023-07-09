@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.worker.trigger.handler;
-
-import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.worker.trigger.exception.TriggerExecutionException;
+package com.bytechef.hermes.worker.trigger.exception;
 
 /**
- * A strategy interface used for executing a {@link TriggerExecution}.
- *
- * @author Ivica Cardic
+ * @author Ivica cardic
  */
-public interface TriggerHandler<O> {
+public class TriggerExecutionException extends Exception {
 
-    TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
+    public TriggerExecutionException(String message) {
+        super(message);
+    }
 
-    record TriggerOutput(Object value, Object state, boolean batch) {
+    public TriggerExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

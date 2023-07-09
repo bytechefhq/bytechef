@@ -21,10 +21,10 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,11 +36,11 @@ import java.util.Optional;
 @Component
 public class JobServiceClient implements JobService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public JobServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public JobServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -70,30 +70,22 @@ public class JobServiceClient implements JobService {
 
     @Override
     public Job getTaskExecutionJob(long taskExecutionId) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/job-service/get-task-execution-job/{taskExecutionId}")
-                .build(taskExecutionId))
-            .retrieve()
-            .bodyToMono(Job.class)
-            .block();
+                .build(taskExecutionId),
+            Job.class);
     }
 
     @Override
     public Job resumeToStatusStarted(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/job-service/resume-to-status-started/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Job.class)
-            .block();
+                .build(id),
+            null, Job.class);
     }
 
     @Override
@@ -106,44 +98,31 @@ public class JobServiceClient implements JobService {
 
     @Override
     public Job setStatusToStarted(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/job-service/set-status-to-started/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Job.class)
-            .block();
+                .build(id),
+            null, Job.class);
     }
 
     @Override
     public Job setStatusToStopped(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/job-service/set-status-to-stopped/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Job.class)
-            .block();
+                .build(id),
+            null, Job.class);
     }
 
     @Override
     public Job update(Job job) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/job-service/update")
-                .build())
-            .bodyValue(job)
-            .retrieve()
-            .bodyToMono(Job.class)
-            .block();
+                .build(),
+            job, Job.class);
     }
 }

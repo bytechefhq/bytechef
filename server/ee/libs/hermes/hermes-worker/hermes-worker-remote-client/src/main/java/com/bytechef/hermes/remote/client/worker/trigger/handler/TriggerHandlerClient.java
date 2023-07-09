@@ -18,6 +18,7 @@
 package com.bytechef.hermes.remote.client.worker.trigger.handler;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler.TriggerOutput;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,6 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
@@ -36,11 +36,15 @@ import java.util.Map;
 @Component
 public class TriggerHandlerClient {
 
+    private final DefaultWebClient defaultWebClient;
     private final DiscoveryClient discoveryClient;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public TriggerHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+    public TriggerHandlerClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        this.defaultWebClient = defaultWebClient;
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;
     }
@@ -51,17 +55,13 @@ public class TriggerHandlerClient {
             discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0],
             objectMapper);
 
-        return WebClient.create()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        return defaultWebClient.post(
+            uriBuilder -> uriBuilder
                 .scheme("http")
                 .host(serviceInstance.getHost())
                 .port(serviceInstance.getPort())
                 .path("/api/internal/trigger-handler/handle")
-                .build())
-            .bodyValue(Map.of("type", type, "triggerExecution", triggerExecution))
-            .retrieve()
-            .bodyToMono(TriggerOutput.class)
-            .block();
+                .build(),
+            Map.of("type", type, "triggerExecution", triggerExecution), TriggerOutput.class);
     }
 }

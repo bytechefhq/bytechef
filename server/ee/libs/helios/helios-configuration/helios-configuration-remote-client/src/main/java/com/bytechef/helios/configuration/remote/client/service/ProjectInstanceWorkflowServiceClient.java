@@ -17,12 +17,12 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -32,11 +32,11 @@ import java.util.List;
 @Component
 public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWorkflowService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceWorkflowServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public ProjectInstanceWorkflowServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -52,18 +52,14 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     @Override
     @SuppressFBWarnings("NP")
     public long getProjectInstanceWorkflowConnectionId(String key, String operationName) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-workflow-service/get-project-instance-workflow-connection-id" +
                         "/{key}/{taskName}")
-                .build(key, operationName))
-            .retrieve()
-            .bodyToMono(Long.class)
-            .block();
+                .build(key, operationName),
+            Long.class);
     }
 
     @Override
@@ -88,16 +84,11 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
 
     @Override
     public void updateEnabled(Long id, boolean enabled) {
-        loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-workflow-service/update-enabled/{id}/{enabled}")
-                .build(id, enabled))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(id, enabled));
     }
 }

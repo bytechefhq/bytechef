@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.client.facade;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
@@ -34,8 +35,10 @@ import java.util.Map;
  */
 public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implements TriggerDefinitionFacade {
 
-    public TriggerDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-        super(discoveryClient, objectMapper);
+    public TriggerDefinitionFacadeClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        super(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -43,16 +46,11 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName,
-                "/trigger-definition-facade/execute-editor-description"))
-            .bodyValue(
-                new EditorDescriptionRequest(
-                    triggerName, triggerParameters, componentName, componentVersion, connectionId))
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-editor-description"),
+            new EditorDescriptionRequest(
+                triggerName, triggerParameters, componentName, componentVersion, connectionId),
+            String.class);
     }
 
     @Override
@@ -60,15 +58,10 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String workflowExecutionId, Long connectionId) {
 
-        WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-disable"))
-            .bodyValue(
-                new ListenerDisableRequest(
-                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+        defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-disable"),
+            new ListenerDisableRequest(
+                componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId));
     }
 
     @Override
@@ -76,15 +69,10 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String workflowExecutionId, Long connectionId) {
 
-        WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-enable"))
-            .bodyValue(
-                new ListenerEnableRequest(
-                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+        defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-enable"),
+            new ListenerEnableRequest(
+                componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId));
     }
 
     @Override
@@ -92,16 +80,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, Long connectionId, String searchText) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-options"))
-            .bodyValue(
-                new OptionsRequest(
-                    triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
-                    searchText))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<OptionDTO>>() {})
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-options"),
+            new OptionsRequest(
+                triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
+                searchText),
+            new ParameterizedTypeReference<List<OptionDTO>>() {});
     }
 
     @Override
@@ -109,15 +93,10 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-output-schema"))
-            .bodyValue(
-                new OutputSchemaRequest(
-                    triggerName, triggerParameters, componentName, componentVersion, connectionId))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-output-schema"),
+            new OutputSchemaRequest(triggerName, triggerParameters, componentName, componentVersion, connectionId),
+            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
     }
 
     @Override
@@ -125,15 +104,11 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-properties"))
-            .bodyValue(
-                new PropertiesRequest(
-                    triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-properties"),
+            new PropertiesRequest(
+                triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName),
+            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
     }
 
     @Override
@@ -141,17 +116,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String workflowExecutionId, DynamicWebhookEnableOutput output, Long connectionId) {
 
-        WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(
-                uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-disable"))
-            .bodyValue(
-                new DynamicWebhookDisableRequest(
-                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, output,
-                    connectionId))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+        defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-disable"),
+            new DynamicWebhookDisableRequest(
+                componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, output,
+                connectionId));
     }
 
     @Override
@@ -159,16 +129,12 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String workflowExecutionId, Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(
-                uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-enable"))
-            .bodyValue(
-                new DynamicWebhookEnableRequest(
-                    componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId))
-            .retrieve()
-            .bodyToMono(DynamicWebhookEnableOutput.class)
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-enable"),
+            new DynamicWebhookEnableRequest(
+                componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId),
+            DynamicWebhookEnableOutput.class);
     }
 
     @Override
@@ -176,15 +142,10 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-sample-output"))
-            .bodyValue(
-                new SampleOutputRequest(
-                    triggerName, triggerParameters, componentName, componentVersion, connectionId))
-            .retrieve()
-            .bodyToMono(Object.class)
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-sample-output"),
+            new SampleOutputRequest(triggerName, triggerParameters, componentName, componentVersion, connectionId),
+            Object.class);
     }
 
     private record EditorDescriptionRequest(

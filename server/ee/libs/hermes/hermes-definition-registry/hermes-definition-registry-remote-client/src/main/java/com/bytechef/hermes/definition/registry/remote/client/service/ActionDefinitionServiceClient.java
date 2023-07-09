@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
@@ -36,8 +37,10 @@ import java.util.Map;
 public class ActionDefinitionServiceClient extends AbstractWorkerClient
     implements ActionDefinitionService {
 
-    public ActionDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-        super(discoveryClient, objectMapper);
+    public ActionDefinitionServiceClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        super(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -83,30 +86,24 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public ActionDefinitionDTO getActionDefinition(String componentName, int componentVersion, String actionName) {
-        return WORKER_WEB_CLIENT
-            .get()
-            .uri(uriBuilder -> toUri(
+        return defaultWebClient.get(
+            uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/action-definition-service/get-action-definition/{componentName}/{componentVersion}/{actionName}",
-                componentName, componentVersion, actionName))
-            .retrieve()
-            .bodyToMono(ActionDefinitionDTO.class)
-            .block();
+                componentName, componentVersion, actionName),
+            ActionDefinitionDTO.class);
     }
 
     @Override
     public List<ActionDefinitionDTO> getActionDefinitions(
         String componentName, int componentVersion) {
 
-        return WORKER_WEB_CLIENT
-            .get()
-            .uri(uriBuilder -> toUri(
+        return defaultWebClient.get(
+            uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/action-definition-service/get-action-definitions/{componentName}/{componentVersion}",
-                componentName, componentVersion))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<ActionDefinitionDTO>>() {})
-            .block();
+                componentName, componentVersion),
+            new ParameterizedTypeReference<List<ActionDefinitionDTO>>() {});
     }
 
     @Override

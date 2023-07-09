@@ -17,11 +17,12 @@
 
 package com.bytechef.hermes.connection.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +33,11 @@ import java.util.Optional;
 @Component
 public class ConnectionServiceClient implements ConnectionService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
-    public ConnectionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    @SuppressFBWarnings("EI")
+    public ConnectionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -51,16 +53,12 @@ public class ConnectionServiceClient implements ConnectionService {
     @Override
     public Optional<Connection> fetchConnection(long id) {
         return Optional.ofNullable(
-            loadBalancedWebClientBuilder
-                .build()
-                .get()
-                .uri(uriBuilder -> uriBuilder
+            loadBalancedWebClient.get(
+                uriBuilder -> uriBuilder
                     .host("connection-service-app")
                     .path("/api/internal/connection-service/fetch-connection/{id}")
-                    .build(id))
-                .retrieve()
-                .bodyToMono(Connection.class)
-                .block());
+                    .build(id),
+                Connection.class));
     }
 
     @Override
@@ -70,16 +68,12 @@ public class ConnectionServiceClient implements ConnectionService {
 
     @Override
     public List<Connection> getConnections() {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("connection-service-app")
                 .path("/api/internal/connection-service/get-connections")
-                .build())
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<Connection>>() {})
-            .block();
+                .build(),
+            new ParameterizedTypeReference<List<Connection>>() {});
     }
 
     @Override

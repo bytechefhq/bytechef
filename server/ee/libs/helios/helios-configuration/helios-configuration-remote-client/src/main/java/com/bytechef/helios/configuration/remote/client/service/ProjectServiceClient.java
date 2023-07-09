@@ -17,12 +17,12 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +33,11 @@ import java.util.Optional;
 @Component
 public class ProjectServiceClient implements ProjectService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public ProjectServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public ProjectServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -67,44 +67,32 @@ public class ProjectServiceClient implements ProjectService {
 
     @Override
     public Project getWorkflowProject(String workflowId) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path("/api/internal/project-service/get-workflow-project/{workflowId}")
-                .build(workflowId))
-            .retrieve()
-            .bodyToMono(Project.class)
-            .block();
+                .build(workflowId),
+            Project.class);
     }
 
     @Override
     public Project getProject(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path("/api/internal/project-service/get-project/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Project.class)
-            .block();
+                .build(id),
+            Project.class);
     }
 
     @Override
     public List<Project> getProjects() {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path("/api/internal/project-service/get-projects")
-                .build())
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<Project>>() {})
-            .block();
+                .build(),
+            new ParameterizedTypeReference<List<Project>>() {});
     }
 
     @Override

@@ -17,10 +17,11 @@
 
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -29,52 +30,41 @@ import java.util.List;
  */
 public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefinitionService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
-    public TaskDispatcherDefinitionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    @SuppressFBWarnings("EI")
+    public TaskDispatcherDefinitionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
     public TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path(
                     "/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}")
-                .build(name, version))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<TaskDispatcherDefinitionDTO>() {})
-            .block();
+                .build(name, version),
+            new ParameterizedTypeReference<TaskDispatcherDefinitionDTO>() {});
     }
 
     @Override
     public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definitions")
-                .build())
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
-            .block();
+                .build(),
+            new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {});
     }
 
     @Override
     public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}")
-                .build(name))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
-            .block();
+                .build(name),
+            new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {});
     }
 }

@@ -17,6 +17,7 @@
 
 package com.bytechef.execution.config;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.remote.client.facade.TriggerDefinitionFacadeClient;
 import com.bytechef.hermes.definition.registry.remote.client.service.ComponentDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.remote.client.service.TriggerDefinitionServiceClient;
@@ -33,22 +34,22 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ComponentDefinitionServiceClient componentDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ComponentDefinitionServiceClient(discoveryClient, objectMapper);
+        return new ComponentDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     TriggerDefinitionFacadeClient triggerDefinitionFacadeClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new TriggerDefinitionFacadeClient(discoveryClient, objectMapper);
+        return new TriggerDefinitionFacadeClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     TriggerDefinitionServiceClient triggerDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new TriggerDefinitionServiceClient(discoveryClient, objectMapper);
+        return new TriggerDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 }

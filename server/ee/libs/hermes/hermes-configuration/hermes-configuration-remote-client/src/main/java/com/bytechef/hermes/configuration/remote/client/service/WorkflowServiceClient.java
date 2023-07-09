@@ -19,9 +19,9 @@ package com.bytechef.hermes.configuration.remote.client.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -31,11 +31,11 @@ import java.util.List;
 @Component
 public class WorkflowServiceClient implements WorkflowService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public WorkflowServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public WorkflowServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -50,16 +50,12 @@ public class WorkflowServiceClient implements WorkflowService {
 
     @Override
     public Workflow getWorkflow(String id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path("/api/internal/workflow-service/get-workflow/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Workflow.class)
-            .block();
+                .build(id),
+            Workflow.class);
     }
 
     @Override

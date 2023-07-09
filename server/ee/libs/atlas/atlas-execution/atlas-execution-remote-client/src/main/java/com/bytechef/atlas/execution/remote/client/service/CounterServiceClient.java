@@ -18,9 +18,9 @@
 package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -28,52 +28,40 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 public class CounterServiceClient implements CounterService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
-    public CounterServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    @SuppressFBWarnings("EI")
+    public CounterServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
     public void delete(long id) {
-        loadBalancedWebClientBuilder
-            .build()
-            .delete()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.delete(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/counter-service/delete/{id}")
-                .build(id))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(id));
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public long decrement(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/counter-service/decrement/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Long.class)
-            .block();
+                .build(id),
+            null, Long.class);
     }
 
     @Override
     public void set(long id, long value) {
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/counter-service/set/{id}/{value}")
-                .build(id, value))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(id, value),
+            null);
     }
 }

@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.execution.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -29,54 +29,40 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 public class TriggerExecutionServiceClient implements TriggerExecutionService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public TriggerExecutionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public TriggerExecutionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
     public TriggerExecution create(TriggerExecution triggerExecution) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/trigger-execution-service/create")
-                .build())
-            .bodyValue(triggerExecution)
-            .retrieve()
-            .bodyToMono(TriggerExecution.class)
-            .block();
+                .build(),
+            triggerExecution, TriggerExecution.class);
     }
 
     @Override
     public TriggerExecution getTriggerExecution(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/trigger-execution-service/get-trigger-execution/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(TriggerExecution.class)
-            .block();
+                .build(id),
+            TriggerExecution.class);
     }
 
     @Override
     public TriggerExecution update(TriggerExecution triggerExecution) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/trigger-execution-service/update")
-                .build())
-            .bodyValue(triggerExecution)
-            .retrieve()
-            .bodyToMono(TriggerExecution.class)
-            .block();
+                .build(),
+            triggerExecution, TriggerExecution.class);
     }
 }
