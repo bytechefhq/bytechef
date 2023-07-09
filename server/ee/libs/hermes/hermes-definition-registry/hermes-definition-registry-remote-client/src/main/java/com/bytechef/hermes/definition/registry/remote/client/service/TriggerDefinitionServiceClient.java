@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
@@ -37,8 +38,10 @@ import static com.bytechef.hermes.component.definition.TriggerDefinition.Dynamic
 public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     implements TriggerDefinitionService {
 
-    public TriggerDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-        super(discoveryClient, objectMapper);
+    public TriggerDefinitionServiceClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        super(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -62,14 +65,11 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(
-                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-refresh"))
-            .bodyValue(new DynamicWebhookRefresh(componentName, componentVersion, triggerName, output))
-            .retrieve()
-            .bodyToMono(DynamicWebhookEnableOutput.class)
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-service/execute-dynamic-webhook-refresh"),
+            new DynamicWebhookRefresh(componentName, componentVersion, triggerName, output),
+            DynamicWebhookEnableOutput.class);
     }
 
     @Override
@@ -130,28 +130,22 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
-        return WORKER_WEB_CLIENT
-            .get()
-            .uri(uriBuilder -> toUri(
+        return defaultWebClient.get(
+            uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/trigger-definition-service/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
-                componentName, componentVersion, triggerName))
-            .retrieve()
-            .bodyToMono(TriggerDefinitionDTO.class)
-            .block();
+                componentName, componentVersion, triggerName),
+            TriggerDefinitionDTO.class);
     }
 
     @Override
     public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
-        return WORKER_WEB_CLIENT
-            .get()
-            .uri(uriBuilder -> toUri(
+        return defaultWebClient.get(
+            uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}", componentName,
-                componentVersion))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<TriggerDefinitionDTO>>() {})
-            .block();
+                componentVersion),
+            new ParameterizedTypeReference<List<TriggerDefinitionDTO>>() {});
     }
 
     private record DynamicWebhookRefresh(

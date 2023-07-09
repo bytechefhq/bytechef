@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.execution.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Optional;
 
@@ -32,40 +32,31 @@ import java.util.Optional;
 @Component("triggerStorageService")
 public class TriggerStateServiceClient implements TriggerStateService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public TriggerStateServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public TriggerStateServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
         return Optional.ofNullable(
-            loadBalancedWebClientBuilder
-                .build()
-                .get()
-                .uri(uriBuilder -> uriBuilder
+            loadBalancedWebClient.get(
+                uriBuilder -> uriBuilder
                     .host("execution-service-app")
                     .path("/api/internal/trigger-storage-service/fetch-value/{workflowExecutionId}")
-                    .build(workflowExecutionId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<T>() {})
-                .block());
+                    .build(workflowExecutionId),
+                new ParameterizedTypeReference<T>() {}));
     }
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
-        loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/trigger-storage-service/save/{workflowExecutionId}")
-                .build(workflowExecutionId))
-            .bodyValue(value)
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(workflowExecutionId),
+            value);
     }
 }

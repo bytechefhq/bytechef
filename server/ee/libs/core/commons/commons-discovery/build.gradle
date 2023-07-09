@@ -1,5 +1,4 @@
 dependencies {
-//    api "com.fasterxml.jackson.core:jackson-databind"
     api libs.org.springframework.cloud.spring.cloud.commons
 
     implementation "com.fasterxml.jackson.core:jackson-databind"

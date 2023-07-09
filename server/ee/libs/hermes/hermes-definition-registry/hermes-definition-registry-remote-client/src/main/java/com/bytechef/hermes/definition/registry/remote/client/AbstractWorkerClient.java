@@ -18,12 +18,12 @@
 package com.bytechef.hermes.definition.registry.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 
 import java.net.URI;
@@ -33,13 +33,16 @@ import java.util.Map;
 public abstract class AbstractWorkerClient {
 
     protected static final String WORKER_SERVICE_APP = "worker-service-app";
-    protected static final WebClient WORKER_WEB_CLIENT = WebClient.create();
+    protected final DefaultWebClient defaultWebClient;
 
     protected final DiscoveryClient discoveryClient;
     protected final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public AbstractWorkerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+    public AbstractWorkerClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        this.defaultWebClient = defaultWebClient;
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;
     }

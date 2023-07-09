@@ -19,13 +19,13 @@ package com.bytechef.atlas.worker.remote.client.task.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
@@ -36,11 +36,15 @@ import java.util.Map;
 public class TaskHandlerClient {
 
     private final DiscoveryClient discoveryClient;
+    private final DefaultWebClient defaultWebClient;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public TaskHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+    public TaskHandlerClient(
+        DiscoveryClient discoveryClient, DefaultWebClient defaultWebClient, ObjectMapper objectMapper) {
+
         this.discoveryClient = discoveryClient;
+        this.defaultWebClient = defaultWebClient;
         this.objectMapper = objectMapper;
     }
 
@@ -50,17 +54,14 @@ public class TaskHandlerClient {
             discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0],
             objectMapper);
 
-        return WebClient.create()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        return defaultWebClient.post(
+            uriBuilder -> uriBuilder
                 .scheme("http")
                 .host(serviceInstance.getHost())
                 .port(serviceInstance.getPort())
                 .path("/api/internal/task-handler/handle")
-                .build())
-            .bodyValue(Map.of("type", type, "taskExecution", taskExecution))
-            .retrieve()
-            .bodyToMono(Object.class)
-            .block();
+                .build(),
+            Map.of("type", type, "taskExecution", taskExecution),
+            Object.class);
     }
 }
