@@ -1,4 +1,11 @@
 import {Switch} from '@/components/ui/switch';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {ComponentDefinitionBasicModel} from '@/middleware/core/workflow/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import InlineSVG from 'react-inlinesvg';
@@ -8,60 +15,102 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(projectId);
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
 
-    const componentIcons: {[key: string]: string} = {};
+    const workflowComponentDefinitions: {
+        [key: string]: ComponentDefinitionBasicModel | undefined;
+    } = {};
+
+    workflows?.map((workflow) => {
+        const componentNames = workflow.tasks?.map(
+            (task) => task.type.split('/')[0]
+        );
+
+        componentNames?.map((componentName) => {
+            if (!workflowComponentDefinitions[componentName]) {
+                workflowComponentDefinitions[componentName] =
+                    componentDefinitions?.find(
+                        (componentDefinition) =>
+                            componentDefinition.name === componentName
+                    );
+            }
+        });
+    });
 
     return (
-        <div className="border-b border-b-gray-100 px-2 py-4">
-            <h3 className="mb-2 text-sm font-bold uppercase text-gray-600">
+        <div className="border-b border-b-gray-100 py-2">
+            <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
                 Workflows
             </h3>
 
             <ul className="space-y-2">
                 {workflows?.map((workflow) => {
-                    const componentNames = workflow.tasks?.map(
+                    let componentNames = workflow.tasks?.map(
                         (task) => task.type.split('/')[0]
                     );
 
-                    componentNames?.map((componentName) => {
-                        if (!componentIcons[componentName]) {
-                            componentIcons[componentName] =
-                                componentDefinitions?.find(
-                                    (componentDefinition) =>
-                                        componentDefinition.name ===
-                                        componentName
-                                )?.icon ?? '';
-                        }
-                    });
+                    componentNames = componentNames?.filter(
+                        (item, index) => componentNames?.indexOf(item) === index
+                    );
 
                     return (
                         <li
                             key={workflow.id}
-                            className="flex items-center justify-between"
+                            className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                         >
-                            <Link
-                                className="flex justify-start text-sm"
-                                to={`/automation/projects/${projectId}/workflow/${workflow.id}`}
-                            >
-                                {workflow.label}
+                            <div className="w-10/12">
+                                <Link
+                                    className="flex items-center"
+                                    to={`/automation/projects/${projectId}/workflow/${workflow.id}`}
+                                >
+                                    <div className="w-6/12 text-sm font-semibold">
+                                        {workflow.label}
+                                    </div>
 
-                                <div className="ml-6 flex">
-                                    {componentNames?.map(
-                                        (componentName, index) => (
-                                            <InlineSVG
-                                                className="mr-1 h-5 w-5 flex-none"
-                                                key={`${componentName}-${index}`}
-                                                src={
-                                                    componentIcons[
+                                    <div className="ml-6 flex">
+                                        {componentNames?.map(
+                                            (componentName) => {
+                                                const componentDefinition =
+                                                    workflowComponentDefinitions[
                                                         componentName
-                                                    ]
-                                                }
-                                            />
-                                        )
-                                    )}
-                                </div>
-                            </Link>
+                                                    ];
 
-                            <Switch />
+                                                return (
+                                                    <div
+                                                        key={componentName}
+                                                        className="mr-0.5 flex items-center justify-center rounded-full border p-1"
+                                                    >
+                                                        <TooltipProvider>
+                                                            <Tooltip>
+                                                                <TooltipTrigger>
+                                                                    <InlineSVG
+                                                                        className="h-5 w-5 flex-none"
+                                                                        key={
+                                                                            componentName
+                                                                        }
+                                                                        src={
+                                                                            componentDefinition?.icon ??
+                                                                            ''
+                                                                        }
+                                                                    />
+                                                                </TooltipTrigger>
+
+                                                                <TooltipContent side="right">
+                                                                    {
+                                                                        componentDefinition?.title
+                                                                    }
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-1 justify-end text-sm">
+                                        <Switch />
+                                    </div>
+                                </Link>
+                            </div>
                         </li>
                     );
                 })}
