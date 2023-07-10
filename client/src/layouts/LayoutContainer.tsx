@@ -10,22 +10,22 @@ type SidebarContentLayoutProps = {
     leftSidebarBody?: ReactNode;
     leftSidebarHeader?: ReactNode;
     leftSidebarOpen?: boolean;
-    leftSidebarWidth?: string;
+    leftSidebarWidth?: '64' | '72';
     rightSidebarBody?: ReactNode;
     rightSidebarHeader?: ReactNode;
     rightSidebarOpen?: boolean;
-    rightSidebarWidth?: string;
+    rightSidebarWidth?: '460';
     rightToolbarBody?: ReactNode;
     rightToolbarOpen?: boolean;
 };
 
 const leftSidebarWidths = {
-    '64': ['md:w-64', 'md:pl-64'],
-    '72': ['md:w-72', 'md:pl-72'],
+    64: ['md:w-64', 'md:pl-64'],
+    72: ['md:w-72', 'md:pl-72'],
 };
 
 const rightSidebarWidths = {
-    '460': 'w-[460px]',
+    460: 'w-[460px]',
 };
 
 const LayoutContainer = ({
@@ -40,7 +40,7 @@ const LayoutContainer = ({
     rightSidebarBody,
     rightSidebarHeader,
     rightSidebarOpen = false,
-    rightSidebarWidth,
+    rightSidebarWidth = '460',
     rightToolbarBody,
     rightToolbarOpen = false,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
