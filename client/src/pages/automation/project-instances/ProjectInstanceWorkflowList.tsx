@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom';
 
 const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(projectId);
-
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
 
     const componentIcons: {[key: string]: string} = {};
@@ -23,15 +22,16 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                         (task) => task.type.split('/')[0]
                     );
 
-			        componentNames?.map((componentName) => {
-			            if (!componentIcons[componentName]) {
-			                componentIcons[componentName] =
-			                    componentDefinitions?.find(
-			                        (componentDefinition) =>
-			                            componentDefinition.name === componentName
-			                    )?.icon ?? '';
-			            }
-			        });
+                    componentNames?.map((componentName) => {
+                        if (!componentIcons[componentName]) {
+                            componentIcons[componentName] =
+                                componentDefinitions?.find(
+                                    (componentDefinition) =>
+                                        componentDefinition.name ===
+                                        componentName
+                                )?.icon ?? '';
+                        }
+                    });
 
                     return (
                         <li
@@ -45,13 +45,19 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                                 {workflow.label}
 
                                 <div className="ml-6 flex">
-                                    {componentNames?.map((componentName) => (
-                                        <InlineSVG
-                                            className="mr-1 h-5 w-5 flex-none"
-                                            key={componentName}
-                                            src={componentIcons[componentName]}
-                                        />
-                                    ))}
+                                    {componentNames?.map(
+                                        (componentName, index) => (
+                                            <InlineSVG
+                                                className="mr-1 h-5 w-5 flex-none"
+                                                key={`${componentName}-${index}`}
+                                                src={
+                                                    componentIcons[
+                                                        componentName
+                                                    ]
+                                                }
+                                            />
+                                        )
+                                    )}
                                 </div>
                             </Link>
 
