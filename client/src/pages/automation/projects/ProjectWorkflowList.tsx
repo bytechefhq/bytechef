@@ -40,22 +40,6 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
 
-    workflows?.map((workflow) => {
-        const componentNames = workflow.tasks?.map(
-            (task) => task.type.split('/')[0]
-        );
-
-        componentNames?.map((componentName) => {
-            if (!workflowComponentDefinitions[componentName]) {
-                workflowComponentDefinitions[componentName] =
-                    componentDefinitions?.find(
-                        (componentDefinition) =>
-                            componentDefinition.name === componentName
-                    );
-            }
-        });
-    });
-
     return (
         <div className="border-b border-b-gray-100 py-2">
             <div className="mb-1 flex items-center justify-between">
@@ -79,11 +63,22 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
 
             <ul>
                 {workflows?.map((workflow) => {
-                    let componentNames = workflow.tasks?.map(
+                    const componentNames = workflow.tasks?.map(
                         (task) => task.type.split('/')[0]
                     );
 
-                    componentNames = componentNames?.filter(
+                    componentNames?.map((componentName) => {
+                        if (!workflowComponentDefinitions[componentName]) {
+                            workflowComponentDefinitions[componentName] =
+                                componentDefinitions?.find(
+                                    (componentDefinition) =>
+                                        componentDefinition.name ===
+                                        componentName
+                                );
+                        }
+                    });
+
+                    const filteredComponentNames = componentNames?.filter(
                         (item, index) => componentNames?.indexOf(item) === index
                     );
 
@@ -102,7 +97,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                     </div>
 
                                     <div className="ml-6 flex">
-                                        {componentNames?.map(
+                                        {filteredComponentNames?.map(
                                             (componentName) => {
                                                 const componentDefinition =
                                                     workflowComponentDefinitions[
@@ -142,7 +137,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                     </div>
 
                                     <div className="flex flex-1 justify-end text-sm">
-                                        {project.lastModifiedDate?.toLocaleDateString()}
+                                        {workflow.lastModifiedDate?.toLocaleDateString()}
                                     </div>
                                 </Link>
                             </div>
