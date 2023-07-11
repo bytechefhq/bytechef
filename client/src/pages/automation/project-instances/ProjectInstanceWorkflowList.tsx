@@ -16,6 +16,10 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
 
+    const workflowComponentDefinitions: {
+        [key: string]: ComponentDefinitionBasicModel | undefined;
+    } = {};
+
     return (
         <div className="border-b border-b-gray-100 py-2">
             <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
@@ -24,17 +28,11 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
 
             <ul className="space-y-2">
                 {workflows?.map((workflow) => {
-                    const workflowComponentDefinitions: {
-                        [key: string]:
-                            | ComponentDefinitionBasicModel
-                            | undefined;
-                    } = {};
-
                     const componentNames = workflow.tasks?.map(
                         (task) => task.type.split('/')[0]
                     );
 
-                    componentNames?.map((componentName) => {
+                    componentNames?.forEach((componentName) => {
                         if (!workflowComponentDefinitions[componentName]) {
                             workflowComponentDefinitions[componentName] =
                                 componentDefinitions?.find(
@@ -45,7 +43,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                         }
                     });
 
-                    const componentNamesFiltered = componentNames?.filter(
+                    const filteredComponentNames = componentNames?.filter(
                         (item, index) => componentNames?.indexOf(item) === index
                     );
 
@@ -64,7 +62,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                                     </div>
 
                                     <div className="ml-6 flex">
-                                        {componentNamesFiltered?.map(
+                                        {filteredComponentNames?.map(
                                             (componentName) => {
                                                 const componentDefinition =
                                                     workflowComponentDefinitions[
