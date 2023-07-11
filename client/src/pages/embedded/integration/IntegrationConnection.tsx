@@ -2,18 +2,18 @@ import LayoutContainer from '@/layouts/LayoutContainer';
 import PageHeader from '@/layouts/PageHeader';
 import IntegrationLeftSidebarNav from '@/pages/embedded/integration/components/IntegrationLeftSidebarNav';
 
-const IntegrationWorkflowEditor = () => {
+const IntegrationConnection = () => {
     return (
         <LayoutContainer
-            header={<PageHeader position="main" title="Workflow Editor" />}
+            header={<PageHeader position="main" title="Connection" />}
             leftSidebarHeader={
                 <PageHeader position="sidebar" title="Pipedrive Integration" />
             }
             leftSidebarBody={<IntegrationLeftSidebarNav />}
         >
-            <div>Workflow Editor</div>
+            <div>Connection</div>
         </LayoutContainer>
     );
 };
 
-export default IntegrationWorkflowEditor;
+export default IntegrationConnection;

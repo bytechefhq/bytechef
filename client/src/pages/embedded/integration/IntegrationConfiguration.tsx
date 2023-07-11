@@ -9,14 +9,14 @@ const IntegrationConfiguration = () => {
     return (
         <LayoutContainer
             className="bg-muted"
-            header={<PageHeader position="main" title="Integration Portal" />}
+            header={<PageHeader position="main" title="Configuration" />}
             leftSidebarHeader={
                 <PageHeader position="sidebar" title="Pipedrive Integration" />
             }
             leftSidebarBody={<IntegrationLeftSidebarNav />}
             rightSidebarOpen={true}
             rightSidebarBody={
-                <PageHeader position="main" title="Configuration" />
+                <PageHeader position="main" title="Integration Portal" />
             }
             rightSidebarWidth="460"
         >
