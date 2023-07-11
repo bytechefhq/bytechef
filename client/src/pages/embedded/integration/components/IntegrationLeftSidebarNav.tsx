@@ -6,12 +6,16 @@ const sidebarNavItems = [
         title: 'Configuration',
     },
     {
+        href: 'connection',
+        title: 'Connection',
+    },
+    {
         href: 'workflows',
         title: 'Workflows',
     },
     {
-        href: 'settings',
-        title: 'Settings',
+        href: 'user-metadata',
+        title: 'User Metadata',
     },
 ];
 
