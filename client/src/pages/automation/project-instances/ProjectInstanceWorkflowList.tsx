@@ -13,27 +13,8 @@ import {Link} from 'react-router-dom';
 
 const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(projectId);
+
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
-
-    const workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel | undefined;
-    } = {};
-
-    workflows?.map((workflow) => {
-        const componentNames = workflow.tasks?.map(
-            (task) => task.type.split('/')[0]
-        );
-
-        componentNames?.map((componentName) => {
-            if (!workflowComponentDefinitions[componentName]) {
-                workflowComponentDefinitions[componentName] =
-                    componentDefinitions?.find(
-                        (componentDefinition) =>
-                            componentDefinition.name === componentName
-                    );
-            }
-        });
-    });
 
     return (
         <div className="border-b border-b-gray-100 py-2">
@@ -43,11 +24,28 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
 
             <ul className="space-y-2">
                 {workflows?.map((workflow) => {
-                    let componentNames = workflow.tasks?.map(
+                    const workflowComponentDefinitions: {
+                        [key: string]:
+                            | ComponentDefinitionBasicModel
+                            | undefined;
+                    } = {};
+
+                    const componentNames = workflow.tasks?.map(
                         (task) => task.type.split('/')[0]
                     );
 
-                    componentNames = componentNames?.filter(
+                    componentNames?.map((componentName) => {
+                        if (!workflowComponentDefinitions[componentName]) {
+                            workflowComponentDefinitions[componentName] =
+                                componentDefinitions?.find(
+                                    (componentDefinition) =>
+                                        componentDefinition.name ===
+                                        componentName
+                                );
+                        }
+                    });
+
+                    const componentNamesFiltered = componentNames?.filter(
                         (item, index) => componentNames?.indexOf(item) === index
                     );
 
@@ -66,7 +64,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                                     </div>
 
                                     <div className="ml-6 flex">
-                                        {componentNames?.map(
+                                        {componentNamesFiltered?.map(
                                             (componentName) => {
                                                 const componentDefinition =
                                                     workflowComponentDefinitions[
