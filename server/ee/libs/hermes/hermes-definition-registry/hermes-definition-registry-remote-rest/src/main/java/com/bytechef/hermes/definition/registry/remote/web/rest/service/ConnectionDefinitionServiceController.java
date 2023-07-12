@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,6 +40,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@Hidden
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")

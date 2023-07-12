@@ -20,6 +20,7 @@ package com.bytechef.atlas.execution.remote.web.rest.service;
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.service.ContextService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@Hidden
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class ContextServiceController {
