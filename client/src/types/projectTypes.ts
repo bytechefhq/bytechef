@@ -11,7 +11,7 @@ import {
     ObjectPropertyModel,
     StringPropertyModel,
     TimePropertyModel,
-} from 'middleware/core/workflow/configuration';
+} from 'middleware/hermes/configuration';
 
 export type PropertyType = AnyPropertyModel &
     ArrayPropertyModel &

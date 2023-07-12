@@ -3,7 +3,7 @@ import {CheckIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
 import Dialog from 'components/Dialog/Dialog';
-import {ProjectInstanceModel} from 'middleware/automation/configuration';
+import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,

@@ -1,7 +1,7 @@
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '@/middleware/core/workflow/configuration';
+} from '@/middleware/hermes/configuration';
 import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
 import {memo, useEffect, useState} from 'react';

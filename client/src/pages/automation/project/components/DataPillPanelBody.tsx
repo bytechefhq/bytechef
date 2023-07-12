@@ -1,4 +1,4 @@
-import {ComponentDefinitionModel} from '@/middleware/automation/execution/models';
+import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {PropertyType} from '@/types/projectTypes';

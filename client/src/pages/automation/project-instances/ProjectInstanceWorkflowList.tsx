@@ -5,7 +5,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {ComponentDefinitionBasicModel} from '@/middleware/core/workflow/configuration';
+import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import InlineSVG from 'react-inlinesvg';

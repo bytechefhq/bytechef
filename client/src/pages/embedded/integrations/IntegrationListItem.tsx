@@ -2,7 +2,7 @@ import {
     IntegrationModel,
     IntegrationModelStatusEnum,
     TagModel,
-} from '@/middleware/embedded/configuration';
+} from '@/middleware/dione/configuration';
 import {
     useCreateIntegrationWorkflowRequestMutation,
     useDeleteIntegrationMutation,

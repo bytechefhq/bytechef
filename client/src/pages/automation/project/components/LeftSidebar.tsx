@@ -1,7 +1,7 @@
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '@/middleware/core/workflow/configuration';
+} from '@/middleware/hermes/configuration';
 import {useEffect, useState} from 'react';
 
 import WorkflowNodesList from './WorkflowNodesList';
