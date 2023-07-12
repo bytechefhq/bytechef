@@ -1781,6 +1781,7 @@
   } ],
   "category": null,
   "connection": {
+    "authorizationRequired": null,
     "authorizations": [ {
       "detectOn": null,
       "description": null,

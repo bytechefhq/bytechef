@@ -605,6 +605,7 @@
   } ],
   "category": null,
   "connection": {
+    "authorizationRequired": null,
     "authorizations": null,
     "baseUri": null,
     "componentName": "aws-s3",
