@@ -70,7 +70,7 @@ paths:
         schema:
           type: "integer"
           format: "int64"
-      - name: "tagIds"
+      - name: "tagId"
         description: "The tag id of used for filtering project instances."
         in: "query"
         required: false
