@@ -36,7 +36,7 @@ import java.util.List;
 @RestController
 
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/embedded")
-public class IntegrationWorkflowController implements WorkflowsApi {
+public class IntegrationWorkflowController implements IntegrationWorkflowsApi {
 
     private final ConversionService conversionService;
     private final WorkflowFacade workflowFacade;
@@ -52,7 +52,7 @@ public class IntegrationWorkflowController implements WorkflowsApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteWorkflow(String id) {
+    public ResponseEntity<Void> deleteIntegrationWorkflow(String id) {
         workflowService.delete(id);
 
         return ResponseEntity
@@ -62,14 +62,14 @@ public class IntegrationWorkflowController implements WorkflowsApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<WorkflowModel> getWorkflow(String id) {
+    public ResponseEntity<WorkflowModel> getIntegrationWorkflow(String id) {
         return ResponseEntity.ok(conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class)
             .definition(null));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<List<WorkflowModel>> getWorkflows() {
+    public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
         for (WorkflowDTO workflowDTO : workflowFacade.getWorkflows()) {
@@ -83,7 +83,7 @@ public class IntegrationWorkflowController implements WorkflowsApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
+    public ResponseEntity<WorkflowModel> updateIntegrationWorkflow(String id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
             conversionService.convert(workflowFacade.update(id, workflowModel.getDefinition()), WorkflowModel.class));
     }

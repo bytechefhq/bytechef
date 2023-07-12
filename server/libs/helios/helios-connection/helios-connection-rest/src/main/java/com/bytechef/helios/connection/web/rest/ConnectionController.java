@@ -18,11 +18,8 @@
 package com.bytechef.helios.connection.web.rest;
 
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
-import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
-import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -73,15 +70,6 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getConnectionTags() {
-        return ResponseEntity.ok(
-            connectionFacade.getConnectionTags()
-                .stream()
-                .map(tag -> conversionService.convert(tag, TagModel.class))
-                .toList());
-    }
-
-    @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String componentName, Integer connectionVersion, Long tagId) {
@@ -100,19 +88,5 @@ public class ConnectionController implements ConnectionsApi {
             conversionService.convert(
                 connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
                 ConnectionModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateConnectionTagsRequestModel) {
-        List<TagModel> tagModels = updateConnectionTagsRequestModel.getTags();
-
-        connectionFacade.update(
-            id,
-            tagModels.stream()
-                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                .toList());
-
-        return ResponseEntity.noContent()
-            .build();
     }
 }
