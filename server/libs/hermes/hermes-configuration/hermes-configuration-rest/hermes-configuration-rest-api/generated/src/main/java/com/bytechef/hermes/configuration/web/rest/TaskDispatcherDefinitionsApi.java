@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:33.068832+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:17:15.091180+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-dispatcher-definitions", description = "The Core Task Dispatcher Definitions API")
 public interface TaskDispatcherDefinitionsApi {
@@ -43,7 +43,7 @@ public interface TaskDispatcherDefinitionsApi {
     }
 
     /**
-     * GET /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion} : Get a task dispatcher definition.
+     * GET /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion} : Get a task dispatcher definition
      * Get a task dispatcher definition.
      *
      * @param taskDispatcherName The name of a task dispatcher to get. (required)
@@ -52,7 +52,7 @@ public interface TaskDispatcherDefinitionsApi {
      */
     @Operation(
         operationId = "getTaskDispatcherDefinition",
-        summary = "Get a task dispatcher definition.",
+        summary = "Get a task dispatcher definition",
         description = "Get a task dispatcher definition.",
         tags = { "task-dispatcher-definitions" },
         responses = {
@@ -85,7 +85,7 @@ public interface TaskDispatcherDefinitionsApi {
 
 
     /**
-     * GET /task-dispatcher-definitions/{taskDispatcherName}/versions : Get all task dispatcher definition versions of a task dispatcher.
+     * GET /task-dispatcher-definitions/{taskDispatcherName}/versions : Get all task dispatcher definition versions of a task dispatcher
      * Get all task dispatcher definition versions of a task dispatcher.
      *
      * @param taskDispatcherName The name of a task dispatcher. (required)
@@ -93,7 +93,7 @@ public interface TaskDispatcherDefinitionsApi {
      */
     @Operation(
         operationId = "getTaskDispatcherDefinitionVersions",
-        summary = "Get all task dispatcher definition versions of a task dispatcher.",
+        summary = "Get all task dispatcher definition versions of a task dispatcher",
         description = "Get all task dispatcher definition versions of a task dispatcher.",
         tags = { "task-dispatcher-definitions" },
         responses = {
@@ -125,14 +125,14 @@ public interface TaskDispatcherDefinitionsApi {
 
 
     /**
-     * GET /task-dispatcher-definitions : Get all task dispatcher definitions.
+     * GET /task-dispatcher-definitions : Get all task dispatcher definitions
      * Get all task dispatcher definitions.
      *
      * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getTaskDispatcherDefinitions",
-        summary = "Get all task dispatcher definitions.",
+        summary = "Get all task dispatcher definitions",
         description = "Get all task dispatcher definitions.",
         tags = { "task-dispatcher-definitions" },
         responses = {
