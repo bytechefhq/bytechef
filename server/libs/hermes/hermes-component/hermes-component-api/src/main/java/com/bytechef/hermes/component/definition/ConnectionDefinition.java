@@ -46,6 +46,8 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
      */
     Authorization getAuthorization(String authorizationName);
 
+    Optional<Boolean> getAuthorizationRequired();
+
     /**
      *
      * @return
