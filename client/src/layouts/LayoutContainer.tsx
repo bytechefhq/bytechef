@@ -1,6 +1,6 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
-import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
+import {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type SidebarContentLayoutProps = {

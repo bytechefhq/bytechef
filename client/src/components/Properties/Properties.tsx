@@ -282,7 +282,7 @@ const Properties = ({
     formState,
     properties,
     register,
-}: PropertiesProps): JSX.Element => (
+}: PropertiesProps) => (
     <ul className={twMerge('h-full', customClassName)}>
         {properties.map((property, index) => (
             <Property

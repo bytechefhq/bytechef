@@ -2,11 +2,11 @@ import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
 } from '@/middleware/core/workflow/configuration';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import WorkflowNodesList from './WorkflowNodesList';
 
-interface SidebarProps {
+interface LeftSidebarProps {
     data: {
         components: Array<ComponentDefinitionBasicModel>;
         flowControls: Array<TaskDispatcherDefinitionModel>;
@@ -14,7 +14,7 @@ interface SidebarProps {
     filter: string;
 }
 
-const LeftSidebar: React.FC<SidebarProps> = ({data, filter}): JSX.Element => {
+const LeftSidebar = ({data, filter}: LeftSidebarProps) => {
     const [filteredComponents, setFilteredComponents] = useState<
         Array<ComponentDefinitionBasicModel>
     >([]);

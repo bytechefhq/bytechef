@@ -3,10 +3,10 @@ import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
 } from 'middleware/core/workflow/configuration';
-import React, {HTMLAttributes} from 'react';
+import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
-interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
+interface DragEvent<T = Element> extends MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
 }
 
@@ -19,7 +19,7 @@ const WorkflowNodesListItem = ({
     draggable,
     handleClick,
     node,
-}: WorkflowNodesListItemProps): JSX.Element => {
+}: WorkflowNodesListItemProps) => {
     const onDragStart = (event: DragEvent, name: string) => {
         event.dataTransfer.setData('application/reactflow', name);
         event.dataTransfer.effectAllowed = 'move';

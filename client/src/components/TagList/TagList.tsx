@@ -50,7 +50,7 @@ const TagList = ({
     remainingTags,
     tags,
     updateTagsMutation,
-}: TagListProps): JSX.Element => {
+}: TagListProps) => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 

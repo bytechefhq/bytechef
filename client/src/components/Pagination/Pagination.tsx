@@ -10,11 +10,7 @@ interface ButtonProps {
     onClick: (pageNumber: number) => void;
 }
 
-const Button = ({
-    onClick,
-    pageIndexToMap,
-    pageNumber,
-}: ButtonProps): JSX.Element => (
+const Button = ({onClick, pageIndexToMap, pageNumber}: ButtonProps) => (
     <button
         aria-current="page"
         className={twMerge([
@@ -44,7 +40,7 @@ const Pagination = ({
     pageSize,
     totalElements,
     totalPages,
-}: PaginationProps): JSX.Element => {
+}: PaginationProps) => {
     const renderPageLinks = useCallback(() => {
         if (totalPages === 0) {
             return null;
@@ -54,6 +50,7 @@ const Pagination = ({
             totalPages < visiblePageButtonCount
                 ? totalPages
                 : visiblePageButtonCount;
+
         const pageIndices = [pageNumber];
         numberOfButtons--;
 

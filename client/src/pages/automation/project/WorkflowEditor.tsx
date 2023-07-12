@@ -32,7 +32,7 @@ type WorkflowProps = {
     flowControls: TaskDispatcherDefinitionBasicModel[];
 };
 
-const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
+const Workflow = ({components, flowControls}: WorkflowProps) => {
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();

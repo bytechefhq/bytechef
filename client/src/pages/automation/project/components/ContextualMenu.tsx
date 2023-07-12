@@ -4,7 +4,7 @@ import {
 } from '@/middleware/core/workflow/configuration';
 import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
-import React, {memo, useEffect, useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
@@ -25,7 +25,7 @@ const ContextualMenu = ({
     edge,
     flowControls,
     id,
-}: ContextualMenuProps): JSX.Element => {
+}: ContextualMenuProps) => {
     const [filter, setFilter] = useState('');
 
     const [filteredComponents, setFilteredComponents] = useState<

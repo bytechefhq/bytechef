@@ -4,7 +4,7 @@ import {
     InformationCircleIcon,
     XCircleIcon,
 } from '@heroicons/react/24/outline';
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export interface AlertProps {
