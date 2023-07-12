@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("IntegerProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:17:15.091180+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T19:44:20.976179+02:00[Europe/Zagreb]")
 public class IntegerPropertyAllOfModel {
 
   private Integer maxValue;

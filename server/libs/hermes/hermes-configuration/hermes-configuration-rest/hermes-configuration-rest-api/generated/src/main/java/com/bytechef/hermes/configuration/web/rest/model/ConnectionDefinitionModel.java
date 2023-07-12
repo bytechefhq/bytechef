@@ -25,8 +25,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:17:15.091180+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T19:44:20.976179+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
+
+  private Boolean authorizationRequired = true;
 
   @Valid
   private List<@Valid AuthorizationModel> authorizations;
@@ -59,6 +61,26 @@ public class ConnectionDefinitionModel {
   public ConnectionDefinitionModel(String componentName, Integer version) {
     this.componentName = componentName;
     this.version = version;
+  }
+
+  public ConnectionDefinitionModel authorizationRequired(Boolean authorizationRequired) {
+    this.authorizationRequired = authorizationRequired;
+    return this;
+  }
+
+  /**
+   * If a connection requires an authorization to be defined or not
+   * @return authorizationRequired
+  */
+  
+  @Schema(name = "authorizationRequired", description = "If a connection requires an authorization to be defined or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationRequired")
+  public Boolean getAuthorizationRequired() {
+    return authorizationRequired;
+  }
+
+  public void setAuthorizationRequired(Boolean authorizationRequired) {
+    this.authorizationRequired = authorizationRequired;
   }
 
   public ConnectionDefinitionModel authorizations(List<@Valid AuthorizationModel> authorizations) {
@@ -226,7 +248,8 @@ public class ConnectionDefinitionModel {
       return false;
     }
     ConnectionDefinitionModel connectionDefinition = (ConnectionDefinitionModel) o;
-    return Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
+    return Objects.equals(this.authorizationRequired, connectionDefinition.authorizationRequired) &&
+        Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
         Objects.equals(this.baseUri, connectionDefinition.baseUri) &&
         Objects.equals(this.componentDescription, connectionDefinition.componentDescription) &&
         Objects.equals(this.componentName, connectionDefinition.componentName) &&
@@ -237,13 +260,14 @@ public class ConnectionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizations, baseUri, componentDescription, componentName, properties, componentTitle, version);
+    return Objects.hash(authorizationRequired, authorizations, baseUri, componentDescription, componentName, properties, componentTitle, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionDefinitionModel {\n");
+    sb.append("    authorizationRequired: ").append(toIndentedString(authorizationRequired)).append("\n");
     sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
     sb.append("    baseUri: ").append(toIndentedString(baseUri)).append("\n");
     sb.append("    componentDescription: ").append(toIndentedString(componentDescription)).append("\n");
