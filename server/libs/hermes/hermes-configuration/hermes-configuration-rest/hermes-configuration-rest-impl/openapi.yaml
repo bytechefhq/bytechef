@@ -1079,6 +1079,11 @@ components:
       - "componentName"
       - "version"
       properties:
+        authorizationRequired:
+          description: "If a connection requires an authorization to be defined or\
+            \ not"
+          type: "boolean"
+          default: true
         authorizations:
           type: "array"
           items:
