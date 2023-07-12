@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.hermes.connection.web.rest;
+package com.bytechef.dione.configuration.web.rest;
 
-import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,44 +32,44 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T14:11:27.142264+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:22:17.202030+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "connection-oauth2", description = "The Core Connection OAuth2 API")
-public interface ConnectionOauth2PropertiesApi {
+@Tag(name = "integration-tags", description = "The Embedded Integration Tags API")
+public interface IntegrationTagsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /connection-oauth2-properties : Get OAuth2 properties
-     * Get OAuth2 properties.
+     * GET /integration-tags : Get integration tags
+     * Get integration tags.
      *
-     * @return The OAuth2Properties object. (status code 200)
+     * @return A list of integration tags. (status code 200)
      */
     @Operation(
-        operationId = "getOAuth2Properties",
-        summary = "Get OAuth2 properties",
-        description = "Get OAuth2 properties.",
-        tags = { "connection-oauth2" },
+        operationId = "getIntegrationTags",
+        summary = "Get integration tags",
+        description = "Get integration tags.",
+        tags = { "integration-tags" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The OAuth2Properties object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = OAuth2PropertiesModel.class))
+            @ApiResponse(responseCode = "200", description = "A list of integration tags.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-oauth2-properties",
+        value = "/integration-tags",
         produces = { "application/json" }
     )
-    default ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties(
+    default ResponseEntity<List<TagModel>> getIntegrationTags(
         
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"redirectUri\" : \"redirectUri\", \"predefinedApps\" : [ \"predefinedApps\", \"predefinedApps\" ] }";
+                    String exampleString = "[ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

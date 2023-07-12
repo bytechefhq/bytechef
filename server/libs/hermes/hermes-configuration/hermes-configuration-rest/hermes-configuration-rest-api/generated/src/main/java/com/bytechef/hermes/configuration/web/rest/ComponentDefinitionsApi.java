@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:33.068832+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:17:15.091180+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ComponentDefinitionsApi {
@@ -487,7 +487,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{componentName}/versions : Get all component definition versions of a component.
+     * GET /component-definitions/{componentName}/versions : Get all component definition versions of a component
      * Get all component definition versions of a component.
      *
      * @param componentName The name of a component. (required)
@@ -495,7 +495,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentDefinitionVersions",
-        summary = "Get all component definition versions of a component.",
+        summary = "Get all component definition versions of a component",
         description = "Get all component definition versions of a component.",
         tags = { "component-definitions" },
         responses = {
@@ -575,7 +575,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName} : Get a trigger definition of a component.
+     * GET /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName} : Get a trigger definition of a component
      * Get a trigger definition of a component.
      *
      * @param componentName The name of the component. (required)
@@ -585,7 +585,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerDefinition",
-        summary = "Get a trigger definition of a component.",
+        summary = "Get a trigger definition of a component",
         description = "Get a trigger definition of a component.",
         tags = { "trigger-definitions" },
         responses = {
@@ -619,7 +619,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{componentName}/{componentVersion}/trigger-definitions : Get a list of trigger definitionss for a component.
+     * GET /component-definitions/{componentName}/{componentVersion}/trigger-definitions : Get a list of trigger definitionss for a component
      * Get a list of trigger definitionss for a component.
      *
      * @param componentName The name of a component. (required)
@@ -628,7 +628,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerDefinitions",
-        summary = "Get a list of trigger definitionss for a component.",
+        summary = "Get a list of trigger definitionss for a component",
         description = "Get a list of trigger definitionss for a component.",
         tags = { "trigger-definitions" },
         responses = {
@@ -661,7 +661,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description : Get an trigger description shown in the editor.
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description : Get an trigger description shown in the editor
      * Get an trigger description shown in the editor.
      *
      * @param componentName The name of the component. (required)
@@ -672,7 +672,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerEditorDescription",
-        summary = "Get an trigger description shown in the editor.",
+        summary = "Get an trigger description shown in the editor",
         description = "Get an trigger description shown in the editor.",
         tags = { "trigger-definitions" },
         responses = {
@@ -699,7 +699,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema : Get a trigger output schema shown in the editor.
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema : Get a trigger output schema shown in the editor
      * Get a trigger output schema shown in the editor.
      *
      * @param componentName The name of the component. (required)
@@ -710,7 +710,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerOutputSchema",
-        summary = "Get a trigger output schema shown in the editor.",
+        summary = "Get a trigger output schema shown in the editor",
         description = "Get a trigger output schema shown in the editor.",
         tags = { "trigger-definitions" },
         responses = {
@@ -746,7 +746,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties : Get dynamic properties for a trigger property shown in the editor.
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties : Get dynamic properties for a trigger property shown in the editor
      * Get dynamic properties for a trigger property shown in the editor.
      *
      * @param componentName The name of a component. (required)
@@ -758,7 +758,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerPropertyDynamicProperties",
-        summary = "Get dynamic properties for a trigger property shown in the editor.",
+        summary = "Get dynamic properties for a trigger property shown in the editor",
         description = "Get dynamic properties for a trigger property shown in the editor.",
         tags = { "trigger-definitions" },
         responses = {
@@ -795,8 +795,8 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options : Get an trigger description shown in the editor.
-     * Get an trigger description shown in the editor.
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options : Get a trigger property options shown in the editor
+     * Get a trigger property options shown in the editor.
      *
      * @param componentName The name of the component. (required)
      * @param componentVersion The version of a component. (required)
@@ -808,8 +808,8 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerPropertyOptions",
-        summary = "Get an trigger description shown in the editor.",
-        description = "Get an trigger description shown in the editor.",
+        summary = "Get a trigger property options shown in the editor",
+        description = "Get a trigger property options shown in the editor.",
         tags = { "trigger-definitions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
@@ -846,7 +846,7 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output : Get a trigger sample output shown in the editor.
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output : Get a trigger sample output shown in the editor
      * Get a trigger sample output shown in the editor.
      *
      * @param componentName The name of the component. (required)
@@ -857,7 +857,7 @@ public interface ComponentDefinitionsApi {
      */
     @Operation(
         operationId = "getComponentTriggerSampleOutput",
-        summary = "Get a trigger sample output shown in the editor.",
+        summary = "Get a trigger sample output shown in the editor",
         description = "Get a trigger sample output shown in the editor.",
         tags = { "trigger-definitions" },
         responses = {

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:33.068832+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:17:15.091180+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-definitions", description = "The Core Connection Definitions API")
 public interface ConnectionDefinitionsApi {
@@ -43,7 +43,7 @@ public interface ConnectionDefinitionsApi {
     }
 
     /**
-     * POST /connection-definitions/oauth2 : Retrieves oauth2 authorization parameters.
+     * POST /connection-definitions/oauth2 : Retrieves oauth2 authorization parameters
      * Retrieves oauth2 authorization parameters.
      *
      * @param getOAuth2AuthorizationParametersRequestModel  (required)
@@ -51,7 +51,7 @@ public interface ConnectionDefinitionsApi {
      */
     @Operation(
         operationId = "getOAuth2AuthorizationParameters",
-        summary = "Retrieves oauth2 authorization parameters.",
+        summary = "Retrieves oauth2 authorization parameters",
         description = "Retrieves oauth2 authorization parameters.",
         tags = { "connection-definitions" },
         responses = {
