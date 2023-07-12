@@ -3,6 +3,7 @@ import {
     CreateIntegrationWorkflowRequest,
     DeleteIntegrationRequest,
     IntegrationModel,
+    IntegrationTagsApi,
     IntegrationsApi,
     UpdateIntegrationTagsRequest,
     WorkflowModel,
@@ -55,7 +56,7 @@ export const useUpdateIntegrationTagsMutation = (
 ) =>
     useMutation({
         mutationFn: (request: UpdateIntegrationTagsRequest) => {
-            return new IntegrationsApi().updateIntegrationTags(request);
+            return new IntegrationTagsApi().updateIntegrationTags(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
