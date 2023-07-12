@@ -85,7 +85,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all component definition versions of a component.
-     * Get all component definition versions of a component.
+     * Get all component definition versions of a component
      */
     async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -108,7 +108,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all component definition versions of a component.
-     * Get all component definition versions of a component.
+     * Get all component definition versions of a component
      */
     async getComponentDefinitionVersions(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
         const response = await this.getComponentDefinitionVersionsRaw(requestParameters, initOverrides);

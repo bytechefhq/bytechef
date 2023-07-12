@@ -15,24 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
-  CategoryModel,
   CreateProjectWorkflowRequestModel,
   ProjectModel,
-  TagModel,
-  UpdateTagsRequestModel,
   WorkflowModel,
 } from '../models';
 import {
-    CategoryModelFromJSON,
-    CategoryModelToJSON,
     CreateProjectWorkflowRequestModelFromJSON,
     CreateProjectWorkflowRequestModelToJSON,
     ProjectModelFromJSON,
     ProjectModelToJSON,
-    TagModelFromJSON,
-    TagModelToJSON,
-    UpdateTagsRequestModelFromJSON,
-    UpdateTagsRequestModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models';
@@ -58,10 +49,6 @@ export interface GetProjectRequest {
     id: number;
 }
 
-export interface GetProjectWorkflowsRequest {
-    id: number;
-}
-
 export interface GetProjectsRequest {
     categoryId?: number;
     projectInstances?: boolean;
@@ -71,11 +58,6 @@ export interface GetProjectsRequest {
 export interface UpdateProjectRequest {
     id: number;
     projectModel: ProjectModel;
-}
-
-export interface UpdateProjectTagsRequest {
-    id: number;
-    updateTagsRequestModel: UpdateTagsRequestModel;
 }
 
 /**
@@ -138,7 +120,7 @@ export class ProjectsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/projects/{id}/project-workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -253,94 +235,6 @@ export class ProjectsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get categories.
-     * Get categories
-     */
-    async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/projects/categories`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
-    }
-
-    /**
-     * Get categories.
-     * Get categories
-     */
-    async getProjectCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
-        const response = await this.getProjectCategoriesRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get project tags.
-     * Get project tags.
-     */
-    async getProjectTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/projects/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get project tags.
-     * Get project tags.
-     */
-    async getProjectTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getProjectTagsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get workflows for particular project.
-     * Get workflows for particular project.
-     */
-    async getProjectWorkflowsRaw(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectWorkflows.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowModelFromJSON));
-    }
-
-    /**
-     * Get workflows for particular project.
-     * Get workflows for particular project.
-     */
-    async getProjectWorkflows(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
-        const response = await this.getProjectWorkflowsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Get projects.
      * Get projects.
      */
@@ -417,44 +311,6 @@ export class ProjectsApi extends runtime.BaseAPI {
     async updateProject(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
         const response = await this.updateProjectRaw(requestParameters, initOverrides);
         return await response.value();
-    }
-
-    /**
-     * Updates tags of an existing project.
-     * Updates tags of an existing project.
-     */
-    async updateProjectTagsRaw(requestParameters: UpdateProjectTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectTags.');
-        }
-
-        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateProjectTags.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/projects/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Updates tags of an existing project.
-     * Updates tags of an existing project.
-     */
-    async updateProjectTags(requestParameters: UpdateProjectTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateProjectTagsRaw(requestParameters, initOverrides);
     }
 
 }

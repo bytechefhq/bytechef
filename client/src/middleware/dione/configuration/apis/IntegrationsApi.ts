@@ -15,24 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
-  CategoryModel,
   CreateIntegrationWorkflowRequestModel,
   IntegrationModel,
-  TagModel,
-  UpdateTagsRequestModel,
   WorkflowModel,
 } from '../models';
 import {
-    CategoryModelFromJSON,
-    CategoryModelToJSON,
     CreateIntegrationWorkflowRequestModelFromJSON,
     CreateIntegrationWorkflowRequestModelToJSON,
     IntegrationModelFromJSON,
     IntegrationModelToJSON,
-    TagModelFromJSON,
-    TagModelToJSON,
-    UpdateTagsRequestModelFromJSON,
-    UpdateTagsRequestModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models';
@@ -54,10 +45,6 @@ export interface GetIntegrationRequest {
     id: number;
 }
 
-export interface GetIntegrationWorkflowsRequest {
-    id: number;
-}
-
 export interface GetIntegrationsRequest {
     categoryId?: number;
     tagId?: number;
@@ -66,11 +53,6 @@ export interface GetIntegrationsRequest {
 export interface UpdateIntegrationRequest {
     id: number;
     integrationModel: IntegrationModel;
-}
-
-export interface UpdateIntegrationTagsRequest {
-    id: number;
-    updateTagsRequestModel: UpdateTagsRequestModel;
 }
 
 /**
@@ -133,7 +115,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/integrations/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/integrations/{id}/integration-workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -216,94 +198,6 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get categories.
-     * Get categories
-     */
-    async getIntegrationCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/integrations/categories`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
-    }
-
-    /**
-     * Get categories.
-     * Get categories
-     */
-    async getIntegrationCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
-        const response = await this.getIntegrationCategoriesRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get integration tags.
-     * Get integration tags
-     */
-    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/integrations/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get integration tags.
-     * Get integration tags
-     */
-    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getIntegrationTagsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get workflows for particular integration.
-     * Get workflows for particular integration
-     */
-    async getIntegrationWorkflowsRaw(requestParameters: GetIntegrationWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getIntegrationWorkflows.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/integrations/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowModelFromJSON));
-    }
-
-    /**
-     * Get workflows for particular integration.
-     * Get workflows for particular integration
-     */
-    async getIntegrationWorkflows(requestParameters: GetIntegrationWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
-        const response = await this.getIntegrationWorkflowsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Get integrations.
      * Get integrations
      */
@@ -376,44 +270,6 @@ export class IntegrationsApi extends runtime.BaseAPI {
     async updateIntegration(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.updateIntegrationRaw(requestParameters, initOverrides);
         return await response.value();
-    }
-
-    /**
-     * Updates tags of an existing integration.
-     * Updates tags of an existing integration
-     */
-    async updateIntegrationTagsRaw(requestParameters: UpdateIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateIntegrationTags.');
-        }
-
-        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateIntegrationTags.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/integrations/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Updates tags of an existing integration.
-     * Updates tags of an existing integration
-     */
-    async updateIntegrationTags(requestParameters: UpdateIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateIntegrationTagsRaw(requestParameters, initOverrides);
     }
 
 }
