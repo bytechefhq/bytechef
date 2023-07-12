@@ -2,7 +2,7 @@ import {
     CategoryModel,
     IntegrationModel,
     TagModel,
-} from '@/middleware/embedded/configuration';
+} from '@/middleware/dione/configuration';
 import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,

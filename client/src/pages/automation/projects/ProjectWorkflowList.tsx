@@ -6,9 +6,9 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {ComponentDefinitionBasicModel} from '@/middleware/core/workflow/configuration';
+import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import WorkflowDialog from 'components/WorkflowDialog/WorkflowDialog';
-import {ProjectModel} from 'middleware/automation/configuration';
+import {ProjectModel} from 'middleware/helios/configuration';
 import {useCreateProjectWorkflowRequestMutation} from 'mutations/projects.mutations';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';

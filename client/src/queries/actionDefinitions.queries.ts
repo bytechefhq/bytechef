@@ -4,7 +4,7 @@ import {
     ActionDefinitionsApi,
     GetActionDefinitionsRequest,
     GetComponentActionDefinitionRequest,
-} from 'middleware/core/workflow/configuration';
+} from 'middleware/hermes/configuration';
 
 export const ActionDefinitionKeys = {
     actionDefinition: (request: GetComponentActionDefinitionRequest) => [

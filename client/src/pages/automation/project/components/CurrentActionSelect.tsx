@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/tooltip';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select from 'components/Select/Select';
-import {ActionDefinitionBasicModel} from 'middleware/core/workflow/configuration';
+import {ActionDefinitionBasicModel} from 'middleware/hermes/configuration';
 
 const CurrentActionSelect = ({
     actions,

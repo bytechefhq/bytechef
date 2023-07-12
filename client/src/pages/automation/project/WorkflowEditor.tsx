@@ -1,7 +1,7 @@
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
-} from 'middleware/core/workflow/configuration';
+} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {
     Controls,

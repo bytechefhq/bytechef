@@ -4,7 +4,7 @@ import {
     ConnectionModel,
     ConnectionsApi,
     UpdateConnectionTagsRequest,
-} from '../middleware/automation/connection';
+} from '../middleware/helios/connection';
 
 type CreateConnectionMutationProps = {
     onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;

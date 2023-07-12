@@ -5,7 +5,7 @@ import Properties from 'components/Properties/Properties';
 import {
     ProjectInstanceModel,
     WorkflowModel,
-} from 'middleware/automation/configuration';
+} from 'middleware/helios/configuration';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {UseFormGetValues} from 'react-hook-form';

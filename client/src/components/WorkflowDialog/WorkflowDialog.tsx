@@ -1,4 +1,4 @@
-import {WorkflowModel} from '@/middleware/automation/configuration';
+import {WorkflowModel} from '@/middleware/helios/configuration';
 import {PlusIcon} from '@heroicons/react/24/outline';
 import {Close} from '@radix-ui/react-dialog';
 import {UseMutationResult} from '@tanstack/react-query';

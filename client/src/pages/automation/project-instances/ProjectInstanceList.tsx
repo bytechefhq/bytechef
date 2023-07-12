@@ -8,7 +8,7 @@ import {
     AccordionContent,
     AccordionItem,
 } from '@radix-ui/react-accordion';
-import {ProjectModel} from 'middleware/automation/configuration';
+import {ProjectModel} from 'middleware/helios/configuration';
 import {useSearchParams} from 'react-router-dom';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';

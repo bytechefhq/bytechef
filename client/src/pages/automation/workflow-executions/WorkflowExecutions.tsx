@@ -13,7 +13,7 @@ import {
     GetProjectWorkflowExecutionsJobStatusEnum,
     ProjectWorkflowExecutionModel,
     ProjectWorkflowExecutionModelFromJSON,
-} from 'middleware/automation/execution';
+} from 'middleware/helios/execution';
 import {
     useGetProjectInstancesQuery,
     useGetProjectWorkflowExecutionsQuery,

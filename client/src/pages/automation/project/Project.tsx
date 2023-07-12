@@ -1,7 +1,4 @@
-import {
-    ProjectModel,
-    WorkflowModel,
-} from '@/middleware/automation/configuration';
+import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
 import {useCreateProjectWorkflowRequestMutation} from '@/mutations/projects.mutations';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {

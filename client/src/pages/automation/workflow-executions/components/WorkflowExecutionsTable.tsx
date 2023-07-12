@@ -9,7 +9,7 @@ import Badge from 'components/Badge/Badge';
 import {
     JobBasicModel,
     ProjectWorkflowExecutionModel,
-} from 'middleware/automation/execution';
+} from 'middleware/helios/execution';
 import useWorkflowExecutionDetailsDialogStore from 'pages/automation/project/stores/useWorkflowExecutionDetailsDialogStore';
 
 const getDuration = (
