@@ -4,7 +4,7 @@ import {
     useGetProjectTagsQuery,
 } from '@/queries/projects.queries';
 import {TagIcon} from '@heroicons/react/20/solid';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';

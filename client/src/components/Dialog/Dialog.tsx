@@ -36,7 +36,7 @@ const Dialog = ({
     title,
     triggerLabel,
     wizard = false,
-}: DialogProps): JSX.Element => (
+}: DialogProps) => (
     <Root open={isOpen} onOpenChange={onOpenChange}>
         {customTrigger && <Trigger asChild>{customTrigger}</Trigger>}
 

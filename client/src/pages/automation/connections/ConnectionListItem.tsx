@@ -11,7 +11,7 @@ import {ConnectionKeys} from '@/queries/connections.queries';
 import {CalendarIcon} from '@heroicons/react/24/outline';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';

@@ -63,7 +63,7 @@ const Select = ({
     placeholder,
     triggerClassName,
     value,
-}: SelectProps): JSX.Element => (
+}: SelectProps) => (
     <fieldset className={twMerge('w-full', fieldsetClassName)}>
         {label && (
             <Label

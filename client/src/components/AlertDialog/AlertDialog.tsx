@@ -9,7 +9,7 @@ import {
     Root,
     Title,
 } from '@radix-ui/react-alert-dialog';
-import React, {Dispatch, Fragment, SetStateAction} from 'react';
+import {Dispatch, Fragment, SetStateAction} from 'react';
 
 import Button from '../Button/Button';
 

@@ -24,7 +24,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
     (
         {className, error, fieldsetClassName, label, name, options, ...props},
         ref
-    ): JSX.Element => (
+    ) => (
         <fieldset className={twMerge(label ? 'mb-3' : '', fieldsetClassName)}>
             {label && (
                 <label

@@ -1,5 +1,5 @@
 import {XCircleIcon} from '@heroicons/react/24/outline';
-import React, {PropsWithChildren} from 'react';
+import {PropsWithChildren} from 'react';
 
 type TError = Error | null;
 
@@ -7,7 +7,7 @@ const PageLoader = ({
     children,
     errors,
     loading,
-}: PropsWithChildren<{errors: TError[]; loading: boolean}>): JSX.Element => {
+}: PropsWithChildren<{errors: TError[]; loading: boolean}>) => {
     let errorExists = false;
 
     errors.forEach((error) => {

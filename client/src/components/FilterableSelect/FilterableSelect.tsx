@@ -44,13 +44,7 @@ const FilterableSelect = <
     label,
     name,
     ...props
-}: FilterableSelectProps<
-    Option,
-    IsMulti,
-    Group,
-    TFieldValues,
-    TName
->): JSX.Element => (
+}: FilterableSelectProps<Option, IsMulti, Group, TFieldValues, TName>) => (
     <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
         {label && (
             <label

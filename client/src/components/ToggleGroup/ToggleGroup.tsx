@@ -18,7 +18,7 @@ const ToggleGroup = ({
     defaultValue,
     onValueChange,
     toggleItems,
-}: ToggleGroupProps): JSX.Element => (
+}: ToggleGroupProps) => (
     <ToggleGroupPrimitive.Root
         aria-label="Items"
         className={twMerge('flex px-2 py-4', containerClassName)}

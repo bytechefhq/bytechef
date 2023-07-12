@@ -12,9 +12,7 @@ import Alert from 'components/Alert/Alert';
 import Button from 'components/Button/Button';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
-import FilterableSelect, {
-    ISelectOption,
-} from 'components/FilterableSelect/FilterableSelect';
+import FilterableSelect from 'components/FilterableSelect/FilterableSelect';
 import Input from 'components/Input/Input';
 import Label from 'components/Label/Label';
 import NativeSelect from 'components/NativeSelect/NativeSelect';
@@ -25,7 +23,6 @@ import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-    GetOAuth2AuthorizationParametersRequestModel,
 } from 'middleware/core/workflow/configuration';
 import {
     useCreateConnectionMutation,
@@ -187,7 +184,7 @@ const ConnectionDialog = ({
     const authorizationsExists =
         connectionDefinition && !!connectionDefinition?.authorizations?.length;
 
-    const authorizationOptions: ISelectOption[] = useMemo(
+    const authorizationOptions = useMemo(
         () =>
             connectionDefinition && connectionDefinition.authorizations
                 ? [
@@ -287,7 +284,7 @@ const ConnectionDialog = ({
         }
     }
 
-    function getAuthorizationType(): string {
+    function getAuthorizationType() {
         let authorizationType = '';
 
         if (connectionDefinition?.authorizations) {
@@ -304,7 +301,7 @@ const ConnectionDialog = ({
         return authorizationType;
     }
 
-    function getNewConnection(additionalParameters?: object): ConnectionModel {
+    function getNewConnection(additionalParameters?: object) {
         const {componentName, name, parameters, tags} = getValues();
 
         return {
@@ -320,7 +317,7 @@ const ConnectionDialog = ({
         } as ConnectionModel;
     }
 
-    function getNewOAuth2AuthorizationParameters(): GetOAuth2AuthorizationParametersRequestModel {
+    function getNewOAuth2AuthorizationParameters() {
         const {componentName, parameters} = getValues();
 
         return {
@@ -330,10 +327,10 @@ const ConnectionDialog = ({
             parameters: {
                 ...parameters,
             },
-        } as GetOAuth2AuthorizationParametersRequestModel;
+        };
     }
 
-    function getErrors(): string[] {
+    function getErrors() {
         const errors: string[] = [];
 
         if (componentDefinitionsError && !componentDefinitionsLoading) {
@@ -373,16 +370,14 @@ const ConnectionDialog = ({
         return errors;
     }
 
-    function saveConnection(
-        additionalParameters?: object
-    ): Promise<ConnectionModel> | undefined {
+    function saveConnection(additionalParameters?: object) {
         if (connection?.id) {
             const {name, tags} = getValues();
 
             updateConnectionMutation.mutate({
                 id: connection?.id,
-                name: name,
-                tags: tags,
+                name,
+                tags,
                 version: connection?.version,
             } as ConnectionModel);
         } else {

@@ -10,7 +10,7 @@ import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/react/24/solid';
 import {format} from 'date-fns';
 import {useState} from 'react';
 
-type InputProps = {
+type DatePickerProps = {
     className?: string;
     name: string;
     fieldsetClassName?: string;
@@ -30,7 +30,7 @@ const DatePicker = ({
     name,
     onChange,
     placeholder,
-}: InputProps): JSX.Element => {
+}: DatePickerProps) => {
     const [date, setDate] = useState<Date | null>(null);
 
     return (
@@ -93,7 +93,7 @@ const Header = ({
     increaseMonth,
     nextMonthButtonDisabled,
     prevMonthButtonDisabled,
-}: ReactDatePickerCustomHeaderProps): JSX.Element => (
+}: ReactDatePickerCustomHeaderProps) => (
     <div className="flex items-center justify-between p-2">
         <span className="text-lg text-gray-700">
             {format(date, 'MMMM yyyy')}

@@ -1,9 +1,7 @@
-import React from 'react';
-
 import Button from '../../../../components/Button/Button';
 import useOAuth2, {AuthTokenPayload} from '../oauth2/useOAuth2';
 
-const LoadingIcon = (): JSX.Element => (
+const LoadingIcon = () => (
     <svg
         className="-ml-1 mr-1 h-4 w-4 animate-spin text-white"
         xmlns="http://www.w3.org/2000/svg"
@@ -51,33 +49,28 @@ const OAuth2Button = ({
     scope,
 }: OAuth2ButtonProps) => {
     const {getAuth, loading} = useOAuth2({
-        authorizationUrl: authorizationUrl,
-        clientId: clientId,
-        onCodeSuccess: onCodeSuccess,
-        onError: onError,
-        onTokenSuccess: onTokenSuccess,
-        redirectUri: redirectUri,
-        responseType: responseType,
-        scope: scope,
+        authorizationUrl,
+        clientId,
+        onCodeSuccess,
+        onError,
+        onTokenSuccess,
+        redirectUri,
+        responseType,
+        scope,
     });
-
-    if (loading) {
-        return (
-            <Button
-                disabled={true}
-                icon={<LoadingIcon />}
-                iconPosition="left"
-                label="Connecting..."
-                type="button"
-            />
-        );
-    }
 
     return (
         <Button
-            label="Connect"
-            type="submit"
-            onClick={() => onClick(getAuth)}
+            disabled={loading}
+            icon={loading && <LoadingIcon />}
+            iconPosition={loading ? 'left' : undefined}
+            label={loading ? 'Connecting...' : 'Connect'}
+            type={loading ? 'button' : 'submit'}
+            onClick={() => {
+                if (loading) {
+                    onClick(getAuth);
+                }
+            }}
         />
     );
 };
