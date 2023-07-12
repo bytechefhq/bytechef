@@ -36,7 +36,6 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ProjectInstanceController implements ProjectInstancesApi {
 
@@ -100,14 +99,6 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     public ResponseEntity<ProjectInstanceModel> getProjectInstance(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(projectInstanceFacade.getProjectInstance(id), ProjectInstanceModel.class));
-    }
-
-    @Override
-    public ResponseEntity<List<TagModel>> getProjectInstanceTags() {
-        return ResponseEntity.ok(projectInstanceFacade.getProjectInstanceTags()
-            .stream()
-            .map(tag -> conversionService.convert(tag, TagModel.class))
-            .toList());
     }
 
     @Override
