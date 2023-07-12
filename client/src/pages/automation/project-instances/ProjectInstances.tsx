@@ -32,29 +32,26 @@ const ProjectInstances = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Project,
     };
 
-    const [current, setCurrent] = useState<{id?: number; type: Type}>(
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(
         defaultCurrentState
     );
 
     const {data: projects, isLoading: projectsLoading} = useGetProjectsQuery({
         projectInstances: true,
     });
+
     const {data: tags, isLoading: tagsLoading} =
         useGetProjectInstanceTagsQuery();
 
-    const title =
-        !projectsLoading &&
-        current.type === Type.Project &&
-        current.id &&
-        projects &&
-        projects.length > 0
-            ? projects.filter((category) => category.id === current.id)[0].name!
-            : !tagsLoading &&
-              current.type === Type.Tag &&
-              tags &&
-              tags.length > 0
-            ? tags && tags.filter((tag) => tag.id === current.id)[0].name!
-            : 'All Projects';
+    const matchingProject = projects?.find(
+        (project) => project.id === filterData.id
+    );
+
+    const matchingTag = tags?.find((tag) => tag.id === filterData.id);
+
+    const pageTitle = matchingProject
+        ? matchingProject?.name
+        : matchingTag && matchingTag?.name;
 
     return (
         <LayoutContainer
@@ -62,7 +59,7 @@ const ProjectInstances = () => {
                 <PageHeader
                     position="main"
                     right={<ProjectInstanceDialog />}
-                    title={title}
+                    title={`Instances: ${pageTitle || 'All Projects'}`}
                 />
             }
             leftSidebarHeader={
@@ -75,18 +72,17 @@ const ProjectInstances = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    current:
-                                        !current?.id &&
-                                        current.type === Type.Project,
+                                    filterData:
+                                        !filterData?.id &&
+                                        filterData.type === Type.Project,
                                     name: 'All Projects',
                                     onItemClick: (id?: number | string) => {
-                                        setCurrent({
+                                        setFilterData({
                                             id: id as number,
                                             type: Type.Project,
                                         });
                                     },
                                 }}
-                                toLink=""
                             />
 
                             {!projectsLoading &&
@@ -94,15 +90,16 @@ const ProjectInstances = () => {
                                     <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
-                                            current:
-                                                current?.id === item.id &&
-                                                current.type === Type.Project,
+                                            filterData:
+                                                filterData?.id === item.id &&
+                                                filterData.type ===
+                                                    Type.Project,
                                             id: item.id,
                                             name: item.name,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
-                                                setCurrent({
+                                                setFilterData({
                                                     id: id as number,
                                                     type: Type.Project,
                                                 });
@@ -122,15 +119,17 @@ const ProjectInstances = () => {
                                         <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
-                                                current:
-                                                    current?.id === item.id &&
-                                                    current.type === Type.Tag,
+                                                filterData:
+                                                    filterData?.id ===
+                                                        item.id &&
+                                                    filterData.type ===
+                                                        Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {
-                                                    setCurrent({
+                                                    setFilterData({
                                                         id: id as number,
                                                         type: Type.Tag,
                                                     });

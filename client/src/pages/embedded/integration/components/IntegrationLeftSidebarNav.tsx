@@ -26,7 +26,7 @@ const IntegrationLeftSidebarNav = () => {
                 <LeftSidebarNavItem
                     key={item.href}
                     item={{
-                        current: location.pathname === item.href,
+                        filterData: location.pathname === item.href,
                         name: item.title,
                     }}
                     toLink={`/embedded/integrations/1/${item.href}`}

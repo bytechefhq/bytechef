@@ -29,7 +29,7 @@ const Integrations = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
 
-    const [current, setCurrent] = useState<{id?: number; type: Type}>(
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(
         defaultCurrentState
     );
 
@@ -39,17 +39,17 @@ const Integrations = () => {
 
     const title =
         !categoriesLoading &&
-        current.type === Type.Category &&
-        current.id &&
+        filterData.type === Type.Category &&
+        filterData.id &&
         categories &&
         categories.length > 0
-            ? categories.filter((category) => category.id === current.id)[0]
+            ? categories.filter((category) => category.id === filterData.id)[0]
                   .name!
             : !tagsLoading &&
-              current.type === Type.Tag &&
+              filterData.type === Type.Tag &&
               tags &&
               tags.length > 0
-            ? tags && tags.filter((tag) => tag.id === current.id)[0].name!
+            ? tags && tags.filter((tag) => tag.id === filterData.id)[0].name!
             : 'All Categories';
 
     return (
@@ -71,18 +71,17 @@ const Integrations = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    current:
-                                        !current?.id &&
-                                        current.type === Type.Category,
+                                    filterData:
+                                        !filterData?.id &&
+                                        filterData.type === Type.Category,
                                     name: 'All Categories',
                                     onItemClick: (id?: number | string) => {
-                                        setCurrent({
+                                        setFilterData({
                                             id: id as number,
                                             type: Type.Category,
                                         });
                                     },
                                 }}
-                                toLink=""
                             />
 
                             {!categoriesLoading &&
@@ -90,15 +89,16 @@ const Integrations = () => {
                                     <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
-                                            current:
-                                                current?.id === item.id &&
-                                                current.type === Type.Category,
+                                            filterData:
+                                                filterData?.id === item.id &&
+                                                filterData.type ===
+                                                    Type.Category,
                                             id: item.id,
                                             name: item.name,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
-                                                setCurrent({
+                                                setFilterData({
                                                     id: id as number,
                                                     type: Type.Category,
                                                 });
@@ -120,15 +120,17 @@ const Integrations = () => {
                                         <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
-                                                current:
-                                                    current?.id === item.id &&
-                                                    current.type === Type.Tag,
+                                                filterData:
+                                                    filterData?.id ===
+                                                        item.id &&
+                                                    filterData.type ===
+                                                        Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {
-                                                    setCurrent({
+                                                    setFilterData({
                                                         id: id as number,
                                                         type: Type.Tag,
                                                     });
