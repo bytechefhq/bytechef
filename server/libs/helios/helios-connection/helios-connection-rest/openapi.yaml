@@ -6,9 +6,28 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
+- name: "connection-tags"
+  description: "The Automation Connection Tags API"
 - name: "connections"
   description: "The Automation Connections API"
 paths:
+  /connection-tags:
+    get:
+      description: "Get connection tags."
+      summary: "Get connection tags"
+      tags:
+      - "connection-tags"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "A list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
   /connections:
     get:
       description: "Get all connections."
@@ -64,23 +83,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-  /connections/tags:
-    get:
-      description: "Get connection tags."
-      summary: "Get connection tags"
-      tags:
-      - "connections"
-      operationId: "getConnectionTags"
-      responses:
-        "200":
-          description: "A list of connection tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
   /connections/{id}:
     delete:
       description: "Delete a connection."
@@ -147,12 +149,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-  /connections/{id}/tags:
+  /connections/{id}/connection-tags:
     put:
       description: "Updates tags of an existing connection."
       summary: "Updates tags of an existing connection"
       tags:
-      - "connections"
+      - "connection-tags"
       operationId: "updateConnectionTags"
       parameters:
       - name: "id"

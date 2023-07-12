@@ -455,7 +455,7 @@ paths:
   /component-definitions/{componentName}/versions:
     get:
       description: "Get all component definition versions of a component."
-      summary: "Get all component definition versions of a component."
+      summary: "Get all component definition versions of a component"
       tags:
       - "component-definitions"
       operationId: "getComponentDefinitionVersions"
@@ -478,7 +478,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions:
     get:
       description: "Get a list of trigger definitionss for a component."
-      summary: "Get a list of trigger definitionss for a component."
+      summary: "Get a list of trigger definitionss for a component"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerDefinitions"
@@ -507,7 +507,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}:
     get:
       description: "Get a trigger definition of a component."
-      summary: "Get a trigger definition of a component."
+      summary: "Get a trigger definition of a component"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerDefinition"
@@ -540,7 +540,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description:
     post:
       description: "Get an trigger description shown in the editor."
-      summary: "Get an trigger description shown in the editor."
+      summary: "Get an trigger description shown in the editor"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerEditorDescription"
@@ -578,7 +578,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema:
     post:
       description: "Get a trigger output schema shown in the editor."
-      summary: "Get a trigger output schema shown in the editor."
+      summary: "Get a trigger output schema shown in the editor"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerOutputSchema"
@@ -618,7 +618,7 @@ paths:
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output:
     post:
       description: "Get a trigger sample output shown in the editor."
-      summary: "Get a trigger sample output shown in the editor."
+      summary: "Get a trigger sample output shown in the editor"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerSampleOutput"
@@ -656,7 +656,7 @@ paths:
   ? /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties
   : post:
       description: "Get dynamic properties for a trigger property shown in the editor."
-      summary: "Get dynamic properties for a trigger property shown in the editor."
+      summary: "Get dynamic properties for a trigger property shown in the editor"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerPropertyDynamicProperties"
@@ -701,8 +701,8 @@ paths:
                   $ref: "#/components/schemas/Property"
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options:
     post:
-      description: "Get an trigger description shown in the editor."
-      summary: "Get an trigger description shown in the editor."
+      description: "Get a trigger property options shown in the editor."
+      summary: "Get a trigger property options shown in the editor"
       tags:
       - "trigger-definitions"
       operationId: "getComponentTriggerPropertyOptions"
@@ -753,7 +753,7 @@ paths:
   /connection-definitions/oauth2:
     post:
       description: "Retrieves oauth2 authorization parameters."
-      summary: "Retrieves oauth2 authorization parameters."
+      summary: "Retrieves oauth2 authorization parameters"
       tags:
       - "connection-definitions"
       operationId: "getOAuth2AuthorizationParameters"
@@ -796,7 +796,7 @@ paths:
   /task-dispatcher-definitions:
     get:
       description: "Get all task dispatcher definitions."
-      summary: "Get all task dispatcher definitions."
+      summary: "Get all task dispatcher definitions"
       tags:
       - "task-dispatcher-definitions"
       operationId: "getTaskDispatcherDefinitions"
@@ -812,7 +812,7 @@ paths:
   /task-dispatcher-definitions/{taskDispatcherName}/versions:
     get:
       description: "Get all task dispatcher definition versions of a task dispatcher."
-      summary: "Get all task dispatcher definition versions of a task dispatcher."
+      summary: "Get all task dispatcher definition versions of a task dispatcher"
       tags:
       - "task-dispatcher-definitions"
       operationId: "getTaskDispatcherDefinitionVersions"
@@ -835,7 +835,7 @@ paths:
   /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}:
     get:
       description: "Get a task dispatcher definition."
-      summary: "Get a task dispatcher definition."
+      summary: "Get a task dispatcher definition"
       tags:
       - "task-dispatcher-definitions"
       operationId: "getTaskDispatcherDefinition"
