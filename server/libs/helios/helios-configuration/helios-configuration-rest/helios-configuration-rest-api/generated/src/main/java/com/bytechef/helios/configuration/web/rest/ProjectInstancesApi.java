@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:26:39.213536+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T17:48:51.717386+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
@@ -261,7 +261,7 @@ public interface ProjectInstancesApi {
      * Get project instances.
      *
      * @param projectId The project ids used for filtering project instances. (optional)
-     * @param tagIds The tag id of used for filtering project instances. (optional)
+     * @param tagId The tag id of used for filtering project instances. (optional)
      * @return A list of project instances. (status code 200)
      */
     @Operation(
@@ -282,7 +282,7 @@ public interface ProjectInstancesApi {
     )
     default ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
         @Parameter(name = "projectId", description = "The project ids used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectId", required = false) Long projectId,
-        @Parameter(name = "tagIds", description = "The tag id of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) Long tagIds
+        @Parameter(name = "tagId", description = "The tag id of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
