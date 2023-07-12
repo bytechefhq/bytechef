@@ -8,13 +8,16 @@ import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
     PageModel,
+    ProjectCategoriesApi,
     ProjectInstanceModel,
+    ProjectInstanceTagsApi,
     ProjectInstancesApi,
     ProjectModel,
+    ProjectTagsApi,
+    ProjectWorkflowsApi,
     ProjectsApi,
     TagModel,
     WorkflowModel,
-    WorkflowsApi,
 } from 'middleware/helios/configuration';
 
 export const ProjectKeys = {
@@ -53,7 +56,7 @@ export const WorkflowKeys = {
 
 export const useGetProjectCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
-        new ProjectsApi().getProjectCategories()
+        new ProjectCategoriesApi().getProjectCategories()
     );
 
 export const useGetProjectInstancesQuery = (filters: {
@@ -67,12 +70,12 @@ export const useGetProjectInstancesQuery = (filters: {
 
 export const useGetProjectInstanceTagsQuery = () =>
     useQuery<TagModel[], Error>(ProjectKeys.projectInstanceTags, () =>
-        new ProjectInstancesApi().getProjectInstanceTags()
+        new ProjectInstanceTagsApi().getProjectInstanceTags()
     );
 
 export const useGetProjectTagsQuery = () =>
     useQuery<TagModel[], Error>(ProjectKeys.projectTags, () =>
-        new ProjectsApi().getProjectTags()
+        new ProjectTagsApi().getProjectTags()
     );
 
 export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
@@ -95,7 +98,7 @@ export const useGetProjectsQuery = (filters?: {
 
 export const useGetProjectWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
-        new ProjectsApi().getProjectWorkflows({id})
+        new ProjectWorkflowsApi().getProjectProjectWorkflows({id})
     );
 
 export const useGetProjectWorkflowExecutionsQuery = (
@@ -122,5 +125,5 @@ export const useGetWorkflowExecutionQuery = (
 
 export const useGetWorkflowsQuery = () =>
     useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
-        new WorkflowsApi().getWorkflows()
+        new ProjectWorkflowsApi().getProjectWorkflows()
     );

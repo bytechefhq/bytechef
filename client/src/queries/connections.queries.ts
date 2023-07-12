@@ -1,5 +1,6 @@
 import {
     ConnectionModel,
+    ConnectionTagsApi,
     ConnectionsApi,
     GetConnectionsRequest,
     TagModel,
@@ -36,7 +37,7 @@ export const useGetConnectionsQuery = (
 
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>(ConnectionKeys.connectionTags, () =>
-        new ConnectionsApi().getConnectionTags()
+        new ConnectionTagsApi().getConnectionTags()
     );
 
 export const useGetOAuth2AuthorizationParametersQuery = (

@@ -1,7 +1,10 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
+    IntegrationCategoriesApi,
     IntegrationModel,
+    IntegrationTagsApi,
+    IntegrationWorkflowsApi,
     IntegrationsApi,
     TagModel,
     WorkflowModel,
@@ -26,12 +29,12 @@ export const IntegrationKeys = {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         IntegrationKeys.integrationCategories,
-        () => new IntegrationsApi().getIntegrationCategories()
+        () => new IntegrationCategoriesApi().getIntegrationCategories()
     );
 
 export const useGetIntegrationTagsQuery = () =>
     useQuery<TagModel[], Error>(IntegrationKeys.integrationTags, () =>
-        new IntegrationsApi().getIntegrationTags()
+        new IntegrationTagsApi().getIntegrationTags()
     );
 
 export const useGetIntegrationQuery = (
@@ -58,5 +61,8 @@ export const useGetIntegrationsQuery = (filters: {
 export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
-        () => new IntegrationsApi().getIntegrationWorkflows({id})
+        () =>
+            new IntegrationWorkflowsApi().getIntegrationIntegrationWorkflows({
+                id,
+            })
     );
