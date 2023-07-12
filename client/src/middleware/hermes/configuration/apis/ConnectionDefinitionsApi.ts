@@ -124,7 +124,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Retrieves oauth2 authorization parameters.
-     * Retrieves oauth2 authorization parameters.
+     * Retrieves oauth2 authorization parameters
      */
     async getOAuth2AuthorizationParametersRaw(requestParameters: GetOAuth2AuthorizationParametersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizationParametersModel>> {
         if (requestParameters.getOAuth2AuthorizationParametersRequestModel === null || requestParameters.getOAuth2AuthorizationParametersRequestModel === undefined) {
@@ -150,7 +150,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Retrieves oauth2 authorization parameters.
-     * Retrieves oauth2 authorization parameters.
+     * Retrieves oauth2 authorization parameters
      */
     async getOAuth2AuthorizationParameters(requestParameters: GetOAuth2AuthorizationParametersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizationParametersModel> {
         const response = await this.getOAuth2AuthorizationParametersRaw(requestParameters, initOverrides);
