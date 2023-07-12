@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -60,7 +61,12 @@ public class WorkflowServiceClient implements WorkflowService {
 
     @Override
     public List<Workflow> getWorkflows() {
-        throw new UnsupportedOperationException();
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
+                .host("configuration-service-app")
+                .path("/api/internal/workflow-service/get-workflows")
+                .build(),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
