@@ -21,6 +21,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
+@Hidden
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class TriggerStateServiceController {

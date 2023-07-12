@@ -20,6 +20,7 @@ package com.bytechef.hermes.execution.remote.web.rest.facade;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@Hidden
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class TriggerLifecycleFacadeController {

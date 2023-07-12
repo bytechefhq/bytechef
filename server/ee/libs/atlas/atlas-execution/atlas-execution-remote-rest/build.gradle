@@ -1,6 +1,7 @@
 dependencies {
     api project(":server:libs:atlas:atlas-execution:atlas-execution-api")
 
+    implementation libs.io.swagger.core.v3.swagger.annotations
     implementation "jakarta.validation:jakarta.validation-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-web"

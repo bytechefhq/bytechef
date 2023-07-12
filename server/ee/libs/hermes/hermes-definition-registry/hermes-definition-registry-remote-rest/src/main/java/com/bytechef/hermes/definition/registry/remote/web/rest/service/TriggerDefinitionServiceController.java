@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,6 +36,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
+@Hidden
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
