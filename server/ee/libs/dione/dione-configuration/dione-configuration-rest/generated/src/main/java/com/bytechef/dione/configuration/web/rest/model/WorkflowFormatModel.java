@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets WorkflowFormat
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:22:17.202030+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T07:59:51.110362+02:00[Europe/Zagreb]")
 public enum WorkflowFormatModel {
   
   JSON("JSON"),

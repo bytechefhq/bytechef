@@ -32,24 +32,24 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T17:48:51.717386+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T08:20:03.882558+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-workflows", description = "The Automation Project Workflows API")
-public interface ProjectWorkflowsApi {
+public interface WorkflowsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * DELETE /project-workflows/{id} : Delete a workflow
+     * DELETE /workflows/{id} : Delete a workflow
      * Delete a workflow.
      *
      * @param id The id of the workflow to delete. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "deleteProjectWorkflow",
+        operationId = "deleteWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
         tags = { "project-workflows" },
@@ -59,9 +59,9 @@ public interface ProjectWorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/project-workflows/{id}"
+        value = "/workflows/{id}"
     )
-    default ResponseEntity<Void> deleteProjectWorkflow(
+    default ResponseEntity<Void> deleteWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -70,14 +70,14 @@ public interface ProjectWorkflowsApi {
 
 
     /**
-     * GET /project-workflows/{id} : Get a workflow by id
+     * GET /workflows/{id} : Get a workflow by id
      * Get a workflow by id.
      *
      * @param id The id of the workflow to get. (required)
      * @return The workflow object. (status code 200)
      */
     @Operation(
-        operationId = "getProjectWorkflow",
+        operationId = "getWorkflow",
         summary = "Get a workflow by id",
         description = "Get a workflow by id.",
         tags = { "project-workflows" },
@@ -89,10 +89,10 @@ public interface ProjectWorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-workflows/{id}",
+        value = "/workflows/{id}",
         produces = { "application/json" }
     )
-    default ResponseEntity<WorkflowModel> getProjectWorkflow(
+    default ResponseEntity<WorkflowModel> getWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to get.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
     ) {
         getRequest().ifPresent(request -> {
@@ -110,13 +110,13 @@ public interface ProjectWorkflowsApi {
 
 
     /**
-     * GET /project-workflows : Get workflow definitions
+     * GET /workflows : Get workflow definitions
      * Get workflow definitions.
      *
      * @return A list of workflows. (status code 200)
      */
     @Operation(
-        operationId = "getProjectWorkflows",
+        operationId = "getWorkflows",
         summary = "Get workflow definitions",
         description = "Get workflow definitions.",
         tags = { "project-workflows" },
@@ -128,10 +128,10 @@ public interface ProjectWorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-workflows",
+        value = "/workflows",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
+    default ResponseEntity<List<WorkflowModel>> getWorkflows(
         
     ) {
         getRequest().ifPresent(request -> {
@@ -149,7 +149,7 @@ public interface ProjectWorkflowsApi {
 
 
     /**
-     * PUT /project-workflows/{id} : Update an existing workflow
+     * PUT /workflows/{id} : Update an existing workflow
      * Update an existing workflow.
      *
      * @param id The id of the workflow to update. (required)
@@ -157,7 +157,7 @@ public interface ProjectWorkflowsApi {
      * @return The updated workflow object. (status code 200)
      */
     @Operation(
-        operationId = "updateProjectWorkflow",
+        operationId = "updateWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
         tags = { "project-workflows" },
@@ -169,11 +169,11 @@ public interface ProjectWorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/project-workflows/{id}",
+        value = "/workflows/{id}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<WorkflowModel> updateProjectWorkflow(
+    default ResponseEntity<WorkflowModel> updateWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "WorkflowModel", description = "The workflow object that needs to updated.", required = true) @Valid @RequestBody WorkflowModel workflowModel
     ) {
