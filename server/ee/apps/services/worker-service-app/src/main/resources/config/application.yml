@@ -100,8 +100,6 @@ spring:
 #####
 
 bytechef:
-  data-storage:
-    provider: db
   discovery-service:
     provider: redis
   file-storage:
@@ -110,8 +108,6 @@ bytechef:
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
-  persistence:
-    provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
   webhookUrl: http://127.0.0.1:9555
