@@ -30,7 +30,7 @@ export const ProjectKeys = {
     projectInstanceTags: ['projectInstanceTags'] as const,
     projectInstances: ['projectInstances'] as const,
     projectList: (
-        filters: {categoryIds?: number[]; tagIds?: number[]} | undefined
+        filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
     projectTags: ['projectTags'] as const,
     projectWorkflows: (id: number) => [
@@ -88,9 +88,9 @@ export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
     );
 
 export const useGetProjectsQuery = (filters?: {
-    categoryIds?: number[];
+    categoryId?: number;
     projectInstances?: boolean;
-    tagIds?: number[];
+    tagId?: number;
 }) =>
     useQuery<ProjectModel[], Error>(ProjectKeys.projectList(filters), () =>
         new ProjectsApi().getProjects(filters)
