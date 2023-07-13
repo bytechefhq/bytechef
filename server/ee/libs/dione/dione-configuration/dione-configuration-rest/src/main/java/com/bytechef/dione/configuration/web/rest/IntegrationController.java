@@ -74,7 +74,7 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getIntegrationIntegrationWorkflows(Long id) {
+    public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(Long id) {
         return ResponseEntity.ok(
             integrationFacade.getIntegrationWorkflows(id)
                 .stream()

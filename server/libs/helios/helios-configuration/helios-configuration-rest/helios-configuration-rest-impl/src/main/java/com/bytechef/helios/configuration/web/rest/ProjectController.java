@@ -105,7 +105,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getProjectProjectWorkflows(Long id) {
+    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
             projectFacade.getProjectWorkflows(id)
                 .stream()
