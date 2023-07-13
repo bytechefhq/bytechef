@@ -103,10 +103,10 @@ const TagList = ({
 
             {isNewTagWindowVisible ? (
                 <CreatableSelect
-                    className="w-40"
+                    className="w-40 text-start"
                     name="newTag"
                     options={remainingTags!.map((tag: TagModel) => ({
-                        label: `${tag.name}${tag.name.slice(1)}`,
+                        label: `${tag.name}`,
                         tag,
                         value: tag.name.toLowerCase().replace(/\W/g, ''),
                     }))}
