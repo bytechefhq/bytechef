@@ -31,6 +31,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.OAuth2Service;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -65,6 +66,9 @@ public class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
+
+    @MockBean
+    private OAuth2Service oAuth2Service;
 
     @Autowired
     private TagRepository tagRepository;

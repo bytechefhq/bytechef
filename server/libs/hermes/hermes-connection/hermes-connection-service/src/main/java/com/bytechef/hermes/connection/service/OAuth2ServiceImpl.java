@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,42 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.hermes.connection.config;
+package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * @author Arik Cohen
+ * @author Ivica Cardic
  */
-@Component
-@ConfigurationProperties(prefix = "bytechef.connection.oauth2")
-@SuppressFBWarnings("EI")
-public class OAuth2Properties {
+@Service
+public class OAuth2ServiceImpl implements OAuth2Service {
 
-    private Map<String, OAuth2App> predefinedApps = new HashMap<>();
-    private String redirectUri;
+    private final OAuth2Properties oAuth2Properties;
 
+    @SuppressFBWarnings("EI")
+    public OAuth2ServiceImpl(OAuth2Properties oAuth2Properties) {
+        this.oAuth2Properties = oAuth2Properties;
+    }
+
+    @Override
     public Map<String, ?> checkPredefinedApp(String componentName, Map<String, ?> connectionParameters) {
         Map<String, Object> newConnectionParameters = new HashMap<>(connectionParameters);
 
         if (!StringUtils.hasText((String) connectionParameters.get(Authorization.CLIENT_ID))) {
-            if (predefinedApps.containsKey(componentName)) {
-                OAuth2Properties.OAuth2App oAuth2App = predefinedApps.get(componentName);
+            Map<String, OAuth2Properties.OAuth2App> oAuth2AppMap = oAuth2Properties.getPredefinedApps();
+
+            if (oAuth2AppMap.containsKey(componentName)) {
+                OAuth2Properties.OAuth2App oAuth2App = oAuth2AppMap.get(componentName);
 
                 newConnectionParameters.putAll(
                     Map.of(
@@ -59,22 +63,16 @@ public class OAuth2Properties {
         return newConnectionParameters;
     }
 
-    public Map<String, OAuth2App> getPredefinedApps() {
-        return predefinedApps;
-    }
-
-    public void setPredefinedApps(Map<String, OAuth2App> predefinedApps) {
-        this.predefinedApps = predefinedApps;
-    }
-
+    @Override
     public String getRedirectUri() {
-        return redirectUri;
+        return oAuth2Properties.getRedirectUri();
     }
 
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
-    }
-
-    public record OAuth2App(String clientId, String clientSecret) {
+    @Override
+    public List<String> getPredefinedApps() {
+        return oAuth2Properties.getPredefinedApps()
+            .keySet()
+            .stream()
+            .toList();
     }
 }

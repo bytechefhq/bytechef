@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.hermes.connection.config.OAuth2Properties;
+import com.bytechef.hermes.connection.service.OAuth2Service;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,21 +32,22 @@ import java.util.Map;
 public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
-    private final OAuth2Properties oAuth2Properties;
+    private final OAuth2Service oAuth2Service;
 
     @SuppressFBWarnings("EI")
     public OAuth2ParameterFacadeImpl(
-        ConnectionDefinitionService connectionDefinitionService, OAuth2Properties oAuth2Properties) {
+        ConnectionDefinitionService connectionDefinitionService, OAuth2Service oAuth2Service) {
 
         this.connectionDefinitionService = connectionDefinitionService;
-        this.oAuth2Properties = oAuth2Properties;
+        this.oAuth2Service = oAuth2Service;
     }
 
+    @Override
     public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         return connectionDefinitionService.getOAuth2Parameters(
-            componentName, connectionVersion, oAuth2Properties.checkPredefinedApp(componentName, connectionParameters),
+            componentName, connectionVersion, oAuth2Service.checkPredefinedApp(componentName, connectionParameters),
             authorizationName);
     }
 }
