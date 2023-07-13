@@ -47,7 +47,7 @@ export interface GetProjectInstanceRequest {
 
 export interface GetProjectInstancesRequest {
     projectId?: number;
-    tagIds?: number;
+    tagId?: number;
 }
 
 export interface UpdateProjectInstanceRequest {
@@ -243,8 +243,8 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
             queryParameters['projectId'] = requestParameters.projectId;
         }
 
-        if (requestParameters.tagIds !== undefined) {
-            queryParameters['tagIds'] = requestParameters.tagIds;
+        if (requestParameters.tagId !== undefined) {
+            queryParameters['tagId'] = requestParameters.tagId;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
