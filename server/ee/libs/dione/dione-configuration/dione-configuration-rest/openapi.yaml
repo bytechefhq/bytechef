@@ -148,13 +148,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Integration"
-  /integrations/{id}/integration-workflows:
+  /integrations/{id}/workflows:
     get:
       description: "Get integration workflows for particular integration."
       summary: "Get integration workflows for particular integration"
       tags:
       - "integration-workflows"
-      operationId: "getIntegrationIntegrationWorkflows"
+      operationId: "getIntegrationWorkflows"
       parameters:
       - name: "id"
         description: "The id of an integration."
@@ -252,13 +252,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Tag"
-  /integration-workflows:
+  /workflows:
     get:
       description: "Get integration workflow definitions."
       summary: "Get integration workflow definitions"
       tags:
       - "integration-workflows"
-      operationId: "getIntegrationWorkflows"
+      operationId: "getWorkflows"
       responses:
         "200":
           description: "A list of workflows."
@@ -268,13 +268,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Workflow"
-  /integration-workflows/{id}:
+  /workflows/{id}:
     delete:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
       - "integration-workflows"
-      operationId: "deleteIntegrationWorkflow"
+      operationId: "deleteWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to delete."
@@ -290,7 +290,7 @@ paths:
       summary: "Get a workflow by id"
       tags:
       - "integration-workflows"
-      operationId: "getIntegrationWorkflow"
+      operationId: "getWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to get."
@@ -310,7 +310,7 @@ paths:
       summary: "Update an existing workflow"
       tags:
       - "integration-workflows"
-      operationId: "updateIntegrationWorkflow"
+      operationId: "updateWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to update."

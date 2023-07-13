@@ -299,22 +299,6 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Tag"
-  /project-workflows:
-    get:
-      description: "Get workflow definitions."
-      summary: "Get workflow definitions"
-      tags:
-      - "project-workflows"
-      operationId: "getProjectWorkflows"
-      responses:
-        "200":
-          description: "A list of workflows."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Workflow"
   /projects:
     get:
       description: "Get projects."
@@ -459,13 +443,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
-  /projects/{id}/project-workflows:
+  /projects/{id}/project-tags:
+    put:
+      description: "Updates tags of an existing project."
+      summary: "Updates tags of an existing project."
+      tags:
+      - "project-tags"
+      operationId: "updateProjectTags"
+      parameters:
+      - name: "id"
+        description: "The id of a project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+  /projects/{id}/workflows:
     get:
       description: "Get workflows for particular project."
       summary: "Get workflows for particular project."
       tags:
       - "project-workflows"
-      operationId: "getProjectProjectWorkflows"
+      operationId: "getProjectWorkflows"
       parameters:
       - name: "id"
         description: "The id of a project."
@@ -522,37 +530,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
-  /projects/{id}/project-tags:
-    put:
-      description: "Updates tags of an existing project."
-      summary: "Updates tags of an existing project."
+  /workflows:
+    get:
+      description: "Get workflow definitions."
+      summary: "Get workflow definitions"
       tags:
-      - "project-tags"
-      operationId: "updateProjectTags"
-      parameters:
-      - name: "id"
-        description: "The id of a project."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateTagsRequest"
-        required: true
+      - "project-workflows"
+      operationId: "getWorkflows"
       responses:
         "200":
-          description: "Successful operation."
-  /project-workflows/{id}:
+          description: "A list of workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
+  /workflows/{id}:
     delete:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
       - "project-workflows"
-      operationId: "deleteProjectWorkflow"
+      operationId: "deleteWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to delete."
@@ -568,7 +568,7 @@ paths:
       summary: "Get a workflow by id"
       tags:
       - "project-workflows"
-      operationId: "getProjectWorkflow"
+      operationId: "getWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to get."
@@ -588,7 +588,7 @@ paths:
       summary: "Update an existing workflow"
       tags:
       - "project-workflows"
-      operationId: "updateProjectWorkflow"
+      operationId: "updateWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to update."
