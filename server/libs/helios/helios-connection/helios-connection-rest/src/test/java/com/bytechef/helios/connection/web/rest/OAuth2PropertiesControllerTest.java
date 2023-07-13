@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ConnectionOAuth2PropertiesControllerTest {
+public class OAuth2PropertiesControllerTest {
 
     @Disabled
     @Test
