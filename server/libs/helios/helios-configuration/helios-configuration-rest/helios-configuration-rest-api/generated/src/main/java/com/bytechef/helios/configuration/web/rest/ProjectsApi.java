@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T17:48:51.717386+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T08:20:03.882558+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "projects", description = "The Automation Projects API")
 public interface ProjectsApi {
@@ -86,7 +86,7 @@ public interface ProjectsApi {
 
 
     /**
-     * POST /projects/{id}/project-workflows : Create new workflow and adds it to an existing project.
+     * POST /projects/{id}/workflows : Create new workflow and adds it to an existing project.
      * Create new workflow and adds it to an existing project.
      *
      * @param id The id of a project. (required)
@@ -106,7 +106,7 @@ public interface ProjectsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/projects/{id}/project-workflows",
+        value = "/projects/{id}/workflows",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -237,14 +237,14 @@ public interface ProjectsApi {
 
 
     /**
-     * GET /projects/{id}/project-workflows : Get workflows for particular project.
+     * GET /projects/{id}/workflows : Get workflows for particular project.
      * Get workflows for particular project.
      *
      * @param id The id of a project. (required)
      * @return The updated project object. (status code 200)
      */
     @Operation(
-        operationId = "getProjectProjectWorkflows",
+        operationId = "getProjectWorkflows",
         summary = "Get workflows for particular project.",
         description = "Get workflows for particular project.",
         tags = { "project-workflows" },
@@ -256,10 +256,10 @@ public interface ProjectsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/projects/{id}/project-workflows",
+        value = "/projects/{id}/workflows",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<WorkflowModel>> getProjectProjectWorkflows(
+    default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
