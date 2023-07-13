@@ -22,19 +22,19 @@ import {
     WorkflowModelToJSON,
 } from '../models';
 
-export interface DeleteProjectWorkflowRequest {
+export interface DeleteWorkflowRequest {
     id: string;
 }
 
-export interface GetProjectProjectWorkflowsRequest {
+export interface GetProjectWorkflowsRequest {
     id: number;
 }
 
-export interface GetProjectWorkflowRequest {
+export interface GetWorkflowRequest {
     id: string;
 }
 
-export interface UpdateProjectWorkflowRequest {
+export interface UpdateWorkflowRequest {
     id: string;
     workflowModel: WorkflowModel;
 }
@@ -48,9 +48,9 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Delete a workflow.
      * Delete a workflow
      */
-    async deleteProjectWorkflowRaw(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteWorkflowRaw(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteProjectWorkflow.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -58,7 +58,7 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -71,17 +71,17 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Delete a workflow.
      * Delete a workflow
      */
-    async deleteProjectWorkflow(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteProjectWorkflowRaw(requestParameters, initOverrides);
+    async deleteWorkflow(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteWorkflowRaw(requestParameters, initOverrides);
     }
 
     /**
      * Get workflows for particular project.
      * Get workflows for particular project.
      */
-    async getProjectProjectWorkflowsRaw(requestParameters: GetProjectProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
+    async getProjectWorkflowsRaw(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectProjectWorkflows.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectWorkflows.');
         }
 
         const queryParameters: any = {};
@@ -89,7 +89,7 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/project-workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -102,8 +102,8 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Get workflows for particular project.
      * Get workflows for particular project.
      */
-    async getProjectProjectWorkflows(requestParameters: GetProjectProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
-        const response = await this.getProjectProjectWorkflowsRaw(requestParameters, initOverrides);
+    async getProjectWorkflows(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
+        const response = await this.getProjectWorkflowsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -111,9 +111,9 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Get a workflow by id.
      * Get a workflow by id
      */
-    async getProjectWorkflowRaw(requestParameters: GetProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
+    async getWorkflowRaw(requestParameters: GetWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectWorkflow.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -121,7 +121,7 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -134,8 +134,8 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Get a workflow by id.
      * Get a workflow by id
      */
-    async getProjectWorkflow(requestParameters: GetProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
-        const response = await this.getProjectWorkflowRaw(requestParameters, initOverrides);
+    async getWorkflow(requestParameters: GetWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
+        const response = await this.getWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -143,13 +143,13 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Get workflow definitions.
      * Get workflow definitions
      */
-    async getProjectWorkflowsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
+    async getWorkflowsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-workflows`,
+            path: `/workflows`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -162,8 +162,8 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Get workflow definitions.
      * Get workflow definitions
      */
-    async getProjectWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
-        const response = await this.getProjectWorkflowsRaw(initOverrides);
+    async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
+        const response = await this.getWorkflowsRaw(initOverrides);
         return await response.value();
     }
 
@@ -171,13 +171,13 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Update an existing workflow.
      * Update an existing workflow
      */
-    async updateProjectWorkflowRaw(requestParameters: UpdateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
+    async updateWorkflowRaw(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectWorkflow.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateWorkflow.');
         }
 
         if (requestParameters.workflowModel === null || requestParameters.workflowModel === undefined) {
-            throw new runtime.RequiredError('workflowModel','Required parameter requestParameters.workflowModel was null or undefined when calling updateProjectWorkflow.');
+            throw new runtime.RequiredError('workflowModel','Required parameter requestParameters.workflowModel was null or undefined when calling updateWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -187,7 +187,7 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -201,8 +201,8 @@ export class ProjectWorkflowsApi extends runtime.BaseAPI {
      * Update an existing workflow.
      * Update an existing workflow
      */
-    async updateProjectWorkflow(requestParameters: UpdateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
-        const response = await this.updateProjectWorkflowRaw(requestParameters, initOverrides);
+    async updateWorkflow(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
+        const response = await this.updateWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
