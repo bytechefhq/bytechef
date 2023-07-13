@@ -40,15 +40,15 @@ const Projects = () => {
 
     const {data: tags, isLoading: tagsLoading} = useGetProjectTagsQuery();
 
-    const matchingCategory = categories?.find(
-        (category) => category.id === filterData.id
-    );
+    let pageTitle: string | undefined;
 
-    const matchingTag = tags?.find((tag) => tag.id === filterData.id);
-
-    const pageTitle = matchingCategory
-        ? matchingCategory?.name
-        : matchingTag && matchingTag?.name;
+    if (filterData.type === Type.Category) {
+        pageTitle = categories?.find(
+            (category) => category.id === filterData.id
+        )?.name;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    }
 
     return (
         <LayoutContainer
@@ -69,7 +69,9 @@ const Projects = () => {
                             }}
                         />
                     }
-                    title={`Projects: ${pageTitle || 'All'}`}
+                    title={`${
+                        searchParams.get('tagId') ? 'Tags' : 'Categories'
+                    }: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarHeader={
