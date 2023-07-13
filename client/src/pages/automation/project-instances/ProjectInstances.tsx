@@ -43,15 +43,15 @@ const ProjectInstances = () => {
     const {data: tags, isLoading: tagsLoading} =
         useGetProjectInstanceTagsQuery();
 
-    const matchingProject = projects?.find(
-        (project) => project.id === filterData.id
-    );
+    let pageTitle: string | undefined;
 
-    const matchingTag = tags?.find((tag) => tag.id === filterData.id);
-
-    const pageTitle = matchingProject
-        ? matchingProject?.name
-        : matchingTag && matchingTag?.name;
+    if (filterData.type === Type.Project) {
+        pageTitle = projects?.find(
+            (project) => project.id === filterData.id
+        )?.name;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    }
 
     return (
         <LayoutContainer
@@ -59,7 +59,9 @@ const ProjectInstances = () => {
                 <PageHeader
                     position="main"
                     right={<ProjectInstanceDialog />}
-                    title={`Instances: ${pageTitle || 'All Projects'}`}
+                    title={`${
+                        searchParams.get('tagId') ? 'Tags' : 'Projects'
+                    }: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarHeader={
