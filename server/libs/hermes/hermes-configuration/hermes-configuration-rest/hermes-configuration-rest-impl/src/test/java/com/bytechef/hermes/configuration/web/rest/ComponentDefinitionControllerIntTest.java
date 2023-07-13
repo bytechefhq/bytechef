@@ -30,7 +30,6 @@ import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 
 import java.util.List;
 
-import com.bytechef.hermes.connection.config.OAuth2Properties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -67,9 +66,6 @@ public class ComponentDefinitionControllerIntTest {
 
     @MockBean
     private ConnectionDefinitionService connectionDefinitionService;
-
-    @MockBean
-    private OAuth2Properties oAuth2Properties;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
