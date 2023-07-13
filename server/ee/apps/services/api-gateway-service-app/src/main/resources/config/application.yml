@@ -76,7 +76,7 @@ spring:
         - id: connection-service
           uri: lb://connection-service-app
           predicates:
-            - Path=/api/automation/connection-tags/**,/api/automation/connections/**,/api/core/connection-oauth2-properties/**
+            - Path=/api/automation/connection-tags/**,/api/automation/connections/**,/api/core/oauth2-properties/**
         - id: execution-service
           uri: lb://execution-service-app
           predicates:
