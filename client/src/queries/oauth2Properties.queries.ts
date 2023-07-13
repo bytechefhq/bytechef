@@ -1,7 +1,5 @@
-import {
-    ConnectionOauth2Api,
-    OAuth2PropertiesModel,
-} from '@/middleware/hermes/connection';
+import {OAuth2PropertiesModel} from '@/middleware/hermes/connection';
+import {Oauth2Api} from '@/middleware/hermes/connection/apis/Oauth2Api';
 import {useQuery} from '@tanstack/react-query';
 
 export const OAuth2PropertiesKeys = {
@@ -11,5 +9,5 @@ export const OAuth2PropertiesKeys = {
 export const useGetOAuth2PropertiesQuery = () =>
     useQuery<OAuth2PropertiesModel, Error>(
         OAuth2PropertiesKeys.oAuth2Properties,
-        () => new ConnectionOauth2Api().getOAuth2Properties()
+        () => new Oauth2Api().getOAuth2Properties()
     );
