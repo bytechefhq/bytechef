@@ -77,7 +77,7 @@ const openPopup = (url: string) => {
     // To fix issues with window.screen in multi-monitor setups, the easier option is to center the pop-up over the
     // parent window.
     const top = window.outerHeight / 2 + window.screenY - POPUP_HEIGHT / 2 - 50;
-    const left = window.outerWidth / 2 + window.screenX - POPUP_WIDTH / 2 - 400;
+    const left = window.outerWidth / 2 + window.screenX - POPUP_WIDTH / 2;
 
     return window.open(
         url,
