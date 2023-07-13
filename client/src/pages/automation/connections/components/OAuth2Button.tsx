@@ -67,7 +67,7 @@ const OAuth2Button = ({
             label={loading ? 'Connecting...' : 'Connect'}
             type={loading ? 'button' : 'submit'}
             onClick={() => {
-                if (loading) {
+                if (!loading) {
                     onClick(getAuth);
                 }
             }}
