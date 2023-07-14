@@ -110,9 +110,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                                 leadingIcon && 'left-10'
                             )}
                         >
-                            {dataPills.map((pill) => (
+                            {dataPills.map((pill, index) => (
                                 <span
-                                    key={pill}
+                                    key={`${pill}-${index}`}
                                     className="inline-flex rounded-full border bg-gray-100 px-2 py-1 text-xs"
                                 >
                                     {pill}

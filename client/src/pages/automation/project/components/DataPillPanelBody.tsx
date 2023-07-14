@@ -9,6 +9,7 @@ import {
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
+import {MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
@@ -51,8 +52,53 @@ const DataPillPanelBody = ({
         !!componentActions?.length
     );
 
-    const handleDataPillClick = (property: PropertyType) => {
-        const dataPillData = property.label || property.name;
+    const getMatchingSubProperty = (
+        properties: PropertyType[],
+        name: string
+    ): PropertyType | undefined => {
+        const matchingProperties = properties.map((subProperty) => {
+            if (subProperty.label === name || subProperty.name === name) {
+                return subProperty;
+            } else if (subProperty.properties) {
+                return getMatchingSubProperty(subProperty.properties, name);
+            }
+        });
+
+        if (matchingProperties) {
+            return matchingProperties.filter(
+                (property) => property !== undefined
+            )[0];
+        } else {
+            return undefined;
+        }
+    };
+
+    const handleDataPillClick = (
+        event: MouseEvent<HTMLDivElement>,
+        property: PropertyType
+    ) => {
+        let dataPillData = property.label || property.name;
+
+        if (!(event.target instanceof HTMLDivElement)) {
+            return;
+        }
+
+        const eventData = event.currentTarget.dataset.name;
+
+        if (!eventData) {
+            return;
+        }
+
+        if (property.name !== eventData && property.properties?.length) {
+            const matchingProperty = getMatchingSubProperty(
+                property.properties,
+                eventData
+            );
+
+            if (matchingProperty) {
+                dataPillData = matchingProperty.label || matchingProperty.name;
+            }
+        }
 
         if (focusedInput && dataPillData) {
             const existingDataPill = dataPills.find(
@@ -171,8 +217,11 @@ const DataPillPanelBody = ({
                                                 (property: PropertyType) => (
                                                     <DataPill
                                                         key={property.name}
-                                                        onClick={() =>
+                                                        onClick={(
+                                                            event: MouseEvent<HTMLDivElement>
+                                                        ) =>
                                                             handleDataPillClick(
+                                                                event,
                                                                 property
                                                             )
                                                         }
