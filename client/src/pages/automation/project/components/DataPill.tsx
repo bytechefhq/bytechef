@@ -1,3 +1,4 @@
+import {MouseEvent} from 'react';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
@@ -6,7 +7,7 @@ const DataPill = ({
     onClick,
     property,
 }: {
-    onClick: () => void;
+    onClick: (event: MouseEvent<HTMLDivElement>) => void;
     property: PropertyType;
 }) => {
     const hasSubProperties = !!property.properties?.length;
