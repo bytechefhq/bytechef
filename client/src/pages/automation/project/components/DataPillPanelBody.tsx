@@ -77,6 +77,7 @@ const DataPillPanelBody = ({
 
     const handleDataPillClick = (
         event: MouseEvent<HTMLDivElement>,
+        componentName: string,
         property: PropertyType
     ) => {
         let dataPillData = property.label || property.name;
@@ -100,7 +101,9 @@ const DataPillPanelBody = ({
             );
 
             if (matchingProperty) {
-                dataPillData = matchingProperty.label || matchingProperty.name;
+                dataPillData = `${componentName}/${property.name}/${
+                    matchingProperty.label || matchingProperty.name
+                }`;
             }
         }
 
@@ -226,6 +229,7 @@ const DataPillPanelBody = ({
                                                         ) =>
                                                             handleDataPillClick(
                                                                 event,
+                                                                title || name,
                                                                 property
                                                             )
                                                         }
