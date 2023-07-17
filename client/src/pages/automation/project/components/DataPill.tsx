@@ -10,7 +10,7 @@ const DataPill = ({
     onClick: (event: MouseEvent<HTMLDivElement>) => void;
     property: PropertyType;
 }) => {
-    const hasSubProperties = !!property.properties?.length;
+    const subProperties = property.properties || property.items;
 
     return (
         <li
@@ -20,20 +20,20 @@ const DataPill = ({
             }
             className={twMerge(
                 'mr-auto',
-                hasSubProperties &&
+                subProperties &&
                     'flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
             )}
         >
-            {hasSubProperties ? (
+            {subProperties ? (
                 <fieldset className="flex flex-col rounded-lg border-2 border-gray-400 px-2 pb-2">
                     <legend className="px-2 pb-2 text-sm font-semibold uppercase text-gray-500">
                         {property.label}
                     </legend>
 
                     <ul className="flex flex-col space-y-2">
-                        {property.properties?.map((subProperty) => (
+                        {subProperties?.map((subProperty, index) => (
                             <DataPill
-                                key={subProperty.name}
+                                key={`${subProperty.name}-${index}`}
                                 onClick={onClick}
                                 property={subProperty}
                             />

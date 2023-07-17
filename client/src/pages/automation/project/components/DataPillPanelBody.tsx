@@ -61,6 +61,8 @@ const DataPillPanelBody = ({
                 return subProperty;
             } else if (subProperty.properties) {
                 return getMatchingSubProperty(subProperty.properties, name);
+            } else if (subProperty.items) {
+                return getMatchingSubProperty(subProperty.items, name);
             }
         });
 
@@ -89,9 +91,11 @@ const DataPillPanelBody = ({
             return;
         }
 
-        if (property.name !== eventData && property.properties?.length) {
+        const subProperties = property.properties || property.items;
+
+        if (property.name !== eventData && subProperties?.length) {
             const matchingProperty = getMatchingSubProperty(
-                property.properties,
+                subProperties,
                 eventData
             );
 
@@ -135,7 +139,7 @@ const DataPillPanelBody = ({
     ) =>
         properties?.reduce((previousValue: PropertyType[], currentValue) => {
             const subProperties = getFilteredProperties(
-                currentValue.properties || [],
+                currentValue.properties || currentValue.items || [],
                 filterQuery
             );
 
