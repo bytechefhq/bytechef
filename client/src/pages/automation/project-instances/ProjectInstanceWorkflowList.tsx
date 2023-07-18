@@ -11,7 +11,13 @@ import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 
-const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
+const ProjectInstanceWorkflowList = ({
+    projectId,
+    projectInstanceEnabled,
+}: {
+    projectId: number;
+    projectInstanceEnabled?: boolean;
+}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(projectId);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
@@ -105,7 +111,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
                             </div>
 
                             <div className="flex w-2/12 items-center justify-center">
-                                <Switch />
+                                <Switch disabled={projectInstanceEnabled} />
                             </div>
 
                             <div className="flex w-1/12"></div>

@@ -118,19 +118,25 @@ const ProjectInstanceDialog = ({
             updateProjectInstanceMutation.mutate({
                 ...projectInstance,
                 ...formData,
-                projectId: formData?.project?.id,
-            });
+                projectId: formData?.project?.id || 0,
+            } as ProjectInstanceModel);
         } else {
             createProjectInstanceMutation.mutate(formData);
         }
+
+        setActiveStepIndex(0);
     }
 
     return (
         <Dialog
             isOpen={isOpen}
-            onOpenChange={(isOpen) =>
-                isOpen ? setIsOpen(isOpen) : closeDialog()
-            }
+            onOpenChange={(isOpen) => {
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    closeDialog();
+                }
+            }}
             triggerLabel={
                 showTrigger
                     ? `${projectInstance?.id ? 'Edit' : 'Create'} Instance`
@@ -233,7 +239,6 @@ const ProjectInstanceDialog = ({
                                     label="Next"
                                     onClick={() => {
                                         handleSubmit(saveProjectInstance);
-
                                         setActiveStepIndex(activeStepIndex + 1);
                                     }}
                                 />
