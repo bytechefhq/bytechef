@@ -239,6 +239,7 @@ const ProjectInstanceDialog = ({
                                     label="Next"
                                     onClick={() => {
                                         handleSubmit(saveProjectInstance);
+
                                         setActiveStepIndex(activeStepIndex + 1);
                                     }}
                                 />
