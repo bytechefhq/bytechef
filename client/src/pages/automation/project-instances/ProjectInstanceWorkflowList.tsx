@@ -1,3 +1,4 @@
+import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
 import {Switch} from '@/components/ui/switch';
 import {
     Tooltip,
@@ -107,6 +108,10 @@ const ProjectInstanceWorkflowList = ({
                                             }
                                         )}
                                     </div>
+
+                                    <div className="flex flex-1 justify-end text-sm">
+                                        {workflow.lastModifiedDate?.toLocaleDateString()}
+                                    </div>
                                 </Link>
                             </div>
 
@@ -114,7 +119,27 @@ const ProjectInstanceWorkflowList = ({
                                 <Switch disabled={projectInstanceEnabled} />
                             </div>
 
-                            <div className="flex w-1/12"></div>
+                            <DropdownMenu
+                                id={projectId}
+                                menuItems={[
+                                    {
+                                        label: 'Edit',
+                                        onClick: () => {
+                                            console.log('TODO');
+                                        },
+                                    },
+                                    {
+                                        separator: true,
+                                    },
+                                    {
+                                        danger: true,
+                                        label: 'Delete',
+                                        onClick: () => {
+                                            console.log('TODO');
+                                        },
+                                    },
+                                ]}
+                            />
                         </li>
                     );
                 })}
