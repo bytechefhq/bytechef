@@ -4240,7 +4240,7 @@
   "description": "Makes an HTTP request and returns the response data.",
   "icon": "path:assets/httpclient.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": { },
+  "filterCompatibleConnectionDefinitions": null,
   "metadata": null,
   "name": "httpClient",
   "resources": null,
