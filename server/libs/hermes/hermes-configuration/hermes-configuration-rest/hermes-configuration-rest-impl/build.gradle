@@ -34,12 +34,12 @@ tasks.register("generateOpenAPI") {
 }
 
 dependencies {
-    api project(":server:libs:core:message-broker:message-broker-api")
-    api project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api")
-
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-web"
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:core:message-broker:message-broker-api")
+    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api")
+    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-api")
 
     testImplementation "org.springframework:spring-webflux"
     testImplementation "org.springframework.boot:spring-boot-starter-web"
