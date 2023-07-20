@@ -1,8 +1,8 @@
 dependencies {
-    api project(":server:libs:core:message-broker:message-broker-api")
-    api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
 
     implementation "org.springframework:spring-context"
     implementation "org.springframework.boot:spring-boot"
+    implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
 }
