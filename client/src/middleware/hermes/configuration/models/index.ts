@@ -27,6 +27,7 @@ export * from './NullPropertyModel';
 export * from './NumberPropertyAllOfModel';
 export * from './NumberPropertyModel';
 export * from './OAuth2AuthorizationParametersModel';
+export * from './OAuth2PropertiesModel';
 export * from './ObjectPropertyAllOfModel';
 export * from './ObjectPropertyModel';
 export * from './OptionModel';
