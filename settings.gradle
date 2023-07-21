@@ -95,7 +95,6 @@ include("server:libs:hermes:hermes-configuration:hermes-configuration-rest:herme
 include("server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-impl")
 include("server:libs:hermes:hermes-configuration:hermes-configuration-service")
 include("server:libs:hermes:hermes-connection:hermes-connection-api")
-include("server:libs:hermes:hermes-connection:hermes-connection-rest")
 include("server:libs:hermes:hermes-connection:hermes-connection-service")
 include("server:libs:hermes:hermes-coordinator:hermes-coordinator-api")
 include("server:libs:hermes:hermes-coordinator:hermes-coordinator-impl")

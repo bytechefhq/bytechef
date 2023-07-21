@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service;
+package com.bytechef.hermes.configuration.service;
 
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.connection.config.OAuth2Properties;
+import com.bytechef.hermes.configuration.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

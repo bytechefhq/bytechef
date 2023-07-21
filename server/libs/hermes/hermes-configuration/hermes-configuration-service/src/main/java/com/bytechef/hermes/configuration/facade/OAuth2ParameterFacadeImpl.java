@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.hermes.connection.service.OAuth2Service;
+import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

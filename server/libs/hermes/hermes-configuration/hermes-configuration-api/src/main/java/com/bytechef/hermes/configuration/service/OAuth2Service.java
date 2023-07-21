@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service;
+package com.bytechef.hermes.configuration.service;
 
 import java.util.List;
 import java.util.Map;
