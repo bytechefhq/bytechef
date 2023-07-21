@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.hermes.connection.web.rest;
+package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T08:57:16.452294+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-21T07:34:24.091329+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "connection-oauth2", description = "The Core Connection OAuth2 API")
+@Tag(name = "oauth2", description = "The Core OAuth2 API")
 public interface Oauth2PropertiesApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -51,7 +51,7 @@ public interface Oauth2PropertiesApi {
         operationId = "getOAuth2Properties",
         summary = "Get OAuth2 properties",
         description = "Get OAuth2 properties.",
-        tags = { "connection-oauth2" },
+        tags = { "oauth2" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The OAuth2Properties object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = OAuth2PropertiesModel.class))

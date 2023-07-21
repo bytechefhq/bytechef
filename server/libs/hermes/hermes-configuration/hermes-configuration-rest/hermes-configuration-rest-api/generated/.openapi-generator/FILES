@@ -4,6 +4,7 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/ActionDefinitionsApi.ja
 src/main/java/com/bytechef/hermes/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/ComponentDefinitionsApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/ConnectionDefinitionsApi.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/Oauth2PropertiesApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/TaskDispatcherDefinitionsApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionModel.java
@@ -32,6 +33,7 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/model/NullPropertyModel
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/NumberPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/NumberPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OAuth2AuthorizationParametersModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/OAuth2PropertiesModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ObjectPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ObjectPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OptionModel.java
