@@ -26,12 +26,11 @@ import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepos
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
-import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.connection.service.OAuth2Service;
+import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -269,11 +268,6 @@ public class ConnectionFacadeIntTest {
         @Bean
         ConnectionService connectionService(ConnectionRepository connectionRepository) {
             return new ConnectionServiceImpl(connectionRepository);
-        }
-
-        @Bean
-        OAuth2Properties oAuth2Properties() {
-            return new OAuth2Properties();
         }
 
         @Bean
