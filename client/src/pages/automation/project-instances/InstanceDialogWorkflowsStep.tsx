@@ -11,12 +11,19 @@ import {useState} from 'react';
 import {UseFormGetValues} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
-const InstanceDialogWorkflowListItem = ({
-    workflow,
-}: {
+interface InstanceDialogWorkflowListItemProps {
     workflow: WorkflowModel;
-}) => {
-    const [isEnabled, setIsEnabled] = useState(false);
+    label: string;
+    isEnabled: boolean;
+    setIsEnabled: (isEnabled: boolean) => void;
+}
+
+export const InstanceDialogWorkflowListItem = ({
+    isEnabled,
+    label,
+    setIsEnabled,
+    workflow,
+}: InstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
     const tabs = [
@@ -65,12 +72,12 @@ const InstanceDialogWorkflowListItem = ({
     ];
 
     return (
-        <li>
+        <div>
             <div
                 className={twMerge('flex cursor-pointer justify-between py-2')}
                 onClick={() => setIsEnabled(!isEnabled)}
             >
-                <span className="font-semibold">{workflow.label}</span>
+                <span className="font-semibold">{label}</span>
 
                 <Switch
                     checked={isEnabled}
@@ -117,7 +124,7 @@ const InstanceDialogWorkflowListItem = ({
                     )}
                 </div>
             )}
-        </li>
+        </div>
     );
 };
 
@@ -127,7 +134,6 @@ const InstanceDialogWorkflowsStep = (props: {
     const {data: workflows} = useGetProjectWorkflowsQuery(
         props.getValues().projectId!
     );
-
     return (
         <ul className="space-y-4">
             {workflows &&
@@ -135,6 +141,9 @@ const InstanceDialogWorkflowsStep = (props: {
                     <InstanceDialogWorkflowListItem
                         key={workflow.id!}
                         workflow={workflow}
+                        label={workflow.label!}
+                        isEnabled={false}
+                        setIsEnabled={() => true}
                     />
                 ))}
         </ul>
