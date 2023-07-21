@@ -6,11 +6,15 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {WorkflowModel} from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
+import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
+
+import {ProjectInstanceEditWorkflowDialog} from './ProjectInstanceEditWorkflowDialog';
 
 const ProjectInstanceWorkflowList = ({
     projectId,
@@ -19,6 +23,8 @@ const ProjectInstanceWorkflowList = ({
     projectId: number;
     projectInstanceEnabled?: boolean;
 }) => {
+    const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
     const {data: workflows} = useGetProjectWorkflowsQuery(projectId);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
@@ -26,6 +32,10 @@ const ProjectInstanceWorkflowList = ({
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
+
+    const [selectedWorkflow, setSelectedWorkflow] = useState<
+        WorkflowModel | undefined
+    >(undefined);
 
     return (
         <div className="border-b border-b-gray-100 py-2">
@@ -55,92 +65,107 @@ const ProjectInstanceWorkflowList = ({
                     );
 
                     return (
-                        <li
-                            key={workflow.id}
-                            className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
-                        >
-                            <div className="w-9/12">
-                                <Link
-                                    className="flex items-center"
-                                    to={`/automation/projects/${projectId}/workflow/${workflow.id}`}
-                                >
-                                    <div className="w-6/12 text-sm font-semibold">
-                                        {workflow.label}
-                                    </div>
+                        <>
+                            <li
+                                key={workflow.id}
+                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                            >
+                                <div className="w-9/12">
+                                    <Link
+                                        className="flex items-center"
+                                        to={`/automation/projects/${projectId}/workflow/${workflow.id}`}
+                                    >
+                                        <div className="w-6/12 text-sm font-semibold">
+                                            {workflow.label}
+                                        </div>
 
-                                    <div className="ml-6 flex">
-                                        {filteredComponentNames?.map(
-                                            (componentName) => {
-                                                const componentDefinition =
-                                                    workflowComponentDefinitions[
-                                                        componentName
-                                                    ];
+                                        <div className="ml-6 flex">
+                                            {filteredComponentNames?.map(
+                                                (componentName) => {
+                                                    const componentDefinition =
+                                                        workflowComponentDefinitions[
+                                                            componentName
+                                                        ];
 
-                                                return (
-                                                    <div
-                                                        key={componentName}
-                                                        className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                                    >
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger>
-                                                                    <InlineSVG
-                                                                        className="h-5 w-5 flex-none"
-                                                                        key={
-                                                                            componentName
+                                                    return (
+                                                        <div
+                                                            key={componentName}
+                                                            className="mr-0.5 flex items-center justify-center rounded-full border p-1"
+                                                        >
+                                                            <TooltipProvider>
+                                                                <Tooltip>
+                                                                    <TooltipTrigger>
+                                                                        <InlineSVG
+                                                                            className="h-5 w-5 flex-none"
+                                                                            key={
+                                                                                componentName
+                                                                            }
+                                                                            src={
+                                                                                componentDefinition?.icon ??
+                                                                                ''
+                                                                            }
+                                                                        />
+                                                                    </TooltipTrigger>
+
+                                                                    <TooltipContent side="right">
+                                                                        {
+                                                                            componentDefinition?.title
                                                                         }
-                                                                        src={
-                                                                            componentDefinition?.icon ??
-                                                                            ''
-                                                                        }
-                                                                    />
-                                                                </TooltipTrigger>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
 
-                                                                <TooltipContent side="right">
-                                                                    {
-                                                                        componentDefinition?.title
-                                                                    }
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                    </div>
-                                                );
-                                            }
-                                        )}
-                                    </div>
+                                        <div className="flex flex-1 justify-end text-sm">
+                                            {workflow.lastModifiedDate?.toLocaleDateString()}
+                                        </div>
+                                    </Link>
+                                </div>
 
-                                    <div className="flex flex-1 justify-end text-sm">
-                                        {workflow.lastModifiedDate?.toLocaleDateString()}
-                                    </div>
-                                </Link>
-                            </div>
+                                <div className="flex w-2/12 items-center justify-center">
+                                    <Switch disabled={projectInstanceEnabled} />
+                                </div>
 
-                            <div className="flex w-2/12 items-center justify-center">
-                                <Switch disabled={projectInstanceEnabled} />
-                            </div>
+                                <DropdownMenu
+                                    id={projectId}
+                                    menuItems={[
+                                        {
+                                            label: 'Edit',
+                                            onClick: () => {
+                                                setSelectedWorkflow(workflow);
 
-                            <DropdownMenu
-                                id={projectId}
-                                menuItems={[
-                                    {
-                                        label: 'Edit',
-                                        onClick: () => {
-                                            console.log('TODO');
+                                                setShowEditWorkflowDialog(true);
+                                            },
                                         },
-                                    },
-                                    {
-                                        separator: true,
-                                    },
-                                    {
-                                        danger: true,
-                                        label: 'Delete',
-                                        onClick: () => {
-                                            console.log('TODO');
+                                        {
+                                            separator: true,
                                         },
-                                    },
-                                ]}
-                            />
-                        </li>
+                                        {
+                                            danger: true,
+                                            label: 'Delete',
+                                            onClick: () => {
+                                                console.log('TODO');
+                                            },
+                                        },
+                                    ]}
+                                />
+
+                                {showEditWorkflowDialog && (
+                                    <ProjectInstanceEditWorkflowDialog
+                                        workflow={selectedWorkflow!}
+                                        showTrigger={false}
+                                        visible
+                                        onClose={() =>
+                                            setShowEditWorkflowDialog(false)
+                                        }
+                                    />
+                                )}
+                            </li>
+                        </>
                     );
                 })}
             </ul>
