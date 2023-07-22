@@ -25,7 +25,7 @@ import {
 /**
  * 
  */
-export class ProjectCategoriesApi extends runtime.BaseAPI {
+export class AutomationProjectCategoriesApi extends runtime.BaseAPI {
 
     /**
      * Get categories.

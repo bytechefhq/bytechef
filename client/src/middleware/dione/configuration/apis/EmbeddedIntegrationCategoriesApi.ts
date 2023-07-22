@@ -25,7 +25,7 @@ import {
 /**
  * 
  */
-export class IntegrationCategoriesApi extends runtime.BaseAPI {
+export class EmbeddedIntegrationCategoriesApi extends runtime.BaseAPI {
 
     /**
      * Get integration categories.

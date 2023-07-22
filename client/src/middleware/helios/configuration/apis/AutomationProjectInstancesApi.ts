@@ -66,7 +66,7 @@ export interface UpdateProjectInstanceRequest {
 /**
  * 
  */
-export class ProjectInstancesApi extends runtime.BaseAPI {
+export class AutomationProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Create a new project instance.

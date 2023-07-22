@@ -63,7 +63,7 @@ export interface UpdateProjectRequest {
 /**
  * 
  */
-export class ProjectsApi extends runtime.BaseAPI {
+export class AutomationProjectsApi extends runtime.BaseAPI {
 
     /**
      * Create a new project.
