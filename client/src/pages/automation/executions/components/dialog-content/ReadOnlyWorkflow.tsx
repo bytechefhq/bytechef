@@ -1,17 +1,17 @@
 import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
-import {ProjectWorkflowExecutionModel} from 'middleware/helios/execution';
+import {ExecutionModel} from 'middleware/helios/execution';
 
 const ReadOnlyWorkflow = ({
+    execution,
     setWorkflowExecutionDetailsDialogOpen,
-    workflowExecution,
 }: {
-    workflowExecution: ProjectWorkflowExecutionModel;
+    execution: ExecutionModel;
     setWorkflowExecutionDetailsDialogOpen: (
         workflowExecutionDetailsDialogOpen: boolean
     ) => void;
 }) => {
-    const {instance, project, workflow} = workflowExecution;
+    const {instance, project, workflow} = execution;
 
     return (
         <div className="flex w-full justify-between bg-gray-100 p-4">

@@ -10,13 +10,13 @@ import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {QueueListIcon} from '@heroicons/react/24/outline';
 import {
-    GetProjectWorkflowExecutionsJobStatusEnum,
-    ProjectWorkflowExecutionModel,
-    ProjectWorkflowExecutionModelFromJSON,
+    ExecutionModel,
+    ExecutionModelFromJSON,
+    GetExecutionsJobStatusEnum,
 } from 'middleware/helios/execution';
 import {
+    useGetExecutionsQuery,
     useGetProjectInstancesQuery,
-    useGetProjectWorkflowExecutionsQuery,
     useGetProjectsQuery,
     useGetWorkflowsQuery,
 } from 'queries/projects.queries';
@@ -25,35 +25,35 @@ import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '../project/stores/useWorkflowExecutionDetailsDialogStore';
-import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
-import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
+import ExecutionDetailsDialog from './components/ExecutionDetailsDialog';
+import ExecutionsTable from './components/ExecutionsTable';
 
 const jobStatusOptions = [
     {
-        label: GetProjectWorkflowExecutionsJobStatusEnum.Started,
-        value: GetProjectWorkflowExecutionsJobStatusEnum.Started,
+        label: GetExecutionsJobStatusEnum.Started,
+        value: GetExecutionsJobStatusEnum.Started,
     },
     {
-        label: GetProjectWorkflowExecutionsJobStatusEnum.Completed,
-        value: GetProjectWorkflowExecutionsJobStatusEnum.Completed,
+        label: GetExecutionsJobStatusEnum.Completed,
+        value: GetExecutionsJobStatusEnum.Completed,
     },
     {
-        label: GetProjectWorkflowExecutionsJobStatusEnum.Created,
-        value: GetProjectWorkflowExecutionsJobStatusEnum.Created,
+        label: GetExecutionsJobStatusEnum.Created,
+        value: GetExecutionsJobStatusEnum.Created,
     },
     {
-        label: GetProjectWorkflowExecutionsJobStatusEnum.Stopped,
-        value: GetProjectWorkflowExecutionsJobStatusEnum.Stopped,
+        label: GetExecutionsJobStatusEnum.Stopped,
+        value: GetExecutionsJobStatusEnum.Stopped,
     },
     {
-        label: GetProjectWorkflowExecutionsJobStatusEnum.Failed,
-        value: GetProjectWorkflowExecutionsJobStatusEnum.Failed,
+        label: GetExecutionsJobStatusEnum.Failed,
+        value: GetExecutionsJobStatusEnum.Failed,
     },
 ];
 
-export const WorkflowExecutions = () => {
+export const Executions = () => {
     const [filterStatus, setFilterStatus] =
-        useState<GetProjectWorkflowExecutionsJobStatusEnum>();
+        useState<GetExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
         undefined
     );
@@ -77,7 +77,7 @@ export const WorkflowExecutions = () => {
         data: WorkflowExecutionsPage,
         error: WorkflowExecutionsError,
         isLoading: WorkflowExecutionsLoading,
-    } = useGetProjectWorkflowExecutionsQuery({
+    } = useGetExecutionsQuery({
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -104,8 +104,8 @@ export const WorkflowExecutions = () => {
             : 'There is no executed workflows for the current criteria.';
 
     const tableData = WorkflowExecutionsPage?.content?.map(
-        (WorkflowExecution: ProjectWorkflowExecutionModel) =>
-            ProjectWorkflowExecutionModelFromJSON(WorkflowExecution)
+        (WorkflowExecution: ExecutionModel) =>
+            ExecutionModelFromJSON(WorkflowExecution)
     );
 
     return (
@@ -154,7 +154,7 @@ export const WorkflowExecutions = () => {
                                 ) => {
                                     if (value) {
                                         setFilterStatus(
-                                            value.value as GetProjectWorkflowExecutionsJobStatusEnum
+                                            value.value as GetExecutionsJobStatusEnum
                                         );
                                     } else {
                                         setFilterStatus(undefined);
@@ -270,7 +270,7 @@ export const WorkflowExecutions = () => {
                             )}
                         >
                             {tableData && tableData.length > 0 ? (
-                                <WorkflowExecutionsTable data={tableData} />
+                                <ExecutionsTable data={tableData} />
                             ) : (
                                 <EmptyList
                                     icon={
@@ -284,11 +284,11 @@ export const WorkflowExecutions = () => {
                     )}
 
                 {workflowExecutionDetailsDialogOpen && (
-                    <WorkflowExecutionDetailsDialog />
+                    <ExecutionDetailsDialog />
                 )}
             </LayoutContainer>
         </PageLoader>
     );
 };
 
-export default WorkflowExecutions;
+export default Executions;

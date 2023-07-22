@@ -36,18 +36,18 @@ const navigation: {
     },
     {href: '/automation/connections', icon: LinkIcon, name: 'Connections'},
     {
-        href: '/automation/workflow-executions',
+        href: '/automation/executions',
         icon: QueueListIcon,
-        name: 'Workflow Executions',
+        name: 'Executions',
     },
 ];
 
 const titles: {[key: string]: string} = {
     '/': 'Projects',
     '/automation/connections': 'Connections',
+    '/automation/executions': 'Executions',
     '/automation/project-instances': 'Project Instances',
     '/automation/projects': 'Projects',
-    '/automation/workflow-executions': 'Workflow Executions',
 };
 
 function App() {
