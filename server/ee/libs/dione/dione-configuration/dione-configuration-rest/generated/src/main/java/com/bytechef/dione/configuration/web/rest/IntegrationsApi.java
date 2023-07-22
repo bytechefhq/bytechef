@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.363670+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:04.509639+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "integrations", description = "The Embedded Integrations API")
+@Tag(name = "embedded-integrations", description = "The Embedded Integrations API")
 public interface IntegrationsApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -55,7 +55,7 @@ public interface IntegrationsApi {
         operationId = "createIntegration",
         summary = "Create a new integration",
         description = "Create a new integration.",
-        tags = { "integrations" },
+        tags = { "embedded-integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The integration object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
@@ -97,7 +97,7 @@ public interface IntegrationsApi {
         operationId = "createIntegrationWorkflow",
         summary = "Create new workflow and adds it to an existing integration",
         description = "Create new workflow and adds it to an existing integration.",
-        tags = { "integrations" },
+        tags = { "embedded-integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -139,7 +139,7 @@ public interface IntegrationsApi {
         operationId = "deleteIntegration",
         summary = "Delete an integration",
         description = "Delete an integration.",
-        tags = { "integrations" },
+        tags = { "embedded-integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -167,7 +167,7 @@ public interface IntegrationsApi {
         operationId = "getIntegration",
         summary = "Get an integration by id",
         description = "Get an integration by id.",
-        tags = { "integrations" },
+        tags = { "embedded-integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The integration object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
@@ -207,7 +207,7 @@ public interface IntegrationsApi {
         operationId = "getIntegrationWorkflows",
         summary = "Get integration workflows for particular integration",
         description = "Get integration workflows for particular integration.",
-        tags = { "integration-workflows" },
+        tags = { "embedded-workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -248,7 +248,7 @@ public interface IntegrationsApi {
         operationId = "getIntegrations",
         summary = "Get integrations",
         description = "Get integrations.",
-        tags = { "integrations" },
+        tags = { "embedded-integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of integrations.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
@@ -290,7 +290,7 @@ public interface IntegrationsApi {
         operationId = "updateIntegration",
         summary = "Update an existing integration",
         description = "Update an existing integration.",
-        tags = { "integrations" },
+        tags = { "embedded-integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
@@ -333,7 +333,7 @@ public interface IntegrationsApi {
         operationId = "updateIntegrationTags",
         summary = "Updates tags of an existing integration",
         description = "Updates tags of an existing integration.",
-        tags = { "integration-tags" },
+        tags = { "embedded-integration-tags" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }

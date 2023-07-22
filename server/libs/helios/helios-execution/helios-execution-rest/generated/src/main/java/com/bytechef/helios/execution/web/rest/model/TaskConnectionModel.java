@@ -19,10 +19,10 @@ import jakarta.annotation.Generated;
  * The connection used in a particular task.
  */
 
-@Schema(name = "JobConnection", description = "The connection used in a particular task.")
-@JsonTypeName("JobConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:41:06.109085+02:00[Europe/Zagreb]")
-public class JobConnectionModel {
+@Schema(name = "TaskConnection", description = "The connection used in a particular task.")
+@JsonTypeName("TaskConnection")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:03.230135+02:00[Europe/Zagreb]")
+public class TaskConnectionModel {
 
   private Long id;
 
@@ -30,7 +30,7 @@ public class JobConnectionModel {
 
   private String taskName;
 
-  public JobConnectionModel id(Long id) {
+  public TaskConnectionModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -50,7 +50,7 @@ public class JobConnectionModel {
     this.id = id;
   }
 
-  public JobConnectionModel key(String key) {
+  public TaskConnectionModel key(String key) {
     this.key = key;
     return this;
   }
@@ -70,7 +70,7 @@ public class JobConnectionModel {
     this.key = key;
   }
 
-  public JobConnectionModel taskName(String taskName) {
+  public TaskConnectionModel taskName(String taskName) {
     this.taskName = taskName;
     return this;
   }
@@ -98,10 +98,10 @@ public class JobConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    JobConnectionModel jobConnection = (JobConnectionModel) o;
-    return Objects.equals(this.id, jobConnection.id) &&
-        Objects.equals(this.key, jobConnection.key) &&
-        Objects.equals(this.taskName, jobConnection.taskName);
+    TaskConnectionModel taskConnection = (TaskConnectionModel) o;
+    return Objects.equals(this.id, taskConnection.id) &&
+        Objects.equals(this.key, taskConnection.key) &&
+        Objects.equals(this.taskName, taskConnection.taskName);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class JobConnectionModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class JobConnectionModel {\n");
+    sb.append("class TaskConnectionModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    taskName: ").append(toIndentedString(taskName)).append("\n");
