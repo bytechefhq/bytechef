@@ -54,7 +54,7 @@ export interface StopJobRequest {
 /**
  * 
  */
-export class ProjectJobsApi extends runtime.BaseAPI {
+export class AutomationJobsApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.

@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { JobConnectionModel } from './JobConnectionModel';
+import type { TaskConnectionModel } from './TaskConnectionModel';
 import {
-    JobConnectionModelFromJSON,
-    JobConnectionModelFromJSONTyped,
-    JobConnectionModelToJSON,
-} from './JobConnectionModel';
+    TaskConnectionModelFromJSON,
+    TaskConnectionModelFromJSONTyped,
+    TaskConnectionModelToJSON,
+} from './TaskConnectionModel';
 import type { WebhookModel } from './WebhookModel';
 import {
     WebhookModelFromJSON,
@@ -34,10 +34,10 @@ import {
 export interface JobParametersModel {
     /**
      * 
-     * @type {Array<JobConnectionModel>}
+     * @type {Array<TaskConnectionModel>}
      * @memberof JobParametersModel
      */
-    connections?: Array<JobConnectionModel>;
+    connections?: Array<TaskConnectionModel>;
     /**
      * The inputs expected by the workflow
      * @type {{ [key: string]: object; }}
@@ -96,7 +96,7 @@ export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(JobConnectionModelFromJSON)),
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(TaskConnectionModelFromJSON)),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
@@ -115,7 +115,7 @@ export function JobParametersModelToJSON(value?: JobParametersModel | null): any
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(JobConnectionModelToJSON)),
+        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(TaskConnectionModelToJSON)),
         'inputs': value.inputs,
         'label': value.label,
         'parentTaskExecutionId': value.parentTaskExecutionId,

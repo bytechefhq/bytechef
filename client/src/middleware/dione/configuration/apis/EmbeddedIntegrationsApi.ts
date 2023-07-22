@@ -58,7 +58,7 @@ export interface UpdateIntegrationRequest {
 /**
  * 
  */
-export class IntegrationsApi extends runtime.BaseAPI {
+export class EmbeddedIntegrationsApi extends runtime.BaseAPI {
 
     /**
      * Create a new integration.

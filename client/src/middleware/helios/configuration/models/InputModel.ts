@@ -20,13 +20,13 @@ import { exists, mapValues } from '../runtime';
  */
 export interface InputModel {
     /**
-     * The string of an input
+     * The descriptive name of an input
      * @type {string}
      * @memberof InputModel
      */
     label?: string;
     /**
-     * The name of an output
+     * The name of an input
      * @type {string}
      * @memberof InputModel
      */
