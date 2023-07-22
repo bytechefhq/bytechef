@@ -1,22 +1,24 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Automation Project API"
+  title: "Automation Execution API"
   version: "1"
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "jobs"
-  description: "The Automation Jobs API"
-- name: "project-workflow-executions"
-  description: "The Automation Project Workflow Executions API"
+- name: "project-jobs"
+  description: "The Automation Project Jobs API"
+- name: "project-executions"
+  description: "The Automation Project Executions API"
+- name: "project-tests"
+  description: "The Automation Project Tests API"
 paths:
   /jobs:
     get:
       description: "Get a page of jobs."
       summary: "Get a page of jobs"
       tags:
-      - "jobs"
+      - "project-jobs"
       operationId: "getJobs"
       parameters:
       - name: "pageNumber"
@@ -38,7 +40,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "jobs"
+      - "project-jobs"
       operationId: "createJob"
       requestBody:
         description: "Parameters required to run a job, for example '{\"workflowId\"\
@@ -65,7 +67,7 @@ paths:
       description: "Get the latest job."
       summary: "Get the latest job"
       tags:
-      - "jobs"
+      - "project-jobs"
       operationId: "getLatestJob"
       responses:
         "200":
@@ -79,7 +81,7 @@ paths:
       description: "Get a job by id."
       summary: "Get a job by id"
       tags:
-      - "jobs"
+      - "project-jobs"
       operationId: "getJob"
       parameters:
       - name: "id"
@@ -101,7 +103,7 @@ paths:
       description: "Restart a job."
       summary: "Restart a job"
       tags:
-      - "jobs"
+      - "project-jobs"
       operationId: "restartJob"
       parameters:
       - name: "id"
@@ -119,7 +121,7 @@ paths:
       description: "Stop a job."
       summary: "Stop a job"
       tags:
-      - "jobs"
+      - "project-jobs"
       operationId: "stopJob"
       parameters:
       - name: "id"
@@ -132,13 +134,13 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /project-workflow-executions:
+  /executions:
     get:
       description: "Get project workflow executions."
       summary: "Get project workflow executions"
       tags:
-      - "project-workflow-executions"
-      operationId: "getProjectWorkflowExecutions"
+      - "project-executions"
+      operationId: "getExecutions"
       parameters:
       - name: "jobStatus"
         description: "The status of an executed job"
@@ -201,16 +203,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
-  /project-workflow-executions/{id}:
+  /executions/{id}:
     get:
       description: "Get workflow execution by id."
       summary: "Get workflow executions by id"
       tags:
-      - "project-workflow-executions"
-      operationId: "getProjectWorkflowExecution"
+      - "project-executions"
+      operationId: "getExecution"
       parameters:
       - name: "id"
-        description: "The id of a workflow execution."
+        description: "The id of an execution."
         in: "path"
         required: true
         schema:
@@ -218,11 +220,34 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The of workflow execution object."
+          description: "The execution object."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectWorkflowExecution"
+                $ref: "#/components/schemas/Execution"
+  /tests:
+    post:
+      description: "Execute a workflow synchronously for testing purposes."
+      summary: "Execute a workflow synchronously for testing purpose"
+      tags:
+      - "project-tests"
+      operationId: "test"
+      operationId: "testWorkflow"
+      requestBody:
+        description: "Parameters required to run a job, for example '{\"workflowId\"\
+          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestParameters"
+        required: true
+      responses:
+        "200":
+          description: "The output expected by the workflow."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
 components:
   schemas:
     ComponentDefinition:
@@ -242,6 +267,40 @@ components:
         title:
           description: "The title"
           type: "string"
+    Execution:
+      description: "Contains information about execution of a project workflow."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        instance:
+          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstance"
+        job:
+          $ref: "#/components/schemas/Job"
+        project:
+          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/Project"
+        workflow:
+          $ref: "#/components/schemas/WorkflowBasic"
+    ExecutionBasic:
+      description: "Contains basic information about execution of a project workflow."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        instance:
+          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
+        job:
+          $ref: "#/components/schemas/JobBasic"
+        project:
+          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
+        workflow:
+          $ref: "#/components/schemas/WorkflowBasic"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
@@ -254,25 +313,6 @@ components:
           type: "array"
           items:
             type: "string"
-    Input:
-      type: "object"
-      required:
-      - "name"
-      - "value"
-      properties:
-        label:
-          description: "The string of an input"
-          type: "string"
-        name:
-          description: "The name of an output"
-          type: "string"
-        required:
-          description: "If an input is required, or not"
-          type: "boolean"
-          default: false
-        type:
-          description: "The type of an input, for example \\\"string\\\""
-          type: "string"
     JobBasic:
       description: "Represents an execution of a workflow."
       type: "object"
@@ -386,7 +426,7 @@ components:
         connections:
           type: "array"
           items:
-            $ref: "#/components/schemas/JobConnection"
+            $ref: "#/components/schemas/TaskConnection"
         inputs:
           description: "The inputs expected by the workflow"
           type: "object"
@@ -411,33 +451,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Webhook"
-    JobConnection:
-      description: "The connection used in a particular task."
-      type: "object"
-      properties:
-        id:
-          description: "The connection id"
-          type: "integer"
-          format: "int64"
-        key:
-          description: "The connection key under which a connection is defined in\
-            \ a workflow definition."
-          type: "string"
-        taskName:
-          description: "The task name to which a connection belongs."
-          type: "string"
-    Output:
-      type: "object"
-      required:
-      - "name"
-      - "value"
-      properties:
-        name:
-          description: "The name of an output"
-          type: "string"
-        value:
-          description: "The value of an output"
-          type: "object"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
@@ -463,42 +476,23 @@ components:
           type: "array"
           items:
             type: "object"
-    ProjectWorkflowExecution:
-      description: "Contains information about execution of one of project workflows."
+    TaskConnection:
+      description: "The connection used in a particular task."
       type: "object"
       properties:
         id:
-          description: "The id of a workflow execution."
+          description: "The connection id"
           type: "integer"
           format: "int64"
-          readOnly: true
-        instance:
-          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstance"
-        job:
-          $ref: "#/components/schemas/Job"
-        project:
-          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/Project"
-        workflow:
-          $ref: "#/components/schemas/WorkflowBasic"
-    ProjectWorkflowExecutionBasic:
-      description: "Contains information about execution of one of project workflows."
-      type: "object"
-      properties:
-        id:
-          description: "The id of a workflow execution."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        instance:
-          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
-        job:
-          $ref: "#/components/schemas/JobBasic"
-        project:
-          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
-        workflow:
-          $ref: "#/components/schemas/WorkflowBasic"
+        key:
+          description: "The connection key under which a connection is defined in\
+            \ a workflow definition."
+          type: "string"
+        taskName:
+          description: "The task name to which a connection belongs."
+          type: "string"
     TaskExecution:
-      description: "Adds execution semantics to the task."
+      description: "Adds execution semantics to a task."
       type: "object"
       required:
       - "jobId"
@@ -625,6 +619,22 @@ components:
           description: "The type of the task."
           type: "string"
           readOnly: true
+    TestParameters:
+      description: "Defines parameters used to test a workflow."
+      type: "object"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskConnection"
+        inputs:
+          description: "The inputs expected by the workflow"
+          type: "object"
+          additionalProperties:
+            type: "object"
+        workflowId:
+          description: "Id of the workflow to execute."
+          type: "string"
     Webhook:
       description: "Used to register to receive notifications for certain events."
       type: "object"

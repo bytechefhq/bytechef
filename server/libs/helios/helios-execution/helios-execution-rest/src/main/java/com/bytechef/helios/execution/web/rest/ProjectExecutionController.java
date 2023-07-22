@@ -17,10 +17,9 @@
 
 package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacade;
-import com.bytechef.helios.configuration.web.rest.ProjectWorkflowExecutionsApi;
-import com.bytechef.helios.configuration.web.rest.model.ProjectWorkflowExecutionBasicModel;
-import com.bytechef.helios.configuration.web.rest.model.ProjectWorkflowExecutionModel;
+import com.bytechef.helios.execution.facade.ExecutionFacade;
+import com.bytechef.helios.execution.web.rest.model.ExecutionBasicModel;
+import com.bytechef.helios.execution.web.rest.model.ExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -35,37 +34,37 @@ import java.time.LocalDateTime;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
-public class ProjectWorkflowExecutionController implements ProjectWorkflowExecutionsApi {
+public class ProjectExecutionController implements ExecutionsApi {
 
     private final ConversionService conversionService;
-    private final ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade;
+    private final ExecutionFacade executionFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowExecutionController(
-        ConversionService conversionService, ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade) {
+    public ProjectExecutionController(
+        ConversionService conversionService, ExecutionFacade executionFacade) {
 
         this.conversionService = conversionService;
-        this.projectWorkflowExecutionFacade = projectWorkflowExecutionFacade;
+        this.executionFacade = executionFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ProjectWorkflowExecutionModel> getProjectWorkflowExecution(Long id) {
+    public ResponseEntity<ExecutionModel> getExecution(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(projectWorkflowExecutionFacade.getProjectWorkflowExecution(id),
-                ProjectWorkflowExecutionModel.class));
+            conversionService.convert(executionFacade.getExecution(id),
+                ExecutionModel.class));
     }
 
     @Override
-    public ResponseEntity<Page> getProjectWorkflowExecutions(
+    public ResponseEntity<Page> getExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
         return ResponseEntity.ok(
-            projectWorkflowExecutionFacade
-                .getProjectWorkflowExecutions(
+            executionFacade
+                .getExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
-                    workflowExecutionDTO, ProjectWorkflowExecutionBasicModel.class)));
+                    workflowExecutionDTO, ExecutionBasicModel.class)));
     }
 }

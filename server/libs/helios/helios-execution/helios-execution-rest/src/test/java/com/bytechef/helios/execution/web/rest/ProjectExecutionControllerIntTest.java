@@ -15,25 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.facade;
+package com.bytechef.helios.execution.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 /**
  * @author Ivica Cardic
  */
-public class ProjectWorkflowExecutionFacadeTest {
+@Disabled
+@WebMvcTest(value = ProjectExecutionController.class)
+public class ProjectExecutionControllerIntTest {
 
-    @Disabled
     @Test
     public void testGetProjectWorkflowExecution() {
-        // TODO
+// TODO
     }
 
-    @Disabled
     @Test
-    public void searchProjectWorkflowExecutions() {
-        // TODO
+    public void testSearchProjectWorkflowExecutions() {
+// TODO
     }
 }

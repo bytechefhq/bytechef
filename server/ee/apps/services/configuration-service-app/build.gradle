@@ -20,7 +20,6 @@ dependencies {
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
 
     implementation project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
-    implementation project(":server:ee:libs:atlas:atlas-worker:atlas-worker-remote-client")
     implementation project(":server:ee:libs:core:discovery:discovery-redis")
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest")
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-service")
@@ -35,7 +34,6 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-service")
-    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     implementation project(":server:libs:configs:account-config")
     implementation project(":server:libs:configs:liquibase-config")
     implementation project(":server:libs:core:category:category-service")
@@ -46,7 +44,6 @@ dependencies {
     implementation project(":server:libs:helios:helios-configuration:helios-configuration-service")
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-impl")
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-service")
-    implementation project(":server:libs:hermes:hermes-test:hermes-test-rest")
     implementation project(":server:libs:hermes:hermes-test:hermes-test-service")
 
     testImplementation project(":server:libs:test:test-int-support")

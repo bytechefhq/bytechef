@@ -20,6 +20,7 @@ dependencies {
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
 
     implementation project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
+    implementation project(":server:ee:libs:atlas:atlas-worker:atlas-worker-remote-client")
     implementation project(":server:ee:libs:core:discovery:discovery-redis")
     implementation project(":server:ee:libs:helios:helios-configuration:helios-configuration-remote-client")
     implementation project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-client")
@@ -30,6 +31,7 @@ dependencies {
 
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc")
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-service")
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     implementation project(":server:libs:configs:liquibase-config")
     implementation project(":server:libs:core:message-broker:message-broker-amqp")
     implementation project(":server:libs:core:message-broker:message-broker-kafka")

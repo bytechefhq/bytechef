@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.web.rest;
+package com.bytechef.helios.execution.web.rest;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.helios.execution.web.rest.model.JobModel;
+import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
 import com.bytechef.hermes.test.WorkflowTestExecutor;
-import com.bytechef.hermes.test.web.rest.model.JobModel;
-import com.bytechef.hermes.test.web.rest.model.JobParametersModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,23 +30,22 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
-public class WorkflowTestController implements WorkflowTestsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+public class ProjectTestController implements TestsApi {
 
     private final ConversionService conversionService;
     private final WorkflowTestExecutor workflowTestExecutor;
 
-    public WorkflowTestController(ConversionService conversionService, WorkflowTestExecutor workflowTestExecutor) {
+    public ProjectTestController(ConversionService conversionService, WorkflowTestExecutor workflowTestExecutor) {
         this.conversionService = conversionService;
         this.workflowTestExecutor = workflowTestExecutor;
     }
 
     @Override
-    public ResponseEntity<JobModel> testWorkflow(JobParametersModel jobParametersModel) {
+    public ResponseEntity<JobModel> testWorkflow(TestParametersModel testParametersModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowTestExecutor.execute(conversionService.convert(jobParametersModel, JobParameters.class)),
+                workflowTestExecutor.execute(conversionService.convert(testParametersModel, JobParameters.class)),
                 JobModel.class));
     }
 }

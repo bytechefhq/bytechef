@@ -15,26 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.web.rest;
+package com.bytechef.helios.execution.facade;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import com.bytechef.helios.execution.dto.ExecutionDTO;
+import org.springframework.data.domain.Page;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-@Disabled
-@WebMvcTest(value = ProjectWorkflowExecutionController.class)
-public class ProjectWorkflowExecutionControllerIntTest {
+public interface ExecutionFacade {
 
-    @Test
-    public void testGetProjectWorkflowExecution() {
-// TODO
-    }
+    ExecutionDTO getExecution(long id);
 
-    @Test
-    public void testSearchProjectWorkflowExecutions() {
-// TODO
-    }
+    Page<ExecutionDTO> getExecutions(
+        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
+        String workflowId, Integer pageNumber);
+
 }
