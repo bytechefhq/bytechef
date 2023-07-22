@@ -8,8 +8,6 @@ servers:
 tags:
 - name: "project-categories"
   description: "The Automation Project Categories API"
-- name: "project-instance-jobs"
-  description: "The Automation Project Instance Jobs API"
 - name: "project-instance-tags"
   description: "The Automation Project Instance Tags API"
 - name: "project-instances"
@@ -254,7 +252,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "project-instance-jobs"
+      - "project-instances"
       operationId: "createProjectInstanceWorkflowJob"
       parameters:
       - name: "id"
