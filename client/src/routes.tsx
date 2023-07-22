@@ -13,10 +13,10 @@ import ErrorPage from './ErrorPage';
 import {ProjectsApi} from './middleware/helios/configuration';
 import Connections from './pages/automation/connections/Connections';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
+import Executions from './pages/automation/executions/Executions';
 import ProjectInstances from './pages/automation/project-instances/ProjectInstances';
 import Project from './pages/automation/project/Project';
 import Projects from './pages/automation/projects/Projects';
-import WorkflowExecutions from './pages/automation/workflow-executions/WorkflowExecutions';
 import Integrations from './pages/embedded/integrations/Integrations';
 import {ProjectKeys} from './queries/projects.queries';
 
@@ -62,8 +62,8 @@ export const router = createBrowserRouter([
                         path: 'connections',
                     },
                     {
-                        element: <WorkflowExecutions />,
-                        path: 'workflow-executions',
+                        element: <Executions />,
+                        path: 'executions',
                     },
                 ],
                 path: 'automation',
