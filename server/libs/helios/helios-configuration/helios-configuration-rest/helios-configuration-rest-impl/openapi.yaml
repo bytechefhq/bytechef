@@ -6,25 +6,25 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "project-categories"
+- name: "automation-project-categories"
   description: "The Automation Project Categories API"
-- name: "project-instance-tags"
+- name: "automation-project-instance-tags"
   description: "The Automation Project Instance Tags API"
-- name: "project-instances"
+- name: "automation-project-instances"
   description: "The Automation Project Instances API"
-- name: "projects"
-  description: "The Automation Projects API"
-- name: "project-tags"
+- name: "automation-project-tags"
   description: "The Automation Project Tags API"
-- name: "project-workflows"
-  description: "The Automation Project Workflows API"
+- name: "automation-projects"
+  description: "The Automation Projects API"
+- name: "automation-workflows"
+  description: "The Automation Workflows API"
 paths:
   /project-categories:
     get:
       description: "Get categories."
       summary: "Get categories"
       tags:
-      - "project-categories"
+      - "automation-project-categories"
       operationId: "getProjectCategories"
       responses:
         "200":
@@ -41,7 +41,7 @@ paths:
       description: "Get project instance tags."
       summary: "Get project instance tags"
       tags:
-      - "project-instance-tags"
+      - "automation-project-instance-tags"
       operationId: "getProjectInstanceTags"
       responses:
         "200":
@@ -58,7 +58,7 @@ paths:
       description: "Get project instances."
       summary: "Get project instances"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "getProjectInstances"
       parameters:
       - name: "projectId"
@@ -88,7 +88,7 @@ paths:
       description: "Create a new project instance."
       summary: "Create a new project instance"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "createProjectInstance"
       requestBody:
         content:
@@ -108,7 +108,7 @@ paths:
       description: "Delete a project instance."
       summary: "Delete a project instance"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "deleteProjectInstance"
       parameters:
       - name: "id"
@@ -125,7 +125,7 @@ paths:
       description: "Get a project instance by id."
       summary: "Get a project instance by id"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "getProjectInstance"
       parameters:
       - name: "id"
@@ -146,7 +146,7 @@ paths:
       description: "Update an existing project instance."
       summary: "Update an existing project instance"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "updateProjectInstance"
       parameters:
       - name: "id"
@@ -174,7 +174,7 @@ paths:
       description: "Enable/disable a project instance."
       summary: "Enable/disable a project instance"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "enableProjectInstance"
       parameters:
       - name: "id"
@@ -198,7 +198,7 @@ paths:
       description: "Updates tags of an existing project instance."
       summary: "Updates tags of an existing project instance"
       tags:
-      - "project-instance-tags"
+      - "automation-project-instance-tags"
       operationId: "updateProjectInstanceTags"
       parameters:
       - name: "id"
@@ -222,7 +222,7 @@ paths:
       description: "Enable/disable a workflow of a project instance."
       summary: "Enable/disable a workflow of a project instance"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "enableProjectInstanceWorkflow"
       parameters:
       - name: "id"
@@ -252,7 +252,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "project-instances"
+      - "automation-project-instances"
       operationId: "createProjectInstanceWorkflowJob"
       parameters:
       - name: "id"
@@ -285,7 +285,7 @@ paths:
       description: "Get project tags."
       summary: "Get project tags."
       tags:
-      - "project-tags"
+      - "automation-project-tags"
       operationId: "getProjectTags"
       responses:
         "200":
@@ -302,7 +302,7 @@ paths:
       description: "Get projects."
       summary: "Get projects."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "getProjects"
       parameters:
       - name: "categoryId"
@@ -338,7 +338,7 @@ paths:
       description: "Create a new project."
       summary: "Create a new project."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "createProject"
       requestBody:
         content:
@@ -358,7 +358,7 @@ paths:
       description: "Delete a project."
       summary: "Delete a project."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "deleteProject"
       parameters:
       - name: "id"
@@ -375,7 +375,7 @@ paths:
       description: "Get a project by id."
       summary: "Get a project by id."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "getProject"
       parameters:
       - name: "id"
@@ -396,7 +396,7 @@ paths:
       description: "Update an existing project."
       summary: "Update an existing project."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "updateProject"
       parameters:
       - name: "id"
@@ -424,7 +424,7 @@ paths:
       description: "Duplicates existing project."
       summary: "Duplicates existing project."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "duplicateProject"
       parameters:
       - name: "id"
@@ -441,12 +441,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
-  /projects/{id}/project-tags:
+  /projects/{id}/automation-project-tags:
     put:
       description: "Updates tags of an existing project."
       summary: "Updates tags of an existing project."
       tags:
-      - "project-tags"
+      - "automation-project-tags"
       operationId: "updateProjectTags"
       parameters:
       - name: "id"
@@ -470,7 +470,7 @@ paths:
       description: "Get workflows for particular project."
       summary: "Get workflows for particular project."
       tags:
-      - "project-workflows"
+      - "automation-workflows"
       operationId: "getProjectWorkflows"
       parameters:
       - name: "id"
@@ -493,7 +493,7 @@ paths:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
       tags:
-      - "projects"
+      - "automation-projects"
       operationId: "createProjectWorkflow"
       parameters:
       - name: "id"
@@ -533,7 +533,7 @@ paths:
       description: "Get workflow definitions."
       summary: "Get workflow definitions"
       tags:
-      - "project-workflows"
+      - "automation-workflows"
       operationId: "getWorkflows"
       responses:
         "200":
@@ -549,7 +549,7 @@ paths:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-      - "project-workflows"
+      - "automation-workflows"
       operationId: "deleteWorkflow"
       parameters:
       - name: "id"
@@ -565,7 +565,7 @@ paths:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
       tags:
-      - "project-workflows"
+      - "automation-workflows"
       operationId: "getWorkflow"
       parameters:
       - name: "id"
@@ -585,7 +585,7 @@ paths:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-      - "project-workflows"
+      - "automation-workflows"
       operationId: "updateWorkflow"
       parameters:
       - name: "id"
@@ -643,69 +643,6 @@ components:
         __version:
           type: "integer"
           format: "int32"
-    Connection:
-      description: "Contains all required information to open a connection to a service\
-        \ defined by componentName parameter."
-      type: "object"
-      required:
-      - "name"
-      - "componentName"
-      - "componentVersion"
-      - "parameters"
-      properties:
-        active:
-          description: "If a connection is used in any of active workflows."
-          type: "boolean"
-          readOnly: true
-        authorizationName:
-          description: "The name of an authorization used by this connection. Used\
-            \ for HTTP based services."
-          type: "string"
-        componentName:
-          description: "The name of a component that uses this connection."
-          type: "string"
-        connectionVersion:
-          description: "The version of a component that uses this connection."
-          type: "integer"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of a connection."
-          type: "string"
-        id:
-          description: "The id of a connection."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        parameters:
-          description: "The parameters of a connection."
-          type: "object"
-          additionalProperties:
-            type: "object"
-          writeOnly: true
-        tags:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Tag"
-        __version:
-          type: "integer"
-          format: "int32"
     Input:
       type: "object"
       required:
@@ -713,10 +650,10 @@ components:
       - "value"
       properties:
         label:
-          description: "The string of an input"
+          description: "The descriptive name of an input"
           type: "string"
         name:
-          description: "The name of an output"
+          description: "The name of an input"
           type: "string"
         required:
           description: "If an input is required, or not"
