@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-21T07:36:05.195613+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T07:23:41.462597+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
@@ -96,7 +96,7 @@ public interface ProjectInstancesApi {
         operationId = "createProjectInstanceWorkflowJob",
         summary = "Create a request for running a new job",
         description = "Create a request for running a new job.",
-        tags = { "project-instance-jobs" },
+        tags = { "project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CreateProjectInstanceWorkflowJob200ResponseModel.class))
