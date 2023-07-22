@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.741985+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:00:51.254016+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "projects", description = "The Automation Projects API")
+@Tag(name = "automation-projects", description = "The Automation Projects API")
 public interface ProjectsApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -55,7 +55,7 @@ public interface ProjectsApi {
         operationId = "createProject",
         summary = "Create a new project.",
         description = "Create a new project.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -97,7 +97,7 @@ public interface ProjectsApi {
         operationId = "createProjectWorkflow",
         summary = "Create new workflow and adds it to an existing project.",
         description = "Create new workflow and adds it to an existing project.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -139,7 +139,7 @@ public interface ProjectsApi {
         operationId = "deleteProject",
         summary = "Delete a project.",
         description = "Delete a project.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -167,7 +167,7 @@ public interface ProjectsApi {
         operationId = "duplicateProject",
         summary = "Duplicates existing project.",
         description = "Duplicates existing project.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The duplicated project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -207,7 +207,7 @@ public interface ProjectsApi {
         operationId = "getProject",
         summary = "Get a project by id.",
         description = "Get a project by id.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -247,7 +247,7 @@ public interface ProjectsApi {
         operationId = "getProjectWorkflows",
         summary = "Get workflows for particular project.",
         description = "Get workflows for particular project.",
-        tags = { "project-workflows" },
+        tags = { "automation-workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -289,7 +289,7 @@ public interface ProjectsApi {
         operationId = "getProjects",
         summary = "Get projects.",
         description = "Get projects.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of projects.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProjectModel.class)))
@@ -332,7 +332,7 @@ public interface ProjectsApi {
         operationId = "updateProject",
         summary = "Update an existing project.",
         description = "Update an existing project.",
-        tags = { "projects" },
+        tags = { "automation-projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -364,7 +364,7 @@ public interface ProjectsApi {
 
 
     /**
-     * PUT /projects/{id}/project-tags : Updates tags of an existing project.
+     * PUT /projects/{id}/automation-project-tags : Updates tags of an existing project.
      * Updates tags of an existing project.
      *
      * @param id The id of a project. (required)
@@ -375,14 +375,14 @@ public interface ProjectsApi {
         operationId = "updateProjectTags",
         summary = "Updates tags of an existing project.",
         description = "Updates tags of an existing project.",
-        tags = { "project-tags" },
+        tags = { "automation-project-tags" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/projects/{id}/project-tags",
+        value = "/projects/{id}/automation-project-tags",
         consumes = { "application/json" }
     )
     default ResponseEntity<Void> updateProjectTags(

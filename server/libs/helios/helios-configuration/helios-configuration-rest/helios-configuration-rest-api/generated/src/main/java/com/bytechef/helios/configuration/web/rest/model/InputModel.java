@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.741985+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:00:51.254016+02:00[Europe/Zagreb]")
 public class InputModel {
 
   private String label;
@@ -53,11 +53,11 @@ public class InputModel {
   }
 
   /**
-   * The string of an input
+   * The descriptive name of an input
    * @return label
   */
   
-  @Schema(name = "label", description = "The string of an input", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "label", description = "The descriptive name of an input", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("label")
   public String getLabel() {
     return label;
@@ -73,11 +73,11 @@ public class InputModel {
   }
 
   /**
-   * The name of an output
+   * The name of an input
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of an input", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;

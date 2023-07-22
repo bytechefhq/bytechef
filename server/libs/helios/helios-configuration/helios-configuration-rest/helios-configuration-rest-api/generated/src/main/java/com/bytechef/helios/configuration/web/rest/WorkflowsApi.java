@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.741985+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:00:51.254016+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-workflows", description = "The Automation Project Workflows API")
+@Tag(name = "automation-workflows", description = "The Automation Workflows API")
 public interface WorkflowsApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -52,7 +52,7 @@ public interface WorkflowsApi {
         operationId = "deleteWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "project-workflows" },
+        tags = { "automation-workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -80,7 +80,7 @@ public interface WorkflowsApi {
         operationId = "getWorkflow",
         summary = "Get a workflow by id",
         description = "Get a workflow by id.",
-        tags = { "project-workflows" },
+        tags = { "automation-workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -119,7 +119,7 @@ public interface WorkflowsApi {
         operationId = "getWorkflows",
         summary = "Get workflow definitions",
         description = "Get workflow definitions.",
-        tags = { "project-workflows" },
+        tags = { "automation-workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -160,7 +160,7 @@ public interface WorkflowsApi {
         operationId = "updateWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "project-workflows" },
+        tags = { "automation-workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))

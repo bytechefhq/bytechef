@@ -2,7 +2,7 @@ package com.bytechef.helios.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.execution.web.rest.model.JobConnectionModel;
+import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
 import com.bytechef.helios.execution.web.rest.model.WebhookModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -27,11 +27,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:41:06.109085+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:03.230135+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @Valid
-  private List<@Valid JobConnectionModel> connections;
+  private List<@Valid TaskConnectionModel> connections;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
@@ -63,12 +63,12 @@ public class JobParametersModel {
     this.workflowId = workflowId;
   }
 
-  public JobParametersModel connections(List<@Valid JobConnectionModel> connections) {
+  public JobParametersModel connections(List<@Valid TaskConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public JobParametersModel addConnectionsItem(JobConnectionModel connectionsItem) {
+  public JobParametersModel addConnectionsItem(TaskConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -83,11 +83,11 @@ public class JobParametersModel {
   @Valid 
   @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid JobConnectionModel> getConnections() {
+  public List<@Valid TaskConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid JobConnectionModel> connections) {
+  public void setConnections(List<@Valid TaskConnectionModel> connections) {
     this.connections = connections;
   }
 

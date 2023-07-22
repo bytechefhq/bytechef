@@ -34,10 +34,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:41:06.109085+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:03.230135+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-executions", description = "The Automation Project Executions API")
-public interface ProjectExecutionsApi {
+@Tag(name = "automation-executions", description = "The Automation Executions API")
+public interface ExecutionsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -54,7 +54,7 @@ public interface ProjectExecutionsApi {
         operationId = "getExecution",
         summary = "Get workflow executions by id",
         description = "Get workflow execution by id.",
-        tags = { "project-executions" },
+        tags = { "automation-executions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The execution object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecutionModel.class))
@@ -100,7 +100,7 @@ public interface ProjectExecutionsApi {
         operationId = "getExecutions",
         summary = "Get project workflow executions",
         description = "Get project workflow executions.",
-        tags = { "project-executions" },
+        tags = { "automation-executions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The page of workflow executions.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = org.springframework.data.domain.Page.class))
