@@ -33,8 +33,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@SpringBootApplication(
-    scanBasePackages = "com.bytechef")
+@SpringBootApplication(scanBasePackages = "com.bytechef")
 public class ExecutionApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutionApplication.class);
