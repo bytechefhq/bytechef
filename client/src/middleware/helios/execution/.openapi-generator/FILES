@@ -1,11 +1,14 @@
-apis/JobsApi.ts
-apis/ProjectWorkflowExecutionsApi.ts
+apis/ProjectExecutionsApi.ts
+apis/ProjectJobsApi.ts
+apis/ProjectTestsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/ComponentDefinitionModel.ts
 models/CreateJob200ResponseModel.ts
+models/ExecutionBasicModel.ts
 models/ExecutionErrorModel.ts
+models/ExecutionModel.ts
 models/InputModel.ts
 models/JobAllOfModel.ts
 models/JobBasicModel.ts
@@ -21,8 +24,6 @@ models/ProjectInstanceProjectModel.ts
 models/ProjectInstanceWorkflowConnectionModel.ts
 models/ProjectInstanceWorkflowModel.ts
 models/ProjectModel.ts
-models/ProjectWorkflowExecutionBasicModel.ts
-models/ProjectWorkflowExecutionModel.ts
 models/TagModel.ts
 models/TaskExecutionModel.ts
 models/WebhookModel.ts
