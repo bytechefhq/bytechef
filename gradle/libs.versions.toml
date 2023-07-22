@@ -18,7 +18,7 @@ ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", ve
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
 com-github-kagkarlsson-db-scheduler = { module = "com.github.kagkarlsson:db-scheduler", version.ref = "com-github-kagkarlsson" }
 com-github-kagkarlsson-db-scheduler-spring-boot-starter = { module = "com.github.kagkarlsson:db-scheduler-spring-boot-starter", version.ref = "com-github-kagkarlsson" }
-com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.4"
+com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.6.2"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
 com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-10"
@@ -29,9 +29,8 @@ com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 com-zaxxer-HikariCP = "com.zaxxer:HikariCP:5.0.1"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
-io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.7"
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.12"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.15"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.15"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.16"
 jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
@@ -42,7 +41,7 @@ org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-apache-tika-tika-core = "org.apache.tika:tika-core:2.8.0"
 org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.3"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
-org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.0.0"
+org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.0.1"
 org-json = "org.json:json:20230618"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
@@ -69,15 +68,15 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.91"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.109"
 
 [plugins]
-com-diffplug-spotless = "com.diffplug.spotless:6.19.0"
+com-diffplug-spotless = "com.diffplug.spotless:6.20.0"
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.47.0"
 com-github-spotbugs = "com.github.spotbugs:5.0.14"
 com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.2"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
-nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.0"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"
 org-openapi-generator = "org.openapi.generator:6.6.0"
-org-sonarqube = "org.sonarqube:4.2.1.3168"
+org-sonarqube = "org.sonarqube:4.3.0.3225"
 org-springframework-boot = "org.springframework.boot:3.1.1"
