@@ -15,20 +15,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.web.rest.mapper.config;
+package com.bytechef.helios.execution.facade;
 
-import com.bytechef.hermes.test.web.rest.adapter.WorkflowTestConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = {
-    WorkflowTestConversionServiceAdapter.class
-})
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.hermes.test.web.rest.adapter",
-    conversionServiceAdapterClassName = "WorkflowTestConversionServiceAdapter")
-public interface WorkflowTestMapperSpringConfig {
+public class ExecutionFacadeTest {
+
+    @Disabled
+    @Test
+    public void testGetExecution() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testGetExecutions() {
+        // TODO
+    }
 }

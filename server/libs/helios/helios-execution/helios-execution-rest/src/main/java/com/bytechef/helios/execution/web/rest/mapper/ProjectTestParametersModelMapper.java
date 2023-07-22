@@ -19,8 +19,8 @@ package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
 import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
+import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,18 +34,22 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectJobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
+public interface ProjectTestParametersModelMapper extends Converter<TestParametersModel, JobParameters> {
 
     @Override
+    @Mapping(target = "label", ignore = true)
     @Mapping(target = "metadata", qualifiedByName = "metadata", source = ".")
-    JobParameters convert(JobParametersModel jobParametersModel);
+    @Mapping(target = "priority", ignore = true)
+    @Mapping(target = "parentTaskExecutionId", ignore = true)
+    @Mapping(target = "webhooks", ignore = true)
+    JobParameters convert(TestParametersModel testParametersModel);
 
     @Named("metadata")
-    default Map<String, Object> getMetadata(JobParametersModel jobParametersModel) {
+    default Map<String, Object> getMetadata(TestParametersModel testParametersModel) {
         Map<String, Map<String, Map<String, Long>>> connectionMap = new HashMap<>();
 
-        if (jobParametersModel.getConnections() != null) {
-            for (TaskConnectionModel taskConnectionModel : jobParametersModel.getConnections()) {
+        if (testParametersModel.getConnections() != null) {
+            for (TaskConnectionModel taskConnectionModel : testParametersModel.getConnections()) {
                 Map<String, Map<String, Long>> connection = connectionMap.computeIfAbsent(
                     taskConnectionModel.getTaskName(), key -> new HashMap<>());
 

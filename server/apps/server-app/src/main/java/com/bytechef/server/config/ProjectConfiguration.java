@@ -25,8 +25,8 @@ import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectFacadeImpl;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacadeImpl;
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacade;
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacadeImpl;
+import com.bytechef.helios.execution.facade.ExecutionFacade;
+import com.bytechef.helios.execution.facade.ExecutionFacadeImpl;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
@@ -63,11 +63,11 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade(
+    ExecutionFacade projectWorkflowExecutionFacade(
         com.bytechef.hermes.execution.facade.JobFacade jobFacade, JobService jobService,
         ProjectInstanceService projectInstanceService, ProjectService projectService, WorkflowService workflowService) {
 
-        return new ProjectWorkflowExecutionFacadeImpl(
+        return new ExecutionFacadeImpl(
             jobFacade, jobService, projectInstanceService, projectService, workflowService);
     }
 }
