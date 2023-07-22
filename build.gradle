@@ -237,5 +237,5 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 }
 
 wrapper {
-    gradleVersion = "8.2.0"
+    gradleVersion = "8.2.1"
 }
