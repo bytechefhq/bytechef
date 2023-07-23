@@ -20,7 +20,7 @@ type CreatableSelectProps<
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>,
     TFieldValues extends FieldValues = FieldValues,
-    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
     fieldsetClassName?: string;
     defaultValue?: ISelectOption;
@@ -37,7 +37,7 @@ const CreatableSelect = <
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>,
     TFieldValues extends FieldValues = FieldValues,
-    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
     error,
     field,

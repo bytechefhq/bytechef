@@ -665,9 +665,8 @@ const ConnectionDialog = ({
                                                 {componentDefinition?.title}
                                             </span>
                                             connection under name
-                                            <span className="mx-0.5 font-semibold">{`'${
-                                                getValues()?.name
-                                            }'`}</span>
+                                            <span className="mx-0.5 font-semibold">{`'${getValues()
+                                                ?.name}'`}</span>
                                             .
                                         </>
                                     }

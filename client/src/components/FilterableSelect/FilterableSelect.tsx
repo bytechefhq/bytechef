@@ -20,7 +20,7 @@ type FilterableSelectProps<
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>,
     TFieldValues extends FieldValues = FieldValues,
-    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
     defaultValue?: string;
     error?: boolean;
@@ -36,7 +36,7 @@ const FilterableSelect = <
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>,
     TFieldValues extends FieldValues = FieldValues,
-    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
     error,
     field,

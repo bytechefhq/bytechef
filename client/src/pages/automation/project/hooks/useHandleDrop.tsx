@@ -21,7 +21,7 @@ export default function useHandleDrop(): [
         droppedNode:
             | ComponentDefinitionBasicModel
             | TaskDispatcherDefinitionBasicModel
-    ) => void
+    ) => void,
 ] {
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 

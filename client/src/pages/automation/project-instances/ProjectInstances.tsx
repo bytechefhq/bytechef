@@ -46,9 +46,8 @@ const ProjectInstances = () => {
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Project) {
-        pageTitle = projects?.find(
-            (project) => project.id === filterData.id
-        )?.name;
+        pageTitle = projects?.find((project) => project.id === filterData.id)
+            ?.name;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
