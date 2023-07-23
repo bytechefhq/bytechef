@@ -41,16 +41,16 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public Map<String, ?> checkPredefinedApp(String componentName, Map<String, ?> connectionParameters) {
-        Map<String, Object> newConnectionParameters = new HashMap<>(connectionParameters);
+    public Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> parameters) {
+        Map<String, Object> newParameters = new HashMap<>(parameters);
 
-        if (!StringUtils.hasText((String) connectionParameters.get(Authorization.CLIENT_ID))) {
+        if (!StringUtils.hasText((String) parameters.get(Authorization.CLIENT_ID))) {
             Map<String, OAuth2Properties.OAuth2App> oAuth2AppMap = oAuth2Properties.getPredefinedApps();
 
             if (oAuth2AppMap.containsKey(componentName)) {
                 OAuth2Properties.OAuth2App oAuth2App = oAuth2AppMap.get(componentName);
 
-                newConnectionParameters.putAll(
+                newParameters.putAll(
                     Map.of(
                         Authorization.CLIENT_ID, oAuth2App.clientId(),
                         Authorization.CLIENT_SECRET, oAuth2App.clientSecret()));
@@ -60,7 +60,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
             }
         }
 
-        return newConnectionParameters;
+        return newParameters;
     }
 
     @Override

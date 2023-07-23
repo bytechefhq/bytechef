@@ -30,15 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class ConnectionDefinitionController implements ConnectionDefinitionsApi {
 
-    private final OAuth2ParameterFacade oAuth2ParameterFacade;
     private final ConversionService conversionService;
+    private final OAuth2ParameterFacade oAuth2ParameterFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectionDefinitionController(
-        OAuth2ParameterFacade oAuth2ParameterFacade, ConversionService conversionService) {
+        ConversionService conversionService, OAuth2ParameterFacade oAuth2ParameterFacade) {
 
-        this.oAuth2ParameterFacade = oAuth2ParameterFacade;
         this.conversionService = conversionService;
+        this.oAuth2ParameterFacade = oAuth2ParameterFacade;
     }
 
     @Override
