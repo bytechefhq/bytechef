@@ -1,7 +1,7 @@
 import {
+    AutomationConnectionTagsApi,
+    AutomationConnectionsApi,
     ConnectionModel,
-    ConnectionTagsApi,
-    ConnectionsApi,
     UpdateConnectionTagsRequest,
 } from '@/middleware/helios/connection';
 import {useMutation} from '@tanstack/react-query';
@@ -16,7 +16,7 @@ export const useCreateConnectionMutation = (
 ) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connectionModel: ConnectionModel) => {
-            return new ConnectionsApi().createConnection({
+            return new AutomationConnectionsApi().createConnection({
                 connectionModel,
             });
         },
@@ -34,7 +34,7 @@ export const useDeleteConnectionMutation = (
 ) =>
     useMutation<void, Error, number>({
         mutationFn: (id: number) => {
-            return new ConnectionsApi().deleteConnection({
+            return new AutomationConnectionsApi().deleteConnection({
                 id,
             });
         },
@@ -52,7 +52,7 @@ export const useUpdateConnectionMutation = (
 ) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connection: ConnectionModel) => {
-            return new ConnectionsApi().updateConnection({
+            return new AutomationConnectionsApi().updateConnection({
                 connectionModel: connection,
                 id: connection.id!,
             });
@@ -71,7 +71,9 @@ export const useUpdateConnectionTagsMutation = (
 ) =>
     useMutation<void, Error, UpdateConnectionTagsRequest>({
         mutationFn: (request: UpdateConnectionTagsRequest) => {
-            return new ConnectionTagsApi().updateConnectionTags(request);
+            return new AutomationConnectionTagsApi().updateConnectionTags(
+                request
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
