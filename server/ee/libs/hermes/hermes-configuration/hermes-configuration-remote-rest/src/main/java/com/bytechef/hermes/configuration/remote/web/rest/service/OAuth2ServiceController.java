@@ -47,14 +47,15 @@ public class OAuth2ServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/oauth2-service/check-predefined-app/{componentName}",
+        value = "/oauth2-service/check-predefined-parameters/{componentName}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<Map<String, ?>> checkPredefinedApp(
+    public ResponseEntity<Map<String, ?>> checkPredefinedParameters(
         @PathVariable String componentName, @RequestBody Map<String, ?> connectionParameters) {
 
-        return ResponseEntity.ok(oAuth2Service.checkPredefinedApp(componentName, connectionParameters));
+        return ResponseEntity
+            .ok(oAuth2Service.checkPredefinedParameters(componentName, connectionParameters));
     }
 
     @RequestMapping(

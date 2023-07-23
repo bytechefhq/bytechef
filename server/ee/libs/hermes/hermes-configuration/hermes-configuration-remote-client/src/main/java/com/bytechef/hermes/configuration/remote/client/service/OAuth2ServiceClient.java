@@ -41,11 +41,13 @@ public class OAuth2ServiceClient implements OAuth2Service {
     }
 
     @Override
-    public Map<String, ?> checkPredefinedApp(String componentName, @RequestBody Map<String, ?> connectionParameters) {
+    public Map<String, ?> checkPredefinedParameters(
+        String componentName, @RequestBody Map<String, ?> connectionParameters) {
+
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host("connection-service-app")
-                .path("/api/internal/oauth2-service/check-predefined-app/{componentName}")
+                .host("configuration-service-app")
+                .path("/api/internal/oauth2-service/check-predefined-parameters/{componentName}")
                 .build(componentName),
             connectionParameters,
             new ParameterizedTypeReference<>() {});
@@ -55,7 +57,7 @@ public class OAuth2ServiceClient implements OAuth2Service {
     public String getRedirectUri() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host("connection-service-app")
+                .host("configuration-service-app")
                 .path("/api/internal/oauth2-service/get-redirect-uri")
                 .build(),
             String.class);
@@ -65,8 +67,8 @@ public class OAuth2ServiceClient implements OAuth2Service {
     public List<String> getPredefinedApps() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host("connection-service-app")
-                .path("/api/internal/oauth2-service/get-preddefined-apps")
+                .host("configuration-service-app")
+                .path("/api/internal/oauth2-service/get-predefined-apps")
                 .build(),
             new ParameterizedTypeReference<>() {});
     }

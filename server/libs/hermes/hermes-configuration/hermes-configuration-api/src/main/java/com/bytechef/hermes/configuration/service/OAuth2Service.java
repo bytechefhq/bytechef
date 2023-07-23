@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public interface OAuth2Service {
 
-    Map<String, ?> checkPredefinedApp(String componentName, Map<String, ?> connectionParameters);
+    Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> connectionParameters);
 
     String getRedirectUri();
 

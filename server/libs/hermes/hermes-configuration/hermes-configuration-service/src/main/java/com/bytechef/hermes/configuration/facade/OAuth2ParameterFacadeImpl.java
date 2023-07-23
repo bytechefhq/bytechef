@@ -47,7 +47,8 @@ public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         return connectionDefinitionService.getOAuth2Parameters(
-            componentName, connectionVersion, oAuth2Service.checkPredefinedApp(componentName, connectionParameters),
+            componentName, connectionVersion,
+            oAuth2Service.checkPredefinedParameters(componentName, connectionParameters),
             authorizationName);
     }
 }
