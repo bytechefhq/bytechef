@@ -1,21 +1,21 @@
 import {
+    AutomationExecutionsApi,
     ExecutionModel,
     GetExecutionRequest,
     GetExecutionsRequest,
-    ProjectExecutionsApi,
 } from '@/middleware/helios/execution';
 import {useQuery} from '@tanstack/react-query';
 import {
+    AutomationProjectCategoriesApi,
+    AutomationProjectInstanceTagsApi,
+    AutomationProjectInstancesApi,
+    AutomationProjectTagsApi,
+    AutomationProjectsApi,
+    AutomationWorkflowsApi,
     CategoryModel,
     PageModel,
-    ProjectCategoriesApi,
     ProjectInstanceModel,
-    ProjectInstanceTagsApi,
-    ProjectInstancesApi,
     ProjectModel,
-    ProjectTagsApi,
-    ProjectWorkflowsApi,
-    ProjectsApi,
     TagModel,
     WorkflowModel,
 } from 'middleware/helios/configuration';
@@ -56,7 +56,7 @@ export const WorkflowKeys = {
 
 export const useGetProjectCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
-        new ProjectCategoriesApi().getProjectCategories()
+        new AutomationProjectCategoriesApi().getProjectCategories()
     );
 
 export const useGetProjectInstancesQuery = (filters: {
@@ -65,23 +65,23 @@ export const useGetProjectInstancesQuery = (filters: {
 }) =>
     useQuery<ProjectInstanceModel[], Error>(
         ProjectKeys.projectInstanceList(filters),
-        () => new ProjectInstancesApi().getProjectInstances(filters)
+        () => new AutomationProjectInstancesApi().getProjectInstances(filters)
     );
 
 export const useGetProjectInstanceTagsQuery = () =>
     useQuery<TagModel[], Error>(ProjectKeys.projectInstanceTags, () =>
-        new ProjectInstanceTagsApi().getProjectInstanceTags()
+        new AutomationProjectInstanceTagsApi().getProjectInstanceTags()
     );
 
 export const useGetProjectTagsQuery = () =>
     useQuery<TagModel[], Error>(ProjectKeys.projectTags, () =>
-        new ProjectTagsApi().getProjectTags()
+        new AutomationProjectTagsApi().getProjectTags()
     );
 
 export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
     useQuery<ProjectModel, Error>(
         ProjectKeys.project(id),
-        () => new ProjectsApi().getProject({id}),
+        () => new AutomationProjectsApi().getProject({id}),
         {
             initialData,
         }
@@ -93,17 +93,17 @@ export const useGetProjectsQuery = (filters?: {
     tagId?: number;
 }) =>
     useQuery<ProjectModel[], Error>(ProjectKeys.projectList(filters), () =>
-        new ProjectsApi().getProjects(filters)
+        new AutomationProjectsApi().getProjects(filters)
     );
 
 export const useGetProjectWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
-        new ProjectWorkflowsApi().getProjectWorkflows({id})
+        new AutomationWorkflowsApi().getProjectWorkflows({id})
     );
 
 export const useGetExecutionsQuery = (request: GetExecutionsRequest) =>
     useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
-        new ProjectExecutionsApi().getExecutions(request)
+        new AutomationExecutionsApi().getExecutions(request)
     );
 
 export const useGetWorkflowExecutionQuery = (
@@ -112,7 +112,7 @@ export const useGetWorkflowExecutionQuery = (
 ) =>
     useQuery<ExecutionModel, Error>(
         ProjectKeys.workflowExecution(request),
-        () => new ProjectExecutionsApi().getExecution(request),
+        () => new AutomationExecutionsApi().getExecution(request),
         {
             enabled: isEnabled,
         }
@@ -120,5 +120,5 @@ export const useGetWorkflowExecutionQuery = (
 
 export const useGetWorkflowsQuery = () =>
     useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
-        new ProjectWorkflowsApi().getWorkflows()
+        new AutomationWorkflowsApi().getWorkflows()
     );

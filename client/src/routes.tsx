@@ -10,7 +10,7 @@ import {createBrowserRouter} from 'react-router-dom';
 
 import App from './App';
 import ErrorPage from './ErrorPage';
-import {ProjectsApi} from './middleware/helios/configuration';
+import {AutomationProjectsApi} from './middleware/helios/configuration';
 import Connections from './pages/automation/connections/Connections';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
 import Executions from './pages/automation/executions/Executions';
@@ -43,7 +43,7 @@ export const router = createBrowserRouter([
                                     parseInt(params.projectId!)
                                 ),
                                 () =>
-                                    new ProjectsApi().getProject({
+                                    new AutomationProjectsApi().getProject({
                                         id: parseInt(params.projectId!),
                                     })
                             ),
