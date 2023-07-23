@@ -26,6 +26,8 @@ subprojects {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${libs.versions.org.springframework.cloud.dependencies.get()}"
         }
+
+        applyMavenExclusions = false
     }
 
     dependencies {
