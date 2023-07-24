@@ -15,7 +15,6 @@ import {
 import {twMerge} from 'tailwind-merge';
 
 type InputProps = {
-    dataPills?: Array<string>;
     description?: string;
     fieldsetClassName?: string;
     error?: boolean;
@@ -31,7 +30,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     (
         {
             className,
-            dataPills,
             description,
             disabled,
             error,
@@ -100,24 +98,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     {type !== 'hidden' && leadingIcon && (
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-2">
                             {leadingIcon}
-                        </div>
-                    )}
-
-                    {!!dataPills?.length && (
-                        <div
-                            className={twMerge(
-                                'absolute left-0 top-1/2 -translate-y-1/2 space-x-2',
-                                leadingIcon && 'left-10'
-                            )}
-                        >
-                            {dataPills.map((pill, index) => (
-                                <span
-                                    key={`${pill}-${index}`}
-                                    className="inline-flex rounded-full border bg-gray-100 px-2 py-1 text-xs"
-                                >
-                                    {pill}
-                                </span>
-                            ))}
                         </div>
                     )}
 
