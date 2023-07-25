@@ -20,8 +20,6 @@ export const ProjectInstanceEditWorkflowDialog = ({
 }: ProjectInstanceEditWorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
-    const [isEnabled, setIsEnabled] = useState(false);
-
     function closeDialog() {
         setIsOpen(false);
 
@@ -50,18 +48,16 @@ export const ProjectInstanceEditWorkflowDialog = ({
                         key={workflow.id!}
                         workflow={workflow}
                         label="Enable"
-                        isEnabled={isEnabled}
-                        setIsEnabled={setIsEnabled}
                     />
 
-                    <div className="mt-8 flex w-full justify-end space-x-2 self-end">
+                    <div className="mt-4 flex w-full justify-end space-x-2 self-end">
                         <Close asChild>
                             <Button displayType="lightBorder" label="Cancel" />
                         </Close>
 
                         <Button
                             label="Save"
-                            onClick={() => console.log('Saved!')}
+                            onClick={() => console.log('TODO')}
                         />
                     </div>
                 </div>
