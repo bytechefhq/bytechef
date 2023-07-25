@@ -25,12 +25,6 @@ import {
     OutputModelFromJSONTyped,
     OutputModelToJSON,
 } from './OutputModel';
-import type { WorkflowConnectionModel } from './WorkflowConnectionModel';
-import {
-    WorkflowConnectionModelFromJSON,
-    WorkflowConnectionModelFromJSONTyped,
-    WorkflowConnectionModelToJSON,
-} from './WorkflowConnectionModel';
 import type { WorkflowFormatModel } from './WorkflowFormatModel';
 import {
     WorkflowFormatModelFromJSON,
@@ -43,6 +37,12 @@ import {
     WorkflowTaskModelFromJSONTyped,
     WorkflowTaskModelToJSON,
 } from './WorkflowTaskModel';
+import type { WorkflowTriggerModel } from './WorkflowTriggerModel';
+import {
+    WorkflowTriggerModelFromJSON,
+    WorkflowTriggerModelFromJSONTyped,
+    WorkflowTriggerModelToJSON,
+} from './WorkflowTriggerModel';
 
 /**
  * The blueprint that describe the execution of a job.
@@ -50,12 +50,6 @@ import {
  * @interface WorkflowModel
  */
 export interface WorkflowModel {
-    /**
-     * 
-     * @type {Array<WorkflowConnectionModel>}
-     * @memberof WorkflowModel
-     */
-    connections?: Array<WorkflowConnectionModel>;
     /**
      * The created by.
      * @type {string}
@@ -141,6 +135,12 @@ export interface WorkflowModel {
      */
     readonly tasks?: Array<WorkflowTaskModel>;
     /**
+     * The steps that make up the workflow.
+     * @type {Array<WorkflowTriggerModel>}
+     * @memberof WorkflowModel
+     */
+    readonly triggers?: Array<WorkflowTriggerModel>;
+    /**
      * 
      * @type {number}
      * @memberof WorkflowModel
@@ -180,7 +180,6 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'definition': !exists(json, 'definition') ? undefined : json['definition'],
@@ -195,6 +194,7 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
         'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
+        'triggers': !exists(json, 'triggers') ? undefined : ((json['triggers'] as Array<any>).map(WorkflowTriggerModelFromJSON)),
         'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
@@ -208,7 +208,6 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowConnectionModelToJSON)),
         'definition': value.definition,
         'description': value.description,
         'format': WorkflowFormatModelToJSON(value.format),
