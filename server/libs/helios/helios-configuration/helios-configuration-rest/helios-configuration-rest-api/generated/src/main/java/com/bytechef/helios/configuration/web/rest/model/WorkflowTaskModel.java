@@ -2,6 +2,7 @@ package com.bytechef.helios.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -20,13 +21,16 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Represents a definition of the task.
+ * Represents a definition of a workflow task.
  */
 
-@Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
+@Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T08:51:14.844803+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:27:48.489413+02:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
+
+  @Valid
+  private List<@Valid WorkflowConnectionModel> connections;
 
   @Valid
   private List<@Valid WorkflowTaskModel> finalize;
@@ -65,6 +69,34 @@ public class WorkflowTaskModel {
   public WorkflowTaskModel(String name, String type) {
     this.name = name;
     this.type = type;
+  }
+
+  public WorkflowTaskModel connections(List<@Valid WorkflowConnectionModel> connections) {
+    this.connections = connections;
+    return this;
+  }
+
+  public WorkflowTaskModel addConnectionsItem(WorkflowConnectionModel connectionsItem) {
+    if (this.connections == null) {
+      this.connections = new ArrayList<>();
+    }
+    this.connections.add(connectionsItem);
+    return this;
+  }
+
+  /**
+   * Get connections
+   * @return connections
+  */
+  @Valid 
+  @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connections")
+  public List<@Valid WorkflowConnectionModel> getConnections() {
+    return connections;
+  }
+
+  public void setConnections(List<@Valid WorkflowConnectionModel> connections) {
+    this.connections = connections;
   }
 
   public WorkflowTaskModel finalize(List<@Valid WorkflowTaskModel> finalize) {
@@ -265,11 +297,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Type of the task.
+   * The type of a task.
    * @return type
   */
   @NotNull 
-  @Schema(name = "type", description = "Type of the task.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "type", description = "The type of a task.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
   public String getType() {
     return type;
@@ -288,7 +320,8 @@ public class WorkflowTaskModel {
       return false;
     }
     WorkflowTaskModel workflowTask = (WorkflowTaskModel) o;
-    return Objects.equals(this.finalize, workflowTask.finalize) &&
+    return Objects.equals(this.connections, workflowTask.connections) &&
+        Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
         Objects.equals(this.name, workflowTask.name) &&
         Objects.equals(this.node, workflowTask.node) &&
@@ -301,13 +334,14 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(finalize, label, name, node, parameters, post, pre, timeout, type);
+    return Objects.hash(connections, finalize, label, name, node, parameters, post, pre, timeout, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTaskModel {\n");
+    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

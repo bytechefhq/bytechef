@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.configuration.web.rest.model.InputModel;
 import com.bytechef.helios.configuration.web.rest.model.OutputModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowFormatModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -31,11 +31,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T08:51:14.844803+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:27:48.489413+02:00[Europe/Zagreb]")
 public class WorkflowModel {
-
-  @Valid
-  private List<@Valid WorkflowConnectionModel> connections;
 
   private String createdBy;
 
@@ -109,35 +106,10 @@ public class WorkflowModel {
   @Valid
   private List<@Valid WorkflowTaskModel> tasks;
 
+  @Valid
+  private List<@Valid WorkflowTriggerModel> triggers;
+
   private Integer version;
-
-  public WorkflowModel connections(List<@Valid WorkflowConnectionModel> connections) {
-    this.connections = connections;
-    return this;
-  }
-
-  public WorkflowModel addConnectionsItem(WorkflowConnectionModel connectionsItem) {
-    if (this.connections == null) {
-      this.connections = new ArrayList<>();
-    }
-    this.connections.add(connectionsItem);
-    return this;
-  }
-
-  /**
-   * Get connections
-   * @return connections
-  */
-  @Valid 
-  @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connections")
-  public List<@Valid WorkflowConnectionModel> getConnections() {
-    return connections;
-  }
-
-  public void setConnections(List<@Valid WorkflowConnectionModel> connections) {
-    this.connections = connections;
-  }
 
   public WorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -443,6 +415,34 @@ public class WorkflowModel {
     this.tasks = tasks;
   }
 
+  public WorkflowModel triggers(List<@Valid WorkflowTriggerModel> triggers) {
+    this.triggers = triggers;
+    return this;
+  }
+
+  public WorkflowModel addTriggersItem(WorkflowTriggerModel triggersItem) {
+    if (this.triggers == null) {
+      this.triggers = new ArrayList<>();
+    }
+    this.triggers.add(triggersItem);
+    return this;
+  }
+
+  /**
+   * The steps that make up the workflow.
+   * @return triggers
+  */
+  @Valid 
+  @Schema(name = "triggers", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggers")
+  public List<@Valid WorkflowTriggerModel> getTriggers() {
+    return triggers;
+  }
+
+  public void setTriggers(List<@Valid WorkflowTriggerModel> triggers) {
+    this.triggers = triggers;
+  }
+
   public WorkflowModel version(Integer version) {
     this.version = version;
     return this;
@@ -472,8 +472,7 @@ public class WorkflowModel {
       return false;
     }
     WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.connections, workflow.connections) &&
-        Objects.equals(this.createdBy, workflow.createdBy) &&
+    return Objects.equals(this.createdBy, workflow.createdBy) &&
         Objects.equals(this.createdDate, workflow.createdDate) &&
         Objects.equals(this.definition, workflow.definition) &&
         Objects.equals(this.description, workflow.description) &&
@@ -487,19 +486,19 @@ public class WorkflowModel {
         Objects.equals(this.sourceType, workflow.sourceType) &&
         Objects.equals(this.maxRetries, workflow.maxRetries) &&
         Objects.equals(this.tasks, workflow.tasks) &&
+        Objects.equals(this.triggers, workflow.triggers) &&
         Objects.equals(this.version, workflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, createdBy, createdDate, definition, description, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, tasks, version);
+    return Objects.hash(createdBy, createdDate, definition, description, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, tasks, triggers, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowModel {\n");
-    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
@@ -514,6 +513,7 @@ public class WorkflowModel {
     sb.append("    sourceType: ").append(toIndentedString(sourceType)).append("\n");
     sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
+    sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
