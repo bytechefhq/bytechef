@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +45,16 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
+        value = "/job-service/get-job/{id}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Job> getJob(@PathVariable long id) {
+        return ResponseEntity.ok(jobService.getJob(id));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
         value = "/job-service/get-task-execution-job/{taskExecutionId}",
         produces = {
             "application/json"
@@ -58,7 +69,7 @@ public class JobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Job> resumeToStatusStarted(long id) {
+    public ResponseEntity<Job> resumeToStatusStarted(@PathVariable long id) {
         return ResponseEntity.ok(jobService.resumeToStatusStarted(id));
     }
 
@@ -68,7 +79,7 @@ public class JobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Job> setStatusToStarted(long id) {
+    public ResponseEntity<Job> setStatusToStarted(@PathVariable long id) {
         return ResponseEntity.ok(jobService.setStatusToStarted(id));
     }
 
@@ -78,7 +89,7 @@ public class JobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Job> setStatusToStopped(long id) {
+    public ResponseEntity<Job> setStatusToStopped(@PathVariable long id) {
         return ResponseEntity.ok(jobService.setStatusToStopped(id));
     }
 
@@ -91,7 +102,7 @@ public class JobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Job> update(Job job) {
+    public ResponseEntity<Job> update(@RequestBody Job job) {
         return ResponseEntity.ok(jobService.update(job));
     }
 }

@@ -65,7 +65,12 @@ public class JobServiceClient implements JobService {
 
     @Override
     public Job getJob(long id) {
-        throw new UnsupportedOperationException();
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
+                .host("execution-service-app")
+                .path("/api/internal/job-service/get-job/{id}")
+                .build(id),
+            Job.class);
     }
 
     @Override
