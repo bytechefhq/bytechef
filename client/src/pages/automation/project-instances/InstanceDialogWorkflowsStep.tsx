@@ -14,17 +14,14 @@ import {twMerge} from 'tailwind-merge';
 interface InstanceDialogWorkflowListItemProps {
     workflow: WorkflowModel;
     label: string;
-    isEnabled: boolean;
-    setIsEnabled: (isEnabled: boolean) => void;
 }
 
 export const InstanceDialogWorkflowListItem = ({
-    isEnabled,
     label,
-    setIsEnabled,
     workflow,
 }: InstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+    const [isEnabled, setIsEnabled] = useState(false);
 
     const tabs = [
         {
@@ -74,7 +71,7 @@ export const InstanceDialogWorkflowListItem = ({
     return (
         <div>
             <div
-                className={twMerge('flex cursor-pointer justify-between py-2')}
+                className="flex cursor-pointer justify-between py-2"
                 onClick={() => setIsEnabled(!isEnabled)}
             >
                 <span className="font-semibold">{label}</span>
@@ -134,18 +131,16 @@ const InstanceDialogWorkflowsStep = (props: {
     const {data: workflows} = useGetProjectWorkflowsQuery(
         props.getValues().projectId!
     );
+
     return (
         <ul className="space-y-4">
-            {workflows &&
-                workflows?.map((workflow) => (
-                    <InstanceDialogWorkflowListItem
-                        key={workflow.id!}
-                        workflow={workflow}
-                        label={workflow.label!}
-                        isEnabled={false}
-                        setIsEnabled={() => true}
-                    />
-                ))}
+            {workflows?.map((workflow) => (
+                <InstanceDialogWorkflowListItem
+                    key={workflow.id!}
+                    workflow={workflow}
+                    label={workflow.label!}
+                />
+            ))}
         </ul>
     );
 };
