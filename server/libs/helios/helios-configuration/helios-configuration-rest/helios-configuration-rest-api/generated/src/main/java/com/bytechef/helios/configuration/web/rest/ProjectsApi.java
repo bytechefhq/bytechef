@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:00:51.254016+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T08:51:14.844803+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "automation-projects", description = "The Automation Projects API")
 public interface ProjectsApi {
@@ -364,7 +364,7 @@ public interface ProjectsApi {
 
 
     /**
-     * PUT /projects/{id}/automation-project-tags : Updates tags of an existing project.
+     * PUT /projects/{id}/project-tags : Updates tags of an existing project.
      * Updates tags of an existing project.
      *
      * @param id The id of a project. (required)
@@ -382,7 +382,7 @@ public interface ProjectsApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/projects/{id}/automation-project-tags",
+        value = "/projects/{id}/project-tags",
         consumes = { "application/json" }
     )
     default ResponseEntity<Void> updateProjectTags(
