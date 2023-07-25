@@ -19,7 +19,6 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(prefix = "bytechef", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcCounterRepository extends ListPagingAndSortingRepository<Counter, Long>, CounterRepository {
 
     @Override

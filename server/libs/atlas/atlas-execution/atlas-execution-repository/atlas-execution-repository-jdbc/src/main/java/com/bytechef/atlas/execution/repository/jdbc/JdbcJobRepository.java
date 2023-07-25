@@ -21,7 +21,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import java.util.Optional;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(prefix = "bytechef", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcJobRepository
     extends ListPagingAndSortingRepository<Job, Long>, JobRepository, CustomJobRepository {
 
