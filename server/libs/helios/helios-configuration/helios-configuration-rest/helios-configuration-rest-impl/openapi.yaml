@@ -441,7 +441,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
-  /projects/{id}/automation-project-tags:
+  /projects/{id}/project-tags:
     put:
       description: "Updates tags of an existing project."
       summary: "Updates tags of an existing project."
