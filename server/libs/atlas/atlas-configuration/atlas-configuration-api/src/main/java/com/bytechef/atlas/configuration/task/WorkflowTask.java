@@ -252,16 +252,19 @@ public class WorkflowTask implements Task {
 
     @Override
     public String toString() {
-        return "WorkflowTask{" + "finalize="
-            + finalize + ", label='"
-            + label + '\'' + ", name='"
-            + name + '\'' + ", node='"
-            + node + '\'' + ", post="
-            + post + ", pre="
-            + pre + ", timeout='"
-            + timeout + '\'' + ", type='"
-            + type + '\'' + ", parameters='"
-            + parameters + '\'' + '}';
+        return "WorkflowTask{" +
+            "name='" + name + '\'' +
+            ", label='" + label + '\'' +
+            ", type='" + type + '\'' +
+            ", node='" + node + '\'' +
+            ", timeout='" + timeout + '\'' +
+            ", pre=" + pre +
+            ", post=" + post +
+            ", finalize=" + finalize +
+            ", parameters=" + parameters +
+            ", extensions=" + extensions +
+            ", metadata=" + metadata +
+            '}';
     }
 
     @SuppressWarnings("rawtypes")
