@@ -45,20 +45,24 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     }
 
     @Override
-    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String operationName) {
+    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
+        String workflowConnectionOperationName, String workflowConnectionKey) {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public long getProjectInstanceWorkflowConnectionId(String key, String operationName) {
+    public long getProjectInstanceWorkflowConnectionId(
+        String workflowConnectionOperationName, String workflowConnectionKey) {
+
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-workflow-service/get-project-instance-workflow-connection-id" +
-                        "/{key}/{taskName}")
-                .build(key, operationName),
+                        "/{operationName}/{key}")
+                .build(workflowConnectionOperationName, workflowConnectionKey),
             Long.class);
     }
 
