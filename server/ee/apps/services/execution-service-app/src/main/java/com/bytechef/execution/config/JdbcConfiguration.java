@@ -17,6 +17,8 @@
 
 package com.bytechef.execution.config;
 
+import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
@@ -82,11 +84,13 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToMapWrapperConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowExecutionIdConverter(),
+            new StringToWorkflowTaskConverter(objectMapper),
             new StringToWorkflowTriggerConverter(objectMapper),
             new StringToTriggerStateValueConverter(objectMapper),
             new TriggerStateValueToStringConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
             new WorkflowExecutionIdToStringConverter(),
+            new WorkflowTaskToStringConverter(objectMapper),
             new WorkflowTriggerToStringConverter(objectMapper));
     }
 }
