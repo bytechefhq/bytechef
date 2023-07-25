@@ -44,12 +44,12 @@ public class ProjectInstanceServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-instance-service/fetch-project-instance/{jobId}",
+        value = "/project-instance-service/fetch-workflow-project-instance/{workflowId}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<ProjectInstance> fetchJobProjectInstance(@PathVariable long jobId) {
-        return projectInstanceService.fetchJobProjectInstance(jobId)
+    public ResponseEntity<ProjectInstance> fetchWorkflowProjectInstance(@PathVariable String workflowId) {
+        return projectInstanceService.fetchWorkflowProjectInstance(workflowId)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.noContent()
                 .build());

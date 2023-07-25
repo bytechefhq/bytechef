@@ -58,7 +58,7 @@ public interface ProjectInstanceRepository
     @Query("""
             SELECT DISTINCT project_instance.* FROM project_instance
             JOIN project_instance_workflow ON project_instance.id = project_instance_workflow.project_instance_id
-            WHERE project_instance_workflow.workflow_id = (select workflow_id from job where job.id = :jobId)
+            WHERE project_instance_workflow.workflow_id = :workflowId
         """)
-    Optional<ProjectInstance> findByJobId(@Param("jobId") long jobId);
+    Optional<ProjectInstance> findByWorkflowId(@Param("workflowId") String workflowId);
 }
