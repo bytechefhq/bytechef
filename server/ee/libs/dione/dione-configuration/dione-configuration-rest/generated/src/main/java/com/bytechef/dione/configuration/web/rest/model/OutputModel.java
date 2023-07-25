@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Output")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T08:51:13.909681+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T07:05:52.364071+02:00[Europe/Zagreb]")
 public class OutputModel {
 
   private String name;
