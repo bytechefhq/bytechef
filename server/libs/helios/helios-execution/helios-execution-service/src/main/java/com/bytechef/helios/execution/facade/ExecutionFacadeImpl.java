@@ -69,7 +69,7 @@ public class ExecutionFacadeImpl implements ExecutionFacade {
 
         return new ExecutionDTO(
             Objects.requireNonNull(jobDTO.id()),
-            OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(jobDTO.id()), null),
+            OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(jobDTO.workflowId()), null),
             jobDTO,
             projectService.getWorkflowProject(jobDTO.workflowId()),
             workflowService.getWorkflow(jobDTO.workflowId()));
@@ -106,7 +106,7 @@ public class ExecutionFacadeImpl implements ExecutionFacade {
 
         return jobsPage.map(job -> new ExecutionDTO(
             Objects.requireNonNull(job.getId()),
-            OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null),
+            OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(job.getWorkflowId()), null),
             new JobDTO(job, List.of()),
             CollectionUtils.getFirst(
                 projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),

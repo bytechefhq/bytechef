@@ -87,7 +87,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
                 getConnectionIdMap(WorkflowConnection.of(taskExecution.getWorkflowTask())));
         }
 
-        projectInstanceService.fetchJobProjectInstance(Objects.requireNonNull(taskExecution.getJobId()))
+        projectInstanceService.fetchWorkflowProjectInstance(Objects.requireNonNull(job.getWorkflowId()))
             .ifPresent(projectInstance -> taskExecution
                 .putMetadata(MetadataConstants.INSTANCE_ID, projectInstance.getId())
                 .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT));
