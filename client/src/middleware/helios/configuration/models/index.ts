@@ -19,3 +19,4 @@ export * from './WorkflowConnectionModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
 export * from './WorkflowTaskModel';
+export * from './WorkflowTriggerModel';

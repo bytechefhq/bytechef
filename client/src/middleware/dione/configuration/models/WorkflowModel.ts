@@ -25,12 +25,6 @@ import {
     OutputModelFromJSONTyped,
     OutputModelToJSON,
 } from './OutputModel';
-import type { WorkflowConnectionModel } from './WorkflowConnectionModel';
-import {
-    WorkflowConnectionModelFromJSON,
-    WorkflowConnectionModelFromJSONTyped,
-    WorkflowConnectionModelToJSON,
-} from './WorkflowConnectionModel';
 import type { WorkflowFormatModel } from './WorkflowFormatModel';
 import {
     WorkflowFormatModelFromJSON,
@@ -50,12 +44,6 @@ import {
  * @interface WorkflowModel
  */
 export interface WorkflowModel {
-    /**
-     * 
-     * @type {Array<WorkflowConnectionModel>}
-     * @memberof WorkflowModel
-     */
-    connections?: Array<WorkflowConnectionModel>;
     /**
      * The created by.
      * @type {string}
@@ -180,7 +168,6 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'definition': !exists(json, 'definition') ? undefined : json['definition'],
@@ -208,7 +195,6 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowConnectionModelToJSON)),
         'definition': value.definition,
         'description': value.description,
         'format': WorkflowFormatModelToJSON(value.format),
