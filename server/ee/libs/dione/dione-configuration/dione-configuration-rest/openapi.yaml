@@ -504,10 +504,6 @@ components:
       description: "The blueprint that describe the execution of a job."
       type: "object"
       properties:
-        connections:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowConnection"
         createdBy:
           description: "The created by."
           type: "string"
