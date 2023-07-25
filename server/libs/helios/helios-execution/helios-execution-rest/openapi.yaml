@@ -499,7 +499,7 @@ components:
       - "startDate"
       - "status"
       properties:
-        component:
+        componentDefinition:
           $ref: "#/components/schemas/ComponentDefinition"
         createdBy:
           description: "The created by."
