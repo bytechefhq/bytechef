@@ -7,8 +7,8 @@ type ComponentActionsType = Array<{
 }>;
 
 type DataPillType = {
-    name: string;
-    value: Array<string>;
+    id: string;
+    display: string;
 };
 
 interface WorkflowDefinitionState {
