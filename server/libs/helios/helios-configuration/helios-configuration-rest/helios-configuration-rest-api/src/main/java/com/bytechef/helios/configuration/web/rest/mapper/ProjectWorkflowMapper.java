@@ -17,26 +17,35 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.helios.configuration.connection.WorkflowConnection;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
-import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
-public interface ProjectWorkflowMapper extends Converter<WorkflowDTO, WorkflowModel> {
+public interface ProjectWorkflowMapper extends Converter<Workflow, WorkflowModel> {
 
     @Override
-    WorkflowModel convert(WorkflowDTO workflowDTO);
+    @Mapping(target = "connections", ignore = true)
+    WorkflowModel convert(Workflow workflow);
 
     WorkflowTaskModel map(WorkflowTask workflowTask);
+
+    List<WorkflowConnectionModel> map(List<WorkflowConnection> workflowConnections);
 
     default Integer mapTointeger(Optional<Integer> optional) {
         return optional.orElse(null);
@@ -44,5 +53,10 @@ public interface ProjectWorkflowMapper extends Converter<WorkflowDTO, WorkflowMo
 
     default String mapToString(Optional<String> optional) {
         return optional.orElse(null);
+    }
+
+    @AfterMapping
+    default void afterMapping(Workflow workflow, @MappingTarget WorkflowModel workflowModel) {
+        workflowModel.connections(map(WorkflowConnection.of(workflow)));
     }
 }

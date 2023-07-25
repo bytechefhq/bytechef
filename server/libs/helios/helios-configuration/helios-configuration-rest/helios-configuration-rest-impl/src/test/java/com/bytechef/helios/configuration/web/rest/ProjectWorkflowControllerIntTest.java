@@ -26,14 +26,11 @@ import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.helios.configuration.dto.WorkflowDTO;
-import com.bytechef.helios.configuration.facade.WorkflowFacade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,9 +79,6 @@ public class ProjectWorkflowControllerIntTest {
     private WebTestClient webTestClient;
 
     @MockBean
-    private WorkflowFacade workflowFacade;
-
-    @MockBean
     private WorkflowService workflowService;
 
     @BeforeEach
@@ -117,7 +111,7 @@ public class ProjectWorkflowControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(workflowFacade.getWorkflow("1")).thenReturn(new WorkflowDTO(Collections.emptyList(), getWorkflow()));
+            when(workflowService.getWorkflow("1")).thenReturn(getWorkflow());
 
             this.webTestClient
                 .get()
@@ -134,8 +128,7 @@ public class ProjectWorkflowControllerIntTest {
 
     @Test
     public void testGetWorkflows() throws JsonProcessingException {
-        when(workflowFacade.getWorkflows()).thenReturn(
-            List.of(new WorkflowDTO(Collections.emptyList(), getWorkflow())));
+        when(workflowService.getWorkflows()).thenReturn(List.of(getWorkflow()));
 
         try {
             this.webTestClient
@@ -159,7 +152,7 @@ public class ProjectWorkflowControllerIntTest {
         WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION);
 
-        when(workflowFacade.update("1", DEFINITION)).thenReturn(new WorkflowDTO(Collections.emptyList(), workflow));
+        when(workflowService.update("1", DEFINITION)).thenReturn(workflow);
 
         Workflow.Format format = workflow.getFormat();
 
