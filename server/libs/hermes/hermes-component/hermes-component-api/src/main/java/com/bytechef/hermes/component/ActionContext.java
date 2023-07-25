@@ -33,10 +33,10 @@ public interface ActionContext extends Context {
 
     /**
      *
-     * @param taskConnectionKey
+     * @param workflowConnectionKey
      * @return
      */
-    Connection getConnection(String taskConnectionKey);
+    Connection getConnection(String workflowConnectionKey);
 
     /**
      *
