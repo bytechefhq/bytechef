@@ -19,6 +19,8 @@ package com.bytechef.hermes.execution;
 
 import com.bytechef.commons.util.Base64Utils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
+import com.bytechef.hermes.definition.registry.util.WorkflowUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -52,9 +54,12 @@ public class WorkflowExecutionId implements Serializable {
     public static WorkflowExecutionId of(
         String workflowId, long instanceId, String instanceType, WorkflowTrigger workflowTrigger) {
 
+        ComponentOperation componentOperation = WorkflowUtils.getComponentOperation(workflowTrigger.getType());
+
         return of(
-            workflowId, instanceId, instanceType, workflowTrigger.getName(), workflowTrigger.getComponentTriggerName(),
-            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion());
+            workflowId, instanceId, instanceType, workflowTrigger.getName(),
+            componentOperation.componentOperationName(), componentOperation.componentName(),
+            componentOperation.componentVersion());
     }
 
     public static WorkflowExecutionId of(

@@ -20,8 +20,6 @@ package com.bytechef.hermes.configuration.trigger;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
-import com.bytechef.hermes.definition.registry.util.WorkflowUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
@@ -39,9 +37,6 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTrigger implements Serializable, Trigger {
 
-    private String componentName;
-    private int componentVersion;
-    private String componentTriggerName;
     private final Map<String, Object> extensions = new HashMap<>();
     private String name;
     private String label;
@@ -64,12 +59,6 @@ public class WorkflowTrigger implements Serializable, Trigger {
                 this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
                 this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
-
-                ComponentOperation componentOperation = WorkflowUtils.getComponentOperation(type);
-
-                this.componentName = componentOperation.componentName();
-                this.componentVersion = componentOperation.componentVersion();
-                this.componentTriggerName = componentOperation.componentOperationName();
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
             }
@@ -123,14 +112,6 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return Objects.hash(label, name, parameters, timeout, type);
     }
 
-    public String getComponentName() {
-        return componentName;
-    }
-
-    public int getComponentVersion() {
-        return componentVersion;
-    }
-
     public String getName() {
         return name;
     }
@@ -145,10 +126,6 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     public String getTimeout() {
         return timeout;
-    }
-
-    public String getComponentTriggerName() {
-        return componentTriggerName;
     }
 
     public String getType() {
@@ -179,12 +156,14 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     @Override
     public String toString() {
-        return "WorkflowTask{" + ", label='"
-            + label + '\'' + ", name='"
-            + name + '\'' + ", timeout='"
-            + timeout + '\'' + ", type='"
-            + type + '\'' + ", parameters='"
-            + parameters + '\'' + '}';
+        return "WorkflowTrigger{" +
+            "name='" + name + '\'' +
+            ", label='" + label + '\'' +
+            ", timeout='" + timeout + '\'' +
+            ", type='" + type + '\'' +
+            ", parameters=" + parameters +
+            ", extensions=" + extensions +
+            '}';
     }
 
     public static class WorkflowTriggerConverter implements Converter<Map, WorkflowTrigger> {
