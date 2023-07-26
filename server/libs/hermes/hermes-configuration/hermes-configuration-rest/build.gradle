@@ -13,11 +13,13 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.hermes.configuration.web.rest.model"
-    outputDir = "$projectDir/../hermes-configuration-rest-api/generated".toString()
+    outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         "Page": "org.springframework.data.domain.Page"
     ]
 }
+
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
 
 task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "typescript-fetch"
@@ -34,13 +36,21 @@ tasks.register("generateOpenAPI") {
 }
 
 dependencies {
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
+
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
+    implementation libs.org.mapstruct
+    implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
+    implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-web"
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:core:message-broker:message-broker-api")
-    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api")
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-api")
-
-    testImplementation "org.springframework:spring-webflux"
-    testImplementation "org.springframework.boot:spring-boot-starter-web"
+    implementation project(":server:libs:hermes:hermes-test:hermes-test-api")
 }

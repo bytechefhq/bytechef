@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -57,13 +56,13 @@ public class WorkflowConnection {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, WorkflowConnection> of(WorkflowTask workflowTask) {
-        return toMap(workflowTask.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTask.getName());
+    public static List<WorkflowConnection> of(WorkflowTask workflowTask) {
+        return toList(workflowTask.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTask.getName());
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
-        return toMap(workflowTrigger.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTrigger.getName());
+    public static List<WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
+        return toList(workflowTrigger.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTrigger.getName());
     }
 
     public static List<WorkflowConnection> of(Workflow workflow) {
@@ -72,28 +71,27 @@ public class WorkflowConnection {
         WorkflowTrigger.of(workflow)
             .stream()
             .map(WorkflowConnection::of)
-            .forEach(workflowConnectionMap -> workflowConnections.addAll(workflowConnectionMap.values()));
+            .forEach(workflowConnections::addAll);
 
         workflow.getTasks()
             .stream()
             .map(WorkflowConnection::of)
-            .forEach(workflowConnectionMap -> workflowConnections.addAll(workflowConnectionMap.values()));
+            .forEach(workflowConnections::addAll);
 
         return workflowConnections;
     }
 
-    private static Map<String, WorkflowConnection> toMap(
+    private static List<WorkflowConnection> toList(
         Map<String, Map<String, Object>> source, String operationName) {
 
         return source.entrySet()
             .stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> new WorkflowConnection(
-                    MapValueUtils.getString(entry.getValue(), "componentName"),
-                    MapValueUtils.getInteger(entry.getValue(), "componentVersion"),
-                    entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), operationName,
-                    MapValueUtils.getLong(entry.getValue(), ID))));
+            .map(entry -> new WorkflowConnection(
+                MapValueUtils.getString(entry.getValue(), "componentName"),
+                MapValueUtils.getInteger(entry.getValue(), "componentVersion"),
+                entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), operationName,
+                MapValueUtils.getLong(entry.getValue(), ID)))
+            .toList();
     }
 
     public Optional<String> getComponentName() {

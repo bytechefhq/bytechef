@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.AnyPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.ArrayPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.BooleanPropertyDTO;
@@ -63,7 +63,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+@Mapper(config = ConfigurationMapperSpringConfig.class)
 public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, PropertyDTO.PropertyVisitor {
 
     @Override

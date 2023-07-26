@@ -213,7 +213,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private boolean containsConnection(WorkflowTask workflowTask, long id) {
         return WorkflowConnection.of(workflowTask)
-            .values()
             .stream()
             .map(workflowConnection -> containsConnection(workflowConnection, id))
             .findFirst()

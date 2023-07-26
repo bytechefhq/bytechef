@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.HelpDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 public class TriggerDefinitionMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionModelMapper
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionModel> {
 
@@ -52,7 +52,7 @@ public class TriggerDefinitionMapper {
         }
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionBasicModel> {
 

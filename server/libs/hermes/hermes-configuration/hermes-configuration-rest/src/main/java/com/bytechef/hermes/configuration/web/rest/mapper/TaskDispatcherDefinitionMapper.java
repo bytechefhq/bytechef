@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
@@ -31,10 +31,10 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+@Mapper(config = ConfigurationMapperSpringConfig.class)
 public class TaskDispatcherDefinitionMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel> {
 
@@ -53,7 +53,7 @@ public class TaskDispatcherDefinitionMapper {
         }
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionBasicModel> {
 

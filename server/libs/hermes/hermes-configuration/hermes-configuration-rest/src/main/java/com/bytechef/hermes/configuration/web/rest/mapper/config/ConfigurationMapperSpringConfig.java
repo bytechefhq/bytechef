@@ -17,16 +17,16 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper.config;
 
-import com.bytechef.hermes.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
+import com.bytechef.hermes.configuration.web.rest.adapter.ConfigurationConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = WorkflowConfigurationConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = ConfigurationConversionServiceAdapter.class)
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.hermes.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "WorkflowConfigurationConversionServiceAdapter")
-public interface WorkflowConfigurationMapperSpringConfig {
+    conversionServiceAdapterClassName = "ConfigurationConversionServiceAdapter")
+public interface ConfigurationMapperSpringConfig {
 }
