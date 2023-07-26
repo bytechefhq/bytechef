@@ -38,9 +38,9 @@ export const ProjectInstanceEditWorkflowDialog = ({
                     closeDialog();
                 }
             }}
-            title={`${workflow?.id ? 'Edit' : 'Create'} ${
-                workflow?.label
-            } Workflow`}
+            title={`${
+                workflow?.id ? 'Edit' : 'Create'
+            } ${workflow?.label} Workflow`}
         >
             <div className="flex flex-col">
                 <div className="mt-4 flex flex-col ">
