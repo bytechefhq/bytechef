@@ -51,8 +51,6 @@ dependencies {
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-api")
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-api")
 
-    implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api")
-
     testImplementation "org.springframework:spring-webflux"
     testImplementation "org.springframework.boot:spring-boot-starter-web"
 }

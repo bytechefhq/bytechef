@@ -17,10 +17,13 @@
 
 package com.bytechef.helios.execution.web.rest.mapper;
 
+import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.Optional;
@@ -33,6 +36,9 @@ public interface ProjectTaskExecutionMapper extends Converter<TaskExecutionDTO, 
 
     @Override
     TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
+
+    @Mapping(target = "connections", ignore = true)
+    WorkflowTaskModel map(WorkflowTask workflowTask);
 
     default String map(Optional<String> optional) {
         return optional.orElse(null);

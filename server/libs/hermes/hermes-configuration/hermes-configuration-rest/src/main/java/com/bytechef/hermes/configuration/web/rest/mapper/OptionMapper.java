@@ -17,19 +17,23 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
-import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import org.mapstruct.Mapper;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
-public interface OAuth2AuthorizationParametersMapper
-    extends Converter<OAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel> {
+@Mapper(config = ConfigurationMapperSpringConfig.class)
+public interface OptionMapper extends Converter<OptionDTO, OptionModel> {
 
     @Override
-    OAuth2AuthorizationParametersModel convert(OAuth2AuthorizationParametersDTO oAuth2AuthorizationParametersDTO);
+    OptionModel convert(OptionDTO optionDTO);
+
+    default JsonNullable<Object> map(Object value) {
+        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
+    }
 }
