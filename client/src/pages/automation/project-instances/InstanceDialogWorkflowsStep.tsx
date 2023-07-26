@@ -4,6 +4,7 @@ import Input from 'components/Input/Input';
 import Properties from 'components/Properties/Properties';
 import {
     ProjectInstanceModel,
+    WorkflowConnectionModel,
     WorkflowModel,
 } from 'middleware/helios/configuration';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
@@ -22,6 +23,16 @@ export const InstanceDialogWorkflowListItem = ({
 }: InstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
     const [isEnabled, setIsEnabled] = useState(false);
+
+    const connections: WorkflowConnectionModel[] = [];
+
+    workflow.tasks?.map(
+        (task) => task.connections && connections.concat(task.connections)
+    );
+    workflow.triggers?.map(
+        (trigger) =>
+            trigger.connections && connections.concat(trigger.connections)
+    );
 
     const tabs = [
         {
@@ -54,7 +65,7 @@ export const InstanceDialogWorkflowListItem = ({
         {
             content: (
                 <>
-                    {workflow.connections?.map((connection) => (
+                    {connections?.map((connection) => (
                         <Input
                             key={connection.componentName}
                             label={connection.componentName}
@@ -95,7 +106,7 @@ export const InstanceDialogWorkflowListItem = ({
 
             {isEnabled && (
                 <div className="mt-2">
-                    {workflow.connections?.length ? (
+                    {connections?.length ? (
                         <>
                             <nav aria-label="Tabs" className="flex">
                                 {tabs.map((tab, index) => (
