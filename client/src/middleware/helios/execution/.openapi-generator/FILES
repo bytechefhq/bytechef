@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/AutomationExecutionsApi.ts
 apis/AutomationJobsApi.ts
 apis/AutomationTestsApi.ts
@@ -6,9 +7,7 @@ index.ts
 models/CategoryModel.ts
 models/ComponentDefinitionModel.ts
 models/CreateJob200ResponseModel.ts
-models/ExecutionBasicModel.ts
 models/ExecutionErrorModel.ts
-models/ExecutionModel.ts
 models/JobAllOfModel.ts
 models/JobBasicModel.ts
 models/JobModel.ts
@@ -28,6 +27,9 @@ models/TestParametersModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts
 models/WorkflowBasicModel.ts
+models/WorkflowConnectionModel.ts
+models/WorkflowExecutionBasicModel.ts
+models/WorkflowExecutionModel.ts
 models/WorkflowTaskModel.ts
 models/index.ts
 runtime.ts

@@ -3,9 +3,7 @@
 export * from './CategoryModel';
 export * from './ComponentDefinitionModel';
 export * from './CreateJob200ResponseModel';
-export * from './ExecutionBasicModel';
 export * from './ExecutionErrorModel';
-export * from './ExecutionModel';
 export * from './JobAllOfModel';
 export * from './JobBasicModel';
 export * from './JobModel';
@@ -25,4 +23,7 @@ export * from './TestParametersModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';
 export * from './WorkflowBasicModel';
+export * from './WorkflowConnectionModel';
+export * from './WorkflowExecutionBasicModel';
+export * from './WorkflowExecutionModel';
 export * from './WorkflowTaskModel';
