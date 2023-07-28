@@ -15,18 +15,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.dto;
+package com.bytechef.helios.execution.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.hermes.execution.dto.JobDTO;
-import com.bytechef.helios.configuration.domain.Project;
-import com.bytechef.helios.configuration.domain.ProjectInstance;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record ExecutionDTO(
-    long id, ProjectInstance instance, JobDTO job, Project project, Workflow workflow) {
+public class WorkflowExecutionFacadeTest {
+
+    @Disabled
+    @Test
+    public void testGetExecution() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testGetExecutions() {
+        // TODO
+    }
 }

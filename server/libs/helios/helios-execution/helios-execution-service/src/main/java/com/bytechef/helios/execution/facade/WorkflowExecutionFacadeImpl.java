@@ -26,7 +26,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.helios.execution.dto.ExecutionDTO;
+import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.facade.JobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,7 +41,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class ExecutionFacadeImpl implements ExecutionFacade {
+public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     private final JobFacade jobFacade;
     private final JobService jobService;
@@ -50,7 +50,7 @@ public class ExecutionFacadeImpl implements ExecutionFacade {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ExecutionFacadeImpl(
+    public WorkflowExecutionFacadeImpl(
         JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, WorkflowService workflowService) {
 
@@ -64,10 +64,10 @@ public class ExecutionFacadeImpl implements ExecutionFacade {
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public ExecutionDTO getExecution(long id) {
+    public WorkflowExecutionDTO getExecution(long id) {
         JobDTO jobDTO = jobFacade.getJob(id);
 
-        return new ExecutionDTO(
+        return new WorkflowExecutionDTO(
             Objects.requireNonNull(jobDTO.id()),
             OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(jobDTO.workflowId()), null),
             jobDTO,
@@ -78,7 +78,7 @@ public class ExecutionFacadeImpl implements ExecutionFacade {
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public Page<ExecutionDTO> getExecutions(
+    public Page<WorkflowExecutionDTO> getExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
@@ -104,7 +104,7 @@ public class ExecutionFacadeImpl implements ExecutionFacade {
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-        return jobsPage.map(job -> new ExecutionDTO(
+        return jobsPage.map(job -> new WorkflowExecutionDTO(
             Objects.requireNonNull(job.getId()),
             OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(job.getWorkflowId()), null),
             new JobDTO(job, List.of()),
