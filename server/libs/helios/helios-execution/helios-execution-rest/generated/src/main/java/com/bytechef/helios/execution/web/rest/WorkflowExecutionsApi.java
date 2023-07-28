@@ -6,8 +6,8 @@
 package com.bytechef.helios.execution.web.rest;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import com.bytechef.helios.execution.web.rest.model.ExecutionModel;
 import java.time.LocalDateTime;
+import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,17 +34,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:01:29.231011+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "automation-executions", description = "The Automation Executions API")
-public interface ExecutionsApi {
+public interface WorkflowExecutionsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /executions/{id} : Get workflow executions by id
+     * GET /workflow-executions/{id} : Get workflow executions by id
      * Get workflow execution by id.
      *
      * @param id The id of an execution. (required)
@@ -57,16 +57,16 @@ public interface ExecutionsApi {
         tags = { "automation-executions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The execution object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecutionModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowExecutionModel.class))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/executions/{id}",
+        value = "/workflow-executions/{id}",
         produces = { "application/json" }
     )
-    default ResponseEntity<ExecutionModel> getExecution(
+    default ResponseEntity<WorkflowExecutionModel> getExecution(
         @Parameter(name = "id", description = "The id of an execution.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
@@ -84,7 +84,7 @@ public interface ExecutionsApi {
 
 
     /**
-     * GET /executions : Get project workflow executions
+     * GET /workflow-executions : Get project workflow executions
      * Get project workflow executions.
      *
      * @param jobStatus The status of an executed job (optional)
@@ -109,7 +109,7 @@ public interface ExecutionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/executions",
+        value = "/workflow-executions",
         produces = { "application/json" }
     )
     default ResponseEntity<org.springframework.data.domain.Page> getExecutions(
