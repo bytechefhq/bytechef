@@ -41,55 +41,55 @@ import {
 /**
  * Contains information about execution of a project workflow.
  * @export
- * @interface ExecutionModel
+ * @interface WorkflowExecutionModel
  */
-export interface ExecutionModel {
+export interface WorkflowExecutionModel {
     /**
      * The id of a workflow execution.
      * @type {number}
-     * @memberof ExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     readonly id?: number;
     /**
      * 
      * @type {ProjectInstanceModel}
-     * @memberof ExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     instance?: ProjectInstanceModel;
     /**
      * 
      * @type {JobModel}
-     * @memberof ExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     job?: JobModel;
     /**
      * 
      * @type {ProjectModel}
-     * @memberof ExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     project?: ProjectModel;
     /**
      * 
      * @type {WorkflowBasicModel}
-     * @memberof ExecutionModel
+     * @memberof WorkflowExecutionModel
      */
     workflow?: WorkflowBasicModel;
 }
 
 /**
- * Check if a given object implements the ExecutionModel interface.
+ * Check if a given object implements the WorkflowExecutionModel interface.
  */
-export function instanceOfExecutionModel(value: object): boolean {
+export function instanceOfWorkflowExecutionModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ExecutionModelFromJSON(json: any): ExecutionModel {
-    return ExecutionModelFromJSONTyped(json, false);
+export function WorkflowExecutionModelFromJSON(json: any): WorkflowExecutionModel {
+    return WorkflowExecutionModelFromJSONTyped(json, false);
 }
 
-export function ExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ExecutionModel {
+export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowExecutionModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -103,7 +103,7 @@ export function ExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ExecutionModelToJSON(value?: ExecutionModel | null): any {
+export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | null): any {
     if (value === undefined) {
         return undefined;
     }

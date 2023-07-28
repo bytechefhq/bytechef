@@ -41,55 +41,55 @@ import {
 /**
  * Contains basic information about execution of a project workflow.
  * @export
- * @interface ExecutionBasicModel
+ * @interface WorkflowExecutionBasicModel
  */
-export interface ExecutionBasicModel {
+export interface WorkflowExecutionBasicModel {
     /**
      * The id of a workflow execution.
      * @type {number}
-     * @memberof ExecutionBasicModel
+     * @memberof WorkflowExecutionBasicModel
      */
     readonly id?: number;
     /**
      * 
      * @type {ProjectInstanceBasicModel}
-     * @memberof ExecutionBasicModel
+     * @memberof WorkflowExecutionBasicModel
      */
     instance?: ProjectInstanceBasicModel;
     /**
      * 
      * @type {JobBasicModel}
-     * @memberof ExecutionBasicModel
+     * @memberof WorkflowExecutionBasicModel
      */
     job?: JobBasicModel;
     /**
      * 
      * @type {ProjectBasicModel}
-     * @memberof ExecutionBasicModel
+     * @memberof WorkflowExecutionBasicModel
      */
     project?: ProjectBasicModel;
     /**
      * 
      * @type {WorkflowBasicModel}
-     * @memberof ExecutionBasicModel
+     * @memberof WorkflowExecutionBasicModel
      */
     workflow?: WorkflowBasicModel;
 }
 
 /**
- * Check if a given object implements the ExecutionBasicModel interface.
+ * Check if a given object implements the WorkflowExecutionBasicModel interface.
  */
-export function instanceOfExecutionBasicModel(value: object): boolean {
+export function instanceOfWorkflowExecutionBasicModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ExecutionBasicModelFromJSON(json: any): ExecutionBasicModel {
-    return ExecutionBasicModelFromJSONTyped(json, false);
+export function WorkflowExecutionBasicModelFromJSON(json: any): WorkflowExecutionBasicModel {
+    return WorkflowExecutionBasicModelFromJSONTyped(json, false);
 }
 
-export function ExecutionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ExecutionBasicModel {
+export function WorkflowExecutionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowExecutionBasicModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -103,7 +103,7 @@ export function ExecutionBasicModelFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ExecutionBasicModelToJSON(value?: ExecutionBasicModel | null): any {
+export function WorkflowExecutionBasicModelToJSON(value?: WorkflowExecutionBasicModel | null): any {
     if (value === undefined) {
         return undefined;
     }

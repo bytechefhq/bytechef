@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  ExecutionModel,
   PageModel,
+  WorkflowExecutionModel,
 } from '../models';
 import {
-    ExecutionModelFromJSON,
-    ExecutionModelToJSON,
     PageModelFromJSON,
     PageModelToJSON,
+    WorkflowExecutionModelFromJSON,
+    WorkflowExecutionModelToJSON,
 } from '../models';
 
 export interface GetExecutionRequest {
@@ -48,7 +48,7 @@ export class AutomationExecutionsApi extends runtime.BaseAPI {
      * Get workflow execution by id.
      * Get workflow executions by id
      */
-    async getExecutionRaw(requestParameters: GetExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ExecutionModel>> {
+    async getExecutionRaw(requestParameters: GetExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getExecution.');
         }
@@ -58,20 +58,20 @@ export class AutomationExecutionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ExecutionModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionModelFromJSON(jsonValue));
     }
 
     /**
      * Get workflow execution by id.
      * Get workflow executions by id
      */
-    async getExecution(requestParameters: GetExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExecutionModel> {
+    async getExecution(requestParameters: GetExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
         const response = await this.getExecutionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -114,7 +114,7 @@ export class AutomationExecutionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/executions`,
+            path: `/workflow-executions`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
