@@ -19,15 +19,13 @@ package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
+import com.bytechef.helios.execution.web.rest.mapper.util.MetadataUtils;
 import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
-import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,18 +40,6 @@ public interface ProjectJobParametersModelMapper extends Converter<JobParameters
 
     @Named("metadata")
     default Map<String, Object> getMetadata(JobParametersModel jobParametersModel) {
-        Map<String, Map<String, Map<String, Long>>> connectionMap = new HashMap<>();
-
-        if (jobParametersModel.getConnections() != null) {
-            for (TaskConnectionModel taskConnectionModel : jobParametersModel.getConnections()) {
-                Map<String, Map<String, Long>> connection = connectionMap.computeIfAbsent(
-                    taskConnectionModel.getTaskName(), key -> new HashMap<>());
-
-                connection.put(
-                    taskConnectionModel.getKey(), Map.of(WorkflowConnection.ID, taskConnectionModel.getId()));
-            }
-        }
-
-        return Map.of(WorkflowConnection.CONNECTIONS, connectionMap);
+        return MetadataUtils.getMetadata(jobParametersModel.getConnections());
     }
 }

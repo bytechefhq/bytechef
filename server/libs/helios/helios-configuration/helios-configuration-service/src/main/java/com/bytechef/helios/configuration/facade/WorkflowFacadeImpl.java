@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.facade;
+package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
+import com.bytechef.helios.configuration.connection.WorkflowConnection;
+import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 

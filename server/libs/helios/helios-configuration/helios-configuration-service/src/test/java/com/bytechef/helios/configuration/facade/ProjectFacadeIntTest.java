@@ -33,7 +33,7 @@ import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.repository.ProjectRepository;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
+import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.tag.service.TagService;

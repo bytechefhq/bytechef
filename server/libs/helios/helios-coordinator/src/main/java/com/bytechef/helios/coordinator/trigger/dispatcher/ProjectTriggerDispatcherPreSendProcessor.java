@@ -19,7 +19,7 @@ package com.bytechef.helios.coordinator.trigger.dispatcher;
 
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.hermes.execution.domain.TriggerExecution;

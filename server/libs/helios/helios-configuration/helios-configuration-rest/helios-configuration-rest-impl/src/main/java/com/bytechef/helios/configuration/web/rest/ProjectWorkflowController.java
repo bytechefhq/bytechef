@@ -19,8 +19,8 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
-import com.bytechef.hermes.configuration.facade.WorkflowFacade;
+import com.bytechef.helios.configuration.dto.WorkflowDTO;
+import com.bytechef.helios.configuration.facade.WorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
