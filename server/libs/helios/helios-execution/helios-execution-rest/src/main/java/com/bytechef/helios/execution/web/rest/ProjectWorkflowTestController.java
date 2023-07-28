@@ -36,7 +36,8 @@ public class ProjectWorkflowTestController implements WorkflowTestsApi {
     private final ConversionService conversionService;
     private final WorkflowTestExecutor workflowTestExecutor;
 
-    public ProjectWorkflowTestController(ConversionService conversionService, WorkflowTestExecutor workflowTestExecutor) {
+    public ProjectWorkflowTestController(ConversionService conversionService,
+        WorkflowTestExecutor workflowTestExecutor) {
         this.conversionService = conversionService;
         this.workflowTestExecutor = workflowTestExecutor;
     }
