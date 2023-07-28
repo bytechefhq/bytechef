@@ -24,8 +24,6 @@ import com.bytechef.dione.configuration.domain.Integration;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.service.IntegrationService;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,7 +60,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public WorkflowDTO addWorkflow(long id, String label, String description, String definition) {
+    public Workflow addWorkflow(long id, String label, String description, String definition) {
         if (definition == null) {
             definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}"
                 .formatted(label, description);
@@ -72,7 +70,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         integrationService.addWorkflow(id, workflow.getId());
 
-        return new WorkflowDTO(WorkflowConnection.of(workflow), workflow);
+        return workflow;
     }
 
     @Override
@@ -182,12 +180,10 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<WorkflowDTO> getIntegrationWorkflows(long id) {
+    public List<Workflow> getIntegrationWorkflows(long id) {
         Integration integration = integrationService.getIntegration(id);
 
-        return com.bytechef.commons.util.CollectionUtils.map(
-            workflowService.getWorkflows(integration.getWorkflowIds()),
-            workflow -> new WorkflowDTO(WorkflowConnection.of(workflow), workflow));
+        return workflowService.getWorkflows(integration.getWorkflowIds());
     }
 
     @Override

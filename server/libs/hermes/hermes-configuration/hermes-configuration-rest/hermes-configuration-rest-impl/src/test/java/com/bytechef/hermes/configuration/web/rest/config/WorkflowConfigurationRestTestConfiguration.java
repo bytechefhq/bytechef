@@ -28,7 +28,6 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.hermes.configuration.facade.WorkflowFacade;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -74,7 +73,4 @@ public class WorkflowConfigurationRestTestConfiguration {
 
     @MockBean
     private WorkflowService workflowService;
-
-    @MockBean
-    WorkflowFacade workflowFacade;
 }

@@ -17,10 +17,9 @@
 
 package com.bytechef.dione.configuration.web.rest;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
-import com.bytechef.hermes.configuration.facade.WorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -39,15 +38,13 @@ import java.util.List;
 public class IntegrationWorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
-    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public IntegrationWorkflowController(
-        ConversionService conversionService, WorkflowFacade workflowFacade, WorkflowService workflowService) {
+        ConversionService conversionService, WorkflowService workflowService) {
 
         this.conversionService = conversionService;
-        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
     }
 
@@ -63,7 +60,7 @@ public class IntegrationWorkflowController implements WorkflowsApi {
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
-        return ResponseEntity.ok(conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class)
+        return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
             .definition(null));
     }
 
@@ -72,9 +69,9 @@ public class IntegrationWorkflowController implements WorkflowsApi {
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
-        for (WorkflowDTO workflowDTO : workflowFacade.getWorkflows()) {
+        for (Workflow workflow : workflowService.getWorkflows()) {
             workflowModels.add(
-                conversionService.convert(workflowDTO, WorkflowModel.class)
+                conversionService.convert(workflow, WorkflowModel.class)
                     .definition(null));
         }
 
@@ -85,6 +82,6 @@ public class IntegrationWorkflowController implements WorkflowsApi {
     @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
-            conversionService.convert(workflowFacade.update(id, workflowModel.getDefinition()), WorkflowModel.class));
+            conversionService.convert(workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class));
     }
 }

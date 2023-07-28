@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.dto;
+package com.bytechef.helios.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
@@ -23,7 +23,7 @@ import com.bytechef.atlas.configuration.domain.Workflow.Input;
 import com.bytechef.atlas.configuration.domain.Workflow.Output;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;

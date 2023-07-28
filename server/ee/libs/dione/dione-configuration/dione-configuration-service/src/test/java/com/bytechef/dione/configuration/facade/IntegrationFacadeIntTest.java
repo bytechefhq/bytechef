@@ -27,7 +27,6 @@ import com.bytechef.dione.configuration.domain.Integration;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.repository.IntegrationRepository;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
@@ -85,10 +84,10 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        WorkflowDTO workflowDTO = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
+        Workflow workflow = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
 
-        assertThat(workflowDTO.description()).isEqualTo("Description");
-        assertThat(workflowDTO.label()).isEqualTo("Workflow 1");
+        assertThat(workflow.getDescription()).isEqualTo("Description");
+        assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
     }
 
     @Test
@@ -274,11 +273,11 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        List<WorkflowDTO> workflowDTOs = integrationFacade.getIntegrationWorkflows(integration.getId());
+        List<Workflow> workflows = integrationFacade.getIntegrationWorkflows(integration.getId());
 
         assertThat(
-            workflowDTOs.stream()
-                .map(curWorkflow -> curWorkflow.id())
+            workflows.stream()
+                .map(Workflow::getId)
                 .toList())
                     .contains(workflow.getId());
     }

@@ -20,7 +20,7 @@ package com.bytechef.helios.configuration.web.rest.mapper;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
+import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;

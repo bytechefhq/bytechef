@@ -19,7 +19,7 @@ package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
+import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 
 import java.util.List;

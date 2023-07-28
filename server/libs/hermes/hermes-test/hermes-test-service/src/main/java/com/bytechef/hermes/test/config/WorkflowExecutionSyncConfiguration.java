@@ -27,7 +27,6 @@ import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServic
 import com.bytechef.hermes.test.WorkflowTestExecutorImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
@@ -41,7 +40,6 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.sync.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
@@ -70,11 +68,9 @@ import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHa
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -86,7 +82,7 @@ public class WorkflowExecutionSyncConfiguration {
     @Bean
     WorkflowTestExecutor workflowTestExecutor(
         ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
-        TaskHandlerRegistry taskHandlerRegistry, List<WorkflowRepository> workflowRepositories) {
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
@@ -99,9 +95,6 @@ public class WorkflowExecutionSyncConfiguration {
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         EventPublisher eventPublisher = getEventPublisher(jobService, syncMessageBroker, taskExecutionService);
-
-        WorkflowService workflowService = new WorkflowServiceImpl(
-            new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
 
         JobFactoryFacade jobFactoryFacade = new JobFactoryFacadeImpl(
             contextService, eventPublisher, jobService, syncMessageBroker, workflowService);

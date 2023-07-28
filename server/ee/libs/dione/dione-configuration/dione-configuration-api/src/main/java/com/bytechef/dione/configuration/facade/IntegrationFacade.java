@@ -17,9 +17,9 @@
 
 package com.bytechef.dione.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public interface IntegrationFacade {
 
-    WorkflowDTO addWorkflow(long id, String label, String description, String definition);
+    Workflow addWorkflow(long id, String label, String description, String definition);
 
     IntegrationDTO create(IntegrationDTO integrationDTO);
 
@@ -43,7 +43,7 @@ public interface IntegrationFacade {
 
     List<Tag> getIntegrationTags();
 
-    List<WorkflowDTO> getIntegrationWorkflows(long id);
+    List<Workflow> getIntegrationWorkflows(long id);
 
     List<IntegrationDTO> getIntegrations(Long categoryId, Long tagId);
 
