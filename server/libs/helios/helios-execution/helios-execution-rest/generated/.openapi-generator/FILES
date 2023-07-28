@@ -1,15 +1,13 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/helios/execution/web/rest/ApiUtil.java
-src/main/java/com/bytechef/helios/execution/web/rest/ExecutionsApi.java
 src/main/java/com/bytechef/helios/execution/web/rest/JobsApi.java
-src/main/java/com/bytechef/helios/execution/web/rest/TestsApi.java
+src/main/java/com/bytechef/helios/execution/web/rest/WorkflowExecutionsApi.java
+src/main/java/com/bytechef/helios/execution/web/rest/WorkflowTestsApi.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/CreateJob200ResponseModel.java
-src/main/java/com/bytechef/helios/execution/web/rest/model/ExecutionBasicModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/ExecutionErrorModel.java
-src/main/java/com/bytechef/helios/execution/web/rest/model/ExecutionModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/JobAllOfModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/JobBasicModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/JobModel.java
@@ -21,3 +19,6 @@ src/main/java/com/bytechef/helios/execution/web/rest/model/TestParametersModel.j
 src/main/java/com/bytechef/helios/execution/web/rest/model/WebhookModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/WorkflowBasicModel.java
+src/main/java/com/bytechef/helios/execution/web/rest/model/WorkflowConnectionModel.java
+src/main/java/com/bytechef/helios/execution/web/rest/model/WorkflowExecutionBasicModel.java
+src/main/java/com/bytechef/helios/execution/web/rest/model/WorkflowExecutionModel.java
