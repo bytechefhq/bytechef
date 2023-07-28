@@ -1,8 +1,8 @@
 import {
     AutomationExecutionsApi,
-    ExecutionModel,
     GetExecutionRequest,
     GetExecutionsRequest,
+    WorkflowExecutionModel,
 } from '@/middleware/helios/execution';
 import {useQuery} from '@tanstack/react-query';
 import {
@@ -110,7 +110,7 @@ export const useGetWorkflowExecutionQuery = (
     request: GetExecutionRequest,
     isEnabled: boolean
 ) =>
-    useQuery<ExecutionModel, Error>(
+    useQuery<WorkflowExecutionModel, Error>(
         ProjectKeys.workflowExecution(request),
         () => new AutomationExecutionsApi().getExecution(request),
         {

@@ -10,9 +10,9 @@ import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {QueueListIcon} from '@heroicons/react/24/outline';
 import {
-    ExecutionModel,
-    ExecutionModelFromJSON,
     GetExecutionsJobStatusEnum,
+    WorkflowExecutionModel,
+    WorkflowExecutionModelFromJSON,
 } from 'middleware/helios/execution';
 import {
     useGetExecutionsQuery,
@@ -104,8 +104,8 @@ export const Executions = () => {
             : 'There is no executed workflows for the current criteria.';
 
     const tableData = WorkflowExecutionsPage?.content?.map(
-        (WorkflowExecution: ExecutionModel) =>
-            ExecutionModelFromJSON(WorkflowExecution)
+        (workflowExecutionModel: WorkflowExecutionModel) =>
+            WorkflowExecutionModelFromJSON(workflowExecutionModel)
     );
 
     return (
