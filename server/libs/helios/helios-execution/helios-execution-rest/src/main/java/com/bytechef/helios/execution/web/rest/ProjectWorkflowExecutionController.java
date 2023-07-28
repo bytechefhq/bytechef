@@ -17,9 +17,9 @@
 
 package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.helios.execution.facade.ExecutionFacade;
-import com.bytechef.helios.execution.web.rest.model.ExecutionBasicModel;
-import com.bytechef.helios.execution.web.rest.model.ExecutionModel;
+import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
+import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionBasicModel;
+import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -34,25 +34,25 @@ import java.time.LocalDateTime;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
-public class ProjectExecutionController implements ExecutionsApi {
+public class ProjectWorkflowExecutionController implements WorkflowExecutionsApi {
 
     private final ConversionService conversionService;
-    private final ExecutionFacade executionFacade;
+    private final WorkflowExecutionFacade workflowExecutionFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectExecutionController(
-        ConversionService conversionService, ExecutionFacade executionFacade) {
+    public ProjectWorkflowExecutionController(
+        ConversionService conversionService, WorkflowExecutionFacade workflowExecutionFacade) {
 
         this.conversionService = conversionService;
-        this.executionFacade = executionFacade;
+        this.workflowExecutionFacade = workflowExecutionFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ExecutionModel> getExecution(Long id) {
+    public ResponseEntity<WorkflowExecutionModel> getExecution(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(executionFacade.getExecution(id),
-                ExecutionModel.class));
+            conversionService.convert(workflowExecutionFacade.getExecution(id),
+                WorkflowExecutionModel.class));
     }
 
     @Override
@@ -61,10 +61,10 @@ public class ProjectExecutionController implements ExecutionsApi {
         String workflowId, Integer pageNumber) {
 
         return ResponseEntity.ok(
-            executionFacade
+            workflowExecutionFacade
                 .getExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
-                    workflowExecutionDTO, ExecutionBasicModel.class)));
+                    workflowExecutionDTO, WorkflowExecutionBasicModel.class)));
     }
 }
