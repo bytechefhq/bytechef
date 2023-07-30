@@ -36,7 +36,6 @@ import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -54,7 +53,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -182,8 +180,7 @@ public class ProjectControllerIntTest {
         try {
             Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of(), Map.of());
 
-            when(projectFacade.getProjectWorkflows(1L)).thenReturn(
-                List.of(new WorkflowDTO(Collections.emptyList(), workflow)));
+            when(projectFacade.getProjectWorkflows(1L)).thenReturn(List.of(workflow));
 
             this.webTestClient
                 .get()
@@ -302,11 +299,9 @@ public class ProjectControllerIntTest {
         CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel = new CreateProjectWorkflowRequestModel()
             .label("workflowLabel")
             .description("workflowDescription");
-        WorkflowDTO workflow = new WorkflowDTO(
-            Collections.emptyList(),
-            new Workflow(
-                "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
-                Workflow.Format.JSON.getId()));
+        Workflow workflow = new Workflow(
+            "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
+            Workflow.Format.JSON.getId());
 
         when(projectFacade.addProjectWorkflow(anyLong(), any(), any(), any()))
             .thenReturn(workflow);
@@ -325,7 +320,7 @@ public class ProjectControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(workflow.id())
+                .isEqualTo(workflow.getId())
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {
