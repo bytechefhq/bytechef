@@ -17,9 +17,9 @@
 
 package com.bytechef.helios.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
-import com.bytechef.helios.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface ProjectFacade {
 
-    WorkflowDTO addProjectWorkflow(long id, String label, String description, String definition);
+    Workflow addProjectWorkflow(long id, String label, String description, String definition);
 
     ProjectDTO createProject(ProjectDTO projectDTO);
 
@@ -43,7 +43,7 @@ public interface ProjectFacade {
 
     List<Tag> getProjectTags();
 
-    List<WorkflowDTO> getProjectWorkflows(long id);
+    List<Workflow> getProjectWorkflows(long id);
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId);
 
