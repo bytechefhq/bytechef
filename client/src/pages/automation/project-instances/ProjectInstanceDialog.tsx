@@ -13,8 +13,8 @@ import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
-import InstanceDialogBasicStep from './InstanceDialogBasicStep';
-import InstanceDialogWorkflowsStep from './InstanceDialogWorkflowsStep';
+import ProjectInstanceDialogBasicStep from './ProjectInstanceDialogBasicStep';
+import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflowsStep';
 
 interface ProjectDialogProps {
     projectInstance?: ProjectInstanceModel;
@@ -90,7 +90,7 @@ const ProjectInstanceDialog = ({
     const projectInstanceDialogSteps = [
         {
             content: (
-                <InstanceDialogBasicStep
+                <ProjectInstanceDialogBasicStep
                     projectInstance={projectInstance}
                     control={control}
                     touchedFields={touchedFields}
@@ -103,7 +103,9 @@ const ProjectInstanceDialog = ({
             name: 'Basic',
         },
         {
-            content: <InstanceDialogWorkflowsStep getValues={getValues} />,
+            content: (
+                <ProjectInstanceDialogWorkflowsStep getValues={getValues} />
+            ),
             name: 'Workflows',
         },
     ];
