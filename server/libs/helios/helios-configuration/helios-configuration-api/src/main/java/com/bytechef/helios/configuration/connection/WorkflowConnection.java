@@ -36,22 +36,19 @@ public class WorkflowConnection {
     public static final String CONNECTIONS = "connections";
     public static final String ID = "id";
 
-    private final String componentName;
-    private final Long connectionId;
-    private final Integer componentVersion;
+    private final String componentName; // required if a component supports multiple connections
+    private final Integer componentVersion; // required if a component supports multiple connections
+    private final Long id;
     private final String key;
-    private final String name;
-    private final String operationName; // action/trigger name
+    private final String operationName; // task/trigger name used in the workflow
 
     private WorkflowConnection(
-        String componentName, Integer componentVersion, String key, String name, String operationName,
-        Long connectionId) {
+        String componentName, Integer componentVersion, String operationName, String key, Long id) {
 
         this.componentName = componentName;
-        this.connectionId = connectionId;
         this.componentVersion = componentVersion;
+        this.id = id;
         this.key = key;
-        this.name = name;
         this.operationName = operationName;
     }
 
@@ -81,15 +78,12 @@ public class WorkflowConnection {
         return workflowConnections;
     }
 
-    private static List<WorkflowConnection> toList(
-        Map<String, Map<String, Object>> source, String operationName) {
-
+    private static List<WorkflowConnection> toList(Map<String, Map<String, Object>> source, String operationName) {
         return source.entrySet()
             .stream()
             .map(entry -> new WorkflowConnection(
                 MapValueUtils.getString(entry.getValue(), "componentName"),
-                MapValueUtils.getInteger(entry.getValue(), "componentVersion"),
-                entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), operationName,
+                MapValueUtils.getInteger(entry.getValue(), "componentVersion"), operationName, entry.getKey(),
                 MapValueUtils.getLong(entry.getValue(), ID)))
             .toList();
     }
@@ -98,8 +92,8 @@ public class WorkflowConnection {
         return Optional.ofNullable(componentName);
     }
 
-    public Optional<Long> getConnectionId() {
-        return Optional.ofNullable(connectionId);
+    public Optional<Long> getId() {
+        return Optional.ofNullable(id);
     }
 
     public Optional<Integer> getComponentVersion() {
@@ -110,10 +104,6 @@ public class WorkflowConnection {
         return key;
     }
 
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
-    }
-
     public String getOperationName() {
         return operationName;
     }
@@ -122,11 +112,10 @@ public class WorkflowConnection {
     public String toString() {
         return "WorkflowConnection{" +
             "componentName='" + componentName + '\'' +
-            ", connectionId=" + connectionId +
-            ", connectionVersion=" + componentVersion +
+            ", componentVersion=" + componentVersion +
             ", key='" + key + '\'' +
-            ", name='" + name + '\'' +
-            ", taskName='" + operationName + '\'' +
+            ", operationName='" + operationName + '\'' +
+            ", id=" + id +
             '}';
     }
 
@@ -138,8 +127,8 @@ public class WorkflowConnection {
         public WorkflowConnection convert(Map source) {
             return new WorkflowConnection(
                 MapValueUtils.getString(source, "componentName"), MapValueUtils.getInteger(source, "componentVersion"),
-                MapValueUtils.getString(source, "key"), MapValueUtils.getString(source, "name"),
-                MapValueUtils.getString(source, "operationName"), MapValueUtils.getLong(source, "connectionId"));
+                MapValueUtils.getString(source, "operationName"), MapValueUtils.getString(source, "key"),
+                MapValueUtils.getLong(source, "id"));
         }
     }
 }
