@@ -206,9 +206,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private boolean containsConnection(WorkflowConnection workflowConnection, long id) {
-        return workflowConnection.getConnectionId()
+        return workflowConnection.getId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(workflowConnection.getOperationName(), workflowConnection.getKey()) != null);
+            .orElseGet(() -> getConnection(workflowConnection.getOperationName(),
+                workflowConnection.getKey()) != null);
     }
 
     private boolean containsConnection(WorkflowTask workflowTask, long id) {

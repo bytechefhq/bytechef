@@ -41,7 +41,7 @@ public abstract class AbstractDispatcherPreSendProcessor {
     }
 
     private Long getConnectionId(WorkflowConnection workflowConnection) {
-        return workflowConnection.getConnectionId()
+        return workflowConnection.getId()
             .orElseGet(() -> projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
                 workflowConnection.getOperationName(), workflowConnection.getKey()));
     }
