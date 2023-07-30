@@ -4,7 +4,7 @@ import {WorkflowModel} from '@/middleware/helios/configuration';
 import {Close} from '@radix-ui/react-dialog';
 import {useState} from 'react';
 
-import {InstanceDialogWorkflowListItem} from './InstanceDialogWorkflowsStep';
+import {ProjectInstanceDialogWorkflowListItem} from './ProjectInstanceDialogWorkflowsStep';
 
 interface ProjectInstanceEditWorkflowDialogProps {
     workflow: WorkflowModel;
@@ -44,7 +44,7 @@ export const ProjectInstanceEditWorkflowDialog = ({
         >
             <div className="flex flex-col">
                 <div className="mt-4 flex flex-col ">
-                    <InstanceDialogWorkflowListItem
+                    <ProjectInstanceDialogWorkflowListItem
                         key={workflow.id!}
                         workflow={workflow}
                         label="Enable"
