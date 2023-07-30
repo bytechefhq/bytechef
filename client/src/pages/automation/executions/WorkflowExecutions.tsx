@@ -25,8 +25,8 @@ import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '../project/stores/useWorkflowExecutionDetailsDialogStore';
-import ExecutionDetailsDialog from './components/ExecutionDetailsDialog';
-import ExecutionsTable from './components/ExecutionsTable';
+import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
+import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 
 const jobStatusOptions = [
     {
@@ -51,7 +51,7 @@ const jobStatusOptions = [
     },
 ];
 
-export const Executions = () => {
+export const WorkflowExecutions = () => {
     const [filterStatus, setFilterStatus] =
         useState<GetExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
@@ -138,10 +138,7 @@ export const Executions = () => {
                 }
                 leftSidebarHeader={
                     <>
-                        <PageHeader
-                            position="sidebar"
-                            title="Workflow Executions"
-                        />
+                        <PageHeader position="sidebar" title="Executions" />
 
                         <div className="px-4">
                             <FilterableSelect
@@ -270,7 +267,7 @@ export const Executions = () => {
                             )}
                         >
                             {tableData && tableData.length > 0 ? (
-                                <ExecutionsTable data={tableData} />
+                                <WorkflowExecutionsTable data={tableData} />
                             ) : (
                                 <EmptyList
                                     icon={
@@ -284,11 +281,11 @@ export const Executions = () => {
                     )}
 
                 {workflowExecutionDetailsDialogOpen && (
-                    <ExecutionDetailsDialog />
+                    <WorkflowExecutionDetailsDialog />
                 )}
             </LayoutContainer>
         </PageLoader>
     );
 };
 
-export default Executions;
+export default WorkflowExecutions;
