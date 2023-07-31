@@ -7,11 +7,9 @@ import {
     Accordion,
     AccordionContent,
     AccordionItem,
-    AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';
 import ProjectDialog from './ProjectDialog';
@@ -53,7 +51,7 @@ const ProjectList = () => {
                         title="No projects"
                     />
                 ) : (
-                    <Accordion type="multiple">
+                    <Accordion type="multiple" className="mb-8">
                         {projects.map((project) => {
                             const projectTagIds = project.tags?.map(
                                 (tag) => tag.id
@@ -63,12 +61,9 @@ const ProjectList = () => {
                                 <AccordionItem
                                     value={project.id!.toString()}
                                     key={project.id}
+                                    className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
                                 >
-                                    <AccordionTrigger
-                                        className={twMerge(
-                                            'group w-full rounded-md px-2 py-3 hover:bg-gray-50 data-[state=closed]:border-b data-[state=closed]:border-b-gray-100'
-                                        )}
-                                    >
+                                    <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50">
                                         <ProjectListItem
                                             key={project.id}
                                             project={project}
@@ -79,7 +74,7 @@ const ProjectList = () => {
                                                     )
                                             )}
                                         />
-                                    </AccordionTrigger>
+                                    </div>
 
                                     <AccordionContent>
                                         <ProjectWorkflowList
