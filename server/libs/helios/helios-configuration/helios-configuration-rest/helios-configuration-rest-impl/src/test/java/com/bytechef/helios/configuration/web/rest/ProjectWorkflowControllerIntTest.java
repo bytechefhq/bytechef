@@ -186,7 +186,7 @@ public class ProjectWorkflowControllerIntTest {
 
     private static Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            DEFINITION, Workflow.Format.JSON, "1",
-            OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}), Map.of());
+            DEFINITION, Workflow.Format.JSON, "1", OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}),
+            Map.of());
     }
 }
