@@ -162,12 +162,17 @@ public final class Workflow implements Persistable<String> {
 
     @PersistenceCreator
     public Workflow(String definition, String id, int format) throws Exception {
-        this(definition, Format.valueOf(format), id, readWorkflowMap(definition, id, format), Map.of());
+        this(definition, Format.valueOf(format), id, null, readWorkflowMap(definition, id, format), Map.of());
+    }
+
+    public Workflow(String definition, Format format, String id, Map<String, ?> source, Map<String, Object> metadata) {
+        this(definition, format, id, null, source, metadata);
     }
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String definition, Format format, String id, Map<String, ?> source, Map<String, Object> metadata) {
+        String definition, Format format, String id, LocalDateTime lastModifiedDate, Map<String, ?> source,
+        Map<String, Object> metadata) {
 
         Assert.notNull(definition, "'definition' must not be null");
         Assert.notNull(format, "'format' must not be null");
@@ -178,6 +183,7 @@ public final class Workflow implements Persistable<String> {
         this.definition = definition;
         this.format = format.getId();
         this.id = id;
+        this.lastModifiedDate = lastModifiedDate;
         this.metadata = new HashMap<>(metadata);
 
         for (Map.Entry<String, ?> entry : source.entrySet()) {

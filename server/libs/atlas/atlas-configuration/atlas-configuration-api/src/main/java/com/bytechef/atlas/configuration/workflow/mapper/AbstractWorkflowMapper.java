@@ -19,6 +19,7 @@ package com.bytechef.atlas.configuration.workflow.mapper;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +48,8 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             Map<String, Object> workflowMap = parse(definition, objectMapper);
 
             return new Workflow(
-                definition, workflowResource.getWorkflowFormat(), workflowResource.getId(), workflowMap,
+                definition, workflowResource.getWorkflowFormat(), workflowResource.getId(),
+                LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())), workflowMap,
                 workflowResource.getMetadata());
         } catch (IOException e) {
             throw new RuntimeException(e);
