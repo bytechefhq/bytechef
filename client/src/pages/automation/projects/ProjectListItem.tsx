@@ -11,6 +11,7 @@ import {
 } from '@/mutations/projects.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon} from '@heroicons/react/24/outline';
+import {AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -98,7 +99,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     return (
         <>
             <div className="flex items-center justify-between">
-                <div className="w-10/12">
+                <AccordionTrigger className="group w-10/12">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
                             {project.description ? (
@@ -188,9 +189,11 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             )}
                         </div>
                     </div>
-                </div>
+                </AccordionTrigger>
 
-                <DropdownMenu id={project.id} menuItems={dropdownItems} />
+                <div className="flex w-2/12 justify-end">
+                    <DropdownMenu id={project.id} menuItems={dropdownItems} />
+                </div>
             </div>
 
             <AlertDialog
