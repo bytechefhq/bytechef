@@ -53,30 +53,35 @@ const ProjectInstanceWorkflowList = ({
 
             <ul>
                 {workflows?.map((workflow) => {
-                    const names = workflow.tasks?.map(
+                    const definitionNames = workflow.tasks?.map(
                         (task) => task.type.split('/')[0]
                     );
 
-                    names?.forEach((name) => {
-                        if (!workflowComponentDefinitions[name]) {
-                            workflowComponentDefinitions[name] =
+                    definitionNames?.forEach((definitionName) => {
+                        if (!workflowComponentDefinitions[definitionName]) {
+                            workflowComponentDefinitions[definitionName] =
                                 componentDefinitions?.find(
                                     (componentDefinition) =>
-                                        componentDefinition.name === name
+                                        componentDefinition.name ===
+                                        definitionName
                                 );
                         }
 
-                        if (!workflowTaskDispatcherDefinitions[name]) {
-                            workflowTaskDispatcherDefinitions[name] =
+                        if (
+                            !workflowTaskDispatcherDefinitions[definitionName]
+                        ) {
+                            workflowTaskDispatcherDefinitions[definitionName] =
                                 taskDispatcherDefinitions?.find(
                                     (taskDispatcherDefinition) =>
-                                        taskDispatcherDefinition.name === name
+                                        taskDispatcherDefinition.name ===
+                                        definitionName
                                 );
                         }
                     });
 
-                    const filteredNames = names?.filter(
-                        (item, index) => names?.indexOf(item) === index
+                    const filteredDefinitionNames = definitionNames?.filter(
+                        (item, index) =>
+                            definitionNames?.indexOf(item) === index
                     );
 
                     return (
@@ -95,48 +100,50 @@ const ProjectInstanceWorkflowList = ({
                                         </div>
 
                                         <div className="ml-6 flex">
-                                            {filteredNames?.map((name) => {
-                                                const componentDefinition =
-                                                    workflowComponentDefinitions[
-                                                        name
-                                                    ];
-                                                const taskDispatcherDefinition =
-                                                    workflowTaskDispatcherDefinitions[
-                                                        name
-                                                    ];
+                                            {filteredDefinitionNames?.map(
+                                                (name) => {
+                                                    const componentDefinition =
+                                                        workflowComponentDefinitions[
+                                                            name
+                                                        ];
+                                                    const taskDispatcherDefinition =
+                                                        workflowTaskDispatcherDefinitions[
+                                                            name
+                                                        ];
 
-                                                return (
-                                                    <div
-                                                        key={name}
-                                                        className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                                    >
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger>
-                                                                    <InlineSVG
-                                                                        className="h-5 w-5 flex-none"
-                                                                        key={
-                                                                            name
-                                                                        }
-                                                                        src={
-                                                                            componentDefinition?.icon
-                                                                                ? componentDefinition?.icon
-                                                                                : taskDispatcherDefinition?.icon ??
-                                                                                  ''
-                                                                        }
-                                                                    />
-                                                                </TooltipTrigger>
+                                                    return (
+                                                        <div
+                                                            key={name}
+                                                            className="mr-0.5 flex items-center justify-center rounded-full border p-1"
+                                                        >
+                                                            <TooltipProvider>
+                                                                <Tooltip>
+                                                                    <TooltipTrigger>
+                                                                        <InlineSVG
+                                                                            className="h-5 w-5 flex-none"
+                                                                            key={
+                                                                                name
+                                                                            }
+                                                                            src={
+                                                                                componentDefinition?.icon
+                                                                                    ? componentDefinition?.icon
+                                                                                    : taskDispatcherDefinition?.icon ??
+                                                                                      ''
+                                                                            }
+                                                                        />
+                                                                    </TooltipTrigger>
 
-                                                                <TooltipContent side="right">
-                                                                    {
-                                                                        componentDefinition?.title
-                                                                    }
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                    </div>
-                                                );
-                                            })}
+                                                                    <TooltipContent side="right">
+                                                                        {
+                                                                            componentDefinition?.title
+                                                                        }
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
                                         </div>
 
                                         <div className="flex flex-1 justify-end text-sm">
