@@ -26,10 +26,10 @@ export const ProjectInstanceDialogWorkflowListItem = ({
 
     const connections: WorkflowConnectionModel[] = [];
 
-    workflow.tasks?.map(
+    workflow.tasks?.forEach(
         (task) => task.connections && connections.concat(task.connections)
     );
-    workflow.triggers?.map(
+    workflow.triggers?.forEach(
         (trigger) =>
             trigger.connections && connections.concat(trigger.connections)
     );
