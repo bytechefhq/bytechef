@@ -33,6 +33,8 @@ import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -204,7 +206,43 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
+        public ModifiableActionDefinition sampleOutput(boolean sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(LocalDate sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(List<Map<String, ?>> sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(LocalDateTime sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(Map<String, ?> sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(Number sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(String sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
@@ -1123,7 +1161,43 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
+        public ModifiableTriggerDefinition sampleOutput(boolean sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(LocalDate sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(List<Map<String, ?>> sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(LocalDateTime sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(Map<String, ?> sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(Number sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(String sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
