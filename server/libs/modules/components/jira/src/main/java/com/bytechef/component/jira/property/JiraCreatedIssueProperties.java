@@ -17,30 +17,40 @@
 
 package com.bytechef.component.jira.property;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class JiraCreatedIssueProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("id").label("Id")
-                .description("The ID of the created issue or subtask.")
-                .required(false),
-            string("key").label("Key")
-                .description("The key of the created issue or subtask.")
-                .required(false),
-            string("self").label("Self")
-                .description("The URL of the created issue or subtask.")
-                .required(false),
-            object("transition").properties(JiraNestedResponseProperties.PROPERTIES)
-                .label("Transition")
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("id").label("Id")
+            .description("The ID of the created issue or subtask.")
+            .required(false),
+        string("key").label("Key")
+            .description("The key of the created issue or subtask.")
+            .required(false),
+        string("self").label("Self")
+            .description("The URL of the created issue or subtask.")
+            .required(false),
+        object("transition").properties(JiraNestedResponseProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .placeholder("Add to Transition")
+            .label("Transition")
+            .required(false));
 }

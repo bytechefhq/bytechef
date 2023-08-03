@@ -30,6 +30,9 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -275,6 +278,39 @@ public class MailchimpAddMemberToListAction {
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))
-        .sampleOutput(
-            "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\": \"string\", \"contact_id\": \"string\", \"full_name\": \"string\", \"web_id\": 0, \"email_type\": \"string\", \"status\": \"subscribed\", \"unsubscribe_reason\": \"string\", \"consents_to_one_to_one_messaging\": true, \"merge_fields\": { \"property1\": null, \"property2\": null }, \"interests\": { \"property1\": true, \"property2\": true }, \"stats\": { \"avg_open_rate\": 0, \"avg_click_rate\": 0, \"ecommerce_data\": { \"total_revenue\": 0, \"number_of_orders\": 0, \"currency_code\": \"USD\" } }, \"ip_signup\": \"string\", \"timestamp_signup\": \"2019-08-24T14:15:22Z\", \"ip_opt\": \"string\", \"timestamp_opt\": \"2019-08-24T14:15:22Z\", \"member_rating\": 0, \"last_changed\": \"2019-08-24T14:15:22Z\", \"language\": \"string\", \"vip\": true, \"email_client\": \"string\", \"location\": { \"latitude\": 0, \"longitude\": 0, \"gmtoff\": 0, \"dstoff\": 0, \"country_code\": \"string\", \"timezone\": \"string\", \"region\": \"string\" }, \"marketing_permissions\": [ { \"marketing_permission_id\": \"string\", \"text\": \"string\", \"enabled\": true } ], \"last_note\": { \"note_id\": 0, \"created_at\": \"2019-08-24T14:15:22Z\", \"created_by\": \"string\", \"note\": \"string\" }, \"source\": \"string\", \"tags_count\": 0, \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"list_id\": \"string\", \"_links\": [ { \"rel\": \"string\", \"href\": \"string\", \"method\": \"GET\", \"targetSchema\": \"string\", \"schema\": \"string\" } ] }");
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", "string"), Map.entry("email_address", "string"),
+            Map.entry("unique_email_id", "string"), Map.entry("contact_id", "string"), Map.entry("full_name", "string"),
+            Map.entry("web_id", 0), Map.entry("email_type", "string"), Map.entry("status", "subscribed"),
+            Map.entry("unsubscribe_reason", "string"), Map.entry("consents_to_one_to_one_messaging", true),
+            Map.entry("merge_fields",
+                Map.<String, Object>ofEntries(new AbstractMap.SimpleEntry<>("property1", null),
+                    new AbstractMap.SimpleEntry<>("property2", null))),
+            Map.entry("interests",
+                Map.<String, Object>ofEntries(Map.entry("property1", true), Map.entry("property2", true))),
+            Map.entry("stats",
+                Map.<String, Object>ofEntries(Map.entry("avg_open_rate", 0), Map.entry("avg_click_rate", 0),
+                    Map.entry("ecommerce_data",
+                        Map.<String, Object>ofEntries(Map.entry("total_revenue", 0), Map.entry("number_of_orders", 0),
+                            Map.entry("currency_code", "USD"))))),
+            Map.entry("ip_signup", "string"), Map.entry("timestamp_signup", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
+            Map.entry("ip_opt", "string"), Map.entry("timestamp_opt", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
+            Map.entry("member_rating", 0), Map.entry("last_changed", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
+            Map.entry("language", "string"), Map.entry("vip", true), Map.entry("email_client", "string"),
+            Map.entry("location",
+                Map.<String, Object>ofEntries(Map.entry("latitude", 0), Map.entry("longitude", 0),
+                    Map.entry("gmtoff", 0), Map.entry("dstoff", 0), Map.entry("country_code", "string"),
+                    Map.entry("timezone", "string"), Map.entry("region", "string"))),
+            Map.entry("marketing_permissions",
+                List.of(Map.<String, Object>ofEntries(Map.entry("marketing_permission_id", "string"),
+                    Map.entry("text", "string"), Map.entry("enabled", true)))),
+            Map.entry("last_note",
+                Map.<String, Object>ofEntries(Map.entry("note_id", 0),
+                    Map.entry("created_at", LocalDateTime.of(2019, 8, 24, 14, 15, 22)),
+                    Map.entry("created_by", "string"), Map.entry("note", "string"))),
+            Map.entry("source", "string"), Map.entry("tags_count", 0),
+            Map.entry("tags", List.of(Map.<String, Object>ofEntries(Map.entry("id", 0), Map.entry("name", "string")))),
+            Map.entry("list_id", "string"),
+            Map.entry("_links",
+                List.of(Map.<String, Object>ofEntries(Map.entry("rel", "string"), Map.entry("href", "string"),
+                    Map.entry("method", "GET"), Map.entry("targetSchema", "string"), Map.entry("schema", "string"))))));
 }

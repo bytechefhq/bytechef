@@ -28,6 +28,7 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import java.time.LocalDate;
 import java.util.Map;
 
 /**
@@ -249,6 +250,65 @@ public class PipedriveAddOrganizationAction {
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))
-        .sampleOutput(
-            "{\"success\":true,\"data\":{\"id\":1,\"company_id\":77,\"owner_id\":{\"id\":10,\"name\":\"Will Smith\",\"email\":\"will.smith@pipedrive.com\",\"has_pic\":0,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":10},\"name\":\"Bolt\",\"open_deals_count\":1,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":1,\"email_messages_count\":2,\"people_count\":1,\"activities_count\":2,\"done_activities_count\":1,\"undone_activities_count\":0,\"files_count\":0,\"notes_count\":0,\"followers_count\":1,\"won_deals_count\":0,\"related_won_deals_count\":0,\"lost_deals_count\":0,\"related_lost_deals_count\":0,\"active_flag\":true,\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"},\"value\":101},\"country_code\":\"USA\",\"first_char\":\"b\",\"update_time\":\"2020-09-08 12:14:11\",\"add_time\":\"2020-02-25 10:04:08\",\"visible_to\":\"3\",\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"label\":7,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"address_subpremise\":\"\",\"address_street_number\":\"3a\",\"address_route\":\"Mustamäe tee\",\"address_sublocality\":\"Kristiine\",\"address_locality\":\"Tallinn\",\"address_admin_area_level_1\":\"Harju maakond\",\"address_admin_area_level_2\":\"\",\"address_country\":\"Estonia\",\"address_postal_code\":\"10616\",\"address_formatted_address\":\"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\"owner_name\":\"John Doe\",\"cc_email\":\"org@pipedrivemail.com\"},\"related_objects\":{\"organization\":{\"1\":{\"id\":1,\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}},\"picture\":{\"1\":{\"id\":1,\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"}}}}}");
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
+            Map.entry("data",
+                Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("company_id", 77),
+                    Map.entry("owner_id",
+                        Map.<String, Object>ofEntries(Map.entry("id", 10), Map.entry("name", "Will Smith"),
+                            Map.entry("email", "will.smith@pipedrive.com"), Map.entry("has_pic", 0),
+                            Map.entry("pic_hash",
+                                "2611ace8ac6a3afe2f69ed56f9e08c6b"),
+                            Map.entry("active_flag", true), Map.entry("value", 10))),
+                    Map.entry("name", "Bolt"), Map.entry("open_deals_count", 1),
+                    Map.entry("related_open_deals_count", 2), Map.entry("closed_deals_count", 3),
+                    Map.entry("related_closed_deals_count", 1), Map.entry("email_messages_count", 2),
+                    Map.entry("people_count", 1), Map.entry("activities_count", 2),
+                    Map.entry("done_activities_count", 1), Map.entry("undone_activities_count", 0),
+                    Map.entry("files_count", 0), Map.entry("notes_count", 0), Map.entry("followers_count", 1),
+                    Map.entry("won_deals_count", 0), Map.entry("related_won_deals_count", 0),
+                    Map.entry("lost_deals_count", 0), Map.entry("related_lost_deals_count", 0),
+                    Map.entry("active_flag", true),
+                    Map.entry("picture_id", Map.<String, Object>ofEntries(Map.entry("item_type", "person"),
+                        Map.entry("item_id", 25), Map.entry("active_flag", true),
+                        Map.entry("add_time", "2020-09-08 08:17:52"), Map.entry("update_time", "0000-00-00 00:00:00"),
+                        Map.entry("added_by_user_id", 967055),
+                        Map.entry("pictures", Map.<String, Object>ofEntries(Map.entry("128",
+                            "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg"),
+                            Map.entry("512",
+                                "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg"))),
+                        Map.entry("value", 101))),
+                    Map.entry("country_code", "USA"), Map.entry("first_char", "b"),
+                    Map.entry("update_time", "2020-09-08 12:14:11"), Map.entry("add_time", "2020-02-25 10:04:08"),
+                    Map.entry("visible_to", 3.0), Map.entry("next_activity_date", LocalDate.of(2019, 11, 29)),
+                    Map.entry("next_activity_time", "11:30:00"), Map.entry("next_activity_id", 128),
+                    Map.entry("last_activity_id", 34), Map.entry("last_activity_date", LocalDate.of(2019, 11, 28)),
+                    Map.entry("label", 7), Map.entry("address", "Mustamäe tee 3a, 10615 Tallinn"),
+                    Map.entry("address_subpremise", ""), Map.entry("address_street_number", "3a"),
+                    Map.entry("address_route", "Mustamäe tee"), Map.entry("address_sublocality", "Kristiine"),
+                    Map.entry("address_locality", "Tallinn"), Map.entry("address_admin_area_level_1", "Harju maakond"),
+                    Map.entry("address_admin_area_level_2", ""), Map.entry("address_country", "Estonia"),
+                    Map.entry("address_postal_code", 10616.0),
+                    Map.entry("address_formatted_address", "Mustamäe tee 3a, 10616 Tallinn, Estonia"),
+                    Map.entry("owner_name", "John Doe"), Map.entry("cc_email", "org@pipedrivemail.com"))),
+            Map.entry("related_objects",
+                Map.<String, Object>ofEntries(
+                    Map.entry("organization", Map.<String, Object>ofEntries(Map.entry("1",
+                        Map.<String, Object>ofEntries(Map.entry("id", 1), Map
+                            .entry("name", "Org Name"), Map.entry("people_count", 1), Map.entry("owner_id", 123),
+                            Map.entry("address", "Mustamäe tee 3a, 10615 Tallinn"), Map.entry("active_flag", true),
+                            Map.entry("cc_email", "org@pipedrivemail.com"))))),
+                    Map.entry("user", Map.<String, Object>ofEntries(Map.entry("123",
+                        Map.<String, Object>ofEntries(Map.entry("id", 123), Map.entry("name", "Jane Doe"), Map
+                            .entry("email", "jane@pipedrive.com"), Map.entry("has_pic", 1),
+                            Map.entry("pic_hash", "2611ace8ac6a3afe2f69ed56f9e08c6b"),
+                            Map.entry("active_flag", true))))),
+                    Map.entry("picture", Map.<String, Object>ofEntries(Map.entry("1", Map.<String, Object>ofEntries(
+                        Map.entry("id", 1), Map.entry("item_type", "person"), Map.entry("item_id", 25),
+                        Map.entry("active_flag", true), Map.entry("add_time", "2020-09-08 08:17:52"),
+                        Map.entry("update_time", "0000-00-00 00:00:00"), Map.entry("added_by_user_id", 967055),
+                        Map.entry("pictures", Map.<String, Object>ofEntries(Map.entry(
+                            "128",
+                            "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"),
+                            Map.entry("512",
+                                "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg")))))))))));
 }
