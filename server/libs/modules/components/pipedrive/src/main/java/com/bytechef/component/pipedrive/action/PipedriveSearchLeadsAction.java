@@ -29,6 +29,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -188,6 +189,31 @@ public class PipedriveSearchLeadsAction {
                 .metadata(
                     Map.of(
                         "responseFormat", ResponseFormat.JSON)))
-        .sampleOutput(
-            "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.29,\"item\":{\"id\":\"39c433f0-8a4c-11ec-8728-09968f0a1ca0\",\"type\":\"lead\",\"title\":\"John Doe lead\",\"owner\":{\"id\":1},\"person\":{\"id\":1,\"name\":\"John Doe\"},\"organization\":{\"id\":1,\"name\":\"John company\"},\"phones\":[],\"emails\":[\"john@doe.com\"],\"custom_fields\":[],\"notes\":[],\"value\":100,\"currency\":\"USD\",\"visible_to\":3,\"is_archived\":false}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}");
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
+            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("items", List.of(Map.<String, Object>ofEntries(
+                Map.entry("result_score", 0.29),
+                Map.entry("item", Map.<String, Object>ofEntries(Map.entry("id", "39c433f0-8a4c-11ec-8728-09968f0a1ca0"),
+                    Map.entry("type", "lead"), Map.entry("title", "John Doe lead"),
+                    Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
+                    Map.entry("person",
+                        Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "John Doe"))),
+                    Map.entry("organization",
+                        Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "John company"))),
+                    Map.entry("phones", List.of()), Map.entry("emails", List.of("john@doe.com")),
+                    Map.entry("custom_fields", List.of()), Map.entry("notes", List.of()), Map.entry("value", 100),
+                    Map.entry("currency", "USD"), Map.entry("visible_to", 3), Map.entry("is_archived", false)))))))),
+            Map.entry("additional_data",
+                Map.<String, Object>ofEntries(Map.entry("description", "The additional data of the list"),
+                    Map.entry("type", "object"),
+                    Map.entry("properties",
+                        Map.<String, Object>ofEntries(
+                            Map.entry("start",
+                                Map.<String, Object>ofEntries(Map.entry("type", "integer"),
+                                    Map.entry("description", "Pagination start"))),
+                            Map.entry("limit",
+                                Map.<String, Object>ofEntries(Map.entry("type", "integer"),
+                                    Map.entry("description", "Items shown per page"))),
+                            Map.entry("more_items_in_collection",
+                                Map.<String, Object>ofEntries(Map.entry("type", "boolean"), Map.entry("description",
+                                    "If there are more list items in the collection than displayed or not")))))))));
 }

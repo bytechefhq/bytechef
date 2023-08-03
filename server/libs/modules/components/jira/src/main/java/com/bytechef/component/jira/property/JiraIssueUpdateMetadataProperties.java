@@ -23,7 +23,7 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */

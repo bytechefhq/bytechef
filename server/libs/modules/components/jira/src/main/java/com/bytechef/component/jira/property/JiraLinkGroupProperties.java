@@ -18,34 +18,44 @@
 package com.bytechef.component.jira.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class JiraLinkGroupProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("id").label("Id")
-                .required(false),
-            string("styleClass").label("Style Class")
-                .required(false),
-            object("header").properties(JiraSimpleLinkProperties.PROPERTIES)
-                .label("Header")
-                .description("Details about the operations available in this version.")
-                .required(false),
-            integer("weight").label("Weight")
-                .required(false),
-            array("links").items(object().properties(JiraSimpleLinkProperties.PROPERTIES)
-                .description("Details about the operations available in this version."))
-                .placeholder("Add to Links")
-                .label("Links")
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("id").label("Id")
+            .required(false),
+        string("styleClass").label("Style Class")
+            .required(false),
+        object("header").properties(JiraSimpleLinkProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .placeholder("Add to Header")
+            .label("Header")
+            .description("Details about the operations available in this version.")
+            .required(false),
+        integer("weight").label("Weight")
+            .required(false),
+        array("links").items(object().properties(JiraSimpleLinkProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .description("Details about the operations available in this version."))
+            .placeholder("Add to Links")
+            .label("Links")
+            .required(false));
 }

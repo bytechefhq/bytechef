@@ -29,6 +29,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -168,6 +170,18 @@ public class PipedriveSearchPersonsAction {
                 .metadata(
                     Map.of(
                         "responseFormat", ResponseFormat.JSON)))
-        .sampleOutput(
-            "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.5092,\"item\":{\"id\":1,\"type\":\"person\",\"name\":\"Jane Doe\",\"phones\":[\"+372 555555555\"],\"emails\":[\"jane@pipedrive.com\"],\"visible_to\":3,\"owner\":{\"id\":1},\"organization\":{\"id\":1,\"name\":\"Organization name\",\"address\":null},\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}");
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
+            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("items",
+                List.of(Map.<String, Object>ofEntries(Map.entry("result_score", 0.5092),
+                    Map.entry("item", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("type", "person"),
+                        Map.entry("name", "Jane Doe"), Map.entry("phones", List.of("+372 555555555")),
+                        Map.entry("emails", List.of("jane@pipedrive.com")), Map.entry("visible_to", 3),
+                        Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
+                        Map.entry("organization",
+                            Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Organization name"),
+                                new AbstractMap.SimpleEntry<>("address", null))),
+                        Map.entry("custom_fields", List.of()), Map.entry("notes", List.of())))))))),
+            Map.entry("additional_data", Map
+                .<String, Object>ofEntries(Map.entry("pagination", Map.<String, Object>ofEntries(Map.entry("start", 0),
+                    Map.entry("limit", 100), Map.entry("more_items_in_collection", false)))))));
 }

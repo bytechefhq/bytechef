@@ -25,31 +25,30 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class JiraJsonTypeBeanProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("type").label("Type")
-                .description("The data type of the field.")
-                .required(true),
-            string("items").label("Items")
-                .description("When the data type is an array, the name of the field items within the array.")
-                .required(false),
-            string("system").label("System")
-                .description("If the field is a system field, the name of the field.")
-                .required(false),
-            string("custom").label("Custom")
-                .description("If the field is a custom field, the URI of the field.")
-                .required(false),
-            integer("customId").label("Custom Id")
-                .description("If the field is a custom field, the custom ID of the field.")
-                .required(false),
-            object("configuration").additionalProperties(object())
-                .placeholder("Add to Configuration")
-                .label("Configuration")
-                .description("If the field is a custom field, the configuration of the field.")
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("type").label("Type")
+            .description("The data type of the field.")
+            .required(true),
+        string("items").label("Items")
+            .description("When the data type is an array, the name of the field items within the array.")
+            .required(false),
+        string("system").label("System")
+            .description("If the field is a system field, the name of the field.")
+            .required(false),
+        string("custom").label("Custom")
+            .description("If the field is a custom field, the URI of the field.")
+            .required(false),
+        integer("customId").label("Custom Id")
+            .description("If the field is a custom field, the custom ID of the field.")
+            .required(false),
+        object("configuration").additionalProperties(object())
+            .placeholder("Add to Configuration")
+            .label("Configuration")
+            .description("If the field is a custom field, the configuration of the field.")
+            .required(false));
 }
