@@ -24,8 +24,6 @@ import java.util.Map;
  */
 public interface InstanceWorkflowManager {
 
-    long createJob(long instanceId, String workflowId);
-
     Map<String, ?> getInputs(long instanceId, String workflowId);
 
     String getType();

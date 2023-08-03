@@ -17,8 +17,6 @@
 
 package com.bytechef.helios.coordinator.instance;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
@@ -33,25 +31,13 @@ import java.util.Map;
 @Component
 public class ProjectInstanceWorkflowManager implements InstanceWorkflowManager {
 
-    private final JobFactoryFacade jobFactoryFacade;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
     public static final String PROJECT = "PROJECT";
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceWorkflowManager(
-        JobFactoryFacade jobFactoryFacade, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
-
-        this.jobFactoryFacade = jobFactoryFacade;
+    public ProjectInstanceWorkflowManager(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
-    }
-
-    @Override
-    public long createJob(long instanceId, String workflowId) {
-        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            instanceId, workflowId);
-
-        return jobFactoryFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
     }
 
     @Override
