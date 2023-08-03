@@ -20,9 +20,14 @@ package com.bytechef.cli.command.component.subcommand;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -60,6 +65,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -101,6 +109,7 @@ public class OpenApiComponentGenerator {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             enable(SerializationFeature.INDENT_OUTPUT);
+            registerModule(new JavaTimeModule());
             registerModule(new Jdk8Module());
         }
     };
@@ -264,7 +273,7 @@ public class OpenApiComponentGenerator {
 
         javacOpts.add("-classpath");
         javacOpts.add(
-            "libs/auto-service-annotations-1.0.1.jar:libs/hermes-component-api-1.0.jar:" +
+            "libs/auto-service-annotations-1.1.1.jar:libs/hermes-component-api-1.0.jar:" +
                 "libs/hermes-definition-api-1.0.jar");
 
         Path parentPath = sourcePath.getParent();
@@ -362,6 +371,18 @@ public class OpenApiComponentGenerator {
         return filteredOperationsMap;
     }
 
+    private static <T> Object convert(Object fromValue, TypeReference<T> toValueType) {
+        try {
+            return OBJECT_MAPPER.convertValue(fromValue, toValueType);
+        } catch (IllegalArgumentException e1) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e1.getMessage(), e1);
+            }
+        }
+
+        return null;
+    }
+
     private String getAbsolutePathname(String subPath) {
         return outputPath + File.separator + componentName + File.separator + subPath;
     }
@@ -370,7 +391,7 @@ public class OpenApiComponentGenerator {
         Operation operation = operationItem.operation();
         String method = operationItem.method();
 
-        OutputEntry outputEntry = getOutputEntry(operation, openAPI);
+        OutputEntry outputEntry = getOutputEntry(operation);
         PropertiesEntry propertiesEntry = getPropertiesEntry(operation, openAPI);
 
         CodeBlock.Builder builder = CodeBlock.builder();
@@ -414,16 +435,16 @@ public class OpenApiComponentGenerator {
             metadataBuilder.build(),
             propertiesEntry.propertiesCodeBlock());
 
-        CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputCodeBlock();
+        CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputSchemaCodeBlock();
 
         if (codeBlock != null && !codeBlock.isEmpty()) {
             builder.add(".outputSchema($L)", codeBlock);
         }
 
-        Object sampleOutput = outputEntry == null ? null : outputEntry.sampleOutput();
+        codeBlock = outputEntry == null ? null : outputEntry.sampleOutputCodeBlock();
 
-        if (sampleOutput != null) {
-            builder.add(".sampleOutput($S)", sampleOutput);
+        if (codeBlock != null && !codeBlock.isEmpty()) {
+            builder.add(".sampleOutput($L)", outputEntry.sampleOutputCodeBlock());
         }
 
         return builder.build();
@@ -947,9 +968,7 @@ public class OpenApiComponentGenerator {
 
         propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
 
-        builder.add(
-            "$L($S)",
-            extensionMap.get("x-property-type"), propertyName);
+        builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
 
         if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
             builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
@@ -1071,13 +1090,9 @@ public class OpenApiComponentGenerator {
         return operationItemsMap;
     }
 
-    @SuppressWarnings({
-        "rawtypes"
-    })
-    private OutputEntry getOutputEntry(Operation operation, OpenAPI openAPI) {
+    private OutputEntry getOutputEntry(Operation operation) {
         ApiResponse apiResponse = null;
         ApiResponses apiResponses = operation.getResponses();
-        CodeBlock.Builder builder = CodeBlock.builder();
         OutputEntry outputEntry = null;
 
         for (String responseCode : List.of("200", "201", "default")) {
@@ -1098,39 +1113,46 @@ public class OpenApiComponentGenerator {
 
                 MediaType mediaType = content.get(mimeType);
 
-                Schema schema = mediaType.getSchema();
-
-                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
-
-                String responseFormat;
-
-                if (Objects.equals(schema.getType(), "string") && Objects.equals(schema.getFormat(), "binary")) {
-                    responseFormat = "BINARY";
-                } else {
-                    responseFormat = switch (mimeType) {
-                        case "application/json" -> "JSON";
-                        case "application/xml" -> "XML";
-                        case "application/octet-stream" -> "BINARY";
-                        default -> "TEXT";
-                    };
-                }
-
-                builder.add(
-                    """
-                        .metadata(
-                           $T.of(
-                             "responseFormat", ResponseFormat.$L
-                           )
-                        )
-                        """,
-                    Map.class,
-                    responseFormat);
-
-                outputEntry = new OutputEntry(builder.build(), mediaType.getExample());
+                outputEntry = new OutputEntry(
+                    getOutputSchemaCodeBlock(mimeType, mediaType), getSampleOutputCodeBlock(mediaType.getExample()));
             }
         }
 
         return outputEntry;
+    }
+
+    private CodeBlock getOutputSchemaCodeBlock(String mimeType, MediaType mediaType) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        Schema schema = mediaType.getSchema();
+
+        builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
+
+        String responseFormat;
+
+        if (Objects.equals(schema.getType(), "string") && Objects.equals(schema.getFormat(), "binary")) {
+            responseFormat = "BINARY";
+        } else {
+            responseFormat = switch (mimeType) {
+                case "application/json" -> "JSON";
+                case "application/xml" -> "XML";
+                case "application/octet-stream" -> "BINARY";
+                default -> "TEXT";
+            };
+        }
+
+        builder.add(
+            """
+                .metadata(
+                   $T.of(
+                     "responseFormat", ResponseFormat.$L
+                   )
+                )
+                """,
+            Map.class,
+            responseFormat);
+
+        return builder.build();
     }
 
     private String getPackageName() {
@@ -1288,15 +1310,142 @@ public class OpenApiComponentGenerator {
         return requestBodyPropertiesEntry;
     }
 
+    private static CodeBlock getSampleOutputCodeBlock(Object sampleOutput) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        if (sampleOutput == null) {
+            return builder.build();
+        } else if (sampleOutput instanceof String string) {
+            Object convertedSampleOutput = null;
+            JsonNode jsonNode = null;
+
+            try {
+                jsonNode = OBJECT_MAPPER.readTree(string);
+            } catch (JsonProcessingException e) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(e.getMessage(), e);
+                }
+            }
+
+            if (jsonNode != null) {
+                convertedSampleOutput = convert(jsonNode, new TypeReference<Map<String, Object>>() {});
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(jsonNode, new TypeReference<List<Map<String, Object>>>() {});
+                }
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Boolean>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Double>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Float>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Long>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Integer>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Short>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDateTime>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDate>() {});
+            }
+
+            if (convertedSampleOutput != null) {
+                sampleOutput = convertedSampleOutput;
+            }
+        } else if (sampleOutput instanceof ObjectNode objectNode) {
+            sampleOutput = convert(objectNode, new TypeReference<Map<String, Object>>() {});
+
+            if (sampleOutput == null) {
+                sampleOutput = convert(objectNode, new TypeReference<List<Map<String, Object>>>() {});
+            }
+        }
+
+        if (sampleOutput instanceof LocalDateTime localDateTime) {
+            builder.add(
+                "$T.of($L,$L,$L,$L,$L,$L)", ClassName.get(LocalDateTime.class),
+                localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth(),
+                localDateTime.getHour(), localDateTime.getMinute(), localDateTime.getSecond());
+        } else if (sampleOutput instanceof LocalDate localDate) {
+            builder.add(
+                "$T.of($L,$L,$L)", ClassName.get(LocalDate.class), localDate.getYear(), localDate.getMonthValue(),
+                localDate.getDayOfMonth());
+        } else if (sampleOutput instanceof Collection<?> collection) {
+            List<?> list = new ArrayList<>(collection);
+
+            builder.add("$T.of(", ClassName.get(List.class));
+
+            for (int i = 0; i < list.size(); i++) {
+                builder.add("$L", getSampleOutputCodeBlock(list.get(i)));
+
+                if (i < list.size() - 1) {
+                    builder.add(",");
+                }
+            }
+
+            builder.add(")");
+        } else if (sampleOutput instanceof Map<?, ?> map) {
+            builder.add("$T.<String, Object>ofEntries(", ClassName.get(Map.class));
+
+            List<Map.Entry<String, CodeBlock>> entries = map.entrySet()
+                .stream()
+                .map(entry -> Map.entry((String) entry.getKey(), getSampleOutputCodeBlock(entry.getValue())))
+                .toList();
+
+            for (int i = 0; i < entries.size(); i++) {
+                Map.Entry<String, CodeBlock> entry = entries.get(i);
+
+                CodeBlock valueCodeBlock = entry.getValue();
+
+                if (valueCodeBlock.isEmpty()) {
+                    builder.add("new $T.SimpleEntry<>($S,$L)", ClassName.get(AbstractMap.class), entry.getKey(), null);
+                } else {
+                    builder.add("Map.entry($S,$L)", entry.getKey(), entry.getValue());
+                }
+
+                if (i < entries.size() - 1) {
+                    builder.add(",");
+                }
+            }
+
+            builder.add(")");
+        } else if (sampleOutput instanceof String string) {
+            builder.add("$S", string);
+        } else {
+            builder.add("$L", sampleOutput);
+        }
+
+        return builder.build();
+    }
+
     private CodeBlock getAdditionalPropertiesCodeBlock(String propertyName, Schema<?> schema, boolean outputSchema) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        if (schema.getAdditionalProperties() instanceof Boolean) {
-            builder.add(
-                """
-                    .additionalProperties(
-                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                        """);
+        if (schema.getAdditionalProperties() instanceof Boolean additionalProperties) {
+            if (additionalProperties) {
+                builder.add(
+                    """
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                            """);
+            }
         } else {
             Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
 
@@ -1315,7 +1464,7 @@ public class OpenApiComponentGenerator {
             }
         }
 
-        if (!outputSchema) {
+        if (!outputSchema && propertyName != null) {
             builder.add(".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
         }
 
@@ -1404,9 +1553,6 @@ public class OpenApiComponentGenerator {
             .collect(CodeBlock.joining(","));
     }
 
-    @SuppressWarnings({
-        "rawtypes"
-    })
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
         boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI) {
@@ -1833,7 +1979,7 @@ public class OpenApiComponentGenerator {
         }
     }
 
-    private record OutputEntry(CodeBlock outputCodeBlock, Object sampleOutput) {
+    private record OutputEntry(CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock) {
     }
 
     private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {
