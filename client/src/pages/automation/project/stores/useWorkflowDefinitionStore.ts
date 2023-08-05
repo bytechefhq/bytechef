@@ -1,15 +1,11 @@
 /* eslint-disable sort-keys */
+import {DataPillType} from '@/types/types';
 import {create} from 'zustand';
 
 type ComponentActionsType = Array<{
     componentName: string;
     actionName: string;
 }>;
-
-type DataPillType = {
-    id: string;
-    display: string;
-};
 
 interface WorkflowDefinitionState {
     componentNames: string[];

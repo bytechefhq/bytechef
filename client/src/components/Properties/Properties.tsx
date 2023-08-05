@@ -55,6 +55,7 @@ interface PropertyProps {
     customClassName?: string;
     actionName?: string;
     formState?: FormState<FieldValues>;
+    mention?: boolean;
     path?: string;
     register?: UseFormRegister<PropertyFormProps>;
 }
@@ -63,6 +64,7 @@ export const Property = ({
     actionName,
     customClassName,
     formState,
+    mention,
     path = 'parameters',
     property,
     register,
@@ -158,6 +160,7 @@ export const Property = ({
                         leadingIcon={
                             TYPE_ICONS[type as keyof typeof TYPE_ICONS]
                         }
+                        mention={mention}
                         name={name!}
                         required={required}
                         title={type}
@@ -273,6 +276,7 @@ interface PropertiesProps {
     customClassName?: string;
     actionName?: string;
     formState?: FormState<FieldValues>;
+    mention?: boolean;
     register?: UseFormRegister<PropertyFormProps>;
 }
 
@@ -280,6 +284,7 @@ const Properties = ({
     actionName,
     customClassName,
     formState,
+    mention,
     properties,
     register,
 }: PropertiesProps) => (
@@ -289,6 +294,7 @@ const Properties = ({
                 actionName={actionName}
                 formState={formState}
                 key={`${property.name}_${index}`}
+                mention={mention}
                 property={property}
                 register={register}
             />

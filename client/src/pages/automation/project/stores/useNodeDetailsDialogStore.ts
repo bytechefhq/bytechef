@@ -19,8 +19,10 @@ interface NodeDetailsState {
     currentNode: Node;
     setCurrentNode: (currentNode: Node) => void;
 
-    focusedInput: HTMLInputElement | null;
-    setFocusedInput: (focusedInput: HTMLInputElement) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    focusedInput: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setFocusedInput: (focusedInput: any) => void;
 }
 
 interface ConnectionNoteState {

@@ -1,10 +1,9 @@
 import Input from 'components/Input/Input';
+import MentionsInput from 'components/MentionsInput/MentionsInput';
 import {useDataPillPanelStore} from 'pages/automation/project/stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from 'pages/automation/project/stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from 'pages/automation/project/stores/useWorkflowDefinitionStore';
-import {ReactNode, SetStateAction, useRef, useState} from 'react';
-import {Mention, MentionsInput} from 'react-mentions';
-import {twMerge} from 'tailwind-merge';
+import {ReactNode, useRef} from 'react';
 
 interface InputPropertyProps {
     controlType?: string;
@@ -13,6 +12,7 @@ interface InputPropertyProps {
     error?: boolean;
     fieldsetClassName?: string;
     hidden?: boolean;
+    mention?: boolean;
     name?: string;
     label?: string;
     leadingIcon?: ReactNode;
@@ -28,12 +28,13 @@ const InputProperty = ({
     hidden,
     label,
     leadingIcon,
+    mention,
     name,
     required,
     title,
 }: InputPropertyProps) => {
-    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {focusedInput, nodeDetailsDialogOpen, setFocusedInput} =
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {nodeDetailsDialogOpen, setFocusedInput} =
         useNodeDetailsDialogStore();
 
     const {dataPills} = useWorkflowDefinitionStore();
@@ -63,57 +64,41 @@ const InputProperty = ({
         }
     };
 
-    const [mentionsInputValue, setMentionsInputValue] = useState('');
-
-    if (dataPillPanelOpen) {
-        return (
-            <div className="w-full">
+    return (
+        <>
+            {mention ? (
                 <MentionsInput
-                    className="p-2"
-                    value={mentionsInputValue}
-                    onChange={(event: {
-                        target: {value: SetStateAction<string>};
-                    }) => setMentionsInputValue(event.target.value)}
-                    singleLine
-                    placeholder="Add data using '@'"
-                    a11ySuggestionsListLabel="Suggested mentions"
-                >
-                    <Mention trigger="@" data={dataPills} />
-                </MentionsInput>
-            </div>
-        );
-    } else {
-        return (
-            <Input
-                className={twMerge(
-                    dataPillPanelOpen &&
-                        focusedInput?.name === name &&
-                        'shadow-lg shadow-blue-200 ring ring-blue-500'
-                )}
-                description={description}
-                defaultValue={defaultValue as string}
-                error={error}
-                fieldsetClassName="flex-1 mb-0"
-                key={name}
-                label={label || name}
-                leadingIcon={leadingIcon}
-                name={name!}
-                required={required}
-                title={title}
-                type={hidden ? 'hidden' : getInputType()}
-                onFocus={() => {
-                    if (nodeDetailsDialogOpen) {
-                        setDataPillPanelOpen(true);
+                    data={dataPills}
+                    id={name!}
+                    placeholder="Mention datapills using '${'"
+                />
+            ) : (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={error}
+                    fieldsetClassName="flex-1 mb-0"
+                    key={name}
+                    label={label || name}
+                    leadingIcon={leadingIcon}
+                    name={name!}
+                    required={required}
+                    title={title}
+                    type={hidden ? 'hidden' : getInputType()}
+                    onFocus={() => {
+                        if (nodeDetailsDialogOpen) {
+                            setDataPillPanelOpen(true);
 
-                        if (inputRef.current) {
-                            setFocusedInput(inputRef.current);
+                            if (inputRef.current) {
+                                setFocusedInput(inputRef.current);
+                            }
                         }
-                    }
-                }}
-                ref={inputRef}
-            />
-        );
-    }
+                    }}
+                    ref={inputRef}
+                />
+            )}
+        </>
+    );
 };
 
 export default InputProperty;
