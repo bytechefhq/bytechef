@@ -9,14 +9,12 @@ import {
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
-import {useEffect} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import getFilteredProperties from '../utils/getFilteredProperties';
 import DataPill from './DataPill';
-
-type dataPillType = {display: string; id: string};
 
 const DataPillPanelBody = ({
     containerHeight,
@@ -25,8 +23,7 @@ const DataPillPanelBody = ({
     containerHeight: number;
     dataPillFilterQuery: string;
 }) => {
-    const {componentActions, componentNames, setDataPills} =
-        useWorkflowDefinitionStore();
+    const {componentActions, componentNames} = useWorkflowDefinitionStore();
 
     const {currentNode} = useNodeDetailsDialogStore();
 
@@ -54,136 +51,6 @@ const DataPillPanelBody = ({
         !!componentActions?.length
     );
 
-    const getFilteredProperties = (
-        properties: PropertyType[],
-        filterQuery: string
-    ) =>
-        properties?.reduce((previousValue: PropertyType[], currentValue) => {
-            const subProperties = getFilteredProperties(
-                currentValue.properties || currentValue.items || [],
-                filterQuery
-            );
-
-            if (
-                currentValue.name
-                    ?.toLowerCase()
-                    .includes(filterQuery.toLowerCase()) ||
-                subProperties.length
-            ) {
-                previousValue.push(Object.assign({}, currentValue));
-            }
-
-            return previousValue;
-        }, []);
-
-    const getSubProperties = (
-        properties: PropertyType[],
-        propertyName: string,
-        componentTitle: string
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): any =>
-        properties.map((subProperty: PropertyType) => {
-            if (subProperty.properties?.length) {
-                return getSubProperties(
-                    subProperty.properties,
-                    propertyName,
-                    componentTitle
-                );
-            } else if (subProperty.items?.length) {
-                return getSubProperties(
-                    subProperty.items,
-                    propertyName,
-                    componentTitle
-                );
-            }
-
-            return {
-                display: `${componentTitle}/${propertyName}/${
-                    subProperty.label || subProperty.name
-                }`,
-                id: `${componentTitle}/${propertyName}/${subProperty.name}`,
-            };
-        });
-
-    const componentProperties = previousComponents?.map((component, index) => {
-        if (!actionData?.length) {
-            return;
-        }
-
-        const outputSchema: PropertyType | undefined =
-            actionData[index]?.outputSchema;
-
-        const properties = outputSchema?.properties?.length
-            ? outputSchema.properties
-            : outputSchema?.items;
-
-        return {
-            componentName: component.title,
-            properties,
-        };
-    });
-
-    const getExistingProperties = (
-        properties: PropertyType[]
-    ): PropertyType[] =>
-        properties.filter((property) => {
-            if (property.properties) {
-                return getExistingProperties(property.properties);
-            } else if (property.items) {
-                return getExistingProperties(property.items);
-            }
-
-            return !!property.name;
-        });
-
-    const availableDataPills: dataPillType[] = [];
-
-    componentProperties?.forEach((componentProperty) => {
-        if (!componentProperty) {
-            return;
-        }
-
-        const existingProperties = getExistingProperties(
-            componentProperty.properties!
-        );
-
-        const formattedProperties: dataPillType[] = existingProperties.map(
-            (property: PropertyType) => {
-                if (property.properties) {
-                    return getSubProperties(
-                        property.properties,
-                        property.name!,
-                        componentProperty.componentName!
-                    );
-                } else if (property.items) {
-                    return getSubProperties(
-                        property.items,
-                        property.name!,
-                        componentProperty.componentName!
-                    );
-                }
-
-                return {
-                    display: `${componentProperty.componentName}/${
-                        property.label || property.name
-                    }`,
-                    id: property.name,
-                };
-            }
-        );
-
-        if (existingProperties.length && formattedProperties.length) {
-            availableDataPills.push(...formattedProperties);
-        }
-    });
-
-    useEffect(() => {
-        if (availableDataPills) {
-            setDataPills(availableDataPills.flat(Infinity));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [availableDataPills.length]);
-
     return (
         <Accordion className="h-full" collapsible type="single">
             {previousComponents?.map(
@@ -206,10 +73,10 @@ const DataPillPanelBody = ({
                     );
 
                     const filteredProperties = existingProperties?.length
-                        ? getFilteredProperties(
-                              existingProperties,
-                              dataPillFilterQuery
-                          )
+                        ? getFilteredProperties({
+                              filterQuery: dataPillFilterQuery,
+                              properties: existingProperties,
+                          })
                         : [];
 
                     return (
@@ -247,12 +114,10 @@ const DataPillPanelBody = ({
                                     >
                                         <ul className="flex w-full flex-col space-y-2 group-data-[state=open]:h-full">
                                             {filteredProperties?.map(
-                                                (property: PropertyType) => (
+                                                (property) => (
                                                     <DataPill
+                                                        component={component}
                                                         key={property.name}
-                                                        onClick={() =>
-                                                            console.log('TODO')
-                                                        }
                                                         property={property}
                                                     />
                                                 )
