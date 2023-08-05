@@ -1,5 +1,5 @@
 [versions]
-ch-qos-logback = "1.4.8"
+ch-qos-logback = "1.4.9"
 checkstyle = "10.6.0"
 com-github-kagkarlsson = "12.4.0"
 com-google-auto-service = "1.1.1"
@@ -7,8 +7,8 @@ info-picocli = "4.7.4"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.0.1"
 org-springframework-boot = "3.1.2"
-org-springframework-cloud = "4.0.3"
-org-springframework-cloud-dependencies = "2022.0.3"
+org-springframework-cloud = "4.0.4"
+org-springframework-cloud-dependencies = "2022.0.4"
 org-testcontainers = "1.18.3"
 pmd = "6.54.0"
 spotbugs = "4.7.3"
@@ -35,18 +35,19 @@ jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotati
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
 mysql-mysql-connector-java = "mysql:mysql-connector-java:8.0.33"
-org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.29.0"
+org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.30.0"
 org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.1"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-apache-tika-tika-core = "org.apache.tika:tika-core:2.8.0"
-org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.3"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.0.1"
 org-json = "org.json:json:20230618"
+org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.10.0"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
+org-mockito-mockito-inline = "org.mockito:mockito-inline:5.2.0"
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.7"
 org-springdoc-springdoc-openapi-starter-webmvc-ui = "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0"
@@ -68,12 +69,12 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.109"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.120"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.20.0"
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.47.0"
-com-github-spotbugs = "com.github.spotbugs:5.0.14"
+com-github-spotbugs = "com.github.spotbugs:5.1.1"
 com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.2"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"
