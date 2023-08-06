@@ -34,6 +34,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -58,7 +59,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-
+@ConditionalOnEnabled("coordinator")
 @EnableConfigurationProperties(TaskCoordinatorProperties.class)
 public class TaskCoordinatorConfiguration {
 

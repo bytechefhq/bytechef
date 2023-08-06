@@ -85,16 +85,14 @@ public class WorkflowExecutionSyncConfiguration {
         TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
-
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
-
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
         JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
-        EventPublisher eventPublisher = getEventPublisher(jobService, syncMessageBroker, taskExecutionService);
+        EventPublisher eventPublisher = createEventPublisher(jobService, syncMessageBroker, taskExecutionService);
 
         JobFactoryFacade jobFactoryFacade = new JobFactoryFacadeImpl(
             contextService, eventPublisher, jobService, syncMessageBroker, workflowService);
@@ -119,7 +117,7 @@ public class WorkflowExecutionSyncConfiguration {
             taskExecutionService);
     }
 
-    private EventPublisher getEventPublisher(
+    private EventPublisher createEventPublisher(
         JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         List<EventListener> eventListeners = List.of(

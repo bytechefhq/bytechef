@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
@@ -37,8 +38,8 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ProjectController implements ProjectsApi {
 
     private final ConversionService conversionService;

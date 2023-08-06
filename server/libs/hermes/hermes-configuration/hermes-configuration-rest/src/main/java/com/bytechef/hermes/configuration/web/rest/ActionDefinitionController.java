@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.util.WorkflowUtils;
@@ -33,6 +34,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@ConditionalOnEnabled("coordinator")
 public class ActionDefinitionController implements ActionDefinitionsApi {
 
     private final ActionDefinitionService actionDefinitionService;

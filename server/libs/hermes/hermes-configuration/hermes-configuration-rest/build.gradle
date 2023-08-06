@@ -50,6 +50,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-web"
+    implementation project(":server:libs:core:autoconfigure-annotations")
     implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-api")
     implementation project(":server:libs:hermes:hermes-test:hermes-test-api")

@@ -15,20 +15,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.discovery.redis.config;
+package com.bytechef.atlas.worker.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@ConditionalOnProperty(value = "spring.cloud.config.discovery")
 @Configuration
-@Import({
-    RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
-})
-public class RedisDiscoveryClientBootstrapConfiguration {
+public class TaskHandlerRegistryConfiguration {
+
+    @Bean
+    TaskHandlerRegistry taskHandlerRegistry(Map<String, TaskHandler<?>> taskHandlerMap) {
+        return taskHandlerMap::get;
+    }
 }
