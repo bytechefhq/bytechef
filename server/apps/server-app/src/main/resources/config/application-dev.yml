@@ -23,5 +23,3 @@ spring:
   h2:
     console:
       enabled: false
-  messages:
-    cache-duration: PT1S
