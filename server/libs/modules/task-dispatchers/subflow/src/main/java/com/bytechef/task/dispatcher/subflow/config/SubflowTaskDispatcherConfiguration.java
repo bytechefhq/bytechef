@@ -18,13 +18,13 @@
 package com.bytechef.task.dispatcher.subflow.config;
 
 import com.bytechef.atlas.execution.facade.JobFactoryFacade;
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,8 +32,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='worker-service-app'")
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='coordinator-service-app'")
+@ConditionalOnEnabled("coordinator")
 public class SubflowTaskDispatcherConfiguration {
 
     @Bean("subflowTaskDispatcherResolverFactory_v1")
@@ -42,12 +41,13 @@ public class SubflowTaskDispatcherConfiguration {
     }
 
     @Configuration
-    @ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='worker-service-app'")
+    @ConditionalOnEnabled("coordinator")
     public static class SubflowJobStatusEventListenerConfiguration {
 
         @Bean
         SubflowJobStatusEventListener subflowJobStatusEventListener(
             JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+
             return new SubflowJobStatusEventListener(jobService, messageBroker, taskExecutionService);
         }
     }

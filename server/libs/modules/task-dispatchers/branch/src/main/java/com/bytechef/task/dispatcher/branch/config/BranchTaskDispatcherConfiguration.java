@@ -24,8 +24,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -33,17 +31,19 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='coordinator-service-app'")
 public class BranchTaskDispatcherConfiguration {
 
-    @Autowired
-    private ContextService contextService;
+    private final ContextService contextService;
+    private final MessageBroker messageBroker;
+    private final TaskExecutionService taskExecutionService;
 
-    @Autowired
-    private MessageBroker messageBroker;
+    public BranchTaskDispatcherConfiguration(
+        ContextService contextService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
-    @Autowired
-    private TaskExecutionService taskExecutionService;
+        this.contextService = contextService;
+        this.messageBroker = messageBroker;
+        this.taskExecutionService = taskExecutionService;
+    }
 
     @Bean("branchTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory branchTaskCompletionHandlerFactory() {

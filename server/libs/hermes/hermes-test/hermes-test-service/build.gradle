@@ -4,6 +4,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory")
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-service")
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-sync")
+    implementation project(":server:libs:core:autoconfigure-annotations")
     implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:event:event-listener:event-listener-api")

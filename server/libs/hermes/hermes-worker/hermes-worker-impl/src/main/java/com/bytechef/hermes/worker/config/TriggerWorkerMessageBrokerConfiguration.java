@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.worker.config;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
@@ -30,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-
+@ConditionalOnEnabled("worker")
 public class TriggerWorkerMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;

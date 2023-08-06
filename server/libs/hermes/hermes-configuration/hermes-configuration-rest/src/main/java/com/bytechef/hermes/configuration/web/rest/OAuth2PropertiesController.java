@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@ConditionalOnEnabled("coordinator")
 public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
     private final OAuth2Service oAuth2Service;

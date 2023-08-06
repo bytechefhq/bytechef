@@ -15,20 +15,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.discovery.redis.config;
+package com.bytechef.autoconfigure.annotation;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.springframework.context.annotation.Conditional;
 
 /**
  * @author Ivica Cardic
  */
-@ConditionalOnProperty(value = "spring.cloud.config.discovery")
-@Configuration
-@Import({
-    RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({
+    ElementType.TYPE, ElementType.METHOD
 })
-public class RedisDiscoveryClientBootstrapConfiguration {
+@Conditional(OnEnabledCondition.class)
+public @interface ConditionalOnEnabled {
+
+    String[] value();
 }

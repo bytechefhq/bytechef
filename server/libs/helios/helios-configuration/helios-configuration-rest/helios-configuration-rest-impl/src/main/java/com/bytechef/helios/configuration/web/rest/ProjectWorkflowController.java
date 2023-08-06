@@ -19,6 +19,7 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -35,6 +36,7 @@ import java.util.List;
 @RestController
 
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ProjectWorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
