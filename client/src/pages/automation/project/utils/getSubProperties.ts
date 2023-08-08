@@ -8,28 +8,32 @@ export default function getSubProperties({
 }: {
     component: ComponentDefinitionModel;
     properties: PropertyType[];
-    propertyName: string;
+    propertyName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any {
     return properties.map((subProperty) => {
+        const subPropertyLabel = subProperty.label || subProperty.name;
+
         if (subProperty.properties?.length) {
             return getSubProperties({
                 component,
                 properties: subProperty.properties,
-                propertyName,
+                propertyName: subPropertyLabel,
             });
         } else if (subProperty.items?.length) {
             return getSubProperties({
                 component,
                 properties: subProperty.items,
-                propertyName,
+                propertyName: subPropertyLabel,
             });
         }
 
         return {
             component: JSON.stringify(component),
             id: subProperty.name,
-            value: `${propertyName}/${subProperty.label || subProperty.name}`,
+            value: propertyName
+                ? `${propertyName}/${subPropertyLabel}`
+                : `${subPropertyLabel}`,
         };
     });
 }

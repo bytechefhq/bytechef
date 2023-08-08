@@ -171,13 +171,11 @@ const NodeDetailsDialog = () => {
                     return getSubProperties({
                         component: componentProperty.component!,
                         properties: property.properties,
-                        propertyName: property.name!,
                     });
                 } else if (property.items) {
                     return getSubProperties({
                         component: componentProperty.component!,
                         properties: property.items,
-                        propertyName: property.name!,
                     });
                 }
 

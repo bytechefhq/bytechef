@@ -8,10 +8,12 @@ import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 
 const DataPill = ({
     component,
+    parentProperty,
     property,
 }: {
     component: ComponentDefinitionModel;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
+    parentProperty?: PropertyType;
     property: PropertyType;
 }) => {
     const {focusedInput} = useNodeDetailsDialogStore();
@@ -20,13 +22,23 @@ const DataPill = ({
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 
-    const addDataPillToInput = (property: PropertyType) => {
+    const addDataPillToInput = (
+        dataPill: PropertyType,
+        parentProperty?: PropertyType
+    ) => {
+        const parentPropertyLabel =
+            parentProperty?.label || parentProperty?.name;
+
+        const dataPillLabel = parentPropertyLabel
+            ? `${parentPropertyLabel}/${dataPill.label || dataPill.name}`
+            : `${dataPill.label || dataPill.name}`;
+
         mentionInput.insertItem(
             {
                 component,
                 icon: component.icon,
-                id: property.label || property.name,
-                value: property.name,
+                id: dataPill.name,
+                value: dataPillLabel,
             },
             true,
             {blotName: 'bytechef-mention'}
@@ -44,7 +56,7 @@ const DataPill = ({
             {subProperties ? (
                 <fieldset className="flex flex-col rounded-lg border-2 border-gray-400 px-2 pb-2">
                     <legend className="px-2 pb-2 text-sm font-semibold uppercase text-gray-500">
-                        {property.label}
+                        {property.label || property.name}
                     </legend>
 
                     <ul className="flex flex-col space-y-2">
@@ -52,8 +64,11 @@ const DataPill = ({
                             <DataPill
                                 component={component}
                                 key={`${subProperty.name}-${index}`}
-                                onClick={() => addDataPillToInput(subProperty)}
+                                onClick={() =>
+                                    addDataPillToInput(subProperty, property)
+                                }
                                 property={subProperty}
+                                parentProperty={property}
                             />
                         ))}
                     </ul>
@@ -66,7 +81,7 @@ const DataPill = ({
                     onDragStart={(event) =>
                         event.dataTransfer.setData('name', property.name!)
                     }
-                    onClick={() => addDataPillToInput(property)}
+                    onClick={() => addDataPillToInput(property, parentProperty)}
                 >
                     <span className="mr-2" title={property.type}>
                         {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
