@@ -34,5 +34,8 @@ dependencies {
     implementation project(":server:libs:helios:helios-connection:helios-connection-service")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
 
+    runtimeOnly "org.postgresql:postgresql"
+    runtimeOnly "com.zaxxer:HikariCP"
+
     testImplementation project(":server:libs:test:test-int-support")
 }

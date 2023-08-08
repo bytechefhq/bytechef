@@ -13,15 +13,12 @@ management:
         liveness:
           include: livenessState
         readiness:
-          include: readinessState,db
+          include: readinessState
   info:
     git:
       mode: full
     env:
       enabled: true
-  health:
-    rabbit:
-      enabled: false # When using Rabbit, will be set to true via post-processor
   metrics:
     enable:
       http: true
@@ -100,18 +97,8 @@ spring:
 bytechef:
   discovery-service:
     provider: redis
-  context-repository:
-    provider: jdbc
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-  workflow-repository:
-    classpath:
-      enabled: true
-    filesystem:
-      enabled: true
-      location-pattern: ${user.home}/bytechef/**/*.yaml
-    jdbc:
-      enabled: true

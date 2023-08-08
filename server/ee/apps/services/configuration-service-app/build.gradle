@@ -45,5 +45,8 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest")
     implementation project(":server:libs:hermes:hermes-configuration:hermes-configuration-service")
 
+    runtimeOnly "org.postgresql:postgresql"
+    runtimeOnly "com.zaxxer:HikariCP"
+
     testImplementation project(":server:libs:test:test-int-support")
 }

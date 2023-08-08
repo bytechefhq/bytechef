@@ -13,15 +13,12 @@ management:
         liveness:
           include: livenessState
         readiness:
-          include: readinessState,db
+          include: readinessState
   info:
     git:
       mode: full
     env:
       enabled: true
-  health:
-    rabbit:
-      enabled: false # When using Rabbit, will be set to true via post-processor
   metrics:
     enable:
       http: true
@@ -67,8 +64,6 @@ spring:
       write-null-map-values: false
     date-format: ${bytechef.serialization.date-format}
     time-zone: UTC
-  liquibase:
-    contexts: worker
   profiles:
     active: #spring.profiles.active#
     group:

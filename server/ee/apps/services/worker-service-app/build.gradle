@@ -11,7 +11,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-aop"
-    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
@@ -29,7 +28,6 @@ dependencies {
     implementation project(":server:ee:libs:hermes:hermes-worker:hermes-worker-remote-rest")
 
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
-    implementation project(":server:libs:configs:liquibase-config")
     implementation project(":server:libs:core:message-broker:message-broker-amqp")
     implementation project(":server:libs:core:message-broker:message-broker-kafka")
     implementation project(":server:libs:core:message-broker:message-broker-redis")

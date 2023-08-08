@@ -30,9 +30,6 @@ management:
       mode: full
     env:
       enabled: true
-  health:
-    rabbit:
-      enabled: false # When using Rabbit, will be set to true via post-processor
   metrics:
     enable:
       http: true
@@ -70,6 +67,13 @@ spring:
     redis:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${bytechef.datasource.url}
+    username: ${bytechef.datasource.username}
+    password: ${bytechef.datasource.password}
+    hikari:
+      poolName: Hikari
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -81,7 +85,7 @@ spring:
   jmx:
     enabled: false
   liquibase:
-      contexts: execution
+      contexts: execution,data-storage
   output:
     ansi:
       console-available: true
