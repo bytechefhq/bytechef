@@ -24,6 +24,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +38,7 @@ public class BranchTaskDispatcherConfiguration {
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
         ContextService contextService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
