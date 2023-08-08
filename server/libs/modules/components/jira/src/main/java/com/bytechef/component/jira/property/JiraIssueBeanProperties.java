@@ -90,8 +90,6 @@ public class JiraIssueBeanProperties {
             .description("A list of editable field details.")
             .required(false),
         object("changelog").properties(JiraPageOfChangelogsProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .placeholder("Add to Changelog")
             .label("Changelog")
             .description("A page of changelogs.")
@@ -102,8 +100,6 @@ public class JiraIssueBeanProperties {
             .description("The versions of each field on the issue.")
             .required(false),
         object("fieldsToInclude").properties(JiraIncludedFieldsProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .placeholder("Add to Fields To Include")
             .label("Fields To Include")
             .required(false),

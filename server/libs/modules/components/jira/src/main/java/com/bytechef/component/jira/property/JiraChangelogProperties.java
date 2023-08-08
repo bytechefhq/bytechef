@@ -42,8 +42,6 @@ public class JiraChangelogProperties {
             .description("The ID of the changelog.")
             .required(false),
         object("author").properties(JiraUserDetailsProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .placeholder("Add to Author")
             .label("Author")
             .description(
@@ -57,8 +55,6 @@ public class JiraChangelogProperties {
             .description("The date on which the change took place.")
             .required(false),
         array("items").items(object().properties(JiraChangeDetailsProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .description("A change item."))
             .placeholder("Add to Items")
             .label("Items")

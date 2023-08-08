@@ -67,7 +67,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -212,7 +211,7 @@ public class OpenApiComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "time")
             .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
-            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
+            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseType")
             .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
     }
 
@@ -1128,12 +1127,12 @@ public class OpenApiComponentGenerator {
 
         builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
 
-        String responseFormat;
+        String responseType;
 
         if (Objects.equals(schema.getType(), "string") && Objects.equals(schema.getFormat(), "binary")) {
-            responseFormat = "BINARY";
+            responseType = "BINARY";
         } else {
-            responseFormat = switch (mimeType) {
+            responseType = switch (mimeType) {
                 case "application/json" -> "JSON";
                 case "application/xml" -> "XML";
                 case "application/octet-stream" -> "BINARY";
@@ -1145,12 +1144,12 @@ public class OpenApiComponentGenerator {
             """
                 .metadata(
                    $T.of(
-                     "responseFormat", ResponseFormat.$L
+                     "responseType", ResponseType.$L
                    )
                 )
                 """,
             Map.class,
-            responseFormat);
+            responseType);
 
         return builder.build();
     }
@@ -1415,7 +1414,7 @@ public class OpenApiComponentGenerator {
                 CodeBlock valueCodeBlock = entry.getValue();
 
                 if (valueCodeBlock.isEmpty()) {
-                    builder.add("new $T.SimpleEntry<>($S,$L)", ClassName.get(AbstractMap.class), entry.getKey(), null);
+                    builder.add("Map.entry($S,$S)", entry.getKey(), "");
                 } else {
                     builder.add("Map.entry($S,$L)", entry.getKey(), entry.getValue());
                 }

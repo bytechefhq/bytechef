@@ -30,13 +30,12 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.util.Map;
 
 import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -118,7 +117,7 @@ public class MailchimpSubscribeTrigger {
                         "user", true,
                         "admin", true,
                         "api", true))))
-            .configuration(responseFormat(ResponseFormat.JSON))
+            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .execute()
             .body();
 

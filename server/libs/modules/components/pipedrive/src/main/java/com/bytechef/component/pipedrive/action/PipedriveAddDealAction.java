@@ -28,11 +28,10 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.time.LocalDate;
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
@@ -362,20 +361,18 @@ public class PipedriveAddDealAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+                    "responseType", ResponseType.JSON)))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
             Map.entry("data",
                 Map.<String, Object>ofEntries(Map.entry("id", 1),
                     Map.entry("creator_user_id",
                         Map.<String, Object>ofEntries(Map.entry("id", 8877), Map.entry("name", "Creator"),
                             Map.entry("email", "john.doe@pipedrive.com"), Map.entry("has_pic", false),
-                            new AbstractMap.SimpleEntry<>("pic_hash", null), Map.entry("active_flag", true),
-                            Map.entry("value", 8877))),
+                            Map.entry("pic_hash", ""), Map.entry("active_flag", true), Map.entry("value", 8877))),
                     Map.entry("user_id",
                         Map.<String, Object>ofEntries(Map.entry("id", 8877), Map.entry("name", "Creator"),
                             Map.entry("email", "john.doe@pipedrive.com"), Map.entry("has_pic", false),
-                            new AbstractMap.SimpleEntry<>("pic_hash", null), Map.entry("active_flag", true),
-                            Map.entry("value", 8877))),
+                            Map.entry("pic_hash", ""), Map.entry("active_flag", true), Map.entry("value", 8877))),
                     Map.entry("person_id",
                         Map.<String, Object>ofEntries(Map.entry("active_flag", true), Map.entry("name", "Person"),
                             Map.entry("email",
@@ -393,17 +390,15 @@ public class PipedriveAddDealAction {
                     Map.entry("currency", "EUR"), Map.entry("add_time", "2019-05-29 04:21:51"),
                     Map.entry("update_time", "2019-11-28 16:19:50"),
                     Map.entry("stage_change_time", "2019-11-28 15:41:22"), Map.entry("active", true),
-                    Map.entry("deleted", false), Map.entry("status", "open"),
-                    new AbstractMap.SimpleEntry<>("probability", null),
+                    Map.entry("deleted", false), Map.entry("status", "open"), Map.entry("probability", ""),
                     Map.entry("next_activity_date", LocalDate.of(2019, 11, 29)),
                     Map.entry("next_activity_time", "11:30:00"), Map.entry("next_activity_id", 128),
-                    new AbstractMap.SimpleEntry<>("last_activity_id", null),
-                    new AbstractMap.SimpleEntry<>("last_activity_date", null),
-                    new AbstractMap.SimpleEntry<>("lost_reason", null), Map.entry("visible_to", 1.0),
-                    new AbstractMap.SimpleEntry<>("close_time", null), Map.entry("pipeline_id", 1),
-                    Map.entry("won_time", "2019-11-27 11:40:36"), Map.entry("first_won_time", "2019-11-27 11:40:36"),
-                    Map.entry("lost_time", ""), Map.entry("products_count", 0), Map.entry("files_count", 0),
-                    Map.entry("notes_count", 2), Map.entry("followers_count", 0), Map.entry("email_messages_count", 4),
+                    Map.entry("last_activity_id", ""), Map.entry("last_activity_date", ""),
+                    Map.entry("lost_reason", ""), Map.entry("visible_to", 1.0), Map.entry("close_time", ""),
+                    Map.entry("pipeline_id", 1), Map.entry("won_time", "2019-11-27 11:40:36"),
+                    Map.entry("first_won_time", "2019-11-27 11:40:36"), Map.entry("lost_time", ""),
+                    Map.entry("products_count", 0), Map.entry("files_count", 0), Map.entry("notes_count", 2),
+                    Map.entry("followers_count", 0), Map.entry("email_messages_count", 4),
                     Map.entry("activities_count", 1), Map.entry("done_activities_count", 0),
                     Map.entry("undone_activities_count", 1), Map.entry("participants_count", 1),
                     Map.entry("expected_close_date", LocalDate.of(2019, 6, 29)),
@@ -414,23 +409,24 @@ public class PipedriveAddDealAction {
                     Map.entry("next_activity_type", "call"), Map.entry("next_activity_duration", "00:30:00"),
                     Map.entry("next_activity_note", "Note content"), Map.entry("formatted_value", "€5,000"),
                     Map.entry("weighted_value", 5000), Map.entry("formatted_weighted_value", "€5,000"),
-                    Map.entry("weighted_value_currency", "EUR"), new AbstractMap.SimpleEntry<>("rotten_time", null),
+                    Map.entry("weighted_value_currency", "EUR"), Map.entry("rotten_time", ""),
                     Map.entry("owner_name", "Creator"), Map.entry("cc_email", "company+deal1@pipedrivemail.com"),
                     Map.entry("org_hidden", false), Map.entry("person_hidden", false))),
-            Map.entry("related_objects",
-                Map.<String, Object>ofEntries(
-                    Map.entry("user", Map.<String, Object>ofEntries(Map.entry("8877",
-                        Map.<String, Object>ofEntries(Map.entry("id", 8877), Map.entry("name", "Creator"), Map
-                            .entry("email", "john.doe@pipedrive.com"), Map.entry("has_pic", false),
-                            new AbstractMap.SimpleEntry<>("pic_hash", null), Map.entry("active_flag", true))))),
-                    Map.entry("organization",
-                        Map.<String, Object>ofEntries(Map.entry("2", Map.<String, Object>ofEntries(Map.entry("id", 2),
-                            Map.entry("name", "Organization"), Map.entry("people_count", 2),
-                            Map.entry("owner_id", 8877), Map.entry("address", "Mustamäe tee 3a, 10615 Tallinn"),
-                            Map.entry("active_flag", true), Map.entry("cc_email", "org@pipedrivemail.com"))))),
-                    Map.entry("person",
-                        Map.<String, Object>ofEntries(Map.entry("1101", Map.<String, Object>ofEntries(
-                            Map.entry("active_flag", true), Map.entry("id", 1101), Map.entry("name", "Person"),
+            Map.entry("related_objects", Map.<String, Object>ofEntries(
+                Map.entry("user",
+                    Map.<String, Object>ofEntries(Map.entry("8877", Map.<String, Object>ofEntries(Map.entry("id", 8877),
+                        Map.entry("name", "Creator"), Map.entry("email", "john.doe@pipedrive.com"),
+                        Map.entry("has_pic", false), Map.entry("pic_hash", ""), Map.entry("active_flag", true))))),
+                Map.entry("organization",
+                    Map.<String, Object>ofEntries(Map.entry("2",
+                        Map.<String, Object>ofEntries(Map.entry("id", 2), Map.entry("name", "Organization"),
+                            Map.entry("people_count", 2), Map.entry("owner_id", 8877),
+                            Map.entry("address", "Mustamäe tee 3a, 10615 Tallinn"), Map.entry("active_flag", true),
+                            Map.entry("cc_email", "org@pipedrivemail.com"))))),
+                Map.entry("person",
+                    Map.<String, Object>ofEntries(Map.entry("1101",
+                        Map.<String, Object>ofEntries(Map.entry("active_flag", true), Map.entry("id", 1101),
+                            Map.entry("name", "Person"),
                             Map.entry("email",
                                 List.of(Map.<String, Object>ofEntries(Map.entry("label", "work"),
                                     Map.entry("value", "person@pipedrive.com"), Map.entry("primary", true)))),
@@ -438,18 +434,17 @@ public class PipedriveAddDealAction {
                                 List.of(Map.<String, Object>ofEntries(Map.entry("label", "work"),
                                     Map.entry("value", 3.421787767E9), Map.entry("primary", true)))),
                             Map.entry("owner_id", 8877))))),
-                    Map.entry("stage", Map.<String, Object>ofEntries(Map.entry("2",
-                        Map.<String, Object>ofEntries(Map.entry("id", 2), Map.entry("company_id", 123),
-                            Map.entry("order_nr", 1), Map.entry("name", "Stage Name"), Map.entry("active_flag", true),
-                            Map.entry("deal_probability", 100), Map.entry("pipeline_id", 1),
-                            Map.entry("rotten_flag", false), new AbstractMap.SimpleEntry<>("rotten_days", null),
-                            Map.entry("add_time", "2015-12-08 13:54:06"),
-                            Map.entry("update_time", "2015-12-08 13:54:06"), Map.entry("pipeline_name", "Pipeline"),
-                            Map.entry("pipeline_deal_probability", true))))),
-                    Map.entry("pipeline",
-                        Map.<String, Object>ofEntries(Map.entry("1",
-                            Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Pipeline"),
-                                Map.entry("url_title", "Pipeline"), Map.entry("order_nr", 0), Map.entry("active", true),
-                                Map.entry("deal_probability", true), Map.entry("add_time", "2015-12-08 10:00:24"),
-                                Map.entry("update_time", "2015-12-08 10:00:24")))))))));
+                Map.entry("stage",
+                    Map.<String, Object>ofEntries(Map.entry("2", Map.<String, Object>ofEntries(Map.entry("id", 2),
+                        Map.entry("company_id", 123), Map.entry("order_nr", 1), Map.entry("name", "Stage Name"),
+                        Map.entry("active_flag", true), Map.entry("deal_probability", 100), Map.entry("pipeline_id", 1),
+                        Map.entry("rotten_flag", false), Map.entry("rotten_days", ""),
+                        Map.entry("add_time", "2015-12-08 13:54:06"), Map.entry("update_time", "2015-12-08 13:54:06"),
+                        Map.entry("pipeline_name", "Pipeline"), Map.entry("pipeline_deal_probability", true))))),
+                Map.entry("pipeline",
+                    Map.<String, Object>ofEntries(Map.entry("1",
+                        Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Pipeline"),
+                            Map.entry("url_title", "Pipeline"), Map.entry("order_nr", 0), Map.entry("active", true),
+                            Map.entry("deal_probability", true), Map.entry("add_time", "2015-12-08 10:00:24"),
+                            Map.entry("update_time", "2015-12-08 10:00:24")))))))));
 }

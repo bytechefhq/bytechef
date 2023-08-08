@@ -23,11 +23,10 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.time.LocalDate;
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
@@ -273,7 +272,7 @@ public class PipedriveGetOrganizationAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", ResponseFormat.JSON)))
+                        "responseType", ResponseType.JSON)))
         .sampleOutput(
             Map.<String, Object>ofEntries(Map.entry("success", true),
                 Map.entry("data",
@@ -361,7 +360,7 @@ public class PipedriveGetOrganizationAction {
                                             Map.entry("email_address", "attendee@pipedrivemail.com"),
                                             Map.entry("is_organizer", 0), Map.entry("name", "Attendee"),
                                             Map.entry("person_id", 25312), Map.entry("status", "noreply"),
-                                            new AbstractMap.SimpleEntry<>("user_id", null)))),
+                                            Map.entry("user_id", "")))),
                                     Map.entry("participants",
                                         List.of(
                                             Map.<String, Object>ofEntries(Map.entry("person_id", 17985),
@@ -377,7 +376,7 @@ public class PipedriveGetOrganizationAction {
                                         Map.entry("clean_name", "Audio 10:55:07.m4a"),
                                         Map.entry("url",
                                             "https://pipedrive-files.s3-eu-west-1.amazonaws.com/Audio-recording.m4a"))))),
-                                new AbstractMap.SimpleEntry<>("next_activity", null),
+                                Map.entry("next_activity", ""),
                                 Map.entry("additional_data", Map.<String, Object>ofEntries(Map.entry("pagination",
                                     Map.<String, Object>ofEntries(Map.entry("start", 0), Map.entry("limit", 100),
                                         Map.entry("more_items_in_collection", false), Map.entry("next_start", 100))))),

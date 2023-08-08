@@ -26,7 +26,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -139,7 +139,7 @@ public class PipedriveSearchOrganizationAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", ResponseFormat.JSON)))
+                        "responseType", ResponseType.JSON)))
         .sampleOutput(
             Map.<String, Object>ofEntries(
                 Map.entry("success", true), Map

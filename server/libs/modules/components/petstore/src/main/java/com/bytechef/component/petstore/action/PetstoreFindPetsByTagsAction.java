@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.component.petstore.property.PetstorePetProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -54,5 +54,5 @@ public class PetstoreFindPetsByTagsAction {
         .outputSchema(array().items(object().properties(PetstorePetProperties.PROPERTIES))
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)));
+                    "responseType", ResponseType.JSON)));
 }

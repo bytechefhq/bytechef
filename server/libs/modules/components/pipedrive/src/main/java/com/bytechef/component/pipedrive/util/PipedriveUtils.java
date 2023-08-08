@@ -20,7 +20,7 @@ package com.bytechef.component.pipedrive.util;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.Option;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 /**
@@ -49,7 +49,7 @@ public class PipedriveUtils {
                         "event_object", eventObject,
                         "event_action", eventAction,
                         "subscription_url", webhookUrl)))
-            .configuration(responseFormat(ResponseFormat.JSON))
+            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .execute()
             .body();
 
@@ -59,7 +59,7 @@ public class PipedriveUtils {
     public static void unsubscribeWebhook(String webhookId) {
         HttpClientUtils
             .delete("/api/v1/webhooks/%s".formatted(webhookId))
-            .configuration(responseFormat(ResponseFormat.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute();
     }
 
@@ -71,7 +71,7 @@ public class PipedriveUtils {
                     dependsOn == null
                         ? Map.of()
                         : Map.of(dependsOn, List.of(MapValueUtils.getString(inputParameters, dependsOn, ""))))
-                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
                 .execute()
                 .getBody();
 

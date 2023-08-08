@@ -26,7 +26,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.Type;
 import org.springframework.util.StringUtils;
@@ -56,7 +56,7 @@ public class OpenApiClient {
                 OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList())),
             MapValueUtils.get(metadata, "method", RequestMethod.class))
             .configuration(
-                HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
+                HttpClientUtils.responseType(getResponseType(actionDefinition)))
             .headers(
                 getValuesMap(
                     taskExecution.getParameters(),
@@ -130,10 +130,10 @@ public class OpenApiClient {
         return null;
     }
 
-    private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
+    private ResponseType getResponseType(ActionDefinition actionDefinition) {
         return actionDefinition.getOutputSchema()
             .map(outputProperty -> MapValueUtils.get(
-                outputProperty.getMetadata(), "responseFormat", ResponseFormat.class))
+                outputProperty.getMetadata(), "responseType", ResponseType.class))
             .orElse(null);
     }
 

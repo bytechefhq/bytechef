@@ -21,15 +21,9 @@ import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.ComponentDSL.time;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.component.jira.property.JiraIssueBeanProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -139,12 +133,10 @@ public class JiraGetIssueAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .outputSchema(object().properties(JiraIssueBeanProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .description("Details about an issue.")
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+                    "responseType", ResponseType.JSON)))
         .sampleOutput(
             Map.<String, Object>ofEntries(Map.entry("id", 10002.0),
                 Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10002"), Map.entry("key", "ED-1"),
