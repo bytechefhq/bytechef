@@ -18,15 +18,9 @@
 package com.bytechef.component.jira.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
@@ -51,8 +45,6 @@ public class JiraSearchResultsProperties {
             .description("The number of results on the page.")
             .required(false),
         array("issues").items(object().properties(JiraIssueBeanProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .description("Details about an issue."))
             .placeholder("Add to Issues")
             .label("Issues")

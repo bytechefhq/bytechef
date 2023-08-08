@@ -21,7 +21,7 @@ import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.component.petstore.property.PetstoreUserProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -50,5 +50,5 @@ public class PetstoreCreateUserAction {
         .outputSchema(object().properties(PetstoreUserProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)));
+                    "responseType", ResponseType.JSON)));
 }

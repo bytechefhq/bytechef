@@ -40,7 +40,7 @@ tasks:
   label: "Get content from Liferay Object REST endpoint"
   parameters:
     uri: "${objectEndpointUrl}/openapi.json"
-    responseFormat: "JSON"
+    responseType: "JSON"
     headerParameters:
       Authorization:
       - "Basic ${apiToken}"
@@ -87,7 +87,7 @@ tasks:
       label: "Post content to Liferay Batch Engine REST endpoint"
       parameters:
         uri: "${batchEngineEndpointUrl}/com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition"
-        responseFormat: "JSON"
+        responseType: "JSON"
         headerParameters:
           Authorization:
           - "Basic ${apiToken}"
@@ -118,7 +118,7 @@ tasks:
   label: "Post content to Liferay Batch Engine REST endpoint"
   parameters:
     uri: "${batchEngineEndpointUrl}/com.liferay.object.rest.dto.v1_0.ObjectEntry"
-    responseFormat: "JSON"
+    responseType: "JSON"
     headerParameters:
       Authorization:
       - "Basic ${apiToken}"

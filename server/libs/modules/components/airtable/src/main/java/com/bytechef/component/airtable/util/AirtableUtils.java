@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
@@ -39,7 +39,7 @@ import java.util.Objects;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
@@ -60,7 +60,7 @@ public class AirtableUtils {
         return (connection, inputParameters, searchText) -> {
             Map<String, ?> response = HttpClientUtils
                 .get("https://api.airtable.com/v0/meta/bases")
-                .configuration(responseFormat(ResponseFormat.JSON))
+                .configuration(responseType(ResponseType.JSON))
                 .execute()
                 .getBody();
 
@@ -82,7 +82,7 @@ public class AirtableUtils {
             Map<String, List<AirtableTable>> tablesMap = JsonUtils.read(
                 HttpClientUtils
                     .get(url)
-                    .configuration(responseFormat(ResponseFormat.TEXT))
+                    .configuration(responseType(HttpClientUtils.ResponseType.TEXT))
                     .execute()
                     .getBody(),
                 new TypeReference<>() {});
@@ -155,7 +155,7 @@ public class AirtableUtils {
 
             Map<String, ?> response = HttpClientUtils
                 .get(url)
-                .configuration(responseFormat(ResponseFormat.JSON))
+                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
                 .execute()
                 .getBody();
 

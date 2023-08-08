@@ -30,7 +30,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.component.jira.property.JiraCreatedIssueProperties;
 import com.bytechef.component.jira.property.JiraIssueUpdateDetailsProperties;
@@ -83,12 +83,10 @@ public class JiraCreateIssueAction {
                     Map.of(
                         "type", PropertyType.BODY)))
         .outputSchema(object().properties(JiraCreatedIssueProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .description("Details about a created issue or subtask.")
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+                    "responseType", ResponseType.JSON)))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", 10000.0), Map.entry("key", "ED-24"),
             Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10000"),
             Map.entry("transition",

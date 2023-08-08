@@ -48,7 +48,7 @@ public final class HttpClientUtils {
     /**
      *
      */
-    public enum ResponseFormat {
+    public enum ResponseType {
         BINARY,
         JSON,
         TEXT,
@@ -150,13 +150,13 @@ public final class HttpClientUtils {
 
     /**
      *
-     * @param responseFormat
+     * @param responseType
      * @return
      */
-    public static Configuration responseFormat(ResponseFormat responseFormat) {
+    public static Configuration responseType(ResponseType responseType) {
         Configuration configuration = new Configuration();
 
-        configuration.responseFormat = responseFormat;
+        configuration.responseType = responseType;
 
         return configuration;
     }
@@ -260,7 +260,7 @@ public final class HttpClientUtils {
         private boolean followAllRedirects;
         private boolean followRedirect;
         private String proxy;
-        private ResponseFormat responseFormat;
+        private ResponseType responseType;
         private Duration timeout = Duration.ofMillis(1000);
 
         private Configuration() {
@@ -331,11 +331,11 @@ public final class HttpClientUtils {
 
         /**
          *
-         * @param responseFormat
+         * @param responseType
          * @return
          */
-        public Configuration responseFormat(ResponseFormat responseFormat) {
-            this.responseFormat = responseFormat;
+        public Configuration responseType(ResponseType responseType) {
+            this.responseType = responseType;
 
             return this;
         }
@@ -387,8 +387,8 @@ public final class HttpClientUtils {
          *
          * @return
          */
-        public ResponseFormat getResponseFormat() {
-            return responseFormat;
+        public ResponseType getResponseType() {
+            return responseType;
         }
 
         /**

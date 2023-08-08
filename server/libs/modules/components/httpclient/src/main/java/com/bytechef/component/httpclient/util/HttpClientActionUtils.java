@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
@@ -140,7 +140,7 @@ public class HttpClientActionUtils {
                         .followAllRedirects(MapValueUtils.getBoolean(inputParameters, FOLLOW_ALL_REDIRECTS, false))
                         .followRedirect(MapValueUtils.getBoolean(inputParameters, FOLLOW_REDIRECT, false))
                         .proxy(MapValueUtils.getString(inputParameters, PROXY))
-                        .responseFormat(getResponseFormat(inputParameters))
+                        .responseType(getResponseType(inputParameters))
                         .timeout(Duration.ofMillis(MapValueUtils.getInteger(inputParameters, TIMEOUT, 10000))))
                 .headers((Map) MapValueUtils.getMap(inputParameters, HEADERS, List.class))
                 .queryParameters((Map) MapValueUtils.getMap(inputParameters, QUERY_PARAMETERS, List.class))
@@ -200,9 +200,9 @@ public class HttpClientActionUtils {
         return body;
     }
 
-    private static ResponseFormat getResponseFormat(Map<String, ?> inputParameters) {
+    private static ResponseType getResponseType(Map<String, ?> inputParameters) {
         return inputParameters.containsKey(RESPONSE_FORMAT)
-            ? ResponseFormat.valueOf(MapValueUtils.getString(inputParameters, RESPONSE_FORMAT))
+            ? ResponseType.valueOf(MapValueUtils.getString(inputParameters, RESPONSE_FORMAT))
             : null;
     }
 }

@@ -18,6 +18,7 @@
 package com.bytechef.component.httpclient.constant;
 
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
@@ -27,7 +28,7 @@ import java.util.List;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
@@ -65,7 +66,7 @@ public class HttpClientConstants {
     public static final String PUT = "put";
     public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String RESPONSE_FILENAME = "responseFilename";
-    public static final String RESPONSE_FORMAT = "responseFormat";
+    public static final String RESPONSE_FORMAT = "responseType";
     public static final String TIMEOUT = "timeout";
     public static final String URI = "uri";
 
@@ -138,21 +139,21 @@ public class HttpClientConstants {
                 .options(
                     option(
                         "JSON",
-                        ResponseFormat.JSON.name(),
+                        ResponseType.JSON.name(),
                         "The response is automatically converted to object/array."),
                     option(
                         "XML",
-                        ResponseFormat.XML.name(),
+                        HttpClientUtils.ResponseType.XML.name(),
                         "The response is automatically converted to object/array."),
-                    option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
+                    option("Text", ResponseType.TEXT.name(), "The response is returned as a text."),
                     option(
-                        "File", ResponseFormat.BINARY.name(),
+                        "File", ResponseType.BINARY.name(),
                         "The response is returned as a file object."))
-                .defaultValue(ResponseFormat.JSON.name()),
+                .defaultValue(ResponseType.JSON.name()),
             string(RESPONSE_FILENAME)
                 .label("Response Filename")
                 .description("The name of the file if the response is returned as a file object.")
-                .displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())),
+                .displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.name())),
 
             //
             // Header properties

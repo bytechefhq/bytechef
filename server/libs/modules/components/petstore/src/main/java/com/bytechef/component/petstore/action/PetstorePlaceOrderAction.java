@@ -21,7 +21,7 @@ import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.component.petstore.property.PetstoreOrderProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -50,5 +50,5 @@ public class PetstorePlaceOrderAction {
         .outputSchema(object().properties(PetstoreOrderProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)));
+                    "responseType", ResponseType.JSON)));
 }

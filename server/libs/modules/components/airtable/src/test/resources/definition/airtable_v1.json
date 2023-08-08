@@ -90,7 +90,7 @@
       "hidden": null,
       "label": null,
       "metadata": {
-        "responseFormat": "JSON"
+        "responseType": "JSON"
       },
       "placeholder": null,
       "required": null,
