@@ -36,9 +36,4 @@ subprojects {
             image = "bytechef/bytechef-$project.name:latest"
         }
     }
-
-    dependencies {
-        runtimeOnly "org.postgresql:postgresql"
-        runtimeOnly "com.zaxxer:HikariCP"
-    }
 }

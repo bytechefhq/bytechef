@@ -26,5 +26,8 @@ dependencies {
     implementation project(":server:libs:core:message-broker:message-broker-redis")
     implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl")
 
+    runtimeOnly "org.postgresql:postgresql"
+    runtimeOnly "com.zaxxer:HikariCP"
+
     testImplementation project(":server:libs:test:test-int-support")
 }
