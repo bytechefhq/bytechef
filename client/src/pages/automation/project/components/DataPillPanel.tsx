@@ -4,6 +4,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -12,6 +13,7 @@ import {useCallback, useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import DataPillPanelBody from './DataPillPanelBody';
 
 const DataPillPanel = () => {
@@ -19,7 +21,8 @@ const DataPillPanel = () => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
+    const {currentNode, nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
+    const {componentNames} = useWorkflowDefinitionStore();
 
     const panelContainerRef = useCallback(
         (panelContainer: HTMLDivElement) =>
@@ -29,9 +32,28 @@ const DataPillPanel = () => {
         []
     );
 
+    const currentNodeIndex = componentNames.indexOf(currentNode.name);
+
+    const previousComponentNames =
+        componentNames.length > 1
+            ? componentNames.slice(0, currentNodeIndex)
+            : [];
+
+    const {data: previousComponents} = useGetComponentDefinitionsQuery(
+        {
+            include: previousComponentNames,
+        },
+        !!previousComponentNames.length
+    );
+
     return (
         <Dialog.Root
-            open={nodeDetailsDialogOpen && dataPillPanelOpen}
+            open={
+                nodeDetailsDialogOpen &&
+                dataPillPanelOpen &&
+                !!previousComponentNames.length &&
+                !!previousComponents
+            }
             onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
             modal={false}
         >
@@ -91,6 +113,7 @@ const DataPillPanel = () => {
                             <DataPillPanelBody
                                 containerHeight={panelContainerHeight}
                                 dataPillFilterQuery={dataPillFilterQuery}
+                                previousComponents={previousComponents!}
                             />
                         </main>
                     </div>

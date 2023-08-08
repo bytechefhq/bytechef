@@ -109,13 +109,13 @@ const NodeDetailsDialog = () => {
     const previousComponentNames =
         componentNames.length > 1
             ? componentNames.slice(0, currentNodeIndex)
-            : componentNames;
+            : [];
 
     const {data: previousComponents} = useGetComponentDefinitionsQuery(
         {
             include: previousComponentNames,
         },
-        !!componentNames.length
+        !!previousComponentNames.length
     );
 
     const {data: actionData} = useGetActionDefinitionsQuery(
@@ -279,25 +279,29 @@ const NodeDetailsDialog = () => {
                     {currentComponent ? (
                         <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
                             <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
-                                <Button
-                                    aria-label={
-                                        dataPillPanelOpen
-                                            ? 'Close the data pill panel'
-                                            : 'Open the data pill panel'
-                                    }
-                                    className="mr-auto p-0"
-                                    displayType="icon"
-                                    icon={
-                                        dataPillPanelOpen ? (
-                                            <PanelRightOpen className="h-6 w-6 cursor-pointer text-gray-900" />
-                                        ) : (
-                                            <PanelRightClose className="h-6 w-6 cursor-pointer text-gray-900" />
-                                        )
-                                    }
-                                    onClick={() =>
-                                        setDataPillPanelOpen(!dataPillPanelOpen)
-                                    }
-                                />
+                                {!!previousComponentNames.length && (
+                                    <Button
+                                        aria-label={
+                                            dataPillPanelOpen
+                                                ? 'Close the data pill panel'
+                                                : 'Open the data pill panel'
+                                        }
+                                        className="mr-auto p-0"
+                                        displayType="icon"
+                                        icon={
+                                            dataPillPanelOpen ? (
+                                                <PanelRightOpen className="h-6 w-6 cursor-pointer text-gray-900" />
+                                            ) : (
+                                                <PanelRightClose className="h-6 w-6 cursor-pointer text-gray-900" />
+                                            )
+                                        }
+                                        onClick={() =>
+                                            setDataPillPanelOpen(
+                                                !dataPillPanelOpen
+                                            )
+                                        }
+                                    />
+                                )}
 
                                 {currentNode.label}
 
