@@ -24,7 +24,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.test.WorkflowTestExecutorImpl;
+import com.bytechef.hermes.test.JobTestExecutorImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -47,7 +47,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.test.WorkflowTestExecutor;
+import com.bytechef.hermes.test.JobTestExecutor;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
@@ -77,10 +77,10 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Configuration
-public class WorkflowExecutionSyncConfiguration {
+public class JobTestConfiguration {
 
     @Bean
-    WorkflowTestExecutor workflowTestExecutor(
+    JobTestExecutor workflowTestExecutor(
         ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
@@ -97,7 +97,7 @@ public class WorkflowExecutionSyncConfiguration {
         JobFactoryFacade jobFactoryFacade = new JobFactoryFacadeImpl(
             contextService, eventPublisher, jobService, syncMessageBroker, workflowService);
 
-        return new WorkflowTestExecutorImpl(
+        return new JobTestExecutorImpl(
             componentDefinitionService, contextService,
             JobSyncExecutor.builder()
                 .contextService(contextService)

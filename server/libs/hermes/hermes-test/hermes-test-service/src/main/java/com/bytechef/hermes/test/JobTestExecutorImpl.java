@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowTestExecutorImpl implements WorkflowTestExecutor {
+public class JobTestExecutorImpl implements JobTestExecutor {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -46,7 +46,7 @@ public class WorkflowTestExecutorImpl implements WorkflowTestExecutor {
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowTestExecutorImpl(
+    public JobTestExecutorImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
         JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
 
