@@ -20,7 +20,7 @@ package com.bytechef.helios.execution.web.rest;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.web.rest.model.JobModel;
 import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
-import com.bytechef.hermes.test.WorkflowTestExecutor;
+import com.bytechef.hermes.test.JobTestExecutor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,19 +34,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectWorkflowTestController implements WorkflowTestsApi {
 
     private final ConversionService conversionService;
-    private final WorkflowTestExecutor workflowTestExecutor;
+    private final JobTestExecutor jobTestExecutor;
 
     public ProjectWorkflowTestController(ConversionService conversionService,
-        WorkflowTestExecutor workflowTestExecutor) {
+        JobTestExecutor jobTestExecutor) {
         this.conversionService = conversionService;
-        this.workflowTestExecutor = workflowTestExecutor;
+        this.jobTestExecutor = jobTestExecutor;
     }
 
     @Override
     public ResponseEntity<JobModel> testWorkflow(TestParametersModel testParametersModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowTestExecutor.execute(conversionService.convert(testParametersModel, JobParameters.class)),
+                jobTestExecutor.execute(conversionService.convert(testParametersModel, JobParameters.class)),
                 JobModel.class));
     }
 }
