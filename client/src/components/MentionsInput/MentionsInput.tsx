@@ -1,5 +1,6 @@
+import getRandomId from '@/pages/automation/project/utils/getRandomId';
 import QuillMention from 'quill-mention';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -23,15 +24,18 @@ const MentionInputListItem = (item: DataPillType) => `
 
 type MentionsInputProps = {
     data: Array<DataPillType>;
-    id: string;
+    label?: string;
     placeholder?: string;
 };
 
-const MentionsInput = ({data, id, placeholder}: MentionsInputProps) => {
+const MentionsInput = ({data, label, placeholder}: MentionsInputProps) => {
     const [value, setValue] = useState('');
+
     const editorRef = useRef<ReactQuill>(null);
 
     const {focusedInput, setFocusedInput} = useNodeDetailsDialogStore();
+
+    const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
 
     const modules = {
         mention: {
@@ -96,31 +100,41 @@ const MentionsInput = ({data, id, placeholder}: MentionsInputProps) => {
                 },
                 [data]
             ),
-            spaceAfterInsert: true,
         },
         toolbar: false,
     };
 
     return (
-        <ReactQuill
-            className={twMerge(
-                'h-full w-full',
-                focusedInput?.props.id === id && 'focused'
+        <fieldset className="w-full">
+            {label && (
+                <label
+                    className="block px-2 text-sm font-medium capitalize text-gray-700"
+                    htmlFor={elementId}
+                >
+                    {label}
+                </label>
             )}
-            formats={['bytechef-mention', 'mention']}
-            id={id}
-            key="keyBAR"
-            modules={modules}
-            onChange={setValue}
-            onFocus={() => {
-                if (editorRef.current) {
-                    setFocusedInput(editorRef.current);
-                }
-            }}
-            placeholder={placeholder}
-            ref={editorRef}
-            value={value}
-        />
+
+            <ReactQuill
+                className={twMerge(
+                    'h-full w-full mt-1',
+                    focusedInput?.props.id === elementId && 'focused'
+                )}
+                formats={['bytechef-mention', 'mention']}
+                id={elementId}
+                key={elementId}
+                modules={modules}
+                onChange={setValue}
+                onFocus={() => {
+                    if (editorRef.current) {
+                        setFocusedInput(editorRef.current);
+                    }
+                }}
+                placeholder={placeholder}
+                ref={editorRef}
+                value={value}
+            />
+        </fieldset>
     );
 };
 
