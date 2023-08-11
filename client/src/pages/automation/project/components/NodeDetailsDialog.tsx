@@ -205,7 +205,7 @@ const NodeDetailsDialog = () => {
                 setActiveTab('description');
             }
 
-            if (activeTab === 'output' && !currentAction) {
+            if (activeTab === 'output' && !currentAction?.outputSchema) {
                 setActiveTab('description');
             }
         }
@@ -254,7 +254,7 @@ const NodeDetailsDialog = () => {
 
         if (
             (name === 'connection' && !componentHasConnection) ||
-            (name === 'output' && !currentAction) ||
+            (name === 'output' && !currentAction?.outputSchema) ||
             (name === 'properties' && !currentAction?.properties?.length)
         ) {
             return;

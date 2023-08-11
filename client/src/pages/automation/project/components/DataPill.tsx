@@ -53,7 +53,7 @@ const DataPill = ({
                     'flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
             )}
         >
-            {subProperties ? (
+            {subProperties?.length ? (
                 <fieldset className="flex flex-col rounded-lg border-2 border-gray-400 px-2 pb-2">
                     <legend className="px-2 pb-2 text-sm font-semibold uppercase text-gray-500">
                         {property.label || property.name}

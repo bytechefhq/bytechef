@@ -34,10 +34,9 @@ const InputProperty = ({
     title,
 }: InputPropertyProps) => {
     const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {dataPills} = useWorkflowDefinitionStore();
     const {nodeDetailsDialogOpen, setFocusedInput} =
         useNodeDetailsDialogStore();
-
-    const {dataPills} = useWorkflowDefinitionStore();
 
     const inputRef = useRef(null);
 
@@ -66,13 +65,15 @@ const InputProperty = ({
 
     return (
         <>
-            {mention ? (
+            {mention && !!dataPills.length && !!name && (
                 <MentionsInput
                     data={dataPills}
-                    id={name!}
+                    label={label}
                     placeholder="Mention datapills using '${'"
                 />
-            ) : (
+            )}
+
+            {!mention && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
