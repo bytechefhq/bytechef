@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.OptionsDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -28,11 +27,11 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class OptionsDataSourceDTO {
+public class OptionsDataSource {
 
     private final List<String> loadOptionsDependsOn;
 
-    public OptionsDataSourceDTO(OptionsDataSource optionsDataSource) {
+    public OptionsDataSource(com.bytechef.hermes.definition.OptionsDataSource optionsDataSource) {
         this.loadOptionsDependsOn = OptionalUtils.orElse(optionsDataSource.getLoadOptionsDependsOn(), List.of());
     }
 
@@ -44,7 +43,7 @@ public class OptionsDataSourceDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof OptionsDataSourceDTO that))
+        if (!(o instanceof OptionsDataSource that))
             return false;
         return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn);
     }
@@ -56,7 +55,7 @@ public class OptionsDataSourceDTO {
 
     @Override
     public String toString() {
-        return "OptionsDataSourceDTO{" +
+        return "OptionsDataSource{" +
             "loadOptionsDependsOn=" + loadOptionsDependsOn +
             '}';
     }

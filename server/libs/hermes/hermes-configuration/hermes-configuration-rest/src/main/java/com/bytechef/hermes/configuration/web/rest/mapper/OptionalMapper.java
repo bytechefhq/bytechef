@@ -18,11 +18,11 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
-import com.bytechef.hermes.definition.registry.dto.HelpDTO;
-import com.bytechef.hermes.definition.registry.dto.OptionsDataSourceDTO;
-import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
+import com.bytechef.hermes.definition.registry.domain.Property;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinitionBasic;
+import com.bytechef.hermes.definition.registry.domain.Help;
+import com.bytechef.hermes.definition.registry.domain.OptionsDataSource;
+import com.bytechef.hermes.definition.registry.domain.Resources;
 import org.mapstruct.Mapper;
 
 import java.util.Optional;
@@ -33,13 +33,13 @@ import java.util.Optional;
 @Mapper(config = ConfigurationMapperSpringConfig.class)
 public interface OptionalMapper {
 
-    default ConnectionDefinitionBasicDTO mapToConnectionDefinitionBasicDTO(
-        Optional<ConnectionDefinitionBasicDTO> value) {
+    default ConnectionDefinitionBasic mapToConnectionDefinitionBasicDTO(
+        Optional<ConnectionDefinitionBasic> value) {
 
         return value.orElse(null);
     }
 
-    default HelpDTO mapToHelpDTO(Optional<HelpDTO> value) {
+    default Help mapToHelpDTO(Optional<Help> value) {
         return value.orElse(null);
     }
 
@@ -47,15 +47,15 @@ public interface OptionalMapper {
         return value.orElse(null);
     }
 
-    default OptionsDataSourceDTO mapToOptionsDataSourceDTO(Optional<OptionsDataSourceDTO> value) {
+    default OptionsDataSource mapToOptionsDataSourceDTO(Optional<OptionsDataSource> value) {
         return value.orElse(null);
     }
 
-    default PropertyDTO mapToPropertyDTO(Optional<PropertyDTO> value) {
+    default Property mapToPropertyDTO(Optional<Property> value) {
         return value.orElse(null);
     }
 
-    default ResourcesDTO mapToResourcesModel(Optional<ResourcesDTO> value) {
+    default Resources mapToResourcesModel(Optional<Resources> value) {
         return value.orElse(null);
     }
 

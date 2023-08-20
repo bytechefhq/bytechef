@@ -17,9 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -37,30 +36,24 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version) {
-        return toTaskDispatcherDefinitionDTO(
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
+        return new TaskDispatcherDefinition(
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version));
     }
 
     @Override
-    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
+    public List<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
         return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions()
             .stream()
-            .map(this::toTaskDispatcherDefinitionDTO)
+            .map(TaskDispatcherDefinition::new)
             .toList();
     }
 
     @Override
-    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
+    public List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name) {
         return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions(name)
             .stream()
-            .map(this::toTaskDispatcherDefinitionDTO)
+            .map(TaskDispatcherDefinition::new)
             .toList();
-    }
-
-    private TaskDispatcherDefinitionDTO toTaskDispatcherDefinitionDTO(
-        TaskDispatcherDefinition taskDispatcherDefinition) {
-
-        return new TaskDispatcherDefinitionDTO(taskDispatcherDefinition);
     }
 }

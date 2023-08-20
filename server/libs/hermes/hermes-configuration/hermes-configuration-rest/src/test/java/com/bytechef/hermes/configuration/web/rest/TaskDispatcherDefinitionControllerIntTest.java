@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -92,8 +92,8 @@ public class TaskDispatcherDefinitionControllerIntTest {
         Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
             .thenReturn(
                 List.of(
-                    new TaskDispatcherDefinitionDTO("task-dispatcher1"),
-                    new TaskDispatcherDefinitionDTO("task-dispatcher2")));
+                    new TaskDispatcherDefinition("task-dispatcher1"),
+                    new TaskDispatcherDefinition("task-dispatcher2")));
 
         try {
             webTestClient

@@ -20,7 +20,7 @@ package com.bytechef.hermes.test.executor;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
@@ -72,7 +72,7 @@ public class JobTestExecutorImpl implements JobTestExecutor {
                     taskExecution)));
     }
 
-    private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
+    private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {
         ComponentOperation componentOperation = ComponentUtils.getComponentOperation(taskExecution.getType());
 
         return componentDefinitionService.getComponentDefinition(

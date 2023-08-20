@@ -20,9 +20,9 @@ package com.bytechef.hermes.definition.registry.remote.client.service;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
@@ -46,7 +46,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    public List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -106,7 +106,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<OptionDTO> executeOptions(
+    public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName,
         String searchText) {
@@ -115,7 +115,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -145,13 +145,13 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
+    public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/trigger-definition-service/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
                 componentName, componentVersion, triggerName),
-            TriggerDefinitionDTO.class);
+            TriggerDefinition.class);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
+    public List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,

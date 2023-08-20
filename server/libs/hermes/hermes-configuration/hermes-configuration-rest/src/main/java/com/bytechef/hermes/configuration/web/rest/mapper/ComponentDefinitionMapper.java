@@ -18,10 +18,10 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
-import com.bytechef.hermes.definition.registry.dto.HelpDTO;
-import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinitionBasic;
+import com.bytechef.hermes.definition.registry.domain.Help;
+import com.bytechef.hermes.definition.registry.domain.Resources;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
@@ -36,25 +36,25 @@ public class ComponentDefinitionMapper {
         OptionalMapper.class
     })
     public interface ComponentDefinitionToComponentDefinitionModelMapper
-        extends Converter<ComponentDefinitionDTO, ComponentDefinitionModel> {
+        extends Converter<ComponentDefinition, ComponentDefinitionModel> {
 
-        ComponentDefinitionModel convert(ComponentDefinitionDTO componentDefinitionDTO);
+        ComponentDefinitionModel convert(ComponentDefinition componentDefinition);
 
-        ConnectionDefinitionBasicModel map(ConnectionDefinitionBasicDTO connectionDefinitionBasicDTO);
+        ConnectionDefinitionBasicModel map(ConnectionDefinitionBasic connectionDefinitionBasic);
 
-        HelpModel map(HelpDTO helpDTO);
+        HelpModel map(Help help);
 
-        ResourcesModel map(ResourcesDTO resourcesDTO);
+        ResourcesModel map(Resources resources);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
         OptionalMapper.class
     })
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
-        extends Converter<ComponentDefinitionDTO, ComponentDefinitionBasicModel> {
+        extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 
-        ComponentDefinitionBasicModel convert(ComponentDefinitionDTO componentDefinitionDTO);
+        ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
 
-        ResourcesModel map(ResourcesDTO resourcesDTO);
+        ResourcesModel map(Resources resources);
     }
 }

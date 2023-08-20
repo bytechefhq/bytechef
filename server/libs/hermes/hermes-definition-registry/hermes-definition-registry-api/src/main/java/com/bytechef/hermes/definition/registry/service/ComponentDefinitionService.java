@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ import java.util.List;
  */
 public interface ComponentDefinitionService {
 
-    ComponentDefinitionDTO getComponentDefinition(String name, Integer version);
+    ComponentDefinition getComponentDefinition(String name, Integer version);
 
-    List<ComponentDefinitionDTO> getComponentDefinitions();
+    List<ComponentDefinition> getComponentDefinitions();
 
-    List<ComponentDefinitionDTO> getComponentDefinitions(String name);
+    List<ComponentDefinition> getComponentDefinitionVersions(String name);
 }

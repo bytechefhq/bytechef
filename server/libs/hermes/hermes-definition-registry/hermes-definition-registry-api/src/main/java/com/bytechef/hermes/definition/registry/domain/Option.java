@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Objects;
@@ -28,14 +27,14 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class OptionDTO {
+public class Option {
 
     private final String description;
     private final String displayCondition;
     private final String name;
     private final Object value;
 
-    public OptionDTO(Option<?> option) {
+    public Option(com.bytechef.hermes.definition.Option<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);
         this.displayCondition = option.getDisplayCondition();
         this.name = option.getName();
@@ -62,11 +61,11 @@ public class OptionDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof OptionDTO optionDTO))
+        if (!(o instanceof Option option))
             return false;
-        return Objects.equals(description, optionDTO.description)
-            && Objects.equals(displayCondition, optionDTO.displayCondition) && Objects.equals(name, optionDTO.name)
-            && Objects.equals(value, optionDTO.value);
+        return Objects.equals(description, option.description)
+            && Objects.equals(displayCondition, option.displayCondition) && Objects.equals(name, option.name)
+            && Objects.equals(value, option.value);
     }
 
     @Override

@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,46 +44,46 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, name, "/component-definition-service/get-component-definition/{name}/{version}", name,
                 checkVersion(version)),
-            ComponentDefinitionDTO.class);
+            ComponentDefinition.class);
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions() {
+    public List<ComponentDefinition> getComponentDefinitions() {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(uriBuilder, serviceInstance,
                         "/component-definition-service/get-component-definitions"),
-                    new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
             this::toComponentDefinitions)
             .block();
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
+    public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(uriBuilder, serviceInstance,
-                        "/component-definition-service/get-component-definitions/{name}", name),
-                    new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                        "/component-definition-service/get-component-definition-versions/{name}", name),
+                    new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
             this::toComponentDefinitions)
             .block();
     }
 
     @SuppressWarnings("unchecked")
-    private List<ComponentDefinitionDTO> toComponentDefinitions(Object[] objectArray) {
+    private List<ComponentDefinition> toComponentDefinitions(Object[] objectArray) {
         return Arrays.stream(objectArray)
-            .map(object -> (List<ComponentDefinitionDTO>) object)
+            .map(object -> (List<ComponentDefinition>) object)
             .flatMap(Collection::stream)
             .toList();
     }

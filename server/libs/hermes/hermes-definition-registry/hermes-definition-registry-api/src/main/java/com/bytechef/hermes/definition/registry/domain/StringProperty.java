@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.IntegerProperty;
+import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,25 +30,23 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class IntegerPropertyDTO extends ValuePropertyDTO<Integer> {
+public class StringProperty extends ValueProperty<String> {
 
-    private Integer maxValue;
-    private Integer minValue;
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
+    private SampleDataType sampleDataType;
 
-    private IntegerPropertyDTO() {
+    private StringProperty() {
     }
 
-    public IntegerPropertyDTO(IntegerProperty integerProperty) {
-        super(integerProperty);
+    public StringProperty(Property.StringProperty stringProperty) {
+        super(stringProperty);
 
-        this.maxValue = OptionalUtils.orElse(integerProperty.getMaxValue(), null);
-        this.minValue = OptionalUtils.orElse(integerProperty.getMinValue(), null);
         this.options = CollectionUtils.map(
-            OptionalUtils.orElse(integerProperty.getOptions(), List.of()), OptionDTO::new);
+            OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            integerProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+            stringProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.sampleDataType = OptionalUtils.orElse(stringProperty.getSampleDataType(), SampleDataType.JSON);
     }
 
     @Override
@@ -55,44 +54,41 @@ public class IntegerPropertyDTO extends ValuePropertyDTO<Integer> {
         return propertyVisitor.visit(this);
     }
 
-    public Optional<Integer> getMaxValue() {
-        return Optional.ofNullable(maxValue);
-    }
-
-    public Optional<Integer> getMinValue() {
-        return Optional.ofNullable(minValue);
-    }
-
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
+    }
+
+    public SampleDataType getSampleDataType() {
+        return sampleDataType;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof IntegerPropertyDTO that))
+        if (!(o instanceof StringProperty that))
             return false;
-        return Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
-            && Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+        if (!super.equals(o))
+            return false;
+        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource)
+            && sampleDataType == that.sampleDataType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(maxValue, minValue, options, optionsDataSource);
+        return Objects.hash(super.hashCode(), options, optionsDataSource, sampleDataType);
     }
 
     @Override
     public String toString() {
-        return "IntegerPropertyDTO{" +
-            "maxValue=" + maxValue +
-            ", minValue=" + minValue +
-            ", options=" + options +
+        return "StringProperty{" +
+            "options=" + options +
             ", optionsDataSource=" + optionsDataSource +
+            ", sampleDataType=" + sampleDataType +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +

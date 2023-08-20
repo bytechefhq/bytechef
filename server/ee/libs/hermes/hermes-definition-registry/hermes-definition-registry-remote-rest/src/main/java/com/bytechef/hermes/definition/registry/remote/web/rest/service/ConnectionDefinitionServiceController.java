@@ -20,8 +20,8 @@ package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -63,7 +63,7 @@ public class ConnectionDefinitionServiceController {
             "application/json"
         })
     public ResponseEntity<ApplyResponse> executeAuthorizationApply(
-        @Valid @RequestBody Connection connection) {
+        @Valid @RequestBody ConnectionDefinitionServiceController.ConnectionRequest connection) {
 
         return ResponseEntity.ok(
             connectionDefinitionService.executeAuthorizationApply(
@@ -83,19 +83,19 @@ public class ConnectionDefinitionServiceController {
     public ResponseEntity<AuthorizationCallbackResponse> executeAuthorizationCallback(
         @Valid @RequestBody AuthorizationCallbackRequest authorizationCallbackRequest) {
 
-        Connection connection = authorizationCallbackRequest.connection();
+        ConnectionRequest connectionRequest = authorizationCallbackRequest.connection();
 
         return ResponseEntity.ok(
             connectionDefinitionService.executeAuthorizationCallback(
-                connection.componentName, connection.connectionVersion, connection.parameters,
-                connection.authorizationName, authorizationCallbackRequest.redirectUri()));
+                connectionRequest.componentName, connectionRequest.connectionVersion, connectionRequest.parameters,
+                connectionRequest.authorizationName, authorizationCallbackRequest.redirectUri()));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-fetch-base-uri")
-    public ResponseEntity<String> executeFetchBaseUri(Connection connection) {
-        return connectionDefinitionService.executeFetchBaseUri(
+        value = "/execute-base-uri")
+    public ResponseEntity<String> executeBaseUri(ConnectionRequest connection) {
+        return connectionDefinitionService.executeBaseUri(
             connection.componentName, connection.connectionVersion, connection.parameters)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
@@ -123,7 +123,7 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<ConnectionDefinitionDTO> getConnectionDefinition(
+    public ResponseEntity<ConnectionDefinition> getConnectionDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
@@ -136,7 +136,7 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ConnectionDefinitionDTO>> getConnectionDefinitions(
+    public ResponseEntity<List<ConnectionDefinition>> getConnectionDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
@@ -149,33 +149,34 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ConnectionDefinitionDTO>> getConnectionDefinitions() {
+    public ResponseEntity<List<ConnectionDefinition>> getConnectionDefinitions() {
         return ResponseEntity.ok(connectionDefinitionService.getConnectionDefinitions());
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/get-oauth2-parameters",
+        value = "/get-oauth2-authorization-parameters",
         consumes = {
             "application/json"
         },
         produces = {
             "application/json"
         })
-    public ResponseEntity<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
-        @Valid @RequestBody Connection connection) {
+    public ResponseEntity<OAuth2AuthorizationParameters> getOAuth2AuthorizationParameters(
+        @Valid @RequestBody ConnectionDefinitionServiceController.ConnectionRequest connection) {
 
-        return ResponseEntity.ok(connectionDefinitionService.getOAuth2Parameters(
-            connection.componentName, connection.connectionVersion, connection.parameters,
-            connection.authorizationName));
+        return ResponseEntity.ok(
+            connectionDefinitionService.getOAuth2AuthorizationParameters(
+                connection.componentName, connection.connectionVersion, connection.parameters,
+                connection.authorizationName));
     }
 
     @SuppressFBWarnings("EI")
-    public record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
+    public record AuthorizationCallbackRequest(ConnectionRequest connection, String redirectUri) {
     }
 
     @SuppressFBWarnings("EI")
-    public record Connection(
+    public record ConnectionRequest(
         @NotNull String componentName, int connectionVersion, Map<String, Object> parameters,
         String authorizationName) {
     }

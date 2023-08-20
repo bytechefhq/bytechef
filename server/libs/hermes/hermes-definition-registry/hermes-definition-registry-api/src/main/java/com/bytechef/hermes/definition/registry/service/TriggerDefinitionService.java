@@ -19,9 +19,9 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
 
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public interface TriggerDefinitionService {
 
-    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
@@ -60,12 +60,12 @@ public interface TriggerDefinitionService {
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId);
 
-    List<OptionDTO> executeOptions(
+    List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName,
         String searchText);
 
-    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
@@ -81,7 +81,7 @@ public interface TriggerDefinitionService {
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         WebhookRequest webhookRequest, Map<String, Long> connectionIdMap);
 
-    TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName);
+    TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName);
 
-    List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion);
+    List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion);
 }

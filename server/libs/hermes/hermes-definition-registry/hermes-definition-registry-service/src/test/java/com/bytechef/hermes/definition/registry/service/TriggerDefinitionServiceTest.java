@@ -33,12 +33,6 @@ public class TriggerDefinitionServiceTest {
 
     @Disabled
     @Test
-    public void testGetTriggerDefinitionMono() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
     public void testGetTriggerDefinitions() {
         // TODO
     }

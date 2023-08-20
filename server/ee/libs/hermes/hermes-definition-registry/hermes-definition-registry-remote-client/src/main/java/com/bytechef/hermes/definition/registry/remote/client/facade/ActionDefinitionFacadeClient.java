@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.remote.client.facade;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +54,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<OptionDTO> executeOptions(
+    public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
@@ -67,7 +67,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId) {
 
@@ -79,7 +79,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    public List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 

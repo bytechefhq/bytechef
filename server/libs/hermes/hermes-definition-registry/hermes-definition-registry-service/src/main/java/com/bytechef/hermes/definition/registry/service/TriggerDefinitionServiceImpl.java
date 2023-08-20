@@ -31,7 +31,6 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
@@ -51,17 +50,15 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Property;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
@@ -96,7 +93,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    public List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -106,13 +103,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return ComponentContextSupplier.get(
             getTriggerContext(componentName, connectionId),
             () -> {
-                List<? extends Property.ValueProperty<?>> valueProperties = propertiesFunction.apply(
-                    contextConnectionFactory.createConnection(
+                List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
+                    propertiesFunction.apply(contextConnectionFactory.createConnection(
                         componentName, componentVersion, connectionParameters, authorizationName),
-                    triggerParameters);
+                        triggerParameters);
 
                 return valueProperties.stream()
-                    .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
+                    .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
                     .toList();
             });
     }
@@ -210,7 +207,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<OptionDTO> executeOptions(
+    public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName,
         String searchText) {
@@ -221,19 +218,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return ComponentContextSupplier.get(
             getTriggerContext(componentName, connectionId),
             () -> {
-                List<Option<?>> options = optionsFunction.apply(
+                List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
                     contextConnectionFactory.createConnection(
                         componentName, componentVersion, connectionParameters, authorizationName),
                     triggerParameters, searchText);
 
                 return options.stream()
-                    .map(OptionDTO::new)
+                    .map(Option::new)
                     .toList();
             });
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -242,7 +239,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return ComponentContextSupplier.get(
             getTriggerContext(componentName, connectionId),
-            () -> PropertyDTO.toPropertyDTO(
+            () -> Property.toProperty(
                 outputSchemaFunction.apply(
                     contextConnectionFactory.createConnection(
                         componentName, componentVersion, connectionParameters, authorizationName),
@@ -271,8 +268,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Object triggerState, WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(connectionIdMap);
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return ComponentContextSupplier.get(triggerContext, () -> doExecuteTrigger(
             triggerDefinition, triggerContext, inputParameters, triggerState, webhookRequest));
@@ -284,30 +281,30 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(connectionIdMap);
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return executeWebhookValidate(triggerDefinition, triggerContext, inputParameters, webhookRequest);
     }
 
     @Override
-    public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
-        return toTriggerDefinitionDTO(
+    public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
+        return new TriggerDefinition(
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName));
     }
 
     @Override
-    public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
+    public List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
             .stream()
-            .map(this::toTriggerDefinitionDTO)
+            .map(TriggerDefinition::new)
             .toList();
     }
 
     @SuppressWarnings("unchecked")
     private TriggerOutput doExecuteTrigger(
-        TriggerDefinition triggerDefinition, TriggerContext triggerContext, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest) {
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, TriggerContext triggerContext,
+        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest) {
 
         TriggerOutput triggerOutput;
         TriggerType triggerType = triggerDefinition.getType();
@@ -357,8 +354,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private static TriggerOutput executePollingTrigger(
-        TriggerDefinition triggerDefinition, TriggerContext triggerContext, Map<String, ?> inputParameters,
-        Map<String, Object> triggerState, PollFunction pollFunction) {
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, TriggerContext triggerContext,
+        Map<String, ?> inputParameters, Map<String, Object> triggerState, PollFunction pollFunction) {
 
         PollOutput pollOutput = pollFunction.apply(
             new PollContext(inputParameters, triggerState, triggerContext));
@@ -391,8 +388,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private boolean executeWebhookValidate(
-        TriggerDefinition triggerDefinition, TriggerContext triggerContext, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest) {
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, TriggerContext triggerContext,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest) {
 
         WebhookValidateContext context = new WebhookValidateContext(
             inputParameters, webhookRequest.headers(), webhookRequest.parameters(), webhookRequest.body(),
@@ -428,8 +425,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private DynamicWebhookRefreshFunction getDynamicWebhookRefreshFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookRefresh());
     }
@@ -437,8 +434,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private DynamicWebhookDisableConsumer getDynamicWebhookDisableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookDisable());
     }
@@ -446,8 +443,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private DynamicWebhookEnableFunction getDynamicWebhookEnableFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
     }
@@ -458,8 +455,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionDataSource(),
@@ -471,8 +468,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private ListenerDisableConsumer getListenerDisableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerDisable());
     }
@@ -480,8 +477,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private ListenerEnableConsumer getListenerEnableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerEnable());
     }
@@ -489,8 +486,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private OutputSchemaFunction getOutputSchemaFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(
             triggerDefinition.getOutputSchemaDataSource());
@@ -501,8 +498,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private SampleOutputFunction getSampleOutputFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            componentName, componentVersion, triggerName);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
             triggerDefinition.getSampleOutputDataSource());
@@ -513,10 +510,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private TriggerContext getTriggerContext(String componentName, Long connectionId) {
         return contextFactory.createTriggerContext(
             connectionId == null ? Map.of() : Map.of(componentName, connectionId));
-    }
-
-    private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
-        return new TriggerDefinitionDTO(triggerDefinition);
     }
 
     private record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {

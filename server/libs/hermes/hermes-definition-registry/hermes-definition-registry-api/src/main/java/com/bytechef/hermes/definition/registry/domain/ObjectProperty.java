@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.ObjectProperty;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,33 +28,33 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
+public class ObjectProperty extends ValueProperty<Object> {
 
-    private List<? extends PropertyDTO> additionalProperties;
+    private List<? extends Property> additionalProperties;
     private boolean multipleValues;
     private String objectType;
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
-    private List<? extends PropertyDTO> properties;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
+    private List<? extends Property> properties;
 
-    private ObjectPropertyDTO() {
+    private ObjectProperty() {
     }
 
-    public ObjectPropertyDTO(ObjectProperty objectProperty) {
+    public ObjectProperty(com.bytechef.hermes.definition.Property.ObjectProperty objectProperty) {
         super(objectProperty);
 
         this.additionalProperties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
-            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
         this.objectType = OptionalUtils.orElse(objectProperty.getObjectType(), null);
         this.options =
-            CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), OptionDTO::new);
+            CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            objectProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+            objectProperty.getOptionsDataSource(), OptionsDataSource::new, null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getProperties(), List.of()),
-            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
     }
 
     @Override
@@ -63,7 +62,7 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
         return propertyVisitor.visit(this);
     }
 
-    public List<? extends PropertyDTO> getAdditionalProperties() {
+    public List<? extends Property> getAdditionalProperties() {
         return Collections.unmodifiableList(additionalProperties);
     }
 
@@ -75,15 +74,15 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
         return Optional.ofNullable(objectType);
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
     }
 
-    public List<? extends PropertyDTO> getProperties() {
+    public List<? extends Property> getProperties() {
         return Collections.unmodifiableList(properties);
     }
 
@@ -91,7 +90,7 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ObjectPropertyDTO that))
+        if (!(o instanceof ObjectProperty that))
             return false;
         return multipleValues == that.multipleValues && Objects.equals(additionalProperties, that.additionalProperties)
             && Objects.equals(objectType, that.objectType) && Objects.equals(options, that.options)
@@ -105,7 +104,7 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
 
     @Override
     public String toString() {
-        return "ObjectPropertyDTO{" +
+        return "ObjectProperty{" +
             "additionalProperties=" + additionalProperties +
             ", multipleValues=" + multipleValues +
             ", objectType='" + objectType + '\'' +

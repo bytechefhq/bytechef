@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EmbeddedSql
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
-public class ConnectionServiceIntTest {
+public class ConnectionDefinitionServiceIntTest {
 
     @Autowired
     private ConnectionService connectionService;

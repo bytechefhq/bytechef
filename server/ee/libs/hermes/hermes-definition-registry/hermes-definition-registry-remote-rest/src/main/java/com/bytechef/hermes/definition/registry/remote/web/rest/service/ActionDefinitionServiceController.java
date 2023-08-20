@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -66,12 +66,12 @@ public class ActionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<ActionDefinitionDTO> getActionDefinition(
+    public ResponseEntity<ActionDefinition> getActionDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion, @PathVariable("actionName") String actionName) {
 
-        return ResponseEntity.ok(
-            actionDefinitionService.getActionDefinition(componentName, componentVersion, actionName));
+        return ResponseEntity
+            .ok(actionDefinitionService.getActionDefinition(componentName, componentVersion, actionName));
     }
 
     @RequestMapping(
@@ -80,12 +80,11 @@ public class ActionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ActionDefinitionDTO>> getActionDefinitions(
+    public ResponseEntity<List<ActionDefinition>> getActionDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
-        return ResponseEntity.ok(
-            actionDefinitionService.getActionDefinitions(componentName, componentVersion));
+        return ResponseEntity.ok(actionDefinitionService.getActionDefinitions(componentName, componentVersion));
     }
 
     @SuppressFBWarnings("EI")

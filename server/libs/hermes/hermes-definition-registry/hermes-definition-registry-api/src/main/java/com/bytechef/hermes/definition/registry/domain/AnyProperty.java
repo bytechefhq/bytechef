@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
-import com.bytechef.hermes.definition.Property.AnyProperty;
+import com.bytechef.hermes.definition.Property;
 
 /**
  * @author Ivica Cardic
  */
-public class AnyPropertyDTO extends ValuePropertyDTO<Object> {
+public class AnyProperty extends ValueProperty<Object> {
 
-    private AnyPropertyDTO() {
+    private AnyProperty() {
     }
 
-    public AnyPropertyDTO(AnyProperty anyProperty) {
+    public AnyProperty(Property.AnyProperty anyProperty) {
         super(anyProperty);
     }
 
@@ -38,7 +38,7 @@ public class AnyPropertyDTO extends ValuePropertyDTO<Object> {
 
     @Override
     public String toString() {
-        return "AnyPropertyDTO{" +
+        return "AnyProperty{" +
             "controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +

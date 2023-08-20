@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -50,7 +50,7 @@ public class ComponentDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<ComponentDefinitionDTO> getComponentDefinition(
+    public ResponseEntity<ComponentDefinition> getComponentDefinition(
         @PathVariable("name") String name, @PathVariable("version") Integer version) {
 
         return ResponseEntity.ok(componentDefinitionService.getComponentDefinition(name, version));
@@ -62,17 +62,17 @@ public class ComponentDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ComponentDefinitionDTO>> getComponentDefinitions() {
+    public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions() {
         return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions());
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-component-definitions/{name}",
+        value = "/get-component-definition-versions/{name}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ComponentDefinitionDTO>> getComponentDefinitions(@PathVariable("name") String name) {
-        return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions(name));
+    public ResponseEntity<List<ComponentDefinition>> getComponentDefinitionVersions(@PathVariable("name") String name) {
+        return ResponseEntity.ok(componentDefinitionService.getComponentDefinitionVersions(name));
     }
 }

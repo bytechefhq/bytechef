@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
@@ -31,26 +29,26 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ConnectionDefinitionDTO extends ConnectionDefinitionBasicDTO {
+public class ConnectionDefinition extends ConnectionDefinitionBasic {
 
-    private final List<AuthorizationDTO> authorizations;
-    private final List<? extends PropertyDTO> properties;
+    private final List<Authorization> authorizations;
+    private final List<? extends Property> properties;
 
-    public ConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
+    public ConnectionDefinition(com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition) {
         super(connectionDefinition);
 
         this.authorizations = toAuthorizationDTOs(
             OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList()));
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
-            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
     }
 
-    public List<AuthorizationDTO> getAuthorizations() {
+    public List<Authorization> getAuthorizations() {
         return authorizations;
     }
 
-    public List<? extends PropertyDTO> getProperties() {
+    public List<? extends Property> getProperties() {
         return properties;
     }
 
@@ -58,7 +56,7 @@ public class ConnectionDefinitionDTO extends ConnectionDefinitionBasicDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ConnectionDefinitionDTO that))
+        if (!(o instanceof ConnectionDefinition that))
             return false;
         if (!super.equals(o))
             return false;
@@ -72,7 +70,7 @@ public class ConnectionDefinitionDTO extends ConnectionDefinitionBasicDTO {
 
     @Override
     public String toString() {
-        return "ConnectionDefinitionDTO{" +
+        return "ConnectionDefinition{" +
             "authorizations=" + authorizations +
             ", properties=" + properties +
             ", authorizationRequired=" + authorizationRequired +
@@ -83,9 +81,10 @@ public class ConnectionDefinitionDTO extends ConnectionDefinitionBasicDTO {
             "} ";
     }
 
-    private static List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {
+    private static List<Authorization>
+        toAuthorizationDTOs(List<? extends com.bytechef.hermes.component.definition.Authorization> authorizations) {
         return authorizations.stream()
-            .map(AuthorizationDTO::new)
+            .map(Authorization::new)
             .toList();
     }
 }

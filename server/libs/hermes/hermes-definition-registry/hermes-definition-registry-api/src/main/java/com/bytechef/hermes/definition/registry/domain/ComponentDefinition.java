@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.component.util.CustomActionUtils;
 import com.bytechef.commons.util.IconUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,21 +33,21 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ComponentDefinitionDTO {
+public class ComponentDefinition {
 
-    private final List<ActionDefinitionBasicDTO> actions;
+    private final List<ActionDefinitionBasic> actions;
     private final String category;
-    private final ConnectionDefinitionBasicDTO connection;
+    private final ConnectionDefinitionBasic connection;
     private final String description;
     private final String icon;
     private final String name;
-    private final ResourcesDTO resources;
+    private final Resources resources;
     private final List<String> tags;
-    private final List<TriggerDefinitionBasicDTO> triggers;
+    private final List<TriggerDefinitionBasic> triggers;
     private final String title;
     private final int version;
 
-    public ComponentDefinitionDTO(String name) {
+    public ComponentDefinition(String name) {
         this.actions = List.of();
         this.category = null;
         this.connection = null;
@@ -62,27 +61,26 @@ public class ComponentDefinitionDTO {
         this.version = 0;
     }
 
-    public ComponentDefinitionDTO(ComponentDefinition componentDefinition) {
+    public ComponentDefinition(com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
-        this.connection = OptionalUtils.mapOrElse(
-            componentDefinition.getConnection(), ConnectionDefinitionBasicDTO::new, null);
+        this.connection =
+            OptionalUtils.mapOrElse(componentDefinition.getConnection(), ConnectionDefinitionBasic::new, null);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = componentDefinition.getName();
-        this.resources = OptionalUtils.mapOrElse(componentDefinition.getResources(), ResourcesDTO::new, null);
+        this.resources = OptionalUtils.mapOrElse(componentDefinition.getResources(), Resources::new, null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), Collections.emptyList());
         this.triggers = OptionalUtils.mapOrElse(
             componentDefinition.getTriggers(),
-            triggerDefinitions -> CollectionUtils.map(
-                triggerDefinitions, TriggerDefinitionBasicDTO::new),
+            triggerDefinitions -> CollectionUtils.map(triggerDefinitions, TriggerDefinitionBasic::new),
             Collections.emptyList());
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
         this.version = componentDefinition.getVersion();
     }
 
-    public List<ActionDefinitionBasicDTO> getActions() {
+    public List<ActionDefinitionBasic> getActions() {
         return actions;
     }
 
@@ -90,7 +88,7 @@ public class ComponentDefinitionDTO {
         return Optional.ofNullable(category);
     }
 
-    public Optional<ConnectionDefinitionBasicDTO> getConnection() {
+    public Optional<ConnectionDefinitionBasic> getConnection() {
         return Optional.ofNullable(connection);
     }
 
@@ -106,7 +104,7 @@ public class ComponentDefinitionDTO {
         return name;
     }
 
-    public Optional<ResourcesDTO> getResources() {
+    public Optional<Resources> getResources() {
         return Optional.ofNullable(resources);
     }
 
@@ -114,7 +112,7 @@ public class ComponentDefinitionDTO {
         return tags;
     }
 
-    public List<TriggerDefinitionBasicDTO> getTriggers() {
+    public List<TriggerDefinitionBasic> getTriggers() {
         return triggers;
     }
 
@@ -130,7 +128,7 @@ public class ComponentDefinitionDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ComponentDefinitionDTO that))
+        if (!(o instanceof ComponentDefinition that))
             return false;
         return version == that.version && Objects.equals(actions, that.actions)
             && Objects.equals(category, that.category) && Objects.equals(connection, that.connection)
@@ -148,7 +146,7 @@ public class ComponentDefinitionDTO {
 
     @Override
     public String toString() {
-        return "ComponentDefinitionDTO{" +
+        return "ComponentDefinition{" +
             "actions=" + actions +
             ", category='" + category + '\'' +
             ", connection=" + connection +
@@ -163,20 +161,21 @@ public class ComponentDefinitionDTO {
             '}';
     }
 
-    private static List<ActionDefinitionBasicDTO> getActions(ComponentDefinition componentDefinition) {
-        List<ActionDefinitionBasicDTO> actionDefinitionBasicDTOs = OptionalUtils.mapOrElse(
+    private static List<ActionDefinitionBasic>
+        getActions(com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition) {
+        List<ActionDefinitionBasic> actionDefinitionBasics = OptionalUtils.mapOrElse(
             componentDefinition.getActions(),
-            actionDefinitions -> CollectionUtils.map(actionDefinitions, ActionDefinitionBasicDTO::new),
+            actionDefinitions -> CollectionUtils.map(actionDefinitions, ActionDefinitionBasic::new),
             Collections.emptyList());
 
         if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
-            actionDefinitionBasicDTOs = new ArrayList<>(actionDefinitionBasicDTOs);
+            actionDefinitionBasics = new ArrayList<>(actionDefinitionBasics);
 
-            actionDefinitionBasicDTOs.add(
-                new ActionDefinitionBasicDTO(CustomActionUtils.getCustomActionDefinition(componentDefinition)));
+            actionDefinitionBasics.add(
+                new ActionDefinitionBasic(CustomActionUtils.getCustomActionDefinition(componentDefinition)));
         }
 
-        return actionDefinitionBasicDTOs;
+        return actionDefinitionBasics;
     }
 
     private static String getTitle(String componentName, String componentTitle) {

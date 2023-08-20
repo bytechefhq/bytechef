@@ -22,8 +22,8 @@ import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,7 +63,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
         return defaultWebClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, "/connection-definition-service/execute-authorization-apply"),
-            new Connection(componentName, connectionVersion, connectionParameters, authorizationName),
+            new ConnectionRequest(componentName, connectionVersion, connectionParameters, authorizationName),
             ApplyResponse.class);
     }
 
@@ -76,19 +76,19 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
             uriBuilder -> toUri(
                 uriBuilder, componentName, "/connection-definition-service/execute-authorization-callback"),
             new AuthorizationCallbackRequest(
-                new Connection(componentName, connectionVersion, connectionParameters, authorizationName),
+                new ConnectionRequest(componentName, connectionVersion, connectionParameters, authorizationName),
                 redirectUri),
             AuthorizationCallbackResponse.class);
     }
 
     @Override
-    public Optional<String> executeFetchBaseUri(
+    public Optional<String> executeBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
 
         return Optional.ofNullable(
             defaultWebClient.post(
-                uriBuilder -> toUri(uriBuilder, componentName, "/connection-definition-service/fetch-base-uri"),
-                new Connection(componentName, connectionVersion, connectionParameters, null),
+                uriBuilder -> toUri(uriBuilder, componentName, "/connection-definition-service/execute-base-uri"),
+                new ConnectionRequest(componentName, connectionVersion, connectionParameters, null),
                 String.class));
     }
 
@@ -106,17 +106,17 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ConnectionDefinitionDTO getConnectionDefinition(String componentName, int componentVersion) {
+    public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/connection-definition-service/get-connection-definition/{componentName}/{componentVersion}",
                 componentName, componentVersion),
-            ConnectionDefinitionDTO.class);
+            ConnectionDefinition.class);
     }
 
     @Override
-    public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, Integer componentVersion) {
+    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
@@ -125,48 +125,49 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
                         uriBuilder, serviceInstance,
                         "/connection-definition-service/get-connection-definitions/{componentName}/{componentVersion}",
                         componentName, componentVersion),
-                    new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
+                    new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
                 .toList(),
             this::toConnectionDefinitions)
             .block();
     }
 
     @Override
-    public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
+    public List<ConnectionDefinition> getConnectionDefinitions() {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(
                         uriBuilder, serviceInstance, "/connection-definition-service/get-connection-definitions"),
-                    ConnectionDefinitionDTO.class))
+                    ConnectionDefinition.class))
                 .toList(),
             this::toConnectionDefinitions)
             .block();
     }
 
     @Override
-    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/connection-definition-service/get-oauth2-parameters"),
-            new Connection(componentName, connectionVersion, connectionParameters, authorizationName),
-            OAuth2AuthorizationParametersDTO.class);
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/connection-definition-service/get-oauth2-authorization-parameters"),
+            new ConnectionRequest(componentName, connectionVersion, connectionParameters, authorizationName),
+            OAuth2AuthorizationParameters.class);
     }
 
     @SuppressWarnings("unchecked")
-    private List<ConnectionDefinitionDTO> toConnectionDefinitions(Object[] objectArray) {
+    private List<ConnectionDefinition> toConnectionDefinitions(Object[] objectArray) {
         return Arrays.stream(objectArray)
-            .map(object -> (List<ConnectionDefinitionDTO>) object)
+            .map(object -> (List<ConnectionDefinition>) object)
             .flatMap(Collection::stream)
             .toList();
     }
 
-    private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
+    private record AuthorizationCallbackRequest(ConnectionRequest connection, String redirectUri) {
     }
 
-    private record Connection(
+    private record ConnectionRequest(
         String componentName, int connectionVersion, Map<String, ?> parameters, String authorizationName) {
     }
 }

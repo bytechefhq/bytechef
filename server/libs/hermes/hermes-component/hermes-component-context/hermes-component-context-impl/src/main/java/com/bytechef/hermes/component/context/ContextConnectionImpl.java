@@ -65,7 +65,7 @@ public class ContextConnectionImpl implements Context.Connection, AuthorizationC
 
     @Override
     public Optional<String> fetchBaseUri() {
-        return connectionDefinitionService.executeFetchBaseUri(componentName, connectionVersion, parameters);
+        return connectionDefinitionService.executeBaseUri(componentName, connectionVersion, parameters);
     }
 
     @Override

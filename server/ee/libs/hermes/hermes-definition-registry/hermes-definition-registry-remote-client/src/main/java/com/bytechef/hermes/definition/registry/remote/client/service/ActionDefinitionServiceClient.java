@@ -18,10 +18,10 @@
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,8 +34,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ActionDefinitionServiceClient extends AbstractWorkerClient
-    implements ActionDefinitionService {
+public class ActionDefinitionServiceClient extends AbstractWorkerClient implements ActionDefinitionService {
 
     public ActionDefinitionServiceClient(
         DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
@@ -44,7 +43,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    public List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
         String authorizationName) {
@@ -61,7 +60,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<OptionDTO> executeOptions(
+    public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
         String authorizationName) {
@@ -70,7 +69,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -99,17 +98,17 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ActionDefinitionDTO getActionDefinition(String componentName, int componentVersion, String actionName) {
+    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/action-definition-service/get-action-definition/{componentName}/{componentVersion}/{actionName}",
                 componentName, componentVersion, actionName),
-            ActionDefinitionDTO.class);
+            ActionDefinition.class);
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(
+    public List<ActionDefinition> getActionDefinitions(
         String componentName, int componentVersion) {
 
         return defaultWebClient.get(
@@ -121,7 +120,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<ComponentOperation> componentOperations) {
+    public List<ActionDefinition> getActionDefinitions(List<ComponentOperation> componentOperations) {
         // TODO implement this method
 
         throw new UnsupportedOperationException();

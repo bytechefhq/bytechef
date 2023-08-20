@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.DateProperty;
+import com.bytechef.hermes.definition.Property;
 
-import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -30,20 +30,20 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class DatePropertyDTO extends ValuePropertyDTO<LocalDate> {
+public class TimeProperty extends ValueProperty<LocalTime> {
 
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
-    private DatePropertyDTO() {
+    private TimeProperty() {
     }
 
-    public DatePropertyDTO(DateProperty dateProperty) {
-        super(dateProperty);
+    public TimeProperty(Property.TimeProperty timeProperty) {
+        super(timeProperty);
 
-        this.options = CollectionUtils.map(OptionalUtils.orElse(dateProperty.getOptions(), List.of()), OptionDTO::new);
+        this.options = CollectionUtils.map(OptionalUtils.orElse(timeProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            dateProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+            timeProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
 
     @Override
@@ -51,11 +51,11 @@ public class DatePropertyDTO extends ValuePropertyDTO<LocalDate> {
         return propertyVisitor.visit(this);
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
     }
 
@@ -63,24 +63,26 @@ public class DatePropertyDTO extends ValuePropertyDTO<LocalDate> {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof DatePropertyDTO that))
+        if (!(o instanceof TimeProperty that))
+            return false;
+        if (!super.equals(o))
             return false;
         return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(options, optionsDataSource);
+        return Objects.hash(super.hashCode(), options, optionsDataSource);
     }
 
     @Override
     public String toString() {
-        return "DatePropertyDTO{" +
+        return "TimeProperty{" +
             "options=" + options +
             ", optionsDataSource=" + optionsDataSource +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +
-            "} " + super.toString();
+            "} ";
     }
 }

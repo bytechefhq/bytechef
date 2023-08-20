@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.IconUtils;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -31,19 +30,19 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class TaskDispatcherDefinitionDTO {
+public class TaskDispatcherDefinition {
 
     private final String description;
     private final String icon;
     private final String name;
-    private final PropertyDTO outputSchema;
-    private final List<? extends PropertyDTO> properties;
-    private final ResourcesDTO resources;
-    private final List<? extends PropertyDTO> taskProperties;
+    private final Property outputSchema;
+    private final List<? extends Property> properties;
+    private final Resources resources;
+    private final List<? extends Property> taskProperties;
     private final String title;
     private final int version;
 
-    public TaskDispatcherDefinitionDTO(String name) {
+    public TaskDispatcherDefinition(String name) {
         this.description = null;
         this.icon = null;
         this.properties = List.of();
@@ -55,18 +54,19 @@ public class TaskDispatcherDefinitionDTO {
         this.version = 0;
     }
 
-    public TaskDispatcherDefinitionDTO(TaskDispatcherDefinition taskDispatcherDefinition) {
+    public TaskDispatcherDefinition(
+        com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
         this.description = OptionalUtils.orElse(taskDispatcherDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
         this.outputSchema = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null);
+            taskDispatcherDefinition.getOutputSchema(), Property::toProperty, null);
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), PropertyDTO::toPropertyDTO);
-        this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), ResourcesDTO::new, null);
+            OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
+        this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
         this.taskProperties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
-            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.title = OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName());
         this.version = taskDispatcherDefinition.getVersion();
     }
@@ -83,19 +83,19 @@ public class TaskDispatcherDefinitionDTO {
         return name;
     }
 
-    public Optional<PropertyDTO> getOutputSchema() {
+    public Optional<Property> getOutputSchema() {
         return Optional.ofNullable(outputSchema);
     }
 
-    public List<? extends PropertyDTO> getProperties() {
+    public List<? extends Property> getProperties() {
         return properties;
     }
 
-    public Optional<ResourcesDTO> getResources() {
+    public Optional<Resources> getResources() {
         return Optional.ofNullable(resources);
     }
 
-    public List<? extends PropertyDTO> getTaskProperties() {
+    public List<? extends Property> getTaskProperties() {
         return taskProperties;
     }
 
@@ -111,7 +111,7 @@ public class TaskDispatcherDefinitionDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof TaskDispatcherDefinitionDTO that))
+        if (!(o instanceof TaskDispatcherDefinition that))
             return false;
         return version == that.version && Objects.equals(description, that.description)
             && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
@@ -128,7 +128,7 @@ public class TaskDispatcherDefinitionDTO {
 
     @Override
     public String toString() {
-        return "TaskDispatcherDefinitionDTO{" +
+        return "TaskDispatcherDefinition{" +
             "description='" + description + '\'' +
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +

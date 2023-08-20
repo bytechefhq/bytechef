@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 
 import java.util.Map;
 
@@ -26,6 +26,6 @@ import java.util.Map;
  */
 public interface OAuth2ParameterFacade {
 
-    OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
 }

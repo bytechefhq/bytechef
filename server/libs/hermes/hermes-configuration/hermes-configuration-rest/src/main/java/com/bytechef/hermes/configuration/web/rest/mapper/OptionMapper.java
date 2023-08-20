@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
 import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -30,10 +30,10 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
     OptionalMapper.class
 })
-public interface OptionMapper extends Converter<OptionDTO, OptionModel> {
+public interface OptionMapper extends Converter<Option, OptionModel> {
 
     @Override
-    OptionModel convert(OptionDTO optionDTO);
+    OptionModel convert(Option option);
 
     default JsonNullable<Object> mapToJsonNullable(Object value) {
         return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
