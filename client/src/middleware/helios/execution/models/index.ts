@@ -4,7 +4,6 @@ export * from './CategoryModel';
 export * from './ComponentDefinitionModel';
 export * from './CreateJob200ResponseModel';
 export * from './ExecutionErrorModel';
-export * from './JobAllOfModel';
 export * from './JobBasicModel';
 export * from './JobModel';
 export * from './JobParametersModel';

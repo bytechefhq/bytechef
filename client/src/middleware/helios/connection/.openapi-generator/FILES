@@ -1,5 +1,6 @@
-apis/AutomationConnectionTagsApi.ts
-apis/AutomationConnectionsApi.ts
+.openapi-generator-ignore
+apis/AutomationConnectionApi.ts
+apis/AutomationConnectionTagApi.ts
 apis/index.ts
 index.ts
 models/ConnectionModel.ts
