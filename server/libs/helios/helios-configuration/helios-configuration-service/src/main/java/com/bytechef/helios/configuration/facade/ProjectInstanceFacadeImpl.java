@@ -63,8 +63,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     public ProjectInstanceFacadeImpl(
         JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
-        WorkflowService workflowService) {
+        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade, WorkflowService workflowService) {
 
         this.jobFacade = jobFacade;
         this.projectInstanceService = projectInstanceService;
