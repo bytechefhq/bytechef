@@ -1,2 +1,6 @@
 server:
   port: 9999
+
+bytechef:
+  message-broker:
+    provider: jms
