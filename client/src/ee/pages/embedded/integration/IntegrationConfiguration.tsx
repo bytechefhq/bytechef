@@ -1,8 +1,8 @@
 import {Button} from '@/components/ui/button';
+import IntegrationLeftSidebarNav from '@/ee/pages/embedded/integration/components/IntegrationLeftSidebarNav';
+import IntegrationPortalContent from '@/ee/pages/embedded/integration/components/IntegrationPortalContent';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import PageHeader from '@/layouts/PageHeader';
-import IntegrationLeftSidebarNav from '@/pages/embedded/integration/components/IntegrationLeftSidebarNav';
-import IntegrationPortalContent from '@/pages/embedded/integration/components/IntegrationPortalContent';
 import * as React from 'react';
 
 const IntegrationConfiguration = () => {
