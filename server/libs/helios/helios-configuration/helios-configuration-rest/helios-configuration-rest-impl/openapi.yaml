@@ -6,25 +6,25 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "automation-project-categories"
-  description: "The Automation Project Categories API"
-- name: "automation-project-instance-tags"
-  description: "The Automation Project Instance Tags API"
-- name: "automation-project-instances"
-  description: "The Automation Project Instances API"
-- name: "automation-project-tags"
-  description: "The Automation Project Tags API"
-- name: "automation-projects"
-  description: "The Automation Projects API"
-- name: "automation-workflows"
-  description: "The Automation Workflows API"
+- name: "automation-project-category"
+  description: "The Automation Project Category API"
+- name: "automation-project-instance-tag"
+  description: "The Automation Project Instance Tag API"
+- name: "automation-project-instance"
+  description: "The Automation Project Instance API"
+- name: "automation-project-tag"
+  description: "The Automation Project Tag API"
+- name: "automation-project"
+  description: "The Automation Project API"
+- name: "automation-workflow"
+  description: "The Automation Workflow API"
 paths:
   /project-categories:
     get:
       description: "Get categories."
       summary: "Get categories"
       tags:
-      - "automation-project-categories"
+      - "automation-project-category"
       operationId: "getProjectCategories"
       responses:
         "200":
@@ -41,7 +41,7 @@ paths:
       description: "Get project instance tags."
       summary: "Get project instance tags"
       tags:
-      - "automation-project-instance-tags"
+      - "automation-project-instance-tag"
       operationId: "getProjectInstanceTags"
       responses:
         "200":
@@ -58,7 +58,7 @@ paths:
       description: "Get project instances."
       summary: "Get project instances"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "getProjectInstances"
       parameters:
       - name: "projectId"
@@ -88,7 +88,7 @@ paths:
       description: "Create a new project instance."
       summary: "Create a new project instance"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "createProjectInstance"
       requestBody:
         content:
@@ -108,7 +108,7 @@ paths:
       description: "Delete a project instance."
       summary: "Delete a project instance"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "deleteProjectInstance"
       parameters:
       - name: "id"
@@ -125,7 +125,7 @@ paths:
       description: "Get a project instance by id."
       summary: "Get a project instance by id"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "getProjectInstance"
       parameters:
       - name: "id"
@@ -146,7 +146,7 @@ paths:
       description: "Update an existing project instance."
       summary: "Update an existing project instance"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "updateProjectInstance"
       parameters:
       - name: "id"
@@ -174,7 +174,7 @@ paths:
       description: "Enable/disable a project instance."
       summary: "Enable/disable a project instance"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "enableProjectInstance"
       parameters:
       - name: "id"
@@ -198,7 +198,7 @@ paths:
       description: "Updates tags of an existing project instance."
       summary: "Updates tags of an existing project instance"
       tags:
-      - "automation-project-instance-tags"
+      - "automation-project-instance-tag"
       operationId: "updateProjectInstanceTags"
       parameters:
       - name: "id"
@@ -222,7 +222,7 @@ paths:
       description: "Enable/disable a workflow of a project instance."
       summary: "Enable/disable a workflow of a project instance"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "enableProjectInstanceWorkflow"
       parameters:
       - name: "id"
@@ -252,7 +252,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "automation-project-instances"
+      - "automation-project-instance"
       operationId: "createProjectInstanceWorkflowJob"
       parameters:
       - name: "id"
@@ -285,7 +285,7 @@ paths:
       description: "Get project tags."
       summary: "Get project tags."
       tags:
-      - "automation-project-tags"
+      - "automation-project-tag"
       operationId: "getProjectTags"
       responses:
         "200":
@@ -302,7 +302,7 @@ paths:
       description: "Get projects."
       summary: "Get projects."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "getProjects"
       parameters:
       - name: "categoryId"
@@ -338,7 +338,7 @@ paths:
       description: "Create a new project."
       summary: "Create a new project."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "createProject"
       requestBody:
         content:
@@ -358,7 +358,7 @@ paths:
       description: "Delete a project."
       summary: "Delete a project."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "deleteProject"
       parameters:
       - name: "id"
@@ -375,7 +375,7 @@ paths:
       description: "Get a project by id."
       summary: "Get a project by id."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "getProject"
       parameters:
       - name: "id"
@@ -396,7 +396,7 @@ paths:
       description: "Update an existing project."
       summary: "Update an existing project."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "updateProject"
       parameters:
       - name: "id"
@@ -424,7 +424,7 @@ paths:
       description: "Duplicates existing project."
       summary: "Duplicates existing project."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "duplicateProject"
       parameters:
       - name: "id"
@@ -446,7 +446,7 @@ paths:
       description: "Updates tags of an existing project."
       summary: "Updates tags of an existing project."
       tags:
-      - "automation-project-tags"
+      - "automation-project-tag"
       operationId: "updateProjectTags"
       parameters:
       - name: "id"
@@ -470,7 +470,7 @@ paths:
       description: "Get workflows for particular project."
       summary: "Get workflows for particular project."
       tags:
-      - "automation-workflows"
+      - "automation-workflow"
       operationId: "getProjectWorkflows"
       parameters:
       - name: "id"
@@ -493,7 +493,7 @@ paths:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
       tags:
-      - "automation-projects"
+      - "automation-project"
       operationId: "createProjectWorkflow"
       parameters:
       - name: "id"
@@ -533,7 +533,7 @@ paths:
       description: "Get workflow definitions."
       summary: "Get workflow definitions"
       tags:
-      - "automation-workflows"
+      - "automation-workflow"
       operationId: "getWorkflows"
       responses:
         "200":
@@ -549,7 +549,7 @@ paths:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-      - "automation-workflows"
+      - "automation-workflow"
       operationId: "deleteWorkflow"
       parameters:
       - name: "id"
@@ -565,7 +565,7 @@ paths:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
       tags:
-      - "automation-workflows"
+      - "automation-workflow"
       operationId: "getWorkflow"
       parameters:
       - name: "id"
@@ -585,7 +585,7 @@ paths:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-      - "automation-workflows"
+      - "automation-workflow"
       operationId: "updateWorkflow"
       parameters:
       - name: "id"

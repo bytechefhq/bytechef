@@ -6,25 +6,25 @@ info:
 servers:
 - url: "http://localhost:5173/api/core"
 tags:
-- name: "action-definitions"
-  description: "The Core Action Definitions API"
-- name: "component-definitions"
-  description: "The Core Component Definitions API"
-- name: "connection-definitions"
-  description: "The Core Connection Definitions API"
+- name: "action-definition"
+  description: "The Core Action Definition API"
+- name: "component-definition"
+  description: "The Core Component Definition API"
+- name: "connection-definition"
+  description: "The Core Connection Definition API"
 - name: "oauth2"
   description: "The Core OAuth2 API"
-- name: "task-dispatcher-definitions"
-  description: "The Core Task Dispatcher Definitions API"
-- name: "trigger-definitions"
-  description: "The Core Trigger Definitions API"
+- name: "task-dispatcher-definition"
+  description: "The Core Task Dispatcher Definition API"
+- name: "trigger-definition"
+  description: "The Core Trigger Definition API"
 paths:
   /action-definitions:
     get:
       description: "Get all action definitions."
       summary: "Get all action definitions"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getActionDefinitions"
       parameters:
       - name: "taskTypes"
@@ -50,7 +50,7 @@ paths:
       description: "Get all component definitions."
       summary: "Get all component definitions"
       tags:
-      - "component-definitions"
+      - "component-definition"
       operationId: "getComponentDefinitions"
       parameters:
       - name: "actionDefinitions"
@@ -100,7 +100,7 @@ paths:
       description: "Get a list of action definitions for a component."
       summary: "Get a list of action definitions for a component"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionDefinitions"
       parameters:
       - name: "componentName"
@@ -129,7 +129,7 @@ paths:
       description: "Get an action definition of a component."
       summary: "Get an action definition of a component"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionDefinition"
       parameters:
       - name: "componentName"
@@ -162,7 +162,7 @@ paths:
       description: "Get an action description shown in the editor."
       summary: "Get an action description shown in the editor"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionEditorDescription"
       parameters:
       - name: "componentName"
@@ -200,7 +200,7 @@ paths:
       description: "Get an action output schema shown in the editor."
       summary: "Get an action output schema shown in the editor"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionOutputSchema"
       parameters:
       - name: "componentName"
@@ -240,7 +240,7 @@ paths:
       description: "Get an action sample output shown in the editor."
       summary: "Get an action sample output shown in the editor"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionSampleOutput"
       parameters:
       - name: "componentName"
@@ -278,7 +278,7 @@ paths:
       description: "Get dynamic properties for an action property shown in the editor."
       summary: "Get dynamic properties for an action property shown in the editor"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionPropertyDynamicProperties"
       parameters:
       - name: "componentName"
@@ -324,7 +324,7 @@ paths:
       description: "Get an action property options shown in the editor."
       summary: "Get an action property options shown in the editor"
       tags:
-      - "action-definitions"
+      - "action-definition"
       operationId: "getComponentActionPropertyOptions"
       parameters:
       - name: "componentName"
@@ -375,7 +375,7 @@ paths:
       description: "Get connection definition for a component."
       summary: "Get connection definition for a component"
       tags:
-      - "connection-definitions"
+      - "connection-definition"
       operationId: "getComponentConnectionDefinition"
       parameters:
       - name: "componentName"
@@ -402,7 +402,7 @@ paths:
       description: "Get all compatible connection definitions for a component."
       summary: "Get all compatible connection definitions for a component"
       tags:
-      - "connection-definitions"
+      - "connection-definition"
       operationId: "getComponentConnectionDefinitions"
       parameters:
       - name: "componentName"
@@ -431,7 +431,7 @@ paths:
       description: "Get a component definition."
       summary: "Get a component definition"
       tags:
-      - "component-definitions"
+      - "component-definition"
       operationId: "getComponentDefinition"
       parameters:
       - name: "componentName"
@@ -459,7 +459,7 @@ paths:
       description: "Get all component definition versions of a component."
       summary: "Get all component definition versions of a component"
       tags:
-      - "component-definitions"
+      - "component-definition"
       operationId: "getComponentDefinitionVersions"
       parameters:
       - name: "componentName"
@@ -482,7 +482,7 @@ paths:
       description: "Get a list of trigger definitionss for a component."
       summary: "Get a list of trigger definitionss for a component"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerDefinitions"
       parameters:
       - name: "componentName"
@@ -511,7 +511,7 @@ paths:
       description: "Get a trigger definition of a component."
       summary: "Get a trigger definition of a component"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerDefinition"
       parameters:
       - name: "componentName"
@@ -544,7 +544,7 @@ paths:
       description: "Get an trigger description shown in the editor."
       summary: "Get an trigger description shown in the editor"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerEditorDescription"
       parameters:
       - name: "componentName"
@@ -582,7 +582,7 @@ paths:
       description: "Get a trigger output schema shown in the editor."
       summary: "Get a trigger output schema shown in the editor"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerOutputSchema"
       parameters:
       - name: "componentName"
@@ -622,7 +622,7 @@ paths:
       description: "Get a trigger sample output shown in the editor."
       summary: "Get a trigger sample output shown in the editor"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerSampleOutput"
       parameters:
       - name: "componentName"
@@ -660,7 +660,7 @@ paths:
       description: "Get dynamic properties for a trigger property shown in the editor."
       summary: "Get dynamic properties for a trigger property shown in the editor"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerPropertyDynamicProperties"
       parameters:
       - name: "componentName"
@@ -706,7 +706,7 @@ paths:
       description: "Get a trigger property options shown in the editor."
       summary: "Get a trigger property options shown in the editor"
       tags:
-      - "trigger-definitions"
+      - "trigger-definition"
       operationId: "getComponentTriggerPropertyOptions"
       parameters:
       - name: "componentName"
@@ -757,7 +757,7 @@ paths:
       description: "Retrieves oauth2 authorization parameters."
       summary: "Retrieves oauth2 authorization parameters"
       tags:
-      - "connection-definitions"
+      - "connection-definition"
       operationId: "getOAuth2AuthorizationParameters"
       requestBody:
         content:
@@ -814,7 +814,7 @@ paths:
       description: "Get all task dispatcher definitions."
       summary: "Get all task dispatcher definitions"
       tags:
-      - "task-dispatcher-definitions"
+      - "task-dispatcher-definition"
       operationId: "getTaskDispatcherDefinitions"
       responses:
         "200":
@@ -830,7 +830,7 @@ paths:
       description: "Get all task dispatcher definition versions of a task dispatcher."
       summary: "Get all task dispatcher definition versions of a task dispatcher"
       tags:
-      - "task-dispatcher-definitions"
+      - "task-dispatcher-definition"
       operationId: "getTaskDispatcherDefinitionVersions"
       parameters:
       - name: "taskDispatcherName"
@@ -853,7 +853,7 @@ paths:
       description: "Get a task dispatcher definition."
       summary: "Get a task dispatcher definition"
       tags:
-      - "task-dispatcher-definitions"
+      - "task-dispatcher-definition"
       operationId: "getTaskDispatcherDefinition"
       parameters:
       - name: "taskDispatcherName"
