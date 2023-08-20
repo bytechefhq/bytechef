@@ -20,7 +20,7 @@ package com.bytechef.component.objecthelper.action;
 import com.bytechef.hermes.component.Context;
 
 import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -40,10 +40,10 @@ public class ObjectHelperParseActionTest {
 
     @Test
     public void testPerformParse() {
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
             MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(
                     """
                         {
@@ -57,10 +57,10 @@ public class ObjectHelperParseActionTest {
                 .isEqualTo(Map.of("key", 3));
         }
 
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
             MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(
                     """
                         [

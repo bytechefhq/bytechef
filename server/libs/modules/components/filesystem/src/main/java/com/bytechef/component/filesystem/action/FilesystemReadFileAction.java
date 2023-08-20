@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class FilesystemReadFileAction {
         .perform(FilesystemReadFileAction::perform);
 
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        String filename = MapValueUtils.getRequiredString(inputParameters, FILENAME);
+        String filename = MapUtils.getRequiredString(inputParameters, FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
             return context.storeFileContent(filename, inputStream);

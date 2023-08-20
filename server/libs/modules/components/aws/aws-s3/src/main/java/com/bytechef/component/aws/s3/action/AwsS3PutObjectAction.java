@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -78,7 +78,7 @@ public class AwsS3PutObjectAction {
 
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
-        FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
+        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             Map<String, Object> connectionParameters = connection.getParameters();
@@ -88,10 +88,10 @@ public class AwsS3PutObjectAction {
 
             s3Client.putObject(
                 PutObjectRequest.builder()
-                    .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                    .key(MapValueUtils.getRequiredString(inputParameters, KEY))
-                    .acl(MapValueUtils.getString(inputParameters, ACL) != null
-                        ? ObjectCannedACL.fromValue(MapValueUtils.getString(inputParameters, ACL))
+                    .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
+                    .key(MapUtils.getRequiredString(inputParameters, KEY))
+                    .acl(MapUtils.getString(inputParameters, ACL) != null
+                        ? ObjectCannedACL.fromValue(MapUtils.getString(inputParameters, ACL))
                         : null)
                     .build(),
                 tempFilePath);

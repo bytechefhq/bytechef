@@ -32,7 +32,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -88,9 +88,9 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(
             Objects.requireNonNull(taskExecution.getParentId()));
 
-        boolean loopForever = MapValueUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
-        List<?> list = MapValueUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
+        boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
+        Map<String, ?> iteratee = MapUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
+        List<?> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = TaskExecution.builder()

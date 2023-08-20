@@ -18,7 +18,7 @@
 package com.bytechef.component.filestorage.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -38,10 +38,10 @@ public class FileStorageReadActionTest {
 
     @Test
     public void testPerformRead() {
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
             Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-            mockedStatic.when(() -> MapValueUtils.getRequired(
+            mockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(fileEntry);
 

@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -42,8 +42,8 @@ public class FilesystemMkdirActionTest {
             .toString()
             .replace("-", "");
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
                 .thenReturn(tempDir);
 
             FilesystemMkdirAction.perform(Map.of(), Mockito.mock(Context.class));
@@ -54,9 +54,9 @@ public class FilesystemMkdirActionTest {
 
     @Test
     public void testCreateDir2() {
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
             Assertions.assertThrows(ComponentExecutionException.class, () -> {
-                mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
+                mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
                     .thenReturn("/no/such/thing");
 
                 FilesystemMkdirAction.perform(Map.of(), Mockito.mock(Context.class));

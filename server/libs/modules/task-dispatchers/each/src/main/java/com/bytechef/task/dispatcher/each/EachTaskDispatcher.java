@@ -33,7 +33,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -76,8 +76,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        WorkflowTask iteratee = MapValueUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
-        List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
+        WorkflowTask iteratee = MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -89,7 +89,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         } else {
             counterService.set(taskExecution.getId(), list.size());
 

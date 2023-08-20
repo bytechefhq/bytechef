@@ -21,7 +21,7 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
@@ -69,14 +69,14 @@ public class AwsS3ListObjectsAction {
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                .prefix(MapValueUtils.getRequiredString(inputParameters, PREFIX))
+                .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
+                .prefix(MapUtils.getRequiredString(inputParameters, PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
                 .map(o -> new S3ObjectDescription(
-                    MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME), o))
+                    MapUtils.getRequiredString(connectionParameters, BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }

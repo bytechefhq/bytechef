@@ -19,7 +19,7 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.FileStorageComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,10 +45,10 @@ public class FileStorageWriteActionTest {
     public void testPerformWrite() {
         File file = getFile();
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(CONTENT)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(CONTENT)))
                 .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.txt")))
                 .thenReturn("file.txt");
 
@@ -65,10 +65,10 @@ public class FileStorageWriteActionTest {
 
         Mockito.reset(context);
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(CONTENT)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(CONTENT)))
                 .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.txt")))
                 .thenReturn("test.txt");
 

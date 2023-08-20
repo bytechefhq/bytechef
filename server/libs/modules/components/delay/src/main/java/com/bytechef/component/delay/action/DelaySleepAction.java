@@ -20,7 +20,7 @@ package com.bytechef.component.delay.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.time.Duration;
 import java.util.Map;
@@ -49,9 +49,9 @@ public class DelaySleepAction {
 
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
         if (inputParameters.containsKey(MILLIS)) {
-            sleep(MapValueUtils.getLong(inputParameters, MILLIS));
+            sleep(MapUtils.getLong(inputParameters, MILLIS));
         } else if (inputParameters.containsKey("duration")) {
-            Duration duration = MapValueUtils.getDuration(inputParameters, "duration");
+            Duration duration = MapUtils.getDuration(inputParameters, "duration");
 
             sleep(duration.toMillis());
         } else {

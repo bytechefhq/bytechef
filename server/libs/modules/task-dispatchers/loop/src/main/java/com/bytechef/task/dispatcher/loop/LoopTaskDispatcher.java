@@ -34,7 +34,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -71,9 +71,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        boolean loopForever = MapValueUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        WorkflowTask iteratee = MapValueUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
-        List<?> list = MapValueUtils.getList(taskExecution.getParameters(), LIST, Collections.emptyList());
+        boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
+        WorkflowTask iteratee = MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<?> list = MapUtils.getList(taskExecution.getParameters(), LIST, Collections.emptyList());
 
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -115,7 +115,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         }
     }
 

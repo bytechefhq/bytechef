@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 
 import java.io.InputStream;
@@ -82,12 +82,12 @@ public class XmlFileReadAction {
         .perform(XmlFileReadAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
-        boolean isArray = MapValueUtils.getBoolean(inputParameters, IS_ARRAY, true);
+        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
+        boolean isArray = MapUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = MapValueUtils.getString(inputParameters, PATH);
+            String path = MapUtils.getString(inputParameters, PATH);
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
@@ -99,8 +99,8 @@ public class XmlFileReadAction {
                 items = XmlUtils.read(inputStream, path);
             }
 
-            Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
-            Integer pageNumber = MapValueUtils.getInteger(inputParameters, PAGE_NUMBER);
+            Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
+            Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -126,7 +126,7 @@ public class XmlFileReadAction {
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (connection, inputParameters) -> {
-            if (MapValueUtils.getBoolean(inputParameters, IS_ARRAY, false)) {
+            if (MapUtils.getBoolean(inputParameters, IS_ARRAY, false)) {
                 return object();
             } else {
                 return array();

@@ -29,7 +29,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -132,7 +132,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution conditionTaskExecution, String caseTrue) {
-        return MapValueUtils.getList(
+        return MapUtils.getList(
             conditionTaskExecution.getParameters(), caseTrue, WorkflowTask.class, Collections.emptyList());
     }
 }

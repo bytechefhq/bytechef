@@ -23,17 +23,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class DataSourceFactory {
-    private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
+
+    private static final Map<String, DataSource> DATA_SOURCE_MAP = new ConcurrentHashMap<>();
 
     public DataSource getDataSource(
         Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
@@ -45,20 +44,20 @@ public class DataSourceFactory {
         Map<String, Object> connectionParameters = connection.getParameters();
 
         String url = "jdbc:" + databaseJdbcName + "://"
-            + MapValueUtils.getString(connectionParameters, JdbcConstants.HOST)
+            + MapUtils.getString(connectionParameters, JdbcConstants.HOST)
             + ":"
-            + MapValueUtils.getString(connectionParameters, JdbcConstants.PORT)
+            + MapUtils.getString(connectionParameters, JdbcConstants.PORT)
             + "/"
-            + MapValueUtils.getString(connectionParameters, JdbcConstants.DATABASE);
-        String username = MapValueUtils.getString(connectionParameters, JdbcConstants.USERNAME);
+            + MapUtils.getString(connectionParameters, JdbcConstants.DATABASE);
+        String username = MapUtils.getString(connectionParameters, JdbcConstants.USERNAME);
 
-        return dataSourceMap.computeIfAbsent(url + username, key -> {
+        return DATA_SOURCE_MAP.computeIfAbsent(url + username, key -> {
             DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
 
             dataSourceBuilder.driverClassName(jdbcDriverClassName);
             dataSourceBuilder.url(url);
             dataSourceBuilder.username(username);
-            dataSourceBuilder.password(MapValueUtils.getString(connectionParameters, JdbcConstants.PASSWORD));
+            dataSourceBuilder.password(MapUtils.getString(connectionParameters, JdbcConstants.PASSWORD));
 
             return dataSourceBuilder.build();
         });

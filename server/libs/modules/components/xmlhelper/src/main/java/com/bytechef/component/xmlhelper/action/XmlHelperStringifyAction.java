@@ -19,7 +19,7 @@ package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 
 import java.util.Map;
@@ -64,7 +64,7 @@ public class XmlHelperStringifyAction {
         .perform(XmlHelperStringifyAction::perform);
 
     protected static String perform(Map<String, ?> inputParameters, Context context) {
-        Object source = MapValueUtils.getRequired(inputParameters, SOURCE);
+        Object source = MapUtils.getRequired(inputParameters, SOURCE);
 
         return XmlUtils.write(source);
     }

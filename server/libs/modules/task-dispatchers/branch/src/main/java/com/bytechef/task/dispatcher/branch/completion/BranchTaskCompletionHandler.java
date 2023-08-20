@@ -34,7 +34,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,15 +135,15 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
-        Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = MapValueUtils.getList(
+        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<WorkflowTask> caseWorkflowTasks = MapUtils.getList(
             taskExecution.getParameters(), CASES, WorkflowTask.class, Collections.emptyList());
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
-            Object key = MapValueUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
-            List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+            Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
+            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
                 caseWorkflowTask.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
             if (key.equals(expression)) {
@@ -151,7 +151,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
             }
         }
 
-        return MapValueUtils.getList(
+        return MapUtils.getList(
             taskExecution.getParameters(), DEFAULT, WorkflowTask.class, Collections.emptyList());
     }
 }

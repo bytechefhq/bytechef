@@ -20,7 +20,7 @@ package com.bytechef.component.jsonfile.action;
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -59,13 +59,13 @@ public class JsonFileWriteActionTest {
     public void testPerformWriteJSON() throws JSONException {
         File file = getFile("sample.json");
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSON");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
             JsonFileWriteAction.perform(Map.of(), context);
@@ -92,13 +92,13 @@ public class JsonFileWriteActionTest {
     public void testPerformWriteJSONArray() throws JSONException {
         File file = getFile("sample_array.json");
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSON");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
             JsonFileWriteAction.perform(Map.of(), context);
@@ -121,13 +121,13 @@ public class JsonFileWriteActionTest {
 
         Mockito.reset(context);
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn("test.json");
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSON");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
             JsonFileWriteAction.perform(Map.of(), context);
@@ -146,13 +146,13 @@ public class JsonFileWriteActionTest {
     public void testPerformWriteJSONL() throws JSONException {
         File file = getFile("sample.jsonl");
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSONL");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
             JsonFileWriteAction.perform(
@@ -177,13 +177,13 @@ public class JsonFileWriteActionTest {
 
         Mockito.reset(context);
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn("test.jsonl");
-            mockedStatic.when(() -> MapValueUtils.getString(
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSONL");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
             JsonFileWriteAction.perform(

@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -36,10 +36,10 @@ public class XmlHelperStringifyActionTest {
 
     @Test
     public void testPerformStringify() {
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
             MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(Map.of("id", 45, "name", "Poppy"));
             xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
                 .thenReturn("""

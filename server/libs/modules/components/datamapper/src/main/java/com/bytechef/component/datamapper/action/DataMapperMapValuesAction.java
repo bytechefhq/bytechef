@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.util.Map;
 
@@ -166,7 +166,7 @@ public class DataMapperMapValuesAction {
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (connection, inputParameters) -> {
-            if (MapValueUtils.getInteger(inputParameters, TYPE, 1) == 1) {
+            if (MapUtils.getInteger(inputParameters, TYPE, 1) == 1) {
                 return object();
             } else {
                 return array();

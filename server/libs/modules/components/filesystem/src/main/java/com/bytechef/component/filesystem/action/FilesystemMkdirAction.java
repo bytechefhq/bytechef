@@ -20,7 +20,7 @@ package com.bytechef.component.filesystem.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,7 +55,7 @@ public class FilesystemMkdirAction {
      */
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
         try {
-            return Files.createDirectories(Paths.get(MapValueUtils.getRequiredString(inputParameters, PATH)));
+            return Files.createDirectories(Paths.get(MapUtils.getRequiredString(inputParameters, PATH)));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create directories " + inputParameters, ioException);
         }
