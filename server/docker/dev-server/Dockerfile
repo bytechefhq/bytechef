@@ -1,4 +1,4 @@
-FROM gradle:8.1.1-jdk17-alpine AS build
+FROM gradle:8.3.0-jdk20-alpine AS build
 
 WORKDIR /build
 
@@ -14,7 +14,7 @@ WORKDIR server/apps/server-app
 
 RUN gradle bootJar --no-daemon
 
-FROM ghcr.io/graalvm/graalvm-ce:ol9-java17-22.3.0
+FROM ghcr.io/graalvm/graalvm-community:20.0.2-ol9
 
 #USER root
 
