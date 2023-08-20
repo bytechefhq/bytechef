@@ -33,7 +33,7 @@ import {
      ObjectPropertyModelFromJSONTyped,
      StringPropertyModelFromJSONTyped,
      TimePropertyModelFromJSONTyped
-} from './';
+} from './index';
 
 /**
  * A base property.

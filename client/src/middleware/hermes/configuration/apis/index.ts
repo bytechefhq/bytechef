@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ActionDefinitionsApi';
-export * from './ComponentDefinitionsApi';
-export * from './ConnectionDefinitionsApi';
+export * from './ActionDefinitionApi';
+export * from './ComponentDefinitionApi';
+export * from './ConnectionDefinitionApi';
 export * from './Oauth2Api';
-export * from './TaskDispatcherDefinitionsApi';
-export * from './TriggerDefinitionsApi';
+export * from './TaskDispatcherDefinitionApi';
+export * from './TriggerDefinitionApi';
