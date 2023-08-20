@@ -2,12 +2,12 @@ import {useMutation} from '@tanstack/react-query';
 import {
     CreateIntegrationWorkflowRequest,
     DeleteIntegrationRequest,
-    EmbeddedIntegrationTagsApi,
-    EmbeddedIntegrationsApi,
+    EmbeddedIntegrationApi,
+    EmbeddedIntegrationTagApi,
     IntegrationModel,
     UpdateIntegrationTagsRequest,
     WorkflowModel,
-} from 'middleware/dione/configuration';
+} from 'ee/middleware/dione/configuration';
 
 type CreateIntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
@@ -19,7 +19,7 @@ export const useCreateIntegrationMutation = (
 ) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
-            return new EmbeddedIntegrationsApi().createIntegration({
+            return new EmbeddedIntegrationApi().createIntegration({
                 integrationModel: integration,
             });
         },
@@ -37,7 +37,7 @@ export const useUpdateIntegrationMutation = (
 ) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
-            return new EmbeddedIntegrationsApi().updateIntegration({
+            return new EmbeddedIntegrationApi().updateIntegration({
                 id: integration.id!,
                 integrationModel: integration,
             });
@@ -56,7 +56,7 @@ export const useUpdateIntegrationTagsMutation = (
 ) =>
     useMutation({
         mutationFn: (request: UpdateIntegrationTagsRequest) => {
-            return new EmbeddedIntegrationTagsApi().updateIntegrationTags(
+            return new EmbeddedIntegrationTagApi().updateIntegrationTags(
                 request
             );
         },
@@ -74,7 +74,7 @@ export const useDeleteIntegrationMutation = (
 ) =>
     useMutation({
         mutationFn: (request: DeleteIntegrationRequest) => {
-            return new EmbeddedIntegrationsApi().deleteIntegration(request);
+            return new EmbeddedIntegrationApi().deleteIntegration(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -96,7 +96,7 @@ export const useCreateIntegrationWorkflowRequestMutation = (
 ) =>
     useMutation({
         mutationFn: (request: CreateIntegrationWorkflowRequest) => {
-            return new EmbeddedIntegrationsApi().createIntegrationWorkflow(
+            return new EmbeddedIntegrationApi().createIntegrationWorkflow(
                 request
             );
         },
