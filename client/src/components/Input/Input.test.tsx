@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import {describe, expect, it} from 'vitest';
 
 import {render, screen, userEvent} from '../../utils/test-utils';
 import Input from './Input';
