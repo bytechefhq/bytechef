@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:27:48.489413+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:12.149855+02:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;
@@ -29,11 +29,6 @@ public class WorkflowConnectionModel {
 
   private String key;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link WorkflowConnectionModel#WorkflowConnectionModel(String, Integer, String)}
-   */
-  @Deprecated
   public WorkflowConnectionModel() {
     super();
   }

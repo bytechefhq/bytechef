@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T07:05:52.364071+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:10.906224+02:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @Valid
@@ -50,11 +50,6 @@ public class WorkflowTaskModel {
 
   private String type;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link WorkflowTaskModel#WorkflowTaskModel(String, String)}
-   */
-  @Deprecated
   public WorkflowTaskModel() {
     super();
   }

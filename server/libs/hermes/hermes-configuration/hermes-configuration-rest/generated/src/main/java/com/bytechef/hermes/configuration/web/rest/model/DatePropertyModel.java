@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateProperty", description = "A date property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
 public class DatePropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -87,6 +87,7 @@ public class DatePropertyModel extends ValuePropertyModel {
   public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
+
 
   public DatePropertyModel controlType(ControlTypeModel controlType) {
     super.setControlType(controlType);
@@ -152,7 +153,6 @@ public class DatePropertyModel extends ValuePropertyModel {
     super.setType(type);
     return this;
   }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

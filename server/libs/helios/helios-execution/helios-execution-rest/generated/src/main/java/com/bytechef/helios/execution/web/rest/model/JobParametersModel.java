@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:02.603415+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @Valid
@@ -47,11 +47,6 @@ public class JobParametersModel {
   @Valid
   private List<@Valid WebhookModel> webhooks;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link JobParametersModel#JobParametersModel(String)}
-   */
-  @Deprecated
   public JobParametersModel() {
     super();
   }

@@ -28,8 +28,9 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AnyProperty", description = "An any of property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
 public class AnyPropertyModel extends ValuePropertyModel {
+
 
   public AnyPropertyModel controlType(ControlTypeModel controlType) {
     super.setControlType(controlType);
@@ -95,7 +96,6 @@ public class AnyPropertyModel extends ValuePropertyModel {
     super.setType(type);
     return this;
   }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

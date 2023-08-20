@@ -9,7 +9,6 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/TaskDispatcherDefinitio
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/AnyPropertyModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/ArrayPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ArrayPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/AuthorizationTypeModel.java
@@ -20,21 +19,16 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/model/ComponentOperatio
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ControlTypeModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/DatePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/DateTimePropertyModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/HelpModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/IntegerPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/IntegerPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/NullPropertyModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/NumberPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/NumberPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OAuth2AuthorizationParametersModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OAuth2PropertiesModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/ObjectPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ObjectPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OptionsDataSourceModel.java
@@ -49,5 +43,4 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/model/TimePropertyModel
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TriggerDefinitionModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TriggerTypeModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/ValuePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ValuePropertyModel.java
