@@ -32,8 +32,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author Ivica Cardic
  */
-@SpringBootApplication(
-    scanBasePackages = "com.bytechef")
+@SpringBootApplication(scanBasePackages = "com.bytechef")
 public class CoordinatorApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorApplication.class);
