@@ -6,21 +6,21 @@ info:
 servers:
 - url: "http://localhost:5173/api/embedded"
 tags:
-- name: "embedded-integration-categories"
-  description: "The Embedded Integration Categories API"
-- name: "embedded-integration-tags"
-  description: "The Embedded Integration Tags API"
-- name: "embedded-integrations"
-  description: "The Embedded Integrations API"
-- name: "embedded-workflows"
-  description: "The Embedded Workflows API"
+- name: "embedded-integration-category"
+  description: "The Embedded Integration Category API"
+- name: "embedded-integration-tag"
+  description: "The Embedded Integration Tag API"
+- name: "embedded-integration"
+  description: "The Embedded Integration API"
+- name: "embedded-workflow"
+  description: "The Embedded Workflow API"
 paths:
   /integration-categories:
     get:
       description: "Get integration categories."
       summary: "Get integration categories"
       tags:
-      - "embedded-integration-categories"
+      - "embedded-integration-category"
       operationId: "getIntegrationCategories"
       responses:
         "200":
@@ -37,7 +37,7 @@ paths:
       description: "Get integrations."
       summary: "Get integrations"
       tags:
-      - "embedded-integrations"
+      - "embedded-integration"
       operationId: "getIntegrations"
       parameters:
       - name: "categoryId"
@@ -67,7 +67,7 @@ paths:
       description: "Create a new integration."
       summary: "Create a new integration"
       tags:
-      - "embedded-integrations"
+      - "embedded-integration"
       operationId: "createIntegration"
       requestBody:
         content:
@@ -87,7 +87,7 @@ paths:
       description: "Delete an integration."
       summary: "Delete an integration"
       tags:
-      - "embedded-integrations"
+      - "embedded-integration"
       operationId: "deleteIntegration"
       parameters:
       - name: "id"
@@ -104,7 +104,7 @@ paths:
       description: "Get an integration by id."
       summary: "Get an integration by id"
       tags:
-      - "embedded-integrations"
+      - "embedded-integration"
       operationId: "getIntegration"
       parameters:
       - name: "id"
@@ -125,7 +125,7 @@ paths:
       description: "Update an existing integration."
       summary: "Update an existing integration"
       tags:
-      - "embedded-integrations"
+      - "embedded-integration"
       operationId: "updateIntegration"
       parameters:
       - name: "id"
@@ -153,7 +153,7 @@ paths:
       description: "Get integration workflows for particular integration."
       summary: "Get integration workflows for particular integration"
       tags:
-      - "embedded-workflows"
+      - "embedded-workflow"
       operationId: "getIntegrationWorkflows"
       parameters:
       - name: "id"
@@ -176,7 +176,7 @@ paths:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
       tags:
-      - "embedded-integrations"
+      - "embedded-integration"
       operationId: "createIntegrationWorkflow"
       parameters:
       - name: "id"
@@ -216,7 +216,7 @@ paths:
       description: "Updates tags of an existing integration."
       summary: "Updates tags of an existing integration"
       tags:
-      - "embedded-integration-tags"
+      - "embedded-integration-tag"
       operationId: "updateIntegrationTags"
       parameters:
       - name: "id"
@@ -240,7 +240,7 @@ paths:
       description: "Get integration tags."
       summary: "Get integration tags"
       tags:
-      - "embedded-integration-tags"
+      - "embedded-integration-tag"
       operationId: "getIntegrationTags"
       responses:
         "200":
@@ -257,7 +257,7 @@ paths:
       description: "Get integration workflow definitions."
       summary: "Get integration workflow definitions"
       tags:
-      - "embedded-workflows"
+      - "embedded-workflow"
       operationId: "getWorkflows"
       responses:
         "200":
@@ -273,7 +273,7 @@ paths:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-      - "embedded-workflows"
+      - "embedded-workflow"
       operationId: "deleteWorkflow"
       parameters:
       - name: "id"
@@ -289,7 +289,7 @@ paths:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
       tags:
-      - "embedded-workflows"
+      - "embedded-workflow"
       operationId: "getWorkflow"
       parameters:
       - name: "id"
@@ -309,7 +309,7 @@ paths:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-      - "embedded-workflows"
+      - "embedded-workflow"
       operationId: "updateWorkflow"
       parameters:
       - name: "id"
