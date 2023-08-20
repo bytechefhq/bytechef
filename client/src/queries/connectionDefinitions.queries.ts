@@ -1,6 +1,6 @@
 import {
+    ConnectionDefinitionApi,
     ConnectionDefinitionModel,
-    ConnectionDefinitionsApi,
     GetComponentConnectionDefinitionRequest,
     GetComponentConnectionDefinitionsRequest,
 } from '@/middleware/hermes/configuration';
@@ -22,7 +22,7 @@ export const useGetConnectionDefinitionQuery = (
     useQuery<ConnectionDefinitionModel, Error>(
         ConnectDefinitionKeys.connectionDefinitionDetails(request),
         () =>
-            new ConnectionDefinitionsApi().getComponentConnectionDefinition(
+            new ConnectionDefinitionApi().getComponentConnectionDefinition(
                 request!
             ),
         {
@@ -37,7 +37,7 @@ export const useGetConnectionDefinitionsQuery = (
     useQuery<ConnectionDefinitionModel[], Error>(
         ConnectDefinitionKeys.connectionDefinitions(request),
         () =>
-            new ConnectionDefinitionsApi().getComponentConnectionDefinitions(
+            new ConnectionDefinitionApi().getComponentConnectionDefinitions(
                 request
             ),
         {enabled: false || enabledCondition}

@@ -1,7 +1,7 @@
 import {
+    ComponentDefinitionApi,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-    ComponentDefinitionsApi,
     GetComponentDefinitionRequest,
     GetComponentDefinitionsRequest,
 } from '@/middleware/hermes/configuration';
@@ -23,7 +23,7 @@ export const useGetComponentDefinitionQuery = (
 ) =>
     useQuery<ComponentDefinitionModel, Error>(
         ComponentDefinitionKeys.componentDefinition(request),
-        () => new ComponentDefinitionsApi().getComponentDefinition(request),
+        () => new ComponentDefinitionApi().getComponentDefinition(request),
         {
             enabled: !!request.componentName,
         }
@@ -35,7 +35,7 @@ export const useGetComponentDefinitionsQuery = (
 ) =>
     useQuery<ComponentDefinitionBasicModel[], Error>(
         ComponentDefinitionKeys.componentDefinitions(request),
-        () => new ComponentDefinitionsApi().getComponentDefinitions(request),
+        () => new ComponentDefinitionApi().getComponentDefinitions(request),
         {
             enabled: false || enabledCondition,
         }
