@@ -106,10 +106,6 @@ spring:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
-    scheduling:
-      thread-name-prefix: connection-service-app-scheduling-
-      pool:
-        size: 2
 
 #####
 
