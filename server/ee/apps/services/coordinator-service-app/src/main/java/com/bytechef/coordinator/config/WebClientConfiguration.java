@@ -30,7 +30,9 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Configuration
 @EnableRetry
-@LoadBalancerClients(@LoadBalancerClient("configuration-service-app"))
+@LoadBalancerClients({
+    @LoadBalancerClient("configuration-service-app"), @LoadBalancerClient("execution-service-app")
+})
 public class WebClientConfiguration {
 
     @LoadBalanced
