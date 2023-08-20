@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -42,7 +43,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/connection-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ConnectionDefinitionServiceController {
 
@@ -54,7 +55,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definition-service/execute-authorization-apply",
+        value = "/execute-authorization-apply",
         consumes = {
             "application/json"
         },
@@ -72,7 +73,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definition-service/execute-authorization-callback",
+        value = "/execute-authorization-callback",
         consumes = {
             "application/json"
         },
@@ -92,9 +93,9 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definition-service/fetch-base-uri")
-    public ResponseEntity<String> fetchBaseUri(Connection connection) {
-        return connectionDefinitionService.fetchBaseUri(
+        value = "/execute-fetch-base-uri")
+    public ResponseEntity<String> executeFetchBaseUri(Connection connection) {
+        return connectionDefinitionService.executeFetchBaseUri(
             connection.componentName, connection.connectionVersion, connection.parameters)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
@@ -103,7 +104,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-definition-service/get-authorization-type/{componentName}/{connectionVersion}/{authorizationName}",
+        value = "/get-authorization-type/{componentName}/{connectionVersion}/{authorizationName}",
         produces = {
             "application/json"
         })
@@ -118,7 +119,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-definition-service/get-connection-definition/{componentName}/{componentVersion}",
+        value = "/get-connection-definition/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
@@ -131,7 +132,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-definition-service/get-connection-definitions/{componentName}/{componentVersion}",
+        value = "/get-connection-definitions/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
@@ -144,7 +145,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-definition-service/get-connection-definitions",
+        value = "/get-connection-definitions",
         produces = {
             "application/json"
         })
@@ -154,7 +155,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definition-service/get-oauth2-parameters",
+        value = "/get-oauth2-parameters",
         consumes = {
             "application/json"
         },
@@ -169,10 +170,12 @@ public class ConnectionDefinitionServiceController {
             connection.authorizationName));
     }
 
-    private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
+    @SuppressFBWarnings("EI")
+    public record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
     }
 
-    private record Connection(
+    @SuppressFBWarnings("EI")
+    public record Connection(
         @NotNull String componentName, int connectionVersion, Map<String, Object> parameters,
         String authorizationName) {
     }

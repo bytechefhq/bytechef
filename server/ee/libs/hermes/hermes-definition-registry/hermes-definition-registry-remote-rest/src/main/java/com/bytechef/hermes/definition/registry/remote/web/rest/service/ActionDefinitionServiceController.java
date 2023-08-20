@@ -19,22 +19,25 @@ package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/action-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ActionDefinitionServiceController {
 
@@ -45,8 +48,21 @@ public class ActionDefinitionServiceController {
     }
 
     @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-trigger",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Object> executePerform(@RequestBody PerformRequest performRequest) {
+        return ResponseEntity.ok(
+            actionDefinitionService.executePerform(
+                performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
+                performRequest.taskExecutionId, performRequest.inputParameters, performRequest.connectionIdMap));
+    }
+
+    @RequestMapping(
         method = RequestMethod.GET,
-        value = "/action-definition-service/get-action-definition/{componentName}/{componentVersion}/{actionName}",
+        value = "/get-action-definition/{componentName}/{componentVersion}/{actionName}",
         produces = {
             "application/json"
         })
@@ -60,7 +76,7 @@ public class ActionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/action-definition-service/get-action-definitions/{componentName}/{componentVersion}",
+        value = "/get-action-definitions/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
@@ -70,5 +86,11 @@ public class ActionDefinitionServiceController {
 
         return ResponseEntity.ok(
             actionDefinitionService.getActionDefinitions(componentName, componentVersion));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record PerformRequest(
+        String componentName, int componentVersion, String actionName, long taskExecutionId,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
     }
 }

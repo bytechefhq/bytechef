@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/workflow-service")
 public class WorkflowServiceController {
 
     private final WorkflowService workflowService;
@@ -46,7 +46,7 @@ public class WorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflow-service/get-workflow/{id}",
+        value = "/get-workflow/{id}",
         produces = {
             "application/json"
         })
@@ -56,7 +56,7 @@ public class WorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflow-service/get-workflows",
+        value = "/get-workflows",
         produces = {
             "application/json"
         })

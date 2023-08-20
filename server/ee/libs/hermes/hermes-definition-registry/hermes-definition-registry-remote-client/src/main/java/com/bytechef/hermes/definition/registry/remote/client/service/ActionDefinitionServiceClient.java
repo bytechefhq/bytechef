@@ -19,8 +19,8 @@ package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
@@ -44,9 +44,18 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
+        String authorizationName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -54,32 +63,37 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters,
-        String searchText) {
+        Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
+        String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        int componentVersion, String componentName, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters) {
+    public Object executePerform(
+        String componentName, int componentVersion, String actionName, long taskExecutionId,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
 
-        throw new UnsupportedOperationException();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/action-definition-service/execute-perform"),
+            new PerformRequest(
+                componentName, componentVersion, actionName, taskExecutionId, inputParameters, connectionIdMap),
+            Object.class);
     }
 
     @Override
     public Object executeSampleOutput(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        String authorizationName, Map<String, ?> connectionParameters) {
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -103,7 +117,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
                 uriBuilder, componentName,
                 "/action-definition-service/get-action-definitions/{componentName}/{componentVersion}",
                 componentName, componentVersion),
-            new ParameterizedTypeReference<List<ActionDefinitionDTO>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -111,5 +125,10 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
         // TODO implement this method
 
         throw new UnsupportedOperationException();
+    }
+
+    private record PerformRequest(
+        String componentName, int componentVersion, String actionName, long taskExecutionId,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
     }
 }

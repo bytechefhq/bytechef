@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/trigger-execution-service")
 public class TriggerExecutionServiceController {
 
     private final TriggerExecutionService triggerExecutionService;
@@ -45,7 +45,7 @@ public class TriggerExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-execution-service/create",
+        value = "/create",
         consumes = {
             "application/json"
         },
@@ -58,7 +58,7 @@ public class TriggerExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/trigger-execution-service/get-trigger-execution/{id}",
+        value = "/get-trigger-execution/{id}",
         consumes = {
             "application/json"
         },
@@ -71,7 +71,7 @@ public class TriggerExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-execution-service/update",
+        value = "/update",
         consumes = {
             "application/json"
         },

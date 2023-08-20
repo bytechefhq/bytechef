@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/component-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ComponentDefinitionServiceController {
 
@@ -46,7 +46,7 @@ public class ComponentDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definition-service/get-component-definition/{name}/{version}",
+        value = "/get-component-definition/{name}/{version}",
         produces = {
             "application/json"
         })
@@ -58,7 +58,7 @@ public class ComponentDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definition-service/get-component-definitions",
+        value = "/get-component-definitions",
         produces = {
             "application/json"
         })
@@ -68,7 +68,7 @@ public class ComponentDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definition-service/get-component-definitions/{name}",
+        value = "/get-component-definitions/{name}",
         produces = {
             "application/json"
         })

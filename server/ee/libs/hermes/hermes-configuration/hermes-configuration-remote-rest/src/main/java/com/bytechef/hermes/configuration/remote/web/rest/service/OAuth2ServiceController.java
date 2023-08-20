@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/oauth2-service")
 public class OAuth2ServiceController {
 
     private final OAuth2Service oAuth2Service;
@@ -47,7 +47,7 @@ public class OAuth2ServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/oauth2-service/check-predefined-parameters/{componentName}",
+        value = "/check-predefined-parameters/{componentName}",
         produces = {
             "application/json"
         })
@@ -60,7 +60,7 @@ public class OAuth2ServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/oauth2-service/get-redirect-uri",
+        value = "/get-redirect-uri",
         produces = {
             "application/json"
         })
@@ -70,7 +70,7 @@ public class OAuth2ServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/oauth2-service/get-predefined-apps",
+        value = "/get-predefined-apps",
         produces = {
             "application/json"
         })

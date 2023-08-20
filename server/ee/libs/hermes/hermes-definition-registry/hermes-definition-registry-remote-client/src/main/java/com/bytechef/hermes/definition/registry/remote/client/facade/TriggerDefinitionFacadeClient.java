@@ -47,7 +47,8 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         Long connectionId) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-editor-description"),
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-editor-description"),
             new EditorDescriptionRequest(
                 triggerName, triggerParameters, componentName, componentVersion, connectionId),
             String.class);
@@ -59,7 +60,8 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String workflowExecutionId, Long connectionId) {
 
         defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-disable"),
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-listener-disable"),
             new ListenerDisableRequest(
                 componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId));
     }
@@ -70,7 +72,8 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
         String workflowExecutionId, Long connectionId) {
 
         defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-listener-enable"),
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-facade/execute-listener-enable"),
             new ListenerEnableRequest(
                 componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId));
     }
