@@ -23,21 +23,17 @@ import com.bytechef.hermes.configuration.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
 public class AuthorizationMapper {
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface AuthorizationToAuthorizationModelMapper extends Converter<AuthorizationDTO, AuthorizationModel> {
 
         @Override
         AuthorizationModel convert(AuthorizationDTO authorizationDTO);
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 }

@@ -26,14 +26,14 @@ import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
 public class TriggerDefinitionMapper {
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface TriggerDefinitionToTriggerDefinitionModelMapper
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionModel> {
 
@@ -41,18 +41,11 @@ public class TriggerDefinitionMapper {
         TriggerDefinitionModel convert(TriggerDefinitionDTO triggerDefinitionDTO);
 
         HelpModel map(HelpDTO helpDTO);
-
-        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionBasicModel> {
 
@@ -60,14 +53,5 @@ public class TriggerDefinitionMapper {
         TriggerDefinitionBasicModel convert(TriggerDefinitionDTO triggerDefinitionDTO);
 
         HelpModel map(HelpDTO helpDTO);
-
-        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 }
