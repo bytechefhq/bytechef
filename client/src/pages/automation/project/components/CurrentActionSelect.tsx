@@ -46,7 +46,7 @@ const CurrentActionSelect = ({
             </div>
         ) : (
             <Select
-                contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                contentClassName="max-w-select-triggerDefinition-width max-h-select-content-available-height-1/2"
                 description={description}
                 label="Actions"
                 onValueChange={(value) => handleValueChange(value)}

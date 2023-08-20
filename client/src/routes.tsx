@@ -1,23 +1,23 @@
-import IntegrationConfiguration from '@/pages/embedded/integration/IntegrationConfiguration';
-import IntegrationConnection from '@/pages/embedded/integration/IntegrationConnection';
-import IntegrationUserMetadata from '@/pages/embedded/integration/IntegrationUserMetadata';
-import IntegrationWorkflowEditor from '@/pages/embedded/integration/IntegrationWorkflowEditor';
+import App from '@/App';
+import ErrorPage from '@/ErrorPage';
+import IntegrationConfiguration from '@/ee/pages/embedded/integration/IntegrationConfiguration';
+import IntegrationConnection from '@/ee/pages/embedded/integration/IntegrationConnection';
+import IntegrationUserMetadata from '@/ee/pages/embedded/integration/IntegrationUserMetadata';
+import IntegrationWorkflowEditor from '@/ee/pages/embedded/integration/IntegrationWorkflowEditor';
+import Integrations from '@/ee/pages/embedded/integrations/Integrations';
+import {AutomationProjectApi} from '@/middleware/helios/configuration';
+import Connections from '@/pages/automation/connections/Connections';
+import OAuthPopup from '@/pages/automation/connections/oauth2/OAuthPopup';
+import WorkflowExecutions from '@/pages/automation/executions/WorkflowExecutions';
+import ProjectInstances from '@/pages/automation/project-instances/ProjectInstances';
+import Project from '@/pages/automation/project/Project';
+import Projects from '@/pages/automation/projects/Projects';
 import Account from '@/pages/settings/Account';
 import Appearance from '@/pages/settings/Appearance';
 import Settings from '@/pages/settings/Settings';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter} from 'react-router-dom';
 
-import App from './App';
-import ErrorPage from './ErrorPage';
-import {AutomationProjectsApi} from './middleware/helios/configuration';
-import Connections from './pages/automation/connections/Connections';
-import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
-import WorkflowExecutions from './pages/automation/executions/WorkflowExecutions';
-import ProjectInstances from './pages/automation/project-instances/ProjectInstances';
-import Project from './pages/automation/project/Project';
-import Projects from './pages/automation/projects/Projects';
-import Integrations from './pages/embedded/integrations/Integrations';
 import {ProjectKeys} from './queries/projects.queries';
 
 const queryClient = new QueryClient();
@@ -43,7 +43,7 @@ export const router = createBrowserRouter([
                                     parseInt(params.projectId!)
                                 ),
                                 () =>
-                                    new AutomationProjectsApi().getProject({
+                                    new AutomationProjectApi().getProject({
                                         id: parseInt(params.projectId!),
                                     })
                             ),

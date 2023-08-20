@@ -1,7 +1,7 @@
 import {useQuery} from '@tanstack/react-query';
 import {
+    ActionDefinitionApi,
     ActionDefinitionModel,
-    ActionDefinitionsApi,
     GetActionDefinitionsRequest,
     GetComponentActionDefinitionRequest,
 } from 'middleware/hermes/configuration';
@@ -23,7 +23,7 @@ export const useGetActionDefinitionQuery = (
 ) =>
     useQuery<ActionDefinitionModel, Error>(
         ActionDefinitionKeys.actionDefinition(request),
-        () => new ActionDefinitionsApi().getComponentActionDefinition(request),
+        () => new ActionDefinitionApi().getComponentActionDefinition(request),
         {enabled: false || enabledCondition}
     );
 
@@ -33,6 +33,6 @@ export const useGetActionDefinitionsQuery = (
 ) =>
     useQuery<ActionDefinitionModel[], Error>(
         ActionDefinitionKeys.actionDefinitions(request),
-        () => new ActionDefinitionsApi().getActionDefinitions(request),
+        () => new ActionDefinitionApi().getActionDefinitions(request),
         {enabled: false || enabledCondition}
     );

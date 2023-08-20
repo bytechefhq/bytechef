@@ -1,12 +1,12 @@
 import {
-    AutomationConnectionTagsApi,
-    AutomationConnectionsApi,
+    AutomationConnectionApi,
+    AutomationConnectionTagApi,
     ConnectionModel,
     GetConnectionsRequest,
     TagModel,
 } from '@/middleware/helios/connection';
 import {
-    ConnectionDefinitionsApi,
+    ConnectionDefinitionApi,
     GetOAuth2AuthorizationParametersRequestModel,
     OAuth2AuthorizationParametersModel,
 } from '@/middleware/hermes/configuration';
@@ -31,13 +31,13 @@ export const useGetConnectionsQuery = (
 ) =>
     useQuery<ConnectionModel[], Error>(
         ConnectionKeys.connectionList(filters),
-        () => new AutomationConnectionsApi().getConnections(filters),
+        () => new AutomationConnectionApi().getConnections(filters),
         {enabled: false || enabledCondition}
     );
 
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>(ConnectionKeys.connectionTags, () =>
-        new AutomationConnectionTagsApi().getConnectionTags()
+        new AutomationConnectionTagApi().getConnectionTags()
     );
 
 export const useGetOAuth2AuthorizationParametersQuery = (
@@ -47,7 +47,7 @@ export const useGetOAuth2AuthorizationParametersQuery = (
     useQuery<OAuth2AuthorizationParametersModel, Error>(
         ConnectionKeys.connectionOAuth2AuthorizationParameters(request),
         () =>
-            new ConnectionDefinitionsApi().getOAuth2AuthorizationParameters({
+            new ConnectionDefinitionApi().getOAuth2AuthorizationParameters({
                 getOAuth2AuthorizationParametersRequestModel: request,
             }),
         {

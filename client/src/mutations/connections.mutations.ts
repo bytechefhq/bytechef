@@ -1,6 +1,6 @@
 import {
-    AutomationConnectionTagsApi,
-    AutomationConnectionsApi,
+    AutomationConnectionApi,
+    AutomationConnectionTagApi,
     ConnectionModel,
     UpdateConnectionTagsRequest,
 } from '@/middleware/helios/connection';
@@ -16,7 +16,7 @@ export const useCreateConnectionMutation = (
 ) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connectionModel: ConnectionModel) => {
-            return new AutomationConnectionsApi().createConnection({
+            return new AutomationConnectionApi().createConnection({
                 connectionModel,
             });
         },
@@ -34,7 +34,7 @@ export const useDeleteConnectionMutation = (
 ) =>
     useMutation<void, Error, number>({
         mutationFn: (id: number) => {
-            return new AutomationConnectionsApi().deleteConnection({
+            return new AutomationConnectionApi().deleteConnection({
                 id,
             });
         },
@@ -52,7 +52,7 @@ export const useUpdateConnectionMutation = (
 ) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connection: ConnectionModel) => {
-            return new AutomationConnectionsApi().updateConnection({
+            return new AutomationConnectionApi().updateConnection({
                 connectionModel: connection,
                 id: connection.id!,
             });
@@ -71,7 +71,7 @@ export const useUpdateConnectionTagsMutation = (
 ) =>
     useMutation<void, Error, UpdateConnectionTagsRequest>({
         mutationFn: (request: UpdateConnectionTagsRequest) => {
-            return new AutomationConnectionTagsApi().updateConnectionTags(
+            return new AutomationConnectionTagApi().updateConnectionTags(
                 request
             );
         },
