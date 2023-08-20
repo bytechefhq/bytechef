@@ -47,7 +47,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
@@ -116,6 +116,7 @@ public class ValuePropertyModel extends PropertyModel {
     this.exampleValue = exampleValue;
   }
 
+
   public ValuePropertyModel advancedOption(Boolean advancedOption) {
     super.setAdvancedOption(advancedOption);
     return this;
@@ -165,7 +166,6 @@ public class ValuePropertyModel extends PropertyModel {
     super.setType(type);
     return this;
   }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

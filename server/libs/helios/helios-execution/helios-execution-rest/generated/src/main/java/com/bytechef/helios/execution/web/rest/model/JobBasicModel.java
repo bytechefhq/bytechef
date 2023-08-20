@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:02.603415+02:00[Europe/Zagreb]")
 public class JobBasicModel {
 
   private String createdBy;
@@ -115,11 +115,6 @@ public class JobBasicModel {
 
   private String workflowId;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link JobBasicModel#JobBasicModel(Integer, LocalDateTime, StatusEnum)}
-   */
-  @Deprecated
   public JobBasicModel() {
     super();
   }

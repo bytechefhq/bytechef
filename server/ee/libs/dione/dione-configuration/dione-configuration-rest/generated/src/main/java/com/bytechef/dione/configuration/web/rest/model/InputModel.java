@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T07:05:52.364071+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:10.906224+02:00[Europe/Zagreb]")
 public class InputModel {
 
   private String label;
@@ -31,11 +31,6 @@ public class InputModel {
 
   private String type;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link InputModel#InputModel(String)}
-   */
-  @Deprecated
   public InputModel() {
     super();
   }
