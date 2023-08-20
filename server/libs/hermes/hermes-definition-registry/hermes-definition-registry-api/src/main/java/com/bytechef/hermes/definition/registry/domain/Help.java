@@ -15,48 +15,52 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
-import com.bytechef.hermes.definition.PropertiesDataSource;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.commons.util.OptionalUtils;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public class PropertiesDataSourceDTO {
+public class Help {
 
-    private final List<String> loadPropertiesDependsOn;
+    private final String body;
+    private final String learnMoreUrl;
 
-    public PropertiesDataSourceDTO(PropertiesDataSource propertiesDataSource) {
-        this.loadPropertiesDependsOn = Objects.requireNonNull(propertiesDataSource.getLoadPropertiesDependsOn());
+    public Help(com.bytechef.hermes.component.definition.Help help) {
+        this.body = help.getBody();
+        this.learnMoreUrl = OptionalUtils.orElse(help.getLearnMoreUrl(), null);
     }
 
-    public List<String> getLoadPropertiesDependsOn() {
-        return loadPropertiesDependsOn;
+    public String getBody() {
+        return body;
+    }
+
+    public String getLearnMoreUrl() {
+        return learnMoreUrl;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof PropertiesDataSourceDTO that))
+        if (!(o instanceof Help help))
             return false;
-        return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn);
+        return Objects.equals(body, help.body) && Objects.equals(learnMoreUrl, help.learnMoreUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(loadPropertiesDependsOn);
+        return Objects.hash(body, learnMoreUrl);
     }
 
     @Override
     public String toString() {
-        return "PropertiesDataSourceDTO{" +
-            "loadPropertiesDependsOn=" + loadPropertiesDependsOn +
+        return "Help{" +
+            "body='" + body + '\'' +
+            ", learnMoreUrl='" + learnMoreUrl + '\'' +
             '}';
     }
 }

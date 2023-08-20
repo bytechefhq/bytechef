@@ -20,8 +20,8 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 
 import java.util.List;
 import java.util.Map;
@@ -41,17 +41,17 @@ public interface ConnectionDefinitionService {
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
         String redirectUri);
 
-    Optional<String> executeFetchBaseUri(
+    Optional<String> executeBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters);
 
     AuthorizationType getAuthorizationType(String authorizationName, String componentName, int connectionVersion);
 
-    ConnectionDefinitionDTO getConnectionDefinition(String componentName, int componentVersion);
+    ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion);
 
-    List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, Integer componentVersion);
+    List<ConnectionDefinition> getConnectionDefinitions();
 
-    List<ConnectionDefinitionDTO> getConnectionDefinitions();
+    List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion);
 
-    OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
 }

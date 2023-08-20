@@ -27,7 +27,7 @@ public class ComponentDefinitionFacadeTest {
 
     @Disabled
     @Test
-    public void testGetComponentDefinitionsMono() {
+    public void testGetComponentDefinitions() {
         // TODO
     }
 }

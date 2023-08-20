@@ -15,53 +15,47 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Help;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public class HelpDTO {
+@SuppressFBWarnings("EI")
+public class PropertiesDataSource {
 
-    private final String body;
-    private final String learnMoreUrl;
+    private final List<String> loadPropertiesDependsOn;
 
-    public HelpDTO(Help help) {
-        this.body = help.getBody();
-        this.learnMoreUrl = OptionalUtils.orElse(help.getLearnMoreUrl(), null);
+    public PropertiesDataSource(com.bytechef.hermes.definition.PropertiesDataSource propertiesDataSource) {
+        this.loadPropertiesDependsOn = Objects.requireNonNull(propertiesDataSource.getLoadPropertiesDependsOn());
     }
 
-    public String getBody() {
-        return body;
-    }
-
-    public String getLearnMoreUrl() {
-        return learnMoreUrl;
+    public List<String> getLoadPropertiesDependsOn() {
+        return loadPropertiesDependsOn;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof HelpDTO helpDTO))
+        if (!(o instanceof PropertiesDataSource that))
             return false;
-        return Objects.equals(body, helpDTO.body) && Objects.equals(learnMoreUrl, helpDTO.learnMoreUrl);
+        return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(body, learnMoreUrl);
+        return Objects.hash(loadPropertiesDependsOn);
     }
 
     @Override
     public String toString() {
-        return "HelpDTO{" +
-            "body='" + body + '\'' +
-            ", learnMoreUrl='" + learnMoreUrl + '\'' +
+        return "PropertiesDataSource{" +
+            "loadPropertiesDependsOn=" + loadPropertiesDependsOn +
             '}';
     }
 }

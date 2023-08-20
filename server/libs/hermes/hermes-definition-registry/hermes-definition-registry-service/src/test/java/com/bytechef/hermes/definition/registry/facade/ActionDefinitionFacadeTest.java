@@ -15,31 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.facade;
 
-import com.bytechef.hermes.definition.Property;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class NullPropertyDTO extends ValuePropertyDTO<Void> {
+public class ActionDefinitionFacadeTest {
 
-    private NullPropertyDTO() {
-    }
-
-    public NullPropertyDTO(Property.NullProperty nullProperty) {
-        super(nullProperty);
-    }
-
-    @Override
-    public Object accept(PropertyVisitor propertyVisitor) {
-        return propertyVisitor.visit(this);
-    }
-
-    @Override
-    public String toString() {
-        return "NullPropertyDTO{" +
-            "controlType=" + controlType +
-            "} ";
+    @Disabled
+    @Test
+    public void testExecuteDynamicProperties() {
+        // TODO
     }
 }

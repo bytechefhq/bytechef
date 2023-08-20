@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.facade;
 
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -68,7 +68,7 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<OptionDTO>> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
+    public ResponseEntity<List<Option>> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
@@ -83,7 +83,7 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValuePropertyDTO<?>>> executeProperties(
+    public ResponseEntity<List<? extends ValueProperty<?>>> executeProperties(
         @Valid @RequestBody PropertiesRequest propertiesRequest) {
 
         return ResponseEntity.ok(
@@ -98,7 +98,7 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValuePropertyDTO<?>>> executeOutputSchema(
+    public ResponseEntity<List<? extends ValueProperty<?>>> executeOutputSchema(
         @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(

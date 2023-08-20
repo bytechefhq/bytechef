@@ -18,8 +18,8 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.HelpDTO;
+import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
+import com.bytechef.hermes.definition.registry.domain.Help;
 
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
@@ -36,23 +36,23 @@ public class ActionDefinitionMapper {
         OptionalMapper.class
     })
     public interface ActionDefinitionToActionDefinitionModelMapper
-        extends Converter<ActionDefinitionDTO, ActionDefinitionModel> {
+        extends Converter<ActionDefinition, ActionDefinitionModel> {
 
         @Override
-        ActionDefinitionModel convert(ActionDefinitionDTO actionDefinitionDTO);
+        ActionDefinitionModel convert(ActionDefinition actionDefinition);
 
-        HelpModel map(HelpDTO helpDTO);
+        HelpModel map(Help help);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
         OptionalMapper.class
     })
     public interface ActionDefinitionToActionDefinitionBasicModelMapper
-        extends Converter<ActionDefinitionDTO, ActionDefinitionBasicModel> {
+        extends Converter<ActionDefinition, ActionDefinitionBasicModel> {
 
         @Override
-        ActionDefinitionBasicModel convert(ActionDefinitionDTO actionDefinitionDTO);
+        ActionDefinitionBasicModel convert(ActionDefinition actionDefinition);
 
-        HelpModel map(HelpDTO helpDTO);
+        HelpModel map(Help help);
     }
 }

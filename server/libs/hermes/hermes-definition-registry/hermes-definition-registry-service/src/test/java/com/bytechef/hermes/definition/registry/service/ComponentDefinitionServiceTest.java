@@ -33,19 +33,7 @@ public class ComponentDefinitionServiceTest {
 
     @Disabled
     @Test
-    public void testGetComponentDefinitionMono() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testGetComponentDefinitionsMono() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testGetComponentDefinitionsMono(String name) {
+    public void testGetComponentDefinitions() {
         // TODO
     }
 }

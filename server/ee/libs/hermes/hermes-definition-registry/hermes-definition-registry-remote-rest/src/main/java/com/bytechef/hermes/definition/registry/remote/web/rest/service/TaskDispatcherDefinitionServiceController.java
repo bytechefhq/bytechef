@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -50,7 +50,7 @@ public class TaskDispatcherDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinition(
+    public ResponseEntity<TaskDispatcherDefinition> getTaskDispatcherDefinition(
         @PathVariable("name") String name, @PathVariable("version") Integer version) {
 
         return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version));
@@ -62,7 +62,7 @@ public class TaskDispatcherDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions() {
+    public ResponseEntity<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
         return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinitions());
     }
 
@@ -72,7 +72,7 @@ public class TaskDispatcherDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionVersions(
+    public ResponseEntity<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionVersions(
         @PathVariable("name") String name) {
 
         return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(name));

@@ -57,13 +57,13 @@ public class ConnectionDefinitionServiceTest {
 
     @Disabled
     @Test
-    public void testGetConnectionDefinitionMono() {
+    public void testGetConnectionDefinition() {
 // TODO
     }
 
     @Disabled
     @Test
-    public void testGetConnectionDefinitionsMono() {
+    public void testGetConnectionDefinitions() {
 // TODO
     }
 

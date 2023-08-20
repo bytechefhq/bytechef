@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
 import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -104,7 +104,7 @@ public class TriggerDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<TriggerDefinitionDTO> getTriggerDefinition(
+    public ResponseEntity<TriggerDefinition> getTriggerDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion, @PathVariable("triggerName") String triggerName) {
 
@@ -118,7 +118,7 @@ public class TriggerDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<TriggerDefinitionDTO>> getTriggerDefinitions(
+    public ResponseEntity<List<TriggerDefinition>> getTriggerDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 

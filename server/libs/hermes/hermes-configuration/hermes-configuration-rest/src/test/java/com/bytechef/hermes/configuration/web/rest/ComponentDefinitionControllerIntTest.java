@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -91,7 +91,7 @@ public class ComponentDefinitionControllerIntTest {
     @Test
     public void testGetComponentDefinitions() {
         Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null, null, null, null))
-            .thenReturn(List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2")));
+            .thenReturn(List.of(new ComponentDefinition("component1"), new ComponentDefinition("component2")));
 
         try {
             webTestClient

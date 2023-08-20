@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.definition.Property.ArrayProperty;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,26 +29,26 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
+public class ArrayProperty extends ValueProperty<Object[]> {
 
-    private List<? extends PropertyDTO> items;
+    private List<? extends Property> items;
     private boolean multipleValues; // Defaults to true
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
-    private ArrayPropertyDTO() {
+    private ArrayProperty() {
     }
 
-    public ArrayPropertyDTO(ArrayProperty arrayProperty) {
+    public ArrayProperty(com.bytechef.hermes.definition.Property.ArrayProperty arrayProperty) {
         super(arrayProperty);
 
         this.items = CollectionUtils.map(
             OptionalUtils.orElse(arrayProperty.getItems(), List.of(ComponentDSL.string())),
-            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);
-        this.options = CollectionUtils.map(OptionalUtils.orElse(arrayProperty.getOptions(), List.of()), OptionDTO::new);
+        this.options = CollectionUtils.map(OptionalUtils.orElse(arrayProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            arrayProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+            arrayProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
         return propertyVisitor.visit(this);
     }
 
-    public List<? extends PropertyDTO> getItems() {
+    public List<? extends Property> getItems() {
         return Collections.unmodifiableList(items);
     }
 
@@ -65,11 +64,11 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
         return multipleValues;
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
     }
 
@@ -77,7 +76,7 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ArrayPropertyDTO that))
+        if (!(o instanceof ArrayProperty that))
             return false;
         return multipleValues == that.multipleValues && Objects.equals(items, that.items)
             && Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
@@ -90,7 +89,7 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
 
     @Override
     public String toString() {
-        return "ArrayPropertyDTO{" +
+        return "ArrayProperty{" +
             "items=" + items +
             ", multipleValues=" + multipleValues +
             ", options=" + options +

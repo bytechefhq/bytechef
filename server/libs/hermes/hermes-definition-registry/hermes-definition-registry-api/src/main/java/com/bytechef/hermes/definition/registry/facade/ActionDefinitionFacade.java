@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -29,11 +29,11 @@ public interface ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId);
 
-    List<OptionDTO> executeOptions(
+    List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText);
 
-    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId);
 
@@ -41,7 +41,7 @@ public interface ActionDefinitionFacade {
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         Long connectionId);
 
-    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId);
 }

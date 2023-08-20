@@ -18,8 +18,8 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.Resources;
+import com.bytechef.hermes.definition.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
@@ -35,23 +35,23 @@ public class TaskDispatcherDefinitionMapper {
         OptionalMapper.class
     })
     public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
-        extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel> {
+        extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
 
         @Override
-        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
+        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinition taskDispatcherDefinition);
 
-        ResourcesModel map(ResourcesDTO resourcesDTO);
+        ResourcesModel map(Resources resources);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
         OptionalMapper.class
     })
     public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
-        extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionBasicModel> {
+        extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionBasicModel> {
 
         @Override
-        TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
+        TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinition taskDispatcherDefinition);
 
-        ResourcesModel map(ResourcesDTO resourcesDTO);
+        ResourcesModel map(Resources resources);
     }
 }

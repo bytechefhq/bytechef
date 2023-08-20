@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -30,36 +29,41 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ActionDefinitionDTO extends ActionDefinitionBasicDTO {
+public class TriggerDefinition extends TriggerDefinitionBasic {
 
     private final boolean editorDescriptionDataSource;
-    private final PropertyDTO outputSchema;
+    private final Property outputSchema;
     private final boolean outputSchemaDataSource;
-    private final List<? extends PropertyDTO> properties;
+    private final List<? extends Property> properties;
     private final Object sampleOutput;
     private final boolean sampleOutputDataSource;
+    private final boolean webhookRawBody;
+    private final boolean workflowSyncExecution;
+    private final boolean workflowSyncValidation;
 
-    public ActionDefinitionDTO(ActionDefinition actionDefinition) {
-        super(actionDefinition);
-
+    public TriggerDefinition(com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition) {
+        super(triggerDefinition);
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false);
+            triggerDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false);
         this.outputSchema = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null);
+            triggerDefinition.getOutputSchema(), Property::toProperty, null);
         this.outputSchemaDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false);
+            triggerDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false);
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), PropertyDTO::toPropertyDTO);
-        this.sampleOutput = OptionalUtils.orElse(actionDefinition.getSampleOutput(), null);
+            OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
+        this.sampleOutput = triggerDefinition.getSampleOutput();
         this.sampleOutputDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false);
+            triggerDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false);
+        this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
+        this.workflowSyncExecution = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncExecution(), false);
+        this.workflowSyncValidation = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncValidation(), false);
     }
 
     public boolean isEditorDescriptionDataSource() {
         return editorDescriptionDataSource;
     }
 
-    public Optional<PropertyDTO> getOutputSchema() {
+    public Optional<Property> getOutputSchema() {
         return Optional.ofNullable(outputSchema);
     }
 
@@ -67,52 +71,71 @@ public class ActionDefinitionDTO extends ActionDefinitionBasicDTO {
         return outputSchemaDataSource;
     }
 
-    public List<? extends PropertyDTO> getProperties() {
+    public List<? extends Property> getProperties() {
         return properties;
     }
 
-    public Optional<Object> getSampleOutput() {
-        return Optional.ofNullable(sampleOutput);
+    public Object getSampleOutput() {
+        return sampleOutput;
     }
 
     public boolean isSampleOutputDataSource() {
         return sampleOutputDataSource;
     }
 
+    public boolean isWebhookRawBody() {
+        return webhookRawBody;
+    }
+
+    public boolean isWorkflowSyncExecution() {
+        return workflowSyncExecution;
+    }
+
+    public boolean isWorkflowSyncValidation() {
+        return workflowSyncValidation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ActionDefinitionDTO that))
+        if (!(o instanceof TriggerDefinition that))
             return false;
         if (!super.equals(o))
             return false;
         return editorDescriptionDataSource == that.editorDescriptionDataSource
             && outputSchemaDataSource == that.outputSchemaDataSource
-            && sampleOutputDataSource == that.sampleOutputDataSource && Objects.equals(outputSchema, that.outputSchema)
+            && sampleOutputDataSource == that.sampleOutputDataSource && webhookRawBody == that.webhookRawBody
+            && workflowSyncExecution == that.workflowSyncExecution
+            && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(outputSchema, that.outputSchema)
             && Objects.equals(properties, that.properties) && Objects.equals(sampleOutput, that.sampleOutput);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
-            properties, sampleOutput, sampleOutputDataSource);
+            properties, sampleOutput, sampleOutputDataSource, webhookRawBody, workflowSyncExecution,
+            workflowSyncValidation);
     }
 
     @Override
     public String toString() {
-        return "ActionDefinitionDTO{" +
+        return "TriggerDefinition{" +
             "editorDescriptionDataSource=" + editorDescriptionDataSource +
             ", outputSchema=" + outputSchema +
             ", outputSchemaDataSource=" + outputSchemaDataSource +
             ", properties=" + properties +
             ", sampleOutput=" + sampleOutput +
             ", sampleOutputDataSource=" + sampleOutputDataSource +
+            ", webhookRawBody=" + webhookRawBody +
+            ", workflowSyncExecution=" + workflowSyncExecution +
+            ", workflowSyncValidation=" + workflowSyncValidation +
             ", batch=" + batch +
             ", description='" + description + '\'' +
             ", help=" + help +
             ", name='" + name + '\'' +
             ", title='" + title + '\'' +
+            ", type=" + type +
             "} ";
     }
 }

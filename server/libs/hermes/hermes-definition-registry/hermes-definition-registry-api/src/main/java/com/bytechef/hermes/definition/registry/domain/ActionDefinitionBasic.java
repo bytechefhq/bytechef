@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -28,18 +28,18 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ActionDefinitionBasicDTO {
+public class ActionDefinitionBasic {
 
     protected final boolean batch;
     protected final String description;
-    protected final HelpDTO help;
+    protected final Help help;
     protected final String name;
     protected final String title;
 
-    public ActionDefinitionBasicDTO(ActionDefinition actionDefinition) {
+    public ActionDefinitionBasic(ActionDefinition actionDefinition) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
         this.description = Objects.requireNonNull(getDescription(actionDefinition));
-        this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), HelpDTO::new, null);
+        this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
         this.name = Objects.requireNonNull(actionDefinition.getName());
         this.title = Objects.requireNonNull(getTitle(actionDefinition));
     }
@@ -52,7 +52,7 @@ public class ActionDefinitionBasicDTO {
         return description;
     }
 
-    public Optional<HelpDTO> getHelp() {
+    public Optional<Help> getHelp() {
         return Optional.ofNullable(help);
     }
 
@@ -82,7 +82,7 @@ public class ActionDefinitionBasicDTO {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ActionDefinitionBasicDTO that = (ActionDefinitionBasicDTO) o;
+        ActionDefinitionBasic that = (ActionDefinitionBasic) o;
         return batch == that.batch && Objects.equals(description, that.description) && Objects.equals(help, that.help)
             && Objects.equals(name, that.name) && Objects.equals(title, that.title);
     }
@@ -94,7 +94,7 @@ public class ActionDefinitionBasicDTO {
 
     @Override
     public String toString() {
-        return "ActionDefinitionBasicDTO{" +
+        return "ActionDefinitionBasic{" +
             "batch=" + batch +
             ", description='" + description + '\'' +
             ", help=" + help +

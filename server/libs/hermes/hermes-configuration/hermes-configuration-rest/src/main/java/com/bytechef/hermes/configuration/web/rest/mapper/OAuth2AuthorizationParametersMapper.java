@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -28,8 +28,8 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = ConfigurationMapperSpringConfig.class)
 public interface OAuth2AuthorizationParametersMapper
-    extends Converter<OAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel> {
+    extends Converter<OAuth2AuthorizationParameters, OAuth2AuthorizationParametersModel> {
 
     @Override
-    OAuth2AuthorizationParametersModel convert(OAuth2AuthorizationParametersDTO oAuth2AuthorizationParametersDTO);
+    OAuth2AuthorizationParametersModel convert(OAuth2AuthorizationParameters oAuth2AuthorizationParameters);
 }

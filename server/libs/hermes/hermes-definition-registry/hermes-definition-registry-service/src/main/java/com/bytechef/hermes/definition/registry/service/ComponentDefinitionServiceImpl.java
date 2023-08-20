@@ -17,9 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -37,29 +36,26 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(name, version);
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+        com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition =
+            componentDefinitionRegistry.getComponentDefinition(name, version);
 
-        return toComponentDefinitionDTO(componentDefinition);
+        return new ComponentDefinition(componentDefinition);
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions() {
+    public List<ComponentDefinition> getComponentDefinitions() {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .map(this::toComponentDefinitionDTO)
+            .map(ComponentDefinition::new)
             .toList();
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
+    public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         return componentDefinitionRegistry.getComponentDefinitions(name)
             .stream()
-            .map(this::toComponentDefinitionDTO)
+            .map(ComponentDefinition::new)
             .toList();
-    }
-
-    private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {
-        return new ComponentDefinitionDTO(componentDefinition);
     }
 }

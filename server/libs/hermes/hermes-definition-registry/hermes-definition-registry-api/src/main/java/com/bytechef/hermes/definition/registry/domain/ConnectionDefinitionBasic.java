@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ConnectionDefinitionBasicDTO {
+public class ConnectionDefinitionBasic {
 
     protected final boolean authorizationRequired;
     protected final String componentDescription;
@@ -36,7 +36,7 @@ public class ConnectionDefinitionBasicDTO {
     protected final String componentTitle;
     protected final int version;
 
-    public ConnectionDefinitionBasicDTO(ConnectionDefinition connectionDefinition) {
+    public ConnectionDefinitionBasic(ConnectionDefinition connectionDefinition) {
         this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);
         this.componentDescription =
             OptionalUtils.orElse(connectionDefinition.getComponentDescription(), null);
@@ -70,7 +70,7 @@ public class ConnectionDefinitionBasicDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ConnectionDefinitionBasicDTO that))
+        if (!(o instanceof ConnectionDefinitionBasic that))
             return false;
         return authorizationRequired == that.authorizationRequired && version == that.version
             && Objects.equals(componentDescription, that.componentDescription)
@@ -84,7 +84,7 @@ public class ConnectionDefinitionBasicDTO {
 
     @Override
     public String toString() {
-        return "ConnectionDefinitionBasicDTO{" +
+        return "ConnectionDefinitionBasic{" +
             "authorizationRequired=" + authorizationRequired +
             ", componentDescription='" + componentDescription + '\'' +
             ", componentName='" + componentName + '\'' +

@@ -19,8 +19,8 @@ package com.bytechef.hermes.definition.registry.remote.client.facade;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,7 +79,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     }
 
     @Override
-    public List<OptionDTO> executeOptions(
+    public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, Long connectionId, String searchText) {
 
@@ -88,22 +88,22 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             new OptionsRequest(
                 triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
                 searchText),
-            new ParameterizedTypeReference<List<OptionDTO>>() {});
+            new ParameterizedTypeReference<List<Option>>() {});
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-output-schema"),
             new OutputSchemaRequest(triggerName, triggerParameters, componentName, componentVersion, connectionId),
-            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
+            new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    public List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, Long connectionId) {
 
@@ -111,7 +111,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
             uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-facade/execute-properties"),
             new PropertiesRequest(
                 triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName),
-            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
+            new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
     }
 
     @Override

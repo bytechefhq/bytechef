@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
-
-import com.bytechef.hermes.definition.Property;
+package com.bytechef.hermes.definition.registry.domain;
 
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public class DynamicPropertiesPropertyDTO extends PropertyDTO {
+public class DynamicPropertiesProperty extends Property {
 
-    private PropertiesDataSourceDTO propertiesDataSource;
+    private PropertiesDataSource propertiesDataSource;
 
-    private DynamicPropertiesPropertyDTO() {
+    private DynamicPropertiesProperty() {
     }
 
-    public DynamicPropertiesPropertyDTO(Property.DynamicPropertiesProperty property) {
+    public DynamicPropertiesProperty(com.bytechef.hermes.definition.Property.DynamicPropertiesProperty property) {
         super(property);
 
-        this.propertiesDataSource = new PropertiesDataSourceDTO(property.getDynamicPropertiesDataSource());
+        this.propertiesDataSource = new PropertiesDataSource(property.getDynamicPropertiesDataSource());
     }
 
     @Override
@@ -42,7 +40,7 @@ public class DynamicPropertiesPropertyDTO extends PropertyDTO {
         return propertyVisitor.visit(this);
     }
 
-    public PropertiesDataSourceDTO getPropertiesDataSource() {
+    public PropertiesDataSource getPropertiesDataSource() {
         return propertiesDataSource;
     }
 
@@ -50,7 +48,7 @@ public class DynamicPropertiesPropertyDTO extends PropertyDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof DynamicPropertiesPropertyDTO that))
+        if (!(o instanceof DynamicPropertiesProperty that))
             return false;
         return Objects.equals(propertiesDataSource, that.propertiesDataSource);
     }
@@ -62,7 +60,7 @@ public class DynamicPropertiesPropertyDTO extends PropertyDTO {
 
     @Override
     public String toString() {
-        return "DynamicPropertiesPropertyDTO{" +
+        return "DynamicPropertiesProperty{" +
             "propertiesDataSource=" + propertiesDataSource +
             "} " + super.toString();
     }

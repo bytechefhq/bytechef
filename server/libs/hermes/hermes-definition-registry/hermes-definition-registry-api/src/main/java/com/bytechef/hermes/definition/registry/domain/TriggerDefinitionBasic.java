@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -28,19 +28,19 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class TriggerDefinitionBasicDTO {
+public class TriggerDefinitionBasic {
 
     protected final boolean batch;
     protected final String description;
-    protected final HelpDTO help;
+    protected final Help help;
     protected final String name;
     protected final String title;
     protected final TriggerType type;
 
-    public TriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition) {
+    public TriggerDefinitionBasic(TriggerDefinition triggerDefinition) {
         this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
         this.description = Objects.requireNonNull(getDescription(triggerDefinition));
-        this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), HelpDTO::new, null);
+        this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
         this.name = Objects.requireNonNull(triggerDefinition.getName());
         this.title = Objects.requireNonNull(getTitle(triggerDefinition));
         this.type = Objects.requireNonNull(triggerDefinition.getType());
@@ -54,7 +54,7 @@ public class TriggerDefinitionBasicDTO {
         return description;
     }
 
-    public HelpDTO getHelp() {
+    public Help getHelp() {
         return help;
     }
 
@@ -74,7 +74,7 @@ public class TriggerDefinitionBasicDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof TriggerDefinitionBasicDTO that))
+        if (!(o instanceof TriggerDefinitionBasic that))
             return false;
         return batch == that.batch && Objects.equals(description, that.description) && Objects.equals(help, that.help)
             && Objects.equals(name, that.name) && Objects.equals(title, that.title) && type == that.type;
@@ -87,7 +87,7 @@ public class TriggerDefinitionBasicDTO {
 
     @Override
     public String toString() {
-        return "TriggerDefinitionBasicDTO{" +
+        return "TriggerDefinitionBasic{" +
             "batch=" + batch +
             ", description='" + description + '\'' +
             ", help=" + help +

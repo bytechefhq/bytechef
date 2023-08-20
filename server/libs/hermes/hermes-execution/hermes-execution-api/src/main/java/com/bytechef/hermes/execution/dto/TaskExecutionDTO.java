@@ -20,7 +20,7 @@ package com.bytechef.hermes.execution.dto;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -31,14 +31,14 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TaskExecutionDTO(
-    ComponentDefinitionDTO componentDefinition, String createdBy, LocalDateTime createdDate, LocalDateTime endDate,
+    ComponentDefinition componentDefinition, String createdBy, LocalDateTime createdDate, LocalDateTime endDate,
     ExecutionError error, long executionTime, Long id, Map<String, ?> input, Long jobId, String lastModifiedBy,
     LocalDateTime lastModifiedDate, int maxRetries, Object output, Long parentId, int priority, int progress,
     int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
     TaskExecution.Status status, int taskNumber, String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(
-        ComponentDefinitionDTO componentDefinition, Map<String, ?> input, TaskExecution taskExecution) {
+        ComponentDefinition componentDefinition, Map<String, ?> input, TaskExecution taskExecution) {
 
         this(
             componentDefinition, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
