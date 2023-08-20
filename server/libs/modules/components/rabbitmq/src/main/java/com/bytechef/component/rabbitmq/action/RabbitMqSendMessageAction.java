@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.rabbitmq.client.Channel;
 
 import java.nio.charset.StandardCharsets;
@@ -63,15 +63,15 @@ public class RabbitMqSendMessageAction {
         Connection connection = context.getConnection();
 
         try (com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
-            MapValueUtils.getString(connection.getParameters(), HOSTNAME),
-            MapValueUtils.getInteger(connection.getParameters(), PORT, 5672),
-            MapValueUtils.getString(connection.getParameters(), USERNAME),
-            MapValueUtils.getString(connection.getParameters(), PASSWORD))) {
+            MapUtils.getString(connection.getParameters(), HOSTNAME),
+            MapUtils.getInteger(connection.getParameters(), PORT, 5672),
+            MapUtils.getString(connection.getParameters(), USERNAME),
+            MapUtils.getString(connection.getParameters(), PASSWORD))) {
 
             Channel channel = rabbitMqConnection.createChannel();
 
-            String queueName = MapValueUtils.getRequiredString(inputParameters, QUEUE);
-            String message = JsonUtils.write(MapValueUtils.getRequired(inputParameters, MESSAGE));
+            String queueName = MapUtils.getRequiredString(inputParameters, QUEUE);
+            String message = JsonUtils.write(MapUtils.getRequired(inputParameters, MESSAGE));
 
             channel.queueDeclare(queueName, true, false, false, null);
             channel.basicPublish("", queueName, null, message.getBytes(StandardCharsets.UTF_8));

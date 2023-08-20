@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -95,7 +95,7 @@ public class JsonFileWriteAction {
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context)
         throws ComponentExecutionException {
         JsonFileTaskConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
-        Object source = MapValueUtils.getRequired(inputParameters, SOURCE);
+        Object source = MapUtils.getRequired(inputParameters, SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -113,7 +113,7 @@ public class JsonFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                getDefaultFileName(fileType, MapValueUtils.getString(inputParameters, FILENAME)), inputStream);
+                getDefaultFileName(fileType, MapUtils.getString(inputParameters, FILENAME)), inputStream);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create json file", ioException);
         }

@@ -19,7 +19,7 @@ package com.bytechef.helios.configuration.connection;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import org.springframework.core.convert.converter.Converter;
 
@@ -82,9 +82,9 @@ public class WorkflowConnection {
         return source.entrySet()
             .stream()
             .map(entry -> new WorkflowConnection(
-                MapValueUtils.getString(entry.getValue(), "componentName"),
-                MapValueUtils.getInteger(entry.getValue(), "componentVersion"), operationName, entry.getKey(),
-                MapValueUtils.getLong(entry.getValue(), ID)))
+                MapUtils.getString(entry.getValue(), "componentName"),
+                MapUtils.getInteger(entry.getValue(), "componentVersion"), operationName, entry.getKey(),
+                MapUtils.getLong(entry.getValue(), ID)))
             .toList();
     }
 
@@ -126,9 +126,9 @@ public class WorkflowConnection {
         @SuppressWarnings("unchecked")
         public WorkflowConnection convert(Map source) {
             return new WorkflowConnection(
-                MapValueUtils.getString(source, "componentName"), MapValueUtils.getInteger(source, "componentVersion"),
-                MapValueUtils.getString(source, "operationName"), MapValueUtils.getString(source, "key"),
-                MapValueUtils.getLong(source, "id"));
+                MapUtils.getString(source, "componentName"), MapUtils.getInteger(source, "componentVersion"),
+                MapUtils.getString(source, "operationName"), MapUtils.getString(source, "key"),
+                MapUtils.getLong(source, "id"));
         }
     }
 }

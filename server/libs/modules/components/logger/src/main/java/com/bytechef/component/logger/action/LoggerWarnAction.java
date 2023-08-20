@@ -19,7 +19,7 @@ package com.bytechef.component.logger.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class LoggerWarnAction {
         .perform(LoggerWarnAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        logger.warn(MapValueUtils.getString(inputParameters, TEXT));
+        logger.warn(MapUtils.getString(inputParameters, TEXT));
 
         return null;
     }

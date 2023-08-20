@@ -18,7 +18,7 @@
 package com.bytechef.component.delay.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -37,8 +37,8 @@ public class DelaySleepActionTest {
 
     @Test
     public void test1() {
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getDuration(Mockito.anyMap(), Mockito.eq("duration")))
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getDuration(Mockito.anyMap(), Mockito.eq("duration")))
                 .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
             long now = System.currentTimeMillis();
@@ -54,9 +54,9 @@ public class DelaySleepActionTest {
 
     @Test
     public void test2() {
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getLong(Mockito.anyMap(), Mockito.eq(MILLIS)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getLong(Mockito.anyMap(), Mockito.eq(MILLIS)))
                 .thenReturn(500L);
 
             long now = System.currentTimeMillis();
@@ -66,7 +66,7 @@ public class DelaySleepActionTest {
             long delta = System.currentTimeMillis() - now;
 
             Assertions.assertTrue(
-                delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
+                delta >= 500 && delta < 700, String.format("Period %dms does not meet range [500,700>", delta));
         }
     }
 

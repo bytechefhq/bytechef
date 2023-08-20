@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -48,11 +48,11 @@ public class FilesystemWriteFileActionTest {
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getRequired(
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+            mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(file.getAbsolutePath());
 
             assertThat(FilesystemWriteFileAction.perform(Map.of(), context))

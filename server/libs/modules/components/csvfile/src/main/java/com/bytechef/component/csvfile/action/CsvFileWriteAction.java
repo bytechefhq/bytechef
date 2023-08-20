@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.fasterxml.jackson.databind.SequenceWriter;
 
 import java.io.ByteArrayInputStream;
@@ -73,7 +73,7 @@ public class CsvFileWriteAction {
 
     @SuppressWarnings("unchecked")
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        List<Map<String, ?>> rows = (List<Map<String, ?>>) MapValueUtils.getList(inputParameters, ROWS, List.of());
+        List<Map<String, ?>> rows = (List<Map<String, ?>>) MapUtils.getList(inputParameters, ROWS, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.storeFileContent("file.csv", inputStream);

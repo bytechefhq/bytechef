@@ -36,7 +36,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -82,7 +82,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         Map<String, ?> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey(TASKS)) {
-            List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
                 selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
 
             if (subWorkflowTasks.isEmpty()) {
@@ -90,7 +90,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 taskExecution.setEndDate(LocalDateTime.now());
                 taskExecution.setExecutionTime(0);
 
-                messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+                messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
             } else {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
@@ -121,7 +121,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             // TODO check, it seems wrong
             taskExecution.setOutput(selectedCase.get("value"));
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         }
     }
 
@@ -135,20 +135,20 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     private Map<String, ?> resolveCase(TaskExecution taskExecution) {
-        Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = MapValueUtils.getList(
+        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<Map<String, Object>> cases = MapUtils.getList(
             taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
 
         Assert.notNull(cases, "you must specify 'cases' in a branch statement");
 
         for (Map<String, Object> oneCase : cases) {
-            Object key = MapValueUtils.getRequired(oneCase, KEY);
+            Object key = MapUtils.getRequired(oneCase, KEY);
 
             if (key.equals(expression)) {
                 return oneCase;
             }
         }
 
-        return MapValueUtils.getMap(taskExecution.getParameters(), DEFAULT, Collections.emptyMap());
+        return MapUtils.getMap(taskExecution.getParameters(), DEFAULT, Collections.emptyMap());
     }
 }

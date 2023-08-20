@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -66,11 +66,11 @@ public class AwsS3GetObjectAction {
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             return context.storeFileContent(
-                MapValueUtils.getRequiredString(inputParameters, FILENAME),
+                MapUtils.getRequiredString(inputParameters, FILENAME),
                 s3Client.getObject(
                     GetObjectRequest.builder()
-                        .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                        .key(MapValueUtils.getRequiredString(inputParameters, KEY))
+                        .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
+                        .key(MapUtils.getRequiredString(inputParameters, KEY))
                         .build(),
                     ResponseTransformer.toInputStream()));
         }

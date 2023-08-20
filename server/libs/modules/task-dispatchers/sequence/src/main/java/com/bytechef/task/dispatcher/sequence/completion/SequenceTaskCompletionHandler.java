@@ -28,7 +28,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -92,7 +92,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             contextService.push(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
-        List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+        List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
             sequenceTaskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {

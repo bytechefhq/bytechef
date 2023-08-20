@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,11 +71,11 @@ public class XmlFileWriteActionTest {
                 }
             });
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn("file.xml");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
             XmlFileWriteAction.perform(Map.of(), context);
@@ -100,11 +100,11 @@ public class XmlFileWriteActionTest {
 
         Mockito.reset(context);
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn(TEST_XML);
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
             XmlFileWriteAction.perform(Map.of(), context);
@@ -135,11 +135,11 @@ public class XmlFileWriteActionTest {
                 }
             });
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn("file.xml");
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
             XmlFileWriteAction.perform(Map.of(), context);
@@ -164,11 +164,11 @@ public class XmlFileWriteActionTest {
 
         Mockito.reset(context);
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> MapValueUtils.getString(
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn(TEST_XML);
-            mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
             XmlFileWriteAction.perform(Map.of(), context);

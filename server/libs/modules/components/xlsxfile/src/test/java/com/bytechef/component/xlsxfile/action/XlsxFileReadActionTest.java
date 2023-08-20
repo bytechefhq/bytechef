@@ -19,7 +19,7 @@ package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -206,24 +206,24 @@ public class XlsxFileReadActionTest {
     @SuppressFBWarnings("OBL")
     private Map<String, ?> getReadParameters(
         String extension, boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize,
-        boolean readAsString, File file, MockedStatic<MapValueUtils> mockedStatic)
+        boolean readAsString, File file, MockedStatic<MapUtils> mockedStatic)
         throws FileNotFoundException {
 
         Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        mockedStatic.when(() -> MapValueUtils.getRequired(
+        mockedStatic.when(() -> MapUtils.getRequired(
             Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
             .thenReturn(fileEntry);
-        mockedStatic.when(() -> MapValueUtils.getBoolean(Mockito.anyMap(), Mockito.eq(HEADER_ROW), Mockito.eq(true)))
+        mockedStatic.when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
-        mockedStatic.when(() -> MapValueUtils.getBoolean(
+        mockedStatic.when(() -> MapUtils.getBoolean(
             Mockito.anyMap(), Mockito.eq(INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
             .thenReturn(includeEmptyCells);
-        mockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+        mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
             .thenReturn(pageNumber);
-        mockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+        mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
             .thenReturn(pageSize);
-        mockedStatic.when(() -> MapValueUtils.getBoolean(
+        mockedStatic.when(() -> MapUtils.getBoolean(
             Mockito.anyMap(), Mockito.eq(READ_AS_STRING), Mockito.eq(false)))
             .thenReturn(readAsString);
 
@@ -241,7 +241,7 @@ public class XlsxFileReadActionTest {
     private void readFile(String extension) throws IOException, JSONException {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
             assertEquals(
                 new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
                 new JSONArray((List<?>) XlsxFileReadAction.perform(

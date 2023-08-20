@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class FilesystemRmAction {
      * </p>
      */
     protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        File file = new File(MapValueUtils.getRequiredString(inputParameters, PATH));
+        File file = new File(MapUtils.getRequiredString(inputParameters, PATH));
 
         try {
             return deleteRecursively(file.toPath());

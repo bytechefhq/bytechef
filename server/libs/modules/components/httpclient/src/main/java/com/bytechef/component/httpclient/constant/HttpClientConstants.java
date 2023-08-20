@@ -19,7 +19,7 @@ package com.bytechef.component.httpclient.constant;
 
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
 import java.util.Arrays;
@@ -107,7 +107,7 @@ public class HttpClientConstants {
 
     public static final OutputSchemaDataSource.OutputSchemaFunction OUTPUT_PROPERTIES =
         (connection, inputParameters) -> {
-            if (MapValueUtils.getBoolean(inputParameters, FULL_RESPONSE, false)) {
+            if (MapUtils.getBoolean(inputParameters, FULL_RESPONSE, false)) {
                 return object()
                     .properties(any("body"), object("headers"), integer("status"));
             } else {

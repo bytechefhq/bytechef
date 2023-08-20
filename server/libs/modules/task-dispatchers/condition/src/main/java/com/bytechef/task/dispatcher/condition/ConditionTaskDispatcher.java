@@ -31,7 +31,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -74,10 +74,10 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
         List<WorkflowTask> subWorkflowTasks;
 
         if (ConditionTaskUtils.resolveCase(taskExecution)) {
-            subWorkflowTasks = MapValueUtils.getList(
+            subWorkflowTasks = MapUtils.getList(
                 taskExecution.getParameters(), CASE_TRUE, WorkflowTask.class, Collections.emptyList());
         } else {
-            subWorkflowTasks = MapValueUtils.getList(
+            subWorkflowTasks = MapUtils.getList(
                 taskExecution.getParameters(), CASE_FALSE, WorkflowTask.class, Collections.emptyList());
         }
 
@@ -106,7 +106,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         }
     }
 

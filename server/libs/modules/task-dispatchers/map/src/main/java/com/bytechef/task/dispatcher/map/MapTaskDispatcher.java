@@ -37,7 +37,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -69,8 +69,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
-        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
+        Map<String, ?> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
 
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -82,7 +82,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         } else {
             counterService.set(taskExecution.getId(), list.size());
 
@@ -99,8 +99,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                 Map<String, Object> newContext = new HashMap<>(
                     contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
-                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
-                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
                 iterateeTaskExecution.evaluate(newContext);
 

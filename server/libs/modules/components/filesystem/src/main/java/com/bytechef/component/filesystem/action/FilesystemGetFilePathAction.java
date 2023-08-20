@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.File;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class FilesystemGetFilePathAction {
      * the text before the last forward or backslash.
      */
     protected static String perform(Map<String, ?> inputParameters, Context context) {
-        String filename = MapValueUtils.getRequiredString(inputParameters, FILENAME);
+        String filename = MapUtils.getRequiredString(inputParameters, FILENAME);
 
         return filename.substring(0, filename.lastIndexOf(File.separator));
     }

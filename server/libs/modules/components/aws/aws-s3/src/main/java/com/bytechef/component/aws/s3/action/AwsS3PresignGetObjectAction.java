@@ -21,7 +21,7 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
@@ -67,11 +67,11 @@ public class AwsS3PresignGetObjectAction {
                 presignedObjectBuilder -> presignedObjectBuilder
                     .signatureDuration(
                         Duration.parse(
-                            "PT" + MapValueUtils.getRequiredString(connectionParameters, SIGNATURE_DURATION)))
+                            "PT" + MapUtils.getRequiredString(connectionParameters, SIGNATURE_DURATION)))
                     .getObjectRequest(
                         requestBuilder -> requestBuilder
-                            .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                            .key(MapValueUtils.getRequiredString(inputParameters, KEY))));
+                            .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
+                            .key(MapUtils.getRequiredString(inputParameters, KEY))));
 
             URL url = presignedGetObjectRequest.url();
 

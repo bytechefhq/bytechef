@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Option;
@@ -77,7 +77,7 @@ public class AirtableUtils {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
-                MapValueUtils.getRequiredString(inputParameters, BASE_ID));
+                MapUtils.getRequiredString(inputParameters, BASE_ID));
 
             Map<String, List<AirtableTable>> tablesMap = JsonUtils.read(
                 HttpClientUtils
@@ -91,12 +91,12 @@ public class AirtableUtils {
                 logger.debug("Response for url='%s': %s".formatted(url, tablesMap));
             }
 
-            List<AirtableTable> tables = MapValueUtils.getList(tablesMap, "tables", AirtableTable.class);
+            List<AirtableTable> tables = MapUtils.getList(tablesMap, "tables", AirtableTable.class);
 
             AirtableTable table = tables
                 .stream()
                 .filter(curTable -> Objects.equals(
-                    curTable.id(), MapValueUtils.getRequiredString(inputParameters, TABLE_ID)))
+                    curTable.id(), MapUtils.getRequiredString(inputParameters, TABLE_ID)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Request Airtable table does not exist"));
 
@@ -151,7 +151,7 @@ public class AirtableUtils {
     public static ComponentOptionsFunction getTableIdOptions() {
         return (connection, inputParameters, searchText) -> {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
-                MapValueUtils.getRequiredString(inputParameters, BASE_ID));
+                MapUtils.getRequiredString(inputParameters, BASE_ID));
 
             Map<String, ?> response = HttpClientUtils
                 .get(url)
@@ -170,7 +170,7 @@ public class AirtableUtils {
     private static List<Option<?>> getOptions(Map<String, ?> response, String name) {
         List<Option<?>> options = new ArrayList<>();
 
-        for (Map<?, ?> list : MapValueUtils.getRequiredList(response, name, Map.class)) {
+        for (Map<?, ?> list : MapUtils.getRequiredList(response, name, Map.class)) {
             options.add(option((String) list.get("name"), list.get("id")));
         }
 

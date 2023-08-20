@@ -23,11 +23,12 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +45,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test1() {
-        TaskHandlerResolver resolver = task -> t -> MapValueUtils.get(t.getParameters(), "value");
+        TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -95,7 +96,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test3() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(TaskMessageRoute.TASKS_COMPLETIONS, t -> {
+        messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getOutput());
@@ -115,7 +116,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             String type = t1.getType();
 
             if ("var".equals(type)) {
-                return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
+                return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
             }
             if ("pass".equals(type)) {
                 return t2 -> null;
@@ -127,11 +128,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             }
         };
 
-        TaskWorker worker = TaskWorker.builder()
-            .taskHandlerResolver(taskHandlerResolver)
-            .messageBroker(messageBroker)
-            .eventPublisher(e -> {})
-            .build();
+        TaskWorker worker = new TaskWorker(
+            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver);
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
 

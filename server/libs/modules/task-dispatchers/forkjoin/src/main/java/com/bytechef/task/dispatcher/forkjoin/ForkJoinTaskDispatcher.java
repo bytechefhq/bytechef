@@ -36,7 +36,7 @@ import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +107,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
+        List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
             taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
@@ -124,7 +124,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         } else {
             Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
@@ -146,7 +146,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                     .taskNumber(1)
                     .workflowTask(
                         WorkflowTask.of(
-                            MapValueUtils.append(
+                            MapUtils.append(
                                 branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, i))))
                     .build();
 

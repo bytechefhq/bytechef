@@ -24,7 +24,7 @@ import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -188,28 +188,28 @@ public final class Workflow implements Persistable<String> {
 
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
-                this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
+                this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
             } else if (WorkflowConstants.INPUTS.equals(entry.getKey())) {
                 this.inputs = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
+                    MapUtils.getList(source, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
                     map -> new Input(
-                        MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
-                        MapValueUtils.getString(map, WorkflowConstants.LABEL),
-                        MapValueUtils.getString(map, WorkflowConstants.TYPE, "string"),
-                        MapValueUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
+                        MapUtils.getRequiredString(map, WorkflowConstants.NAME),
+                        MapUtils.getString(map, WorkflowConstants.LABEL),
+                        MapUtils.getString(map, WorkflowConstants.TYPE, "string"),
+                        MapUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
-                this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+                this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.OUTPUTS.equals(entry.getKey())) {
                 this.outputs = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.OUTPUTS, Map.class, List.of()),
+                    MapUtils.getList(source, WorkflowConstants.OUTPUTS, Map.class, List.of()),
                     map -> new Output(
-                        MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
-                        MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
+                        MapUtils.getRequiredString(map, WorkflowConstants.NAME),
+                        MapUtils.getRequiredString(map, WorkflowConstants.VALUE)));
             } else if (WorkflowConstants.MAX_RETRIES.equals(entry.getKey())) {
-                this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
+                this.maxRetries = MapUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
             } else if (WorkflowConstants.TASKS.equals(entry.getKey())) {
                 this.tasks = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, List.of()),
+                    MapUtils.getList(source, WorkflowConstants.TASKS, Map.class, List.of()),
                     WorkflowTask::of);
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
@@ -249,11 +249,11 @@ public final class Workflow implements Persistable<String> {
     }
 
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
-        return MapValueUtils.get(extensions, name, elementType, defaultValue);
+        return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
-        return MapValueUtils.getList(extensions, name, elementType, defaultValue);
+        return MapUtils.getList(extensions, name, elementType, defaultValue);
     }
 
     @Override

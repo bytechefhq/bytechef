@@ -19,7 +19,7 @@ package com.bytechef.component.mailchimp.util;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.definition.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class MailchimpUtils {
 
     public static ComponentOptionsFunction getListIdOptions() {
         return (connection, inputParameters, searchText) -> {
-            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
+            String accessToken = MapUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
 
             String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken));
 
@@ -73,7 +73,7 @@ public class MailchimpUtils {
 
             List<Option<?>> options = new ArrayList<>();
 
-            for (Map<?, ?> list : MapValueUtils.getRequiredList(response, "lists", Map.class)) {
+            for (Map<?, ?> list : MapUtils.getRequiredList(response, "lists", Map.class)) {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 

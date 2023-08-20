@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -101,12 +101,12 @@ public class JsonFileReadAction {
         throws ComponentExecutionException {
 
         FileType fileType = getFileType(inputParameters);
-        FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
-        boolean isArray = MapValueUtils.getBoolean(inputParameters, IS_ARRAY, true);
+        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
+        boolean isArray = MapUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = MapValueUtils.getString(inputParameters, PATH);
+            String path = MapUtils.getString(inputParameters, PATH);
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
@@ -131,8 +131,8 @@ public class JsonFileReadAction {
                 }
             }
 
-            Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
-            Integer pageNumber = MapValueUtils.getInteger(inputParameters, PAGE_NUMBER);
+            Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
+            Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -156,7 +156,7 @@ public class JsonFileReadAction {
     }
 
     protected static FileType getFileType(Map<String, ?> inputParameters) {
-        String fileType = MapValueUtils.getString(inputParameters, FILE_TYPE, FileType.JSON.name());
+        String fileType = MapUtils.getString(inputParameters, FILE_TYPE, FileType.JSON.name());
 
         return FileType.valueOf(fileType.toUpperCase());
     }

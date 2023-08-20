@@ -33,7 +33,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +74,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = MapValueUtils.getList(
+        List<WorkflowTask> workflowTasks = MapUtils.getList(
             taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
@@ -84,7 +84,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         } else {
             counterService.set(taskExecution.getId(), workflowTasks.size());
 

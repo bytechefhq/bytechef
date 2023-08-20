@@ -20,7 +20,7 @@ package com.bytechef.component.bash.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 import java.io.BufferedWriter;
@@ -60,7 +60,7 @@ public class BashExecuteAction {
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
 
-            writeStringToFile(scriptFile, MapValueUtils.getRequiredString(inputParameters, SCRIPT));
+            writeStringToFile(scriptFile, MapUtils.getRequiredString(inputParameters, SCRIPT));
 
             try {
                 Runtime runtime = Runtime.getRuntime();

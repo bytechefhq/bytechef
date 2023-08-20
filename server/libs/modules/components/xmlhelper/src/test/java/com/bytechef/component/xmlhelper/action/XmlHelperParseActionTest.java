@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -37,10 +37,10 @@ public class XmlHelperParseActionTest {
 
     @Test
     public void testPerformParse() {
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
             MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequiredString(
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequiredString(
                 Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn("""
                     <Flower id="45">
@@ -54,10 +54,10 @@ public class XmlHelperParseActionTest {
                 .isEqualTo(Map.of("id", "45", "name", "Poppy"));
         }
 
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
             MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequiredString(
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequiredString(
                 Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn("""
                     <Flowers>

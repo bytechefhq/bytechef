@@ -21,7 +21,7 @@ package com.bytechef.atlas.configuration.task;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,28 +57,28 @@ public class WorkflowTask implements Task {
     private WorkflowTask(Map<String, ?> source) {
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
-                this.finalize = MapValueUtils.getList(
+                this.finalize = MapUtils.getList(
                     source, WorkflowConstants.FINALIZE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
-                this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+                this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
-                this.metadata = MapValueUtils.getMap(source, WorkflowConstants.METADATA, Collections.emptyMap());
+                this.metadata = MapUtils.getMap(source, WorkflowConstants.METADATA, Collections.emptyMap());
             } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
-                this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
+                this.name = MapUtils.getString(source, WorkflowConstants.NAME);
             } else if (WorkflowConstants.NODE.equals(entry.getKey())) {
-                this.node = MapValueUtils.getString(source, WorkflowConstants.NODE);
+                this.node = MapUtils.getString(source, WorkflowConstants.NODE);
             } else if (WorkflowConstants.PARAMETERS.equals(entry.getKey())) {
-                this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
+                this.parameters = MapUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
             } else if (WorkflowConstants.POST.equals(entry.getKey())) {
-                this.post = MapValueUtils.getList(
+                this.post = MapUtils.getList(
                     source, WorkflowConstants.POST, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.PRE.equals(entry.getKey())) {
-                this.pre = MapValueUtils.getList(
+                this.pre = MapUtils.getList(
                     source, WorkflowConstants.PRE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
-                this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
+                this.timeout = MapUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
-                this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
+                this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
             } else {
                 this.extensions.put(entry.getKey(), entry.getValue());
             }
@@ -118,11 +118,11 @@ public class WorkflowTask implements Task {
     }
 
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
-        return MapValueUtils.get(extensions, name, elementType, defaultValue);
+        return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
-        return MapValueUtils.getList(extensions, name, elementType, defaultValue);
+        return MapUtils.getList(extensions, name, elementType, defaultValue);
     }
 
     @Override
