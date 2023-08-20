@@ -28,7 +28,6 @@ import com.bytechef.hermes.definition.registry.dto.IntegerPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.NullPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.NumberPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.ObjectPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionsDataSourceDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.StringPropertyDTO;
@@ -49,21 +48,18 @@ import com.bytechef.hermes.configuration.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TimePropertyModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConfigurationMapperSpringConfig.class)
+@Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+    OptionalMapper.class
+})
 public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, PropertyDTO.PropertyVisitor {
 
     @Override
@@ -168,50 +164,5 @@ public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, P
                 .map(this::convert)
                 .toList();
         }
-    }
-
-    default Boolean mapToBoolean(Optional<Boolean> optional) {
-        return optional.orElse(null);
-    }
-
-    default Integer mapToInteger(Optional<Integer> optional) {
-        return optional.orElse(null);
-    }
-
-    default JsonNullable<Object> mapToJsonNullable(Object value) {
-        return JsonNullable.of(value);
-    }
-
-    default JsonNullable<Object> mapToJsonNullable(Optional<?> optional) {
-        return JsonNullable.of(optional.orElse(null));
-    }
-
-    default LocalDate mapToLocalDate(Optional<LocalDate> optional) {
-        return optional.orElse(null);
-    }
-
-    default LocalDateTime mapToLocalDateTime(Optional<LocalDateTime> optional) {
-        return optional.orElse(null);
-    }
-
-    default LocalTime mapToLocalTime(Optional<LocalTime> optional) {
-        return optional.orElse(null);
-    }
-
-    default Object mapToObject(Optional<Object> optional) {
-        return optional.orElse(null);
-    }
-
-    default OptionDTO mapToOption(Optional<OptionDTO> optional) {
-        return optional.orElse(null);
-    }
-
-    default OptionsDataSourceModel mapToOptionsDataSourceModel(Optional<OptionsDataSourceDTO> optional) {
-        return optional.map(this::map)
-            .orElse(null);
-    }
-
-    default String mapToString(Optional<String> optional) {
-        return optional.orElse(null);
     }
 }

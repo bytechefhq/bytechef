@@ -26,15 +26,14 @@ import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinition
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConfigurationMapperSpringConfig.class)
 public class TaskDispatcherDefinitionMapper {
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel> {
 
@@ -42,18 +41,11 @@ public class TaskDispatcherDefinitionMapper {
         TaskDispatcherDefinitionModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
 
         ResourcesModel map(ResourcesDTO resourcesDTO);
-
-        default ResourcesModel mapToResource(Optional<ResourcesDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionBasicModel> {
 
@@ -61,14 +53,5 @@ public class TaskDispatcherDefinitionMapper {
         TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
 
         ResourcesModel map(ResourcesDTO resourcesDTO);
-
-        default ResourcesModel mapToResource(Optional<ResourcesDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 }

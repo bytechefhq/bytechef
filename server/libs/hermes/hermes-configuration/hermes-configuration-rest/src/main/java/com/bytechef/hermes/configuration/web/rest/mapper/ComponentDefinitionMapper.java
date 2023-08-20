@@ -30,11 +30,11 @@ import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 public class ComponentDefinitionMapper {
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ComponentDefinitionToComponentDefinitionModelMapper
         extends Converter<ComponentDefinitionDTO, ComponentDefinitionModel> {
 
@@ -45,44 +45,16 @@ public class ComponentDefinitionMapper {
         HelpModel map(HelpDTO helpDTO);
 
         ResourcesModel map(ResourcesDTO resourcesDTO);
-
-        default ConnectionDefinitionBasicModel mapToConnectionDefinitionBasic(
-            Optional<ConnectionDefinitionBasicDTO> optional) {
-
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default ResourcesModel mapToResource(Optional<ResourcesDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinitionDTO, ComponentDefinitionBasicModel> {
 
         ComponentDefinitionBasicModel convert(ComponentDefinitionDTO componentDefinitionDTO);
 
         ResourcesModel map(ResourcesDTO resourcesDTO);
-
-        default ResourcesModel mapToResource(Optional<ResourcesDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 }

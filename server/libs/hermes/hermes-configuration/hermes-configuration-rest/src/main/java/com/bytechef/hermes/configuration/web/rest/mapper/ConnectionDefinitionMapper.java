@@ -25,35 +25,29 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
 public class ConnectionDefinitionMapper {
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ConnectionDefinitionToConnectionDefinitionModelMapper
         extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionModel> {
 
         @Override
         @Mapping(target = "baseUri", ignore = true)
         ConnectionDefinitionModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
-
-        default String mapToString(Optional<String> optional) {
-            return optional.orElse(null);
-        }
     }
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
         extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionBasicModel> {
 
         @Override
         ConnectionDefinitionBasicModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
-
-        default String mapToString(Optional<String> optional) {
-            return optional.orElse(null);
-        }
     }
 }
