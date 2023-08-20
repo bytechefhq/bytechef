@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/trigger-storage-service")
 public class TriggerStateServiceController {
 
     private final TriggerStateService triggerStateService;
@@ -46,7 +46,7 @@ public class TriggerStateServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/trigger-storage-service/fetch-value/{workflowExecutionId}",
+        value = "/fetch-value/{workflowExecutionId}",
         consumes = {
             "application/json"
         })
@@ -59,7 +59,7 @@ public class TriggerStateServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/trigger-storage-service/save/{workflowExecutionId}",
+        value = "/save/{workflowExecutionId}",
         consumes = {
             "application/json"
         })

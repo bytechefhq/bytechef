@@ -18,7 +18,6 @@
 package com.bytechef.hermes.execution.remote.client.facade;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -40,20 +39,26 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerDisable(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId) {
 
         post(
             "/api/internal/trigger-lifecycle-facade/execute-trigger-enable",
-            new TriggerRequest(workflowExecutionId, triggerParameters, connectionId));
+            new TriggerRequest(
+                workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
+                connectionId));
     }
 
     @Override
     public void executeTriggerEnable(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId) {
 
         post(
             "/api/internal/trigger-lifecycle-facade/execute-trigger-disable",
-            new TriggerRequest(workflowExecutionId, triggerParameters, connectionId));
+            new TriggerRequest(
+                workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
+                connectionId));
     }
 
     private void post(String path, TriggerRequest workflowExecutionId) {
@@ -67,6 +72,7 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId) {
     }
 }

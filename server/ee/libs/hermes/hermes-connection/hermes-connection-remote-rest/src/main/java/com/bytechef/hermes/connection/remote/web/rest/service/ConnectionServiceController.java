@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/connection-service")
 public class ConnectionServiceController {
 
     private final ConnectionService connectionService;
@@ -46,7 +46,7 @@ public class ConnectionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-service/fetch-connection/{id}",
+        value = "/fetch-connection/{id}",
         produces = {
             "application/json"
         })
@@ -59,7 +59,7 @@ public class ConnectionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-service/get-connections",
+        value = "/get-connections",
         produces = {
             "application/json"
         })

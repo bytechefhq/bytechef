@@ -32,7 +32,8 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ActionDefinitionFacadeClient extends AbstractWorkerClient implements ActionDefinitionFacade {
+public class ActionDefinitionFacadeClient extends AbstractWorkerClient
+    implements ActionDefinitionFacade {
 
     public ActionDefinitionFacadeClient(
         DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
@@ -46,7 +47,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         Long connectionId) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-editor-description"),
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-editor-description"),
             new EditorDescriptionRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId),
             String.class);
@@ -58,11 +59,11 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-options"),
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-options"),
             new OptionsRequest(
                 actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
                 searchText),
-            new ParameterizedTypeReference<List<OptionDTO>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -71,10 +72,10 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         Long connectionId) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-output-schema"),
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-output-schema"),
             new OutputSchemaRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId),
-            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -83,10 +84,10 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         Map<String, Object> actionParameters, Long connectionId) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-properties"),
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-properties"),
             new PropertiesRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId, propertyName),
-            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         Long connectionId) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-sample-output"),
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-sample-output"),
             new SampleOutputRequest(actionName, actionParameters, componentName, componentVersion, connectionId),
             Object.class);
     }

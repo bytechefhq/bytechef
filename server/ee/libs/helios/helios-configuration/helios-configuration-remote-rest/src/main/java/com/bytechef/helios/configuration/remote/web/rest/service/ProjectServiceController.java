@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/project-service")
 public class ProjectServiceController {
 
     private final ProjectService projectService;
@@ -46,7 +46,7 @@ public class ProjectServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-service/get-project/{id}",
+        value = "/get-project/{id}",
         produces = {
             "application/json"
         })
@@ -56,7 +56,7 @@ public class ProjectServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-service/get-projects",
+        value = "/get-projects",
         produces = {
             "application/json"
         })
@@ -66,7 +66,7 @@ public class ProjectServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-service/get-workflow-project/{workflowId}",
+        value = "/get-workflow-project/{workflowId}",
         produces = {
             "application/json"
         })

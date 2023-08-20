@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/project-instance-service")
 public class ProjectInstanceServiceController {
 
     private final ProjectInstanceService projectInstanceService;
@@ -44,7 +44,7 @@ public class ProjectInstanceServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-instance-service/fetch-workflow-project-instance/{workflowId}",
+        value = "/fetch-workflow-project-instance/{workflowId}",
         produces = {
             "application/json"
         })
@@ -57,7 +57,7 @@ public class ProjectInstanceServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-instance-service/update-enabled/{id}/{enabled}",
+        value = "/update-enabled/{id}/{enabled}",
         produces = {
             "application/json"
         })
