@@ -1,8 +1,9 @@
 dependencies {
+    api project(":server:libs:helios:helios-connection:helios-connection-api")
+
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-tx"
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:helios:helios-connection:helios-connection-api")
     implementation project(":server:libs:helios:helios-configuration:helios-configuration-api")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 

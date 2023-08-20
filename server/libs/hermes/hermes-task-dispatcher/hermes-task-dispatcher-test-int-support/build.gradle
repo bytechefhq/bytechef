@@ -7,7 +7,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory")
     implementation project(":server:libs:atlas:atlas-execution:atlas-execution-service")
-    implementation project(":server:libs:atlas:atlas-execution:atlas-execution-sync")
+    implementation project(":server:libs:atlas:atlas-sync-executor")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:core:event:event-listener:event-listener-impl")
