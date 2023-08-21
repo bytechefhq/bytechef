@@ -17,14 +17,51 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Help;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record HelpDTO(String body, String learnMoreUrl) {
+public class HelpDTO {
 
-    HelpDTO(Help help) {
-        this(help.getBody(), help.getLearnMoreUrl());
+    private final String body;
+    private final String learnMoreUrl;
+
+    public HelpDTO(Help help) {
+        this.body = help.getBody();
+        this.learnMoreUrl = OptionalUtils.orElse(help.getLearnMoreUrl(), null);
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getLearnMoreUrl() {
+        return learnMoreUrl;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof HelpDTO helpDTO))
+            return false;
+        return Objects.equals(body, helpDTO.body) && Objects.equals(learnMoreUrl, helpDTO.learnMoreUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(body, learnMoreUrl);
+    }
+
+    @Override
+    public String toString() {
+        return "HelpDTO{" +
+            "body='" + body + '\'' +
+            ", learnMoreUrl='" + learnMoreUrl + '\'' +
+            '}';
     }
 }

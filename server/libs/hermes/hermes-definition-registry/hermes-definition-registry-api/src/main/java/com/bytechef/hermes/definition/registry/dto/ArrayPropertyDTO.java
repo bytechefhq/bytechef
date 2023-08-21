@@ -24,6 +24,7 @@ import com.bytechef.hermes.definition.Property.ArrayProperty;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -70,5 +71,33 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ArrayPropertyDTO that))
+            return false;
+        return multipleValues == that.multipleValues && Objects.equals(items, that.items)
+            && Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(items, multipleValues, options, optionsDataSource);
+    }
+
+    @Override
+    public String toString() {
+        return "ArrayPropertyDTO{" +
+            "items=" + items +
+            ", multipleValues=" + multipleValues +
+            ", options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
     }
 }

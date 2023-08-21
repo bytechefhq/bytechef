@@ -21,20 +21,85 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ActionDefinitionBasicDTO(
-    boolean batch, String description, Optional<HelpDTO> help, String name, String title) {
+public class ActionDefinitionBasicDTO {
+
+    protected final boolean batch;
+    protected final String description;
+    protected final HelpDTO help;
+    protected final String name;
+    protected final String title;
 
     public ActionDefinitionBasicDTO(ActionDefinition actionDefinition) {
-        this(
-            OptionalUtils.orElse(actionDefinition.getBatch(), false),
-            ActionDefinitionDTO.getDescription(actionDefinition),
-            OptionalUtils.mapOptional(actionDefinition.getHelp(), HelpDTO::new), actionDefinition.getName(),
-            ActionDefinitionDTO.getTitle(actionDefinition));
+        this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
+        this.description = Objects.requireNonNull(getDescription(actionDefinition));
+        this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), HelpDTO::new, null);
+        this.name = Objects.requireNonNull(actionDefinition.getName());
+        this.title = Objects.requireNonNull(getTitle(actionDefinition));
+    }
+
+    public boolean isBatch() {
+        return batch;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Optional<HelpDTO> getHelp() {
+        return Optional.ofNullable(help);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    private static String getDescription(ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(
+            actionDefinition.getDescription(),
+            OptionalUtils.orElse(actionDefinition.getComponentTitle(), actionDefinition.getComponentName()) +
+                ": " +
+                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
+    }
+
+    private static String getTitle(ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ActionDefinitionBasicDTO that = (ActionDefinitionBasicDTO) o;
+        return batch == that.batch && Objects.equals(description, that.description) && Objects.equals(help, that.help)
+            && Objects.equals(name, that.name) && Objects.equals(title, that.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(batch, description, help, name, title);
+    }
+
+    @Override
+    public String toString() {
+        return "ActionDefinitionBasicDTO{" +
+            "batch=" + batch +
+            ", description='" + description + '\'' +
+            ", help=" + help +
+            ", name='" + name + '\'' +
+            ", title='" + title + '\'' +
+            '}';
     }
 }

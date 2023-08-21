@@ -35,4 +35,11 @@ public class NullPropertyDTO extends ValuePropertyDTO<Void> {
     public Object accept(PropertyVisitor propertyVisitor) {
         return propertyVisitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "NullPropertyDTO{" +
+            "controlType=" + controlType +
+            "} ";
+    }
 }

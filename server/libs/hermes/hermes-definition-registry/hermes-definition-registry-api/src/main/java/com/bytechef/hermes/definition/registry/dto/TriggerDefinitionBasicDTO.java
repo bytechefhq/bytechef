@@ -22,20 +22,90 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record TriggerDefinitionBasicDTO(
-    boolean batch, String description, Optional<HelpDTO> help, String name, String title, TriggerType type) {
+public class TriggerDefinitionBasicDTO {
+
+    protected final boolean batch;
+    protected final String description;
+    protected final HelpDTO help;
+    protected final String name;
+    protected final String title;
+    protected final TriggerType type;
 
     public TriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition) {
-        this(
-            OptionalUtils.orElse(triggerDefinition.getBatch(), false),
-            TriggerDefinitionDTO.getDescription(triggerDefinition),
-            OptionalUtils.mapOptional(triggerDefinition.getHelp(), HelpDTO::new), triggerDefinition.getName(),
-            TriggerDefinitionDTO.getTitle(triggerDefinition), triggerDefinition.getType());
+        this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
+        this.description = Objects.requireNonNull(getDescription(triggerDefinition));
+        this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), HelpDTO::new, null);
+        this.name = Objects.requireNonNull(triggerDefinition.getName());
+        this.title = Objects.requireNonNull(getTitle(triggerDefinition));
+        this.type = Objects.requireNonNull(triggerDefinition.getType());
+    }
+
+    public boolean isBatch() {
+        return batch;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public HelpDTO getHelp() {
+        return help;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public TriggerType getType() {
+        return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof TriggerDefinitionBasicDTO that))
+            return false;
+        return batch == that.batch && Objects.equals(description, that.description) && Objects.equals(help, that.help)
+            && Objects.equals(name, that.name) && Objects.equals(title, that.title) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(batch, description, help, name, title, type);
+    }
+
+    @Override
+    public String toString() {
+        return "TriggerDefinitionBasicDTO{" +
+            "batch=" + batch +
+            ", description='" + description + '\'' +
+            ", help=" + help +
+            ", name='" + name + '\'' +
+            ", title='" + title + '\'' +
+            ", type=" + type +
+            '}';
+    }
+
+    private static String getDescription(TriggerDefinition triggerDefinition) {
+        return OptionalUtils.orElse(
+            triggerDefinition.getDescription(),
+            OptionalUtils.orElse(triggerDefinition.getComponentTitle(), triggerDefinition.getComponentName()) +
+                ": " +
+                getTitle(triggerDefinition));
+    }
+
+    private static String getTitle(TriggerDefinition triggerDefinition) {
+        return OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName());
     }
 }

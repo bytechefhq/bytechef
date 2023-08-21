@@ -17,16 +17,70 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record OptionDTO(String description, String displayCondition, String name, Object value) {
+public class OptionDTO {
+
+    private final String description;
+    private final String displayCondition;
+    private final String name;
+    private final Object value;
 
     public OptionDTO(Option<?> option) {
-        this(option.getDescription(), option.getDisplayCondition(), option.getName(), option.getValue());
+        this.description = OptionalUtils.orElse(option.getDescription(), null);
+        this.displayCondition = option.getDisplayCondition();
+        this.name = option.getName();
+        this.value = option.getValue();
+    }
+
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public String getDisplayCondition() {
+        return displayCondition;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof OptionDTO optionDTO))
+            return false;
+        return Objects.equals(description, optionDTO.description)
+            && Objects.equals(displayCondition, optionDTO.displayCondition) && Objects.equals(name, optionDTO.name)
+            && Objects.equals(value, optionDTO.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, displayCondition, name, value);
+    }
+
+    @Override
+    public String toString() {
+        return "OptionDTO{" +
+            "description='" + description + '\'' +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", name='" + name + '\'' +
+            ", value=" + value +
+            '}';
     }
 }

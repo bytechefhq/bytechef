@@ -19,22 +19,44 @@ package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record PropertiesDataSourceDTO(List<String> loadPropertiesDependsOn) {
+public class PropertiesDataSourceDTO {
 
-    public PropertiesDataSourceDTO {
-        Assert.notNull(loadPropertiesDependsOn, "'loadPropertiesDependsOn' must not be null.");
-        Assert.notEmpty(loadPropertiesDependsOn, "'loadPropertiesDependsOn' must not be empty.");
-    }
+    private final List<String> loadPropertiesDependsOn;
 
     public PropertiesDataSourceDTO(PropertiesDataSource propertiesDataSource) {
-        this(propertiesDataSource.getLoadPropertiesDependsOn());
+        this.loadPropertiesDependsOn = Objects.requireNonNull(propertiesDataSource.getLoadPropertiesDependsOn());
+    }
+
+    public List<String> getLoadPropertiesDependsOn() {
+        return loadPropertiesDependsOn;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof PropertiesDataSourceDTO that))
+            return false;
+        return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(loadPropertiesDependsOn);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertiesDataSourceDTO{" +
+            "loadPropertiesDependsOn=" + loadPropertiesDependsOn +
+            '}';
     }
 }

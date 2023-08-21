@@ -22,49 +22,97 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ActionDefinitionDTO(
-    boolean batch, String description, boolean editorDescriptionDataSource, Optional<HelpDTO> help,
-    String name, PropertyDTO outputSchema, boolean outputSchemaDataSource,
-    List<? extends PropertyDTO> properties, Optional<Object> sampleOutput, boolean sampleOutputDataSource,
-    String title) {
+public class ActionDefinitionDTO extends ActionDefinitionBasicDTO {
+
+    private final boolean editorDescriptionDataSource;
+    private final PropertyDTO outputSchema;
+    private final boolean outputSchemaDataSource;
+    private final List<? extends PropertyDTO> properties;
+    private final Object sampleOutput;
+    private final boolean sampleOutputDataSource;
 
     public ActionDefinitionDTO(ActionDefinition actionDefinition) {
-        this(
-            OptionalUtils.orElse(actionDefinition.getBatch(), false),
-            getDescription(actionDefinition),
-            OptionalUtils.mapOrElse(
-                actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
-            OptionalUtils.mapOptional(actionDefinition.getHelp(), HelpDTO::new), actionDefinition.getName(),
-            OptionalUtils.mapOrElse(actionDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null),
-            OptionalUtils.mapOrElse(
-                actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
-            CollectionUtils.map(
-                OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
-                PropertyDTO::toPropertyDTO),
-            actionDefinition.getSampleOutput(),
-            OptionalUtils.mapOrElse(
-                actionDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false),
-            getTitle(actionDefinition));
+        super(actionDefinition);
+
+        this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
+            actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false);
+        this.outputSchema = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputSchema(), PropertyDTO::toPropertyDTO, null);
+        this.outputSchemaDataSource = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false);
+        this.properties = CollectionUtils.map(
+            OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), PropertyDTO::toPropertyDTO);
+        this.sampleOutput = OptionalUtils.orElse(actionDefinition.getSampleOutput(), null);
+        this.sampleOutputDataSource = OptionalUtils.mapOrElse(
+            actionDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false);
     }
 
-    public static String getDescription(ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(
-            actionDefinition.getDescription(),
-            ComponentDefinitionDTO.getTitle(
-                actionDefinition.getComponentName(),
-                OptionalUtils.orElse(actionDefinition.getComponentTitle(), null)) + ": "
-                + getTitle(actionDefinition));
+    public boolean isEditorDescriptionDataSource() {
+        return editorDescriptionDataSource;
     }
 
-    public static String getTitle(ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
+    public Optional<PropertyDTO> getOutputSchema() {
+        return Optional.ofNullable(outputSchema);
+    }
+
+    public boolean isOutputSchemaDataSource() {
+        return outputSchemaDataSource;
+    }
+
+    public List<? extends PropertyDTO> getProperties() {
+        return properties;
+    }
+
+    public Optional<Object> getSampleOutput() {
+        return Optional.ofNullable(sampleOutput);
+    }
+
+    public boolean isSampleOutputDataSource() {
+        return sampleOutputDataSource;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ActionDefinitionDTO that))
+            return false;
+        if (!super.equals(o))
+            return false;
+        return editorDescriptionDataSource == that.editorDescriptionDataSource
+            && outputSchemaDataSource == that.outputSchemaDataSource
+            && sampleOutputDataSource == that.sampleOutputDataSource && Objects.equals(outputSchema, that.outputSchema)
+            && Objects.equals(properties, that.properties) && Objects.equals(sampleOutput, that.sampleOutput);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
+            properties, sampleOutput, sampleOutputDataSource);
+    }
+
+    @Override
+    public String toString() {
+        return "ActionDefinitionDTO{" +
+            "editorDescriptionDataSource=" + editorDescriptionDataSource +
+            ", outputSchema=" + outputSchema +
+            ", outputSchemaDataSource=" + outputSchemaDataSource +
+            ", properties=" + properties +
+            ", sampleOutput=" + sampleOutput +
+            ", sampleOutputDataSource=" + sampleOutputDataSource +
+            ", batch=" + batch +
+            ", description='" + description + '\'' +
+            ", help=" + help +
+            ", name='" + name + '\'' +
+            ", title='" + title + '\'' +
+            "} ";
     }
 }
