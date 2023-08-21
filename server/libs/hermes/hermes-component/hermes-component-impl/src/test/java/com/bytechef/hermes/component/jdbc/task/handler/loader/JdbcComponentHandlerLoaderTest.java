@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.handler;
+package com.bytechef.hermes.component.jdbc.task.handler.loader;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,11 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentTriggerHandlerTest {
+public class JdbcComponentHandlerLoaderTest {
 
     @Disabled
     @Test
-    public void testHandle() {
+    public void testLoadComponentTaskHandlerFactories() {
         // TODO
     }
 }

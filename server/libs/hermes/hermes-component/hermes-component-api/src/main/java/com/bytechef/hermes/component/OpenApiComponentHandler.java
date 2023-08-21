@@ -74,11 +74,11 @@ public interface OpenApiComponentHandler extends ComponentHandler {
 
     /**
      *
-     * @param actionDefinition
+     * @param modifiableActionDefinition
      * @return
      */
-    default ModifiableActionDefinition modifyAction(ModifiableActionDefinition actionDefinition) {
-        return actionDefinition;
+    default ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
+        return modifiableActionDefinition;
     }
 
     /**
@@ -92,22 +92,24 @@ public interface OpenApiComponentHandler extends ComponentHandler {
 
     /**
      *
-     * @param connectionDefinition
+     * @param modifiableConnectionDefinition
      * @return
      */
-    default ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
-        return connectionDefinition;
+    default ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition;
     }
 
     /**
      *
-     * @param property
+     * @param modifiableProperty
      * @return
      */
     default ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> property) {
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        return property;
+        return modifiableProperty;
     }
 
     /**

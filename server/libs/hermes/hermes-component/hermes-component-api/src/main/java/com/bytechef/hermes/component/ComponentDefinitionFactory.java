@@ -26,6 +26,12 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  */
 public interface ComponentDefinitionFactory {
 
+    /**
+     *
+     * @return
+     */
+    ComponentDefinition getDefinition();
+
     default String getName() {
         ComponentDefinition componentDefinition = getDefinition();
 
@@ -37,10 +43,4 @@ public interface ComponentDefinitionFactory {
 
         return componentDefinition.getVersion();
     }
-
-    /**
-     *
-     * @return
-     */
-    ComponentDefinition getDefinition();
 }

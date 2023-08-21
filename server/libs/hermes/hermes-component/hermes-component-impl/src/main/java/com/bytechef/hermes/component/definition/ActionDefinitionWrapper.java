@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author Ivica Cardic
@@ -49,7 +50,9 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     protected final SampleOutputDataSource sampleOutputDataSource;
     protected final String title;
 
-    public ActionDefinitionWrapper(ActionDefinition actionDefinition) {
+    public ActionDefinitionWrapper(
+        ActionDefinition actionDefinition, Supplier<PerformFunction> performFunctionSupplier) {
+
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
         this.componentName = actionDefinition.getComponentName();
         this.componentDescription = OptionalUtils.orElse(actionDefinition.getComponentDescription(), null);
@@ -58,7 +61,7 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
         this.editorDescriptionDataSource =
             OptionalUtils.orElse(actionDefinition.getEditorDescriptionDataSource(), null);
-        this.performFunction = OptionalUtils.orElse(actionDefinition.getPerform(), null);
+        this.performFunction = performFunctionSupplier.get();
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
         this.name = actionDefinition.getName();

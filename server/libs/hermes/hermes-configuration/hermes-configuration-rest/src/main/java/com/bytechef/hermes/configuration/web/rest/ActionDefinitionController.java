@@ -56,7 +56,7 @@ public class ActionDefinitionController implements ActionDefinitionsApi {
                     .map(ComponentOperation::ofType)
                     .toList())
                 .stream()
-                .map(action -> conversionService.convert(action, ActionDefinitionModel.class))
+                .map(actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class))
                 .toList());
     }
 }

@@ -26,6 +26,8 @@ import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Objects;
+
 /**
  * @author Ivica Cardic
  */
@@ -45,7 +47,8 @@ public class WorkerHandlerConfiguration {
 
             return actionDefinitionService.executePerform(
                 componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName(), taskExecution.getId(), taskExecution.getParameters(),
+                componentOperation.operationName(), Objects.requireNonNull(taskExecution.getId()),
+                taskExecution.getParameters(),
                 MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
         };
     }

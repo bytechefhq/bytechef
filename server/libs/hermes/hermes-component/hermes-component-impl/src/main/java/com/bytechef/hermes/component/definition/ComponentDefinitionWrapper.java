@@ -17,7 +17,10 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.hermes.component.util.CustomActionUtils;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -27,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -49,8 +54,30 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     protected final String title;
     protected final List<? extends TriggerDefinition> triggers;
 
-    public ComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
-        this.actions = OptionalUtils.orElse(componentDefinition.getActions(), null);
+    public ComponentDefinitionWrapper(
+        ComponentHandler componentHandler,
+        BiFunction<ComponentHandler, ActionDefinition, ActionDefinition> actionDefinitionMapper) {
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        List<ActionDefinition> actionDefinitions = OptionalUtils.mapOrElse(
+            componentDefinition.getActions(),
+            curActionDefinitions -> CollectionUtils.map(
+                curActionDefinitions,
+                (Function<ActionDefinition, ActionDefinition>) actionDefinition -> actionDefinitionMapper
+                    .apply(componentHandler, actionDefinition)),
+            List.of());
+
+        // Custom Actions support
+
+        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
+            actionDefinitions = new ArrayList<>(actionDefinitions);
+
+            actionDefinitions.add(CustomActionUtils.getCustomActionDefinition(componentDefinition));
+        }
+
+        this.actions = actionDefinitions;
+
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);

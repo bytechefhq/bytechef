@@ -15,19 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.oas.task.handler;
+package com.bytechef.atlas.worker.task.factory;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentDefinitionFactoryBeanDefinitionLoaderTest {
+public interface TaskDispatcherAdapterFactory {
 
-    @Disabled
-    @Test
-    public void testCreateTaskHandler() {
-        // TODO
-    }
+    TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver);
+
+    String getName();
 }

@@ -26,6 +26,9 @@ import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
 
+/**
+ * @author Ivica Cardic
+ */
 public interface ComponentDefinitionRegistry {
 
     ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName);

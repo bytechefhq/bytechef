@@ -29,8 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -53,11 +51,6 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
     @Bean
     ObjectMapper objectMapper() {
         return new ObjectMapper();
-    }
-
-    @EnableCaching
-    @TestConfiguration
-    public static class CacheConfiguration {
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")

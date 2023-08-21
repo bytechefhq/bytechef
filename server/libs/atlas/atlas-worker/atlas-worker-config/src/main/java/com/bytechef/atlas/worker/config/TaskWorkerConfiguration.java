@@ -19,18 +19,22 @@
 
 package com.bytechef.atlas.worker.config;
 
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
-import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
+import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +60,17 @@ public class TaskWorkerConfiguration {
 
         this.taskDispatcherAdapterTaskHandlerFactories = taskDispatcherAdapterTaskHandlerFactories == null
             ? Collections.emptyList() : taskDispatcherAdapterTaskHandlerFactories;
+    }
+
+    @Bean
+    TaskHandlerRegistry taskHandlerRegistry(
+        Map<String, TaskHandler<?>> taskHandlerMap,
+        @Autowired(required = false) TaskHandlerMapFactory taskHandlerMapFactory) {
+
+        return MapUtils.concat(
+            taskHandlerMap,
+            taskHandlerMapFactory.getTaskHandlerMap() == null
+                ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap())::get;
     }
 
     @Bean

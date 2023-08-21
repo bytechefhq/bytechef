@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.component.util;
+package com.bytechef.hermes.component.util;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -26,7 +26,6 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Help;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.definition.Property.ControlType;
 import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
@@ -53,7 +52,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class CustomActionUtils {
 
-    public static final String CUSTOM = "custom";
+    private static final String CUSTOM = "custom";
 
     private static final String BODY_CONTENT = "bodyContent";
     private static final String BODY_CONTENT_MIME_TYPE = "bodyContentMimeType";

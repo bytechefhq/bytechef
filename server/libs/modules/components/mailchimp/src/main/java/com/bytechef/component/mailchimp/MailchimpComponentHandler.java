@@ -53,20 +53,22 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     }
 
     @Override
-    public ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
-        return connectionDefinition.baseUri(connectionParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
-            MailchimpUtils.getMailChimpServer(
-                MapUtils.getRequiredString(connectionParameters, ACCESS_TOKEN))));
+    public ModifiableConnectionDefinition
+        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+        return modifiableConnectionDefinition
+            .baseUri(connectionParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
+                MailchimpUtils.getMailChimpServer(
+                    MapUtils.getRequiredString(connectionParameters, ACCESS_TOKEN))));
     }
 
     @Override
     public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> property) {
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(property.getName(), "listId")) {
-            ((ModifiableStringProperty) property).options(MailchimpUtils.getListIdOptions());
+        if (Objects.equals(modifiableProperty.getName(), "listId")) {
+            ((ModifiableStringProperty) modifiableProperty).options(MailchimpUtils.getListIdOptions());
         }
 
-        return property;
+        return modifiableProperty;
     }
 }

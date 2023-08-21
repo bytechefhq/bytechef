@@ -23,11 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentDefinitionFactoryBeanDefinitionLoaderTest {
+public class ComponentTriggerHandlerTest {
 
     @Disabled
     @Test
-    public void testLoadComponentTaskHandlerFactories() {
+    public void testHandle() {
         // TODO
     }
 }

@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.var;
+package com.bytechef.hermes.definition.registry.component.factory;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import com.bytechef.hermes.component.ComponentHandler;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class VarComponentHandlerTest {
+public interface ComponentHandlerListFactory {
 
-    @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/var_v1.json", new VarComponentHandler().getDefinition());
-    }
+    List<? extends ComponentHandler> getComponentHandlers();
 }
