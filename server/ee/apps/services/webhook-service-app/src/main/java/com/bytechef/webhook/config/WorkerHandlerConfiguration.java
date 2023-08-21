@@ -22,7 +22,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +41,7 @@ public class WorkerHandlerConfiguration {
     @Bean
     TaskHandlerRegistry taskHandlerRegistry() {
         return type -> (TaskHandler<?>) taskExecution -> {
-            ComponentOperation componentOperation = ComponentUtils.getComponentOperation(type);
+            ComponentOperation componentOperation = ComponentOperation.ofType(type);
 
             return actionDefinitionService.executePerform(
                 componentOperation.componentName(), componentOperation.componentVersion(),

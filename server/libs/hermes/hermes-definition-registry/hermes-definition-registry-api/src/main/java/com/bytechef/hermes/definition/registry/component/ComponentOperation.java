@@ -25,4 +25,10 @@ package com.bytechef.hermes.definition.registry.component;
  * @param operationName    The component action or trigger name
  */
 public record ComponentOperation(String componentName, int componentVersion, String operationName) {
+
+    public static ComponentOperation ofType(String type) {
+        String[] typeItems = type.split("/");
+
+        return new ComponentOperation(typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems[2]);
+    }
 }
