@@ -48,7 +48,6 @@ import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDef
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.message.broker.MessageBroker;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -126,10 +125,9 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionFacade triggerDefinitionFacade(
-        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService,
-        @Value("bytechef.webhookUrl") String webhookUrl) {
+        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
 
-        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService, webhookUrl);
+        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService);
     }
 
     @Bean

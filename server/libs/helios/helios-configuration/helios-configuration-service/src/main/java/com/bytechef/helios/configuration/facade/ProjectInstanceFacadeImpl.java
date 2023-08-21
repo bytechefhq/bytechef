@@ -57,13 +57,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private final ProjectService projectService;
     private final TagService tagService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
+    private final String webhookUrl;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
         JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade, WorkflowService workflowService) {
+        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade, String webhookUrl,
+        WorkflowService workflowService) {
 
         this.jobFacade = jobFacade;
         this.projectInstanceService = projectInstanceService;
@@ -71,6 +73,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         this.projectService = projectService;
         this.tagService = tagService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
+        this.webhookUrl = webhookUrl;
         this.workflowService = workflowService;
     }
 
@@ -306,7 +309,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
-                getConnectionId(workflowTrigger));
+                getConnectionId(workflowTrigger), webhookUrl);
         }
     }
 
