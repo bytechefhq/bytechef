@@ -18,7 +18,7 @@
 package com.bytechef.commons.discovery.util;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;
@@ -77,7 +77,7 @@ public class WorkerDiscoveryUtils {
                 List<Map<String, String>> components = JsonUtils.read(componentsString, objectMapper);
 
                 return components.stream()
-                    .map(componentMap -> MapValueUtils.getString(componentMap, "name"))
+                    .map(componentMap -> MapUtils.getString(componentMap, "name"))
                     .toList();
             }
         }

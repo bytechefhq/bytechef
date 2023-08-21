@@ -137,13 +137,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<ListenerEnableConsumer> getListenerEnable();
+    Optional<ListenerDisableConsumer> getListenerDisable();
 
     /**
      *
      * @return
      */
-    Optional<ListenerDisableConsumer> getListenerDisable();
+    Optional<ListenerEnableConsumer> getListenerEnable();
 
     /**
      *
@@ -200,6 +200,13 @@ public interface TriggerDefinition {
     TriggerType getType();
 
     /**
+     * TODO
+     *
+     * @return
+     */
+    Optional<Boolean> getWebhookRawBody();
+
+    /**
      *
      * @return
      */
@@ -210,14 +217,14 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<Boolean> getWebhookBodyRaw();
+    Optional<Boolean> getWorkflowSyncExecution();
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<Boolean> getWorkflowSyncExecution();
+    Optional<Boolean> getWorkflowSyncValidation();
 
     /**
      *
@@ -261,18 +268,6 @@ public interface TriggerDefinition {
 
     /**
      *
-     * @param connection
-     * @param inputParameters
-     * @param webhookUrl
-     * @param workflowExecutionId
-     */
-    @SuppressFBWarnings("EI")
-    record DynamicWebhookEnableContext(
-        Connection connection, Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId) {
-    }
-
-    /**
-     *
      */
     @FunctionalInterface
     interface DynamicWebhookEnableFunction {
@@ -280,7 +275,7 @@ public interface TriggerDefinition {
         /**
          * @param context
          */
-        DynamicWebhookEnableOutput apply(DynamicWebhookEnableContext context);
+        DynamicWebhookEnableOutput apply(EnableDynamicWebhookContext context);
 
     }
 
@@ -290,7 +285,7 @@ public interface TriggerDefinition {
      * @param webhookExpirationDate
      */
     @SuppressFBWarnings("EI")
-    record DynamicWebhookEnableOutput(Map<String, Object> parameters, LocalDateTime webhookExpirationDate) {
+    record DynamicWebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
 
         public Object getParameter(String key) {
             return parameters.get(key);
@@ -317,8 +312,9 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record DynamicWebhookRequestContext(
-        Map<String, ?> inputParameters, WebhookHeaders headers, WebhookParameters parameters, WebhookBody body,
-        WebhookMethod method, DynamicWebhookEnableOutput dynamicWebhookEnableOutput, TriggerContext triggerContext) {
+        Map<String, ?> inputParameters, Map<String, String[]> headers, Map<String, String[]> parameters,
+        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
+        TriggerContext triggerContext) {
     }
 
     /**
@@ -338,16 +334,24 @@ public interface TriggerDefinition {
 
     /**
      *
+     * @param connection
+     * @param inputParameters
+     * @param webhookUrl
+     * @param workflowExecutionId
      */
-    @FunctionalInterface
-    interface ListenerEnableConsumer {
+    @SuppressFBWarnings("EI")
+    record EnableDynamicWebhookContext(
+        Connection connection, Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId) {
+    }
 
-        /**
-         * @param connection
-         * @param inputParameters
-         * @param workflowExecutionId
-         */
-        void accept(Connection connection, Map<String, ?> inputParameters, String workflowExecutionId);
+    /**
+     * @param inputParameters
+     * @param closureParameters
+     * @param triggerContext
+     */
+    @SuppressFBWarnings("EI")
+    record PollContext(
+        Map<String, ?> inputParameters, Map<String, Object> closureParameters, TriggerContext triggerContext) {
     }
 
     /**
@@ -365,13 +369,30 @@ public interface TriggerDefinition {
     }
 
     /**
-     * @param inputParameters
-     * @param closureParameters
-     * @param triggerContext
+     *
      */
-    @SuppressFBWarnings("EI")
-    record PollContext(
-        Map<String, ?> inputParameters, Map<String, Object> closureParameters, TriggerContext triggerContext) {
+    interface ListenerEmitter {
+
+        /**
+         * @param output
+         */
+        void emit(Object output);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ListenerEnableConsumer {
+
+        /**
+         * @param connection
+         * @param inputParameters
+         * @param workflowExecutionId
+         */
+        void accept(
+            Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
+            ListenerEmitter listenerEmitter);
     }
 
     /**
@@ -416,8 +437,8 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record StaticWebhookRequestContext(
-        Map<String, ?> inputParameters, WebhookHeaders headers, WebhookParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext triggerContext) {
+        Map<String, ?> inputParameters, Map<String, String[]> headers, Map<String, String[]> parameters,
+        WebhookBody body, WebhookMethod method, TriggerContext triggerContext) {
     }
 
     /**
@@ -450,29 +471,12 @@ public interface TriggerDefinition {
     /**
      *
      */
-    interface WebhookHeaders {
+    record WebhookBody(Object content, ContentType contentType, String mimeType) {
 
         /**
          *
-         * @param name
-         * @return
          */
-        String getValue(String name);
-
-        /**
-         *
-         * @param name
-         * @return
-         */
-        String[] getValues(String name);
-    }
-
-    /**
-     *
-     */
-    interface WebhookBody {
-
-        enum ContentType {
+        public enum ContentType {
             BINARY,
             FORM_DATA,
             FORM_URL_ENCODED,
@@ -480,24 +484,6 @@ public interface TriggerDefinition {
             RAW,
             XML
         }
-
-        /**
-         *
-         * @return
-         */
-        <T> T getContent();
-
-        /**
-         *
-         * @return
-         */
-        ContentType getContentType();
-
-        /**
-         *
-         * @return
-         */
-        String getMimeType();
     }
 
     /**
@@ -585,26 +571,6 @@ public interface TriggerDefinition {
     }
 
     /**
-     *
-     */
-    interface WebhookParameters {
-
-        /**
-         *
-         * @param name
-         * @return
-         */
-        String getValue(String name);
-
-        /**
-         *
-         * @param name
-         * @return
-         */
-        String[] getValues(String name);
-    }
-
-    /**
      * @param inputParameters
      * @param headers
      * @param parameters
@@ -614,8 +580,8 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record WebhookValidateContext(
-        Map<String, ?> inputParameters, WebhookHeaders headers, WebhookParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext triggerContext) {
+        Map<String, ?> inputParameters, Map<String, String[]> headers, Map<String, String[]> parameters,
+        WebhookBody body, WebhookMethod method, TriggerContext triggerContext) {
     }
 
     /**
@@ -630,6 +596,5 @@ public interface TriggerDefinition {
          * @return
          */
         boolean apply(WebhookValidateContext context);
-
     }
 }

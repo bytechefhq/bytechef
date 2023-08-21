@@ -64,7 +64,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(TaskMessageRoute.TASKS_COMPLETIONS, message -> {
+        messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, message -> {
             TaskExecution completionTaskExecution = (TaskExecution) message;
 
             result.add(completionTaskExecution.getOutput());
@@ -80,12 +80,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             errors.add(error);
         });
 
-        TaskWorker worker = TaskWorker.builder()
-            .taskHandlerResolver(taskHandlerResolver)
-            .messageBroker(messageBroker)
-            .eventPublisher(e -> {})
-            .executorService(new CurrentThreadExecutorService())
-            .build();
+        TaskWorker worker = new TaskWorker(
+            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver);
 
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 

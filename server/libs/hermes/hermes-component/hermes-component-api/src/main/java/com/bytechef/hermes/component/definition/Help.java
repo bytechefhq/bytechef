@@ -19,6 +19,8 @@ package com.bytechef.hermes.component.definition;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  *
@@ -36,5 +38,5 @@ public interface Help {
      *
      * @return
      */
-    String getLearnMoreUrl();
+    Optional<String> getLearnMoreUrl();
 }

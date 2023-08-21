@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.bytechef.commons.util.MimeTypeUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.tika.Tika;
 import org.springframework.util.Assert;
 
 /**
@@ -63,9 +63,7 @@ public class FileEntry {
             .map(f -> f.substring(filename.lastIndexOf(".") + 1))
             .orElse("");
 
-        Tika tika = new Tika();
-
-        this.mimeType = tika.detect(filename);
+        this.mimeType = MimeTypeUtils.getMimeType(extension);
 
         Path path = Paths.get(filename);
 

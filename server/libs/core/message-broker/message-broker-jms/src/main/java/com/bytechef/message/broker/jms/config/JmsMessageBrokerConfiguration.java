@@ -20,13 +20,13 @@
 package com.bytechef.message.broker.jms.config;
 
 import com.bytechef.message.broker.MessageRoute;
-import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.jms.JmsMessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
@@ -58,15 +58,21 @@ public class JmsMessageBrokerConfiguration
 
     private static final Logger logger = LoggerFactory.getLogger(JmsMessageBrokerConfiguration.class);
 
-    @Autowired
-    private ConnectionFactory connectionFactory;
+    private final ConnectionFactory connectionFactory;
+    private final List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @SuppressFBWarnings("EI")
+    public JmsMessageBrokerConfiguration(
+        ConnectionFactory connectionFactory,
+        @Autowired(
+            required = false) List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers,
+        ObjectMapper objectMapper) {
 
-    @Autowired(required = false)
-    private List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers = Collections
-        .emptyList();
+        this.connectionFactory = connectionFactory;
+        this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void configureJmsListeners(JmsListenerEndpointRegistrar listenerEndpointRegistrar) {
@@ -79,10 +85,6 @@ public class JmsMessageBrokerConfiguration
     public void registerListenerEndpoint(
         JmsListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
         Object delegate, String methodName) {
-
-        if (messageRoute.isControlExchange()) {
-            messageRoute = SystemMessageRoute.CONTROL;
-        }
 
         Class<?> delegateClass = delegate.getClass();
 

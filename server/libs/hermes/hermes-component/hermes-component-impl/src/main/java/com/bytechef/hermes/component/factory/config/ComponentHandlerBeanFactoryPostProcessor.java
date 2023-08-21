@@ -19,13 +19,12 @@ package com.bytechef.hermes.component.factory.config;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.oas.handler.OpenApiComponentHandlerBeanDefinitionLoader;
-import com.bytechef.hermes.component.handler.ComponentHandlerBeanDefinitionLoader;
-import com.bytechef.hermes.component.handler.ComponentHandlerBeanDefinitionLoader.HandlerBeanDefinitionEntry;
-import com.bytechef.hermes.component.handler.ComponentHandlerBeanDefinitionLoader.ComponentHandlerBeanDefinition;
-import com.bytechef.hermes.component.jdbc.handler.JdbcComponentHandlerBeanDefinitionLoader;
-import com.bytechef.hermes.component.handler.DefaultComponentHandlerBeanDefinitionLoader;
+import com.bytechef.hermes.component.oas.loader.OpenAPIComponentDefinitionFactoryBeanDefinitionLoader;
+import com.bytechef.hermes.component.loader.ComponentDefinitionFactoryBeanDefinitionLoader;
+import com.bytechef.hermes.component.loader.ComponentDefinitionFactoryBeanDefinitionLoader.HandlerBeanDefinitionEntry;
+import com.bytechef.hermes.component.loader.ComponentDefinitionFactoryBeanDefinitionLoader.ComponentDefinitionFactoryBeanDefinition;
+import com.bytechef.hermes.component.jdbc.loader.JdbcComponentDefinitionFactoryBeanDefinitionLoader;
+import com.bytechef.hermes.component.loader.DefaultComponentDefinitionFactoryBeanDefinitionLoader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -44,42 +43,42 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private static final List<ComponentHandlerBeanDefinitionLoader> COMPONENT_HANDLER_BEAN_DEFINITION_LOADERS =
+    private static final List<ComponentDefinitionFactoryBeanDefinitionLoader> COMPONENT_DEFINITION_FACTORY__BEAN_DEFINITION_LOADERS =
         List.of(
-            new DefaultComponentHandlerBeanDefinitionLoader(),
-            new JdbcComponentHandlerBeanDefinitionLoader(),
-            new OpenApiComponentHandlerBeanDefinitionLoader());
+            new DefaultComponentDefinitionFactoryBeanDefinitionLoader(),
+            new JdbcComponentDefinitionFactoryBeanDefinitionLoader(),
+            new OpenAPIComponentDefinitionFactoryBeanDefinitionLoader());
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        List<ComponentHandlerBeanDefinition> componentHandlerFactories = COMPONENT_HANDLER_BEAN_DEFINITION_LOADERS
-            .stream()
-            .flatMap(
-                componentHandlerBeanDefinitionLoader -> CollectionUtils.stream(
-                    componentHandlerBeanDefinitionLoader.loadComponentHandlerBeanDefinitions()))
-            .toList();
+        List<ComponentDefinitionFactoryBeanDefinition> componentDefinitionFactoryBeanDefinitions =
+            COMPONENT_DEFINITION_FACTORY__BEAN_DEFINITION_LOADERS.stream()
+                .flatMap(
+                    componentDefinitionFactoryBeanDefinitionLoader -> CollectionUtils.stream(
+                        componentDefinitionFactoryBeanDefinitionLoader.loadComponentDefinitionFactoryBeanDefinitions()))
+                .toList();
 
-        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+        for (ComponentDefinitionFactoryBeanDefinition componentDefinitionFactoryBeanDefinition : componentDefinitionFactoryBeanDefinitions) {
 
-        for (ComponentHandlerBeanDefinition componentHandlerBeanDefinition : componentHandlerFactories) {
             ComponentDefinitionFactory componentDefinitionFactory =
-                componentHandlerBeanDefinition.componentDefinitionFactory();
-
-            ComponentDefinition componentDefinition = componentDefinitionFactory.getDefinition();
+                componentDefinitionFactoryBeanDefinition.componentDefinitionFactory();
 
             beanFactory.registerSingleton(
                 getBeanName(
-                    componentDefinition.getName(), componentDefinition.getVersion(), "ComponentDefinitionFactory", '_'),
+                    componentDefinitionFactory.getName(), componentDefinitionFactory.getVersion(),
+                    "ComponentDefinitionFactory", '_'),
                 componentDefinitionFactory);
 
-            for (HandlerBeanDefinitionEntry handlerBeanDefinitionEntry : componentHandlerBeanDefinition
+            BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+
+            for (HandlerBeanDefinitionEntry handlerBeanDefinitionEntry : componentDefinitionFactoryBeanDefinition
                 .handlerBeanDefinitionEntries()) {
 
                 BeanDefinition handlerBeanDefinition = handlerBeanDefinitionEntry.handlerBeanDefinition();
 
                 beanDefinitionRegistry.registerBeanDefinition(
                     getBeanName(
-                        componentDefinition.getName(), componentDefinition.getVersion(),
+                        componentDefinitionFactory.getName(), componentDefinitionFactory.getVersion(),
                         handlerBeanDefinitionEntry.handlerName(), '/'),
                     handlerBeanDefinition);
             }

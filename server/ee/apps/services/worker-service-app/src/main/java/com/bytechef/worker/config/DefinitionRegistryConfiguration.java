@@ -48,6 +48,7 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.message.broker.MessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -63,17 +64,17 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ActionDefinitionFacade actionDefinitionFacade(
-        ActionDefinitionService actionDefinitionService, ConnectionService connectionService,
-        ContextFactory contextFactory) {
+        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
 
-        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService, contextFactory);
+        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService);
     }
 
     @Bean
     ActionDefinitionService actionDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory) {
 
-        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
+        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory, contextFactory);
     }
 
     @Bean
@@ -130,18 +131,22 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionFacade triggerDefinitionFacade(
-        ConnectionService connectionService, ContextFactory contextFactory,
-        TriggerDefinitionService triggerDefinitionService, @Value("bytechef.webhookUrl") String webhookUrl) {
+        ConnectionService connectionService,
+        TriggerDefinitionService triggerDefinitionService,
+        @Value("bytechef.webhookUrl") String webhookUrl) {
 
         return new TriggerDefinitionFacadeImpl(
-            connectionService, contextFactory, triggerDefinitionService, webhookUrl);
+            connectionService, triggerDefinitionService,
+            webhookUrl);
     }
 
     @Bean
     TriggerDefinitionService triggerDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory, MessageBroker messageBroker) {
 
-        return new TriggerDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
+        return new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextConnectionFactory, contextFactory, messageBroker);
     }
 
     /**
@@ -199,13 +204,13 @@ public class DefinitionRegistryConfiguration {
          * Called from the Context.Connection instance.
          */
         @Override
-        public Optional<String> fetchBaseUri(
+        public Optional<String> executeFetchBaseUri(
             String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
             if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
-                return connectionDefinitionService.fetchBaseUri(
+                return connectionDefinitionService.executeFetchBaseUri(
                     componentName, connectionVersion, connectionParameters);
             } else {
-                return connectionDefinitionServiceClient.fetchBaseUri(
+                return connectionDefinitionServiceClient.executeFetchBaseUri(
                     componentName, connectionVersion, connectionParameters);
             }
         }

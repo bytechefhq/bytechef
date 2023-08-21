@@ -73,13 +73,14 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         invokerConsumer.accept(message.toString());
     }
 
-    public void registerListenerEndpoint(
-        String queueName, Object delegate, String methodName, MessageRoute.Exchange exchange) {
+    public void registerListenerEndpoint(MessageRoute messageRoute, Object delegate, String methodName) {
+        String queueName = messageRoute.toString();
+
         invokerMap.put(queueName, (String message) -> invoke(delegate, methodName, message));
 
         checkQueueExists(queueName);
 
-        if (exchange == MessageRoute.Exchange.MESSAGE) {
+        if (messageRoute.isMessageExchange()) {
             executorService.submit(() -> periodicallyCheckQueueForMessage(queueName));
         }
     }

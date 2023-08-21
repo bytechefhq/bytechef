@@ -21,12 +21,10 @@ import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 public class WebhookComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() throws IOException {
+    public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/webhook_v1.json", new WebhookComponentHandler().getDefinition());
     }
 

@@ -86,10 +86,6 @@ public class TaskWorkerConfiguration {
     TaskWorker taskWorker(
         EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver) {
 
-        return TaskWorker.builder()
-            .eventPublisher(eventPublisher)
-            .messageBroker(messageBroker)
-            .taskHandlerResolver(taskHandlerResolver)
-            .build();
+        return new TaskWorker(eventPublisher, messageBroker, taskHandlerResolver);
     }
 }

@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ComponentOperation;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 
 import java.util.List;
@@ -30,29 +30,33 @@ import java.util.Map;
  */
 public interface ActionDefinitionService {
 
+    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
+        String authorizationName);
+
     String executeEditorDescription(
         String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        String authorizationName, Map<String, ?> connectionParameters);
-
-    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        int componentVersion, String componentName, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters);
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters,
-        String searchText);
+        Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
+        String authorizationName);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        String authorizationName, Map<String, ?> connectionParameters);
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
+
+    Object executePerform(
+        String componentName, int componentVersion, String actionName, long taskExecutionId,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap);
 
     Object executeSampleOutput(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        String authorizationName, Map<String, ?> connectionParameters);
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
-    ActionDefinitionDTO getActionDefinition(
-        String componentName, int componentVersion, String actionName);
+    ActionDefinitionDTO getActionDefinition(String componentName, int componentVersion, String actionName);
 
     List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
 

@@ -47,6 +47,7 @@ import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceI
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistryImpl;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.message.broker.MessageBroker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,17 +62,18 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ActionDefinitionFacade actionDefinitionFacade(
-        ActionDefinitionService actionDefinitionService, ConnectionService connectionService,
-        ContextFactory contextFactory) {
+        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
 
-        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService, contextFactory);
+        return new ActionDefinitionFacadeImpl(
+            actionDefinitionService, connectionService);
     }
 
     @Bean
     ActionDefinitionService actionDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory) {
 
-        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
+        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory, contextFactory);
     }
 
     @Bean
@@ -124,22 +126,25 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionFacade triggerDefinitionFacade(
-        ConnectionService connectionService, ContextFactory contextFactory,
-        TriggerDefinitionService triggerDefinitionService, @Value("bytechef.webhookUrl") String webhookUrl) {
+        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService,
+        @Value("bytechef.webhookUrl") String webhookUrl) {
 
-        return new TriggerDefinitionFacadeImpl(connectionService, contextFactory, triggerDefinitionService, webhookUrl);
+        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService, webhookUrl);
     }
 
     @Bean
     TaskDispatcherDefinitionService
         taskDispatcherDefinitionService(TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry) {
+
         return new TaskDispatcherDefinitionServiceImpl(taskDispatcherDefinitionRegistry);
     }
 
     @Bean
     TriggerDefinitionService triggerDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory, MessageBroker messageBroker) {
 
-        return new TriggerDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
+        return new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextConnectionFactory, contextFactory, messageBroker);
     }
 }

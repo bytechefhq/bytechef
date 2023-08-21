@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 
@@ -29,7 +28,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public sealed interface ActionDefinition permits ModifiableActionDefinition {
+public interface ActionDefinition {
 
     /**
      * TODO
@@ -80,7 +79,7 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return
      */
-    Map<String, Object> getMetadata();
+    Optional<Map<String, Object>> getMetadata();
 
     /**
      *

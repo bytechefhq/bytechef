@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.definition;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
@@ -26,7 +28,7 @@ public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
      *
      * @return
      */
-    String getDescription();
+    Optional<String> getDescription();
 
     /**
      *

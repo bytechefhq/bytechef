@@ -20,14 +20,16 @@ package com.bytechef.component.hubspot.trigger;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
@@ -143,20 +145,27 @@ public class HubspotSubscribeTrigger {
                }
             ]
             """)
-        .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
         .dynamicWebhookDisable(HubspotSubscribeTrigger::dynamicWebhookDisable)
+        .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
         .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
 
     protected static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
         HttpClientUtils
-            .delete("/webhooks/v3/%s/settings".formatted(MapValueUtils.getString(context.inputParameters(), APP_ID)))
+            .delete("/webhooks/v3/%s/settings".formatted(MapUtils.getString(context.inputParameters(), APP_ID)))
             .execute();
     }
 
+    @SuppressWarnings("unchecked")
+    protected static WebhookOutput dynamicWebhookRequest(DynamicWebhookRequestContext context) {
+        WebhookBody webhookBody = context.body();
+
+        return WebhookOutput.list((List<Map<?, ?>>) webhookBody.content());
+    }
+
     @SuppressFBWarnings("RV")
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
+    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(EnableDynamicWebhookContext context) {
         HttpClientUtils
-            .put("/webhooks/v3/%s/settings".formatted(MapValueUtils.getString(context.inputParameters(), APP_ID)))
+            .put("/webhooks/v3/%s/settings".formatted(MapUtils.getString(context.inputParameters(), APP_ID)))
             .body(HttpClientUtils.Body.of(
                 Map.of(
                     "throttling", Map.of(
@@ -168,22 +177,16 @@ public class HubspotSubscribeTrigger {
             .body();
 
         HttpClientUtils
-            .put("/webhooks/v3/%s/subscriptions".formatted(MapValueUtils.getString(context.inputParameters(), APP_ID)))
+            .put("/webhooks/v3/%s/subscriptions".formatted(MapUtils.getString(context.inputParameters(), APP_ID)))
             .body(HttpClientUtils.Body.of(
                 Map.of(
-                    "eventType", MapValueUtils.getString(context.inputParameters(), EVENT_TYPE),
-                    "propertyName", MapValueUtils.getString(context.inputParameters(), PROPERTY_NAME, ""),
+                    "eventType", MapUtils.getString(context.inputParameters(), EVENT_TYPE),
+                    "propertyName", MapUtils.getString(context.inputParameters(), PROPERTY_NAME, ""),
                     "active", true)))
             .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .execute()
             .body();
 
         return null;
-    }
-
-    protected static WebhookOutput dynamicWebhookRequest(DynamicWebhookRequestContext context) {
-        TriggerDefinition.WebhookBody webhookBody = context.body();
-
-        return WebhookOutput.list(webhookBody.getContent());
     }
 }

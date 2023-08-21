@@ -18,12 +18,14 @@
 package com.bytechef.execution.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.execution.facade.WorkflowExecutionFacadeImpl;
-import com.bytechef.hermes.execution.facade.JobFacade;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,10 +37,12 @@ public class ProjectConfiguration {
 
     @Bean
     WorkflowExecutionFacade projectWorkflowExecutionFacade(
-        JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
-        ProjectService projectService, WorkflowService workflowService) {
+        ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
+        ProjectInstanceService projectInstanceService, ProjectService projectService,
+        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         return new WorkflowExecutionFacadeImpl(
-            jobFacade, jobService, projectInstanceService, projectService, workflowService);
+            componentDefinitionService, contextService, jobService, projectInstanceService, projectService,
+            taskExecutionService, workflowService);
     }
 }

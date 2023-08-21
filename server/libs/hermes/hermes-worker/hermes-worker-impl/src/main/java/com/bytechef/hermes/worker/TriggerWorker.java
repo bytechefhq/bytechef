@@ -18,10 +18,10 @@
 package com.bytechef.hermes.worker;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.execution.event.TriggerStartedWorkflowEvent;
+import com.bytechef.hermes.execution.event.TriggerStartedEvent;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandler.TriggerOutput;
+import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.SystemMessageRoute;
@@ -82,12 +82,12 @@ public class TriggerWorker {
 
         Future<?> future = executorService.submit(() -> {
             try {
-                eventPublisher.publishEvent(new TriggerStartedWorkflowEvent(
+                eventPublisher.publishEvent(new TriggerStartedEvent(
                     Objects.requireNonNull(triggerExecution.getId())));
 
                 TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
-                messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, completedTriggerExecution);
+                messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETE, completedTriggerExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -141,16 +141,16 @@ public class TriggerWorker {
     private TriggerExecution doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        TriggerHandler<?> triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
+        TriggerHandler triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
 
-        TriggerOutput output = triggerHandler.handle(triggerExecution.clone());
+        TriggerOutput triggerOutput = triggerHandler.handle(triggerExecution.clone());
 
-        if (output == null) {
+        if (triggerOutput == null) {
             triggerExecution.setState(null);
         } else {
-            triggerExecution.setBatch(output.batch());
-            triggerExecution.setOutput(output.value());
-            triggerExecution.setState(output.state());
+            triggerExecution.setBatch(triggerOutput.batch());
+            triggerExecution.setOutput(triggerOutput.value());
+            triggerExecution.setState(triggerOutput.state());
         }
 
         triggerExecution.setEndDate(LocalDateTime.now());

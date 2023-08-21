@@ -19,7 +19,7 @@
 
 package com.bytechef.event.listener;
 
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 
 /**
  * @author Arik Cohen
@@ -27,5 +27,5 @@ import com.bytechef.event.WorkflowEvent;
  */
 public interface EventListener {
 
-    void onApplicationEvent(WorkflowEvent workflowEvent);
+    void onApplicationEvent(Event event);
 }

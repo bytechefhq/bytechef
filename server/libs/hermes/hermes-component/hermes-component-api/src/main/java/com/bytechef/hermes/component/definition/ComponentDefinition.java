@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.definition.Resources;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-public sealed interface ComponentDefinition permits ModifiableComponentDefinition {
+public interface ComponentDefinition {
 
     /**
      *
@@ -84,7 +83,7 @@ public sealed interface ComponentDefinition permits ModifiableComponentDefinitio
      *
      * @return
      */
-    Map<String, Object> getMetadata();
+    Optional<Map<String, Object>> getMetadata();
 
     /**
      *

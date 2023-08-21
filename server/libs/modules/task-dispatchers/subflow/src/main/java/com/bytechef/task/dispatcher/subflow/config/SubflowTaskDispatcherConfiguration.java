@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.subflow.config;
 
-import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.JobService;
@@ -36,8 +35,8 @@ import org.springframework.context.annotation.Configuration;
 public class SubflowTaskDispatcherConfiguration {
 
     @Bean("subflowTaskDispatcherResolverFactory_v1")
-    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(JobFactoryFacade jobFactoryFacade) {
-        return (taskDispatcher) -> new SubflowTaskDispatcher(jobFactoryFacade);
+    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(MessageBroker messageBroker) {
+        return (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker);
     }
 
     @Configuration

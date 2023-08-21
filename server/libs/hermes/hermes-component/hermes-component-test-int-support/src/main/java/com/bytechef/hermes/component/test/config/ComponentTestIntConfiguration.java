@@ -20,9 +20,18 @@ package com.bytechef.hermes.component.test.config;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactoryImpl;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -43,7 +52,7 @@ import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
-import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
+import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
@@ -87,6 +96,35 @@ public class ComponentTestIntConfiguration {
 
     @MockBean(name = "dataStorageService")
     private DataStorageService dataStorageService;
+
+    @Bean
+    ActionDefinitionService actionDefinitionService(
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory) {
+
+        return new ActionDefinitionServiceImpl(
+            componentDefinitionRegistry, contextConnectionFactory, contextFactory);
+    }
+
+    @Bean
+    ComponentDefinitionRegistry componentDefinitionRegistry(
+        List<ComponentDefinitionFactory> componentDefinitionFactories) {
+
+        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories);
+    }
+
+    @Bean
+    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
+    }
+
+    @Bean
+    ContextConnectionFactory contextConnectionFactory(
+        ComponentDefinitionService componentDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService) {
+
+        return new ContextConnectionFactoryImpl(componentDefinitionService, connectionDefinitionService);
+    }
 
     @Bean
     ContextFactory contextFactory(
@@ -139,12 +177,12 @@ public class ComponentTestIntConfiguration {
     public static class WorkflowExecutorConfiguration {
 
         @Bean
-        ComponentWorkflowTestSupport componentWorkflowTestSupport(
+        JobTestExecutor componentWorkflowTestSupport(
             ContextService contextService, EventPublisher eventPublisher, JobService jobService,
             TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
             WorkflowService workflowService) {
 
-            return new ComponentWorkflowTestSupport(
+            return new JobTestExecutor(
                 contextService, jobService, eventPublisher, taskExecutionService, taskHandlerMap, workflowService);
         }
 

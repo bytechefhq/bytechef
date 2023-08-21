@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.bytechef.message.broker.MessageRoute;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,19 +45,16 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     private static final MessageRoute DEFAULT_MESSAGE_ROUTE = TaskMessageRoute.TASKS;
 
+    @SuppressFBWarnings("EI")
     public DefaultTaskDispatcher(
         MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
         this.messageBroker = Objects.requireNonNull(messageBroker);
-        this.taskDispatcherPreSendProcessors = taskDispatcherPreSendProcessors == null
-            ? List.of()
-            : taskDispatcherPreSendProcessors;
+        this.taskDispatcherPreSendProcessors = taskDispatcherPreSendProcessors;
     }
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
-            taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
-        }
+        taskExecution = preProcess(taskExecution);
 
         MessageRoute messageRoute = calculateQueueName(taskExecution);
 
@@ -69,14 +67,6 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         messageBroker.send(messageRoute, taskExecution);
     }
 
-    private MessageRoute calculateQueueName(Task task) {
-        TaskExecution taskExecution = (TaskExecution) task;
-
-        return taskExecution.getNode() != null
-            ? TaskMessageRoute.ofRoute(taskExecution.getNode())
-            : DEFAULT_MESSAGE_ROUTE;
-    }
-
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
         if (task instanceof TaskExecution) {
@@ -84,5 +74,21 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         }
 
         return null;
+    }
+
+    private MessageRoute calculateQueueName(Task task) {
+        TaskExecution taskExecution = (TaskExecution) task;
+
+        return taskExecution.getNode() != null
+            ? TaskMessageRoute.ofWorkerRoute(taskExecution.getNode())
+            : DEFAULT_MESSAGE_ROUTE;
+    }
+
+    private TaskExecution preProcess(TaskExecution taskExecution) {
+        for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
+            taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
+        }
+
+        return taskExecution;
     }
 }

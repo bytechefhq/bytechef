@@ -37,7 +37,7 @@ public class DistributedEventPublisher implements EventPublisher {
     }
 
     @Override
-    public void publishEvent(WorkflowEvent workflowEvent) {
-        messageBroker.send(SystemMessageRoute.EVENTS, workflowEvent);
+    public void publishEvent(Event event) {
+        messageBroker.send(SystemMessageRoute.EVENTS, event);
     }
 }

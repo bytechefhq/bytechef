@@ -20,7 +20,7 @@ package com.bytechef.component.script;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
+import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 
@@ -46,7 +46,7 @@ public class ScriptComponentHandlerIntTest {
     };
 
     @Autowired
-    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
+    private JobTestExecutor jobTestExecutor;
 
     @Disabled
     @Test
@@ -56,7 +56,7 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformJavaScript() {
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
@@ -69,7 +69,7 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformPython() {
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
@@ -83,7 +83,7 @@ public class ScriptComponentHandlerIntTest {
     @Disabled
     @Test
     public void testPerformR() {
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
@@ -96,7 +96,7 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformRuby() {
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 

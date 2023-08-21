@@ -19,9 +19,10 @@ package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.time.ZoneId;
@@ -41,7 +42,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  * @author Ivica Cardic
  */
 public class ScheduleIntervalTrigger {
-
     public final ModifiableTriggerDefinition triggerDefinition = trigger("interval")
         .title("Interval")
         .description(
@@ -68,8 +68,8 @@ public class ScheduleIntervalTrigger {
                     string(DATETIME),
                     integer(INTERVAL),
                     integer(TIME_UNIT)))
-        .listenerEnable(this::listenerEnable)
-        .listenerDisable(this::listenerDisable);
+        .listenerDisable(this::listenerDisable)
+        .listenerEnable(this::listenerEnable);
 
     private final TriggerScheduler triggerScheduler;
 
@@ -77,29 +77,30 @@ public class ScheduleIntervalTrigger {
         this.triggerScheduler = triggerScheduler;
     }
 
-    protected void listenerEnable(
+    protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        int interval = MapValueUtils.getInteger(inputParameters, INTERVAL);
+        triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
+    }
+
+    protected void listenerEnable(
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter) {
+
+        int interval = MapUtils.getInteger(inputParameters, INTERVAL);
         ZoneId zoneId = ZoneId.systemDefault();
 
         triggerScheduler.scheduleScheduleTrigger(
-            switch (MapValueUtils.getInteger(inputParameters, TIME_UNIT)) {
+            switch (MapUtils.getInteger(inputParameters, TIME_UNIT)) {
                 case 1 -> "0 */%s * ? * *".formatted(interval);
                 case 2 -> "0 0 */%s ? * *".formatted(interval);
                 case 3 -> "0 0 0 */%s * ?".formatted(interval);
                 case 4 -> "0 0 0 1 */%s ?".formatted(interval);
                 default -> throw new ComponentExecutionException("Unexpected time unit value.");
             }, zoneId.getId(), Map.of(
-                INTERVAL, MapValueUtils.getInteger(inputParameters, INTERVAL),
-                TIME_UNIT, MapValueUtils.getInteger(inputParameters, TIME_UNIT)),
+                INTERVAL, MapUtils.getInteger(inputParameters, INTERVAL),
+                TIME_UNIT, MapUtils.getInteger(inputParameters, TIME_UNIT)),
             workflowExecutionId);
 
-    }
-
-    protected void listenerDisable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
-
-        triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 }

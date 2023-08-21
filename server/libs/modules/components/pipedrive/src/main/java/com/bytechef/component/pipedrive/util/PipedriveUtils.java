@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.definition.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class PipedriveUtils {
                 .queryParameters(
                     dependsOn == null
                         ? Map.of()
-                        : Map.of(dependsOn, List.of(MapValueUtils.getString(inputParameters, dependsOn, ""))))
+                        : Map.of(dependsOn, List.of(MapUtils.getString(inputParameters, dependsOn, ""))))
                 .configuration(responseType(HttpClientUtils.ResponseType.JSON))
                 .execute()
                 .getBody();
@@ -81,7 +81,7 @@ public class PipedriveUtils {
 
             List<Option<?>> options = new ArrayList<>();
 
-            for (Map<?, ?> list : MapValueUtils.getRequiredList(response, "data", Map.class)) {
+            for (Map<?, ?> list : MapUtils.getRequiredList(response, "data", Map.class)) {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 

@@ -54,7 +54,7 @@ public class WebhookAutoRespondWithHTTP200Trigger {
 
         return WebhookOutput.map(
             Map.of(
-                BODY, webhookBody.getContent(),
+                BODY, webhookBody.content(),
                 METHOD, context.method(),
                 HEADERS, context.headers(),
                 PARAMETERS, context.parameters()));

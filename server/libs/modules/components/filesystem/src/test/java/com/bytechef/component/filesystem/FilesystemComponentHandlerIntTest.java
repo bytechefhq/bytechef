@@ -20,7 +20,7 @@ package com.bytechef.component.filesystem;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
+import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -43,13 +43,13 @@ public class FilesystemComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
+    private JobTestExecutor jobTestExecutor;
 
     @Test
     public void testRead() throws IOException {
         File sampleFile = getFile();
 
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("filesystem_v1_readFile".getBytes(StandardCharsets.UTF_8)),
             Map.of("filename", sampleFile.getAbsolutePath()));
@@ -73,7 +73,7 @@ public class FilesystemComponentHandlerIntTest {
         File sampleFile = getFile();
         File tempFile = Files.newTemporaryFile();
 
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(

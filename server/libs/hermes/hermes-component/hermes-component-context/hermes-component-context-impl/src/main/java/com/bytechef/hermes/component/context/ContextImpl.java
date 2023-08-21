@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.context;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.TaskProgressedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskProgressedEvent;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -111,7 +111,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     @Override
     public void publishActionProgressEvent(int progress) {
-        eventPublisher.publishEvent(new TaskProgressedWorkflowEvent(taskExecutionId, progress));
+        eventPublisher.publishEvent(new TaskProgressedEvent(taskExecutionId, progress));
     }
 
     @Override

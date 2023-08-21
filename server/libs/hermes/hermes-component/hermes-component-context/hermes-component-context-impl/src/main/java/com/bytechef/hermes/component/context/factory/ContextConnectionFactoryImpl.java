@@ -51,10 +51,10 @@ public class ContextConnectionFactoryImpl implements ContextConnectionFactory {
             componentName, componentVersion);
 
         ConnectionDefinitionBasicDTO connectionDefinitionBasicDTO = OptionalUtils.get(
-            componentDefinitionDTO.connection());
+            componentDefinitionDTO.getConnection());
 
         return new ContextConnectionImpl(
-            componentName, connectionDefinitionBasicDTO.version(), connectionParameters, authorizationName,
+            componentName, connectionDefinitionBasicDTO.getVersion(), connectionParameters, authorizationName,
             connectionDefinitionService);
     }
 }

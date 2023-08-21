@@ -46,6 +46,7 @@ import com.bytechef.hermes.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.definition.Property;
+
 import java.util.List;
 import java.util.Map;
 
@@ -54,36 +55,35 @@ import java.util.Map;
  */
 public class JdbcComponentHandler implements ComponentHandler {
 
+    private static final DataSourceFactory DATA_SOURCE_FACTORY = new DataSourceFactory();
+
     private final ComponentDefinition componentDefinition;
-    private final String databaseJdbcName;
-    private DeleteJdbcOperation deleteJdbcOperation;
-    private ExecuteJdbcOperation executeJdbcOperation;
-    private InsertJdbcOperation insertJdbcOperation;
-    private final String jdbcDriverClassName;
-    private QueryJdbcOperation queryJdbcOperation;
-    private UpdateJdbcOperation updateJdbcOperation;
+    private final DeleteJdbcOperation deleteJdbcOperation;
+    private final ExecuteJdbcOperation executeJdbcOperation;
+    private final InsertJdbcOperation insertJdbcOperation;
+    private final QueryJdbcOperation queryJdbcOperation;
+    private final UpdateJdbcOperation updateJdbcOperation;
 
     public JdbcComponentHandler(JdbcComponentDefinition jdbcComponentDefinition) {
         this.componentDefinition = getComponentDefinition(
             OptionalUtils.orElse(jdbcComponentDefinition.getDescription(), null), jdbcComponentDefinition.getName(),
-            jdbcComponentDefinition.getIcon(), jdbcComponentDefinition.getTitle());
-        this.databaseJdbcName = jdbcComponentDefinition.getDatabaseJdbcName();
-        this.jdbcDriverClassName = jdbcComponentDefinition.getJdbcDriverClassName();
-    }
+            OptionalUtils.orElse(jdbcComponentDefinition.getIcon(), null),
+            OptionalUtils.orElse(jdbcComponentDefinition.getTitle(), null));
+        String databaseJdbcName = jdbcComponentDefinition.getDatabaseJdbcName();
+        String jdbcDriverClassName = jdbcComponentDefinition.getJdbcDriverClassName();
 
-    @Override
-    public ComponentDefinition getDefinition() {
-        return componentDefinition;
-    }
-
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
-        JdbcExecutor jdbcExecutor = new JdbcExecutor(databaseJdbcName, dataSourceFactory, jdbcDriverClassName);
+        JdbcExecutor jdbcExecutor = new JdbcExecutor(databaseJdbcName, DATA_SOURCE_FACTORY, jdbcDriverClassName);
 
         this.deleteJdbcOperation = new DeleteJdbcOperation(jdbcExecutor);
         this.executeJdbcOperation = new ExecuteJdbcOperation(jdbcExecutor);
         this.insertJdbcOperation = new InsertJdbcOperation(jdbcExecutor);
         this.queryJdbcOperation = new QueryJdbcOperation(jdbcExecutor);
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
+    }
+
+    @Override
+    public ComponentDefinition getDefinition() {
+        return componentDefinition;
     }
 
     protected Map<String, Integer> performDelete(Context context, Map<String, ?> inputParameters) {
