@@ -29,6 +29,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.service.TagService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,11 +43,12 @@ public class ProjectConfiguration {
     ProjectInstanceFacade projectInstanceFacade(
         JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade, WorkflowService workflowService) {
+        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
+        @Value("bytechef.webhookUrl") String webhookUrl, WorkflowService workflowService) {
 
         return new ProjectInstanceFacadeImpl(
             jobFacade, projectInstanceService, projectInstanceWorkflowService, projectService,
-            tagService, triggerLifecycleFacade, workflowService);
+            tagService, triggerLifecycleFacade, webhookUrl, workflowService);
     }
 
     @Bean

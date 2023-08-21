@@ -130,13 +130,14 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId) {
+        String workflowExecutionId, Long connectionId, String webhookUrl) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, "/trigger-definition-facade/execute-dynamic-webhook-enable"),
             new DynamicWebhookEnableRequest(
-                componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId),
+                componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connectionId,
+                webhookUrl),
             DynamicWebhookEnableOutput.class);
     }
 
@@ -183,7 +184,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     private record DynamicWebhookEnableRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId) {
+        String workflowExecutionId, Long connectionId, String webhookUrl) {
     }
 
     private record ListenerDisableRequest(

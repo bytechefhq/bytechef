@@ -39,7 +39,7 @@ public interface TriggerDefinitionFacade {
 
     DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId);
+        String workflowExecutionId, Long connectionId, String webhookUrl);
 
     String executeEditorDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
