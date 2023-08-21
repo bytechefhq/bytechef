@@ -90,6 +90,9 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
                                             projectInstanceEnabled={
                                                 projectInstance.enabled
                                             }
+                                            projectInstanceWorkflows={
+                                                projectInstance.projectInstanceWorkflows
+                                            }
                                         />
                                     </AccordionContent>
                                 </AccordionItem>
