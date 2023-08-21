@@ -4,6 +4,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
@@ -39,11 +40,30 @@ const DataPillPanel = () => {
             ? componentNames.slice(0, currentNodeIndex)
             : [];
 
+    const normalizedPreviousComponentNames = previousComponentNames.map(
+        (name) =>
+            name.match(new RegExp(/-\d$/))
+                ? name.slice(0, name.length - 2)
+                : name
+    );
+
     const {data: previousComponents} = useGetComponentDefinitionsQuery(
         {
-            include: previousComponentNames,
+            include: normalizedPreviousComponentNames,
         },
-        !!previousComponentNames.length
+        !!normalizedPreviousComponentNames.length
+    );
+
+    const {componentActions} = useWorkflowDefinitionStore();
+
+    const taskTypes = componentActions?.map(
+        (componentAction) =>
+            `${componentAction.componentName}/1/${componentAction.actionName}`
+    );
+
+    const {data: actionData} = useGetActionDefinitionsQuery(
+        {taskTypes},
+        !!componentActions?.length
     );
 
     return (
@@ -110,11 +130,14 @@ const DataPillPanel = () => {
                                 value={dataPillFilterQuery}
                             />
 
-                            <DataPillPanelBody
-                                containerHeight={panelContainerHeight}
-                                dataPillFilterQuery={dataPillFilterQuery}
-                                previousComponents={previousComponents!}
-                            />
+                            {actionData?.length && (
+                                <DataPillPanelBody
+                                    actionData={actionData}
+                                    containerHeight={panelContainerHeight}
+                                    dataPillFilterQuery={dataPillFilterQuery}
+                                    previousComponents={previousComponents!}
+                                />
+                            )}
                         </main>
                     </div>
                 </Dialog.Content>

@@ -5,6 +5,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {TagModel} from '@/middleware/helios/configuration';
+import {DataPillType} from '@/types/types';
 
 /// <reference types="vite-plugin-svgr/client" />
 
@@ -51,18 +52,20 @@ export interface PropertyFormProps {
 }
 
 interface PropertyProps {
-    property: PropertyType;
-    customClassName?: string;
     actionName?: string;
+    customClassName?: string;
+    dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
     mention?: boolean;
     path?: string;
+    property: PropertyType;
     register?: UseFormRegister<PropertyFormProps>;
 }
 
 export const Property = ({
     actionName,
     customClassName,
+    dataPills,
     formState,
     mention,
     path = 'parameters',
@@ -151,8 +154,9 @@ export const Property = ({
                     inputPropertyTypes.includes(type!)) && (
                     <InputProperty
                         controlType={controlType}
-                        description={description}
+                        dataPills={dataPills}
                         defaultValue={defaultValue as string}
+                        description={description}
                         error={hasError(name!)}
                         fieldsetClassName="flex-1 mb-0"
                         key={name}
@@ -272,17 +276,19 @@ export const Property = ({
 };
 
 interface PropertiesProps {
-    properties: Array<PropertyType>;
-    customClassName?: string;
     actionName?: string;
+    customClassName?: string;
+    dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
     mention?: boolean;
+    properties: Array<PropertyType>;
     register?: UseFormRegister<PropertyFormProps>;
 }
 
 const Properties = ({
     actionName,
     customClassName,
+    dataPills,
     formState,
     mention,
     properties,
@@ -292,6 +298,7 @@ const Properties = ({
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}
+                dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}
                 mention={mention}
