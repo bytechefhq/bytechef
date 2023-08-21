@@ -174,7 +174,7 @@ public class ComponentTestIntConfiguration {
     }
 
     @TestConfiguration
-    public static class WorkflowExecutorConfiguration {
+    public static class WorkflowExecutionConfiguration {
 
         @Bean
         JobTestExecutor componentWorkflowTestSupport(
