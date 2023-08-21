@@ -48,8 +48,5 @@ dependencies {
     implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-rest")
     implementation project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-client")
 
-    testImplementation "org.apache.activemq:artemis-jakarta-server"
-    testImplementation "org.springframework.boot:spring-boot-starter-artemis"
-    testImplementation project(":server:libs:core:message-broker:message-broker-jms")
     testImplementation project(":server:libs:test:test-int-support")
 }

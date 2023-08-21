@@ -83,7 +83,7 @@ public class TaskDispatcherIntTestConfiguration {
     }
 
     @TestConfiguration
-    public static class WorkflowExecutorConfiguration {
+    public static class WorkflowExecutionConfiguration {
 
         @Bean
         ContextService contextService() {

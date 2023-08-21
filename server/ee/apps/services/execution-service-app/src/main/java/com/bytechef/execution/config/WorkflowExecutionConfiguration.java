@@ -15,39 +15,34 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.execution.config;
 
-import com.bytechef.event.EventPublisher;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.atlas.execution.repository.CounterRepository;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
-import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
+import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
-import org.springframework.cache.CacheManager;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.message.broker.MessageBroker;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-public class WorkflowConfiguration {
+public class WorkflowExecutionConfiguration {
 
     @Bean
     ContextService contextService(ContextRepository contextRepository) {
@@ -60,7 +55,7 @@ public class WorkflowConfiguration {
     }
 
     @Bean
-    JobFacade jobFactoryFacade(
+    JobFacade jobFacade(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker, WorkflowService workflowService) {
 
@@ -75,13 +70,5 @@ public class WorkflowConfiguration {
     @Bean
     TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
         return new TaskExecutionServiceImpl(taskExecutionRepository);
-    }
-
-    @Bean
-    WorkflowService workflowService(
-        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
-        List<WorkflowRepository> workflowRepositories) {
-
-        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 }

@@ -49,9 +49,6 @@ import java.util.List;
 @SpringBootConfiguration
 public class WorkflowConfigurationIntTestConfiguration {
 
-//    @MockBean
-//    private EventPublisher eventPublisher;
-
     @MockBean
     private MessageBroker messageBroker;
 
