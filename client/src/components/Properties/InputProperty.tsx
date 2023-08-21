@@ -1,12 +1,11 @@
+import {DataPillType} from '@/types/types';
 import Input from 'components/Input/Input';
 import MentionsInput from 'components/MentionsInput/MentionsInput';
-import {useDataPillPanelStore} from 'pages/automation/project/stores/useDataPillPanelStore';
-import {useNodeDetailsDialogStore} from 'pages/automation/project/stores/useNodeDetailsDialogStore';
-import useWorkflowDefinitionStore from 'pages/automation/project/stores/useWorkflowDefinitionStore';
 import {ReactNode, useRef} from 'react';
 
 interface InputPropertyProps {
     controlType?: string;
+    dataPills?: DataPillType[];
     description?: string;
     defaultValue?: string;
     error?: boolean;
@@ -22,6 +21,7 @@ interface InputPropertyProps {
 
 const InputProperty = ({
     controlType,
+    dataPills,
     defaultValue,
     description,
     error,
@@ -33,11 +33,6 @@ const InputProperty = ({
     required,
     title,
 }: InputPropertyProps) => {
-    const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {dataPills} = useWorkflowDefinitionStore();
-    const {nodeDetailsDialogOpen, setFocusedInput} =
-        useNodeDetailsDialogStore();
-
     const inputRef = useRef(null);
 
     const getInputType = () => {
@@ -65,7 +60,7 @@ const InputProperty = ({
 
     return (
         <>
-            {mention && !!dataPills.length && !!name && (
+            {mention && !!dataPills?.length && !!name && (
                 <MentionsInput
                     data={dataPills}
                     label={label}
@@ -86,15 +81,6 @@ const InputProperty = ({
                     required={required}
                     title={title}
                     type={hidden ? 'hidden' : getInputType()}
-                    onFocus={() => {
-                        if (nodeDetailsDialogOpen) {
-                            setDataPillPanelOpen(true);
-
-                            if (inputRef.current) {
-                                setFocusedInput(inputRef.current);
-                            }
-                        }
-                    }}
                     ref={inputRef}
                 />
             )}
