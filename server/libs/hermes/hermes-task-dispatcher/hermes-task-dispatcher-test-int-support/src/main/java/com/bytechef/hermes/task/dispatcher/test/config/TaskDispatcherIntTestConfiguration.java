@@ -43,7 +43,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -65,11 +64,6 @@ import java.util.List;
 })
 @SpringBootConfiguration
 public class TaskDispatcherIntTestConfiguration {
-
-    @EnableCaching
-    @TestConfiguration
-    public static class CacheConfiguration {
-    }
 
     @TestConfiguration
     public static class EventConfiguration {

@@ -17,24 +17,39 @@
 
 package com.bytechef.hermes.component.factory.config;
 
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.oas.loader.OpenAPIComponentDefinitionFactoryBeanDefinitionLoader;
-import com.bytechef.hermes.component.loader.ComponentDefinitionFactoryBeanDefinitionLoader;
-import com.bytechef.hermes.component.loader.ComponentDefinitionFactoryBeanDefinitionLoader.HandlerBeanDefinitionEntry;
-import com.bytechef.hermes.component.loader.ComponentDefinitionFactoryBeanDefinitionLoader.ComponentDefinitionFactoryBeanDefinition;
-import com.bytechef.hermes.component.jdbc.loader.JdbcComponentDefinitionFactoryBeanDefinitionLoader;
-import com.bytechef.hermes.component.loader.DefaultComponentDefinitionFactoryBeanDefinitionLoader;
+import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.handler.ComponentTriggerHandler;
+import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
+import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader.ComponentTaskHandlerFunction;
+import com.bytechef.hermes.component.oas.handler.loader.OpenAPIComponentHandlerLoader;
+import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader;
+import com.bytechef.hermes.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
+import com.bytechef.hermes.component.handler.loader.DefaultComponentHandlerLoader;
+import com.bytechef.hermes.definition.registry.component.factory.ComponentHandlerListFactory;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -43,49 +58,111 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private static final List<ComponentDefinitionFactoryBeanDefinitionLoader> COMPONENT_DEFINITION_FACTORY__BEAN_DEFINITION_LOADERS =
+    private static final List<ComponentHandlerLoader> COMPONENT_HANDLER_LOADERS =
         List.of(
-            new DefaultComponentDefinitionFactoryBeanDefinitionLoader(),
-            new JdbcComponentDefinitionFactoryBeanDefinitionLoader(),
-            new OpenAPIComponentDefinitionFactoryBeanDefinitionLoader());
+            new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenAPIComponentHandlerLoader());
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        List<ComponentDefinitionFactoryBeanDefinition> componentDefinitionFactoryBeanDefinitions =
-            COMPONENT_DEFINITION_FACTORY__BEAN_DEFINITION_LOADERS.stream()
-                .flatMap(
-                    componentDefinitionFactoryBeanDefinitionLoader -> CollectionUtils.stream(
-                        componentDefinitionFactoryBeanDefinitionLoader.loadComponentDefinitionFactoryBeanDefinitions()))
-                .toList();
+        List<? extends ComponentHandlerEntry> componentHandlerEntries =
+            CollectionUtils.flatMap(COMPONENT_HANDLER_LOADERS, ComponentHandlerLoader::loadComponentHandlers);
 
-        for (ComponentDefinitionFactoryBeanDefinition componentDefinitionFactoryBeanDefinition : componentDefinitionFactoryBeanDefinitions) {
+        beanFactory.registerSingleton(
+            "componentHandlerListFactory", new ComponentHandlerListFactoryImpl(
+                CollectionUtils.map(
+                    componentHandlerEntries, ComponentHandlerEntry::componentHandler)));
 
-            ComponentDefinitionFactory componentDefinitionFactory =
-                componentDefinitionFactoryBeanDefinition.componentDefinitionFactory();
+        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
 
-            beanFactory.registerSingleton(
-                getBeanName(
-                    componentDefinitionFactory.getName(), componentDefinitionFactory.getVersion(),
-                    "ComponentDefinitionFactory", '_'),
-                componentDefinitionFactory);
+        beanDefinitionRegistry.registerBeanDefinition(
+            "componentTaskHandlerMapFactory",
+            BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerMapFactory.class)
+                .addConstructorArgValue(componentHandlerEntries)
+                .addConstructorArgReference("actionDefinitionService")
+                .getBeanDefinition());
 
-            BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+        beanDefinitionRegistry.registerBeanDefinition(
+            "componentTriggerHandlerMapFactory",
+            BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerMapFactory.class)
+                .addConstructorArgValue(componentHandlerEntries)
+                .addConstructorArgReference("triggerDefinitionService")
+                .getBeanDefinition());
+    }
 
-            for (HandlerBeanDefinitionEntry handlerBeanDefinitionEntry : componentDefinitionFactoryBeanDefinition
-                .handlerBeanDefinitionEntries()) {
+    private static String getBeanName(String componentName, int componentVersion, String operationName) {
+        return componentName + '/' + "v" + componentVersion + '/' + operationName;
+    }
 
-                BeanDefinition handlerBeanDefinition = handlerBeanDefinitionEntry.handlerBeanDefinition();
+    private record ComponentTaskHandlerMapFactory(
+        List<ComponentHandlerEntry> componentHandlerEntries, ActionDefinitionService actionDefinitionService)
+        implements TaskHandlerMapFactory {
 
-                beanDefinitionRegistry.registerBeanDefinition(
-                    getBeanName(
-                        componentDefinitionFactory.getName(), componentDefinitionFactory.getVersion(),
-                        handlerBeanDefinitionEntry.handlerName(), '/'),
-                    handlerBeanDefinition);
-            }
+        @Override
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        public Map<String, TaskHandler<?>> getTaskHandlerMap() {
+            return (Map) componentHandlerEntries
+                .stream()
+                .map(componentHandlerEntry -> {
+                    ComponentHandler componentHandler = componentHandlerEntry.componentHandler();
+
+                    ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+                    return OptionalUtils.orElse(componentDefinition.getActions(), List.of())
+                        .stream()
+                        .collect(
+                            Collectors.toMap(
+                                actionDefinition -> getBeanName(
+                                    componentDefinition.getName(), componentDefinition.getVersion(),
+                                    actionDefinition.getName()),
+                                actionDefinition -> {
+                                    ComponentTaskHandlerFunction componentTaskHandlerFunction =
+                                        componentHandlerEntry.componentTaskHandlerFunction();
+
+                                    return componentTaskHandlerFunction.apply(
+                                        actionDefinition.getName(), actionDefinitionService);
+                                }));
+                })
+                .reduce(Map.of(), MapUtils::concat);
         }
     }
 
-    private String getBeanName(String componentName, int componentVersion, String typeName, char delimiter) {
-        return componentName + delimiter + "v" + componentVersion + delimiter + typeName;
+    private record ComponentTriggerHandlerMapFactory(
+        List<ComponentHandlerEntry> componentHandlerEntries, TriggerDefinitionService triggerDefinitionService)
+        implements TriggerHandlerMapFactory {
+
+        @Override
+        public Map<String, TriggerHandler> getTriggerHandlerMap() {
+            return componentHandlerEntries.stream()
+                .map(ComponentHandlerEntry::componentHandler)
+                .map(ComponentDefinitionFactory::getDefinition)
+                .map(this::collect)
+                .reduce(Map.of(), MapUtils::concat);
+        }
+
+        private Map<String, TriggerHandler> collect(ComponentDefinition componentDefinition) {
+            return OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())
+                .stream()
+                .filter(triggerDefinition -> triggerDefinition != null &&
+                    triggerDefinition.getType() != TriggerDefinition.TriggerType.LISTENER)
+                .collect(
+                    Collectors.toMap(
+                        (TriggerDefinition triggerDefinition) -> getBeanName(
+                            componentDefinition.getName(), componentDefinition.getVersion(),
+                            triggerDefinition.getName()),
+                        triggerDefinition -> new ComponentTriggerHandler(
+                            componentDefinition.getName(), componentDefinition.getVersion(),
+                            triggerDefinition.getName(), triggerDefinitionService)));
+        }
+    }
+
+    private record ComponentHandlerListFactoryImpl(List<? extends ComponentHandler> componentHandlers)
+        implements ComponentHandlerListFactory {
+
+        @Override
+        public List<? extends ComponentHandler> getComponentHandlers() {
+            return componentHandlers;
+        }
     }
 }

@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.var;
+package com.bytechef.hermes.component.jdbc.task.handler;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class VarComponentHandlerTest {
+public class JdbcComponentHandlerTest {
 
+    @Disabled
     @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/var_v1.json", new VarComponentHandler().getDefinition());
+    public void testGetDefinition() {
+        // TODO
     }
 }

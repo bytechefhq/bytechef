@@ -1463,7 +1463,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public TriggerType getType() {
-            return Objects.requireNonNull(type);
+            return type;
         }
 
         @Override
@@ -1497,7 +1497,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public EditorDescriptionFunction getEditorDescription() {
-            return Objects.requireNonNull(editorDescription);
+            return editorDescription;
         }
     }
 
@@ -1511,7 +1511,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public OutputSchemaFunction getOutputSchema() {
-            return Objects.requireNonNull(outputSchema);
+            return outputSchema;
         }
     }
 
@@ -1538,7 +1538,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public SampleOutputFunction getSampleOutput() {
-            return Objects.requireNonNull(sampleOutputFunction);
+            return sampleOutputFunction;
         }
     }
 }

@@ -18,12 +18,15 @@
 package com.bytechef.hermes.worker.config;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.broker.MessageBroker;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,8 +41,14 @@ import java.util.concurrent.Executors;
 public class TriggerWorkerConfiguration {
 
     @Bean
-    TriggerHandlerRegistry triggerHandlerRegistry(Map<String, TriggerHandler> triggerHandlerMap) {
-        return triggerHandlerMap::get;
+    TriggerHandlerRegistry triggerHandlerRegistry(
+        Map<String, TriggerHandler> triggerHandlerMap,
+        @Autowired(required = false) TriggerHandlerMapFactory triggerHandlerMapFactory) {
+
+        return MapUtils.concat(
+            triggerHandlerMap,
+            triggerHandlerMapFactory.getTriggerHandlerMap() == null
+                ? Map.of() : triggerHandlerMapFactory.getTriggerHandlerMap())::get;
     }
 
     @Bean

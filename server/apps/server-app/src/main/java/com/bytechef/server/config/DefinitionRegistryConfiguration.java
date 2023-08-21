@@ -24,6 +24,7 @@ import com.bytechef.hermes.component.context.factory.ContextConnectionFactoryImp
 import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
+import com.bytechef.hermes.definition.registry.component.factory.ComponentHandlerListFactory;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
@@ -84,9 +85,11 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     public ComponentDefinitionRegistry componentDefinitionRegistry(
-        List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        List<ComponentDefinitionFactory> componentDefinitionFactories,
+        ComponentHandlerListFactory componentHandlerListFactory) {
 
-        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories);
+        return new ComponentDefinitionRegistryImpl(
+            componentDefinitionFactories, componentHandlerListFactory);
     }
 
     @Bean

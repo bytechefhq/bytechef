@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentTriggerHandler implements TriggerHandler {
+public class ComponentTriggerHandler implements TriggerHandler {
 
     private final String componentName;
     private final int componentVersion;
@@ -38,7 +38,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler {
     private final TriggerDefinitionService triggerDefinitionService;
 
     @SuppressFBWarnings("EI")
-    public DefaultComponentTriggerHandler(
+    public ComponentTriggerHandler(
         String componentName, int componentVersion, String triggerName,
         TriggerDefinitionService triggerDefinitionService) {
 

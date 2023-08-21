@@ -39,7 +39,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
-import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
+import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;

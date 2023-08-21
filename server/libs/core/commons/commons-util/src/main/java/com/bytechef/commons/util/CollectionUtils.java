@@ -18,6 +18,7 @@
 package com.bytechef.commons.util;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -99,6 +100,17 @@ public final class CollectionUtils {
             elseObject);
     }
 
+    public static <T, R> List<? extends R> flatMap(
+        List<T> list, Function<? super T, ? extends Collection<? extends R>> mapper) {
+
+        Objects.requireNonNull(list, "'list' must not be null");
+        Objects.requireNonNull(mapper, "'mapper' must not be null");
+
+        return list.stream()
+            .flatMap(item -> stream(mapper.apply(item)))
+            .toList();
+    }
+
     public static <T> T getFirst(Collection<T> list, Predicate<? super T> filter) {
         Objects.requireNonNull(list, "'list' must not be null");
         Objects.requireNonNull(filter, "'filter' must not be null");
@@ -136,6 +148,15 @@ public final class CollectionUtils {
         Objects.requireNonNull(collection, "'collection' must not be null");
 
         return collection.size();
+    }
+
+    public static <T> List<T> sorted(Collection<T> collection, Comparator<? super T> comparator) {
+        Objects.requireNonNull(collection, "'collection' must not be null");
+        Objects.requireNonNull(comparator, "'comparator' must not be null");
+
+        return collection.stream()
+            .sorted(comparator)
+            .toList();
     }
 
     public static <T> Stream<T> stream(Collection<T> collection) {

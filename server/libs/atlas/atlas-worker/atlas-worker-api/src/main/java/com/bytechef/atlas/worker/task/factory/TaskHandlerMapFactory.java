@@ -15,19 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.jdbc.task.handler;
+package com.bytechef.atlas.worker.task.factory;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class JdbcComponentDefinitionFactoryTest {
+public interface TaskHandlerMapFactory {
 
-    @Disabled
-    @Test
-    public void testGetDefinition() {
-        // TODO
-    }
+    Map<String, TaskHandler<?>> getTaskHandlerMap();
 }
