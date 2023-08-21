@@ -6,6 +6,7 @@ import {
     AutomationProjectsApi,
     CreateProjectWorkflowRequest,
     EnableProjectInstanceRequest,
+    EnableProjectInstanceWorkflowRequest,
     ProjectInstanceModel,
     ProjectModel,
     UpdateProjectInstanceTagsRequest,
@@ -216,6 +217,30 @@ export const useEnableProjectInstanceMutation = (
     useMutation({
         mutationFn: (request: EnableProjectInstanceRequest) => {
             return new AutomationProjectInstancesApi().enableProjectInstance(
+                request
+            );
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type EnableProjectInstanceWorkflowMutationProps = {
+    onSuccess?: (
+        result: void,
+        variables: EnableProjectInstanceWorkflowRequest
+    ) => void;
+    onError?: (
+        error: object,
+        variables: EnableProjectInstanceWorkflowRequest
+    ) => void;
+};
+
+export const useEnableProjectInstanceWorkflowMutation = (
+    mutationProps: EnableProjectInstanceWorkflowMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: EnableProjectInstanceWorkflowRequest) => {
+            return new AutomationProjectInstancesApi().enableProjectInstanceWorkflow(
                 request
             );
         },
