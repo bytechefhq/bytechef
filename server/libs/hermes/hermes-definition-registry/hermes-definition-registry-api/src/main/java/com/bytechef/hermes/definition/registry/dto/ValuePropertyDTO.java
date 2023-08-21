@@ -28,9 +28,9 @@ import java.util.Optional;
  */
 public abstract class ValuePropertyDTO<V> extends PropertyDTO {
 
-    private ControlType controlType;
-    private V defaultValue;
-    private V exampleValue;
+    protected ControlType controlType;
+    protected V defaultValue;
+    protected V exampleValue;
 
     protected ValuePropertyDTO() {
     }

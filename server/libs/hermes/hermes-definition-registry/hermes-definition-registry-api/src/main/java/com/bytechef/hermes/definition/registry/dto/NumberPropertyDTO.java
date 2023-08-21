@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.Property.NumberProperty;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -74,5 +75,35 @@ public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof NumberPropertyDTO that))
+            return false;
+        return Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
+            && Objects.equals(numberPrecision, that.numberPrecision) && Objects.equals(options, that.options)
+            && Objects.equals(optionsDataSource, that.optionsDataSource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(maxValue, minValue, numberPrecision, options, optionsDataSource);
+    }
+
+    @Override
+    public String toString() {
+        return "NumberPropertyDTO{" +
+            "maxValue=" + maxValue +
+            ", minValue=" + minValue +
+            ", numberPrecision=" + numberPrecision +
+            ", options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
     }
 }

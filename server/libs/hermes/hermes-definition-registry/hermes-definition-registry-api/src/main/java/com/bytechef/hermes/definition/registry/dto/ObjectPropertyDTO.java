@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.Property.ObjectProperty;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -84,5 +85,36 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
 
     public List<? extends PropertyDTO> getProperties() {
         return Collections.unmodifiableList(properties);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ObjectPropertyDTO that))
+            return false;
+        return multipleValues == that.multipleValues && Objects.equals(additionalProperties, that.additionalProperties)
+            && Objects.equals(objectType, that.objectType) && Objects.equals(options, that.options)
+            && Objects.equals(optionsDataSource, that.optionsDataSource) && Objects.equals(properties, that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(additionalProperties, multipleValues, objectType, options, optionsDataSource, properties);
+    }
+
+    @Override
+    public String toString() {
+        return "ObjectPropertyDTO{" +
+            "additionalProperties=" + additionalProperties +
+            ", multipleValues=" + multipleValues +
+            ", objectType='" + objectType + '\'' +
+            ", options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
+            ", properties=" + properties +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
     }
 }

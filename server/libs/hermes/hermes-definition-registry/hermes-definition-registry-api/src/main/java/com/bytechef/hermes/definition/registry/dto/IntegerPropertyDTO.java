@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.Property.IntegerProperty;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -68,5 +69,33 @@ public class IntegerPropertyDTO extends ValuePropertyDTO<Integer> {
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof IntegerPropertyDTO that))
+            return false;
+        return Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
+            && Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(maxValue, minValue, options, optionsDataSource);
+    }
+
+    @Override
+    public String toString() {
+        return "IntegerPropertyDTO{" +
+            "maxValue=" + maxValue +
+            ", minValue=" + minValue +
+            ", options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
     }
 }

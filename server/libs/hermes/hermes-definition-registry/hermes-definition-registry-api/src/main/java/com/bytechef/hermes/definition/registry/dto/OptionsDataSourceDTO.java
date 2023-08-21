@@ -22,14 +22,42 @@ import com.bytechef.hermes.definition.OptionsDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record OptionsDataSourceDTO(List<String> loadOptionsDependsOn) {
+public class OptionsDataSourceDTO {
+
+    private final List<String> loadOptionsDependsOn;
 
     public OptionsDataSourceDTO(OptionsDataSource optionsDataSource) {
-        this(OptionalUtils.orElse(optionsDataSource.getLoadOptionsDependsOn(), List.of()));
+        this.loadOptionsDependsOn = OptionalUtils.orElse(optionsDataSource.getLoadOptionsDependsOn(), List.of());
+    }
+
+    public List<String> getLoadOptionsDependsOn() {
+        return loadOptionsDependsOn;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof OptionsDataSourceDTO that))
+            return false;
+        return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(loadOptionsDependsOn);
+    }
+
+    @Override
+    public String toString() {
+        return "OptionsDataSourceDTO{" +
+            "loadOptionsDependsOn=" + loadOptionsDependsOn +
+            '}';
     }
 }

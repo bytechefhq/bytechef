@@ -35,4 +35,13 @@ public class AnyPropertyDTO extends ValuePropertyDTO<Object> {
     public Object accept(PropertyVisitor propertyVisitor) {
         return propertyVisitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "AnyPropertyDTO{" +
+            "controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
+    }
 }
