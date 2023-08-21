@@ -28,7 +28,7 @@ public interface EventPublisher {
     /**
      * Notify all <strong>matching</strong> listeners registered with this application of an application event.
      *
-     * @param workflowEvent the event to publish
+     * @param event the event to publish
      */
-    void publishEvent(WorkflowEvent workflowEvent);
+    void publishEvent(Event event);
 }

@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
-import com.bytechef.hermes.execution.event.TriggerStartedWorkflowEvent;
+import com.bytechef.hermes.execution.event.TriggerStartedEvent;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.message.broker.MessageBroker;
@@ -49,10 +49,10 @@ public class TriggerStartedEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (TriggerStartedWorkflowEvent.TRIGGER_STARTED.equals(workflowEvent.getType())) {
+    public void onApplicationEvent(Event event) {
+        if (TriggerStartedEvent.TRIGGER_STARTED.equals(event.getType())) {
             long triggerExecutionId =
-                ((TriggerStartedWorkflowEvent) workflowEvent).getTriggerExecutionId();
+                ((TriggerStartedEvent) event).getTriggerExecutionId();
 
             TriggerExecution triggerExecution = triggerExecutionService.getTriggerExecution(triggerExecutionId);
 
@@ -66,7 +66,7 @@ public class TriggerStartedEventListener implements EventListener {
                 messageBroker.send(SystemMessageRoute.CONTROL, new CancelControlTrigger(triggerExecution.getId()));
             } else {
                 if (triggerExecution.getStartDate() == null && triggerExecution.getStatus() != Status.STARTED) {
-                    triggerExecution.setStartDate(workflowEvent.getCreatedDate());
+                    triggerExecution.setStartDate(event.getCreatedDate());
                     triggerExecution.setStatus(Status.STARTED);
 
                     triggerExecutionService.update(triggerExecution);

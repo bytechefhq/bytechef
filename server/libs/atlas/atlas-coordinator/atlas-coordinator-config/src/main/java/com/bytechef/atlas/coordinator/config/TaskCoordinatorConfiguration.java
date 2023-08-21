@@ -34,6 +34,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
@@ -68,6 +69,9 @@ public class TaskCoordinatorConfiguration {
 
     @Autowired
     private EventPublisher eventPublisher;
+
+    @Autowired
+    private JobFacade jobFacade;
 
     @Autowired
     private JobService jobService;
@@ -140,15 +144,9 @@ public class TaskCoordinatorConfiguration {
 
     @Bean
     TaskCoordinator taskCoordinator() {
-        return TaskCoordinator.builder()
-            .eventPublisher(eventPublisher)
-            .jobExecutor(jobExecutor())
-            .jobService(jobService)
-            .messageBroker(messageBroker)
-            .taskCompletionHandler(taskCompletionHandler())
-            .taskDispatcher(taskDispatcher())
-            .taskExecutionService(taskExecutionService)
-            .build();
+        return new TaskCoordinator(
+            eventPublisher, jobExecutor(), jobFacade, jobService, messageBroker, taskCompletionHandler(),
+            taskDispatcher(), taskExecutionService);
     }
 
     @Bean

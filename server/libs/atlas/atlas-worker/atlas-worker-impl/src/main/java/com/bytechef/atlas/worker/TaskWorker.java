@@ -24,7 +24,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.TaskStartedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskStartedEvent;
 import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
@@ -74,16 +74,27 @@ public class TaskWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final EventPublisher eventPublisher;
-    private final ExecutorService executorService;
+    private ExecutorService executorService = Executors.newCachedThreadPool();
     private final MessageBroker messageBroker;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
 
-    private TaskWorker(Builder builder) {
-        taskHandlerResolver = Objects.requireNonNull(builder.taskHandlerResolver);
-        messageBroker = Objects.requireNonNull(builder.messageBroker);
-        eventPublisher = Objects.requireNonNull(builder.eventPublisher);
-        executorService = Objects.requireNonNull(builder.executorService);
+    public TaskWorker(
+        EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver) {
+
+        this.eventPublisher = eventPublisher;
+        this.messageBroker = messageBroker;
+        this.taskHandlerResolver = taskHandlerResolver;
+    }
+
+    public TaskWorker(
+        EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
+        TaskHandlerResolver taskHandlerResolver) {
+
+        this.eventPublisher = eventPublisher;
+        this.executorService = executorService;
+        this.messageBroker = messageBroker;
+        this.taskHandlerResolver = taskHandlerResolver;
     }
 
     /**
@@ -100,11 +111,11 @@ public class TaskWorker {
         Future<?> future = executorService.submit(() -> {
             try {
                 eventPublisher.publishEvent(
-                    new TaskStartedWorkflowEvent(taskExecution.getJobId(), taskExecution.getId()));
+                    new TaskStartedEvent(taskExecution.getJobId(), taskExecution.getId()));
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, completedTaskExecution);
+                messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, completedTaskExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -235,46 +246,6 @@ public class TaskWorker {
         }
 
         return DEFAULT_TIME_OUT;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private TaskHandlerResolver taskHandlerResolver;
-        private MessageBroker messageBroker;
-        private EventPublisher eventPublisher;
-        private ExecutorService executorService = Executors.newCachedThreadPool();
-
-        public Builder taskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
-            this.taskHandlerResolver = taskHandlerResolver;
-
-            return this;
-        }
-
-        public Builder messageBroker(MessageBroker messageBroker) {
-            this.messageBroker = messageBroker;
-
-            return this;
-        }
-
-        public Builder eventPublisher(EventPublisher eventPublisher) {
-            this.eventPublisher = eventPublisher;
-
-            return this;
-        }
-
-        public Builder executorService(ExecutorService executorService) {
-            this.executorService = executorService;
-
-            return this;
-        }
-
-        public TaskWorker build() {
-            return new TaskWorker(this);
-        }
     }
 
     private static class TaskExecutionFuture<T> implements Future<T> {

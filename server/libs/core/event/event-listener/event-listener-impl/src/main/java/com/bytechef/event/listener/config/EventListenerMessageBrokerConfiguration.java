@@ -18,6 +18,7 @@
 package com.bytechef.event.listener.config;
 
 import com.bytechef.event.listener.EventListener;
+import com.bytechef.event.listener.config.EventListenerProperties.EventListenerSubscriptions;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,15 +48,11 @@ public class EventListenerMessageBrokerConfiguration {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             EventListener eventListener = applicationContext.getBean(EventListener.class);
 
-            EventListenerProperties.EventListenerSubscriptions subscriptions =
-                eventListenerProperties.getSubscriptions();
+            EventListenerSubscriptions eventListenerSubscriptions = eventListenerProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                SystemMessageRoute.EVENTS,
-                subscriptions.getEvents(),
-                eventListener,
-                "onApplicationEvent");
+                listenerEndpointRegistrar, SystemMessageRoute.EVENTS, eventListenerSubscriptions.getEvents(),
+                eventListener, "onApplicationEvent");
         };
     }
 }

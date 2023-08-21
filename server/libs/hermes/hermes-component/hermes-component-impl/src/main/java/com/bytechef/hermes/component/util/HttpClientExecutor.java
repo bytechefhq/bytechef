@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
+import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.context.factory.AuthorizationContextConnection;
@@ -32,9 +33,6 @@ import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
 import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
-import org.apache.tika.mime.MimeType;
-import org.apache.tika.mime.MimeTypeException;
-import org.apache.tika.mime.MimeTypes;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
@@ -333,7 +331,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         }
 
         if (object instanceof CharSequence) {
-            return ((CharSequence) object).length() == 0;
+            return ((CharSequence) object).isEmpty();
         }
 
         return false;
@@ -341,20 +339,17 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
     private static FileEntry storeBinaryResponseBody(
         Context context, Configuration configuration, Map<String, List<String>> headers,
-        InputStream httpResponseBody) throws MimeTypeException {
+        InputStream httpResponseBody) {
 
         Objects.requireNonNull(context, "'context' must not be null");
 
         String filename = configuration.getFilename();
 
-        if (filename == null || filename.length() == 0) {
+        if (filename == null || filename.isEmpty()) {
             if (headers.containsKey("Content-Type")) {
-                MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
                 List<String> values = headers.get("Content-Type");
 
-                MimeType mimeType = mimeTypes.forName(values.get(0));
-
-                filename = "file" + mimeType.getExtension();
+                filename = "file" + MimeTypeUtils.getDefaultExt(values.get(0));
             } else {
                 filename = "file.txt";
             }

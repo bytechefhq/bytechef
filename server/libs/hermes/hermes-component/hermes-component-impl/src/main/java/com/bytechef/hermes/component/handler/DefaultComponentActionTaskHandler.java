@@ -18,53 +18,46 @@
 package com.bytechef.hermes.component.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.component.context.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
 
-    protected final ComponentHandler componentHandler;
-
-    private final ActionDefinition actionDefinition;
-    private final ContextFactory contextFactory;
+    private final String actionName;
+    private final ActionDefinitionService actionDefinitionService;
+    private final String componentName;
+    private final int componentVersion;
 
     @SuppressFBWarnings("EI2")
     public DefaultComponentActionTaskHandler(
-        ActionDefinition actionDefinition, ComponentHandler componentHandler, ContextFactory contextFactory) {
+        String componentName, int componentVersion, String actionName,
+        ActionDefinitionService actionDefinitionService) {
 
-        this.actionDefinition = actionDefinition;
-        this.componentHandler = componentHandler;
-        this.contextFactory = contextFactory;
+        this.actionName = actionName;
+        this.actionDefinitionService = actionDefinitionService;
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        ActionContext context = contextFactory.createActionContext(
-            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class),
-            taskExecution.getId());
-
-        return ComponentContextSupplier.get(
-            context,
-            () -> {
-                try {
-                    return actionDefinition.getPerform()
-                        .map(performFunction -> performFunction.apply(taskExecution.getParameters(), context))
-                        .orElseGet(() -> componentHandler.handleAction(
-                            actionDefinition, taskExecution.getParameters(), context));
-                } catch (Exception e) {
-                    throw new TaskExecutionException(e.getMessage(), e);
-                }
-            });
+        try {
+            return actionDefinitionService.executePerform(
+                componentName, componentVersion, actionName, Objects.requireNonNull(taskExecution.getId()),
+                taskExecution.getParameters(),
+                MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+        } catch (Exception e) {
+            throw new TaskExecutionException(e.getMessage(), e);
+        }
     }
 }

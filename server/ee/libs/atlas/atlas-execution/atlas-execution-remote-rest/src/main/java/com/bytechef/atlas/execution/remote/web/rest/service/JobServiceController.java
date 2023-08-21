@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/job-service")
 public class JobServiceController {
 
     private final JobService jobService;
@@ -45,7 +45,7 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/job-service/get-job/{id}",
+        value = "/get-job/{id}",
         produces = {
             "application/json"
         })
@@ -55,7 +55,7 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/job-service/get-task-execution-job/{taskExecutionId}",
+        value = "/get-task-execution-job/{taskExecutionId}",
         produces = {
             "application/json"
         })
@@ -65,7 +65,7 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/job-service/resume-to-status-started/{id}",
+        value = "/resume-to-status-started/{id}",
         produces = {
             "application/json"
         })
@@ -75,7 +75,7 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/job-service/set-status-to-started/{id}",
+        value = "/set-status-to-started/{id}",
         produces = {
             "application/json"
         })
@@ -85,7 +85,7 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/job-service/set-status-to-stopped/{id}",
+        value = "/set-status-to-stopped/{id}",
         produces = {
             "application/json"
         })
@@ -95,7 +95,7 @@ public class JobServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/job-service/update",
+        value = "/update",
         consumes = {
             "application/json"
         },

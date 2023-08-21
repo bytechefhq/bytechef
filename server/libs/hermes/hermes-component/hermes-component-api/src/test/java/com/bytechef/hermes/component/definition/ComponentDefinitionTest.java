@@ -49,11 +49,12 @@ public class ComponentDefinitionTest {
     public void testActionDefinition() throws JSONException, JsonProcessingException {
         ActionDefinition action = ComponentDSL.action("name")
             .title("title")
-            .description("description");
+            .description("description")
+            .perform((inputParameters, context) -> null);
 
         jsonAssertEquals(
             """
-                {"batch":null,"componentDescription":null,"componentName":null,"componentTitle":null,"deprecated":null,"description":"description","sampleOutput":null,"help":null,"metadata":null,"name":"name","properties":null,"title":"title","editorDescriptionDataSource":null,"outputSchema":null,"outputSchemaDataSource":null,"sampleOutputDataSource":null,"perform":null}
+                {"batch":null,"componentName":null,"componentDescription":null,"componentTitle":null,"deprecated":null,"description":"description","sampleOutput":null,"help":null,"metadata":null,"name":"name","outputSchema":null,"properties":null,"title":"title","editorDescriptionDataSource":null,"perform":{},"outputSchemaDataSource":null,"sampleOutputDataSource":null}
                 """,
             action);
     }

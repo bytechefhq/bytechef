@@ -26,7 +26,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
+import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -146,7 +146,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         job = jobService.update(job);
 
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
+        eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());

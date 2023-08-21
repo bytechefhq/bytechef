@@ -22,9 +22,9 @@ package com.bytechef.atlas.coordinator.event;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
-import com.bytechef.atlas.execution.event.TaskStartedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskStartedEvent;
 import com.bytechef.event.listener.EventListener;
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
@@ -58,9 +58,9 @@ public class TaskStartedEventListener implements EventListener {
 
     @Override
     @SuppressFBWarnings("NP")
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (TaskStartedWorkflowEvent.TASK_STARTED.equals(workflowEvent.getType())) {
-            long taskExecutionId = ((TaskStartedWorkflowEvent) workflowEvent).getTaskExecutionId();
+    public void onApplicationEvent(Event event) {
+        if (TaskStartedEvent.TASK_STARTED.equals(event.getType())) {
+            long taskExecutionId = ((TaskStartedEvent) event).getTaskExecutionId();
 
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
@@ -80,14 +80,14 @@ public class TaskStartedEventListener implements EventListener {
                 taskDispatcher.dispatch(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId()));
             } else {
                 if (taskExecution.getStartDate() == null && taskExecution.getStatus() != Status.STARTED) {
-                    taskExecution.setStartDate(workflowEvent.getCreatedDate());
+                    taskExecution.setStartDate(event.getCreatedDate());
                     taskExecution.setStatus(Status.STARTED);
 
                     taskExecution = taskExecutionService.update(taskExecution);
                 }
 
                 if (taskExecution.getParentId() != null) {
-                    onApplicationEvent(new TaskStartedWorkflowEvent(taskExecution.getParentId()));
+                    onApplicationEvent(new TaskStartedEvent(taskExecution.getParentId()));
                 }
             }
         }

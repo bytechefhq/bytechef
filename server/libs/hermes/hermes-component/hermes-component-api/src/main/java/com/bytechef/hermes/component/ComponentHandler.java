@@ -17,31 +17,39 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import java.util.Map;
+import java.util.Optional;
 
 /**
- * Default component handler.
+ * Default component handler marker interface.
  *
  * @author Ivica Cardic
  */
 public interface ComponentHandler extends ComponentDefinitionFactory {
 
     /**
-     * This can be useful if we still want to have only one method to handle all actions. It is called when
-     * <code>performFunction</code> of an <code>ActionDefinition</code> instance is null.
+     * This can be useful if we still want to have only one method to handle all actions instead of defining
+     * <code>performFunction</code> for each <code>ActionDefinition</code>.
      *
-     * @param actionDefinition
-     * @param inputParameters
-     * @param context
-     * @return the result of execution
-     * @throws ComponentExecutionException
+     * @return optional HandleActionFunction
      */
-    default Object handleAction(ActionDefinition actionDefinition, Map<String, ?> inputParameters, Context context)
-        throws ComponentExecutionException {
+    default Optional<ActionHandlerFunction> getActionHandler() {
+        return Optional.empty();
+    }
 
-        return null;
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ActionHandlerFunction {
+
+        /**
+         *
+         * @param actionName
+         * @param inputParameters
+         * @param context
+         * @return
+         */
+        Object apply(String actionName, Map<String, ?> inputParameters, Context context);
     }
 }

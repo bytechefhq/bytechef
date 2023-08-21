@@ -18,7 +18,9 @@
 package com.bytechef.hermes.execution.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.definition.registry.component.ComponentOperation;
+import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -52,15 +54,25 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerDisable(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId) {
 
-        TriggerDefinition.DynamicWebhookEnableOutput output = OptionalUtils.orElse(
+        ComponentOperation componentOperation = ComponentUtils.getComponentOperation(workflowTriggerType);
+
+        TriggerDefinitionDTO triggerDefinitionDTO = triggerDefinitionService.getTriggerDefinition(
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName());
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            workflowId, instanceId, instanceType, workflowTriggerName, componentOperation.componentName(),
+            componentOperation.componentVersion(), componentOperation.operationName(),
+            triggerDefinitionDTO.isWebhookRawBody(), triggerDefinitionDTO.isWorkflowSyncExecution(),
+            triggerDefinitionDTO.isWorkflowSyncValidation());
+
+        DynamicWebhookEnableOutput output = OptionalUtils.orElse(
             triggerStateService.fetchValue(workflowExecutionId), null);
-        TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
-            workflowExecutionId.getComponentTriggerName());
 
-        switch (triggerDefinition.type()) {
+        switch (triggerDefinitionDTO.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 triggerDefinitionFacade.executeDynamicWebhookDisable(
                     workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
@@ -80,15 +92,24 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerEnable(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId) {
 
-        TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
-            workflowExecutionId.getComponentTriggerName());
+        ComponentOperation componentOperation = ComponentUtils.getComponentOperation(workflowTriggerType);
 
-        switch (triggerDefinition.type()) {
+        TriggerDefinitionDTO triggerDefinitionDTO = triggerDefinitionService.getTriggerDefinition(
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName());
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            workflowId, instanceId, instanceType, workflowTriggerName, componentOperation.componentName(),
+            componentOperation.componentVersion(), componentOperation.operationName(),
+            triggerDefinitionDTO.isWebhookRawBody(), triggerDefinitionDTO.isWorkflowSyncExecution(),
+            triggerDefinitionDTO.isWorkflowSyncValidation());
+
+        switch (triggerDefinitionDTO.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
-                TriggerDefinition.DynamicWebhookEnableOutput output =
+                DynamicWebhookEnableOutput output =
                     triggerDefinitionFacade.executeDynamicWebhookEnable(
                         workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
                         workflowExecutionId.getComponentTriggerName(), triggerParameters,

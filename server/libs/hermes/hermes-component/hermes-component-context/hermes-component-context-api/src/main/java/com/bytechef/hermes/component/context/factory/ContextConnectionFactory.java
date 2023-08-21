@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.context.factory;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 
 import java.util.Map;
 
@@ -25,6 +25,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public interface ContextConnectionFactory {
-    Context.Connection createConnection(
+
+    Connection createConnection(
         String componentName, int componentVersion, Map<String, ?> connectionParameters, String authorizationName);
 }

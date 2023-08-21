@@ -20,7 +20,7 @@ package com.bytechef.helios.execution.web.rest;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.web.rest.model.JobModel;
 import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
-import com.bytechef.hermes.test.JobTestExecutor;
+import com.bytechef.hermes.test.executor.JobTestExecutor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

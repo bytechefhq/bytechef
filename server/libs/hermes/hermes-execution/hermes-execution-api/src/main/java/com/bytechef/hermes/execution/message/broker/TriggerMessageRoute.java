@@ -24,9 +24,11 @@ import com.bytechef.message.broker.MessageRoute;
  */
 public enum TriggerMessageRoute implements MessageRoute {
 
+    LISTENERS(Exchange.MESSAGE, "listeners"),
+    POLLS(Exchange.MESSAGE, "polls"),
     TRIGGERS(Exchange.MESSAGE, "triggers"),
-    TRIGGERS_COMPLETIONS(Exchange.MESSAGE, "triggers.completions"),
-    TRIGGERS_POLLS(Exchange.MESSAGE, "triggers.polls");
+    TRIGGERS_COMPLETE(Exchange.MESSAGE, "triggers.complete"),
+    WEBHOOKS(Exchange.MESSAGE, "webhooks");
 
     private final Exchange exchange;
     private final String routeName;

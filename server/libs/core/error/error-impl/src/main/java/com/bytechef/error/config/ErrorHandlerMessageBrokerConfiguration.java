@@ -52,10 +52,7 @@ public class ErrorHandlerMessageBrokerConfiguration {
             ErrorHandlerProperties.ErrorHandlerSubscriptions subscriptions = errorHandlerProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                SystemMessageRoute.ERRORS,
-                subscriptions.getErrors(),
-                errorHandler,
+                listenerEndpointRegistrar, SystemMessageRoute.ERRORS, subscriptions.getErrors(), errorHandler,
                 "handle");
         };
     }

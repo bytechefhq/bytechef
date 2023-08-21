@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
+ * @author The Guava Authors
  */
 public class CurrentThreadExecutorService extends AbstractExecutorService {
 

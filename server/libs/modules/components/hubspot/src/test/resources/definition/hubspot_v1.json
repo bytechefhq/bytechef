@@ -1330,9 +1330,10 @@
     "staticWebhookRequest": null,
     "title": "Subscribe",
     "type": "DYNAMIC_WEBHOOK",
-    "webhookBodyRaw": null,
+    "webhookRawBody": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
+    "workflowSyncValidation": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,

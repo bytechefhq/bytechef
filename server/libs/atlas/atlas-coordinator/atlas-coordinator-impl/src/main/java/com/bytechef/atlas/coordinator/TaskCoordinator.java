@@ -23,11 +23,13 @@ import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
+import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
@@ -57,24 +59,36 @@ public class TaskCoordinator {
 
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
+    private final JobFacade jobFacade;
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
-    private TaskCoordinator(Builder builder) {
-        this.eventPublisher = builder.eventPublisher;
-        this.jobExecutor = builder.jobExecutor;
-        this.jobService = builder.jobService;
-        this.messageBroker = builder.messageBroker;
-        this.taskCompletionHandler = builder.taskCompletionHandler;
-        this.taskDispatcher = builder.taskDispatcher;
-        this.taskExecutionService = builder.taskExecutionService;
+    @SuppressFBWarnings("EI")
+    public TaskCoordinator(
+        EventPublisher eventPublisher, JobExecutor jobExecutor, JobFacade jobFacade,
+        JobService jobService, MessageBroker messageBroker, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+
+        this.eventPublisher = eventPublisher;
+        this.jobExecutor = jobExecutor;
+        this.jobFacade = jobFacade;
+        this.jobService = jobService;
+        this.messageBroker = messageBroker;
+        this.taskCompletionHandler = taskCompletionHandler;
+        this.taskDispatcher = taskDispatcher;
+        this.taskExecutionService = taskExecutionService;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    /**
+     * Creates a job instance.
+     *
+     * @param jobParameters The job parameters
+     */
+    public void handleJobsCreate(JobParameters jobParameters) {
+        this.jobFacade.createJob(jobParameters);
     }
 
     /**
@@ -82,7 +96,7 @@ public class TaskCoordinator {
      *
      * @param taskExecution The task to complete.
      */
-    public void complete(TaskExecution taskExecution) {
+    public void handleTasksComplete(TaskExecution taskExecution) {
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {
@@ -93,11 +107,29 @@ public class TaskCoordinator {
     }
 
     /**
+     * Start a running job.
+     *
+     * @param jobId The id of the job to start
+     */
+    @SuppressFBWarnings("NP")
+    public void handleJobsStart(Long jobId) {
+        Job job = jobService.setStatusToStarted(jobId);
+
+        jobExecutor.execute(job);
+
+        eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
+        }
+    }
+
+    /**
      * Resume a stopped or failed job.
      *
      * @param jobId The id of the job to resume.
      */
-    public void resume(Long jobId) {
+    public void handleJobsResume(Long jobId) {
         Job job = jobService.resumeToStatusStarted(jobId);
 
         jobExecutor.execute(job);
@@ -108,37 +140,19 @@ public class TaskCoordinator {
     }
 
     /**
-     * Start a running job.
-     *
-     * @param jobId The id of the job to start
-     */
-    @SuppressFBWarnings("NP")
-    public void start(Long jobId) {
-        Job job = jobService.setStatusToStarted(jobId);
-
-        jobExecutor.execute(job);
-
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
-        }
-    }
-
-    /**
      * Stop a running job.
      *
      * @param jobId The id of the job to stop
      */
     @SuppressFBWarnings("NP")
-    public void stop(Long jobId) {
+    public void handleJobsStop(Long jobId) {
         Job job = jobService.setStatusToStopped(jobId);
 
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+        eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
 
-        if (taskExecutions.size() > 0) {
+        if (!taskExecutions.isEmpty()) {
             TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
 
             currentTaskExecution.setEndDate(LocalDateTime.now());
@@ -154,59 +168,6 @@ public class TaskCoordinator {
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
-        }
-    }
-
-    @SuppressFBWarnings("EI")
-    public static final class Builder {
-        private EventPublisher eventPublisher;
-        private JobExecutor jobExecutor;
-        private JobService jobService;
-        private MessageBroker messageBroker;
-        private TaskCompletionHandler taskCompletionHandler;
-        private TaskDispatcher<? super Task> taskDispatcher;
-        private TaskExecutionService taskExecutionService;
-
-        private Builder() {
-        }
-
-        public Builder eventPublisher(EventPublisher eventPublisher) {
-            this.eventPublisher = eventPublisher;
-            return this;
-        }
-
-        public Builder jobExecutor(JobExecutor jobExecutor) {
-            this.jobExecutor = jobExecutor;
-            return this;
-        }
-
-        public Builder jobService(JobService jobService) {
-            this.jobService = jobService;
-            return this;
-        }
-
-        public Builder messageBroker(MessageBroker messageBroker) {
-            this.messageBroker = messageBroker;
-            return this;
-        }
-
-        public Builder taskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
-            this.taskCompletionHandler = taskCompletionHandler;
-            return this;
-        }
-
-        public Builder taskDispatcher(TaskDispatcher<? super Task> taskDispatcher) {
-            this.taskDispatcher = taskDispatcher;
-            return this;
-        }
-
-        public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
-            this.taskExecutionService = taskExecutionService;
-            return this;
-        }
-
-        public TaskCoordinator build() {
-            return new TaskCoordinator(this);
         }
     }
 }

@@ -35,7 +35,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/task-execution-service")
 public class TaskExecutionServiceController {
 
     private final TaskExecutionService taskExecutionService;
@@ -47,7 +47,7 @@ public class TaskExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/task-execution-service/create",
+        value = "/create",
         consumes = {
             "application/json"
         },

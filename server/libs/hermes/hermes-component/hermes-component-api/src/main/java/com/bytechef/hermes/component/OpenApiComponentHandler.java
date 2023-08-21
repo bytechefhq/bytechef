@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
+public interface OpenApiComponentHandler extends ComponentHandler {
 
     /**
      *
@@ -112,11 +112,11 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
 
     /**
      *
-     * @param actionDefinition
+     * @param actionName
      * @param response
      * @return
      */
-    default Response postExecute(ActionDefinition actionDefinition, Response response) {
+    default Response postExecute(String actionName, Response response) {
         return response;
     }
 }

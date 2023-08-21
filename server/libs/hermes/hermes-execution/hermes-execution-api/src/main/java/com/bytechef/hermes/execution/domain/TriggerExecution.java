@@ -361,6 +361,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         this.id = id;
     }
 
+    private void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
+    }
+
     public void setOutput(Object output) {
         if (output != null) {
             this.output = new MapWrapper(Map.of("output", output));
@@ -420,6 +424,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         private LocalDateTime endDate;
         private ExecutionError error;
         private Long id;
+        private Map<String, Object> metadata;
         private Object output;
         private int priority;
         private LocalDateTime startDate;
@@ -432,36 +437,49 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
         public Builder endDate(LocalDateTime endDate) {
             this.endDate = endDate;
+
             return this;
         }
 
         public Builder error(ExecutionError error) {
             this.error = error;
+
             return this;
         }
 
         public Builder id(Long id) {
             this.id = id;
+
+            return this;
+        }
+
+        public Builder metadata(Map<String, Object> metadata) {
+            this.metadata = metadata;
+
             return this;
         }
 
         public Builder output(Object output) {
             this.output = output;
+
             return this;
         }
 
         public Builder priority(int priority) {
             this.priority = priority;
+
             return this;
         }
 
         public Builder startDate(LocalDateTime startDate) {
             this.startDate = startDate;
+
             return this;
         }
 
         public Builder status(Status status) {
             this.status = status;
+
             return this;
         }
 
@@ -469,6 +487,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             Assert.notNull(workflowExecutionId, "'workflowExecutionId' must not be null");
 
             this.workflowExecutionId = workflowExecutionId;
+
             return this;
         }
 
@@ -476,6 +495,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             Assert.notNull(workflowTrigger, "'workflowTrigger' must not be null");
 
             this.workflowTrigger = workflowTrigger;
+
             return this;
         }
 
@@ -485,6 +505,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             triggerExecution.setEndDate(endDate);
             triggerExecution.setError(error);
             triggerExecution.setId(id);
+            triggerExecution.setMetadata(metadata);
             triggerExecution.setOutput(output);
             triggerExecution.setPriority(priority);
             triggerExecution.setStartDate(startDate);

@@ -24,11 +24,12 @@ import com.bytechef.message.broker.MessageRoute;
  */
 public enum TaskMessageRoute implements MessageRoute {
 
+    JOBS_START(Exchange.MESSAGE, "jobs.start"),
+    JOBS_CREATE(Exchange.MESSAGE, "jobs.create"),
+    JOBS_RESUME(Exchange.MESSAGE, "jobs.resume"),
+    JOBS_STOP(Exchange.MESSAGE, "jobs.stop"),
     TASKS(Exchange.MESSAGE, "tasks"),
-    TASKS_COMPLETIONS(Exchange.MESSAGE, "tasks.completions"),
-    TASKS_JOBS(Exchange.MESSAGE, "tasks.jobs"),
-    TASKS_RESTARTS(Exchange.MESSAGE, "tasks.restarts"),
-    TASKS_STOPS(Exchange.MESSAGE, "tasks.stops");
+    TASKS_COMPLETE(Exchange.MESSAGE, "tasks.complete");
 
     private final Exchange exchange;
     private final String routeName;
@@ -38,14 +39,10 @@ public enum TaskMessageRoute implements MessageRoute {
         this.routeName = routeName;
     }
 
-    public static MessageRoute ofRoute(String routName) {
+    public static MessageRoute ofWorkerRoute(String routName) {
         return switch (routName) {
             case "tasks" -> TASKS;
-            case "tasks.completions" -> TASKS_COMPLETIONS;
-            case "tasks.jobs" -> TASKS_JOBS;
-            case "tasks.restarts" -> TASKS_RESTARTS;
-            case "tasks.stops" -> TASKS_STOPS;
-            default -> new CustomMessageRoute(routName);
+            default -> new CustomTaskMessageRoute(routName);
         };
     }
 
@@ -59,7 +56,7 @@ public enum TaskMessageRoute implements MessageRoute {
         return routeName;
     }
 
-    private record CustomMessageRoute(String routName) implements MessageRoute {
+    private record CustomTaskMessageRoute(String routName) implements MessageRoute {
 
         @Override
         public Exchange getExchange() {

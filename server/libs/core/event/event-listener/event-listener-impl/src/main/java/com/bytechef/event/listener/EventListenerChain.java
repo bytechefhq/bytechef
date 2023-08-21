@@ -19,7 +19,7 @@
 
 package com.bytechef.event.listener;
 
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +37,9 @@ public class EventListenerChain implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
+    public void onApplicationEvent(Event event) {
         for (EventListener eventListener : eventListeners) {
-            eventListener.onApplicationEvent(workflowEvent);
+            eventListener.onApplicationEvent(event);
         }
     }
 }

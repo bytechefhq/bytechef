@@ -18,7 +18,7 @@
 package com.bytechef.component.var;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
+import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 
 import java.nio.charset.StandardCharsets;
@@ -35,11 +35,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class VarComponentHandlerIntTest {
 
     @Autowired
-    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
+    private JobTestExecutor jobTestExecutor;
 
     @Test
     public void testVar() {
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
             Map.of());

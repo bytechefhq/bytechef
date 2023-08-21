@@ -25,11 +25,11 @@ import com.bytechef.message.broker.amqp.AmqpMessageBroker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -62,22 +62,22 @@ public class AmqpMessageBrokerConfiguration
 
     private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
 
-    @Autowired
-    private ConnectionFactory connectionFactory;
+    private final ConnectionFactory connectionFactory;
+    private final List<MessageBrokerConfigurer<RabbitListenerEndpointRegistrar>> messageBrokerConfigurers;
+    private final ObjectMapper objectMapper;
+    private final RabbitProperties rabbitProperties;
 
-    @Autowired(required = false)
-    private List<MessageBrokerConfigurer<RabbitListenerEndpointRegistrar>> messageBrokerConfigurers = Collections
-        .emptyList();
+    @SuppressFBWarnings("EI")
+    public AmqpMessageBrokerConfiguration(
+        ConnectionFactory connectionFactory,
+        @Autowired(
+            required = false) List<MessageBrokerConfigurer<RabbitListenerEndpointRegistrar>> messageBrokerConfigurers,
+        ObjectMapper objectMapper, RabbitProperties rabbitProperties) {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private RabbitProperties rabbitProperties;
-
-    @Bean
-    RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        return new RabbitAdmin(connectionFactory);
+        this.connectionFactory = connectionFactory;
+        this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
+        this.objectMapper = objectMapper;
+        this.rabbitProperties = rabbitProperties;
     }
 
     @Override
@@ -127,11 +127,6 @@ public class AmqpMessageBrokerConfiguration
     }
 
     @Bean
-    MessageConverter jacksonAmqpMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
-
-    @Bean
     Queue controlQueue() {
         return new Queue(SystemMessageRoute.CONTROL.toString(), true, true, true);
     }
@@ -146,6 +141,11 @@ public class AmqpMessageBrokerConfiguration
     }
 
     @Bean
+    MessageConverter jacksonAmqpMessageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    @Bean
     Queue dlqQueue() {
         return new Queue(SystemMessageRoute.DLQ.toString());
     }
@@ -155,6 +155,11 @@ public class AmqpMessageBrokerConfiguration
         return ExchangeBuilder.directExchange(MessageRoute.Exchange.MESSAGE.toString())
             .durable(true)
             .build();
+    }
+
+    @Bean
+    RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
     }
 
     private SimpleRabbitListenerContainerFactory createContainerFactory(int concurrentConsumers) {

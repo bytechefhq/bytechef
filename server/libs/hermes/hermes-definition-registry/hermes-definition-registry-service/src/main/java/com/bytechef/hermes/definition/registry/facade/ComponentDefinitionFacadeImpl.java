@@ -67,7 +67,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
             componentDefinitionDTOs = new ArrayList<>(componentDefinitionDTOs);
 
             componentDefinitionDTOs.sort(
-                Comparator.comparing(componentDefinitionDTO -> include.indexOf(componentDefinitionDTO.name())));
+                Comparator.comparing(componentDefinitionDTO -> include.indexOf(componentDefinitionDTO.getName())));
         }
 
         return componentDefinitionDTOs;
@@ -78,15 +78,15 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
         Boolean triggerDefinitions, List<String> include, List<Connection> connections) {
 
         return componentDefinition -> {
-            if (include != null && !include.isEmpty() && !include.contains(componentDefinition.name())) {
+            if (include != null && !include.isEmpty() && !include.contains(componentDefinition.getName())) {
                 return false;
             }
 
-            if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
+            if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.getActions())) {
                 return false;
             }
 
-            if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.connection())) {
+            if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.getConnection())) {
                 return false;
             }
 
@@ -94,7 +94,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
                 return false;
             }
 
-            if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.triggers())) {
+            if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
                 return false;
             }
 
@@ -104,6 +104,6 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
 
     private static boolean noneMatch(List<Connection> connections, ComponentDefinitionDTO componentDefinition) {
         return connections.stream()
-            .noneMatch(connection -> Objects.equals(connection.getComponentName(), componentDefinition.name()));
+            .noneMatch(connection -> Objects.equals(connection.getComponentName(), componentDefinition.getName()));
     }
 }

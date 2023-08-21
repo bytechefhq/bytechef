@@ -20,7 +20,6 @@
 package com.bytechef.message.broker.kafka.config;
 
 import com.bytechef.message.broker.MessageRoute;
-import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.kafka.KafkaMessageBroker;
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -67,15 +65,20 @@ public class KafkaMessageBrokerConfiguration
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);
 
-    @Autowired
-    private BeanFactory beanFactory;
+    private final BeanFactory beanFactory;
+    private final List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers;
+    private final MessageHandlerMethodFactory messageHandlerMethodFactory;
 
-    @Autowired(required = false)
-    private List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers = Collections
-        .emptyList();
+    public KafkaMessageBrokerConfiguration(
+        BeanFactory beanFactory,
+        @Autowired(
+            required = false) List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers,
+        MessageHandlerMethodFactory messageHandlerMethodFactory) {
 
-    @Autowired
-    private MessageHandlerMethodFactory messageHandlerMethodFactory;
+        this.beanFactory = beanFactory;
+        this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
+        this.messageHandlerMethodFactory = messageHandlerMethodFactory;
+    }
 
     @Override
     public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
@@ -88,12 +91,7 @@ public class KafkaMessageBrokerConfiguration
     @Override
     public void registerListenerEndpoint(
         KafkaListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
-        Object delegate,
-        String methodName) {
-
-        if (messageRoute.isControlExchange()) {
-            messageRoute = SystemMessageRoute.CONTROL;
-        }
+        Object delegate, String methodName) {
 
         Class<?> delegateClass = delegate.getClass();
 

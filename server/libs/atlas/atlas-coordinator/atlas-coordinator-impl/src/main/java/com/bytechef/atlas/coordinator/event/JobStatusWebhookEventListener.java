@@ -21,9 +21,9 @@ package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
+import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.event.listener.EventListener;
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
@@ -55,19 +55,19 @@ public class JobStatusWebhookEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (JobStatusWorkflowEvent.JOB_STATUS.equals(workflowEvent.getType())) {
-            handleEvent((JobStatusWorkflowEvent) workflowEvent);
+    public void onApplicationEvent(Event event) {
+        if (JobStatusEvent.JOB_STATUS.equals(event.getType())) {
+            handleEvent((JobStatusEvent) event);
         }
     }
 
-    private void handleEvent(JobStatusWorkflowEvent workflowEvent) {
+    private void handleEvent(JobStatusEvent workflowEvent) {
         long jobId = workflowEvent.getJobId();
 
         Job job = jobService.getJob(jobId);
 
         for (Job.Webhook webhook : job.getWebhooks()) {
-            if (JobStatusWorkflowEvent.JOB_STATUS.equals(webhook.type())) {
+            if (JobStatusEvent.JOB_STATUS.equals(webhook.type())) {
                 Map<String, Object> webhookEvent = webhook.toMap();
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);

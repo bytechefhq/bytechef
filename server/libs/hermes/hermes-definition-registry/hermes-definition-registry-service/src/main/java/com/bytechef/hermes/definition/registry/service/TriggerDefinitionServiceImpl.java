@@ -19,7 +19,9 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
@@ -29,9 +31,25 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
+import com.bytechef.hermes.component.definition.TriggerDefinition.PollContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
@@ -39,18 +57,20 @@ import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
+import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
+import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
+import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
+import com.bytechef.message.broker.MessageBroker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -61,13 +81,40 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextConnectionFactory contextConnectionFactory;
+    private final ContextFactory contextFactory;
+    private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
     public TriggerDefinitionServiceImpl(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory, MessageBroker messageBroker) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextConnectionFactory = contextConnectionFactory;
+        this.contextFactory = contextFactory;
+        this.messageBroker = messageBroker;
+    }
+
+    @Override
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+
+        ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
+            componentName, componentVersion, triggerName, propertyName);
+
+        return ComponentContextSupplier.get(
+            getTriggerContext(componentName, connectionId),
+            () -> {
+                List<? extends Property.ValueProperty<?>> valueProperties = propertiesFunction.apply(
+                    contextConnectionFactory.createConnection(
+                        componentName, componentVersion, connectionParameters, authorizationName),
+                    triggerParameters);
+
+                return valueProperties.stream()
+                    .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
+                    .toList();
+            });
     }
 
     @Override
@@ -76,11 +123,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
-
-        DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = OptionalUtils.get(
-            triggerDefinition.getDynamicWebhookDisable());
+        DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = getDynamicWebhookDisableConsumer(
+            componentName, componentVersion, triggerName);
 
         DynamicWebhookDisableContext context = new DynamicWebhookDisableContext(
             contextConnectionFactory.createConnection(
@@ -95,13 +139,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Map<String, ?> connectionParameters, String authorizationName, String webhookUrl, String workflowExecutionId) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
+        DynamicWebhookEnableFunction dynamicWebhookEnableFunction = getDynamicWebhookEnableFunction(
+            componentName, componentVersion, triggerName);
 
-        DynamicWebhookEnableFunction dynamicWebhookEnableFunction = OptionalUtils.get(
-            triggerDefinition.getDynamicWebhookEnable());
-
-        DynamicWebhookEnableContext context = new DynamicWebhookEnableContext(
+        EnableDynamicWebhookContext context = new EnableDynamicWebhookContext(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
             triggerParameters, webhookUrl, workflowExecutionId);
@@ -113,71 +154,37 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
-
-        DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = OptionalUtils.get(
-            triggerDefinition.getDynamicWebhookRefresh());
+        DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
+            componentName, componentVersion, triggerName);
 
         return dynamicWebhookRefreshFunction.apply(output);
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String propertyName, Map<String, ?> connectionParameters, String authorizationName) {
-
-        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
-            propertyName, triggerName, componentName, componentVersion);
-
-        PropertiesDataSource propertiesDataSource = property.getDynamicPropertiesDataSource();
-
-        ComponentPropertiesFunction propertiesFunction = (ComponentPropertiesFunction) propertiesDataSource
-            .getProperties();
-
-        List<? extends Property.ValueProperty<?>> valueProperties = propertiesFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters);
-
-        return valueProperties.stream()
-            .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
-            .toList();
-    }
-
-    @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName) {
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
+        EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
+            componentName, componentVersion, triggerName);
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
-
-        EditorDescriptionFunction editorDescriptionFunction = OptionalUtils.mapOrElse(
-            triggerDefinition.getEditorDescriptionDataSource(),
-            EditorDescriptionDataSource::getEditorDescription,
-            (Context.Connection connection, Map<String, ?> inputParameters) -> componentDefinition.getTitle() +
-                ": " + triggerDefinition.getTitle());
-
-        return editorDescriptionFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters);
+        return ComponentContextSupplier.get(
+            getTriggerContext(componentName, connectionId),
+            () -> {
+                return editorDescriptionFunction.apply(
+                    contextConnectionFactory.createConnection(
+                        componentName, componentVersion, connectionParameters, authorizationName),
+                    triggerParameters);
+            });
     }
 
     @Override
     public void executeListenerDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters,
-        String authorizationName, String workflowExecutionId) {
+        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
-
-        ListenerDisableConsumer listenerDisableConsumer = OptionalUtils.get(triggerDefinition.getListenerDisable());
+        ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
+            componentName, componentVersion, triggerName);
 
         listenerDisableConsumer.accept(
             contextConnectionFactory.createConnection(
@@ -186,86 +193,107 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public void executeListenerEnable(
+    public void executeOnEnableListener(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
-
-        ListenerEnableConsumer listenerEnableConsumer = OptionalUtils.get(triggerDefinition.getListenerEnable());
+        ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
+            componentName, componentVersion, triggerName);
 
         listenerEnableConsumer.accept(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters, workflowExecutionId);
+            triggerParameters, workflowExecutionId,
+            output -> messageBroker.send(
+                TriggerMessageRoute.LISTENERS,
+                new ListenerParameters(WorkflowExecutionId.parse(workflowExecutionId), output)));
     }
 
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String propertyName, Map<String, ?> connectionParameters, String authorizationName, String searchText) {
+        String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName,
+        String searchText) {
 
-        DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
-            .getTriggerProperty(propertyName, triggerName, componentName, componentVersion);
+        ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
+            componentName, componentVersion, triggerName, propertyName);
 
-        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
+        return ComponentContextSupplier.get(
+            getTriggerContext(componentName, connectionId),
+            () -> {
+                List<Option<?>> options = optionsFunction.apply(
+                    contextConnectionFactory.createConnection(
+                        componentName, componentVersion, connectionParameters, authorizationName),
+                    triggerParameters, searchText);
 
-        ComponentOptionsFunction optionsFunction = (ComponentOptionsFunction) optionsDataSource.getOptions();
-
-        List<Option<?>> options = optionsFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters, searchText);
-
-        return options.stream()
-            .map(OptionDTO::new)
-            .toList();
+                return options.stream()
+                    .map(OptionDTO::new)
+                    .toList();
+            });
     }
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName) {
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
-        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
+        OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
+            componentName, componentVersion, triggerName);
 
-        OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(
-            triggerDefinition.getOutputSchemaDataSource());
+        return ComponentContextSupplier.get(
+            getTriggerContext(componentName, connectionId),
+            () -> PropertyDTO.toPropertyDTO(
+                outputSchemaFunction.apply(
+                    contextConnectionFactory.createConnection(
+                        componentName, componentVersion, connectionParameters, authorizationName),
+                    triggerParameters)));
+    }
 
-        OutputSchemaFunction outputSchemaFunction = outputSchemaDataSource.getOutputSchema();
+    @Override
+    public Object executeSampleOutput(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
-        return PropertyDTO.toPropertyDTO(
-            outputSchemaFunction.apply(
+        SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
+            componentName, componentVersion, triggerName);
+
+        return ComponentContextSupplier.get(
+            getTriggerContext(componentName, connectionId),
+            () -> sampleOutputFunction.apply(
                 contextConnectionFactory.createConnection(
                     componentName, componentVersion, connectionParameters, authorizationName),
                 triggerParameters));
     }
 
     @Override
-    public Object executeSampleOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName) {
+    public TriggerOutput executeTrigger(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
 
+        TriggerContext triggerContext = contextFactory.createTriggerContext(connectionIdMap);
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
-            triggerName, componentName, componentVersion);
+            componentName, componentVersion, triggerName);
 
-        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
-            triggerDefinition.getSampleOutputDataSource());
+        return ComponentContextSupplier.get(triggerContext, () -> doExecuteTrigger(
+            triggerDefinition, triggerContext, inputParameters, triggerState, webhookRequest));
+    }
 
-        SampleOutputFunction sampleOutputFunction = sampleOutputDataSource.getSampleOutput();
+    @Override
+    public boolean executeWebhookValidate(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
 
-        return sampleOutputFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(connectionIdMap);
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return executeWebhookValidate(triggerDefinition, triggerContext, inputParameters, webhookRequest);
     }
 
     @Override
     public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         return toTriggerDefinitionDTO(
-            componentDefinitionRegistry.getTriggerDefinition(triggerName, componentName, componentVersion));
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName));
     }
 
     @Override
@@ -276,7 +304,221 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .toList();
     }
 
+    @SuppressWarnings("unchecked")
+    private TriggerOutput doExecuteTrigger(
+        TriggerDefinition triggerDefinition, TriggerContext triggerContext, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest) {
+
+        TriggerOutput triggerOutput;
+        TriggerType triggerType = triggerDefinition.getType();
+
+        if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
+            !executeWebhookValidate(
+                triggerDefinition, triggerContext, inputParameters, webhookRequest)) {
+
+            throw new IllegalStateException("Invalid trigger signature.");
+        }
+
+        if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
+            triggerOutput = triggerDefinition.getDynamicWebhookRequest()
+                .map(dynamicWebhookRequestFunction -> executeDynamicWebhookTrigger(
+                    triggerContext, inputParameters, (DynamicWebhookEnableOutput) triggerState, webhookRequest,
+                    dynamicWebhookRequestFunction))
+                .orElseThrow();
+        } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
+            triggerOutput = triggerDefinition.getStaticWebhookRequest()
+                .map(staticWebhookRequestFunction -> executeStaticWebhookTrigger(
+                    triggerContext, inputParameters, webhookRequest, staticWebhookRequestFunction))
+                .orElseThrow();
+        } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
+            triggerOutput = triggerDefinition.getPoll()
+                .map(pollFunction -> executePollingTrigger(
+                    triggerDefinition, triggerContext, inputParameters, (Map<String, Object>) triggerState,
+                    pollFunction))
+                .orElseThrow();
+        } else {
+            throw new IllegalArgumentException("Unknown trigger type: " + triggerType);
+        }
+
+        return triggerOutput;
+    }
+
+    private static TriggerOutput executeDynamicWebhookTrigger(
+        TriggerContext triggerContext, Map<String, ?> inputParameters, DynamicWebhookEnableOutput triggerState,
+        WebhookRequest webhookRequest, DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
+
+        WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
+            new DynamicWebhookRequestContext(
+                inputParameters, webhookRequest.headers(), webhookRequest.parameters(),
+                webhookRequest.body(), webhookRequest.method(),
+                triggerState, triggerContext));
+
+        return new TriggerOutput(webhookOutput.getValue(), null, false);
+    }
+
+    private static TriggerOutput executePollingTrigger(
+        TriggerDefinition triggerDefinition, TriggerContext triggerContext, Map<String, ?> inputParameters,
+        Map<String, Object> triggerState, PollFunction pollFunction) {
+
+        PollOutput pollOutput = pollFunction.apply(
+            new PollContext(inputParameters, triggerState, triggerContext));
+
+        List<Map<?, ?>> records = new ArrayList<>(
+            pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
+
+        while (pollOutput.pollImmediately()) {
+            pollOutput = pollFunction.apply(
+                new PollContext(inputParameters, pollOutput.closureParameters(), triggerContext));
+
+            records.addAll(pollOutput.records());
+        }
+
+        return new TriggerOutput(
+            records, pollOutput.closureParameters(),
+            OptionalUtils.orElse(triggerDefinition.getBatch(), false));
+    }
+
+    private static TriggerOutput executeStaticWebhookTrigger(
+        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookRequest webhookRequest,
+        StaticWebhookRequestFunction staticWebhookRequestFunction) {
+
+        WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
+            new StaticWebhookRequestContext(
+                inputParameters, webhookRequest.headers(), webhookRequest.parameters(),
+                webhookRequest.body(), webhookRequest.method(), triggerContext));
+
+        return new TriggerOutput(webhookOutput.getValue(), null, false);
+    }
+
+    private boolean executeWebhookValidate(
+        TriggerDefinition triggerDefinition, TriggerContext triggerContext, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest) {
+
+        WebhookValidateContext context = new WebhookValidateContext(
+            inputParameters, webhookRequest.headers(), webhookRequest.parameters(), webhookRequest.body(),
+            webhookRequest.method(), triggerContext);
+
+        return triggerDefinition.getWebhookValidate()
+            .map(webhookValidateFunction -> webhookValidateFunction.apply(context))
+            .orElse(true);
+    }
+
+    private ComponentOptionsFunction getComponentOptionsFunction(
+        String componentName, int componentVersion, String triggerName, String propertyName) {
+
+        DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
+            .getTriggerProperty(componentName, componentVersion, triggerName, propertyName);
+
+        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
+
+        return (ComponentOptionsFunction) optionsDataSource.getOptions();
+    }
+
+    private ComponentPropertiesFunction getComponentPropertiesFunction(
+        String componentName, int componentVersion, String triggerName, String propertyName) {
+
+        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
+            componentName, componentVersion, triggerName, propertyName);
+
+        PropertiesDataSource propertiesDataSource = property.getDynamicPropertiesDataSource();
+
+        return (ComponentPropertiesFunction) propertiesDataSource.getProperties();
+    }
+
+    private DynamicWebhookRefreshFunction getDynamicWebhookRefreshFunction(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return OptionalUtils.get(triggerDefinition.getDynamicWebhookRefresh());
+    }
+
+    private DynamicWebhookDisableConsumer getDynamicWebhookDisableConsumer(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return OptionalUtils.get(triggerDefinition.getDynamicWebhookDisable());
+    }
+
+    private DynamicWebhookEnableFunction getDynamicWebhookEnableFunction(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
+    }
+
+    private EditorDescriptionFunction getEditorDescriptionFunction(
+        String componentName, int componentVersion, String triggerName) {
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return OptionalUtils.mapOrElse(
+            triggerDefinition.getEditorDescriptionDataSource(),
+            EditorDescriptionDataSource::getEditorDescription,
+            (Context.Connection connection, Map<String, ?> inputParameters) -> componentDefinition.getTitle() +
+                ": " + triggerDefinition.getTitle());
+    }
+
+    private ListenerDisableConsumer getListenerDisableConsumer(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return OptionalUtils.get(triggerDefinition.getListenerDisable());
+    }
+
+    private ListenerEnableConsumer getListenerEnableConsumer(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return OptionalUtils.get(triggerDefinition.getListenerEnable());
+    }
+
+    private OutputSchemaFunction getOutputSchemaFunction(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(
+            triggerDefinition.getOutputSchemaDataSource());
+
+        return outputSchemaDataSource.getOutputSchema();
+    }
+
+    private SampleOutputFunction getSampleOutputFunction(
+        String componentName, int componentVersion, String triggerName) {
+
+        TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
+            triggerDefinition.getSampleOutputDataSource());
+
+        return sampleOutputDataSource.getSampleOutput();
+    }
+
+    private TriggerContext getTriggerContext(String componentName, Long connectionId) {
+        return contextFactory.createTriggerContext(
+            connectionId == null ? Map.of() : Map.of(componentName, connectionId));
+    }
+
     private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
         return new TriggerDefinitionDTO(triggerDefinition);
+    }
+
+    private record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {
     }
 }

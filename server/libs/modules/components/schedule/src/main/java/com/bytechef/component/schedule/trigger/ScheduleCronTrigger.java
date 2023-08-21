@@ -20,8 +20,9 @@ package com.bytechef.component.schedule.trigger;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
@@ -59,8 +60,8 @@ public class ScheduleCronTrigger {
                     string(DATETIME),
                     string(EXPRESSION),
                     string(TIMEZONE)))
-        .listenerEnable(this::listenerEnable)
-        .listenerDisable(this::listenerDisable);
+        .listenerDisable(this::listenerDisable)
+        .listenerEnable(this::listenerEnable);
 
     private final TriggerScheduler triggerScheduler;
 
@@ -68,20 +69,21 @@ public class ScheduleCronTrigger {
         this.triggerScheduler = triggerScheduler;
     }
 
-    protected void listenerEnable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
-
-        triggerScheduler.scheduleScheduleTrigger(
-            "0 " + MapValueUtils.getString(inputParameters, EXPRESSION),
-            MapValueUtils.getString(inputParameters, TIMEZONE), Map.of(
-                EXPRESSION, MapValueUtils.getString(inputParameters, EXPRESSION),
-                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
-            workflowExecutionId);
-    }
-
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
+    }
+
+    protected void listenerEnable(
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter) {
+
+        triggerScheduler.scheduleScheduleTrigger(
+            "0 " + MapUtils.getString(inputParameters, EXPRESSION),
+            MapUtils.getString(inputParameters, TIMEZONE), Map.of(
+                EXPRESSION, MapUtils.getString(inputParameters, EXPRESSION),
+                TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
+            workflowExecutionId);
     }
 }

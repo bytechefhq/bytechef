@@ -53,7 +53,7 @@ public class ProjectWorkflowExecutionController implements WorkflowExecutionsApi
     @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowExecutionModel> getExecution(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(workflowExecutionFacade.getExecution(id),
+            conversionService.convert(workflowExecutionFacade.getWorkflowExecution(id),
                 WorkflowExecutionModel.class));
     }
 
@@ -64,7 +64,7 @@ public class ProjectWorkflowExecutionController implements WorkflowExecutionsApi
 
         return ResponseEntity.ok(
             workflowExecutionFacade
-                .getExecutions(
+                .getWorkflowExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
                     workflowExecutionDTO, WorkflowExecutionBasicModel.class)));

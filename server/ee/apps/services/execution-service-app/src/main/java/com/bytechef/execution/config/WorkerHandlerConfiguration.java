@@ -19,7 +19,15 @@ package com.bytechef.execution.config;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
-import com.bytechef.atlas.worker.remote.client.task.handler.TaskHandlerClient;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.bytechef.hermes.definition.registry.component.ComponentOperation;
+import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
+import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,14 +37,39 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WorkerHandlerConfiguration {
 
-    private final TaskHandlerClient taskHandlerClient;
+    private final ActionDefinitionService actionDefinitionService;
+    private final TriggerDefinitionService triggerDefinitionService;
 
-    public WorkerHandlerConfiguration(TaskHandlerClient taskHandlerClient) {
-        this.taskHandlerClient = taskHandlerClient;
+    public WorkerHandlerConfiguration(
+        ActionDefinitionService actionDefinitionService, TriggerDefinitionService triggerDefinitionService) {
+
+        this.actionDefinitionService = actionDefinitionService;
+        this.triggerDefinitionService = triggerDefinitionService;
     }
 
     @Bean
     TaskHandlerRegistry taskHandlerRegistry() {
-        return type -> (TaskHandler<?>) taskExecution -> taskHandlerClient.handle(type, taskExecution);
+        return type -> (TaskHandler<?>) taskExecution -> {
+            ComponentOperation componentOperation = ComponentUtils.getComponentOperation(type);
+
+            return actionDefinitionService.executePerform(
+                componentOperation.componentName(), componentOperation.componentVersion(),
+                componentOperation.operationName(), taskExecution.getId(), taskExecution.getParameters(),
+                MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+        };
+    }
+
+    @Bean
+    TriggerHandlerRegistry triggerHandlerRegistry() {
+        return type -> (TriggerHandler) triggerExecution -> {
+            ComponentOperation componentOperation = ComponentUtils.getComponentOperation(type);
+
+            return triggerDefinitionService.executeTrigger(
+                componentOperation.componentName(), componentOperation.componentVersion(),
+                componentOperation.operationName(), triggerExecution.getParameters(), triggerExecution.getState(),
+                MapUtils.getRequired(
+                    triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
+                MapUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+        };
     }
 }

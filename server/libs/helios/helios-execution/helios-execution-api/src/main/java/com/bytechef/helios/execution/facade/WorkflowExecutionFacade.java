@@ -27,9 +27,9 @@ import java.time.LocalDateTime;
  */
 public interface WorkflowExecutionFacade {
 
-    WorkflowExecutionDTO getExecution(long id);
+    WorkflowExecutionDTO getWorkflowExecution(long id);
 
-    Page<WorkflowExecutionDTO> getExecutions(
+    Page<WorkflowExecutionDTO> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 

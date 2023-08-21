@@ -19,6 +19,7 @@ package com.bytechef.execution.config;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.remote.client.facade.TriggerDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.ActionDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.remote.client.service.ComponentDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.remote.client.service.TriggerDefinitionServiceClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class DefinitionRegistryConfiguration {
+
+    @Bean
+    ActionDefinitionServiceClient actionDefinitionServiceClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        return new ActionDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
+    }
 
     @Bean
     ComponentDefinitionServiceClient componentDefinitionServiceClient(

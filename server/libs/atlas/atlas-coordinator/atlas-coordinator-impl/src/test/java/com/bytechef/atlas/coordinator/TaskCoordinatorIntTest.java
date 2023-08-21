@@ -41,7 +41,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.execution.sync.JobSyncExecutor;
+import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
@@ -116,8 +116,6 @@ public class TaskCoordinatorIntTest {
             .contextService(contextService)
             .eventPublisher(e -> {})
             .jobService(jobService)
-            .taskCompletionHandlerFactories(List.of())
-            .taskDispatcherResolverFactories(List.of())
             .taskExecutionService(taskExecutionService)
             .taskHandlerRegistry(taskHandlerMap::get)
             .workflowService(workflowService)

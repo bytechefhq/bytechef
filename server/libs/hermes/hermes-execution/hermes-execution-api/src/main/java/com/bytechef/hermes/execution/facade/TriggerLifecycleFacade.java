@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.execution.facade;
 
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-
 import java.util.Map;
 
 /**
@@ -27,8 +25,10 @@ import java.util.Map;
 public interface TriggerLifecycleFacade {
 
     void executeTriggerDisable(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId);
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId);
 
     void executeTriggerEnable(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId);
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId);
 }

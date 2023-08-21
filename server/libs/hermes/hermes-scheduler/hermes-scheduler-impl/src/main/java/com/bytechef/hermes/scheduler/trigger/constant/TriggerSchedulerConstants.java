@@ -29,13 +29,13 @@ public class TriggerSchedulerConstants {
 
     public static final TaskWithDataDescriptor<PollingTriggerScheduleAndData> POLLING_TRIGGER_RECURRING_TASK =
         new TaskWithDataDescriptor<>(
-            "trigger-poll-recurring-task", PollingTriggerScheduleAndData.class);
+            "polling-trigger-recurring-task", PollingTriggerScheduleAndData.class);
 
     public static final TaskWithDataDescriptor<WorkflowExecutionId> DYNAMIC_WEBHOOK_TRIGGER_REFRESH_ONE_TIME_TASK =
         new TaskWithDataDescriptor<>(
-            "trigger-refresh-dynamic-webhook-recurring-task", WorkflowExecutionId.class);
+            "dynamic-webhook-trigger-refresh-one-time-task", WorkflowExecutionId.class);
 
     public static final TaskWithDataDescriptor<ScheduleTriggerScheduleAndData> SCHEDULE_TRIGGER_RECURRING_TASK =
         new TaskWithDataDescriptor<>(
-            "trigger-execute-workflow-recurring-task", ScheduleTriggerScheduleAndData.class);
+            "schedule-trigger-recurring-task", ScheduleTriggerScheduleAndData.class);
 }

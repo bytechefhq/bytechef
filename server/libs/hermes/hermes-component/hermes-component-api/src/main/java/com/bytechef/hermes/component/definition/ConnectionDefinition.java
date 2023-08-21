@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.definition.Property.InputProperty;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-public sealed interface ConnectionDefinition permits ModifiableConnectionDefinition {
+public interface ConnectionDefinition {
 
     String BASE_URI = "baseUri";
 
