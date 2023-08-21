@@ -20,7 +20,6 @@ package com.bytechef.hermes.execution.facade;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
 import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
@@ -58,7 +57,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId) {
 
-        ComponentOperation componentOperation = ComponentUtils.getComponentOperation(workflowTriggerType);
+        ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             componentOperation.componentName(), componentOperation.componentVersion(),
@@ -96,7 +95,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
 
-        ComponentOperation componentOperation = ComponentUtils.getComponentOperation(workflowTriggerType);
+        ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             componentOperation.componentName(), componentOperation.componentVersion(),

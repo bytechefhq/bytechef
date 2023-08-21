@@ -34,7 +34,6 @@ import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -138,7 +137,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     }
 
     private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {
-        ComponentOperation componentOperation = ComponentUtils.getComponentOperation(taskExecution.getType());
+        ComponentOperation componentOperation = ComponentOperation.ofType(taskExecution.getType());
 
         return componentDefinitionService.getComponentDefinition(
             componentOperation.componentName(), componentOperation.componentVersion());
