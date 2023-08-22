@@ -10,7 +10,7 @@ COPY --chown=gradle:gradle ./build.gradle ./build.gradle
 COPY --chown=gradle:gradle ./gradle.properties ./gradle.properties
 COPY --chown=gradle:gradle ./settings.gradle ./settings.gradle
 
-WORKDIR server/apps/server-app
+WORKDIR ./
 
 RUN gradle bootJar --no-daemon
 
