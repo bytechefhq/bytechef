@@ -45,7 +45,7 @@ public class TriggerStateServiceClient implements TriggerStateService {
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
                     .host("execution-service-app")
-                    .path("/api/internal/trigger-storage-service/fetch-value/{workflowExecutionId}")
+                    .path("/internal/trigger-storage-service/fetch-value/{workflowExecutionId}")
                     .build(workflowExecutionId),
                 new ParameterizedTypeReference<T>() {}));
     }
@@ -55,7 +55,7 @@ public class TriggerStateServiceClient implements TriggerStateService {
         loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/trigger-storage-service/save/{workflowExecutionId}")
+                .path("/internal/trigger-storage-service/save/{workflowExecutionId}")
                 .build(workflowExecutionId),
             value);
     }

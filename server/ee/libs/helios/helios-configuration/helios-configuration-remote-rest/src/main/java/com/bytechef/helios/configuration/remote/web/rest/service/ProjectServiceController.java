@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/project-service")
+@RequestMapping("/internal/project-service")
 public class ProjectServiceController {
 
     private final ProjectService projectService;

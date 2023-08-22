@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/oauth2-service")
+@RequestMapping("/internal/oauth2-service")
 public class OAuth2ServiceController {
 
     private final OAuth2Service oAuth2Service;

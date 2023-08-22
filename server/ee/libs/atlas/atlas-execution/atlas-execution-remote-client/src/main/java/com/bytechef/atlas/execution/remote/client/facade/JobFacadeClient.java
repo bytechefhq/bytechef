@@ -42,7 +42,7 @@ public class JobFacadeClient implements JobFacade {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-facade/create-job")
+                .path("/internal/job-facade/create-job")
                 .build(),
             jobParameters, Long.class);
     }

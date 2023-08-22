@@ -40,7 +40,7 @@ public class CounterServiceClient implements CounterService {
         loadBalancedWebClient.delete(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/counter-service/delete/{id}")
+                .path("/internal/counter-service/delete/{id}")
                 .build(id));
     }
 
@@ -50,7 +50,7 @@ public class CounterServiceClient implements CounterService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/counter-service/decrement/{id}")
+                .path("/internal/counter-service/decrement/{id}")
                 .build(id),
             null, Long.class);
     }
@@ -60,7 +60,7 @@ public class CounterServiceClient implements CounterService {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/counter-service/set/{id}/{value}")
+                .path("/internal/counter-service/set/{id}/{value}")
                 .build(id, value),
             null);
     }

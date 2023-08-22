@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/job-service")
+@RequestMapping("/internal/job-service")
 public class JobServiceController {
 
     private final JobService jobService;

@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/trigger-storage-service")
+@RequestMapping("/internal/trigger-storage-service")
 public class TriggerStateServiceController {
 
     private final TriggerStateService triggerStateService;

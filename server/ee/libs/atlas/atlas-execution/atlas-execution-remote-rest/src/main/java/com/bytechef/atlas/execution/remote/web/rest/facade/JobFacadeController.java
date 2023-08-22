@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/job-facade")
+@RequestMapping("/internal/job-facade")
 public class JobFacadeController {
 
     private final JobFacade jobFacade;

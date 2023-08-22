@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/project-instance-service")
+@RequestMapping("/internal/project-instance-service")
 public class ProjectInstanceServiceController {
 
     private final ProjectInstanceService projectInstanceService;

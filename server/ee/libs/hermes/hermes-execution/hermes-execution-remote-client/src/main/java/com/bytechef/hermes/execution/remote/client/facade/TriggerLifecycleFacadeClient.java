@@ -43,7 +43,7 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
         Map<String, ?> triggerParameters, long connectionId) {
 
         post(
-            "/api/internal/trigger-lifecycle-facade/execute-trigger-enable",
+            "/internal/trigger-lifecycle-facade/execute-trigger-enable",
             new TriggerRequest(
                 workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
                 connectionId, null));
@@ -55,7 +55,7 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
 
         post(
-            "/api/internal/trigger-lifecycle-facade/execute-trigger-disable",
+            "/internal/trigger-lifecycle-facade/execute-trigger-disable",
             new TriggerRequest(
                 workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
                 connectionId, webhookUrl));

@@ -54,7 +54,7 @@ public class WorkflowServiceClient implements WorkflowService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/workflow-service/get-workflow/{id}")
+                .path("/internal/workflow-service/get-workflow/{id}")
                 .build(id),
             Workflow.class);
     }
@@ -64,7 +64,7 @@ public class WorkflowServiceClient implements WorkflowService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/workflow-service/get-workflows")
+                .path("/internal/workflow-service/get-workflows")
                 .build(),
             new ParameterizedTypeReference<>() {});
     }

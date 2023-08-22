@@ -43,7 +43,7 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
             uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path(
-                    "/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}")
+                    "/internal/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}")
                 .build(name, version),
             new ParameterizedTypeReference<>() {});
     }
@@ -53,7 +53,7 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
-                .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definitions")
+                .path("/internal/task-dispatcher-definition-service/get-task-dispatcher-definitions")
                 .build(),
             new ParameterizedTypeReference<>() {});
     }
@@ -63,7 +63,7 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
-                .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}")
+                .path("/internal/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}")
                 .build(name),
             new ParameterizedTypeReference<>() {});
     }

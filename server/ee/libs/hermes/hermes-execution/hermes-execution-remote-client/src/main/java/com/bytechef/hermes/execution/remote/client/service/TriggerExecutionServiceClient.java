@@ -41,7 +41,7 @@ public class TriggerExecutionServiceClient implements TriggerExecutionService {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/trigger-execution-service/create")
+                .path("/internal/trigger-execution-service/create")
                 .build(),
             triggerExecution, TriggerExecution.class);
     }
@@ -51,7 +51,7 @@ public class TriggerExecutionServiceClient implements TriggerExecutionService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/trigger-execution-service/get-trigger-execution/{id}")
+                .path("/internal/trigger-execution-service/get-trigger-execution/{id}")
                 .build(id),
             TriggerExecution.class);
     }
@@ -61,7 +61,7 @@ public class TriggerExecutionServiceClient implements TriggerExecutionService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/trigger-execution-service/update")
+                .path("/internal/trigger-execution-service/update")
                 .build(),
             triggerExecution, TriggerExecution.class);
     }

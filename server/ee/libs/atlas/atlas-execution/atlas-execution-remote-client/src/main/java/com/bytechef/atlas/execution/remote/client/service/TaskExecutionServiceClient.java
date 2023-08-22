@@ -44,7 +44,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/task-execution-service/create")
+                .path("/internal/task-execution-service/create")
                 .build(),
             taskExecution, TaskExecution.class);
     }
@@ -54,7 +54,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/task-execution-service/get-task-execution/{id}")
+                .path("/internal/task-execution-service/get-task-execution/{id}")
                 .build(id),
             TaskExecution.class);
     }
@@ -74,7 +74,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/task-execution-service/get-parent-task-executions/{parentId}")
+                .path("/internal/task-execution-service/get-parent-task-executions/{parentId}")
                 .build(parentId),
             new ParameterizedTypeReference<List<TaskExecution>>() {});
     }
@@ -84,7 +84,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/task-execution-service/update")
+                .path("/internal/task-execution-service/update")
                 .build(),
             taskExecution, TaskExecution.class);
     }

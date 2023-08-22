@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("/internal/trigger-lifecycle-facade")
 public class TriggerLifecycleFacadeController {
 
     private final TriggerLifecycleFacade triggerLifecycleFacade;
@@ -43,7 +43,7 @@ public class TriggerLifecycleFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-lifecycle-facade/execute-trigger-disable")
+        value = "/execute-trigger-disable")
     public void executeTriggerDisable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerDisable(
             triggerRequest.workflowId, triggerRequest.instanceId, triggerRequest.instanceType,
