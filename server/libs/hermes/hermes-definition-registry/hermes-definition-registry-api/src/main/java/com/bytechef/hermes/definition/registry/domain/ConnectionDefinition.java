@@ -31,8 +31,11 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class ConnectionDefinition extends ConnectionDefinitionBasic {
 
-    private final List<Authorization> authorizations;
-    private final List<? extends Property> properties;
+    private List<Authorization> authorizations;
+    private List<? extends Property> properties;
+
+    private ConnectionDefinition() {
+    }
 
     public ConnectionDefinition(com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition) {
         super(connectionDefinition);

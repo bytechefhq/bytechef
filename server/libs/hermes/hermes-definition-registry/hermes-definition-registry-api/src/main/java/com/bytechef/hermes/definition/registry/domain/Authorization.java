@@ -32,11 +32,14 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class Authorization {
 
-    private final String description;
-    private final String name;
-    private final List<? extends Property> properties;
-    private final String title;
-    private final AuthorizationType type;
+    private String description;
+    private String name;
+    private List<? extends Property> properties;
+    private String title;
+    private AuthorizationType type;
+
+    private Authorization() {
+    }
 
     public Authorization(com.bytechef.hermes.component.definition.Authorization authorization) {
         this.description = OptionalUtils.orElse(authorization.getDescription(), null);

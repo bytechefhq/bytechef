@@ -31,12 +31,15 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private final boolean editorDescriptionDataSource;
-    private final Property outputSchema;
-    private final boolean outputSchemaDataSource;
-    private final List<? extends Property> properties;
-    private final Object sampleOutput;
-    private final boolean sampleOutputDataSource;
+    private boolean editorDescriptionDataSource;
+    private Property outputSchema;
+    private boolean outputSchemaDataSource;
+    private List<? extends Property> properties;
+    private Object sampleOutput;
+    private boolean sampleOutputDataSource;
+
+    private ActionDefinition() {
+    }
 
     public ActionDefinition(com.bytechef.hermes.component.definition.ActionDefinition actionDefinition) {
         super(actionDefinition);
