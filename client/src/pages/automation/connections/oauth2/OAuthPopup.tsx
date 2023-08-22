@@ -15,7 +15,7 @@ type Props = {
 const OAuthPopup = (props: Props) => {
     const {
         Component = (
-            <div style={{margin: '12px'}} data-testid="popup-loading">
+            <div className="flex h-screen items-center justify-center text-xl">
                 Loading...
             </div>
         ),
