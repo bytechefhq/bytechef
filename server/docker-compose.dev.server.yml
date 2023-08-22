@@ -29,7 +29,7 @@ services:
   bytechef-server-app:
     build:
       context: ../
-      dockerfile: ./server/docker/dev-server/Dockerfile
+      dockerfile: ./server/apps/server-app/docker/dev-server/Dockerfile
     container_name: bytechef-server
     depends_on:
       - postgres
