@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/trigger-execution-service")
+@RequestMapping("/internal/trigger-execution-service")
 public class TriggerExecutionServiceController {
 
     private final TriggerExecutionService triggerExecutionService;

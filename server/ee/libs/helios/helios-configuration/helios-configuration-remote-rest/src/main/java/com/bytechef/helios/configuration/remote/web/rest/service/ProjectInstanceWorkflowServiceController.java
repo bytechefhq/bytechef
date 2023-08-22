@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/project-instance-workflow-service")
+@RequestMapping("/internal/project-instance-workflow-service")
 public class ProjectInstanceWorkflowServiceController {
 
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;

@@ -47,7 +47,7 @@ public class OAuth2ServiceClient implements OAuth2Service {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/oauth2-service/check-predefined-parameters/{componentName}")
+                .path("/internal/oauth2-service/check-predefined-parameters/{componentName}")
                 .build(componentName),
             connectionParameters,
             new ParameterizedTypeReference<>() {});
@@ -58,7 +58,7 @@ public class OAuth2ServiceClient implements OAuth2Service {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/oauth2-service/get-redirect-uri")
+                .path("/internal/oauth2-service/get-redirect-uri")
                 .build(),
             String.class);
     }
@@ -68,7 +68,7 @@ public class OAuth2ServiceClient implements OAuth2Service {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/oauth2-service/get-predefined-apps")
+                .path("/internal/oauth2-service/get-predefined-apps")
                 .build(),
             new ParameterizedTypeReference<>() {});
     }

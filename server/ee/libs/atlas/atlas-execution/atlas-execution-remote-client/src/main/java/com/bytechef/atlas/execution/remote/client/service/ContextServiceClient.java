@@ -44,7 +44,7 @@ public class ContextServiceClient implements ContextService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/context-service/peek/{stackId}/{classname}")
+                .path("/internal/context-service/peek/{stackId}/{classname}")
                 .build(stackId, classname),
             new ParameterizedTypeReference<Map<String, Object>>() {});
     }
@@ -54,7 +54,7 @@ public class ContextServiceClient implements ContextService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/context-service/peek/{stackId}/{subStackId}/{classname}")
+                .path("/internal/context-service/peek/{stackId}/{subStackId}/{classname}")
                 .build(stackId, subStackId, classname),
             new ParameterizedTypeReference<Map<String, Object>>() {});
     }
@@ -64,7 +64,7 @@ public class ContextServiceClient implements ContextService {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/context-service/push/{stackId}/{classname}")
+                .path("/internal/context-service/push/{stackId}/{classname}")
                 .build(stackId, classname),
             context, new ParameterizedTypeReference<Map<String, Object>>() {});
     }
@@ -74,7 +74,7 @@ public class ContextServiceClient implements ContextService {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/context-service/push/{stackId}/{subStackId}/{classname}")
+                .path("/internal/context-service/push/{stackId}/{subStackId}/{classname}")
                 .build(stackId, classname),
             context, new ParameterizedTypeReference<Map<String, Object>>() {});
     }

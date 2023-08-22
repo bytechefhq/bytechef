@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/task-dispatcher-definition-service")
+@RequestMapping("/internal/task-dispatcher-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "coordinator-service-app")
 public class TaskDispatcherDefinitionServiceController {
 

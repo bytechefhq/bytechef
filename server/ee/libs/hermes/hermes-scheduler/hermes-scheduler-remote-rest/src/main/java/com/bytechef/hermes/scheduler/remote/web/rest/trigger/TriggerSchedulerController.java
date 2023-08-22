@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("/internal/trigger-scheduler")
 public class TriggerSchedulerController {
 
     private final TriggerScheduler triggerScheduler;
@@ -44,7 +44,7 @@ public class TriggerSchedulerController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-scheduler/cancel-dynamic-webhook-trigger-refresh",
+        value = "/cancel-dynamic-webhook-trigger-refresh",
         consumes = {
             "application/json"
         })

@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/counter-service")
+@RequestMapping("/internal/counter-service")
 public class CounterServiceController {
 
     private final CounterService counterService;

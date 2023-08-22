@@ -45,7 +45,7 @@ public class DataStorageServiceClient implements DataStorageService {
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
                     .host("execution-service-app")
-                    .path("/api/internal/data-storage-service/fetch-value/{scope}/{scopeId}/{key}")
+                    .path("/internal/data-storage-service/fetch-value/{scope}/{scopeId}/{key}")
                     .build(scope, scopeId, key),
                 new ParameterizedTypeReference<T>() {}));
     }
@@ -55,7 +55,7 @@ public class DataStorageServiceClient implements DataStorageService {
         loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/data-storage-service/save/{scope}/{scopeId}/{key}")
+                .path("/internal/data-storage-service/save/{scope}/{scopeId}/{key}")
                 .build(scope, scope, key),
             value);
     }

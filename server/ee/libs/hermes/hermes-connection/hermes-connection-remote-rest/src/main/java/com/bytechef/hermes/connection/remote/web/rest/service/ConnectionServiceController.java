@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/connection-service")
+@RequestMapping("/internal/connection-service")
 public class ConnectionServiceController {
 
     private final ConnectionService connectionService;
