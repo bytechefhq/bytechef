@@ -29,10 +29,13 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class Option {
 
-    private final String description;
-    private final String displayCondition;
-    private final String name;
-    private final Object value;
+    private String description;
+    private String displayCondition;
+    private String name;
+    private Object value;
+
+    private Option() {
+    }
 
     public Option(com.bytechef.hermes.definition.Option<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);

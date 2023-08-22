@@ -30,9 +30,12 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class Resources {
 
-    private final Map<String, String> additionalUrls;
-    private final List<String> categories;
-    private final String documentationUrl;
+    private Map<String, String> additionalUrls;
+    private List<String> categories;
+    private String documentationUrl;
+
+    private Resources() {
+    }
 
     public Resources(com.bytechef.hermes.definition.Resources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());

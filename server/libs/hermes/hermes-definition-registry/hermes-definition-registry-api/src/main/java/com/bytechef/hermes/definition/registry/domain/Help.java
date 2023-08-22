@@ -26,8 +26,11 @@ import java.util.Objects;
  */
 public class Help {
 
-    private final String body;
-    private final String learnMoreUrl;
+    private String body;
+    private String learnMoreUrl;
+
+    private Help() {
+    }
 
     public Help(com.bytechef.hermes.component.definition.Help help) {
         this.body = help.getBody();

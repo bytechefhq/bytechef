@@ -30,12 +30,15 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class TriggerDefinitionBasic {
 
-    protected final boolean batch;
-    protected final String description;
-    protected final Help help;
-    protected final String name;
-    protected final String title;
-    protected final TriggerType type;
+    protected boolean batch;
+    protected String description;
+    protected Help help;
+    protected String name;
+    protected String title;
+    protected TriggerType type;
+
+    protected TriggerDefinitionBasic() {
+    }
 
     public TriggerDefinitionBasic(TriggerDefinition triggerDefinition) {
         this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);

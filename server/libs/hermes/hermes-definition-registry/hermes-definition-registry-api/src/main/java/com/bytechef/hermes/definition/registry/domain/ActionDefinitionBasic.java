@@ -30,11 +30,14 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class ActionDefinitionBasic {
 
-    protected final boolean batch;
-    protected final String description;
-    protected final Help help;
-    protected final String name;
-    protected final String title;
+    protected boolean batch;
+    protected String description;
+    protected Help help;
+    protected String name;
+    protected String title;
+
+    protected ActionDefinitionBasic() {
+    }
 
     public ActionDefinitionBasic(ActionDefinition actionDefinition) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);

@@ -31,15 +31,18 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
-    private final boolean editorDescriptionDataSource;
-    private final Property outputSchema;
-    private final boolean outputSchemaDataSource;
-    private final List<? extends Property> properties;
-    private final Object sampleOutput;
-    private final boolean sampleOutputDataSource;
-    private final boolean webhookRawBody;
-    private final boolean workflowSyncExecution;
-    private final boolean workflowSyncValidation;
+    private boolean editorDescriptionDataSource;
+    private Property outputSchema;
+    private boolean outputSchemaDataSource;
+    private List<? extends Property> properties;
+    private Object sampleOutput;
+    private boolean sampleOutputDataSource;
+    private boolean webhookRawBody;
+    private boolean workflowSyncExecution;
+    private boolean workflowSyncValidation;
+
+    private TriggerDefinition() {
+    }
 
     public TriggerDefinition(com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition) {
         super(triggerDefinition);
