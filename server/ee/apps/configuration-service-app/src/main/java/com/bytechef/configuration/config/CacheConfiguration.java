@@ -51,7 +51,8 @@ public class CacheConfiguration {
             .build();
 
         objectMapper.activateDefaultTyping(
-            objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+            objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL,
+            JsonTypeInfo.As.WRAPPER_ARRAY);
 
         return (builder) -> builder.cacheDefaults(
             RedisCacheConfiguration.defaultCacheConfig()
