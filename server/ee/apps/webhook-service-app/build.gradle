@@ -8,7 +8,6 @@ springBoot {
 dependencies {
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "org.springframework:spring-webflux"
-    implementation libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
