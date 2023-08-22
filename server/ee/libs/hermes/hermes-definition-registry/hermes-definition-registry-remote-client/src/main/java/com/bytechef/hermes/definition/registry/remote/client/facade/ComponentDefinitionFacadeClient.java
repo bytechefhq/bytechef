@@ -54,7 +54,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(
-                        uriBuilder, serviceInstance, "/component-definition-facade/get-components", Map.of(),
+                        uriBuilder, serviceInstance, "/component-definition-facade/get-component-definitions", Map.of(),
                         new LinkedMultiValueMap<>() {
                             {
                                 if (actionDefinitions != null) {

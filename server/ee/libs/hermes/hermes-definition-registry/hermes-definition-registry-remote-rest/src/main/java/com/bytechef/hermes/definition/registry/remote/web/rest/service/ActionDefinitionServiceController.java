@@ -49,7 +49,7 @@ public class ActionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-trigger",
+        value = "/execute-perform",
         produces = {
             "application/json"
         })
