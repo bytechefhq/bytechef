@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.scheduler;
+package com.bytechef.execution;
 
+import com.bytechef.test.annotation.EmbeddedRedis;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,9 +25,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * @author Ivica Cardic
  */
+@EmbeddedRedis
 @EmbeddedSql
 @SpringBootTest
-public class SchedulerApplicationIntTest {
+public class ExecutionApplicationIntTest {
 
     @Test
     void testContextLoads() {

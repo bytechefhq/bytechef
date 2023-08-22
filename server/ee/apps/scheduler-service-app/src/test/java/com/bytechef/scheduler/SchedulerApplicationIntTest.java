@@ -15,21 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.webhook;
+package com.bytechef.scheduler;
 
+import com.bytechef.test.annotation.EmbeddedRedis;
+import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
+@EmbeddedRedis
+@EmbeddedSql
 @SpringBootTest
-@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
-public class WebhookApplicationIntTest {
+public class SchedulerApplicationIntTest {
 
     @Test
-    public void testContextLoads() {
+    void testContextLoads() {
     }
 }
