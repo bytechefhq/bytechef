@@ -30,7 +30,7 @@ subprojects {
 
     jib {
         from {
-            image = "ghcr.io/graalvm/graalvm-ce:ol9-java17-22.3.0"
+            image = "ghcr.io/graalvm/graalvm-community:20.0.2-ol9"
         }
         to {
             image = "bytechef/bytechef-$project.name:latest"
