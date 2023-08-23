@@ -32,6 +32,10 @@ dependencies {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.10"
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(20))
@@ -43,7 +47,18 @@ testing {
         // Configure the built-in test suite
         val test by getting(JvmTestSuite::class) {
             // Use JUnit Jupiter test framework
-            useJUnitJupiter("5.10.0")
+            useJUnitJupiter()
         }
+    }
+}
+
+tasks.withType<JacocoReport> {
+    executionData(tasks.withType(org.gradle.api.tasks.testing.Test::class.java))
+    classDirectories.setFrom(sourceSets.main.get().output.classesDirs)
+    sourceDirectories.setFrom(sourceSets.main.get().java.srcDirs)
+
+    reports {
+        xml.getRequired().set(true)
+        html.getRequired().set(true)
     }
 }

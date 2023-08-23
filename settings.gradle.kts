@@ -13,12 +13,14 @@ pluginManagement {
 
         mavenCentral()
 
-        maven { url "https://repo.spring.io/release" }
+        maven {
+            url = uri("https://repo.spring.io/release")
+        }
     }
 }
 
 plugins {
-    id "org.gradle.toolchains.foojay-resolver-convention" version "0.7.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
 }
 
 rootProject.name = "bytechef"
