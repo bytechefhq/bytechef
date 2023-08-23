@@ -3,7 +3,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.org.sonarqube)
-    alias(libs.plugins.org.springframework.boot) apply false
 }
 
 val sonarProperties = Properties()
@@ -33,7 +32,7 @@ subprojects {
     dependencies {
         implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
 
-        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation(rootProject.libs.org.springframework.boot.spring.boot.starter.test)
         testImplementation(rootProject.libs.org.mockito.mockito.inline)
     }
 }
