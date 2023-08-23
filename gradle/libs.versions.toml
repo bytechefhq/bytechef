@@ -41,7 +41,6 @@ org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.0.1"
 org-json = "org.json:json:20230618"
-org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.10.0"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
