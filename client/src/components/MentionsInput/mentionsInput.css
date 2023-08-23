@@ -30,7 +30,7 @@
     @apply border;
     @apply shadow-lg;
     @apply z-50;
-    @apply m-4 mt-6;
+    @apply mx-4;
     @apply rounded-md;
     @apply max-h-96;
     @apply overflow-y-auto;

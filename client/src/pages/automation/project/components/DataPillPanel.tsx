@@ -81,6 +81,7 @@ const DataPillPanel = () => {
                 <Dialog.Content
                     className="fixed inset-y-2 right-[472px] top-16 z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
+                    onOpenAutoFocus={(event) => event.preventDefault()}
                 >
                     <div
                         className="flex h-full flex-col bg-white shadow-xl"
@@ -92,7 +93,7 @@ const DataPillPanel = () => {
 
                                 <TooltipProvider>
                                     <Tooltip>
-                                        <TooltipTrigger>
+                                        <TooltipTrigger asChild>
                                             <InfoCircledIcon className="ml-1 h-4 w-4" />
                                         </TooltipTrigger>
 
@@ -106,7 +107,7 @@ const DataPillPanel = () => {
 
                                 <Button
                                     aria-label="Close the data pill panel"
-                                    className="ml-auto pr-0"
+                                    className="ml-auto"
                                     displayType="icon"
                                     icon={
                                         <Cross1Icon

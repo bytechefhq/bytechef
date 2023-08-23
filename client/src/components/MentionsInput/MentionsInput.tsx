@@ -46,6 +46,24 @@ const MentionsInput = ({data, label, placeholder}: MentionsInputProps) => {
             dataAttributes: ['component'],
             fixMentionsToQuill: true,
             mentionDenotationChars: ['${'],
+            onOpen: useCallback(() => {
+                if (!editorRef.current) {
+                    return;
+                }
+
+                // @ts-expect-error Quill false positive
+                const editorContainer = editorRef.current.getEditor().container;
+
+                const {height} = editorContainer.getBoundingClientRect();
+
+                const mentionListParentElement = editorContainer.querySelector(
+                    '#quill-mention-list'
+                ).parentNode;
+
+                mentionListParentElement.style.top = `${
+                    height + editorContainer.offsetTop + 10
+                }px`;
+            }, []),
             onSelect: useCallback(
                 (
                     item: DataPillType,
