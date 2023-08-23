@@ -9,7 +9,7 @@ org-mapstruct-extensions-spring = "1.0.2"
 org-springframework-boot = "3.1.2"
 org-springframework-cloud = "4.0.4"
 org-springframework-cloud-dependencies = "2022.0.4"
-org-testcontainers = "1.18.3"
+org-testcontainers = "1.19.0"
 pmd = "6.54.0"
 spotbugs = "4.7.3"
 
@@ -67,7 +67,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.127"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.132"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.20.0"
