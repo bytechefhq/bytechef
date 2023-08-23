@@ -142,23 +142,25 @@ const NodeDetailsDialog = () => {
         !!componentActions?.length
     );
 
-    const componentProperties = previousComponents?.map((component, index) => {
-        if (!actionData?.length) {
-            return;
+    const previousComponentProperties = previousComponents?.map(
+        (component, index) => {
+            if (!actionData?.length) {
+                return;
+            }
+
+            const outputSchema: PropertyType | undefined =
+                actionData[index]?.outputSchema;
+
+            const properties = outputSchema?.properties?.length
+                ? outputSchema.properties
+                : outputSchema?.items;
+
+            return {
+                component,
+                properties,
+            };
         }
-
-        const outputSchema: PropertyType | undefined =
-            actionData[index]?.outputSchema;
-
-        const properties = outputSchema?.properties?.length
-            ? outputSchema.properties
-            : outputSchema?.items;
-
-        return {
-            component,
-            properties,
-        };
-    });
+    );
 
     const getExistingProperties = (
         properties: PropertyType[]
@@ -175,7 +177,7 @@ const NodeDetailsDialog = () => {
 
     const availableDataPills: Array<DataPillType> = [];
 
-    componentProperties?.forEach((componentProperty) => {
+    previousComponentProperties?.forEach((componentProperty) => {
         if (!componentProperty || !componentProperty.properties?.length) {
             return;
         }
@@ -382,7 +384,7 @@ const NodeDetailsDialog = () => {
                                     </div>
                                 )}
 
-                                <div className="relative h-full overflow-y-auto">
+                                <div className="relative h-full">
                                     <div className="absolute left-0 top-0 h-full w-full">
                                         {activeTab === 'description' && (
                                             <DescriptionTab
@@ -397,7 +399,7 @@ const NodeDetailsDialog = () => {
                                                     actionName={
                                                         currentActionName
                                                     }
-                                                    customClassName="p-4 overflow-y-auto"
+                                                    customClassName="p-4 overflow-y-auto relative"
                                                     dataPills={dataPills}
                                                     properties={
                                                         currentAction.properties
@@ -425,7 +427,7 @@ const NodeDetailsDialog = () => {
                                 </div>
                             </div>
 
-                            <footer className="mt-auto flex p-4">
+                            <footer className="z-50 mt-auto flex bg-white p-4">
                                 <Select
                                     defaultValue={currentComponent.version.toString()}
                                     options={[
