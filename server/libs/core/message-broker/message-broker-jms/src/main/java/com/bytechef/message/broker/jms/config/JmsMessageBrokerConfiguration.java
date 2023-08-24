@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,96 +13,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.message.broker.jms.config;
 
-import com.bytechef.message.broker.MessageRoute;
-import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.jms.JmsMessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.jms.ConnectionFactory;
-import jakarta.jms.Message;
-import jakarta.jms.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.annotation.JmsListenerConfigurer;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerEndpointRegistrar;
-import org.springframework.jms.config.SimpleJmsListenerEndpoint;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.listener.adapter.MessageListenerAdapter;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
 /**
- * @author Arik Cohen
+ * @author Ivica Cardic
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "jms")
-public class JmsMessageBrokerConfiguration
-    implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
-
-    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBrokerConfiguration.class);
-
-    private final ConnectionFactory connectionFactory;
-    private final List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers;
-    private final ObjectMapper objectMapper;
-
-    @SuppressFBWarnings("EI")
-    public JmsMessageBrokerConfiguration(
-        ConnectionFactory connectionFactory,
-        @Autowired(
-            required = false) List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers,
-        ObjectMapper objectMapper) {
-
-        this.connectionFactory = connectionFactory;
-        this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
-        this.objectMapper = objectMapper;
-    }
-
-    @Override
-    public void configureJmsListeners(JmsListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<JmsListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
-            messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
-        }
-    }
-
-    @Override
-    public void registerListenerEndpoint(
-        JmsListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
-        Object delegate, String methodName) {
-
-        Class<?> delegateClass = delegate.getClass();
-
-        logger.info("Registering JMS Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
-
-        MessageListenerAdapter messageListenerAdapter = new NoReplyMessageListenerAdapter(delegate);
-
-        messageListenerAdapter.setMessageConverter(jacksonJmsMessageConverter(objectMapper));
-        messageListenerAdapter.setDefaultListenerMethod(methodName);
-
-        SimpleJmsListenerEndpoint simpleJmsListenerEndpoint = new SimpleJmsListenerEndpoint();
-
-        simpleJmsListenerEndpoint.setId(messageRoute + delegateClass.getSimpleName() + "Endpoint");
-        simpleJmsListenerEndpoint.setDestination(messageRoute.toString());
-        simpleJmsListenerEndpoint.setMessageListener(messageListenerAdapter);
-
-        listenerEndpointRegistrar.registerEndpoint(simpleJmsListenerEndpoint, createContainerFactory(concurrency));
-    }
+public class JmsMessageBrokerConfiguration {
 
     @Bean
     MessageConverter jacksonJmsMessageConverter(ObjectMapper objectMapper) {
@@ -128,28 +63,8 @@ public class JmsMessageBrokerConfiguration
     }
 
     @Bean
-    JmsMessageBroker jmsMessageBroker(JmsTemplate jmsTemplate) {
+    MessageBroker jmsMessageBroker(JmsTemplate jmsTemplate) {
         return new JmsMessageBroker(jmsTemplate);
     }
 
-    private DefaultJmsListenerContainerFactory createContainerFactory(int concurrency) {
-        DefaultJmsListenerContainerFactory jmsListenerContainerFactory = new DefaultJmsListenerContainerFactory();
-
-        jmsListenerContainerFactory.setConcurrency(String.valueOf(concurrency));
-        jmsListenerContainerFactory.setConnectionFactory(connectionFactory);
-
-        return jmsListenerContainerFactory;
-    }
-
-    private static class NoReplyMessageListenerAdapter extends MessageListenerAdapter {
-
-        public NoReplyMessageListenerAdapter(Object delegate) {
-            super(delegate);
-        }
-
-        @Override
-        protected void handleResult(Object result, Message request, Session session) {
-            // ignore
-        }
-    }
 }

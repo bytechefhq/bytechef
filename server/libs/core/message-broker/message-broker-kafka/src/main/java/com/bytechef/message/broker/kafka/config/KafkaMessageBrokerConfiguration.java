@@ -19,30 +19,16 @@
 
 package com.bytechef.message.broker.kafka.config;
 
-import com.bytechef.message.broker.MessageRoute;
-import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.kafka.KafkaMessageBroker;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.KafkaListenerConfigurer;
-import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
-import org.springframework.kafka.config.MethodKafkaListenerEndpoint;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -55,62 +41,18 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
 
+import java.io.IOException;
+import java.util.Map;
+
 /**
  * @author Arik Cohen
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "kafka")
-public class KafkaMessageBrokerConfiguration
-    implements KafkaListenerConfigurer, MessageBrokerListenerRegistrar<KafkaListenerEndpointRegistrar> {
-
-    private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);
-
-    private final BeanFactory beanFactory;
-    private final List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers;
-    private final MessageHandlerMethodFactory messageHandlerMethodFactory;
-
-    public KafkaMessageBrokerConfiguration(
-        BeanFactory beanFactory,
-        @Autowired(
-            required = false) List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers,
-        MessageHandlerMethodFactory messageHandlerMethodFactory) {
-
-        this.beanFactory = beanFactory;
-        this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
-        this.messageHandlerMethodFactory = messageHandlerMethodFactory;
-    }
-
-    @Override
-    public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<KafkaListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
-
-            messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
-        }
-    }
-
-    @Override
-    public void registerListenerEndpoint(
-        KafkaListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
-        Object delegate, String methodName) {
-
-        Class<?> delegateClass = delegate.getClass();
-
-        logger.info("Registering Kafka Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
-
-        Method listenerMethod = Stream.of(delegateClass.getMethods())
-            .filter(it -> methodName.equals(it.getName()))
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
-
-        MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(
-            messageRoute.toString(), delegate, listenerMethod);
-
-        listenerEndpointRegistrar.registerEndpoint(endpoint);
-    }
+public class KafkaMessageBrokerConfiguration {
 
     @Bean
-    KafkaMessageBroker kafkaMessageBroker(KafkaTemplate kafkaTemplate) {
+    MessageBroker kafkaMessageBroker(KafkaTemplate kafkaTemplate) {
         KafkaMessageBroker kafkaMessageBroker = new KafkaMessageBroker();
 
         kafkaMessageBroker.setKafkaTemplate(kafkaTemplate);
@@ -210,20 +152,5 @@ public class KafkaMessageBrokerConfiguration
         messageHandlerMethodFactory.setMessageConverter(messageConverter);
 
         return messageHandlerMethodFactory;
-    }
-
-    private MethodKafkaListenerEndpoint<String, String> createListenerEndpoint(
-        String queueName, Object listener, Method listenerMethod) {
-
-        final MethodKafkaListenerEndpoint<String, String> endpoint = new MethodKafkaListenerEndpoint<>();
-
-        endpoint.setBeanFactory(beanFactory);
-        endpoint.setBean(listener);
-        endpoint.setMethod(listenerMethod);
-        endpoint.setId(queueName + "Endpoint");
-        endpoint.setTopics(queueName);
-        endpoint.setMessageHandlerMethodFactory(messageHandlerMethodFactory);
-
-        return endpoint;
     }
 }
