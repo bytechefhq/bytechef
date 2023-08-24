@@ -22,9 +22,9 @@ import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Map;
-import org.springframework.context.ApplicationContext;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,24 +33,12 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnEnabled("worker")
-public class TaskWorkerMessageBrokerConfiguration {
-
-    private final ApplicationContext applicationContext;
-    private final TaskWorkerProperties taskWorkerProperties;
-
-    @SuppressFBWarnings("EI")
-    public TaskWorkerMessageBrokerConfiguration(
-        ApplicationContext applicationContext, TaskWorkerProperties taskWorkerProperties) {
-
-        this.applicationContext = applicationContext;
-        this.taskWorkerProperties = taskWorkerProperties;
-    }
+public class TaskWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer() {
+    MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer(
+        TaskWorker taskWorker, TaskWorkerProperties taskWorkerProperties) {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TaskWorker taskWorker = applicationContext.getBean(TaskWorker.class);
-
             Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
