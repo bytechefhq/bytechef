@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.remote.client.trigger;
+package com.bytechef.hermes.scheduler.remote.client;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
@@ -95,7 +95,7 @@ public class TriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void scheduleScheduleTrigger(
-        String pattern, String zoneId, Map<String, Object> output, String workflowExecutionId) {
+        String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId) {
 
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
@@ -113,6 +113,6 @@ public class TriggerSchedulerClient implements TriggerScheduler {
 
     @SuppressFBWarnings("EI")
     private record TriggerWorkflowTaskRequest(
-        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
+        WorkflowExecutionId workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
     }
 }

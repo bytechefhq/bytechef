@@ -6,11 +6,11 @@ springBoot {
 }
 
 dependencies {
-    implementation(libs.com.github.kagkarlsson.db.scheduler.spring.boot.starter)
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(libs.org.springframework.cloud.spring.cloud.starter.loadbalancer)
     implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))

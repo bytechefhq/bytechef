@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDe
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
@@ -131,7 +132,7 @@ public class ScheduleEveryDayTrigger {
                 MINUTE, MapUtils.getInteger(inputParameters, MINUTE),
                 DAY_OF_WEEK, MapUtils.getMap(inputParameters, DAY_OF_WEEK),
                 TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
-            workflowExecutionId);
+            WorkflowExecutionId.parse(workflowExecutionId));
     }
 
     private static String getDayOfWeek(Map<String, ?> inputParameters) {

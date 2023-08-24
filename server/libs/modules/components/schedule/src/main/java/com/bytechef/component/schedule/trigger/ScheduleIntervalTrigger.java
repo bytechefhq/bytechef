@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitte
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.time.ZoneId;
@@ -100,7 +101,7 @@ public class ScheduleIntervalTrigger {
             }, zoneId.getId(), Map.of(
                 INTERVAL, MapUtils.getInteger(inputParameters, INTERVAL),
                 TIME_UNIT, MapUtils.getInteger(inputParameters, TIME_UNIT)),
-            workflowExecutionId);
+            WorkflowExecutionId.parse(workflowExecutionId));
 
     }
 }

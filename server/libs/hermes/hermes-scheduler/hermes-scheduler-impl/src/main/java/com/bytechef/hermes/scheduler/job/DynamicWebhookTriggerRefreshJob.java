@@ -15,65 +15,80 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.handler;
+package com.bytechef.hermes.scheduler.job;
 
-import com.bytechef.commons.util.InstantUtils;
+import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.scheduler.trigger.constant.TriggerSchedulerConstants;
-import com.github.kagkarlsson.scheduler.SchedulerClient;
-import com.github.kagkarlsson.scheduler.task.ExecutionContext;
-import com.github.kagkarlsson.scheduler.task.TaskInstance;
-import com.github.kagkarlsson.scheduler.task.VoidExecutionHandler;
-import org.springframework.context.ApplicationContext;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public class DynamicWebhookTriggerRefreshTaskVoidExecutionHandler
-    implements VoidExecutionHandler<WorkflowExecutionId> {
+public class DynamicWebhookTriggerRefreshJob implements Job {
 
-    private final ApplicationContext applicationContext;
-
-    public DynamicWebhookTriggerRefreshTaskVoidExecutionHandler(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+    private TriggerDefinitionService triggerDefinitionService;
+    private TriggerStateService triggerStateService;
 
     @Override
-    public void execute(TaskInstance<WorkflowExecutionId> taskInstance, ExecutionContext executionContext) {
-        WorkflowExecutionId workflowExecutionId = taskInstance.getData();
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        JobDataMap jobDataMap = context.getMergedJobDataMap();
+
+        String workflowExecutionIdString = jobDataMap.getString("workflowExecutionId");
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(workflowExecutionIdString);
 
         LocalDateTime webhookExpirationDate = refreshDynamicWebhookTrigger(
             workflowExecutionId, workflowExecutionId.getComponentName(),
             workflowExecutionId.getComponentVersion());
 
         if (webhookExpirationDate != null) {
-            SchedulerClient schedulerClient = executionContext.getSchedulerClient();
+            Scheduler scheduler = context.getScheduler();
+            try {
+                TriggerKey triggerKey = TriggerKey.triggerKey(
+                    workflowExecutionIdString, "DynamicWebhookTriggerRefresh");
 
-            schedulerClient.reschedule(
-                TriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_ONE_TIME_TASK.instance(
-                    workflowExecutionId.toString(), workflowExecutionId),
-                InstantUtils.getInstant(webhookExpirationDate));
+                scheduler.rescheduleJob(
+                    triggerKey,
+                    TriggerBuilder.newTrigger()
+                        .withIdentity(TriggerKey.triggerKey("myTrigger", "myTriggerGroup"))
+                        .startAt(DateUtils.getDate(webhookExpirationDate))
+                        .build());
+            } catch (SchedulerException e) {
+                throw new JobExecutionException(e);
+            }
         }
+    }
+
+    @Autowired
+    public void setTriggerDefinitionService(TriggerDefinitionService triggerDefinitionService) {
+        this.triggerDefinitionService = triggerDefinitionService;
+    }
+
+    @Autowired
+    public void setTriggerStateService(TriggerStateService triggerStateService) {
+        this.triggerStateService = triggerStateService;
     }
 
     private LocalDateTime refreshDynamicWebhookTrigger(
         WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion) {
 
         LocalDateTime webhookExpirationDate = null;
-
-        TriggerStateService triggerStateService = applicationContext.getBean(TriggerStateService.class);
-
         TriggerDefinition.DynamicWebhookEnableOutput output = OptionalUtils.get(
             triggerStateService.fetchValue(workflowExecutionId));
-
-        TriggerDefinitionService triggerDefinitionService = applicationContext.getBean(
-            TriggerDefinitionService.class);
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
             componentName, componentVersion, workflowExecutionId.getComponentTriggerName(), output);
