@@ -52,7 +52,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 8. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
 
 
-# Setup for local development 
+# Setup for local development
 
 ## Client Side
 
@@ -185,7 +185,7 @@ This section doesn't provide instructions to install Java and Gradle because the
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
-- [Java - GraalVM for JDK 20+](https://www.graalvm.org/downloads/) 
+- [Java - GraalVM for JDK 20+](https://www.graalvm.org/downloads/)
 - Gradle - V8.3+. - Comes as part of the project as [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
 - A PostgreSQL database - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
 - A Redis instance - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
