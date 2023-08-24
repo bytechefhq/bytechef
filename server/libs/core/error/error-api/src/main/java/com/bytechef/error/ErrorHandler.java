@@ -31,4 +31,6 @@ public interface ErrorHandler<E extends Errorable> {
 
     /** Handle the given error. */
     void handle(E errorable);
+
+    Class<?> getType();
 }

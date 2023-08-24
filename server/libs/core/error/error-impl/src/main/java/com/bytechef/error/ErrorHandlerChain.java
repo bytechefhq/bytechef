@@ -19,22 +19,17 @@
 
 package com.bytechef.error;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Apr 10, 2017
  */
 public class ErrorHandlerChain implements ErrorHandler<Errorable> {
-
-    private static final Logger logger = LoggerFactory.getLogger(ErrorHandlerChain.class);
 
     private final List<? extends ErrorHandler<? super Errorable>> errorHandlers;
 
@@ -46,20 +41,17 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
 
     @Override
     public void handle(Errorable errorable) {
-        for (ErrorHandler<? super Errorable> handler : errorHandlers) {
-            Method method = BeanUtils.findDeclaredMethodWithMinimalParameters(handler.getClass(), "handle");
-
-            if (method == null) {
-                logger.error("Unable to locate handle method for " + handler.getClass());
-
-                return;
-            }
-
-            Class<?> type = method.getParameters()[0].getType();
+        for (ErrorHandler<? super Errorable> errorHandler : errorHandlers) {
+            Class<?> type = errorHandler.getType();
 
             if (type.isAssignableFrom(errorable.getClass())) {
-                handler.handle(errorable);
+                errorHandler.handle(errorable);
             }
         }
+    }
+
+    @Override
+    public Class<?> getType() {
+        return null;
     }
 }

@@ -24,6 +24,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -33,14 +35,16 @@ public class ErrorHandlerMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> errorHandlerMessageBrokerConfigurer(
-        ErrorHandler<?> errorHandler, ErrorHandlerProperties errorHandlerProperties) {
+        List<ErrorHandler<?>> errorHandlers, ErrorHandlerProperties errorHandlerProperties) {
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             ErrorHandlerProperties.ErrorHandlerSubscriptions subscriptions = errorHandlerProperties.getSubscriptions();
 
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, SystemMessageRoute.ERRORS, subscriptions.getErrors(), errorHandler,
-                "handle");
+            for (ErrorHandler<?> errorHandler : errorHandlers) {
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar, SystemMessageRoute.ERRORS, subscriptions.getErrors(), errorHandler,
+                    "handle");
+            }
         };
     }
 }
