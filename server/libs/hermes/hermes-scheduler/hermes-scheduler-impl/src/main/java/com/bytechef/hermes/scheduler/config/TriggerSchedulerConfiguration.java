@@ -17,43 +17,48 @@
 
 package com.bytechef.hermes.scheduler.config;
 
-import com.bytechef.hermes.scheduler.handler.DynamicWebhookTriggerRefreshTaskVoidExecutionHandler;
-import com.bytechef.hermes.scheduler.handler.PollingTriggerTaskVoidExecutionHandler;
-import com.bytechef.hermes.scheduler.handler.ScheduleTriggerTaskVoidExecutionHandler;
-import com.bytechef.hermes.scheduler.trigger.constant.TriggerSchedulerConstants;
-import com.bytechef.hermes.scheduler.trigger.data.PollingTriggerScheduleAndData;
-import com.bytechef.hermes.scheduler.trigger.data.ScheduleTriggerScheduleAndData;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.github.kagkarlsson.scheduler.task.Task;
-import com.github.kagkarlsson.scheduler.task.helper.Tasks;
+import org.quartz.spi.JobFactory;
+import org.quartz.spi.TriggerFiredBundle;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.boot.autoconfigure.quartz.SchedulerFactoryBeanCustomizer;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 @Configuration
-public class TriggerSchedulerConfiguration {
+public class TriggerSchedulerConfiguration implements SchedulerFactoryBeanCustomizer {
 
-    private final ApplicationContext applicationContext;
-
-    public TriggerSchedulerConfiguration(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    @Override
+    public void customize(SchedulerFactoryBean schedulerFactoryBean) {
+        schedulerFactoryBean.setJobFactory(jobFactory());
     }
 
     @Bean
-    Task<ScheduleTriggerScheduleAndData> scheduleTriggerTask() {
-        return Tasks.recurringWithPersistentSchedule(TriggerSchedulerConstants.SCHEDULE_TRIGGER_RECURRING_TASK)
-            .execute(new ScheduleTriggerTaskVoidExecutionHandler((applicationContext)));
+    JobFactory jobFactory() {
+        return new AutowiringSpringBeanJobFactory();
     }
 
-    @Bean
-    Task<PollingTriggerScheduleAndData> pollingTriggerTask() {
-        return Tasks.recurringWithPersistentSchedule(TriggerSchedulerConstants.POLLING_TRIGGER_RECURRING_TASK)
-            .execute(new PollingTriggerTaskVoidExecutionHandler(applicationContext));
-    }
+    private static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
+        implements ApplicationContextAware {
 
-    @Bean
-    Task<WorkflowExecutionId> dynamicWebhookTriggerRefreshTask() {
-        return Tasks.oneTime(TriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_ONE_TIME_TASK)
-            .execute(new DynamicWebhookTriggerRefreshTaskVoidExecutionHandler(applicationContext));
+        private transient AutowireCapableBeanFactory beanFactory;
+
+        @Override
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+            beanFactory = applicationContext.getAutowireCapableBeanFactory();
+        }
+
+        @Override
+        protected Object createJobInstance(TriggerFiredBundle bundle) throws Exception {
+            final Object job = super.createJobInstance(bundle);
+
+            beanFactory.autowireBean(job);
+
+            return job;
+        }
     }
 }

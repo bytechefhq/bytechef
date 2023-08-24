@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.remote.web.rest.trigger;
+package com.bytechef.hermes.scheduler.remote.web.rest;
 
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -105,7 +105,7 @@ public class TriggerSchedulerController {
     void scheduleTriggerWorkflowTask(@Valid @RequestBody TriggerWorkflowTaskRequest triggerWorkflowTaskRequest) {
         triggerScheduler.scheduleScheduleTrigger(
             triggerWorkflowTaskRequest.pattern, triggerWorkflowTaskRequest.zoneId, triggerWorkflowTaskRequest.output,
-            triggerWorkflowTaskRequest.workflowExecutionId);
+            WorkflowExecutionId.parse(triggerWorkflowTaskRequest.workflowExecutionId));
     }
 
     @SuppressFBWarnings("EI")

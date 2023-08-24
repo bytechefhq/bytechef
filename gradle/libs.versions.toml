@@ -1,6 +1,5 @@
 [versions]
 ch-qos-logback = "1.4.11"
-com-github-kagkarlsson = "12.4.0"
 com-google-auto-service = "1.1.1"
 info-picocli = "4.7.4"
 org-mapstruct = "1.5.5.Final"
@@ -13,8 +12,6 @@ org-testcontainers = "1.19.0"
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
-com-github-kagkarlsson-db-scheduler = { module = "com.github.kagkarlsson:db-scheduler", version.ref = "com-github-kagkarlsson" }
-com-github-kagkarlsson-db-scheduler-spring-boot-starter = { module = "com.github.kagkarlsson:db-scheduler-spring-boot-starter", version.ref = "com-github-kagkarlsson" }
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.2"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
