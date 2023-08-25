@@ -9,16 +9,18 @@ import {
 } from 'middleware/helios/configuration';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
-import {UseFormGetValues} from 'react-hook-form';
+import {UseFormGetValues, UseFormRegister} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
 interface ProjectInstanceDialogWorkflowListItemProps {
     workflow: WorkflowModel;
     label: string;
+    register: UseFormRegister<ProjectInstanceModel>;
 }
 
 export const ProjectInstanceDialogWorkflowListItem = ({
     label,
+    register,
     workflow,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
@@ -58,6 +60,7 @@ export const ProjectInstanceDialogWorkflowListItem = ({
                             };
                         }
                     })}
+                    {...register('projectInstanceWorkflows.0.inputs')}
                 />
             ),
             name: 'Configuration',
@@ -138,6 +141,7 @@ export const ProjectInstanceDialogWorkflowListItem = ({
 
 const ProjectInstanceDialogWorkflowsStep = (props: {
     getValues: UseFormGetValues<ProjectInstanceModel>;
+    register: UseFormRegister<ProjectInstanceModel>;
 }) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(
         props.getValues().projectId!
@@ -150,6 +154,7 @@ const ProjectInstanceDialogWorkflowsStep = (props: {
                     key={workflow.id!}
                     workflow={workflow}
                     label={workflow.label!}
+                    register={props.register}
                 />
             ))}
         </ul>

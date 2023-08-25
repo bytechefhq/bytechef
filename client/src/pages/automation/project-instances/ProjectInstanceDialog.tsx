@@ -103,7 +103,10 @@ const ProjectInstanceDialog = ({
         },
         {
             content: (
-                <ProjectInstanceDialogWorkflowsStep getValues={getValues} />
+                <ProjectInstanceDialogWorkflowsStep
+                    getValues={getValues}
+                    register={register}
+                />
             ),
             name: 'Workflows',
         },
