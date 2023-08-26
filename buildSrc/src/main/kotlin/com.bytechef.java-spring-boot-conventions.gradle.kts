@@ -55,7 +55,7 @@ if (project.hasProperty("prod")) {
     }
 } else {
     dependencies {
-//        "developmentOnly"("org.springframework.boot:spring-boot-devtools")
+        "developmentOnly"("org.springframework.boot:spring-boot-devtools:3.1.3")
     }
 
     val profiles = "dev"
