@@ -84,7 +84,7 @@ repositories {
 
 spotbugs {
     toolVersion.set("4.7.3")
-    reportsDir.set(file("${layout.buildDirectory}/reports/spotbugs"))
+    reportsDir.set(file("${layout.buildDirectory.get()}/reports/spotbugs"))
     excludeFilter.set(file("${rootDir}/config/spotbugs/spotbugs-exclude.xml"))
 
     tasks.spotbugsMain {
@@ -266,11 +266,11 @@ testing {
 }
 
 val testReport by tasks.registering(TestReport::class) {
-    destinationDirectory.set(file("${layout.buildDirectory}/reports/tests"))
+    destinationDirectory.set(file("${layout.buildDirectory.get()}/reports/tests"))
     testResults.from(test)
 }
 
 val testIntegrationReport by tasks.registering(TestReport::class) {
-    destinationDirectory.set(file("${layout.buildDirectory}/reports/tests"))
+    destinationDirectory.set(file("${layout.buildDirectory.get()}/reports/tests"))
     testResults.from(testIntegration)
 }
