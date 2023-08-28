@@ -8,10 +8,12 @@ import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 
 const DataPill = ({
     component,
+    componentAlias,
     parentProperty,
     property,
 }: {
     component: ComponentDefinitionModel;
+    componentAlias: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyType;
     property: PropertyType;
@@ -63,7 +65,8 @@ const DataPill = ({
                         {subProperties?.map((subProperty, index) => (
                             <DataPill
                                 component={component}
-                                key={`${subProperty.name}-${index}`}
+                                componentAlias={componentAlias}
+                                key={`${componentAlias}-${subProperty.name}-${index}`}
                                 onClick={() =>
                                     addDataPillToInput(subProperty, property)
                                 }

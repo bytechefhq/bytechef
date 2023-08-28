@@ -1,4 +1,3 @@
-import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
 import {
     ActionDefinitionModel,
     ComponentDefinitionBasicModel,
@@ -15,22 +14,25 @@ import InlineSVG from 'react-inlinesvg';
 
 import getFilteredProperties from '../utils/getFilteredProperties';
 import DataPill from './DataPill';
+import {ComponentActionData} from './DataPillPanel';
 
 const DataPillPanelBody = ({
     actionData,
+    componentActionData,
     containerHeight,
     dataPillFilterQuery,
-    previousComponents,
 }: {
     actionData: ActionDefinitionModel[];
     containerHeight: number;
+    componentActionData: Array<ComponentActionData>;
     dataPillFilterQuery: string;
     previousComponents: ComponentDefinitionBasicModel[];
+    previousComponentNames: string[];
 }) => (
     <Accordion className="h-full" collapsible type="single">
-        {previousComponents?.map(
-            (component: ComponentDefinitionModel, index: number) => {
-                const {icon, name, title} = component;
+        {componentActionData?.map(
+            (componentAction: ComponentActionData, index: number) => {
+                const {icon, title} = componentAction.component;
 
                 const outputSchema: PropertyType | undefined =
                     actionData[index]?.outputSchema;
@@ -53,15 +55,18 @@ const DataPillPanelBody = ({
                 return (
                     <AccordionItem
                         className="group group-data-[state=open]:h-full"
-                        key={name}
+                        key={`accordion-item-${componentAction.workflowAlias}`}
                         style={{
                             maxHeight: containerHeight / 2,
                         }}
-                        value={name}
+                        value={componentAction.workflowAlias}
                     >
                         {!!filteredProperties?.length && (
                             <>
-                                <AccordionTrigger className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b">
+                                <AccordionTrigger
+                                    key={`accordion-trigger-${componentAction.workflowAlias}`}
+                                    className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b"
+                                >
                                     <div className="flex items-center space-x-4">
                                         {icon && (
                                             <div className="flex h-5 w-5 items-center">
@@ -69,7 +74,14 @@ const DataPillPanelBody = ({
                                             </div>
                                         )}
 
-                                        <span className="text-sm">{title}</span>
+                                        <span className="text-sm">
+                                            {title}
+
+                                            <span className="pl-1 text-xs text-gray-400">
+                                                ({componentAction.workflowAlias}
+                                                )
+                                            </span>
+                                        </span>
                                     </div>
 
                                     <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
@@ -80,11 +92,17 @@ const DataPillPanelBody = ({
                                     style={{
                                         maxHeight: containerHeight / 2 - 52,
                                     }}
+                                    key={`accordion-content-${componentAction.workflowAlias}`}
                                 >
                                     <ul className="flex w-full flex-col space-y-2 group-data-[state=open]:h-full">
                                         {filteredProperties?.map((property) => (
                                             <DataPill
-                                                component={component}
+                                                component={
+                                                    componentAction.component
+                                                }
+                                                componentAlias={
+                                                    componentAction.workflowAlias
+                                                }
                                                 key={property.name}
                                                 property={property}
                                             />
