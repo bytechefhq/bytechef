@@ -19,6 +19,7 @@ package com.bytechef.encryption.filesystem.config;
 
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.encryption.filesystem.FileSystemEncryptionKey;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Caardic
  */
 @Configuration
+@ConditionalOnProperty(prefix = "bytechef.encryption", name = "provider", havingValue = "filesystem")
 public class FileSystemEncryptionConfiguration {
 
     @Bean

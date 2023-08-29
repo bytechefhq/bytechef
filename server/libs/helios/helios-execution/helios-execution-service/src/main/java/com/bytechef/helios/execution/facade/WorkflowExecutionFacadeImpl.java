@@ -31,13 +31,14 @@ import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
-import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
+import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -48,6 +49,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
+@Service
 public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;

@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:core:message-broker:message-broker-api"))
+    implementation(project(":server:libs:core:message-broker:message-broker-api"))
 
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("jakarta.jms:jakarta.jms-api")

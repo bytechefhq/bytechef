@@ -19,7 +19,8 @@ package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
@@ -69,23 +70,28 @@ public class JsonFileReadActionTest {
         Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequired(
+        try (MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class);
+            MockedStatic<MapUtils> mapUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
+            mapUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mockedStatic.when(() -> MapUtils.getString(
+            mapUtilsMockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSON");
-            mockedStatic.when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(false)))
+            mapUtilsMockedStatic
+                .when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(false)))
                 .thenReturn(true);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(null);
+            jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
+                .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
             assertEquals(
                 new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)),
@@ -102,21 +108,29 @@ public class JsonFileReadActionTest {
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequired(
+        try (MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class);
+            MockedStatic<MapUtils> mapUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
+            mapUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mockedStatic.when(() -> MapUtils.getString(
+            mapUtilsMockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSON");
-            mockedStatic.when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+            mapUtilsMockedStatic.when(
+                () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(true);
-            mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(PATH)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(PATH)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(null);
+            jsonUtilsMockedStatic.when(() -> JsonUtils.stream(Mockito.any()))
+                .thenReturn(
+                    new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8))
+                        .toList()
+                        .stream());
 
             assertEquals(
                 new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
@@ -127,19 +141,27 @@ public class JsonFileReadActionTest {
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequired(
+        try (MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class);
+            MockedStatic<MapUtils> mapUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
+            mapUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mockedStatic.when(() -> MapUtils.getString(
+            mapUtilsMockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSON");
-            mockedStatic.when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+            mapUtilsMockedStatic.when(
+                () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(true);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(1);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(2);
+            jsonUtilsMockedStatic.when(() -> JsonUtils.stream(Mockito.any()))
+                .thenReturn(
+                    new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8))
+                        .toList()
+                        .stream());
 
             Assertions.assertThat(((List<?>) JsonFileReadAction.perform(Map.of(), context)).size())
                 .isEqualTo(2);
@@ -154,19 +176,27 @@ public class JsonFileReadActionTest {
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequired(
+        try (MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class);
+            MockedStatic<MapUtils> mapUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
+            mapUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mockedStatic.when(() -> MapUtils.getString(
+            mapUtilsMockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSONL");
-            mockedStatic.when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+            mapUtilsMockedStatic.when(
+                () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(true);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(null);
-            mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(null);
+
+            for (String line : Files.linesOf(file, StandardCharsets.UTF_8)) {
+                jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.eq(line)))
+                    .thenReturn(new JSONObject(line).toMap());
+            }
 
             assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
@@ -177,7 +207,8 @@ public class JsonFileReadActionTest {
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        try (MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class);
+            MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
 
             mockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
@@ -185,12 +216,18 @@ public class JsonFileReadActionTest {
             mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
                 .thenReturn("JSONL");
-            mockedStatic.when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+            mockedStatic.when(
+                () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(true);
             mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(1);
             mockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(2);
+
+            for (String line : Files.linesOf(file, StandardCharsets.UTF_8)) {
+                jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.eq(line)))
+                    .thenReturn(new JSONObject(line).toMap());
+            }
 
             Assertions.assertThat(((List<?>) JsonFileReadAction.perform(Map.of(), context)).size())
                 .isEqualTo(2);

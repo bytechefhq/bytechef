@@ -18,8 +18,8 @@
 package com.bytechef.hermes.configuration.facade;
 
 import com.bytechef.hermes.configuration.service.OAuth2Service;
-import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 

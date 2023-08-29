@@ -18,7 +18,7 @@
 package com.bytechef.hermes.data.storage.db.service;
 
 import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.component.Context.DataStorageScope;
+import com.bytechef.hermes.component.definition.Context.DataStorageScope;
 import com.bytechef.hermes.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -22,6 +22,7 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +51,13 @@ class TagServiceIntTest {
     @BeforeEach
     @SuppressFBWarnings("NP")
     public void beforeEach() {
-        tagRepository.deleteAll();
-
         tag = tagRepository.save(new Tag("name"));
+    }
+
+    @AfterEach
+    @SuppressFBWarnings("NP")
+    public void afterEach() {
+        tagRepository.deleteAll();
     }
 
     @Test

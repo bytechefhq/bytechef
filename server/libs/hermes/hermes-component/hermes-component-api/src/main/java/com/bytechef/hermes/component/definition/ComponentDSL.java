@@ -27,6 +27,7 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
+import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
@@ -377,17 +378,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization acquire(AcquireFunction acquire) {
-            if (acquire != null) {
-                this.acquireFunction = acquire;
-            }
+            this.acquireFunction = Objects.requireNonNull(acquire);
 
             return this;
         }
 
         public ModifiableAuthorization apply(ApplyFunction apply) {
-            if (apply != null) {
-                this.applyFunction = apply;
-            }
+            this.applyFunction = Objects.requireNonNull(apply);
 
             return this;
         }
@@ -399,25 +396,19 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization authorizationUrl(AuthorizationUrlFunction authorizationUrl) {
-            if (authorizationUrl != null) {
-                this.authorizationUrlFunction = authorizationUrl;
-            }
+            this.authorizationUrlFunction = Objects.requireNonNull(authorizationUrl);
 
             return this;
         }
 
         public ModifiableAuthorization clientId(ClientIdFunction clientId) {
-            if (clientId != null) {
-                this.clientIdFunction = clientId;
-            }
+            this.clientIdFunction = Objects.requireNonNull(clientId);
 
             return this;
         }
 
         public ModifiableAuthorization clientSecret(ClientSecretFunction clientSecret) {
-            if (clientSecret != null) {
-                this.clientSecretFunction = clientSecret;
-            }
+            this.clientSecretFunction = Objects.requireNonNull(clientSecret);
 
             return this;
         }
@@ -445,9 +436,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization pkce(PkceFunction pkce) {
-            if (pkce != null) {
-                this.pkceFunction = pkce;
-            }
+            this.pkceFunction = Objects.requireNonNull(pkce);
 
             return this;
         }
@@ -468,17 +457,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization refreshUrl(RefreshUrlFunction refreshUrl) {
-            if (refreshUrl != null) {
-                this.refreshUrlFunction = refreshUrl;
-            }
+            this.refreshUrlFunction = Objects.requireNonNull(refreshUrl);
 
             return this;
         }
 
         public ModifiableAuthorization scopes(ScopesFunction scopes) {
-            if (scopes != null) {
-                this.scopesFunction = scopes;
-            }
+            this.scopesFunction = Objects.requireNonNull(scopes);
 
             return this;
         }
@@ -490,9 +475,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization tokenUrl(TokenUrlFunction tokenUrl) {
-            if (tokenUrl != null) {
-                this.tokenUrlFunction = tokenUrl;
-            }
+            this.tokenUrlFunction = Objects.requireNonNull(tokenUrl);
 
             return this;
         }
@@ -622,16 +605,14 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
-            if (actionDefinitions != null) {
-                this.actions = Collections.unmodifiableList(actionDefinitions);
+            this.actions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
 
-                for (ModifiableActionDefinition actionDefinition : actions) {
-                    actionDefinition.componentDescription = this.getDescription()
-                        .orElse(null);
-                    actionDefinition.componentName = this.getName();
-                    actionDefinition.componentTitle = this.getTitle()
-                        .orElse(null);
-                }
+            for (ModifiableActionDefinition actionDefinition : actions) {
+                actionDefinition.componentDescription = this.getDescription()
+                    .orElse(null);
+                actionDefinition.componentName = this.getName();
+                actionDefinition.componentTitle = this.getTitle()
+                    .orElse(null);
             }
 
             return this;
@@ -752,16 +733,14 @@ public final class ComponentDSL extends DefinitionDSL {
         public <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(
             List<T> triggerDefinitions) {
 
-            if (triggerDefinitions != null) {
-                this.triggers = Collections.unmodifiableList(triggerDefinitions);
+            this.triggers = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));
 
-                for (ModifiableTriggerDefinition triggerDefinition : triggers) {
-                    triggerDefinition.componentDescription = this.getDescription()
-                        .orElse(null);
-                    triggerDefinition.componentName = this.getName();
-                    triggerDefinition.componentTitle = this.getTitle()
-                        .orElse(null);
-                }
+            for (ModifiableTriggerDefinition triggerDefinition : triggers) {
+                triggerDefinition.componentDescription = this.getDescription()
+                    .orElse(null);
+                triggerDefinition.componentName = this.getName();
+                triggerDefinition.componentTitle = this.getTitle()
+                    .orElse(null);
             }
 
             return this;
@@ -893,9 +872,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableConnectionDefinition baseUri(BaseUriFunction baseUri) {
-            if (baseUri != null) {
-                this.baseUriFunction = baseUri;
-            }
+            this.baseUriFunction = Objects.requireNonNull(baseUri);
 
             return this;
         }
@@ -1515,7 +1492,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    public record HelpImpl(String body, String learnMoreUrl) implements Help {
+    private record HelpImpl(String body, String learnMoreUrl) implements Help {
 
         @Override
         public String getBody() {

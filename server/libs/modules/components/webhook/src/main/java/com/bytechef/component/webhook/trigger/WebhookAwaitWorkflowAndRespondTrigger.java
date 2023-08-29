@@ -78,7 +78,9 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
 
     protected static boolean webhookValidate(WebhookValidateContext context) {
         return Objects.equals(
-            MapUtils.getArray(context.headers(), X_CRSF_TOKEN, String.class)[0],
+            context.headers()
+                .firstValue(X_CRSF_TOKEN)
+                .orElseThrow(),
             MapUtils.getString(context.inputParameters(), CSRF_TOKEN));
     }
 

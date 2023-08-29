@@ -17,57 +17,12 @@
 
 package com.bytechef.encryption;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
 /**
  * @author Ivica Cardic
  */
-public class Encryption {
+public interface Encryption {
 
-    private static final Base64.Decoder DECODER = Base64.getDecoder();
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    String encrypt(String content);
 
-    private final EncryptionKey encryptionKey;
-
-    public Encryption(EncryptionKey encryptionKey) {
-        this.encryptionKey = encryptionKey;
-    }
-
-    public String encrypt(String content) {
-        try {
-            Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
-
-            return ENCODER.encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String decrypt(String encryptedString) {
-        try {
-            Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
-
-            return new String(cipher.doFinal(DECODER.decode(encryptedString)), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Cipher getCipher(int encryptMode) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-
-        byte[] decodedKey = DECODER
-            .decode(encryptionKey.getKey());
-
-        Key secretKey = new SecretKeySpec(Arrays.copyOf(decodedKey, 16), "AES");
-
-        cipher.init(encryptMode, secretKey);
-
-        return cipher;
-    }
+    String decrypt(String encryptedString);
 }

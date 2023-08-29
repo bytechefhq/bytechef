@@ -17,7 +17,7 @@
 
 package com.bytechef.component.var.action;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapUtils;
 

@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:core:tag:tag-api"))
+    implementation(project(":server:libs:core:tag:tag-api"))
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")

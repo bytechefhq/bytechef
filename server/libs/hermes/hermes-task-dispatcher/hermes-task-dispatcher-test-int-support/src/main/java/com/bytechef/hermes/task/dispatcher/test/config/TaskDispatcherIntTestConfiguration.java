@@ -38,7 +38,6 @@ import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -46,6 +45,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import java.util.Collections;
@@ -62,7 +62,7 @@ import java.util.List;
 @Import({
     ResourceWorkflowRepositoryConfiguration.class
 })
-@SpringBootConfiguration
+@Configuration
 public class TaskDispatcherIntTestConfiguration {
 
     @TestConfiguration

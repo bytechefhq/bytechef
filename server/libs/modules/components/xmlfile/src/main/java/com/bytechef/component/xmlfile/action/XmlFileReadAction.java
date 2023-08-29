@@ -17,11 +17,12 @@
 
 package com.bytechef.component.xmlfile.action;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.util.TypeReference;
 import com.bytechef.hermes.component.util.XmlUtils;
 
 import java.io.InputStream;
@@ -81,7 +82,7 @@ public class XmlFileReadAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(XmlFileReadAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean isArray = MapUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;
@@ -96,7 +97,7 @@ public class XmlFileReadAction {
                     items = stream.toList();
                 }
             } else {
-                items = XmlUtils.read(inputStream, path);
+                items = XmlUtils.readList(inputStream, path, new TypeReference<>() {});
             }
 
             Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);

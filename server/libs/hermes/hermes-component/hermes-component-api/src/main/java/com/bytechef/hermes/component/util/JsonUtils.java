@@ -17,10 +17,13 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
@@ -29,108 +32,201 @@ import java.util.stream.Stream;
  */
 public final class JsonUtils {
 
-    static JsonMapper jsonMapper;
+    private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class);
+
+    static JsonOperations jsonOperations;
 
     static {
-        ServiceLoader<JsonMapper> loader = ServiceLoader.load(JsonMapper.class);
+        try {
+            ServiceLoader<JsonOperations> serviceLoader = ServiceLoader.load(JsonOperations.class);
 
-        jsonMapper = loader.findFirst()
-            .orElse(null);
+            jsonOperations = serviceLoader.findFirst()
+                .orElse(null);
+        } catch (ServiceConfigurationError e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage(), e);
+            }
+        }
 
-        if (jsonMapper == null) {
-            System.err.println("JsonMapper instance is not available");
+        if (jsonOperations == null && logger.isWarnEnabled()) {
+            logger.warn("JsonMapper instance is not available");
         }
     }
 
     private JsonUtils() {
     }
 
-    /**
-     *
-     * @param json
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(String json) {
-        return jsonMapper.read(json);
+    public static Object read(InputStream inputStream) {
+        return jsonOperations.read(inputStream);
     }
 
-    /**
-     *
-     * @param json
-     * @param valueType
-     * @return
-     * @param <T>
-     */
+    public static <T> T read(InputStream inputStream, Class<T> valueType) {
+        return jsonOperations.read(inputStream, valueType);
+    }
+
+    public static Object read(InputStream inputStream, String path) {
+        return jsonOperations.read(inputStream, path);
+    }
+
+    public static <T> T read(InputStream inputStream, String path, Class<T> valueType) {
+        return jsonOperations.read(inputStream, path, valueType);
+    }
+
+    public static <T> T read(InputStream inputStream, String path, TypeReference<T> typeReference) {
+        return jsonOperations.read(inputStream, path, typeReference);
+    }
+
+    public static Object read(String json) {
+        return jsonOperations.read(json);
+    }
+
     public static <T> T read(String json, Class<T> valueType) {
-        return jsonMapper.read(json, valueType);
+        return jsonOperations.read(json, valueType);
     }
 
-    /**
-     *
-     * @param json
-     * @param valueTypeRef
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(String json, TypeReference<T> valueTypeRef) {
-        return jsonMapper.read(json, valueTypeRef);
+    public static <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
+        return jsonOperations.read(inputStream, typeReference);
     }
 
-    /**
-     *
-     * @param inputStream
-     * @param path
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(InputStream inputStream, String path) {
-        return jsonMapper.read(inputStream, path);
+    public static <T> T read(String json, TypeReference<T> typeReference) {
+        return jsonOperations.read(json, typeReference);
     }
 
-    /**
-     *
-     * @param json
-     * @param path
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(String json, String path) {
-        return jsonMapper.read(json, path);
+    public static Object read(String json, String path) {
+        return jsonOperations.read(json, path);
     }
 
-    /**
-     *
-     * @param inputStream
-     * @return
-     */
+    public static <T> T read(String json, String path, Class<T> valueType) {
+        return jsonOperations.read(json, path, valueType);
+    }
+
+    public static <T> T read(String json, String path, TypeReference<T> typeReference) {
+        return jsonOperations.read(json, path, typeReference);
+    }
+
+    public static List<?> readList(InputStream inputStream) {
+        return jsonOperations.readList(inputStream);
+    }
+
+    public static <T> List<T> readList(InputStream inputStream, Class<T> elementType) {
+        return jsonOperations.readList(inputStream, elementType);
+    }
+
+    public static List<?> readList(InputStream inputStream, String path) {
+        return jsonOperations.readList(inputStream, path);
+    }
+
+    public static <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
+        return jsonOperations.readList(inputStream, path, elementType);
+    }
+
+    public static List<?> readList(String json) {
+        return jsonOperations.readList(json);
+    }
+
+    public static <T> List<T> readList(String json, Class<T> elementType) {
+        return jsonOperations.readList(json, elementType);
+    }
+
+    public static List<?> readList(String json, String path) {
+        return jsonOperations.readList(json, path);
+    }
+
+    public static <T> List<T> readList(String json, String path, Class<T> elementType) {
+        return jsonOperations.readList(json, path, elementType);
+    }
+
+    public static <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
+        return jsonOperations.readMap(inputStream, valueType);
+    }
+
+    public static Map<String, ?> readMap(InputStream inputStream, String path) {
+        return jsonOperations.readMap(inputStream, path);
+    }
+
+    public static <V> Map<String, V> readMap(InputStream inputStream, String path, Class<V> valueType) {
+        return jsonOperations.readMap(inputStream, path, valueType);
+    }
+
+    public static Map<String, ?> readMap(String json) {
+        return jsonOperations.readMap(json);
+    }
+
+    public static <V> Map<String, V> readMap(String json, Class<V> valueType) {
+        return jsonOperations.readMap(json, valueType);
+    }
+
+    public static Map<String, ?> readMap(String json, String path) {
+        return jsonOperations.readMap(json, path);
+    }
+
+    public static <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
+        return jsonOperations.readMap(json, path, valueType);
+    }
+
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
-        return jsonMapper.stream(inputStream);
+        return jsonOperations.stream(inputStream);
     }
 
-    /**
-     *
-     * @param object
-     * @return
-     */
     public static String write(Object object) {
-        return jsonMapper.write(object);
+        return jsonOperations.write(object);
     }
 
-    /**
-     *
-     */
-    interface JsonMapper {
+    interface JsonOperations {
 
-        <T> T read(String json);
+        Object read(InputStream inputStream);
+
+        <T> T read(InputStream inputStream, Class<T> valueType);
+
+        <T> T read(InputStream inputStream, TypeReference<T> typeReference);
+
+        Object read(InputStream inputStream, String path);
+
+        <T> T read(InputStream inputStream, String path, Class<T> valueType);
+
+        <T> T read(InputStream inputStream, String path, TypeReference<T> typeReference);
+
+        Object read(String json);
 
         <T> T read(String json, Class<T> valueType);
 
-        <T> T read(String json, TypeReference<T> valueTypeRef);
+        <T> T read(String json, TypeReference<T> typeReference);
 
-        <T> T read(InputStream inputStream, String path);
+        Object read(String json, String path);
 
-        <T> T read(String json, String path);
+        <T> T read(String json, String path, Class<T> valueType);
+
+        <T> T read(String json, String path, TypeReference<T> typeReference);
+
+        List<?> readList(InputStream inputStream);
+
+        <T> List<T> readList(InputStream inputStream, Class<T> elementType);
+
+        List<?> readList(InputStream inputStream, String path);
+
+        <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType);
+
+        List<?> readList(String json);
+
+        <T> List<T> readList(String json, Class<T> elementType);
+
+        List<?> readList(String json, String path);
+
+        <T> List<T> readList(String json, String path, Class<T> elementType);
+
+        <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType);
+
+        Map<String, ?> readMap(InputStream inputStream, String path);
+
+        <V> Map<String, V> readMap(InputStream inputStream, String path, Class<V> valueType);
+
+        Map<String, ?> readMap(String json);
+
+        <V> Map<String, V> readMap(String json, Class<V> valueType);
+
+        Map<String, ?> readMap(String json, String path);
+
+        <V> Map<String, V> readMap(String json, String path, Class<V> valueType);
 
         Stream<Map<String, ?>> stream(InputStream inputStream);
 

@@ -17,6 +17,8 @@
 
 package com.bytechef.coordinator.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.openapitools.jackson.nullable.JsonNullableModule;
@@ -42,5 +44,12 @@ public class JacksonConfiguration {
     @Bean
     JsonNullableModule jsonNullableModule() {
         return new JsonNullableModule();
+    }
+
+    @Bean
+    XmlMapper xmlMapper() {
+        return XmlMapper.xmlBuilder()
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .build();
     }
 }

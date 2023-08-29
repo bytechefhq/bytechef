@@ -18,8 +18,8 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -116,7 +116,7 @@ public class JsonFileReadAction {
                         items = stream.toList();
                     }
                 } else {
-                    items = JsonUtils.read(inputStream, path);
+                    items = (List<Map<String, ?>>) JsonUtils.read(inputStream, path);
                 }
             } else {
                 try (BufferedReader bufferedReader = new BufferedReader(

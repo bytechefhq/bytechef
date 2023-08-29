@@ -1,5 +1,7 @@
 dependencies {
-    api(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
 
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))

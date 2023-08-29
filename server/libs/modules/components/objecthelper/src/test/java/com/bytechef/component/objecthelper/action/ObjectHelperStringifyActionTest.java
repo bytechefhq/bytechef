@@ -17,7 +17,7 @@
 
 package com.bytechef.component.objecthelper.action;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Test;

@@ -18,7 +18,7 @@
 package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.FileStorageComponentHandlerTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;

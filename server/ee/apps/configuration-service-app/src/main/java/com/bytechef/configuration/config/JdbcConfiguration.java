@@ -17,8 +17,8 @@
 
 package com.bytechef.configuration.config;
 
-import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;

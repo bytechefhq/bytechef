@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.worker.trigger.handler;
 
-import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
+import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.exception.TriggerExecutionException;
 

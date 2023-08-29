@@ -71,7 +71,7 @@ public class ErrorHandlerChainTest {
         public Class<?> getType() {
             return JobErrorHandler.class;
         }
-    };
+    }
 
     private static class TaskExecution implements Errorable {
 
@@ -92,7 +92,7 @@ public class ErrorHandlerChainTest {
         public Class<?> getType() {
             return Test1ErrorHandler.class;
         }
-    };
+    }
 
     private static class Test2ErrorHandler implements ErrorHandler<ErrorHandlerChainTest.TaskExecution> {
 

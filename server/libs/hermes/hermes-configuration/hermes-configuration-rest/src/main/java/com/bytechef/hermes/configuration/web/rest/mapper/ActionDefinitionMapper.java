@@ -18,8 +18,8 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
-import com.bytechef.hermes.definition.registry.domain.Help;
+import com.bytechef.hermes.component.registry.domain.ActionDefinition;
+import com.bytechef.hermes.registry.domain.Help;
 
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;

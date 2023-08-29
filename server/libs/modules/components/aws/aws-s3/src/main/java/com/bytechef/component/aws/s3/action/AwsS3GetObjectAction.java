@@ -18,9 +18,9 @@
 package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapUtils;
 import software.amazon.awssdk.core.sync.ResponseTransformer;

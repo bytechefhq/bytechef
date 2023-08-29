@@ -1,4 +1,6 @@
 dependencies {
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-test")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
@@ -12,8 +14,8 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-api"))
     implementation(project(":server:libs:core:event:event-listener:event-listener-impl"))
     implementation(project(":server:libs:core:message-broker:message-broker-sync"))
-    implementation(project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-impl"))
-    implementation(project(":server:libs:hermes:hermes-component:hermes-component-impl"))
-    implementation(project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service"))
+    implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-service"))
+    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
+    implementation(project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api"))
     implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service"))
 }

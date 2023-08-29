@@ -37,6 +37,8 @@ import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -49,6 +51,7 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @Transactional
+@Service
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private final JobFacade jobFacade;
@@ -64,8 +67,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     public ProjectInstanceFacadeImpl(
         JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade, String webhookUrl,
-        WorkflowService workflowService) {
+        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
+        @Value("bytechef.webhookUrl") String webhookUrl, WorkflowService workflowService) {
 
         this.jobFacade = jobFacade;
         this.projectInstanceService = projectInstanceService;

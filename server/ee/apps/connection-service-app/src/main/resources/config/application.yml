@@ -110,6 +110,8 @@ spring:
 #####
 
 bytechef:
+  encryption:
+    provider: filesystem
   discovery-service:
     provider: redis
   context-repository:

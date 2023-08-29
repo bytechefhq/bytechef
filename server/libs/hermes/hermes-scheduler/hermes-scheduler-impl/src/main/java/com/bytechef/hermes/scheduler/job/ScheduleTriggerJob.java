@@ -52,7 +52,7 @@ public class ScheduleTriggerJob implements Job {
                 WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
                 MapUtils.concat(
                     Map.of("datetime", fireTime.toString()),
-                    JsonUtils.read(jobDataMap.getString("output"), objectMapper))));
+                    JsonUtils.readMap(jobDataMap.getString("output"), String.class, objectMapper))));
     }
 
     private record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {

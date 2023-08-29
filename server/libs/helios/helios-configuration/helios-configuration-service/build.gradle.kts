@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
-    api(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
+    implementation(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
+    implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
@@ -13,7 +13,7 @@ dependencies {
     testImplementation(project(":server:libs:core:message-broker:message-broker-api"))
     testImplementation(project(":server:libs:core:category:category-service"))
     testImplementation(project(":server:libs:core:tag:tag-service"))
-    testImplementation(project(":server:libs:hermes:hermes-connection:hermes-connection-service"))
-    testImplementation(project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service"))
+    testImplementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-service"))
+    testImplementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

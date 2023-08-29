@@ -17,7 +17,7 @@
 
 package com.bytechef.component.bash.action;
 
-import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapUtils;
@@ -56,7 +56,7 @@ public class BashExecuteAction {
         .outputSchema(string())
         .perform(BashExecuteAction::perform);
 
-    protected static String perform(Map<String, ?> inputParameters, ActionContext actionContext) {
+    protected static String perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext actionContext) {
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
 

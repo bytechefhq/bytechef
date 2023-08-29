@@ -30,6 +30,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +50,15 @@ import org.springframework.data.domain.PageRequest;
 public class JdbcJobRepositoryIntTest {
 
     @Autowired
-    private JobRepository jobRepository;
+    private JdbcJobRepository jobRepository;
+
+    @AfterEach
+    public void afterEach() {
+        jobRepository.deleteAll();
+    }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void test1FindAll() {
         int pageTotal = jobRepository
             .findAll(PageRequest.of(0, JobRepository.DEFAULT_PAGE_SIZE))
@@ -68,6 +76,7 @@ public class JdbcJobRepositoryIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testFindById() {
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 

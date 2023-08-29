@@ -18,7 +18,7 @@
 package com.bytechef.component.mailchimp.trigger;
 
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;

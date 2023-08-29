@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.data.storage.remote.web.rest.service;
 
-import com.bytechef.hermes.component.Context.DataStorageScope;
+import com.bytechef.hermes.component.definition.Context.DataStorageScope;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;

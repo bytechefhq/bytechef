@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -244,7 +245,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     /**
      * Return the job's human-readable name.
      *
-     * @return {@link Workflow}
+     * @return the workflow label
      */
     public String getLabel() {
         return label;
@@ -324,12 +325,13 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     /**
      * Return the job's workflow id.
      *
-     * @return {@link Workflow}
+     * @return the workflow id
      */
     public String getWorkflowId() {
         return workflowId;
     }
 
+    @JsonIgnore
     @Override
     public boolean isNew() {
         return id == null;

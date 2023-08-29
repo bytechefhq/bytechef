@@ -3,8 +3,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-test")
     implementation("org.springframework.data:spring-data-commons")
     implementation("org.springframework.data:spring-data-jdbc")
-    implementation(libs.org.testcontainers)
-    implementation(libs.org.testcontainers.postgresql)
+    implementation("org.testcontainers:testcontainers")
+    implementation("org.testcontainers:postgresql")
 
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")

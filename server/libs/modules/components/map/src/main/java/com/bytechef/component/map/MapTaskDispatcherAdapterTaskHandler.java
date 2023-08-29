@@ -89,7 +89,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
-        contextService.push(taskExecution.getId(), Context.Classname.TASK_EXECUTION, Collections.emptyMap());
+        contextService.push(
+            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION, Collections.emptyMap());
 
         MapTaskDispatcher mapTaskDispatcher = MapTaskDispatcher.builder()
             .contextService(contextService)
@@ -101,7 +102,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         mapTaskDispatcher.dispatch(taskExecution);
 
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder();
 
             for (ExecutionError error : errors) {
@@ -112,7 +113,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                     break;
                 }
 
-                if (errorMessage.length() > 0) {
+                if (!errorMessage.isEmpty()) {
                     errorMessage.append("\n");
                 }
 

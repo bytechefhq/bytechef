@@ -17,7 +17,7 @@
 
 package com.bytechef.component.httpclient.util;
 
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;

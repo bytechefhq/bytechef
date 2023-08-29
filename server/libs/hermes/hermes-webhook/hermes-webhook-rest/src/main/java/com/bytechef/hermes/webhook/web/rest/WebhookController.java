@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -103,7 +103,7 @@ public class WebhookController {
                     }
                 }
 
-                body = new WebhookBody(
+                body = new WebhookBodyImpl(
                     multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType());
             } else if (mediaType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
                 Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
@@ -118,7 +118,7 @@ public class WebhookController {
                     parameterMap.remove(queryParam);
                 }
 
-                body = new WebhookBody(
+                body = new WebhookBodyImpl(
                     parameterMap, ContentType.FORM_URL_ENCODED, httpServletRequest.getContentType());
                 parameters = toMap(queryParams);
             } else if (mediaType.startsWith(MimeTypeUtils.APPLICATION_JSON_VALUE)) {
@@ -132,7 +132,7 @@ public class WebhookController {
                         objectMapper);
                 }
 
-                body = new WebhookBody(content, ContentType.JSON, httpServletRequest.getContentType());
+                body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
             } else if (mediaType.startsWith(MimeTypeUtils.APPLICATION_XML_VALUE)) {
                 Object content;
 
@@ -143,15 +143,15 @@ public class WebhookController {
                         StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
                 }
 
-                body = new WebhookBody(content, ContentType.XML, httpServletRequest.getContentType());
+                body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
             } else if (mediaType.startsWith("application/")) {
-                body = new WebhookBody(
+                body = new WebhookBodyImpl(
                     fileStorageService.storeFileContent(
                         "file." + toFileExtension(httpServletRequest.getContentType()),
                         httpServletRequest.getInputStream()),
                     ContentType.BINARY, httpServletRequest.getContentType());
             } else {
-                body = new WebhookBody(
+                body = new WebhookBodyImpl(
                     StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
                     ContentType.RAW, httpServletRequest.getContentType());
             }
@@ -233,4 +233,8 @@ public class WebhookController {
 
     private record WebhookParameters(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
     }
+
+    private record WebhookBodyImpl(Object content, ContentType contentType, String mimeType) implements WebhookBody {
+    }
+
 }

@@ -21,7 +21,7 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.execution.event.TriggerStartedEvent;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
+import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.SystemMessageRoute;

@@ -154,72 +154,72 @@
             </column>
         </createTable>
 
-            <addUniqueConstraint
-                tableName="project_instance"
-                columnNames="name"
-                constraintName="uk_project_instance_name" />
+        <addUniqueConstraint
+            tableName="project_instance"
+            columnNames="name"
+            constraintName="uk_project_instance_name" />
 
-            <addForeignKeyConstraint
-                baseTableName="project"
-                baseColumnNames="category_id"
-                constraintName="fk_project_category"
-                referencedTableName="category"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project"
+            baseColumnNames="category_id"
+            constraintName="fk_project_category"
+            referencedTableName="category"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_instance"
-                baseColumnNames="project_id"
-                constraintName="fk_project_instance_project"
-                referencedTableName="project"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_instance"
+            baseColumnNames="project_id"
+            constraintName="fk_project_instance_project"
+            referencedTableName="project"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_instance_tag"
-                baseColumnNames="project_instance_id"
-                constraintName="fk_project_instance_tag_project_instance"
-                referencedTableName="project_instance"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_instance_tag"
+            baseColumnNames="project_instance_id"
+            constraintName="fk_project_instance_tag_project_instance"
+            referencedTableName="project_instance"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_instance_tag"
-                baseColumnNames="tag_id"
-                constraintName="fk_project_instance_tag_tag"
-                referencedTableName="tag"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_instance_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_project_instance_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_instance_workflow"
-                baseColumnNames="project_instance_id"
-                constraintName="fk_project_instance_workflow_project_instance"
-                referencedTableName="project_instance"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_instance_workflow"
+            baseColumnNames="project_instance_id"
+            constraintName="fk_project_instance_workflow_project_instance"
+            referencedTableName="project_instance"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_instance_workflow_connection"
-                baseColumnNames="project_instance_workflow_id"
-                constraintName="fk_project_instance_workflow_connection_piw"
-                referencedTableName="project_instance_workflow"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_instance_workflow_connection"
+            baseColumnNames="project_instance_workflow_id"
+            constraintName="fk_project_instance_workflow_connection_piw"
+            referencedTableName="project_instance_workflow"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_tag"
-                baseColumnNames="project_id"
-                constraintName="fk_project_tag_project"
-                referencedTableName="project"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_tag"
+            baseColumnNames="project_id"
+            constraintName="fk_project_tag_project"
+            referencedTableName="project"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_tag"
-                baseColumnNames="tag_id"
-                constraintName="fk_project_tag_tag"
-                referencedTableName="tag"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_project_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
 
-            <addForeignKeyConstraint
-                baseTableName="project_workflow"
-                baseColumnNames="project_id"
-                constraintName="fk_project_workflow_project"
-                referencedTableName="project"
-                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="project_workflow"
+            baseColumnNames="project_id"
+            constraintName="fk_project_workflow_project"
+            referencedTableName="project"
+            referencedColumnNames="id"/>
     </changeSet>
 </databaseChangeLog>

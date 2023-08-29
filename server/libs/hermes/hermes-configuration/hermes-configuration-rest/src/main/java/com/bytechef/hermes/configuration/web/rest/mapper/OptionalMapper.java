@@ -18,11 +18,11 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.domain.Property;
-import com.bytechef.hermes.definition.registry.domain.ConnectionDefinitionBasic;
-import com.bytechef.hermes.definition.registry.domain.Help;
-import com.bytechef.hermes.definition.registry.domain.OptionsDataSource;
-import com.bytechef.hermes.definition.registry.domain.Resources;
+import com.bytechef.hermes.registry.domain.Property;
+import com.bytechef.hermes.component.registry.domain.ConnectionDefinitionBasic;
+import com.bytechef.hermes.registry.domain.Help;
+import com.bytechef.hermes.registry.domain.OptionsDataSource;
+import com.bytechef.hermes.registry.domain.Resources;
 import org.mapstruct.Mapper;
 
 import java.util.Optional;

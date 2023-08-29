@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.task.dispatcher.definition;
 
+import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
@@ -38,6 +39,12 @@ public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.Modif
      * @return
      */
     Optional<String> getDescription();
+
+    /**
+     *
+     * @return
+     */
+    Optional<Help> getHelp();
 
     /**
      *

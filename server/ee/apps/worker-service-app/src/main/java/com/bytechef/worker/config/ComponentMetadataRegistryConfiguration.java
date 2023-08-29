@@ -19,11 +19,12 @@ package com.bytechef.worker.config;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
@@ -37,23 +38,23 @@ import java.util.Map;
 @Configuration
 public class ComponentMetadataRegistryConfiguration implements InitializingBean {
 
-    private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ComponentDefinitionService componentDefinitionService;
     private final ObjectMapper objectMapper;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
 
     @SuppressFBWarnings("EI2")
     public ComponentMetadataRegistryConfiguration(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ObjectMapper objectMapper,
-        ServiceMetadataRegistry serviceMetadataRegistry) {
+        @Qualifier("componentDefinitionService") ComponentDefinitionService componentDefinitionService,
+        ObjectMapper objectMapper, ServiceMetadataRegistry serviceMetadataRegistry) {
 
-        this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.componentDefinitionService = componentDefinitionService;
         this.objectMapper = objectMapper;
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
     @Override
     public void afterPropertiesSet() {
-        List<ComponentDefinition> componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
+        List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
         serviceMetadataRegistry.registerMetadata(
             Map.of(
