@@ -18,7 +18,7 @@
 package com.bytechef.component.csvfile.action;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandlerTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;

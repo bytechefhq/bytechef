@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:core:error:error-api"))
+    implementation(project(":server:libs:core:error:error-api"))
 
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-beans")

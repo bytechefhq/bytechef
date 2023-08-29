@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component;
 
+import com.bytechef.hermes.component.definition.Context;
+
 import java.util.Map;
 import java.util.Optional;
 

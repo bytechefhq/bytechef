@@ -32,7 +32,7 @@ import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

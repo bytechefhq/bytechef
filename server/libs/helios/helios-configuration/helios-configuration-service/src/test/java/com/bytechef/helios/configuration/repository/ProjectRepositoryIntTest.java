@@ -25,7 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,8 +46,8 @@ public class ProjectRepositoryIntTest {
     @Autowired
     private ProjectRepository projectRepository;
 
-    @BeforeEach
-    public void beforeEach() {
+    @AfterEach
+    public void afterEach() {
         projectRepository.deleteAll();
     }
 

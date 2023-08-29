@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;

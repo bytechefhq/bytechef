@@ -17,22 +17,22 @@
 
 package com.bytechef.execution.config;
 
-import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
+import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.execution.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.execution.converter.StringToWebhooksConverter;
+import com.bytechef.atlas.execution.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.hermes.data.storage.db.converter.DataStorageValueToStringConverter;
-import com.bytechef.hermes.data.storage.db.converter.StringToDataStorageValueConverter;
+import com.bytechef.hermes.data.storage.converter.DataStorageValueToStringConverter;
+import com.bytechef.hermes.data.storage.converter.StringToDataStorageValueConverter;
 import com.bytechef.hermes.execution.converter.StringToTriggerStateValueConverter;
 import com.bytechef.hermes.execution.converter.StringToWorkflowExecutionIdConverter;
-import com.bytechef.hermes.execution.converter.StringToWorkflowTriggerConverter;
+import com.bytechef.hermes.configuration.converter.StringToWorkflowTriggerConverter;
 import com.bytechef.hermes.execution.converter.TriggerStateValueToStringConverter;
 import com.bytechef.hermes.execution.converter.WorkflowExecutionIdToStringConverter;
-import com.bytechef.hermes.execution.converter.WorkflowTriggerToStringConverter;
+import com.bytechef.hermes.configuration.converter.WorkflowTriggerToStringConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;

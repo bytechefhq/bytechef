@@ -34,6 +34,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+/**
+ * @author Ivica Cardic
+ */
 public class JobFacadeImpl implements JobFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
@@ -57,7 +60,7 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
-    // the case where a job is finished and completion task executed, but the transaction is not yet committed and
+    // the case where a job is finished and the completion task executed, but the transaction is not yet committed and
     // the job id is missing.
     @Override
     @Transactional(propagation = Propagation.NEVER)

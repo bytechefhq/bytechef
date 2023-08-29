@@ -38,7 +38,7 @@ import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -78,9 +78,9 @@ public class ProjectFacadeIntTest {
     @Autowired
     private WorkflowCrudRepository workflowRepository;
 
-    @BeforeEach
+    @AfterEach
     @SuppressFBWarnings("NP")
-    public void beforeEach() {
+    public void afterEach() {
         projectRepository.deleteAll();
 
         categoryRepository.deleteAll();

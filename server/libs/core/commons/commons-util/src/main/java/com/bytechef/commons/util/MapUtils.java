@@ -396,47 +396,50 @@ public final class MapUtils {
         return get(map, key, Long.class, defaultValue);
     }
 
-    public static <K> Map<K, ?> getMap(Map<K, ?> map, K key) {
-        Map<?, ?> value = get(map, key, Map.class);
+    public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key) {
+        @SuppressWarnings("unchecked")
+        Map<K2, ?> value = get(map, key, Map.class);
 
         if (value == null) {
             return null;
         }
 
-        return Collections.unmodifiableMap(toMap(value, entry -> (K) entry.getKey(), Map.Entry::getValue));
+        return Collections.unmodifiableMap(toMap(value, entry -> (K2) entry.getKey(), Map.Entry::getValue));
     }
 
-    public static <K> Map<K, ?> getMap(Map<K, ?> map, K key, Map<K, ?> defaultValue) {
-        Map<?, ?> value = get(map, key, Map.class);
+    public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key, Map<K2, ?> defaultValue) {
+        @SuppressWarnings("unchecked")
+        Map<K2, ?> value = get(map, key, Map.class);
 
         if (value == null) {
             return Collections.unmodifiableMap(defaultValue);
         }
 
-        return Collections.unmodifiableMap(toMap(value, entry -> (K) entry.getKey(), Map.Entry::getValue));
+        return Collections.unmodifiableMap(toMap(value, entry -> (K2) entry.getKey(), Map.Entry::getValue));
     }
 
-    public static <K, V> Map<K, V> getMap(Map<K, ?> map, K key, Class<V> valueType) {
-        Map<?, ?> value = get(map, key, Map.class);
+    public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, Class<V> valueType) {
+        @SuppressWarnings("unchecked")
+        Map<K2, ?> value = get(map, key, Map.class);
 
         if (value == null) {
             return null;
         }
 
         return Collections.unmodifiableMap(
-            toMap(value, entry -> (K) entry.getKey(), entry -> convert(entry.getValue(), valueType)));
+            toMap(value, entry -> (K2) entry.getKey(), entry -> convert(entry.getValue(), valueType)));
     }
 
-    public static <K, V> Map<K, V> getMap(
-        Map<K, ?> map, K key, Class<V> valueType, Map<K, V> defaultValue) {
+    public static <K1, K2, V> Map<K2, V> getMap(
+        Map<K1, ?> map, K1 key, Class<V> valueType, Map<K2, V> defaultValue) {
 
-        Map<K, V> value = getMap(map, key, valueType);
+        Map<K2, V> value = getMap(map, key, valueType);
 
         return value == null ? Collections.unmodifiableMap(defaultValue) : value;
     }
 
-    public static <K> Map<K, ?> getMap(Map<K, ?> map, K key, List<Class<?>> valueTypes) {
-        Map<K, ?> mapValue = getMap(map, key);
+    public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key, List<Class<?>> valueTypes) {
+        Map<K2, ?> mapValue = getMap(map, key);
 
         if (mapValue != null) {
             mapValue = MapUtils.toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
@@ -445,10 +448,10 @@ public final class MapUtils {
         return mapValue;
     }
 
-    public static <K> Map<K, ?> getMap(
-        Map<K, ?> map, K key, List<Class<?>> valueTypes, Map<K, ?> defaultValue) {
+    public static <K1, K2> Map<K2, ?> getMap(
+        Map<K1, ?> map, K1 key, List<Class<?>> valueTypes, Map<K2, ?> defaultValue) {
 
-        Map<K, ?> mapValue = getMap(map, key);
+        Map<K2, ?> mapValue = getMap(map, key);
 
         if (mapValue == null) {
             mapValue = Collections.unmodifiableMap(defaultValue);
@@ -460,8 +463,8 @@ public final class MapUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <K, V> Map<K, V> getMap(
-        Map<K, ?> map, K key, ParameterizedTypeReference<V> elementType, Map<K, V> defaultValue) {
+    public static <K1, K2, V> Map<K2, V> getMap(
+        Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType, Map<K2, V> defaultValue) {
 
         ResolvableType resolvableType = ResolvableType.forType(elementType);
 
@@ -589,8 +592,8 @@ public final class MapUtils {
         return value;
     }
 
-    public static <K, V> Map<K, V> getRequiredMap(Map<K, ?> map, K key, Class<V> valueType) {
-        Map<K, V> value = getMap(map, key, valueType);
+    public static <K1, K2, V> Map<K2, V> getRequiredMap(Map<K1, ?> map, K1 key, Class<V> valueType) {
+        Map<K2, V> value = getMap(map, key, valueType);
 
         Objects.requireNonNull(value, "Unknown value for : " + key);
 
@@ -598,20 +601,20 @@ public final class MapUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <K, V> Map<K, V> getRequiredMap(
-        Map<K, ?> map, K key, ParameterizedTypeReference<V> elementType, Map<K, V> defaultValue) {
+    public static <K1, K2, V> Map<K2, V> getRequiredMap(
+        Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType) {
 
         ResolvableType resolvableType = ResolvableType.forType(elementType);
 
-        Map<K, V> value = getMap(map, key, (Class<V>) resolvableType.getRawClass());
+        Map<K2, V> value = getMap(map, key, (Class<V>) resolvableType.getRawClass());
 
         Objects.requireNonNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
-    public static <K> Map<K, ?> getRequiredMap(Map<K, ?> map, K key) {
-        Map<K, ?> value = getMap(map, key);
+    public static <K1, K2> Map<K2, ?> getRequiredMap(Map<K1, ?> map, K1 key) {
+        Map<K2, ?> value = getMap(map, key);
 
         Objects.requireNonNull(value, "Unknown value for : " + key);
 

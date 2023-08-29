@@ -20,9 +20,9 @@ package com.bytechef.webhook.config;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,14 +34,8 @@ import java.util.Objects;
 @Configuration
 public class WorkerHandlerConfiguration {
 
-    private final ActionDefinitionService actionDefinitionService;
-
-    public WorkerHandlerConfiguration(ActionDefinitionService actionDefinitionService) {
-        this.actionDefinitionService = actionDefinitionService;
-    }
-
     @Bean
-    TaskHandlerRegistry taskHandlerRegistry() {
+    TaskHandlerRegistry taskHandlerRegistry(ActionDefinitionService actionDefinitionService) {
         return type -> (TaskHandler<?>) taskExecution -> {
             ComponentOperation componentOperation = ComponentOperation.ofType(type);
 

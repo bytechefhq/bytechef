@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
 import org.mapstruct.Mapper;

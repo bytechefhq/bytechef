@@ -31,13 +31,13 @@ import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.configuration.service.OAuth2Service;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -72,9 +72,9 @@ public class ConnectionFacadeIntTest {
     @Autowired
     private TagRepository tagRepository;
 
-    @BeforeEach
+    @AfterEach
     @SuppressFBWarnings("NP")
-    public void beforeEach() {
+    public void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
     }

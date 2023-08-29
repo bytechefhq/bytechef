@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import java.util.Optional;
 
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -31,7 +32,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JdbcJobRepository
-    extends ListPagingAndSortingRepository<Job, Long>, JobRepository, CustomJobRepository {
+    extends ListPagingAndSortingRepository<Job, Long>, ListCrudRepository<Job, Long>, JobRepository,
+    CustomJobRepository {
+
+    @Override
+    Optional<Job> findById(Long id);
 
     @Override
     @Query("SELECT COUNT(*) FROM job WHERE status=3 AND end_date >= current_date-1 AND end_date < current_date")
@@ -52,4 +57,6 @@ public interface JdbcJobRepository
     @Override
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")
     Job findByTaskExecutionId(@Param("taskExecutionId") Long taskExecutionId);
+
+    Job save(Job job);
 }

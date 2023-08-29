@@ -18,8 +18,8 @@
 package com.bytechef.component.rabbitmq.action;
 
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
-import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -59,7 +59,7 @@ public class RabbitMqSendMessageAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(RabbitMqSendMessageAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
         Connection connection = context.getConnection();
 
         try (com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(

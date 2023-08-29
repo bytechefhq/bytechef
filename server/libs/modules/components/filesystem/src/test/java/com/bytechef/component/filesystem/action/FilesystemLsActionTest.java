@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

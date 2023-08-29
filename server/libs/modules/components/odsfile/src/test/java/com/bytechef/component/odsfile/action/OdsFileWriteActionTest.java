@@ -18,7 +18,7 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;

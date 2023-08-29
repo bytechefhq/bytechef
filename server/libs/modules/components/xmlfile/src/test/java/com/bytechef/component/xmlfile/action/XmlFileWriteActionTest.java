@@ -17,8 +17,9 @@
 
 package com.bytechef.component.xmlfile.action;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.util.XmlUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,14 +42,13 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
  */
 public class XmlFileWriteActionTest {
 
-    private static final Context context = Mockito.mock(Context.class);
-
+    private static final ActionContext ACTION_CONTEXT = Mockito.mock(ActionContext.class);
     private static final String TEST_XML = "test.xml";
     private static final String FILE_XML = "file.xml";
 
     @BeforeEach
     public void beforeEach() {
-        Mockito.reset(context);
+        Mockito.reset(ACTION_CONTEXT);
     }
 
     @Test
@@ -71,47 +71,55 @@ public class XmlFileWriteActionTest {
                 }
             });
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getString(
+        try (MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class);
+            MockedStatic<MapUtils> mapUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
+            mapUtilsMockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn("file.xml");
-            mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+            mapUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
+                .thenReturn(
+                    "<root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>");
 
-            XmlFileWriteAction.perform(Map.of(), context);
+            XmlFileWriteAction.perform(Map.of(), ACTION_CONTEXT);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
                 ByteArrayInputStream.class);
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-            Mockito.verify(context)
+            Mockito.verify(ACTION_CONTEXT)
                 .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
             ByteArrayInputStream byteArrayInputStream = inputStreamArgumentCaptor.getValue();
 
-            Assertions.assertThat(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8))
+            Assertions.assertThat(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8).trim())
                 .isEqualTo(
-                    """
-                        <root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>
-                        """);
+                    "<root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>");
             Assertions.assertThat(filenameArgumentCaptor.getValue())
                 .isEqualTo(FILE_XML);
         }
 
-        Mockito.reset(context);
+        Mockito.reset(ACTION_CONTEXT);
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        try (MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class);
+            MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
             mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn(TEST_XML);
             mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
+                .thenReturn(
+                    "<root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>");
 
-            XmlFileWriteAction.perform(Map.of(), context);
+            XmlFileWriteAction.perform(Map.of(), ACTION_CONTEXT);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-            Mockito.verify(context)
+            Mockito.verify(ACTION_CONTEXT)
                 .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
             Assertions.assertThat(filenameArgumentCaptor.getValue())
@@ -135,47 +143,55 @@ public class XmlFileWriteActionTest {
                 }
             });
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        try (MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class);
+            MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
             mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn("file.xml");
             mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
+                .thenReturn(
+                    "<root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>");
 
-            XmlFileWriteAction.perform(Map.of(), context);
+            XmlFileWriteAction.perform(Map.of(), ACTION_CONTEXT);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
                 .forClass(ByteArrayInputStream.class);
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-            Mockito.verify(context)
+            Mockito.verify(ACTION_CONTEXT)
                 .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
             ByteArrayInputStream byteArrayInputStream = inputStreamArgumentCaptor.getValue();
 
-            Assertions.assertThat(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8))
-                .isEqualTo("""
-                    <root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>
-                    """);
+            Assertions.assertThat(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8).trim())
+                .isEqualTo(
+                    "<root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>");
 
             Assertions.assertThat(filenameArgumentCaptor.getValue())
                 .isEqualTo(FILE_XML);
         }
 
-        Mockito.reset(context);
+        Mockito.reset(ACTION_CONTEXT);
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        try (MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class);
+            MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
             mockedStatic.when(() -> MapUtils.getString(
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.xml")))
                 .thenReturn(TEST_XML);
             mockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
+                .thenReturn(
+                    "<root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>");
 
-            XmlFileWriteAction.perform(Map.of(), context);
+            XmlFileWriteAction.perform(Map.of(), ACTION_CONTEXT);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-            Mockito.verify(context)
+            Mockito.verify(ACTION_CONTEXT)
                 .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
             Assertions.assertThat(filenameArgumentCaptor.getValue())

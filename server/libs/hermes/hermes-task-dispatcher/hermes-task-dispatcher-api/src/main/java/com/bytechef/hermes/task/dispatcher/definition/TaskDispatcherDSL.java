@@ -22,6 +22,7 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
+import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
@@ -29,6 +30,7 @@ import com.bytechef.hermes.definition.Resources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -51,6 +53,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
 
         private String description;
+        private Help help;
         private String icon;
         private final String name;
         private ModifiableOutputProperty<?> outputSchemaProperty;
@@ -70,6 +73,12 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableTaskDispatcherDefinition help(Help help) {
+            this.help = help;
+
+            return this;
+        }
+
         public ModifiableTaskDispatcherDefinition icon(String icon) {
             this.icon = icon;
 
@@ -79,9 +88,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         public <P extends ModifiableOutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(
             P property) {
 
-            if (property != null) {
-                this.outputSchemaProperty = property;
-            }
+            this.outputSchemaProperty = Objects.requireNonNull(property);
 
             return this;
         }
@@ -141,6 +148,11 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
+        }
+
+        @Override
+        public Optional<Help> getHelp() {
+            return Optional.ofNullable(help);
         }
 
         @Override

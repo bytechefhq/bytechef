@@ -17,8 +17,8 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;

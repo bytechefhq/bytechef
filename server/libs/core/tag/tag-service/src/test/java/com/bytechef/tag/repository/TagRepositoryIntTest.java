@@ -22,7 +22,7 @@ import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,9 +39,9 @@ public class TagRepositoryIntTest {
     @Autowired
     private TagRepository tagRepository;
 
-    @BeforeEach
+    @AfterEach
     @SuppressFBWarnings("NP")
-    public void beforeEach() {
+    public void afterEach() {
         tagRepository.deleteAll();
     }
 

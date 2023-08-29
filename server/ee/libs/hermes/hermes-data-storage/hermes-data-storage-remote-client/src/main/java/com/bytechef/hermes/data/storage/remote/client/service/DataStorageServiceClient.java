@@ -18,7 +18,7 @@
 package com.bytechef.hermes.data.storage.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.component.Context.DataStorageScope;
+import com.bytechef.hermes.component.definition.Context.DataStorageScope;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;

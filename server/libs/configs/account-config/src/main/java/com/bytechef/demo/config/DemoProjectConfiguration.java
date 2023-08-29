@@ -27,6 +27,7 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @Configuration
+@Profile("!testint")
 public class DemoProjectConfiguration implements InitializingBean {
 
     private final ProjectService projectService;

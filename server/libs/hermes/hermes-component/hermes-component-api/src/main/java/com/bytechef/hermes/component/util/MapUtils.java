@@ -17,6 +17,9 @@
 
 package com.bytechef.hermes.component.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,20 +27,32 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
+/**
+ * @author Ivica Cardic
+ */
 public class MapUtils {
 
-    static MapReader mapReader;
+    private static final Logger logger = LoggerFactory.getLogger(MapUtils.class);
+
+    static MapOperations mapOperations;
 
     static {
-        ServiceLoader<MapReader> loader = ServiceLoader.load(MapReader.class);
+        try {
+            ServiceLoader<MapOperations> serviceLoader = ServiceLoader.load(MapOperations.class);
 
-        mapReader = loader.findFirst()
-            .orElse(null);
+            mapOperations = serviceLoader.findFirst()
+                .orElse(null);
+        } catch (ServiceConfigurationError e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage(), e);
+            }
+        }
 
-        if (mapReader == null) {
-            System.err.println("MapReader instance is not available");
+        if (mapOperations == null && logger.isWarnEnabled()) {
+            logger.warn("MapOperations instance is not available");
         }
     }
 
@@ -52,7 +67,7 @@ public class MapUtils {
      * @return <code>true</code> if the key exists.<code>false</code> otherwise.
      */
     public static boolean containsKey(Map<String, ?> map, String key) {
-        return mapReader.containsKey(map, key);
+        return mapOperations.containsKey(map, key);
     }
 
     /**
@@ -63,7 +78,7 @@ public class MapUtils {
      * @return The object or <code>null</code> if no object is associated with the given key.
      */
     public static Object get(Map<String, ?> map, String key) {
-        return mapReader.get(map, key);
+        return mapOperations.get(map, key);
     }
 
     /**
@@ -75,7 +90,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> T get(Map<String, ?> map, String key, Class<T> returnType) {
-        return mapReader.get(map, key, returnType);
+        return mapOperations.get(map, key, returnType);
     }
 
     /**
@@ -88,7 +103,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> T get(Map<String, ?> map, String key, Class<T> returnType, T defaultValue) {
-        return mapReader.get(map, key, returnType, defaultValue);
+        return mapOperations.get(map, key, returnType, defaultValue);
     }
 
     /**
@@ -98,7 +113,7 @@ public class MapUtils {
      * @return
      */
     public static Object[] getArray(Map<String, ?> map, String key) {
-        return mapReader.getArray(map, key);
+        return mapOperations.getArray(map, key);
     }
 
     /**
@@ -109,7 +124,7 @@ public class MapUtils {
      * @return
      */
     public static Object[] getArray(Map<String, ?> map, String key, Object[] defaultValue) {
-        return mapReader.getArray(map, key, defaultValue);
+        return mapOperations.getArray(map, key, defaultValue);
     }
 
     /**
@@ -121,7 +136,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType) {
-        return mapReader.getArray(map, key, elementType);
+        return mapOperations.getArray(map, key, elementType);
     }
 
     /**
@@ -133,7 +148,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType, T[] defaultValue) {
-        return mapReader.getArray(map, key, elementType, defaultValue);
+        return mapOperations.getArray(map, key, elementType, defaultValue);
     }
 
     /**
@@ -144,7 +159,7 @@ public class MapUtils {
      * @return The {@link Integer} value associated with the given key -- converting as needed.
      */
     public static Boolean getBoolean(Map<String, ?> map, String key) {
-        return mapReader.getBoolean(map, key);
+        return mapOperations.getBoolean(map, key);
     }
 
     /**
@@ -156,7 +171,7 @@ public class MapUtils {
      * @return The {@link Integer} value associated with the given key -- converting as needed.
      */
     public static boolean getBoolean(Map<String, ?> map, String key, boolean defaultValue) {
-        return mapReader.getBoolean(map, key, defaultValue);
+        return mapOperations.getBoolean(map, key, defaultValue);
     }
 
     /**
@@ -167,7 +182,7 @@ public class MapUtils {
      * @return The {@link Date} value associated with the given key -- converting as needed.
      */
     public static Date getDate(Map<String, ?> map, String key) {
-        return mapReader.getDate(map, key);
+        return mapOperations.getDate(map, key);
     }
 
     /**
@@ -179,7 +194,7 @@ public class MapUtils {
      * @return The {@link Date} value associated with the given key -- converting as needed.
      */
     public static Date getDate(Map<String, ?> map, String key, Date defaultValue) {
-        return mapReader.getDate(map, key, defaultValue);
+        return mapOperations.getDate(map, key, defaultValue);
     }
 
     /**
@@ -190,7 +205,7 @@ public class MapUtils {
      * @return The {@link Double} value associated with the given key -- converting as needed.
      */
     public static Double getDouble(Map<String, ?> map, String key) {
-        return mapReader.getDouble(map, key);
+        return mapOperations.getDouble(map, key);
     }
 
     /**
@@ -202,7 +217,7 @@ public class MapUtils {
      * @return The {@link Double} value associated with the given key -- converting as needed.
      */
     public static double getDouble(Map<String, ?> map, String key, double defaultValue) {
-        return mapReader.getDouble(map, key, defaultValue);
+        return mapOperations.getDouble(map, key, defaultValue);
     }
 
     /**
@@ -213,7 +228,7 @@ public class MapUtils {
      * @return The {@link Duration} value associated with the given key -- converting as needed.
      */
     public static Duration getDuration(Map<String, ?> map, String key) {
-        return mapReader.getDuration(map, key);
+        return mapOperations.getDuration(map, key);
     }
 
     /**
@@ -225,7 +240,7 @@ public class MapUtils {
      * @return The {@link Duration} value associated with the given key -- converting as needed.
      */
     public static Duration getDuration(Map<String, ?> map, String key, Duration defaultDuration) {
-        return mapReader.getDuration(map, key, defaultDuration);
+        return mapOperations.getDuration(map, key, defaultDuration);
     }
 
     /**
@@ -236,7 +251,7 @@ public class MapUtils {
      * @return The {@link Float} value associated with the given key -- converting as needed.
      */
     public static Float getFloat(Map<String, ?> map, String key) {
-        return mapReader.getFloat(map, key);
+        return mapOperations.getFloat(map, key);
     }
 
     /**
@@ -248,7 +263,7 @@ public class MapUtils {
      * @return The {@link Float} value associated with the given key -- converting as needed.
      */
     public static float getFloat(Map<String, ?> map, String key, float defaultValue) {
-        return mapReader.getFloat(map, key, defaultValue);
+        return mapOperations.getFloat(map, key, defaultValue);
     }
 
     /**
@@ -259,7 +274,7 @@ public class MapUtils {
      * @return The {@link Integer} value associated with the given key -- converting as needed.
      */
     public static Integer getInteger(Map<String, ?> map, String key) {
-        return mapReader.getInteger(map, key);
+        return mapOperations.getInteger(map, key);
     }
 
     /**
@@ -271,7 +286,7 @@ public class MapUtils {
      * @return The {@link Integer} value associated with the given key -- converting as needed.
      */
     public static int getInteger(Map<String, ?> map, String key, int defaultValue) {
-        return mapReader.getInteger(map, key, defaultValue);
+        return mapOperations.getInteger(map, key, defaultValue);
     }
 
     /**
@@ -282,7 +297,7 @@ public class MapUtils {
      * @return The list of items
      */
     public static List<?> getList(Map<String, ?> map, String key) {
-        return mapReader.getList(map, key);
+        return mapOperations.getList(map, key);
     }
 
     /**
@@ -294,7 +309,7 @@ public class MapUtils {
      * @return The list of items
      */
     public static List<?> getList(Map<String, ?> map, String key, List<?> defaultValue) {
-        return mapReader.getList(map, key, defaultValue);
+        return mapOperations.getList(map, key, defaultValue);
     }
 
     /**
@@ -306,7 +321,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> List<T> getList(Map<String, ?> map, String key, Class<T> elementType) {
-        return mapReader.getList(map, key, elementType);
+        return mapOperations.getList(map, key, elementType);
     }
 
     /**
@@ -319,7 +334,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> List<T> getList(Map<String, ?> map, String key, Class<T> elementType, List<T> defaultValue) {
-        return mapReader.getList(map, key, elementType, defaultValue);
+        return mapOperations.getList(map, key, elementType, defaultValue);
     }
 
     /**
@@ -330,7 +345,7 @@ public class MapUtils {
      * @return
      */
     public static List<?> getList(Map<String, ?> map, String key, Class<?>[] elementTypes) {
-        return mapReader.getList(map, key, elementTypes);
+        return mapOperations.getList(map, key, elementTypes);
     }
 
     /**
@@ -342,7 +357,7 @@ public class MapUtils {
      * @return
      */
     public static List<?> getList(Map<String, ?> map, String key, List<Class<?>> elementTypes, List<?> defaultValue) {
-        return mapReader.getList(map, key, elementTypes, defaultValue);
+        return mapOperations.getList(map, key, elementTypes, defaultValue);
     }
 
     /**
@@ -352,7 +367,7 @@ public class MapUtils {
      * @return
      */
     public static LocalDate getLocalDate(Map<String, ?> map, String key) {
-        return mapReader.getLocalDate(map, key);
+        return mapOperations.getLocalDate(map, key);
     }
 
     /**
@@ -363,7 +378,7 @@ public class MapUtils {
      * @return
      */
     public static LocalDate getLocalDate(Map<String, ?> map, String key, LocalDate defaultValue) {
-        return mapReader.getLocalDate(map, key, defaultValue);
+        return mapOperations.getLocalDate(map, key, defaultValue);
     }
 
     /**
@@ -373,7 +388,7 @@ public class MapUtils {
      * @return
      */
     public static LocalDateTime getLocalDateTime(Map<String, ?> map, String key) {
-        return mapReader.getLocalDateTime(map, key);
+        return mapOperations.getLocalDateTime(map, key);
     }
 
     /**
@@ -384,7 +399,7 @@ public class MapUtils {
      * @return
      */
     public static LocalDateTime getLocalDateTime(Map<String, ?> map, String key, LocalDateTime defaultValue) {
-        return mapReader.getLocalDateTime(map, key, defaultValue);
+        return mapOperations.getLocalDateTime(map, key, defaultValue);
     }
 
     /**
@@ -394,7 +409,7 @@ public class MapUtils {
      * @return
      */
     public static LocalTime getLocalTime(Map<String, ?> map, String key) {
-        return mapReader.getLocalTime(map, key);
+        return mapOperations.getLocalTime(map, key);
     }
 
     /**
@@ -405,7 +420,7 @@ public class MapUtils {
      * @return
      */
     public static LocalTime getLocalTime(Map<String, ?> map, String key, LocalTime defaultValue) {
-        return mapReader.getLocalTime(map, key, defaultValue);
+        return mapOperations.getLocalTime(map, key, defaultValue);
     }
 
     /**
@@ -416,7 +431,7 @@ public class MapUtils {
      * @return The {@link Long} value associated with the given key -- converting as needed.
      */
     public static Long getLong(Map<String, ?> map, String key) {
-        return mapReader.getLong(map, key);
+        return mapOperations.getLong(map, key);
     }
 
     /**
@@ -428,7 +443,7 @@ public class MapUtils {
      * @return The {@link Long} value associated with the given key -- converting as needed.
      */
     public static long getLong(Map<String, ?> map, String key, long defaultValue) {
-        return mapReader.getLong(map, key, defaultValue);
+        return mapOperations.getLong(map, key, defaultValue);
     }
 
     /**
@@ -439,7 +454,7 @@ public class MapUtils {
      * @return The {@link Map} value associated with the given key.
      */
     public static Map<String, ?> getMap(Map<String, ?> map, String key) {
-        return mapReader.getMap(map, key);
+        return mapOperations.getMap(map, key);
     }
 
     /**
@@ -451,7 +466,7 @@ public class MapUtils {
      * @return The {@link Map} value associated with the given key.
      */
     public static Map<String, ?> getMap(Map<String, ?> map, String key, Map<String, ?> defaultValue) {
-        return mapReader.getMap(map, key, defaultValue);
+        return mapOperations.getMap(map, key, defaultValue);
     }
 
     /**
@@ -463,7 +478,7 @@ public class MapUtils {
      * @param <V>
      */
     public static <V> Map<String, V> getMap(Map<String, ?> map, String key, Class<V> valueType) {
-        return mapReader.getMap(map, key, valueType);
+        return mapOperations.getMap(map, key, valueType);
     }
 
     /**
@@ -478,7 +493,7 @@ public class MapUtils {
     public static <V> Map<String, V> getMap(
         Map<String, ?> map, String key, Class<V> valueType, Map<String, V> defaultValue) {
 
-        return mapReader.getMap(map, key, valueType, defaultValue);
+        return mapOperations.getMap(map, key, valueType, defaultValue);
     }
 
     /**
@@ -489,7 +504,7 @@ public class MapUtils {
      * @return
      */
     public static Map<String, ?> getMap(Map<String, ?> map, String key, List<Class<?>> valueTypes) {
-        return mapReader.getMap(map, key, valueTypes);
+        return mapOperations.getMap(map, key, valueTypes);
     }
 
     /**
@@ -503,7 +518,7 @@ public class MapUtils {
     public static Map<String, ?> getMap(
         Map<String, ?> map, String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
 
-        return mapReader.getMap(map, key, valueTypes, defaultValue);
+        return mapOperations.getMap(map, key, valueTypes, defaultValue);
     }
 
     /**
@@ -516,7 +531,7 @@ public class MapUtils {
      * @throws IllegalArgumentException if no value is associated with the given key.
      */
     public static Object getRequired(Map<String, ?> map, String key) {
-        return mapReader.getRequired(map, key);
+        return mapOperations.getRequired(map, key);
     }
 
     /**
@@ -528,7 +543,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> T getRequired(Map<String, ?> map, String key, Class<T> elementType) {
-        return mapReader.getRequired(map, key, elementType);
+        return mapOperations.getRequired(map, key, elementType);
     }
 
     /**
@@ -538,7 +553,7 @@ public class MapUtils {
      * @return
      */
     public static Object[] getRequiredArray(Map<String, ?> map, String key) {
-        return mapReader.getRequiredArray(map, key);
+        return mapOperations.getRequiredArray(map, key);
     }
 
     /**
@@ -550,7 +565,7 @@ public class MapUtils {
      * @param <T>
      */
     public static <T> T[] getRequiredArray(Map<String, ?> map, String key, Class<T> elementType) {
-        return mapReader.getRequiredArray(map, key, elementType);
+        return mapOperations.getRequiredArray(map, key, elementType);
     }
 
     /**
@@ -560,7 +575,7 @@ public class MapUtils {
      * @return
      */
     public static Boolean getRequiredBoolean(Map<String, ?> map, String key) {
-        return mapReader.getRequiredBoolean(map, key);
+        return mapOperations.getRequiredBoolean(map, key);
     }
 
     /**
@@ -570,7 +585,7 @@ public class MapUtils {
      * @return
      */
     public static Date getRequiredDate(Map<String, ?> map, String key) {
-        return mapReader.getRequiredDate(map, key);
+        return mapOperations.getRequiredDate(map, key);
     }
 
     /**
@@ -580,7 +595,7 @@ public class MapUtils {
      * @return
      */
     public static Double getRequiredDouble(Map<String, ?> map, String key) {
-        return mapReader.getRequiredDouble(map, key);
+        return mapOperations.getRequiredDouble(map, key);
     }
 
     /**
@@ -590,7 +605,7 @@ public class MapUtils {
      * @return
      */
     public static Float getRequiredFloat(Map<String, ?> map, String key) {
-        return mapReader.getRequiredFloat(map, key);
+        return mapOperations.getRequiredFloat(map, key);
     }
 
     /**
@@ -600,7 +615,7 @@ public class MapUtils {
      * @return
      */
     public static Integer getRequiredInteger(Map<String, ?> map, String key) {
-        return mapReader.getRequiredInteger(map, key);
+        return mapOperations.getRequiredInteger(map, key);
     }
 
     /**
@@ -610,7 +625,7 @@ public class MapUtils {
      * @return
      */
     public static LocalDate getRequiredLocalDate(Map<String, ?> map, String key) {
-        return mapReader.getRequiredLocalDate(map, key);
+        return mapOperations.getRequiredLocalDate(map, key);
     }
 
     /**
@@ -620,7 +635,7 @@ public class MapUtils {
      * @return
      */
     public static LocalDateTime getRequiredLocalDateTime(Map<String, ?> map, String key) {
-        return mapReader.getRequiredLocalDateTime(map, key);
+        return mapOperations.getRequiredLocalDateTime(map, key);
     }
 
     /**
@@ -630,15 +645,15 @@ public class MapUtils {
      * @return
      */
     public static LocalTime getRequiredLocalTime(Map<String, ?> map, String key) {
-        return mapReader.getRequiredLocalTime(map, key);
+        return mapOperations.getRequiredLocalTime(map, key);
     }
 
     public static List<?> getRequiredList(Map<String, ?> map, String key) {
-        return mapReader.getRequiredList(map, key);
+        return mapOperations.getRequiredList(map, key);
     }
 
     public static <T> List<T> getRequiredList(Map<String, ?> map, String key, Class<T> elementType) {
-        return mapReader.getRequiredList(map, key, elementType);
+        return mapOperations.getRequiredList(map, key, elementType);
     }
 
     /**
@@ -648,7 +663,7 @@ public class MapUtils {
      * @return
      */
     public static Map<String, ?> getRequiredMap(Map<String, ?> map, String key) {
-        return mapReader.getRequiredMap(map, key);
+        return mapOperations.getRequiredMap(map, key);
     }
 
     /**
@@ -660,7 +675,7 @@ public class MapUtils {
      * @param <V>
      */
     public static <V> Map<String, V> getRequiredMap(Map<String, ?> map, String key, Class<V> valueType) {
-        return mapReader.getRequiredMap(map, key, valueType);
+        return mapOperations.getRequiredMap(map, key, valueType);
     }
 
     /**
@@ -672,7 +687,7 @@ public class MapUtils {
      * @throws IllegalArgumentException if no value is associated with the given key.
      */
     public static String getRequiredString(Map<String, ?> map, String key) {
-        return mapReader.getRequiredString(map, key);
+        return mapOperations.getRequiredString(map, key);
     }
 
     /**
@@ -683,7 +698,7 @@ public class MapUtils {
      * @return The string value associated with the given key -- converting to {@link String} as needed.
      */
     public static String getString(Map<String, ?> map, String key) {
-        return mapReader.getString(map, key);
+        return mapOperations.getString(map, key);
     }
 
     /**
@@ -695,10 +710,10 @@ public class MapUtils {
      * @return The string value associated with the given key -- converting to {@link String} as needed.
      */
     public static String getString(Map<String, ?> map, String key, String defaultValue) {
-        return mapReader.getString(map, key, defaultValue);
+        return mapOperations.getString(map, key, defaultValue);
     }
 
-    interface MapReader {
+    interface MapOperations {
 
         boolean containsKey(Map<String, ?> map, String key);
 
@@ -730,7 +745,7 @@ public class MapUtils {
 
         Duration getDuration(Map<String, ?> map, String key);
 
-        Duration getDuration(Map<String, ?> map, String key, Duration defaultValue);
+        Duration getDuration(Map<String, ?> map, String key, Duration defaultDuration);
 
         Float getFloat(Map<String, ?> map, String key);
 

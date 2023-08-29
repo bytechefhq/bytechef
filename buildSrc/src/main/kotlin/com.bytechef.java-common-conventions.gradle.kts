@@ -19,7 +19,7 @@ plugins {
 val check by tasks.existing
 
 checkstyle {
-    toolVersion = "10.6.0"
+    toolVersion = "10.12.3"
     configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
 }
 
@@ -59,7 +59,7 @@ java {
 }
 
 pmd {
-    toolVersion = "6.54.0"
+    toolVersion = "6.55.0"
     ruleSetFiles = files("${rootDir}/config/pmd/pmd-ruleset.xml")
     ruleSets()
 }
@@ -166,11 +166,11 @@ spotless {
         endWithNewline()
     }
     yaml {
-        target("cli/**/*.yaml", "server/**/*.yaml")
+        target("cli/**/src/**/*.yaml", "server/**/src/**/*.yaml")
         jackson()
     }
     json {
-        target("cli/**/*.json", "server/**/*.json")
+        target("cli/**/src/**/*.json", "server/**/src/**/*.json")
         jackson()
     }
 }

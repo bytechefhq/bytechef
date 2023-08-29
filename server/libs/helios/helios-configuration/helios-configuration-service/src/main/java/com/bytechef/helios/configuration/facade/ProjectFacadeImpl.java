@@ -29,6 +29,7 @@ import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @Transactional
+@Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;

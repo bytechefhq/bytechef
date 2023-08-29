@@ -17,7 +17,7 @@
 
 package com.bytechef.component.datastorage.action;
 
-import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 
 import java.util.Map;
@@ -62,7 +62,7 @@ public class DataStorageAtomicIncrementAction {
                 .properties(integer(VALUE)))
         .perform(DataStorageAtomicIncrementAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext actionContext) {
         // TODO
 
         return null;

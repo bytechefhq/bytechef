@@ -15,10 +15,11 @@ dependencies {
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
-    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc-util"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-converter"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     testImplementation(project(":server:libs:configs:liquibase-config"))

@@ -19,9 +19,10 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class JdbcContextRepositoryIntTest {
 
     @Autowired
-    private ContextRepository contextRepository;
+    private JdbcContextRepository contextRepository;
+
+    @AfterEach
+    public void afterEach() {
+        contextRepository.deleteAll();
+    }
 
     @Test
     public void testFindByStackId() {

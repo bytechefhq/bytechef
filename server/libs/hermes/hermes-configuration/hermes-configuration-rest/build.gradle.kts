@@ -59,5 +59,4 @@ dependencies {
     implementation(project(":server:libs:core:autoconfigure-annotations"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
-    implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
 }

@@ -18,19 +18,19 @@
 package com.bytechef.hermes.configuration.web.rest.config;
 
 import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
-import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
@@ -38,7 +38,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {
     "com.bytechef.hermes.configuration.web.rest", "com.bytechef.hermes.definition.registry"
 })
-@SpringBootConfiguration
+@Configuration
 public class WorkflowConfigurationRestTestConfiguration {
 
     @MockBean

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.domain.Authorization;
+import com.bytechef.hermes.component.registry.domain.Authorization;
 import com.bytechef.hermes.configuration.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;

@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Resources;
 
 import java.util.List;

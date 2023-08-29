@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:ee:libs:dione:dione-configuration:dione-configuration-api"))
+    implementation(project(":server:ee:libs:dione:dione-configuration:dione-configuration-api"))
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")

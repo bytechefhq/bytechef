@@ -24,11 +24,11 @@ import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.util.TypeReference;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property.ControlType;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,11 +80,11 @@ public class AirtableUtils {
                 MapUtils.getRequiredString(inputParameters, BASE_ID));
 
             Map<String, List<AirtableTable>> tablesMap = JsonUtils.read(
-                HttpClientUtils
+                (String) HttpClientUtils
                     .get(url)
                     .configuration(responseType(HttpClientUtils.ResponseType.TEXT))
                     .execute()
-                    .getBody(),
+                    .body(),
                 new TypeReference<>() {});
 
             if (logger.isDebugEnabled()) {

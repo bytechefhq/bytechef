@@ -17,12 +17,12 @@
 
 package com.bytechef.helios.configuration.web.rest.config;
 
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 @ComponentScan(basePackages = {
     "com.bytechef.helios.configuration.web.rest",
 })
-@SpringBootConfiguration
+@Configuration
 public class ProjectConfigurationRestTestConfiguration {
 }

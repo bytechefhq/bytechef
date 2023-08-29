@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 
@@ -135,5 +135,31 @@ public interface ActionDefinition {
          * @return
          */
         Object apply(Map<String, ?> inputParameters, ActionContext context);
+    }
+
+    /**
+     *
+     */
+    interface ActionContext extends Context {
+
+        /**
+         *
+         * @param taskConnectionKey
+         * @return
+         */
+        Optional<Connection> fetchConnection(String taskConnectionKey);
+
+        /**
+         *
+         * @param workflowConnectionKey
+         * @return
+         */
+        Connection getConnection(String workflowConnectionKey);
+
+        /**
+         *
+         * @param progress
+         */
+        void publishActionProgressEvent(int progress);
     }
 }

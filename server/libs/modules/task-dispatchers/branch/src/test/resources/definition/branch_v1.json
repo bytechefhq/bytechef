@@ -1,8 +1,8 @@
 {
   "description": "Executes one and only one branch of execution based on the `expression` value.",
+  "help": null,
   "icon": "path:assets/branch.svg",
   "name": "branch",
-  "outputSchema": null,
   "properties": [ {
     "advancedOption": null,
     "description": "Defines expression upon which evaluation the proper branch continues execution.",
@@ -106,21 +106,21 @@
           "objectType": "TASK",
           "options": null,
           "properties": null,
-          "controlType": "EXPRESSION",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "EXPRESSION"
         } ],
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
     "options": null,
-    "controlType": "OBJECT_BUILDER",
-    "optionsDataSource": null
+    "optionsDataSource": null,
+    "controlType": "OBJECT_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
@@ -154,14 +154,15 @@
       "objectType": "TASK",
       "options": null,
       "properties": null,
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "multipleValues": null,
     "options": null,
-    "controlType": "OBJECT_BUILDER",
-    "optionsDataSource": null
+    "optionsDataSource": null,
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Branch",
-  "version": 1
+  "version": 1,
+  "outputSchema": null
 }

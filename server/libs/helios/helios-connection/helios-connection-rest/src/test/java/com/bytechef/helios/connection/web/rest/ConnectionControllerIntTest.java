@@ -40,10 +40,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -316,7 +316,7 @@ public class ConnectionControllerIntTest {
     }
 
     @ComponentScan(basePackages = "com.bytechef.helios.connection.web.rest")
-    @SpringBootConfiguration
+    @Configuration
     public static class ConnectionRestTestConfiguration {
     }
 }

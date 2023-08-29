@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.data.storage.service;
 
-import com.bytechef.hermes.component.Context.DataStorageScope;
+import com.bytechef.hermes.component.definition.Context.DataStorageScope;
 
 import java.util.Optional;
 

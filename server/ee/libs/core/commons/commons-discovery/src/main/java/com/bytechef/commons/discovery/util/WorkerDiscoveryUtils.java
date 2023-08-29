@@ -19,6 +19,7 @@ package com.bytechef.commons.discovery.util;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;
@@ -74,7 +75,8 @@ public class WorkerDiscoveryUtils {
             String componentsString = metadataMap.get("components");
 
             if (StringUtils.hasText(componentsString)) {
-                List<Map<String, String>> components = JsonUtils.read(componentsString, objectMapper);
+                List<Map<String, String>> components = JsonUtils.read(
+                    componentsString, new TypeReference<>() {}, objectMapper);
 
                 return components.stream()
                     .map(componentMap -> MapUtils.getString(componentMap, "name"))
