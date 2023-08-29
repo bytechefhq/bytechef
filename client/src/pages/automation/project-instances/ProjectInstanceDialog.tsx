@@ -115,6 +115,8 @@ const ProjectInstanceDialog = ({
     function saveProjectInstance() {
         const formData = getValues();
 
+        console.log('formData', formData);
+
         if (!formData) {
             return;
         }

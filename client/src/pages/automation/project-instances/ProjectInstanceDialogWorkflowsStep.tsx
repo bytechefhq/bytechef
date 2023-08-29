@@ -16,12 +16,16 @@ interface ProjectInstanceDialogWorkflowListItemProps {
     workflow: WorkflowModel;
     label: string;
     register: UseFormRegister<ProjectInstanceModel>;
+    workflowIndex?: number;
+    getValues?: UseFormGetValues<ProjectInstanceModel>;
 }
 
 export const ProjectInstanceDialogWorkflowListItem = ({
+    getValues,
     label,
     register,
     workflow,
+    workflowIndex,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
     const [isEnabled, setIsEnabled] = useState(false);
@@ -40,27 +44,71 @@ export const ProjectInstanceDialogWorkflowListItem = ({
         {
             content: workflow.inputs && (
                 <Properties
-                    properties={workflow.inputs.map((input) => {
+                    properties={workflow.inputs.map((input, inputIndex) => {
+                        console.log('input', input, inputIndex);
+
                         if (input.type === 'string') {
                             return {
                                 ...input,
                                 controlType: 'TEXT',
                                 type: 'STRING',
+                                ...register(
+                                    `projectInstanceWorkflows.${workflowIndex!}.inputs.${
+                                        input.name
+                                    }`,
+                                    {
+                                        value:
+                                            getValues &&
+                                            getValues(
+                                                `projectInstanceWorkflows.${workflowIndex!}.inputs.${
+                                                    input.name
+                                                }`
+                                            ),
+                                    }
+                                    // input.name
+                                ),
                             };
                         } else if (input.type === 'number') {
                             return {
                                 ...input,
                                 type: 'NUMBER',
+                                ...register(
+                                    `projectInstanceWorkflows.${workflowIndex!}.inputs.${
+                                        input.name
+                                    }`,
+                                    {
+                                        value:
+                                            getValues &&
+                                            getValues(
+                                                `projectInstanceWorkflows.${workflowIndex!}.inputs.${
+                                                    input.name
+                                                }`
+                                            ),
+                                    }
+                                ),
                             };
                         } else {
                             return {
                                 ...input,
                                 controlType: 'SELECT',
                                 type: 'BOOLEAN',
+                                ...register(
+                                    `projectInstanceWorkflows.${workflowIndex!}.inputs.${
+                                        input.name
+                                    }`,
+                                    {
+                                        value:
+                                            getValues &&
+                                            getValues(
+                                                `projectInstanceWorkflows.${workflowIndex!}.inputs.${
+                                                    input.name
+                                                }`
+                                            ),
+                                    }
+                                ),
                             };
                         }
                     })}
-                    {...register('projectInstanceWorkflows.0.inputs')}
                 />
             ),
             name: 'Configuration',
@@ -68,12 +116,15 @@ export const ProjectInstanceDialogWorkflowListItem = ({
         {
             content: (
                 <>
-                    {connections?.map((connection) => (
+                    {connections?.map((connection, connectionIndex) => (
                         <Input
                             key={connection.componentName}
                             label={connection.componentName}
                             labelClassName="px-2"
-                            name={connection.componentName}
+                            // name={connection.componentName}
+                            {...register(
+                                `projectInstanceWorkflows.${workflowIndex!}.connections.${connectionIndex}`
+                            )}
                         />
                     ))}
                 </>
@@ -149,12 +200,14 @@ const ProjectInstanceDialogWorkflowsStep = (props: {
 
     return (
         <ul className="space-y-4">
-            {workflows?.map((workflow) => (
+            {workflows?.map((workflow, workflowIndex) => (
                 <ProjectInstanceDialogWorkflowListItem
                     key={workflow.id!}
                     workflow={workflow}
                     label={workflow.label!}
                     register={props.register}
+                    workflowIndex={workflowIndex}
+                    getValues={props.getValues}
                 />
             ))}
         </ul>
