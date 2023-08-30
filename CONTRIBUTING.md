@@ -237,7 +237,7 @@ By default, the server will start on port 9555.
 
 When the server starts, it automatically runs migrations on PostgreSQL and populate it with some initial required data.
 
-You can check the status of the server by hitting the endpoint: http://localhost:9555/webjars/swagger-ui/index.html on your browser to get Swagger UI with the list of API endpoints.
+You can check the status of the server by hitting the endpoint: http://localhost:9555/swagger-ui/index.html on your browser to get Swagger UI with the list of API endpoints.
 
 ### Running Tests
 
