@@ -17,11 +17,21 @@
 
 package com.bytechef.configuration.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.openapitools.jackson.nullable.JsonNullableModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 /**
  * @author Ivica Cardic
@@ -30,17 +40,17 @@ import org.springframework.context.annotation.Configuration;
 public class JacksonConfiguration {
 
     @Bean
-    JavaTimeModule javaTimeModule() {
-        return new JavaTimeModule();
-    }
-
-    @Bean
-    Jdk8Module jdk8Module() {
-        return new Jdk8Module();
-    }
-
-    @Bean
-    JsonNullableModule jsonNullableModule() {
-        return new JsonNullableModule();
+    @Primary
+    public ObjectMapper objectMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
+        return new ObjectMapper()
+            .setDateFormat(new SimpleDateFormat(dateFormat))
+            .setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(SerializationFeature.INDENT_OUTPUT)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module())
+            .registerModule(new JsonNullableModule());
     }
 }
