@@ -30,7 +30,6 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -45,7 +44,6 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 @Configuration
-@Profile("!testint")
 public class OrphanWorkflowLoadConfiguration implements InitializingBean {
 
     private static final String WORKFLOWS = "Workflows";
