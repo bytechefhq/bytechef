@@ -25,8 +25,8 @@ import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,8 +41,8 @@ public class ConnectionRepositoryIntTest {
     @Autowired
     private ConnectionRepository connectionRepository;
 
-    @BeforeEach
-    public void beforeEach() {
+    @AfterEach
+    public void afterEach() {
         connectionRepository.deleteAll();
     }
 

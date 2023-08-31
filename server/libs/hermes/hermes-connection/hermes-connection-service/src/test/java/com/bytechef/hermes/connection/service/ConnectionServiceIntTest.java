@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EmbeddedSql
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
-public class ConnectionDefinitionServiceIntTest {
+public class ConnectionServiceIntTest {
 
     @Autowired
     private ConnectionService connectionService;
@@ -51,8 +51,8 @@ public class ConnectionDefinitionServiceIntTest {
     @Autowired
     private TagRepository tagRepository;
 
-    @BeforeEach
-    public void beforeEach() {
+    @AfterEach
+    public void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
     }
