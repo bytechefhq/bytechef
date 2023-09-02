@@ -1,7 +1,4 @@
 dependencies {
-    implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
-    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
-
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.slf4j:slf4j-api")
@@ -11,6 +8,8 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:message-broker:message-broker-api"))
+    implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
+    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
     implementation(project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
     implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api"))
