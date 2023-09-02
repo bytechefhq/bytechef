@@ -1,11 +1,10 @@
 dependencies {
-    implementation(project(":server:libs:helios:helios-connection:helios-connection-api"))
-
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
+    implementation(project(":server:libs:helios:helios-connection:helios-connection-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":server:libs:configs:liquibase-config"))
