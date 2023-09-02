@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:12.149855+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:23:03.600789+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
@@ -46,7 +47,7 @@ public class ProjectInstanceWorkflowModel {
 
   private Integer projectInstanceId;
 
-  private Integer workflowId;
+  private String workflowId;
 
   private Integer version;
 
@@ -186,7 +187,7 @@ public class ProjectInstanceWorkflowModel {
     this.projectInstanceId = projectInstanceId;
   }
 
-  public ProjectInstanceWorkflowModel workflowId(Integer workflowId) {
+  public ProjectInstanceWorkflowModel workflowId(String workflowId) {
     this.workflowId = workflowId;
     return this;
   }
@@ -198,11 +199,11 @@ public class ProjectInstanceWorkflowModel {
   
   @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
-  public Integer getWorkflowId() {
+  public String getWorkflowId() {
     return workflowId;
   }
 
-  public void setWorkflowId(Integer workflowId) {
+  public void setWorkflowId(String workflowId) {
     this.workflowId = workflowId;
   }
 
