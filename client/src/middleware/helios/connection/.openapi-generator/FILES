@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/AutomationConnectionApi.ts
 apis/AutomationConnectionTagApi.ts
 apis/index.ts
