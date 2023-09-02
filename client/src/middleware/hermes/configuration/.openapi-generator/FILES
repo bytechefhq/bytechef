@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/ActionDefinitionApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectionDefinitionApi.ts
