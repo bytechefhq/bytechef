@@ -2,20 +2,14 @@
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-echo "Generate Airtable OpenAPI Connector"
-$SCRIPTPATH/bytechef.sh component init --open-api-path=$SCRIPTPATH/../../server/libs/modules/components/airtable/openapi.yaml -o $SCRIPTPATH/../../server/libs/modules/components airtable
+COMPONENTSFOLDER=$SCRIPTPATH/../../server/libs/modules/components
 
-echo "Generate Jira OpenAPI Connector"
-$SCRIPTPATH/bytechef.sh component init --open-api-path=$SCRIPTPATH/../../server/libs/modules/components/jira/openapi.yaml -o $SCRIPTPATH/../../server/libs/modules/components jira
+for COMPONENTPATH in "$COMPONENTSFOLDER"/*
+do
+    if test -f "$COMPONENTPATH/openapi.yaml"; then
+        COMPONENTNAME=$(basename $COMPONENTPATH)
 
-echo "Generate MailChimp OpenAPI Connector"
-$SCRIPTPATH/bytechef.sh component init --open-api-path=$SCRIPTPATH/../../server/libs/modules/components/mailchimp/openapi.yaml -o $SCRIPTPATH/../../server/libs/modules/components mailchimp
-
-echo "Generate PetStore OpenAPI Connector"
-$SCRIPTPATH/bytechef.sh component init --open-api-path=$SCRIPTPATH/../../server/libs/modules/components/petstore/openapi.yaml -o $SCRIPTPATH/../../server/libs/modules/components petstore
-
-echo "Generate Pipedrive OpenAPI Connector"
-$SCRIPTPATH/bytechef.sh component init --open-api-path=$SCRIPTPATH/../../server/libs/modules/components/pipedrive/openapi.yaml -o $SCRIPTPATH/../../server/libs/modules/components pipedrive
-
-#echo "Generate Shopify OpenAPI Connector"
-#$SCRIPTPATH/bytechef.sh component init --open-api-path=$SCRIPTPATH/../../server/libs/modules/components/shopify/openapi.yaml -o $SCRIPTPATH/../../server/libs/modules/components shopify
+        echo "Generate $COMPONENTNAME OpenAPI Connector"
+        $SCRIPTPATH/bytechef.sh component init --open-api-path=$COMPONENTSFOLDER/$COMPONENTNAME/openapi.yaml -o $COMPONENTSFOLDER $COMPONENTNAME
+    fi
+done
