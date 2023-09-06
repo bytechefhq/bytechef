@@ -18,6 +18,7 @@
 package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
+import com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FileFormat;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -121,7 +122,7 @@ public class XlsxFileReadAction {
         try (InputStream inputStream = context.getFileStream(fileEntry)) {
             String extension = fileEntry.getExtension();
 
-            XlsxFileConstants.FileFormat fileFormat = XlsxFileConstants.FileFormat.valueOf(extension.toUpperCase());
+            FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
 
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
@@ -148,7 +149,7 @@ public class XlsxFileReadAction {
     }
 
     protected static List<Map<String, ?>> read(
-        XlsxFileConstants.FileFormat fileFormat, InputStream inputStream, ReadConfiguration configuration)
+        FileFormat fileFormat, InputStream inputStream, ReadConfiguration configuration)
         throws IOException {
         List<Map<String, ?>> rows = new ArrayList<>();
 
@@ -230,9 +231,9 @@ public class XlsxFileReadAction {
         return rows;
     }
 
-    private static Workbook getWorkbook(XlsxFileConstants.FileFormat fileFormat, InputStream inputStream)
+    private static Workbook getWorkbook(FileFormat fileFormat, InputStream inputStream)
         throws IOException {
-        return fileFormat == XlsxFileConstants.FileFormat.XLS ? new HSSFWorkbook(inputStream)
+        return fileFormat == FileFormat.XLS ? new HSSFWorkbook(inputStream)
             : new XSSFWorkbook(inputStream);
     }
 

@@ -20,7 +20,7 @@ package com.bytechef.dione.configuration.repository;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.dione.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.dione.configuration.domain.Integration;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -29,14 +29,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(classes = IntegrationIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class IntegrationRepositoryIntTest {
 
     @Autowired

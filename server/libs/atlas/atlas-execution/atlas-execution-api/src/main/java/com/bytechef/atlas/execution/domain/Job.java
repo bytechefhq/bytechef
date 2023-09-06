@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 
@@ -125,7 +126,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private MapWrapper metadata = new MapWrapper();
 
     @Column
-    private MapWrapper outputs = new MapWrapper();
+    private FileEntry outputs;
 
     @Column("parent_task_execution_id")
     private AggregateReference<TaskExecution, Long> parentTaskExecutionId;
@@ -297,8 +298,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      *
      * @return {@link Map<String, Object>}
      */
-    public Map<String, ?> getOutputs() {
-        return Collections.unmodifiableMap(outputs.getMap());
+    public FileEntry getOutputs() {
+        return outputs;
     }
 
     public String getLastModifiedBy() {
@@ -365,8 +366,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.metadata = new MapWrapper(metadata);
     }
 
-    public void setOutputs(Map<String, ?> outputs) {
-        this.outputs = new MapWrapper(outputs);
+    public void setOutputs(FileEntry outputs) {
+        this.outputs = outputs;
     }
 
     public void setParentTaskExecutionId(Long parentTaskExecutionId) {

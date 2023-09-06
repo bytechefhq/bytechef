@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.execution.facade;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
@@ -25,7 +26,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,19 +34,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 import java.util.Collections;
 
-@EmbeddedSql
+/**
+ * Ivica Cardic
+ */
 @SpringBootTest(
     classes = {
         WorkflowExecutionIntTestConfiguration.class
     },
     properties = {
-        "bytechef.context-repository.provider=jdbc",
-        "bytechef.persistence.provider=jdbc",
-        "bytechef.workflow-repository.jdbc.enabled=true"
+        "bytechef.workflow.repository.jdbc.enabled=true"
     })
+@Import(PostgreSQLContainerConfiguration.class)
 public class JobFacadeIntTest {
 
     @Autowired
@@ -67,9 +70,13 @@ public class JobFacadeIntTest {
         @MockBean
         private WorkflowService workflowService;
 
+        @MockBean
+        private WorkflowFileStorage workflowFileStorage;
+
         @Bean
         JobFacade jobFacade(JobService jobService, MessageBroker messageBroker) {
-            return new JobFacadeImpl(contextService, e -> {}, jobService, messageBroker, workflowService);
+            return new JobFacadeImpl(
+                contextService, e -> {}, jobService, messageBroker, workflowFileStorage, workflowService);
         }
 
         @Bean

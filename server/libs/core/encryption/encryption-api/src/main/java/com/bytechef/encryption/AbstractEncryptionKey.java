@@ -17,10 +17,11 @@
 
 package com.bytechef.encryption;
 
+import com.bytechef.commons.util.EncodingUtils;
+
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
 import javax.crypto.KeyGenerator;
 
 /**
@@ -53,7 +54,6 @@ public abstract class AbstractEncryptionKey implements EncryptionKey {
         // Creating/Generating a key
         Key key = keyGenerator.generateKey();
 
-        return Base64.getEncoder()
-            .encodeToString(key.getEncoded());
+        return EncodingUtils.encodeBase64ToString(key.getEncoded());
     }
 }

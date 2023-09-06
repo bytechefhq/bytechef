@@ -17,17 +17,19 @@
 
 package com.bytechef.server;
 
-import com.bytechef.test.annotation.EmbeddedRedis;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedRedis
-@EmbeddedSql
 @SpringBootTest
+@Import({
+    PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
+})
 class ServerApplicationIntTest {
 
     @Test

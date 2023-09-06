@@ -136,7 +136,7 @@ public class TriggerSyncExecutor {
         InstanceWorkflowAccessor instanceWorkflowAccessor = instanceWorkflowAccessorRegistry
             .getInstanceWorkflowAccessor(workflowExecutionId.getInstanceType());
 
-        return instanceWorkflowAccessor.getInputs(
+        return instanceWorkflowAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
     }
 

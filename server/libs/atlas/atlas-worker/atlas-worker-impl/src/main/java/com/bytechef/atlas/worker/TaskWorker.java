@@ -21,6 +21,7 @@ package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
@@ -78,23 +79,27 @@ public class TaskWorker {
     private final MessageBroker messageBroker;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
+    private final WorkflowFileStorage workflowFileStorage;
 
     public TaskWorker(
-        EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver) {
+        EventPublisher eventPublisher, MessageBroker messageBroker,
+        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorage workflowFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.messageBroker = messageBroker;
         this.taskHandlerResolver = taskHandlerResolver;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     public TaskWorker(
         EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
-        TaskHandlerResolver taskHandlerResolver) {
+        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorage workflowFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
         this.messageBroker = messageBroker;
         this.taskHandlerResolver = taskHandlerResolver;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     /**
@@ -190,7 +195,8 @@ public class TaskWorker {
             Object output = taskHandler.handle(taskExecution.clone());
 
             if (output != null) {
-                taskExecution.setOutput(output);
+                taskExecution.setOutput(workflowFileStorage.storeTaskExecutionOutput(
+                    taskExecution.getId(), output));
             }
 
             taskExecution.setEndDate(LocalDateTime.now());
@@ -223,7 +229,9 @@ public class TaskWorker {
             TaskExecution completionTaskExecution = doExecuteTask(subTaskExecution);
 
             if (completionTaskExecution.getName() != null) {
-                context.put(completionTaskExecution.getName(), completionTaskExecution.getOutput());
+                context.put(
+                    completionTaskExecution.getName(),
+                    workflowFileStorage.readTaskExecutionOutput(completionTaskExecution.getOutput()));
             }
         }
     }

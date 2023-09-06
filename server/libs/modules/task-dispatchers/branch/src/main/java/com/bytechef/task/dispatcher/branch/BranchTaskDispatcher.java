@@ -28,6 +28,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -59,16 +60,18 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService) {
+        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage) {
 
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -102,15 +105,18 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .workflowTask(subWorkflowTask)
                     .build();
 
-                Map<String, ?> context = contextService.peek(
-                    Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION);
+                Map<String, ?> context = workflowFileStorage.readContextValue(
+                    contextService.peek(
+                        Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION));
 
                 subTaskExecution.evaluate(context);
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
 
                 contextService.push(
-                    Objects.requireNonNull(subTaskExecution.getId()), Classname.TASK_EXECUTION, context);
+                    Objects.requireNonNull(subTaskExecution.getId()), Classname.TASK_EXECUTION,
+                    workflowFileStorage.storeContextValue(
+                        subTaskExecution.getId(), Classname.TASK_EXECUTION, context));
 
                 taskDispatcher.dispatch(subTaskExecution);
             }
@@ -119,7 +125,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
             // TODO check, it seems wrong
-            taskExecution.setOutput(selectedCase.get("value"));
+            taskExecution.setOutput(
+                workflowFileStorage.storeTaskExecutionOutput(taskExecution.getId(), selectedCase.get("value")));
 
             messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         }

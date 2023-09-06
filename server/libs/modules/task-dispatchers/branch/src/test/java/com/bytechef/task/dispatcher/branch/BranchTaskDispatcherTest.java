@@ -27,7 +27,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -40,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.message.broker.MessageRoute;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -50,19 +55,23 @@ import org.mockito.ArgumentCaptor;
  */
 public class BranchTaskDispatcherTest {
 
+    private final Base64FileStorageService base64FileStorageService = new Base64FileStorageService();
     private final ContextService contextService = mock(ContextService.class);
     private final MessageBroker messageBroker = mock(MessageBroker.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
+    private final WorkflowFileStorage workflowFileStorage = new WorkflowFileStorageImpl(
+        base64FileStorageService, new ObjectMapper());
 
     @Test
     public void test1() {
-        when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
+        when(contextService.peek(anyLong(), any())).thenReturn(
+            base64FileStorageService.storeFileContent("", "", "{}"));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -96,31 +105,36 @@ public class BranchTaskDispatcherTest {
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
 
         verify(taskDispatcher, times(1)).dispatch(argument.capture());
-        Assertions.assertEquals("print", argument.getValue()
-            .getType());
+
+        taskExecution = argument.getValue();
+
+        Assertions.assertEquals("print", taskExecution.getType());
     }
 
     @Test
     public void test2() {
-        when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
+        when(contextService.peek(anyLong(), any())).thenReturn(
+            base64FileStorageService.storeFileContent("", "", "{}"));
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService);
-        TaskExecution taskExecution = TaskExecution.builder().id(
-            1L).workflowTask(
-            WorkflowTask.of(
-                Map.of(
-                    WorkflowConstants.NAME, "name",
-                    WorkflowConstants.TYPE, "type",
-                    WorkflowConstants.PARAMETERS,
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .workflowTask(
+                WorkflowTask.of(
                     Map.of(
-                        "cases",
-                        List.of(
-                            Map.of(
-                                "key", "k1",
-                                "tasks",
-                                List.of(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
-                        "expression", "k2")))).build();
+                        WorkflowConstants.NAME, "name",
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS,
+                        Map.of(
+                            "cases",
+                            List.of(
+                                Map.of(
+                                    "key", "k1",
+                                    "tasks",
+                                    List.of(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
+                            "expression", "k2"))))
+            .build();
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
@@ -131,11 +145,12 @@ public class BranchTaskDispatcherTest {
 
     @Test
     public void test3() {
-        when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
+        when(contextService.peek(anyLong(), any())).thenReturn(
+            workflowFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -177,11 +192,12 @@ public class BranchTaskDispatcherTest {
 
     @Test
     public void test4() {
-        when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
+        when(contextService.peek(anyLong(), any())).thenReturn(
+            base64FileStorageService.storeFileContent("", "", "{}"));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -214,6 +230,7 @@ public class BranchTaskDispatcherTest {
 
         TaskExecution value = arg2.getValue();
 
-        Assertions.assertEquals("1234", value.getOutput());
+        Assertions.assertEquals(
+            "1234", workflowFileStorage.readTaskExecutionOutput(value.getOutput()));
     }
 }

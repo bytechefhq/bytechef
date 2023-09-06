@@ -22,10 +22,11 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -45,17 +46,20 @@ public class JobFacadeImpl implements JobFacade {
     private final EventPublisher eventPublisher;
     private final JobService jobService;
     private final MessageBroker messageBroker;
+    private final WorkflowFileStorage workflowFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-        MessageBroker messageBroker, WorkflowService workflowService) {
+        MessageBroker messageBroker, WorkflowFileStorage workflowFileStorage,
+        WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
+        this.workflowFileStorage = workflowFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -70,7 +74,9 @@ public class JobFacadeImpl implements JobFacade {
 
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        contextService.push(job.getId(), Context.Classname.JOB, job.getInputs());
+        contextService.push(
+            job.getId(), Context.Classname.JOB,
+            workflowFileStorage.storeContextValue(job.getId(), Context.Classname.JOB, job.getInputs()));
 
         eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
 

@@ -19,7 +19,6 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(prefix = "bytechef", name = "context-repository.provider", havingValue = "jdbc")
 public interface JdbcContextRepository
     extends ListPagingAndSortingRepository<Context, Long>, ListCrudRepository<Context, Long>,
     ContextRepository {

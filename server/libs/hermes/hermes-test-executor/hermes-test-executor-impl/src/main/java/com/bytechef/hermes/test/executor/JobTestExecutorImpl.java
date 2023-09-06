@@ -20,6 +20,7 @@ package com.bytechef.hermes.test.executor;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.component.registry.ComponentOperation;
@@ -43,16 +44,19 @@ public class JobTestExecutorImpl implements JobTestExecutor {
     private final ContextService contextService;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public JobTestExecutorImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
+        JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -62,12 +66,15 @@ public class JobTestExecutorImpl implements JobTestExecutor {
 
         return new JobDTO(
             job,
+            workflowFileStorage.readContextValue(job.getOutputs()),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(job.getId())),
                 taskExecution -> new TaskExecutionDTO(
                     getComponentDefinition(taskExecution),
-                    contextService.peek(
-                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
+                    workflowFileStorage.readContextValue(
+                        contextService.peek(
+                            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)),
+                    workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()),
                     taskExecution)));
     }
 

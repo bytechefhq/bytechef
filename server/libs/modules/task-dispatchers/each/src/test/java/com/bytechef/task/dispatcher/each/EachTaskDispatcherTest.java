@@ -27,7 +27,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -36,9 +40,10 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -53,12 +58,15 @@ public class EachTaskDispatcherTest {
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+    private final WorkflowFileStorage workflowFileStorage = new WorkflowFileStorageImpl(
+        new Base64FileStorageService(), new ObjectMapper());
 
     @Test
     public void testDispatch1() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+                messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+                workflowFileStorage);
 
             dispatcher.dispatch(TaskExecution.builder()
                 .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -68,11 +76,13 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testDispatch2() {
-        when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
+        when(contextService.peek(anyLong(), any())).thenReturn(
+            workflowFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+            messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+            workflowFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -98,7 +108,8 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+            messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+            workflowFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(
                 1L)

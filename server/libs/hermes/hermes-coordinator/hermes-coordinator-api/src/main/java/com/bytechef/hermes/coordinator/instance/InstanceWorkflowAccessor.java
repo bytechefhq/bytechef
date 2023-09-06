@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public interface InstanceWorkflowAccessor {
 
-    Map<String, ?> getInputs(long instanceId, String workflowId);
+    Map<String, ?> getInputMap(long instanceId, String workflowId);
 
     String getType();
 }

@@ -20,6 +20,7 @@ package com.bytechef.atlas.execution.remote.client.service;
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -40,42 +41,42 @@ public class ContextServiceClient implements ContextService {
     }
 
     @Override
-    public Map<String, ?> peek(long stackId, Classname classname) {
+    public FileEntry peek(long stackId, Classname classname) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/internal/context-service/peek/{stackId}/{classname}")
                 .build(stackId, classname),
-            new ParameterizedTypeReference<Map<String, Object>>() {});
+            FileEntry.class);
     }
 
     @Override
-    public Map<String, ?> peek(long stackId, int subStackId, Classname classname) {
+    public FileEntry peek(long stackId, int subStackId, Classname classname) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/internal/context-service/peek/{stackId}/{subStackId}/{classname}")
                 .build(stackId, subStackId, classname),
-            new ParameterizedTypeReference<Map<String, Object>>() {});
+            FileEntry.class);
     }
 
     @Override
-    public void push(long stackId, Classname classname, Map<String, ?> context) {
+    public void push(long stackId, Classname classname, FileEntry value) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/internal/context-service/push/{stackId}/{classname}")
                 .build(stackId, classname),
-            context, new ParameterizedTypeReference<Map<String, Object>>() {});
+            value, FileEntry.class);
     }
 
     @Override
-    public void push(long stackId, int subStackId, Classname classname, Map<String, ?> context) {
+    public void push(long stackId, int subStackId, Classname classname, FileEntry value) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/internal/context-service/push/{stackId}/{subStackId}/{classname}")
                 .build(stackId, classname),
-            context, new ParameterizedTypeReference<Map<String, Object>>() {});
+            value, new ParameterizedTypeReference<Map<String, Object>>() {});
     }
 }

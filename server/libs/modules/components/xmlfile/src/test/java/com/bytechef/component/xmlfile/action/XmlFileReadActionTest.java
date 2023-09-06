@@ -24,7 +24,6 @@ import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -47,19 +46,13 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE
  */
 public class XmlFileReadActionTest {
 
-    private static final ActionContext ACTION_CONTEXT = Mockito.mock(ActionContext.class);
-    private static final String SAMPLE_ARRAY_XML = "sample_array.xml";
-    private static final String SAMPLE_XML = "sample.xml";
-
-    @BeforeEach
-    public void beforeEach() {
-        Mockito.reset(ACTION_CONTEXT);
-    }
+    private final ActionContext actionContext = Mockito.mock(ActionContext.class);
 
     @Test
     @SuppressWarnings("unchecked")
     public void testPerformRead() throws IOException {
-        File file = getFile(SAMPLE_XML);
+        String sampleXml = "sample.xml";
+        File file = getFile(sampleXml);
         Map<String, ?> map = Map.of(
             "Flower",
             Map.of(
@@ -80,10 +73,10 @@ public class XmlFileReadActionTest {
             xmlUtilsMockedStatic.when(() -> XmlUtils.read(Mockito.anyString()))
                 .thenReturn(map);
 
-            Mockito.when(ACTION_CONTEXT.readFileToString(Mockito.any(Context.FileEntry.class)))
+            Mockito.when(actionContext.readFileToString(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(Map.of(), ACTION_CONTEXT))
+            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(Map.of(), actionContext))
                 .isEqualTo(map);
         }
     }
@@ -91,7 +84,8 @@ public class XmlFileReadActionTest {
     @Test
     @SuppressFBWarnings("OBL")
     public void testPerformReadArray() throws FileNotFoundException {
-        File file = getFile(SAMPLE_ARRAY_XML);
+        String sampleArrayXml = "sample_array.xml";
+        File file = getFile(sampleArrayXml);
         List<?> list = List.of(
             Map.of(
                 "id", "45",
@@ -121,10 +115,10 @@ public class XmlFileReadActionTest {
             xmlUtilsMockedStatic.when(() -> XmlUtils.stream(Mockito.any()))
                 .thenReturn(list.stream());
 
-            Mockito.when(ACTION_CONTEXT.getFileStream(Mockito.any(Context.FileEntry.class)))
+            Mockito.when(actionContext.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
 
-            Assertions.assertThat((List<?>) XmlFileReadAction.perform(Map.of(), ACTION_CONTEXT))
+            Assertions.assertThat((List<?>) XmlFileReadAction.perform(Map.of(), actionContext))
                 .isEqualTo(list);
 
             mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
@@ -140,10 +134,10 @@ public class XmlFileReadActionTest {
             xmlUtilsMockedStatic.when(() -> XmlUtils.stream(Mockito.any()))
                 .thenReturn(list.stream());
 
-            Mockito.when(ACTION_CONTEXT.getFileStream(Mockito.any(Context.FileEntry.class)))
+            Mockito.when(actionContext.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
 
-            Assertions.assertThat(((List<?>) XmlFileReadAction.perform(Map.of(), ACTION_CONTEXT))
+            Assertions.assertThat(((List<?>) XmlFileReadAction.perform(Map.of(), actionContext))
                 .size())
                 .isEqualTo(2);
         }

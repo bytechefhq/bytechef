@@ -17,14 +17,14 @@
 
 package com.bytechef.task.dispatcher.each;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,11 +40,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 @TaskDispatcherIntTest
 public class EachTaskDispatcherIntTest {
 
-    public static final Base64.Encoder ENCODER = Base64.getEncoder();
     private TestVarTaskHandler<List<String>, String> testVarTaskHandler;
 
     @Autowired
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
+
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
 
     @BeforeEach
     void beforeEach() {
@@ -56,14 +58,15 @@ public class EachTaskDispatcherIntTest {
     @Test
     public void testEachTaskDispatcher() {
         taskDispatcherWorkflowTestSupport.execute(
-            ENCODER.encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("each_v1"),
             (counterService, taskExecutionService) -> List.of(
-                (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(taskExecutionService,
-                    taskCompletionHandler, counterService)),
+                (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
+                    counterService, taskCompletionHandler, taskExecutionService)),
             (
                 contextService, counterService, messageBroker, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new EachTaskDispatcher(
-                        taskDispatcher, taskExecutionService, messageBroker, contextService, counterService)),
+                        messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+                        workflowFileStorage)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(

@@ -18,10 +18,11 @@
 package com.bytechef.component.jsonfile;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.file.storage.domain.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -52,6 +53,9 @@ public class JsonFileComponentHandlerIntTest {
     @Autowired
     private JobTestExecutor jobTestExecutor;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @Test
     public void testRead() throws JSONException {
         File sampleFile = getFile("sample_array.json");
@@ -62,14 +66,14 @@ public class JsonFileComponentHandlerIntTest {
                 "fileEntry",
                 fileStorageService
                     .storeFileContent(
-                        sampleFile.getAbsolutePath(),
+                        "data", sampleFile.getAbsolutePath(),
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
@@ -88,7 +92,7 @@ public class JsonFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeJSONFile");
 
@@ -99,9 +103,8 @@ public class JsonFileComponentHandlerIntTest {
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
             new JSONArray(
                 fileStorageService.readFileToString(
-                    new FileEntry(
-                        (String) fileEntryMap.get("name"), (String) fileEntryMap.get("extension"),
-                        (String) fileEntryMap.get("mimeType"), (String) fileEntryMap.get("url")))),
+                    "data",
+                    new FileEntry((String) fileEntryMap.get("name"), (String) fileEntryMap.get("url")))),
             true);
     }
 

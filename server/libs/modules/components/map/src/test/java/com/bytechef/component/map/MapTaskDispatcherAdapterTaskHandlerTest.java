@@ -21,9 +21,12 @@ package com.bytechef.component.map;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -43,10 +47,14 @@ import org.junit.jupiter.api.Test;
  */
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
+    private static final WorkflowFileStorage WORKFLOW_FILE_STORAGE_FACADE = new WorkflowFileStorageImpl(
+        new Base64FileStorageService(), new ObjectMapper());
+
     @Test
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
-        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver);
+        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
+            new ObjectMapper(), resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(
@@ -76,7 +84,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new ComponentExecutionException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                taskHandlerResolver);
+                new ObjectMapper(), taskHandlerResolver);
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
@@ -129,9 +137,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         TaskWorker worker = new TaskWorker(
-            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver);
+            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver,
+            WORKFLOW_FILE_STORAGE_FACADE);
 
-        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
+        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(
+            new ObjectMapper(), taskHandlerResolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(

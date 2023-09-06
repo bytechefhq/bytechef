@@ -21,9 +21,12 @@ package com.bytechef.component.map;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -38,6 +41,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -51,10 +55,14 @@ import java.util.Objects;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
+    private final ObjectMapper objectMapper;
     private final TaskHandlerResolver taskHandlerResolver;
 
-    public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver) {
-        this.taskHandlerResolver = Objects.requireNonNull(taskHandlerResolver);
+    @SuppressFBWarnings("EI")
+    public MapTaskDispatcherAdapterTaskHandler(ObjectMapper objectMapper, TaskHandlerResolver taskHandlerResolver) {
+        this.objectMapper = objectMapper;
+
+        this.taskHandlerResolver = taskHandlerResolver;
     }
 
     @Override
@@ -63,11 +71,13 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         List<Object> result = new ArrayList<>();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
+        WorkflowFileStorage workflowFileStorage = new WorkflowFileStorageImpl(
+            new Base64FileStorageService(), objectMapper);
 
         messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, message -> {
             TaskExecution completionTaskExecution = (TaskExecution) message;
 
-            result.add(completionTaskExecution.getOutput());
+            result.add(workflowFileStorage.readTaskExecutionOutput(completionTaskExecution.getOutput()));
         });
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
@@ -81,7 +91,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         });
 
         TaskWorker worker = new TaskWorker(
-            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver);
+            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver, workflowFileStorage);
 
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 
@@ -90,15 +100,12 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(
-            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION, Collections.emptyMap());
+            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION,
+            workflowFileStorage.storeTaskExecutionOutput(taskExecution.getId(), Collections.emptyMap()));
 
-        MapTaskDispatcher mapTaskDispatcher = MapTaskDispatcher.builder()
-            .contextService(contextService)
-            .counterService(new CounterServiceImpl(new InMemoryCounterRepository()))
-            .messageBroker(messageBroker)
-            .taskDispatcher(worker::handle)
-            .taskExecutionService(taskExecutionService)
-            .build();
+        MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
+            contextService, new CounterServiceImpl(new InMemoryCounterRepository()), messageBroker, worker::handle,
+            taskExecutionService, workflowFileStorage);
 
         mapTaskDispatcher.dispatch(taskExecution);
 

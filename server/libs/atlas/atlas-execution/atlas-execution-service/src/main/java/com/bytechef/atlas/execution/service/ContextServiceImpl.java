@@ -19,12 +19,11 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
-import java.util.Map;
 
 @Transactional
 public class ContextServiceImpl implements ContextService {
@@ -37,7 +36,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, Context.Classname classname, Map<String, ?> value) {
+    public void push(long stackId, Context.Classname classname, FileEntry value) {
         Assert.notNull(classname, "'classname' must not be null");
         Assert.notNull(value, "'value' must not be null");
 
@@ -47,8 +46,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(
-        long stackId, int subStackId, Context.Classname classname, @NonNull Map<String, ?> value) {
+    public void push(long stackId, int subStackId, Context.Classname classname, @NonNull FileEntry value) {
         Assert.notNull(classname, "'classname' must not be null");
         Assert.notNull(value, "'value' must not be null");
 
@@ -59,7 +57,7 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<String, ?> peek(long stackId, Context.Classname classname) {
+    public FileEntry peek(long stackId, Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
             stackId, classname.getId());
 
@@ -67,7 +65,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public Map<String, ?> peek(long stackId, int subStackId, Context.Classname classname) {
+    public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
             stackId, subStackId, classname.getId());
 

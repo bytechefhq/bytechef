@@ -18,6 +18,7 @@
 package com.bytechef.task.dispatcher.branch.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -26,36 +27,39 @@ import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
-@Component
+@Configuration
 public class BranchTaskDispatcherConfiguration {
 
     private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
-        ContextService contextService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+        ContextService contextService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage) {
 
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Bean("branchTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory branchTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage);
     }
 
     @Bean("branchTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory branchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
     }
 }

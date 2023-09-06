@@ -40,13 +40,17 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.file.storage.converter.FileEntryToStringConverter;
+import com.bytechef.file.storage.converter.StringToFileEntryConverter;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
@@ -72,13 +76,11 @@ import java.util.Map;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     properties = {
-        "bytechef.context-repository.provider=jdbc",
-        "bytechef.persistence.provider=jdbc",
-        "bytechef.workflow-repository.classpath.enabled=true"
+        "bytechef.workflow.repository.classpath.enabled=true"
     })
+@Import(PostgreSQLContainerConfiguration.class)
 public class TaskCoordinatorIntTest {
 
     @Autowired
@@ -86,6 +88,9 @@ public class TaskCoordinatorIntTest {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private TaskExecutionService taskExecutionService;
@@ -118,6 +123,7 @@ public class TaskCoordinatorIntTest {
             .jobService(jobService)
             .taskExecutionService(taskExecutionService)
             .taskHandlerRegistry(taskHandlerMap::get)
+            .workflowFileStorageFacade(new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper))
             .workflowService(workflowService)
             .build();
 
@@ -125,10 +131,9 @@ public class TaskCoordinatorIntTest {
     }
 
     @ComponentScan("com.bytechef.liquibase.config")
-    @EmbeddedSql
     @EnableAutoConfiguration
     @Import({
-        ResourceWorkflowRepositoryConfiguration.class
+        PostgreSQLContainerConfiguration.class, ResourceWorkflowRepositoryConfiguration.class
     })
     @Configuration
     public static class CoordinatorIntTestConfiguration {
@@ -176,9 +181,11 @@ public class TaskCoordinatorIntTest {
             protected List<?> userConverters() {
                 return Arrays.asList(
                     new ExecutionErrorToStringConverter(objectMapper),
+                    new FileEntryToStringConverter(objectMapper),
                     new MapWrapperToStringConverter(objectMapper),
                     new StringToExecutionErrorConverter(objectMapper),
                     new StringToExecutionErrorConverter(objectMapper),
+                    new StringToFileEntryConverter(objectMapper),
                     new StringToMapWrapperConverter(objectMapper),
                     new StringToWebhooksConverter(objectMapper),
                     new StringToWorkflowTaskConverter(objectMapper),

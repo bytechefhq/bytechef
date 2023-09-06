@@ -22,23 +22,22 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.config.WorkflowConfigurationIntTestConfiguration;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     classes = WorkflowConfigurationIntTestConfiguration.class,
     properties = {
-        "bytechef.context-repository.provider=jdbc",
-        "bytechef.persistence.provider=jdbc",
-        "bytechef.workflow-repository.jdbc.enabled=true"
+        "bytechef.workflow.repository.jdbc.enabled=true"
     })
+@Import(PostgreSQLContainerConfiguration.class)
 public class WorkflowServiceIntTest {
 
     @Autowired

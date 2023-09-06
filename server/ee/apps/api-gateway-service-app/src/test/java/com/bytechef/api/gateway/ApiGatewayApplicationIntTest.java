@@ -17,15 +17,16 @@
 
 package com.bytechef.api.gateway;
 
-import com.bytechef.test.annotation.EmbeddedRedis;
+import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedRedis
 @SpringBootTest
+@Import(RedisContainerConfiguration.class)
 public class ApiGatewayApplicationIntTest {
 
     @Test

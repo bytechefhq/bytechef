@@ -22,19 +22,20 @@ import com.bytechef.atlas.configuration.repository.jdbc.config.WorkflowConfigura
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     classes = WorkflowConfigurationRepositoryIntTestConfiguration.class,
-    properties = "bytechef.workflow-repository.jdbc.enabled=true")
+    properties = "bytechef.workflow.repository.jdbc.enabled=true")
+@Import(PostgreSQLContainerConfiguration.class)
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired

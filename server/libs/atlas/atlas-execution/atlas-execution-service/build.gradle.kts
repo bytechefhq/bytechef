@@ -1,5 +1,6 @@
 dependencies {
     api(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
+    api(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     api(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-api"))
     api(project(":server:libs:core:message-broker:message-broker-api"))
 

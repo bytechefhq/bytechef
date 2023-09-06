@@ -76,6 +76,7 @@ bytechef:
   discovery-service:
     provider: redis
   file-storage:
+    # File storage provider for binary data (base64 | filesystem) default: filesystem
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files
   message-broker:
@@ -83,3 +84,7 @@ bytechef:
     provider: redis
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  workflow:
+    # Output storage provider for workflow output data (base64 | filesystem) default: base64
+    output-storage:
+      provider: base64

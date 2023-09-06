@@ -24,15 +24,15 @@ import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.EncodingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -46,11 +46,9 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractResourceWorkflowRepository.class);
 
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final String PREFIX = "workflows/";
 
     private final String locationPattern;
-
-    private static final String PREFIX = "workflows/";
 
     public AbstractResourceWorkflowRepository(String locationPattern) {
         this.locationPattern = locationPattern;
@@ -75,9 +73,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
     public Optional<Workflow> findById(String id) {
         List<Workflow> workflows = findAll();
 
-        return workflows.stream()
-            .filter(workflow -> Objects.equals(workflow.getId(), id))
-            .findFirst();
+        return CollectionUtils.findFirst(workflows, workflow -> Objects.equals(workflow.getId(), id));
     }
 
     private Workflow read(Resource resource) {
@@ -95,7 +91,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
         return readWorkflow(
             new WorkflowResource(
-                ENCODER.encodeToString(substring.getBytes(StandardCharsets.UTF_8)), Map.of("path", uri), resource,
+                EncodingUtils.encodeBase64ToString(substring), Map.of("path", uri), resource,
                 Workflow.Format.parse(uri)));
     }
 

@@ -19,13 +19,10 @@
 
 package com.bytechef.atlas.execution.domain;
 
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
+import com.bytechef.file.storage.domain.FileEntry;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -83,38 +80,37 @@ public final class Context implements Persistable<Long> {
     private Long stackId;
 
     @Column("value")
-    private MapWrapper value;
+    private FileEntry value;
 
     public Context() {
-        this.value = new MapWrapper();
     }
 
-    public Context(Map<String, ?> value) {
+    public Context(FileEntry value) {
         Assert.notNull(value, "'value' must not be null");
 
-        this.value = new MapWrapper(value);
+        this.value = value;
     }
 
     public Context(long stackId, Classname classname) {
-        this(stackId, null, classname, new HashMap<>());
+        this(stackId, null, classname, null);
     }
 
-    public Context(long stackId, Classname classname, Map<String, ?> value) {
+    public Context(long stackId, Classname classname, FileEntry value) {
         this(stackId, null, classname, value);
     }
 
     public Context(long stackId, int subStackId, Classname classname) {
-        this(stackId, subStackId, classname, new HashMap<>());
+        this(stackId, subStackId, classname, null);
     }
 
-    public Context(long stackId, Integer subStackId, Classname classname, Map<String, ?> value) {
+    public Context(long stackId, Integer subStackId, Classname classname, FileEntry value) {
         Assert.notNull(classname, "'classname' must not be null");
         Assert.notNull(value, "'value' must not be null");
 
         this.stackId = stackId;
         this.subStackId = subStackId;
         this.classnameId = classname.getId();
-        this.value = new MapWrapper(value);
+        this.value = value;
     }
 
     @Override
@@ -165,8 +161,8 @@ public final class Context implements Persistable<Long> {
         return stackId;
     }
 
-    public Map<String, Object> getValue() {
-        return Collections.unmodifiableMap(value.getMap());
+    public FileEntry getValue() {
+        return value;
     }
 
     @Override

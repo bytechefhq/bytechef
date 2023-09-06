@@ -25,13 +25,12 @@ import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOpe
 import com.bytechef.atlas.configuration.repository.git.operations.JGitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
+import com.bytechef.commons.util.EncodingUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,9 +42,6 @@ import java.util.stream.Collectors;
 public class GitWorkflowRepository implements WorkflowRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepository.class);
-
-    private static final Base64.Decoder DECODER = Base64.getDecoder();
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     private final GitWorkflowOperations gitWorkflowOperations;
 
@@ -100,10 +96,10 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     private static String decode(String str) {
-        return new String(DECODER.decode(str), StandardCharsets.UTF_8);
+        return EncodingUtils.decodeBase64ToString(str);
     }
 
     private static String encode(String id) {
-        return ENCODER.encodeToString(id.getBytes(StandardCharsets.UTF_8));
+        return EncodingUtils.encodeBase64ToString(id);
     }
 }

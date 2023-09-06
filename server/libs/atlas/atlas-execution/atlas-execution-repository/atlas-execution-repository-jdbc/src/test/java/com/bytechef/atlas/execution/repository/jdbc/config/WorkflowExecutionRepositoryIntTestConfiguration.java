@@ -22,8 +22,13 @@ import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.execution.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.converter.WebhooksToStringConverter;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.file.storage.converter.FileEntryToStringConverter;
+import com.bytechef.file.storage.converter.StringToFileEntryConverter;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,6 +58,11 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
         return new ObjectMapper();
     }
 
+    @Bean
+    WorkflowFileStorage workflowFileStorage(ObjectMapper objectMapper) {
+        return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
+    }
+
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
     public static class WorkflowExecutionIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
@@ -66,10 +76,12 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
-                new StringToWebhooksConverter(objectMapper),
                 new ExecutionErrorToStringConverter(objectMapper),
+                new FileEntryToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
+                new StringToFileEntryConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper),
+                new StringToWebhooksConverter(objectMapper),
                 new StringToWorkflowTaskConverter(objectMapper),
                 new WebhooksToStringConverter(objectMapper),
                 new WorkflowTaskToStringConverter(objectMapper));

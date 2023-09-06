@@ -23,6 +23,7 @@ import static com.bytechef.task.dispatcher.sequence.constant.SequenceTaskDispatc
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -36,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -47,16 +49,19 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public SequenceTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage) {
 
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -81,15 +86,23 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        TaskExecution sequenceTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+        TaskExecution sequenceTaskExecution = taskExecutionService.getTaskExecution(
+            Objects.requireNonNull(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
-                contextService.peek(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
+                workflowFileStorage.readContextValue(
+                    contextService.peek(
+                        Objects.requireNonNull(sequenceTaskExecution.getId()), Context.Classname.TASK_EXECUTION)));
 
-            newContext.put(taskExecution.getName(), taskExecution.getOutput());
+            newContext.put(
+                taskExecution.getName(),
+                workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
 
-            contextService.push(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
+            contextService.push(
+                sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION,
+                workflowFileStorage.storeContextValue(
+                    sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext));
         }
 
         List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
@@ -106,14 +119,18 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            Map<String, ?> context = contextService.peek(
-                sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, ?> context = workflowFileStorage.readContextValue(
+                contextService.peek(
+                    Objects.requireNonNull(sequenceTaskExecution.getId()), Context.Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+            contextService.push(
+                Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                workflowFileStorage.storeContextValue(
+                    subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
