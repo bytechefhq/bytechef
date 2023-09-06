@@ -116,8 +116,8 @@ springdoc:
 
 bytechef:
   cache:
-    # Cache provider (redis | simple) default: redis
-    provider: redis
+    # Cache provider (redis | simple) default: simple
+    provider: simple
   connection:
     oauth2:
       redirectUri: ${bytechef.publicUrl}/callback
@@ -131,8 +131,8 @@ bytechef:
   encryption:
     provider: filesystem
   message-broker:
-    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
-    provider: redis
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
+    provider: jms
   publicUrl: http://127.0.0.1:5173
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
