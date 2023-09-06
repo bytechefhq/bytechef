@@ -17,56 +17,47 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.domain.FileEntry;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.Map;
 
 public class ContextFileEntryImpl implements Context.FileEntry {
 
-    private final String extension;
-    private final String mimeType;
-    private final String name;
-    private final String url;
+    private final FileEntry fileEntry;
 
-    public ContextFileEntryImpl(String extension, String mimeType, String name, String url) {
-        this.extension = extension;
-        this.mimeType = mimeType;
-        this.name = name;
-        this.url = url;
+    public ContextFileEntryImpl(String filename, String url) {
+        this.fileEntry = new FileEntry(filename, url);
     }
 
     public ContextFileEntryImpl(FileEntry fileEntry) {
-        this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+        this.fileEntry = fileEntry;
     }
 
     @Override
     public String getExtension() {
-        return extension;
+        return fileEntry.getExtension();
     }
 
     @Override
     public String getMimeType() {
-        return mimeType;
+        return fileEntry.getMimeType();
     }
 
     @Override
     public String getName() {
-        return name;
+        return fileEntry.getName();
     }
 
     @Override
     public String getUrl() {
-        return url;
+        return fileEntry.getUrl();
     }
 
     @Override
     public String toString() {
-        return "ContextFileEntry{" +
-            "extension='" + extension + '\'' +
-            ", mimeType='" + mimeType + '\'' +
-            ", name='" + name + '\'' +
-            ", url='" + url + '\'' +
+        return "ContextFileEntryImpl{" +
+            "fileEntry=" + fileEntry +
             '}';
     }
 
@@ -74,11 +65,7 @@ public class ContextFileEntryImpl implements Context.FileEntry {
 
         @Override
         public Context.FileEntry convert(Map<?, ?> source) {
-            return new ContextFileEntryImpl(
-                (String) source.get("extension"),
-                (String) source.get("mimeType"),
-                (String) source.get("name"),
-                (String) source.get("url"));
+            return new ContextFileEntryImpl((String) source.get("name"), (String) source.get("url"));
         }
     }
 }

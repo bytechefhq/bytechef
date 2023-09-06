@@ -19,6 +19,7 @@ package com.bytechef.helios.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
@@ -70,11 +71,9 @@ public interface ProjectWorkflowMapper extends Converter<Workflow, WorkflowModel
             workflowTaskModel.connections(
                 mapWorkflowConnections(
                     WorkflowConnection.of(
-                        workflow.getTasks()
-                            .stream()
-                            .filter(workflowTask -> Objects.equals(workflowTask.getName(), workflowTaskModel.getName()))
-                            .findFirst()
-                            .orElseThrow())));
+                        CollectionUtils.getFirst(
+                            workflow.getTasks(),
+                            workflowTask -> Objects.equals(workflowTask.getName(), workflowTaskModel.getName())))));
         }
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
@@ -85,13 +84,10 @@ public interface ProjectWorkflowMapper extends Converter<Workflow, WorkflowModel
             workflowTriggerModel.connections(
                 mapWorkflowConnections(
                     WorkflowConnection.of(
-                        workflowTriggers
-                            .stream()
-                            .filter(
-                                workflowTrigger -> Objects.equals(
-                                    workflowTrigger.getName(), workflowTriggerModel.getName()))
-                            .findFirst()
-                            .orElseThrow())));
+                        CollectionUtils.getFirst(
+                            workflowTriggers,
+                            workflowTrigger -> Objects.equals(workflowTrigger.getName(),
+                                workflowTriggerModel.getName())))));
         }
 
         workflowModel.triggers(workflowTriggerModels);

@@ -19,9 +19,10 @@ package com.bytechef.component.odsfile;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,11 +45,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentIntTest
 public class OdsFileComponentHandlerIntTest {
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     @Autowired
     private FileStorageService fileStorageService;
 
     @Autowired
     private JobTestExecutor jobTestExecutor;
+
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
 
     @Test
     public void testRead() throws IOException, JSONException {
@@ -56,18 +62,17 @@ public class OdsFileComponentHandlerIntTest {
 
         try (FileInputStream fileInputStream = new FileInputStream(sampleFile)) {
             Job job = jobTestExecutor.execute(
-                Base64.getEncoder()
-                    .encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+                ENCODER.encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     "fileEntry",
                     fileStorageService
-                        .storeFileContent(sampleFile.getAbsolutePath(), fileInputStream)
+                        .storeFileContent("data", sampleFile.getAbsolutePath(), fileInputStream)
                         .toMap()));
 
             Assertions.assertThat(job.getStatus())
                 .isEqualTo(Job.Status.COMPLETED);
 
-            Map<String, ?> outputs = job.getOutputs();
+            Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -79,8 +84,7 @@ public class OdsFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = jobTestExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("odsfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("odsfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
@@ -88,7 +92,7 @@ public class OdsFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertThat(((Map) outputs.get("writeOdsFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.ods");
@@ -97,15 +101,14 @@ public class OdsFileComponentHandlerIntTest {
 
         try (FileInputStream fileInputStream = new FileInputStream(sampleFile)) {
             job = jobTestExecutor.execute(
-                Base64.getEncoder()
-                    .encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+                ENCODER.encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     "fileEntry",
                     fileStorageService
-                        .storeFileContent(sampleFile.getName(), fileInputStream)
+                        .storeFileContent("data", sampleFile.getName(), fileInputStream)
                         .toMap()));
 
-            outputs = job.getOutputs();
+            outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),

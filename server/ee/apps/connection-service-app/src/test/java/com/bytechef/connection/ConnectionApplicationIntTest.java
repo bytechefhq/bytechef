@@ -17,15 +17,16 @@
 
 package com.bytechef.connection;
 
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest
+@Import(PostgreSQLContainerConfiguration.class)
 public class ConnectionApplicationIntTest {
 
     @Test

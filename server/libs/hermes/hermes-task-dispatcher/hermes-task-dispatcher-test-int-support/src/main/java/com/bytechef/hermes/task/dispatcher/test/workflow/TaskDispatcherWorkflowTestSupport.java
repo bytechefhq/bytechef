@@ -21,6 +21,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -43,18 +44,21 @@ public class TaskDispatcherWorkflowTestSupport {
     private final JobService jobService;
     private final EventPublisher eventPublisher;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherWorkflowTestSupport(
         ContextService contextService, CounterService counterService, JobService jobService,
-        EventPublisher eventPublisher, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        EventPublisher eventPublisher, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.jobService = jobService;
         this.eventPublisher = eventPublisher;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -88,6 +92,7 @@ public class TaskDispatcherWorkflowTestSupport {
                     .apply(contextService, counterService, syncMessageBroker, taskExecutionService))
             .taskExecutionService(taskExecutionService)
             .taskHandlerRegistry(taskHandlerMapSupplier.get()::get)
+            .workflowFileStorageFacade(workflowFileStorage)
             .workflowService(workflowService)
             .build();
 

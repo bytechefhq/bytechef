@@ -26,6 +26,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -56,16 +57,18 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public LoopTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService) {
+        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage) {
 
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -90,7 +93,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
-                contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION));
+                workflowFileStorage.readContextValue(
+                    contextService.peek(
+                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)));
 
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
@@ -107,7 +112,11 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
 
             contextService.push(
-                Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION, newContext);
+                Objects.requireNonNull(
+                    subTaskExecution.getId()),
+                Context.Classname.TASK_EXECUTION,
+                workflowFileStorage.storeContextValue(
+                    subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext));
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

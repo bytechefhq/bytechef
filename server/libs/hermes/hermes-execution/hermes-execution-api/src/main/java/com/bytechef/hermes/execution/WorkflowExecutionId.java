@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.execution;
 
-import com.bytechef.commons.util.Base64Utils;
+import com.bytechef.commons.util.EncodingUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -51,7 +51,7 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId parse(String id) {
-        id = Base64Utils.decodeToString(id);
+        id = EncodingUtils.decodeBase64ToString(id);
 
         String[] items = id.split(":");
 
@@ -76,7 +76,7 @@ public class WorkflowExecutionId implements Serializable {
 
     @Override
     public String toString() {
-        return Base64Utils.encodeToString(
+        return EncodingUtils.encodeBase64ToString(
             instanceType +
                 ':' +
                 instanceId +

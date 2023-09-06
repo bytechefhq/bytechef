@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -43,22 +44,23 @@ public class JacksonConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
-        return new ObjectMapper()
-            .setDateFormat(new SimpleDateFormat(dateFormat))
-            .setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(SerializationFeature.INDENT_OUTPUT)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .registerModule(new JavaTimeModule())
-            .registerModule(new Jdk8Module())
-            .registerModule(new JsonNullableModule());
+        return buildMapper(Jackson2ObjectMapperBuilder.json(), dateFormat);
     }
 
     @Bean
-    XmlMapper xmlMapper() {
-        return XmlMapper.xmlBuilder()
+    XmlMapper xmlMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
+        return buildMapper(Jackson2ObjectMapperBuilder.xml(), dateFormat);
+    }
+
+    private static <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder json, String dateFormat) {
+        return json
+            .dateFormat(new SimpleDateFormat(dateFormat))
+            .timeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
+            .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .featuresToDisable(SerializationFeature.INDENT_OUTPUT)
+            .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .modules(new JavaTimeModule(), new Jdk8Module(), new JsonNullableModule())
             .build();
     }
 }

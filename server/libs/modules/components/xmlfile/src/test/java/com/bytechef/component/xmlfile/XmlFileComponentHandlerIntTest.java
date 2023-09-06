@@ -18,10 +18,11 @@
 package com.bytechef.component.xmlfile;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.file.storage.domain.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -50,6 +51,9 @@ public class XmlFileComponentHandlerIntTest {
     @Autowired
     private JobTestExecutor jobTestExecutor;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @Test
     public void testRead() {
         File sampleFile = getFile("sample.xml");
@@ -59,13 +63,14 @@ public class XmlFileComponentHandlerIntTest {
             Map.of(
                 FILE_ENTRY,
                 fileStorageService.storeFileContent(
+                    "data",
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertThat(Map.of(
             "Flower",
@@ -96,7 +101,7 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeXMLFile");
 
@@ -105,9 +110,8 @@ public class XmlFileComponentHandlerIntTest {
 
         Assertions.assertThat(
             fileStorageService.readFileToString(
-                new FileEntry(
-                    (String) fileEntryMap.get("name"), (String) fileEntryMap.get("extension"),
-                    (String) fileEntryMap.get("mimeType"), (String) fileEntryMap.get("url"))))
+                "data",
+                new FileEntry((String) fileEntryMap.get("name"), (String) fileEntryMap.get("url"))))
             .isEqualTo(
                 """
                     <root><Flower><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name><id>45</id><petals>9</petals></Flower></root>

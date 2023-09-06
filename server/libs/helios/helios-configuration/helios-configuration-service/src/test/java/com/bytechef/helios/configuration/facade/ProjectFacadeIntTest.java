@@ -36,7 +36,7 @@ import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.tag.service.TagService;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +45,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,13 +55,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     classes = ProjectIntTestConfiguration.class,
     properties = {
-        "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc",
-        "bytechef.workflow-repository.jdbc.enabled=true"
+        "bytechef.workflow.repository.jdbc.enabled=true"
     })
+@Import(PostgreSQLContainerConfiguration.class)
 public class ProjectFacadeIntTest {
 
     @Autowired

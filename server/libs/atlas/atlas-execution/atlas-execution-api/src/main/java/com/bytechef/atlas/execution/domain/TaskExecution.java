@@ -22,12 +22,12 @@ package com.bytechef.atlas.execution.domain;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.atlas.configuration.task.Progressable;
 import com.bytechef.message.Retryable;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -134,7 +134,7 @@ public final class TaskExecution
     private int maxRetries;
 
     @Column
-    private MapWrapper output;
+    private FileEntry output;
 
     @Column("parent_id")
     private AggregateReference<TaskExecution, Long> parentId;
@@ -311,16 +311,8 @@ public final class TaskExecution
      *
      * @return Object the output of the task
      */
-    public Object getOutput() {
-        Object outputValue = null;
-
-        if (output != null) {
-            Map<String, Object> map = output.getMap();
-
-            outputValue = map.get("output");
-        }
-
-        return outputValue;
+    public FileEntry getOutput() {
+        return output;
     }
 
     @JsonIgnore
@@ -479,10 +471,8 @@ public final class TaskExecution
         }
     }
 
-    public void setOutput(Object output) {
-        if (output != null) {
-            this.output = new MapWrapper(Map.of("output", output));
-        }
+    public void setOutput(FileEntry output) {
+        this.output = output;
     }
 
     public void setParentId(Long parentId) {
@@ -560,7 +550,7 @@ public final class TaskExecution
         private ExecutionError error;
         private Long id;
         private Long jobId;
-        private MapWrapper output;
+        private FileEntry output;
         private Long parentId;
         private int priority;
         private int progress;
@@ -602,7 +592,7 @@ public final class TaskExecution
             return this;
         }
 
-        public Builder output(MapWrapper output) {
+        public Builder output(FileEntry output) {
             this.output = output;
             return this;
         }

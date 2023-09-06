@@ -18,21 +18,21 @@
 package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     classes = ProjectIntTestConfiguration.class,
     properties = {
-        "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc",
-        "bytechef.workflow-repository.jdbc.enabled=true"
+        "bytechef.workflow.repository.jdbc.enabled=true"
     })
+@Import(PostgreSQLContainerConfiguration.class)
 public class ProjectInstanceFacadeIntTest {
 
     @Disabled

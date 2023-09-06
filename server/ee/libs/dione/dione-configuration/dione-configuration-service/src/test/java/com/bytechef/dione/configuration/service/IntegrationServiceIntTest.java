@@ -24,7 +24,7 @@ import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.dione.configuration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -32,18 +32,17 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(classes = IntegrationIntTestConfiguration.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(PostgreSQLContainerConfiguration.class)
 public class IntegrationServiceIntTest {
 
     private Category category;

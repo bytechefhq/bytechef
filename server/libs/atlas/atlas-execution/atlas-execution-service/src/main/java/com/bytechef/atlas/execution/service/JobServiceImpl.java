@@ -59,16 +59,7 @@ public class JobServiceImpl implements JobService {
 
         validate(jobParameters, workflow);
 
-        Job job = new Job();
-
-        job.setInputs(jobParameters.getInputs());
-        job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
-        job.setMetadata(jobParameters.getMetadata());
-        job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
-        job.setPriority(jobParameters.getPriority());
-        job.setStatus(Job.Status.CREATED);
-        job.setWebhooks(jobParameters.getWebhooks());
-        job.setWorkflowId(workflow.getId());
+        Job job = getJob(jobParameters, workflow);
 
         job = jobRepository.save(job);
 
@@ -167,11 +158,26 @@ public class JobServiceImpl implements JobService {
         return jobRepository.save(job);
     }
 
-    private boolean isRestartable(Job job) {
+    private static boolean isRestartable(Job job) {
         return job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.FAILED;
     }
 
-    private void validate(JobParameters jobParameters, Workflow workflow) {
+    private static Job getJob(JobParameters jobParameters, Workflow workflow) {
+        Job job = new Job();
+
+        job.setInputs(jobParameters.getInputs());
+        job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
+        job.setMetadata(jobParameters.getMetadata());
+        job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
+        job.setPriority(jobParameters.getPriority());
+        job.setStatus(Job.Status.CREATED);
+        job.setWebhooks(jobParameters.getWebhooks());
+        job.setWorkflowId(workflow.getId());
+
+        return job;
+    }
+
+    private static void validate(JobParameters jobParameters, Workflow workflow) {
         // validate inputs
 
         Map<String, Object> inputs = jobParameters.getInputs();

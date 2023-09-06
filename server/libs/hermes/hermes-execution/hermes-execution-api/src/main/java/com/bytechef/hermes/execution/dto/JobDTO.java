@@ -37,10 +37,10 @@ public record JobDTO(
     Map<String, ?> metadata, Map<String, ?> outputs, Long parentTaskExecutionId, int priority, LocalDateTime startDate,
     Status status, List<TaskExecutionDTO> taskExecutions, int version, List<Webhook> webhooks, String workflowId) {
 
-    public JobDTO(Job job, List<TaskExecutionDTO> taskExecutions) {
+    public JobDTO(Job job, Map<String, ?> outputs, List<TaskExecutionDTO> taskExecutions) {
         this(job.getCreatedBy(), job.getCreatedDate(), job.getCurrentTask(), job.getEndDate(), job.getError(),
             job.getId(), job.getInputs(), job.getLabel(), job.getLastModifiedBy(), job.getLastModifiedDate(),
-            job.getMetadata(), job.getOutputs(), job.getParentTaskExecutionId(), job.getPriority(), job.getStartDate(),
+            job.getMetadata(), outputs, job.getParentTaskExecutionId(), job.getPriority(), job.getStartDate(),
             job.getStatus(), taskExecutions, job.getVersion(), job.getWebhooks(), job.getWorkflowId());
         {
         }

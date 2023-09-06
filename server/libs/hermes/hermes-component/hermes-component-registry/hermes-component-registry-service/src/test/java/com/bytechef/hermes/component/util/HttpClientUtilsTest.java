@@ -65,8 +65,8 @@ public class HttpClientUtilsTest {
 
     @BeforeAll
     public static void beforeAll() {
-        HTTP_CLIENT_EXECUTOR.objectMapper = new ObjectMapper();
-        HTTP_CLIENT_EXECUTOR.xmlMapper = new XmlMapper();
+        HttpClientExecutorImpl.objectMapper = new ObjectMapper();
+        HttpClientExecutorImpl.xmlMapper = new XmlMapper();
     }
 
     @Test

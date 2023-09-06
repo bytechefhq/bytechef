@@ -17,14 +17,14 @@
 
 package com.bytechef.hermes.component.definition.factory;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -40,18 +40,19 @@ public class ContextFactory {
     private final ConnectionService connectionService;
     private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
-    private final FileStorageService fileStorageService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher,
+        WorkflowFileStorage workflowFileStorage) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
-        this.fileStorageService = fileStorageService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     public ActionContext createActionContext(Map<String, Long> connectionIdMap, Long taskExecutionId) {
@@ -68,7 +69,7 @@ public class ContextFactory {
 
     private ContextImpl createContextImpl(Map<String, Long> connectionIdMap, Long taskExecutionId) {
         return new ContextImpl(
-            connectionIdMap, taskExecutionId, connectionDefinitionService, connectionService, dataStorageService,
-            fileStorageService, eventPublisher);
+            connectionIdMap, connectionDefinitionService, connectionService, eventPublisher, dataStorageService,
+            workflowFileStorage, taskExecutionId);
     }
 }

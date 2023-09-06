@@ -39,7 +39,7 @@ public class StringToMapWrapperConverter implements Converter<String, MapWrapper
 
     @Override
     public MapWrapper convert(String json) {
-        return json == null ? null : new MapWrapper(read(objectMapper, json));
+        return json == null ? new MapWrapper() : new MapWrapper(read(objectMapper, json));
     }
 
     private Map<String, Object> read(ObjectMapper objectMapper, String json) {

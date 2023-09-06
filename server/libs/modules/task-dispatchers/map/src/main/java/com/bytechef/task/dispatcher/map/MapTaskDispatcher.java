@@ -28,6 +28,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -57,13 +58,20 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     private final MessageBroker messageBroker;
     private final ContextService contextService;
     private final CounterService counterService;
+    private final WorkflowFileStorage workflowFileStorage;
 
-    private MapTaskDispatcher(Builder builder) {
-        taskDispatcher = builder.taskDispatcher;
-        taskExecutionService = builder.taskExecutionService;
-        messageBroker = builder.messageBroker;
-        contextService = builder.contextService;
-        counterService = builder.counterService;
+    @SuppressFBWarnings("EI")
+    public MapTaskDispatcher(
+        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
+        TaskDispatcher<? super TaskExecution> taskDispatcher, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage) {
+
+        this.contextService = contextService;
+        this.counterService = counterService;
+        this.messageBroker = messageBroker;
+        this.taskDispatcher = taskDispatcher;
+        this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -97,7 +105,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
-                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
+                    workflowFileStorage.readContextValue(
+                        contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
 
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
@@ -106,7 +115,9 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 
-                contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
+                contextService.push(
+                    Objects.requireNonNull(iterateeTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                    workflowFileStorage.storeTaskExecutionOutput(iterateeTaskExecution.getId(), newContext));
 
                 taskDispatcher.dispatch(iterateeTaskExecution);
             }
@@ -120,54 +131,5 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
         }
 
         return null;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private TaskDispatcher<? super TaskExecution> taskDispatcher;
-        private TaskExecutionService taskExecutionService;
-        private MessageBroker messageBroker;
-        private ContextService contextService;
-        private CounterService counterService;
-
-        public Builder taskDispatcher(TaskDispatcher<? super TaskExecution> taskDispatcher) {
-            this.taskDispatcher = taskDispatcher;
-
-            return this;
-        }
-
-        public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
-            this.taskExecutionService = taskExecutionService;
-
-            return this;
-        }
-
-        public Builder messageBroker(MessageBroker messageBroker) {
-            this.messageBroker = messageBroker;
-
-            return this;
-        }
-
-        @SuppressFBWarnings("EI")
-        public Builder contextService(ContextService contextService) {
-            this.contextService = contextService;
-
-            return this;
-        }
-
-        @SuppressFBWarnings("EI")
-        public Builder counterService(CounterService counterService) {
-            this.counterService = counterService;
-
-            return this;
-        }
-
-        public MapTaskDispatcher build() {
-            return new MapTaskDispatcher(this);
-        }
     }
 }

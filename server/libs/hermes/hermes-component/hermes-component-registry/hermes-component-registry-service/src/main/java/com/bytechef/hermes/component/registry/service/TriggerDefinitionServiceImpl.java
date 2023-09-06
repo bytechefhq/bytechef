@@ -29,8 +29,10 @@ import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.Edit
 import com.bytechef.hermes.component.definition.EnableDynamicWebhookContextImpl;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.PollContextImpl;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
+import com.bytechef.hermes.component.definition.StaticWebhookRequestContextImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
@@ -47,6 +49,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
+import com.bytechef.hermes.component.definition.WebhookValidateContextImpl;
 import com.bytechef.hermes.component.definition.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.definition.factory.ContextFactory;
 import com.bytechef.hermes.component.definition.HttpHeadersImpl;

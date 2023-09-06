@@ -18,19 +18,18 @@
 package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.Context;
-
-import java.util.Map;
+import com.bytechef.file.storage.domain.FileEntry;
 
 /**
  * @author Ivica Cardic
  */
 public interface ContextService {
 
-    Map<String, ?> peek(long stackId, Context.Classname classname);
+    FileEntry peek(long stackId, Context.Classname classname);
 
-    Map<String, ?> peek(long stackId, int subStackId, Context.Classname classname);
+    FileEntry peek(long stackId, int subStackId, Context.Classname classname);
 
-    void push(long stackId, Context.Classname classname, Map<String, ?> context);
+    void push(long stackId, Context.Classname classname, FileEntry value);
 
-    void push(long stackId, int subStackId, Context.Classname classname, Map<String, ?> context);
+    void push(long stackId, int subStackId, Context.Classname classname, FileEntry value);
 }

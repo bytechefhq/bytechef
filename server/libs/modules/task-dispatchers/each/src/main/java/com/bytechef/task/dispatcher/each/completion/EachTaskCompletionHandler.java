@@ -28,6 +28,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -41,8 +42,8 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public EachTaskCompletionHandler(
-        TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService) {
+        CounterService counterService, TaskCompletionHandler taskCompletionHandler,
+        TaskExecutionService taskExecutionService) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
@@ -71,7 +72,7 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        long subTasksLeft = counterService.decrement(taskExecution.getParentId());
+        long subTasksLeft = counterService.decrement(Objects.requireNonNull(taskExecution.getParentId()));
 
         if (subTasksLeft == 0) {
             TaskExecution eachTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());

@@ -24,6 +24,7 @@ import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispat
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -58,17 +59,20 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public ParallelTaskDispatcher(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -98,10 +102,14 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
-                Map<String, ?> context = contextService.peek(
-                    taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+                Map<String, ?> context = workflowFileStorage.readContextValue(
+                    contextService.peek(
+                        taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
-                contextService.push(parallelTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+                contextService.push(
+                    Objects.requireNonNull(parallelTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                    workflowFileStorage.storeContextValue(
+                        parallelTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
                 taskDispatcher.dispatch(parallelTaskExecution);
             }
         }

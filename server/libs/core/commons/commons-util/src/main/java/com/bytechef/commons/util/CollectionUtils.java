@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -87,6 +88,12 @@ public final class CollectionUtils {
         return list.stream()
             .filter(filter)
             .toList();
+    }
+
+    public static <T> Optional<T> findFirst(Collection<T> list, Predicate<? super T> filter) {
+        return list.stream()
+            .filter(filter)
+            .findFirst();
     }
 
     public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {

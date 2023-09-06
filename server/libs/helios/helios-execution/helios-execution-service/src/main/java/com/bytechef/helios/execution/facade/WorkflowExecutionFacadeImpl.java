@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -44,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -58,13 +60,15 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectService projectService;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
         ProjectInstanceService projectInstanceService, ProjectService projectService,
-        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage,
+        WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
@@ -72,6 +76,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -79,7 +84,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
-        JobDTO jobDTO = new JobDTO(jobService.getJob(id), getJobTaskExecutions(id));
+        Job job = jobService.getJob(id);
+
+        JobDTO jobDTO = new JobDTO(
+            job, workflowFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
 
         return new WorkflowExecutionDTO(
             Objects.requireNonNull(jobDTO.id()),
@@ -121,7 +129,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         return jobsPage.map(job -> new WorkflowExecutionDTO(
             Objects.requireNonNull(job.getId()),
             OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(job.getWorkflowId()), null),
-            new JobDTO(job, List.of()),
+            new JobDTO(job, Map.of(), List.of()),
             CollectionUtils.getFirst(
                 projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
             CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))));
@@ -133,7 +141,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             .stream()
             .map(taskExecution -> new TaskExecutionDTO(
                 getComponentDefinition(taskExecution),
-                contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
+                workflowFileStorage.readContextValue(
+                    contextService.peek(
+                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)),
+                workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()),
                 taskExecutionService.getTaskExecution(taskExecution.getId())))
             .toList();
     }

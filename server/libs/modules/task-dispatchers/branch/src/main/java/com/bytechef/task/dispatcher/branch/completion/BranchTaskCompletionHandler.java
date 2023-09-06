@@ -29,6 +29,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -56,16 +57,19 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public BranchTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        WorkflowFileStorage workflowFileStorage) {
 
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -95,11 +99,18 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
-                contextService.peek(Objects.requireNonNull(branchTaskExecution.getId()), Classname.TASK_EXECUTION));
+                workflowFileStorage.readContextValue(
+                    contextService.peek(Objects.requireNonNull(branchTaskExecution.getId()),
+                        Classname.TASK_EXECUTION)));
 
-            newContext.put(taskExecution.getName(), taskExecution.getOutput());
+            newContext.put(
+                taskExecution.getName(),
+                workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
 
-            contextService.push(branchTaskExecution.getId(), Classname.TASK_EXECUTION, newContext);
+            contextService.push(
+                branchTaskExecution.getId(), Classname.TASK_EXECUTION,
+                workflowFileStorage.storeContextValue(
+                    branchTaskExecution.getId(), Classname.TASK_EXECUTION, newContext));
         }
 
         List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution);
@@ -115,14 +126,16 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 .workflowTask(workflowTask)
                 .build();
 
-            Map<String, ?> context = contextService.peek(
-                Objects.requireNonNull(branchTaskExecution.getId()), Classname.TASK_EXECUTION);
+            Map<String, ?> context = workflowFileStorage.readContextValue(
+                contextService.peek(Objects.requireNonNull(branchTaskExecution.getId()), Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            contextService.push(Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION, context);
+            contextService.push(
+                Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION,
+                workflowFileStorage.storeContextValue(taskExecution.getId(), Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         }

@@ -29,12 +29,13 @@ import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,10 +45,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
-    properties = "bytechef.workflow-repository.jdbc.enabled=true")
+    properties = "bytechef.workflow.repository.jdbc.enabled=true")
+@Import(PostgreSQLContainerConfiguration.class)
 public class IntegrationFacadeIntTest {
 
     @Autowired

@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.commons.util.MapUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,6 +62,6 @@ public class AbstractParameters {
     }
 
     public Map<String, List<String>> getParameters() {
-        return parameters;
+        return Collections.unmodifiableMap(parameters);
     }
 }

@@ -41,7 +41,7 @@ public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor
     }
 
     @Override
-    public Map<String, ?> getInputs(long instanceId, String workflowId) {
+    public Map<String, ?> getInputMap(long instanceId, String workflowId) {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             instanceId, workflowId);
 

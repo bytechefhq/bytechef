@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -86,6 +87,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     @Autowired
+    @SuppressFBWarnings("EI")
     public void setWorkflowService(WorkflowService workflowService) {
         this.workflowService = workflowService;
     }

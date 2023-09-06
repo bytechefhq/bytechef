@@ -124,10 +124,9 @@ bytechef:
   data-storage:
     provider: db
   file-storage:
+    # File storage provider for binary data (base64 | filesystem) default: filesystem
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files
-  context-repository:
-    provider: jdbc
   encryption:
     provider: filesystem
   message-broker:
@@ -147,24 +146,28 @@ bytechef:
     task:
       subscriptions:
         tasks: "10"
-  workflow-repository:
-    # Enable classpath based workflow repository
-    classpath:
-      enabled: true
-    # Enable file system based workflow repository
-    filesystem:
-      enabled: true
-      # Location of workflows on the file system
-      location-pattern: ${user.home}/bytechef/**/*.yaml
-    # Enable a git-based workflow repository
-    git:
-      enabled: false
-      # The URL to the Git Repo
-      url: https://github.com/bytechefhq/bytechef-workflows.git
-      branch: master
-      username:
-      password:
-      # Folders within the git repo that are scanned for workflows
-      search-paths:
-    jdbc:
-      enabled: true
+  workflow:
+    output-storage:
+      # Output storage provider for workflow output data (base64 | filesystem) default: base64
+      provider: base64
+    repository:
+      classpath:
+        # Enable classpath based workflow repository
+        enabled: false
+      filesystem:
+        # Enable filesystem based workflow repository
+        enabled: true
+        # Location of workflows on the file system
+        location-pattern: ${user.home}/bytechef/**/*.yaml
+      git:
+        # Enable a git-based workflow repository
+        enabled: false
+        # The URL to the Git Repo
+        url: https://github.com/bytechefhq/bytechef-workflows.git
+        branch: master
+        username:
+        password:
+        # Folders within the git repo that are scanned for workflows
+        search-paths:
+      jdbc:
+        enabled: true

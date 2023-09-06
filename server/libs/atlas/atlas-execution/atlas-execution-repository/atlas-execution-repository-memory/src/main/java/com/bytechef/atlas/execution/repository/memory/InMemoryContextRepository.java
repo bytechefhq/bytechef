@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
+import com.bytechef.file.storage.domain.FileEntry;
 import org.springframework.util.Assert;
 
 /**
@@ -37,7 +38,7 @@ public class InMemoryContextRepository implements ContextRepository {
 
     private static final Random RANDOM = new Random();
 
-    private final Map<String, Deque<Map<String, Object>>> contexts = new HashMap<>();
+    private final Map<String, Deque<FileEntry>> contexts = new HashMap<>();
 
     @Override
     public Iterable<Context> findAll() {
@@ -50,7 +51,7 @@ public class InMemoryContextRepository implements ContextRepository {
 
     @Override
     public Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
-        Deque<Map<String, Object>> linkedList = contexts.get(getKey(stackId, null, classnameId));
+        Deque<FileEntry> linkedList = contexts.get(getKey(stackId, null, classnameId));
 
         Assert.notNull(linkedList, "unknown stack: " + stackId);
 
@@ -60,7 +61,7 @@ public class InMemoryContextRepository implements ContextRepository {
     @Override
     public Context findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
         long stackId, int subStackId, int classnameId) {
-        Deque<Map<String, Object>> linkedList = contexts.get(getKey(stackId, subStackId, classnameId));
+        Deque<FileEntry> linkedList = contexts.get(getKey(stackId, subStackId, classnameId));
 
         Assert.notNull(linkedList, "unknown stack: " + stackId);
 
@@ -69,7 +70,7 @@ public class InMemoryContextRepository implements ContextRepository {
 
     @Override
     public Context save(Context context) {
-        Deque<Map<String, Object>> stack = contexts.computeIfAbsent(
+        Deque<FileEntry> stack = contexts.computeIfAbsent(
             getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId()), k -> new LinkedList<>());
 
         if (context.isNew()) {

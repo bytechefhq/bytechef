@@ -24,9 +24,11 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
 
+@SuppressFBWarnings("EI")
 public record DynamicWebhookRequestContextImpl(
     Map<String, ?> inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
     WebhookMethod method, DynamicWebhookEnableOutput dynamicWebhookEnableOutput, TriggerContext triggerContext)

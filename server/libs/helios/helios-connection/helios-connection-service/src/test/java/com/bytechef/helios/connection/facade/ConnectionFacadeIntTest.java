@@ -34,7 +34,7 @@ import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -45,6 +45,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,12 +53,12 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(
     classes = ConnectionIntTestConfiguration.class,
     properties = {
         "spring.application.name=server-app"
     })
+@Import(PostgreSQLContainerConfiguration.class)
 public class ConnectionFacadeIntTest {
 
     @Autowired

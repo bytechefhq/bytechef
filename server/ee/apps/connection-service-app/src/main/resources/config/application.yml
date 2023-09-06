@@ -106,7 +106,5 @@ bytechef:
     provider: filesystem
   discovery-service:
     provider: redis
-  context-repository:
-    provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ

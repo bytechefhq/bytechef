@@ -17,13 +17,16 @@
 
 package com.bytechef.hermes.component.test.config;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -41,11 +44,10 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.test.JobTestExecutor;
-import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -153,8 +155,9 @@ public class ComponentTestIntConfiguration {
         @Bean
         JobTestExecutor componentWorkflowTestSupport(
             ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-            TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-            TaskHandlerMapFactory taskHandlerMapFactory, WorkflowService workflowService) {
+            TaskExecutionService taskExecutionService,
+            Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
+            WorkflowService workflowService) {
 
             return new JobTestExecutor(
                 contextService, jobService, eventPublisher, taskExecutionService,
@@ -184,6 +187,15 @@ public class ComponentTestIntConfiguration {
         @Bean
         InMemoryTaskExecutionRepository taskExecutionRepository() {
             return new InMemoryTaskExecutionRepository();
+        }
+    }
+
+    @TestConfiguration
+    public static class WorkflowFileStorageConfiguration {
+
+        @Bean
+        WorkflowFileStorage workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

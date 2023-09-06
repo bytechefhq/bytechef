@@ -38,13 +38,13 @@ public record TaskExecutionDTO(
     TaskExecution.Status status, int taskNumber, String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(
-        ComponentDefinition componentDefinition, Map<String, ?> input, TaskExecution taskExecution) {
+        ComponentDefinition componentDefinition, Map<String, ?> input, Object output, TaskExecution taskExecution) {
 
         this(
             componentDefinition, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
             taskExecution.getEndDate(), taskExecution.getError(), taskExecution.getExecutionTime(),
             taskExecution.getId(), input, taskExecution.getJobId(), taskExecution.getLastModifiedBy(),
-            taskExecution.getLastModifiedDate(), taskExecution.getMaxRetries(), taskExecution.getOutput(),
+            taskExecution.getLastModifiedDate(), taskExecution.getMaxRetries(), output,
             taskExecution.getParentId(), taskExecution.getPriority(), taskExecution.getProgress(),
             taskExecution.getRetryAttempts(), taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(),
             taskExecution.getRetryDelayMillis(), taskExecution.getStartDate(), taskExecution.getStatus(),

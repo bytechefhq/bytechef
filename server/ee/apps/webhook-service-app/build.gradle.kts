@@ -21,8 +21,8 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-impl"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-rest"))
-    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service"))
-    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))

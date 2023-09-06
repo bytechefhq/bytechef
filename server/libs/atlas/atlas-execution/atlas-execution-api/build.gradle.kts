@@ -2,6 +2,7 @@ dependencies {
     api(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     api(project(":server:libs:core:error:error-api"))
     api(project(":server:libs:core:event:event-api"))
+    api(project(":server:libs:core:file-storage:file-storage-api"))
 
     implementation("com.fasterxml.jackson.core:jackson-annotations")
     implementation("org.slf4j:slf4j-api")

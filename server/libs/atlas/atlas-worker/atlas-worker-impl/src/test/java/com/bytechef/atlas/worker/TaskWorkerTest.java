@@ -17,9 +17,12 @@
 
 package com.bytechef.atlas.worker;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
@@ -34,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,16 +45,21 @@ import org.springframework.util.FileSystemUtils;
 
 public class TaskWorkerTest {
 
+    private static final WorkflowFileStorage WORKFLOW_FILE_STORAGE_FACADE = new WorkflowFileStorageImpl(
+        new Base64FileStorageService(), new ObjectMapper());
+
     @Test
     public void test1() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
             TaskMessageRoute.TASKS_COMPLETE,
-            t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
+            t -> Assertions.assertEquals(
+                "done", WORKFLOW_FILE_STORAGE_FACADE.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
         messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> "done");
+        TaskWorker worker =
+            new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> "done", WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -74,7 +83,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
             throw new IllegalArgumentException("bad input");
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -91,7 +100,8 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskMessageRoute.TASKS_COMPLETE, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
+            TaskMessageRoute.TASKS_COMPLETE, t -> Assertions.assertEquals(
+                "done", WORKFLOW_FILE_STORAGE_FACADE.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
         messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
@@ -106,7 +116,7 @@ public class TaskWorkerTest {
             } else {
                 throw new IllegalArgumentException("unknown type: " + type);
             }
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution task = TaskExecution.builder()
             .workflowTask(
@@ -156,7 +166,7 @@ public class TaskWorkerTest {
             } else {
                 throw new IllegalArgumentException("unknown type: " + type);
             }
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -214,7 +224,7 @@ public class TaskWorkerTest {
             } else {
                 throw new IllegalArgumentException("unknown type: " + type);
             }
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -246,7 +256,7 @@ public class TaskWorkerTest {
             }
 
             return null;
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -287,7 +297,7 @@ public class TaskWorkerTest {
             }
 
             return null;
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -338,7 +348,7 @@ public class TaskWorkerTest {
             }
 
             return null;
-        });
+        }, WORKFLOW_FILE_STORAGE_FACADE);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))

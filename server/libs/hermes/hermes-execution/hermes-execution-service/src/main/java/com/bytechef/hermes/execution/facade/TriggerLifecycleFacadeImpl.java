@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.execution.facade;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
@@ -44,8 +43,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     public TriggerLifecycleFacadeImpl(
         TriggerScheduler triggerScheduler, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService,
-        WorkflowService workflowService) {
+        TriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService) {
 
         this.triggerScheduler = triggerScheduler;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
