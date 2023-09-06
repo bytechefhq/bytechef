@@ -15,31 +15,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.config.jdbc;
+package com.bytechef.test.config.testcontainers;
 
-import java.util.Optional;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
-import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.testcontainers.containers.GenericContainer;
 
 /**
  * @author Ivica Cardic
  */
-@EnableJdbcAuditing
-@TestConfiguration
-public abstract class AbstractIntTestJdbcConfiguration extends AbstractJdbcConfiguration {
+@TestConfiguration(proxyBeanMethods = false)
+public class RedisContainerConfiguration {
 
     @Bean
-    AuditorAware<String> auditorProvider() {
-        return () -> Optional.of("system");
-    }
+    public GenericContainer<?> redisContainer(DynamicPropertyRegistry registry) {
+        GenericContainer<?> container = new GenericContainer<>("redis:7.2-alpine")
+            .withExposedPorts(6379);
 
-    @Bean
-    public DateTimeProvider auditingDateTimeProvider() {
-        return CurrentDateTimeProvider.INSTANCE;
+        registry.add("spring.data.redis.host=", container::getHost);
+        registry.add("spring.data.redis.port=", () -> container.getMappedPort(6379));
+
+        return container;
     }
 }
