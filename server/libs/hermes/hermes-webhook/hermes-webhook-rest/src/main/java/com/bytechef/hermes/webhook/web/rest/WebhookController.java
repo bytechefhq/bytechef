@@ -17,12 +17,18 @@
 
 package com.bytechef.hermes.webhook.web.rest;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.hermes.component.util.XmlUtils;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
@@ -61,15 +67,21 @@ public class WebhookController {
 
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        FileStorageService fileStorageService, ObjectMapper objectMapper, WebhookExecutor webhookExecutor) {
+        FileStorageService fileStorageService, ObjectMapper objectMapper,
+        TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
+        WorkflowService workflowService) {
 
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
+        this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
+        this.workflowService = workflowService;
     }
 
     @RequestMapping(
@@ -80,12 +92,18 @@ public class WebhookController {
     public ResponseEntity<?> webhooks(@PathVariable String id, HttpServletRequest httpServletRequest)
         throws Exception {
 
-        WebhookBody body = null;
+        WebhookBodyImpl body = null;
         String mediaType = httpServletRequest.getContentType();
         Map<String, String[]> headers = getHeaderMap(httpServletRequest);
         Map<String, String[]> parameters = httpServletRequest.getParameterMap();
         ResponseEntity<?> responseEntity;
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
+
+        WebhookTriggerFlags webhookTriggerFlags = triggerDefinitionService.getWebhookTriggerFlags(
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName());
 
         if (mediaType != null && !mediaType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
             if (mediaType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
@@ -108,9 +126,7 @@ public class WebhookController {
             } else if (mediaType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
                 Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
 
-                UriComponents uriComponents = UriComponentsBuilder
-                    .fromHttpRequest(new ServletServerHttpRequest(httpServletRequest))
-                    .build();
+                UriComponents uriComponents = getUriComponents(httpServletRequest);
 
                 MultiValueMap<String, String> queryParams = uriComponents.getQueryParams();
 
@@ -124,7 +140,7 @@ public class WebhookController {
             } else if (mediaType.startsWith(MimeTypeUtils.APPLICATION_JSON_VALUE)) {
                 Object content;
 
-                if (workflowExecutionId.isWebhookRawBody()) {
+                if (webhookTriggerFlags.webhookRawBody()) {
                     content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
                 } else {
                     content = JsonUtils.read(
@@ -136,7 +152,7 @@ public class WebhookController {
             } else if (mediaType.startsWith(MimeTypeUtils.APPLICATION_XML_VALUE)) {
                 Object content;
 
-                if (workflowExecutionId.isWebhookRawBody()) {
+                if (webhookTriggerFlags.webhookRawBody()) {
                     content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
                 } else {
                     content = XmlUtils.read(
@@ -147,7 +163,7 @@ public class WebhookController {
             } else if (mediaType.startsWith("application/")) {
                 body = new WebhookBodyImpl(
                     fileStorageService.storeFileContent(
-                        "file." + toFileExtension(httpServletRequest.getContentType()),
+                        "file." + getFileExtension(httpServletRequest.getContentType()),
                         httpServletRequest.getInputStream()),
                     ContentType.BINARY, httpServletRequest.getContentType());
             } else {
@@ -160,24 +176,37 @@ public class WebhookController {
         WebhookRequest webhookRequest = new WebhookRequest(
             headers, parameters, body, WebhookMethod.valueOf(httpServletRequest.getMethod()));
 
-        if (workflowExecutionId.isWorkflowSyncExecution()) {
+        if (webhookTriggerFlags.workflowSyncExecution()) {
             responseEntity = ResponseEntity.ok(webhookExecutor.execute(workflowExecutionId, webhookRequest));
-        } else if (workflowExecutionId.isWorkflowSyncValidation()) {
-            if (webhookExecutor.validateAndExecute(workflowExecutionId, webhookRequest)) {
-                responseEntity = ResponseEntity.ok()
-                    .build();
+        } else if (webhookTriggerFlags.workflowSyncValidation()) {
+            if (webhookExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest)) {
+                responseEntity = getResponseEntity(ResponseEntity.ok());
             } else {
-                responseEntity = ResponseEntity.badRequest()
-                    .build();
+                responseEntity = getResponseEntity(ResponseEntity.badRequest());
             }
         } else {
             webhookExecutor.executeAsync(workflowExecutionId, webhookRequest);
 
-            responseEntity = ResponseEntity.ok()
-                .build();
+            responseEntity = getResponseEntity(ResponseEntity.ok());
         }
 
         return responseEntity;
+    }
+
+    private ComponentOperation getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
+
+        return ComponentOperation.ofType(workflowTrigger.getType());
+    }
+
+    private static String getFileExtension(String mimeTypeString) {
+        MimeType mimeType = MimeTypeUtils.parseMimeType(mimeTypeString);
+
+        String subtype = mimeType.getSubtype();
+
+        return subtype.toLowerCase();
     }
 
     private static Map<String, String[]> getHeaderMap(HttpServletRequest httpServletRequest) {
@@ -192,22 +221,30 @@ public class WebhookController {
         return headerMap;
     }
 
-    private static String[] toArray(Enumeration<String> enumeration) {
-        ArrayList<String> arrayList = new ArrayList<>();
-
-        while (enumeration.hasMoreElements()) {
-            arrayList.add(enumeration.nextElement());
-        }
-
-        return arrayList.toArray(new String[0]);
+    private static <T> ResponseEntity<T> getResponseEntity(ResponseEntity.BodyBuilder bodyBuilder) {
+        return bodyBuilder.build();
     }
 
-    private static String toFileExtension(String mimeTypeString) {
-        MimeType mimeType = MimeTypeUtils.parseMimeType(mimeTypeString);
+    private static UriComponents getUriComponents(HttpServletRequest httpServletRequest) {
+        return UriComponentsBuilder
+            .fromHttpRequest(new ServletServerHttpRequest(httpServletRequest))
+            .build();
+    }
 
-        String subtype = mimeType.getSubtype();
+    private static boolean isBinaryPart(Part part) {
+        String contentType = part.getContentType();
 
-        return subtype.toLowerCase();
+        return contentType != null && contentType.equals(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+    }
+
+    private static String[] toArray(Enumeration<String> enumeration) {
+        List<String> list = new ArrayList<>();
+
+        while (enumeration.hasMoreElements()) {
+            list.add(enumeration.nextElement());
+        }
+
+        return list.toArray(new String[0]);
     }
 
     private static Map<String, String[]> toMap(MultiValueMap<String, String> multiValueMap) {
@@ -224,17 +261,4 @@ public class WebhookController {
 
         return resultMap;
     }
-
-    private boolean isBinaryPart(Part part) {
-        String contentType = part.getContentType();
-
-        return contentType != null && contentType.equals(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-    }
-
-    private record WebhookParameters(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-    }
-
-    private record WebhookBodyImpl(Object content, ContentType contentType, String mimeType) implements WebhookBody {
-    }
-
 }

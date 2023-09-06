@@ -56,7 +56,9 @@ public class WorkflowTask implements Task, Serializable {
     private WorkflowTask() {
     }
 
-    private WorkflowTask(Map<String, ?> source) {
+    public WorkflowTask(Map<String, ?> source) {
+        Assert.notNull(source, "'source' must not be null");
+
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
                 this.finalize = MapUtils.getList(
@@ -91,8 +93,6 @@ public class WorkflowTask implements Task, Serializable {
     }
 
     public static WorkflowTask of(Map<String, ?> source) {
-        Assert.notNull(source, "'source' must not be null");
-
         return new WorkflowTask(source);
     }
 

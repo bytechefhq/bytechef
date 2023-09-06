@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
@@ -84,4 +85,6 @@ public interface TriggerDefinitionService {
     TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName);
 
     List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion);
+
+    WebhookTriggerFlags getWebhookTriggerFlags(String componentName, int componentVersion, String triggerName);
 }

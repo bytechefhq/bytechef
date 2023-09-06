@@ -25,6 +25,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
+import com.bytechef.hermes.execution.message.broker.ListenerParameters;
+import com.bytechef.hermes.execution.message.broker.WebhookParameters;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
@@ -94,8 +96,8 @@ public class TriggerCoordinator {
 
     public void handleListeners(ListenerParameters listenerParameters) {
         TriggerExecution triggerExecution = TriggerExecution.builder()
-            .output(listenerParameters.output)
-            .workflowExecutionId(listenerParameters.workflowExecutionId)
+            .output(listenerParameters.output())
+            .workflowExecutionId(listenerParameters.workflowExecutionId())
             .build();
 
         handleTriggersComplete(triggerExecution);
@@ -113,12 +115,14 @@ public class TriggerCoordinator {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
             .build();
 
-        dispatch(triggerExecution);
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Handling poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
+                triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                triggerExecution.getWorkflowExecutionId());
+        }
 
-        logger.debug(
-            "Handling poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
-            triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-            triggerExecution.getWorkflowExecutionId());
+        dispatch(triggerExecution);
     }
 
     /**
@@ -127,17 +131,19 @@ public class TriggerCoordinator {
      */
     public void handleWebhooks(WebhookParameters webhookParameters) {
         TriggerExecution triggerExecution = TriggerExecution.builder()
-            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookParameters.webhookRequest))
-            .workflowExecutionId(webhookParameters.workflowExecutionId)
-            .workflowTrigger(getWorkflowTrigger(webhookParameters.workflowExecutionId))
+            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookParameters.webhookRequest()))
+            .workflowExecutionId(webhookParameters.workflowExecutionId())
+            .workflowTrigger(getWorkflowTrigger(webhookParameters.workflowExecutionId()))
             .build();
 
-        dispatch(triggerExecution);
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Dispatching webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
+                triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                triggerExecution.getWorkflowExecutionId());
+        }
 
-        logger.debug(
-            "Handling webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
-            triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-            triggerExecution.getWorkflowExecutionId());
+        dispatch(triggerExecution);
     }
 
     private void dispatch(TriggerExecution triggerExecution) {
@@ -168,12 +174,7 @@ public class TriggerCoordinator {
 
         return CollectionUtils.getFirst(
             WorkflowTrigger.of(workflow),
-            workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getWorkflowTriggerName()));
+            workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getTriggerName()));
     }
 
-    public record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {
-    }
-
-    public record WebhookParameters(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-    }
 }

@@ -41,7 +41,7 @@ public class DbDataStorageService implements DataStorageService {
 
     @Override
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
+    @Transactional
     public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
         return dataStorageRepository.findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
             .map(dataStorage -> (T) dataStorage.getValue());

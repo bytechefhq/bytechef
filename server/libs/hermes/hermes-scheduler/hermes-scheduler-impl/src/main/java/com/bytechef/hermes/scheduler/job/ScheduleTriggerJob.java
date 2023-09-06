@@ -20,6 +20,7 @@ package com.bytechef.hermes.scheduler.job;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.message.broker.ListenerParameters;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,9 +54,6 @@ public class ScheduleTriggerJob implements Job {
                 MapUtils.concat(
                     Map.of("datetime", fireTime.toString()),
                     JsonUtils.readMap(jobDataMap.getString("output"), String.class, objectMapper))));
-    }
-
-    private record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {
     }
 
     @Autowired

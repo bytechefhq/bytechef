@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
@@ -180,6 +181,17 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}", componentName,
                 componentVersion),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public WebhookTriggerFlags getWebhookTriggerFlags(String componentName, int componentVersion, String triggerName) {
+        return defaultWebClient.get(
+            uriBuilder -> toUri(
+                uriBuilder, componentName,
+                "/trigger-definition-service/get-webhook-trigger-flags/{componentName}/{componentVersion}" +
+                    "/{triggerName}",
+                componentName, componentVersion, triggerName),
+            WebhookTriggerFlags.class);
     }
 
     private record DynamicWebhookRefresh(

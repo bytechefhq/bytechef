@@ -17,10 +17,14 @@
 
 package com.bytechef.hermes.scheduler.job;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import org.quartz.Job;
@@ -42,24 +46,22 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     private TriggerDefinitionService triggerDefinitionService;
     private TriggerStateService triggerStateService;
+    private WorkflowService workflowService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
 
-        String workflowExecutionIdString = jobDataMap.getString("workflowExecutionId");
-
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(workflowExecutionIdString);
+        String workflowExecutionId = jobDataMap.getString("workflowExecutionId");
 
         LocalDateTime webhookExpirationDate = refreshDynamicWebhookTrigger(
-            workflowExecutionId, workflowExecutionId.getComponentName(),
-            workflowExecutionId.getComponentVersion());
+            WorkflowExecutionId.parse(workflowExecutionId));
 
         if (webhookExpirationDate != null) {
             Scheduler scheduler = context.getScheduler();
             try {
                 TriggerKey triggerKey = TriggerKey.triggerKey(
-                    workflowExecutionIdString, "DynamicWebhookTriggerRefresh");
+                    workflowExecutionId, "DynamicWebhookTriggerRefresh");
 
                 scheduler.rescheduleJob(
                     triggerKey,
@@ -83,15 +85,27 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         this.triggerStateService = triggerStateService;
     }
 
-    private LocalDateTime refreshDynamicWebhookTrigger(
-        WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion) {
+    @Autowired
+    public void setWorkflowService(WorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
 
+    private ComponentOperation getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
+
+        return ComponentOperation.ofType(workflowTrigger.getType());
+    }
+
+    private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId) {
+        ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
+        DynamicWebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
-        TriggerDefinition.DynamicWebhookEnableOutput output = OptionalUtils.get(
-            triggerStateService.fetchValue(workflowExecutionId));
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
-            componentName, componentVersion, workflowExecutionId.getComponentTriggerName(), output);
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName(), output);
 
         if (output != null) {
             triggerStateService.save(workflowExecutionId, output);

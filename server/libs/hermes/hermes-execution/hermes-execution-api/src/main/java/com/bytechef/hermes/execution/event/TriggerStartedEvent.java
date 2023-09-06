@@ -26,7 +26,10 @@ public class TriggerStartedEvent extends AbstractEvent {
 
     public static final String TRIGGER_STARTED = "trigger.started";
 
-    private final long triggerExecutionId;
+    private long triggerExecutionId;
+
+    private TriggerStartedEvent() {
+    }
 
     public TriggerStartedEvent(long triggerExecutionId) {
         super();

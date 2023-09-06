@@ -18,7 +18,7 @@
 package com.bytechef.message.broker.redis.listener;
 
 import com.bytechef.message.broker.MessageRoute;
-import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
+import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.oblac.jrsmq.QueueMessage;
 import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,16 +45,16 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     private final ExecutorService executorService;
     private final Map<String, Consumer<String>> invokerMap = new HashMap<>();
-    private final RedisMessageSerializer redisMessageSerializer;
+    private final RedisMessageDeserializer redisMessageDeserializer;
     private final RedisSMQ redisSMQ;
     private boolean stopped;
 
     @SuppressFBWarnings("EI2")
     public RedisListenerEndpointRegistrar(
-        ExecutorService executorService, RedisMessageSerializer redisMessageSerializer, RedisSMQ redisSMQ) {
+        ExecutorService executorService, RedisMessageDeserializer redisMessageDeserializer, RedisSMQ redisSMQ) {
 
         this.executorService = executorService;
-        this.redisMessageSerializer = redisMessageSerializer;
+        this.redisMessageDeserializer = redisMessageDeserializer;
         this.redisSMQ = redisSMQ;
     }
 
@@ -91,16 +91,20 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     private void periodicallyCheckQueueForMessage(String queueName) {
         while (!stopped) {
-            QueueMessage queueMessage = redisSMQ.popMessage()
-                .qname(queueName)
-                .exec();
+            try {
+                QueueMessage queueMessage = redisSMQ.popMessage()
+                    .qname(queueName)
+                    .exec();
 
-            if (queueMessage == null) {
-                sleep();
-            } else {
-                Consumer<String> invokerConsumer = invokerMap.get(queueName);
+                if (queueMessage == null) {
+                    sleep();
+                } else {
+                    Consumer<String> invokerConsumer = invokerMap.get(queueName);
 
-                executorService.submit(() -> invokerConsumer.accept(queueMessage.message()));
+                    executorService.submit(() -> invokerConsumer.accept(queueMessage.message()));
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -117,9 +121,9 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
     }
 
     private void invoke(Object delegate, String methodName, String messageString) {
-        Object message = redisMessageSerializer.deserialize(messageString);
-
         try {
+            Object message = redisMessageDeserializer.deserialize(messageString);
+
             MethodInvoker methodInvoker = new MethodInvoker();
 
             methodInvoker.setTargetObject(delegate);

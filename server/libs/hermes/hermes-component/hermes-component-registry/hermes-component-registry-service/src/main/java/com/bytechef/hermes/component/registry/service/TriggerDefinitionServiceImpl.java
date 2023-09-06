@@ -17,14 +17,16 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.definition.DynamicWebhookDisableContextImpl;
+import com.bytechef.hermes.component.definition.DynamicWebhookRequestContextImpl;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
+import com.bytechef.hermes.component.definition.EnableDynamicWebhookContextImpl;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
@@ -36,28 +38,27 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.PollContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
 import com.bytechef.hermes.component.definition.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.definition.factory.ContextFactory;
+import com.bytechef.hermes.component.definition.HttpHeadersImpl;
+import com.bytechef.hermes.component.definition.HttpParametersImpl;
+import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
+import com.bytechef.hermes.execution.message.broker.ListenerParameters;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
@@ -71,12 +72,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalLong;
 
 /**
  * @author Ivica Cardic
@@ -312,6 +310,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .toList();
     }
 
+    @Override
+    public WebhookTriggerFlags getWebhookTriggerFlags(String componentName, int componentVersion, String triggerName) {
+        TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        return new WebhookTriggerFlags(
+            triggerDefinition.isWebhookRawBody(), triggerDefinition.isWorkflowSyncExecution(),
+            triggerDefinition.isWorkflowSyncValidation());
+    }
+
     @SuppressWarnings("unchecked")
     private TriggerOutput doExecuteTrigger(
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
@@ -402,8 +409,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private boolean executeWebhookValidate(
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition,
-        TriggerContext triggerContext,
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, TriggerContext triggerContext,
         Map<String, ?> inputParameters, WebhookRequest webhookRequest) {
 
         WebhookValidateContext context = new WebhookValidateContextImpl(
@@ -528,94 +534,4 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             connectionId == null ? Map.of() : Map.of(componentName, connectionId));
     }
 
-    private record DynamicWebhookDisableContextImpl(
-        Map<String, ?> inputParameters, Context.Connection connection,
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput, String workflowExecutionId)
-        implements DynamicWebhookDisableContext {
-    }
-
-    private record DynamicWebhookRequestContextImpl(
-        Map<String, ?> inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-        WebhookMethod method, DynamicWebhookEnableOutput dynamicWebhookEnableOutput, TriggerContext triggerContext)
-        implements com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext {
-    }
-
-    private record EnableDynamicWebhookContextImpl(
-        Map<String, ?> inputParameters, Context.Connection connection, String webhookUrl,
-        String workflowExecutionId) implements EnableDynamicWebhookContext {
-    }
-
-    private static class AbstractParameters {
-
-        private final Map<String, String[]> parameters;
-
-        private AbstractParameters(Map<String, String[]> parameters) {
-            this.parameters = parameters;
-        }
-
-        public List<String> allValues(String name) {
-            return parameters.values()
-                .stream()
-                .flatMap(Arrays::stream)
-                .toList();
-        }
-
-        public Optional<String> firstValue(String name) {
-            Optional<String> optional = Optional.empty();
-
-            if (parameters.containsKey(name)) {
-                String[] values = parameters.get(name);
-
-                if (values != null && values.length > 0) {
-                    optional = Optional.of(values[0]);
-                }
-            }
-
-            return optional;
-        }
-
-        public OptionalLong firstValueAsLong(String name) {
-            return firstValue(name).stream()
-                .mapToLong(Long::valueOf)
-                .findFirst();
-        }
-
-        public Map<String, List<String>> map() {
-            return MapUtils.toMap(parameters, Map.Entry::getKey, entry -> Arrays.asList(entry.getValue()));
-        }
-    }
-
-    private static class HttpHeadersImpl extends AbstractParameters implements HttpHeaders {
-
-        private HttpHeadersImpl(Map<String, String[]> parameters) {
-            super(parameters);
-        }
-    }
-
-    private static class HttpParametersImpl extends AbstractParameters implements HttpParameters {
-
-        private HttpParametersImpl(Map<String, String[]> parameters) {
-            super(parameters);
-        }
-    }
-
-    private record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {
-    }
-
-    private record PollContextImpl(
-        Map<String, ?> inputParameters, Map<String, ?> closureParameters, TriggerContext triggerContext)
-        implements PollContext {
-    }
-
-    private record StaticWebhookRequestContextImpl(
-        Map<String, ?> inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext triggerContext)
-        implements com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext {
-    }
-
-    private record WebhookValidateContextImpl(
-        Map<String, ?> inputParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, TriggerContext triggerContext)
-        implements WebhookValidateContext {
-    }
 }

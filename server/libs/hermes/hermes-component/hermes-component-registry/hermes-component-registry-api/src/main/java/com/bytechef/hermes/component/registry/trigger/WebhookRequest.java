@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record WebhookRequest(
-    Map<String, String[]> headers, Map<String, String[]> parameters, WebhookBody body, WebhookMethod method) {
+    Map<String, String[]> headers, Map<String, String[]> parameters, WebhookBodyImpl body, WebhookMethod method) {
 
     public static final String WEBHOOK_REQUEST = "webhookRequest";
 
@@ -44,7 +44,7 @@ public record WebhookRequest(
 
         @Override
         public WebhookRequest convert(Map<String, Object> source) {
-            WebhookBody webhookBody = null;
+            WebhookRequest.WebhookBodyImpl webhookBody = null;
 
             if (MapUtils.containsKey(source,
                 BODY)) {
@@ -65,7 +65,8 @@ public record WebhookRequest(
                     content = MapUtils.getRequiredString(bodyMap, CONTENT);
                 }
 
-                webhookBody = new WebhookBodyImpl(content, contentType, MapUtils.getString(bodyMap, "mimeType"));
+                webhookBody =
+                    new WebhookRequest.WebhookBodyImpl(content, contentType, MapUtils.getString(bodyMap, "mimeType"));
             }
 
             return new WebhookRequest(
@@ -89,9 +90,9 @@ public record WebhookRequest(
                 });
         }
 
-        private record WebhookBodyImpl(
-            Object content, ContentType contentType, String mimeType) implements WebhookBody {
+    }
 
-        }
+    public record WebhookBodyImpl(
+        Object content, ContentType contentType, String mimeType) implements WebhookBody {
     }
 }

@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
@@ -82,9 +83,11 @@ public class TriggerSyncExecutor {
 
         triggerExecution = preProcess(triggerExecution);
 
+        ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
+
         TriggerOutput triggerOutput = triggerDefinitionService.executeTrigger(
-            workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
-            workflowExecutionId.getComponentTriggerName(), triggerExecution.getParameters(),
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName(), triggerExecution.getParameters(),
             triggerExecution.getState(),
             MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
             MapUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
@@ -112,11 +115,21 @@ public class TriggerSyncExecutor {
 
         triggerExecution = preProcess(triggerExecution.evaluate(getInputs(workflowExecutionId)));
 
+        ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
+
         return triggerDefinitionService.executeWebhookValidate(
-            workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
-            workflowExecutionId.getComponentTriggerName(), triggerExecution.getParameters(),
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName(), triggerExecution.getParameters(),
             MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
             MapUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+    }
+
+    private ComponentOperation getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
+
+        return ComponentOperation.ofType(workflowTrigger.getType());
     }
 
     private Map<String, ?> getInputs(WorkflowExecutionId workflowExecutionId) {
@@ -132,7 +145,7 @@ public class TriggerSyncExecutor {
 
         return CollectionUtils.getFirst(
             WorkflowTrigger.of(workflow),
-            workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getWorkflowTriggerName()));
+            workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getTriggerName()));
     }
 
     private TriggerExecution preProcess(TriggerExecution triggerExecution) {

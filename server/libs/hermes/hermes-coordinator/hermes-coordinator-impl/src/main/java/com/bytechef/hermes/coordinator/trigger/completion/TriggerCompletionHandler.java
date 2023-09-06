@@ -28,7 +28,6 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Map;
@@ -54,7 +53,6 @@ public class TriggerCompletionHandler {
         this.triggerStateService = triggerStateService;
     }
 
-    @Transactional
     @SuppressWarnings("unchecked")
     public void handle(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();

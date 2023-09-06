@@ -19,6 +19,7 @@ package com.bytechef.hermes.configuration.trigger;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
@@ -40,14 +41,16 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private final Map<String, Object> extensions = new HashMap<>();
     private String name;
     private String label;
-    private Map<String, ?> parameters;
+    private Map<String, ?> parameters = Collections.emptyMap();
     private String timeout;
     private String type;
 
     private WorkflowTrigger() {
     }
 
-    private WorkflowTrigger(Map<String, ?> source) {
+    public WorkflowTrigger(Map<String, ?> source) {
+        Assert.notNull(source, "'source' must not be null");
+
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
@@ -69,15 +72,17 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public static WorkflowTrigger of(Map<String, Object> source) {
-        Assert.notNull(source, "'source' must not be null");
-
         return new WorkflowTrigger(source);
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
-        return workflow.getExtensions("triggers", WorkflowTrigger.class, List.of())
-            .stream()
-            .toList();
+        return workflow.getExtensions("triggers", WorkflowTrigger.class, List.of());
+    }
+
+    public static WorkflowTrigger of(String triggerName, Workflow workflow) {
+        return CollectionUtils.getFirst(
+            workflow.getExtensions("triggers", WorkflowTrigger.class, List.of()),
+            workflowTrigger -> Objects.equals(triggerName, workflowTrigger.name));
     }
 
     @Override

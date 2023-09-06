@@ -17,23 +17,16 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.component.webhook.util.WebhookUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
-import java.util.Objects;
 
 import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
 import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
-import static com.bytechef.component.webhook.constant.WebhookConstants.X_CRSF_TOKEN;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.any;
@@ -56,33 +49,15 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
             string(CSRF_TOKEN)
                 .label("CSRF Token")
                 .description(
-                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client."),
+                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.")
+                .required(true),
             integer("timeout")
                 .label("Timeout (ms)")
                 .description(
                     "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
         .outputSchema(getOutputSchemaFunction())
-        .staticWebhookRequest(WebhookAwaitWorkflowAndRespondTrigger::staticWebhookRequest)
-        .webhookValidate(WebhookAwaitWorkflowAndRespondTrigger::webhookValidate);
-
-    protected static TriggerDefinition.WebhookOutput staticWebhookRequest(StaticWebhookRequestContext context) {
-        TriggerDefinition.WebhookBody webhookBody = context.body();
-
-        return TriggerDefinition.WebhookOutput.map(
-            Map.of(
-                BODY, webhookBody.content(),
-                METHOD, context.method(),
-                HEADERS, context.headers(),
-                PARAMETERS, context.parameters()));
-    }
-
-    protected static boolean webhookValidate(WebhookValidateContext context) {
-        return Objects.equals(
-            context.headers()
-                .firstValue(X_CRSF_TOKEN)
-                .orElseThrow(),
-            MapUtils.getString(context.inputParameters(), CSRF_TOKEN));
-    }
+        .staticWebhookRequest(WebhookUtils.getStaticWebhookRequestFunction())
+        .webhookValidate(WebhookUtils.getWebhookValidateFunction());
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO

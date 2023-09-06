@@ -75,7 +75,10 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
     @Override
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
-        return projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId);
+        Assert.notNull(workflowId, "'workflowId' must not be null");
+
+        return projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId)
+            .orElseThrow();
     }
 
     @Override
@@ -85,6 +88,8 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
     @Override
     public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds) {
+        Assert.notNull(projectInstanceIds, "'projectInstanceIds' must not be null");
+
         return projectInstanceWorkflowRepository.findAllByProjectInstanceIdIn(projectInstanceIds);
     }
 

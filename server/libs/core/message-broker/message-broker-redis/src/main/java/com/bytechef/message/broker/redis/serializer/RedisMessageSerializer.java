@@ -48,18 +48,4 @@ public class RedisMessageSerializer {
         }
     }
 
-    public Object deserialize(String string) throws SerializationException {
-        Assert.notNull(string, "'string' must not be null");
-
-        try {
-            RedisMessage redisMessage = objectMapper.readValue(string, RedisMessage.class);
-
-            return objectMapper.readValue(redisMessage.payload(), Class.forName(redisMessage.type()));
-        } catch (Exception e) {
-            throw new SerializationException(e.getMessage());
-        }
-    }
-
-    record RedisMessage(String payload, String type) {
-    }
 }

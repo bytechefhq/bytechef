@@ -20,6 +20,8 @@
 package com.bytechef.atlas.configuration.repository;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,7 +31,7 @@ import java.util.Optional;
  */
 public interface WorkflowRepository {
 
-    Iterable<Workflow> findAll();
+    List<Workflow> findAll();
 
     Optional<Workflow> findById(String id);
 

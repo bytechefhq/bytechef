@@ -22,6 +22,7 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -33,5 +34,5 @@ public interface ProjectInstanceWorkflowRepository extends ListCrudRepository<Pr
 
     List<ProjectInstanceWorkflow> findAllByProjectInstanceIdIn(List<Long> projectInstanceIds);
 
-    ProjectInstanceWorkflow findByProjectInstanceIdAndWorkflowId(long projectInstanceId, String workflowId);
+    Optional<ProjectInstanceWorkflow> findByProjectInstanceIdAndWorkflowId(long projectInstanceId, String workflowId);
 }
