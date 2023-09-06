@@ -34,10 +34,8 @@ public class ErrorHandlerConfiguration {
 
     @Bean
     @Primary
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    ErrorHandler<? super Errorable> errorHandler(List<? extends ErrorHandler<?>> errorHandlers) {
-        return new ErrorHandlerChain((List) errorHandlers);
+    @SuppressWarnings("unchecked")
+    ErrorHandler<?> errorHandler(List<? extends ErrorHandler<?>> errorHandlers) {
+        return new ErrorHandlerChain((List<? extends ErrorHandler<? super Errorable>>) errorHandlers);
     }
 }

@@ -19,16 +19,15 @@ package com.bytechef.hermes.webhook.executor;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.coordinator.TriggerCoordinator;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
+import com.bytechef.hermes.execution.message.broker.WebhookParameters;
 import com.bytechef.message.broker.MessageBroker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -43,18 +42,16 @@ import java.util.Map;
 public class WebhookExecutorImpl implements WebhookExecutor {
 
     private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
-    private final JobFacade jobFacade;
     private final JobSyncExecutor jobSyncExecutor;
     private final MessageBroker messageBroker;
     private final TriggerSyncExecutor triggerSyncExecutor;
 
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobFacade jobFacade,
+        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
         JobSyncExecutor jobSyncExecutor, MessageBroker messageBroker, TriggerSyncExecutor triggerSyncExecutor) {
 
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
-        this.jobFacade = jobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
         this.messageBroker = messageBroker;
         this.triggerSyncExecutor = triggerSyncExecutor;
@@ -94,18 +91,15 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     @Override
     public void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        messageBroker.send(
-            TriggerMessageRoute.WEBHOOKS,
-            new TriggerCoordinator.WebhookParameters(workflowExecutionId, webhookRequest));
+        messageBroker.send(TriggerMessageRoute.WEBHOOKS, new WebhookParameters(workflowExecutionId, webhookRequest));
     }
 
     @Override
-    public boolean validateAndExecute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         boolean valid = triggerSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (valid) {
-            jobFacade.createJob(
-                new JobParameters(workflowExecutionId.getWorkflowId(), getInputs(workflowExecutionId)));
+            executeAsync(workflowExecutionId, webhookRequest);
         }
 
         return valid;
@@ -118,7 +112,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         return new JobParameters(
             workflowExecutionId.getWorkflowId(),
             MapUtils.concat(
-                (Map<String, Object>) inputs, Map.of(workflowExecutionId.getWorkflowTriggerName(), outputItem)));
+                (Map<String, Object>) inputs, Map.of(workflowExecutionId.getTriggerName(), outputItem)));
     }
 
     private Map<String, ?> getInputs(WorkflowExecutionId workflowExecutionId) {

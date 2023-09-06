@@ -42,9 +42,9 @@ public class TriggerStateServiceImpl implements TriggerStateService {
 
     @Override
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
+    @Transactional
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
-        return triggerStateRepository.findByWorkflowExecutionId(workflowExecutionId.getWorkflowId())
+        return triggerStateRepository.findByWorkflowExecutionId(workflowExecutionId.toString())
             .map(triggerLifecycle -> (T) triggerLifecycle.getValue());
     }
 

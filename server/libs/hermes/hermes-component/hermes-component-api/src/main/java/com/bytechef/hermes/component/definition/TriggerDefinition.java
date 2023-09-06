@@ -480,7 +480,7 @@ public interface TriggerDefinition {
          *
          * @return
          */
-        Map<String, List<String>> map();
+        Map<String, List<String>> getParameters();
     }
 
     /**
@@ -513,7 +513,7 @@ public interface TriggerDefinition {
          *
          * @return
          */
-        Map<String, List<String>> map();
+        Map<String, List<String>> getParameters();
     }
 
     /**

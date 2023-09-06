@@ -17,8 +17,10 @@
 
 package com.bytechef.atlas.configuration.workflow.mapper;
 
+import com.bytechef.atlas.configuration.WorkflowReservedWordContributor;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +33,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
@@ -40,6 +46,25 @@ import org.springframework.util.FileCopyUtils;
  * @author Matija Petanjek
  */
 abstract class AbstractWorkflowMapper implements WorkflowMapper {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractWorkflowMapper.class);
+
+    static List<String> additionalWorkflowReservedWords = new ArrayList<>();
+
+    static {
+        try {
+            ServiceLoader<WorkflowReservedWordContributor> serviceLoader = ServiceLoader.load(
+                WorkflowReservedWordContributor.class);
+
+            for (WorkflowReservedWordContributor workflowReservedWordContributor : serviceLoader) {
+                additionalWorkflowReservedWords.addAll(workflowReservedWordContributor.getReservedWord());
+            }
+        } catch (ServiceConfigurationError e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage(), e);
+            }
+        }
+    }
 
     protected Workflow readWorkflow(WorkflowResource workflowResource, ObjectMapper objectMapper) {
         try {
@@ -124,7 +149,10 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             Object v = entry.getValue();
 
             Assert.isTrue(
-                WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS.contains(k),
+                CollectionUtils.concat(
+                    WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS,
+                    additionalWorkflowReservedWords)
+                    .contains(k),
                 "unknown workflow definition property: " + k);
 
             if (v instanceof List) {

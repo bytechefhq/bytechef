@@ -17,14 +17,10 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.component.webhook.util.WebhookUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
-
-import java.util.Map;
 
 import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
@@ -45,20 +41,8 @@ public class WebhookAutoRespondWithHTTP200Trigger {
         .description(
             "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.")
         .type(TriggerType.STATIC_WEBHOOK)
-        .outputSchema(
-            getOutputSchemaFunction())
-        .staticWebhookRequest(WebhookAutoRespondWithHTTP200Trigger::staticWebhookRequest);
-
-    protected static WebhookOutput staticWebhookRequest(StaticWebhookRequestContext context) {
-        WebhookBody webhookBody = context.body();
-
-        return WebhookOutput.map(
-            Map.of(
-                BODY, webhookBody.content(),
-                METHOD, context.method(),
-                HEADERS, context.headers(),
-                PARAMETERS, context.parameters()));
-    }
+        .outputSchema(getOutputSchemaFunction())
+        .staticWebhookRequest(WebhookUtils.getStaticWebhookRequestFunction());
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO

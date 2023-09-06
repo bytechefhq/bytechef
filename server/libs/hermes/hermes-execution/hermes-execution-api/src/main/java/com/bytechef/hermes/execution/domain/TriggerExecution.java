@@ -362,7 +362,11 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     }
 
     private void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
+        if (metadata == null) {
+            this.metadata = new HashMap<>();
+        } else {
+            this.metadata = new HashMap<>(metadata);
+        }
     }
 
     public void setOutput(Object output) {
@@ -401,7 +405,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     @Override
     public String toString() {
-        return "TaskExecution{" + "id="
+        return "TriggerExecution{" + "id="
             + id + ", jobId="
             + status + ", startDate="
             + startDate + ", endDate="

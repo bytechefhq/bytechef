@@ -20,6 +20,7 @@ package com.bytechef.message.broker.redis.config;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.redis.RedisMessageBroker;
+import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oblac.jrsmq.RedisSMQ;
@@ -46,6 +47,11 @@ public class RedisMessageBrokerConfiguration {
         RedisMessageSerializer redisMessageSerializer, RedisSMQ redisSMQ, StringRedisTemplate stringRedisTemplate) {
 
         return new RedisMessageBroker(redisMessageSerializer, redisSMQ, stringRedisTemplate);
+    }
+
+    @Bean
+    RedisMessageDeserializer redisMessageDeserializer(ObjectMapper objectMapper) {
+        return new RedisMessageDeserializer(objectMapper);
     }
 
     @Bean

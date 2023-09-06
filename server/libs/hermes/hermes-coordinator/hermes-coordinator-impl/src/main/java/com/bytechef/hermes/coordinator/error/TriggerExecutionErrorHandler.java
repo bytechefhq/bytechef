@@ -50,7 +50,9 @@ public class TriggerExecutionErrorHandler implements ErrorHandler<TriggerExecuti
 
         Assert.notNull(error, "'error' must not be null");
 
-        logger.error("Trigger {}: {}\n{}", triggerExecution.getId(), error.getMessage(), error.getStackTrace());
+        logger.error(
+            "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),
+            error.getStackTrace());
 
         // set task status to FAILED and persist
 
@@ -62,6 +64,6 @@ public class TriggerExecutionErrorHandler implements ErrorHandler<TriggerExecuti
 
     @Override
     public Class<?> getType() {
-        return TriggerExecutionErrorHandler.class;
+        return TriggerExecution.class;
     }
 }

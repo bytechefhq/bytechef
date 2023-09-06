@@ -115,13 +115,13 @@ public class TaskCoordinator {
     public void handleJobsStart(Long jobId) {
         Job job = jobService.setStatusToStarted(jobId);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("Starting job id={}", jobId);
+        }
+
         jobExecutor.execute(job);
 
         eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
-        }
     }
 
     /**
@@ -132,11 +132,11 @@ public class TaskCoordinator {
     public void handleJobsResume(Long jobId) {
         Job job = jobService.resumeToStatusStarted(jobId);
 
-        jobExecutor.execute(job);
-
         if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
+            logger.debug("Resuming job id={}", jobId);
         }
+
+        jobExecutor.execute(job);
     }
 
     /**
@@ -146,6 +146,10 @@ public class TaskCoordinator {
      */
     @SuppressFBWarnings("NP")
     public void handleJobsStop(Long jobId) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Stopping job id={}", jobId);
+        }
+
         Job job = jobService.setStatusToStopped(jobId);
 
         eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
@@ -164,10 +168,6 @@ public class TaskCoordinator {
                 new CancelControlTask(
                     Objects.requireNonNull(currentTaskExecution.getJobId()),
                     Objects.requireNonNull(currentTaskExecution.getId())));
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
         }
     }
 }

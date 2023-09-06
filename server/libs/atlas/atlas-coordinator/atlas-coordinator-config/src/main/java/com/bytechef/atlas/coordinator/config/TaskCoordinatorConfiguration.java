@@ -122,8 +122,7 @@ public class TaskCoordinatorConfiguration {
 
     @Bean
     TaskExecutionErrorHandler taskExecutionErrorHandler() {
-        return new TaskExecutionErrorHandler(
-            eventPublisher, jobService, taskDispatcher(), taskExecutionService);
+        return new TaskExecutionErrorHandler(eventPublisher, jobService, taskDispatcher(), taskExecutionService);
     }
 
     @Bean
