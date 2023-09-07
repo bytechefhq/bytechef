@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  */
 public class FileEntry {
 
+    private String context;
     private String name;
     private String url;
 
@@ -39,9 +40,12 @@ public class FileEntry {
     }
 
     @SuppressFBWarnings("NP")
-    public FileEntry(String filename, String url) {
+    public FileEntry(String context, String filename, String url) {
+        Assert.notNull(context, "'context' must not be null");
         Assert.notNull(filename, "'filename' must not be null");
         Assert.notNull(url, "'url' must not be null");
+
+        this.context = context;
 
         Path path = Paths.get(filename);
 
@@ -70,6 +74,10 @@ public class FileEntry {
         return Objects.hash(name, url);
     }
 
+    public String getContext() {
+        return context;
+    }
+
     @JsonIgnore
     public String getExtension() {
         String extension = null;
@@ -95,13 +103,15 @@ public class FileEntry {
     }
 
     public Map<String, String> toMap() {
-        return Map.of("name", getName(), "url", getUrl());
+        return Map.of("context", context, "name", name, "url", url);
     }
 
     @Override
     public String toString() {
-        return "FileEntry{" + "name='"
-            + name + '\'' + ", url='"
-            + url + '\'' + '}';
+        return "FileEntry{" +
+            "context='" + context + '\'' +
+            ", name='" + name + '\'' +
+            ", url='" + url + '\'' +
+            '}';
     }
 }

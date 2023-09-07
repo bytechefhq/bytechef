@@ -28,54 +28,21 @@ public interface Context {
 
     /**
      *
-     */
-    enum DataStorageScope {
-        ACCOUNT(4, "Account"),
-        CURRENT_EXECUTION(1, "Current Execution"),
-        WORKFLOW(2, "Workflow"),
-        INSTANCE(3, "Instance");
-
-        private final int id;
-        private final String label;
-
-        DataStorageScope(int id, String label) {
-            this.id = id;
-            this.label = label;
-        }
-
-        public static DataStorageScope valueOf(int id) {
-            return switch (id) {
-                case 1 -> DataStorageScope.CURRENT_EXECUTION;
-                case 2 -> DataStorageScope.WORKFLOW;
-                case 3 -> DataStorageScope.INSTANCE;
-                case 4 -> DataStorageScope.ACCOUNT;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
-            };
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-    }
-
-    /**
-     *
      * @return
      */
     Optional<Connection> fetchConnection();
 
     /**
-     * @param <T>
-     * @param key
+     *
+     *
+     * @param context
      * @param scope
      * @param scopeId
+     * @param key
      * @return
+     * @param <T>
      */
-    <T> Optional<T> fetchValue(String key, DataStorageScope scope, long scopeId);
+    <T> Optional<T> fetchData(String context, int scope, long scopeId, String key);
 
     /**
      *
@@ -98,12 +65,12 @@ public interface Context {
     String readFileToString(FileEntry fileEntry);
 
     /**
-     * @param key
-     * @param value
      * @param scope
      * @param scopeId
+     * @param key
+     * @param data
      */
-    void saveValue(String key, Object value, DataStorageScope scope, long scopeId);
+    void saveData(String context, int scope, long scopeId, String key, Object data);
 
     /**
      *

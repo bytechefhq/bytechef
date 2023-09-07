@@ -17,7 +17,7 @@
 
 package com.bytechef.data.storage.converter;
 
-import com.bytechef.data.storage.domain.DataStorage.DataStorageValue;
+import com.bytechef.data.storage.domain.DataEntry.DataWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,27 +28,27 @@ import org.springframework.data.convert.ReadingConverter;
  * @author Ivica Cardic
  */
 @ReadingConverter
-public class StringToDataStorageValueConverter implements Converter<String, DataStorageValue> {
+public class StringToDataWrapperConverter implements Converter<String, DataWrapper> {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public StringToDataStorageValueConverter(ObjectMapper objectMapper) {
+    public StringToDataWrapperConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public DataStorageValue convert(String source) {
+    public DataWrapper convert(String source) {
         return source == null ? null : read(objectMapper, source);
     }
 
-    private DataStorageValue read(ObjectMapper objectMapper, String json) {
+    private DataWrapper read(ObjectMapper objectMapper, String json) {
         try {
-            DataStorageValue dataStorageValue = objectMapper.readValue(json, DataStorageValue.class);
+            DataWrapper dataWrapper = objectMapper.readValue(json, DataWrapper.class);
 
-            return new DataStorageValue(
-                objectMapper.convertValue(dataStorageValue.value(), Class.forName(dataStorageValue.classname())),
-                dataStorageValue.classname());
+            return new DataWrapper(
+                objectMapper.convertValue(dataWrapper.data(), Class.forName(dataWrapper.classname())),
+                dataWrapper.classname());
         } catch (JsonProcessingException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

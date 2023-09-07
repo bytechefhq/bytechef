@@ -21,8 +21,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -46,9 +44,6 @@ public class XmlFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
@@ -62,8 +57,7 @@ public class XmlFileComponentHandlerIntTest {
             ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                fileStorageService.storeFileContent(
-                    "data",
+                workflowFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
@@ -109,9 +103,7 @@ public class XmlFileComponentHandlerIntTest {
             .isEqualTo("file.xml");
 
         Assertions.assertThat(
-            fileStorageService.readFileToString(
-                "data",
-                new FileEntry((String) fileEntryMap.get("name"), (String) fileEntryMap.get("url"))))
+            workflowFileStorage.readFileToString((String) fileEntryMap.get("name"), (String) fileEntryMap.get("url")))
             .isEqualTo(
                 """
                     <root><Flower><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name><id>45</id><petals>9</petals></Flower></root>

@@ -15,14 +15,31 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.configuration;
+package com.bytechef.hermes.data.storage.db.service;
 
-import java.util.List;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowReservedWordContributor {
+public class DataEntryServiceTest {
 
-    List<String> getReservedWord();
+    @Disabled
+    @Test
+    public void testFetchValue() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testGetDataStorage() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testSave() {
+        // TODO
+    }
 }

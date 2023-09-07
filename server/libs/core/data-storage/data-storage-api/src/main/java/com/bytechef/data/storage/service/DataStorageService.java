@@ -17,8 +17,6 @@
 
 package com.bytechef.data.storage.service;
 
-import com.bytechef.hermes.component.definition.Context.DataStorageScope;
-
 import java.util.Optional;
 
 /**
@@ -26,7 +24,7 @@ import java.util.Optional;
  */
 public interface DataStorageService {
 
-    <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key);
+    <T> Optional<T> fetchData(String context, int scope, long scopeId, String key);
 
-    void save(DataStorageScope scope, long scopeId, String key, Object value);
+    void save(String context, int scope, long scopeId, String key, Object data);
 }

@@ -17,7 +17,6 @@
 
 package com.bytechef.data.storage.domain;
 
-import com.bytechef.hermes.component.definition.Context;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -34,8 +33,11 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@Table("data_storage")
-public class DataStorage implements Persistable<Long> {
+@Table("data_entry")
+public class DataEntry implements Persistable<Long> {
+
+    @Column("context")
+    private String context;
 
     @CreatedBy
     @Column("created_by")
@@ -44,6 +46,9 @@ public class DataStorage implements Persistable<Long> {
     @Column("created_date")
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @Column
+    private DataWrapper data;
 
     @Id
     private Long id;
@@ -65,20 +70,21 @@ public class DataStorage implements Persistable<Long> {
     @Column("scope_id")
     private Long scopeId;
 
-    @Column
-    private DataStorageValue value;
-
     @Version
     private int version;
 
-    public DataStorage() {
+    public DataEntry() {
     }
 
-    public DataStorage(String key, int scope, long scopeId, Object value) {
+    public DataEntry(String key, int scope, long scopeId, Object data) {
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
-        this.value = new DataStorageValue(value, value.getClass());
+        this.data = new DataWrapper(data, data.getClass());
+    }
+
+    public String getContext() {
+        return context;
     }
 
     public String getCreatedBy() {
@@ -87,6 +93,14 @@ public class DataStorage implements Persistable<Long> {
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
+    }
+
+    public Object getData() {
+        if (data == null) {
+            return null;
+        }
+
+        return data.data;
     }
 
     @Override
@@ -106,20 +120,12 @@ public class DataStorage implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public Context.DataStorageScope getScope() {
-        return Context.DataStorageScope.valueOf(scope);
+    public int getScope() {
+        return scope;
     }
 
     public Long getScopeId() {
         return scopeId;
-    }
-
-    public Object getValue() {
-        if (value == null) {
-            return null;
-        }
-
-        return value.value;
     }
 
     public int getVersion() {
@@ -136,9 +142,9 @@ public class DataStorage implements Persistable<Long> {
             return false;
         }
 
-        DataStorage dataStorage = (DataStorage) o;
+        DataEntry dataEntry = (DataEntry) o;
 
-        return Objects.equals(id, dataStorage.id);
+        return Objects.equals(id, dataEntry.id);
     }
 
     @Override
@@ -151,6 +157,14 @@ public class DataStorage implements Persistable<Long> {
         return id == null;
     }
 
+    public void setContext(String context) {
+        this.context = context;
+    }
+
+    public void setData(Object value) {
+        this.data = new DataWrapper(value, value.getClass());
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -159,16 +173,12 @@ public class DataStorage implements Persistable<Long> {
         this.key = key;
     }
 
+    public void setScope(int scope) {
+        this.scope = scope;
+    }
+
     public void setScopeId(Long scopeId) {
         this.scopeId = scopeId;
-    }
-
-    public void setScope(Context.DataStorageScope scope) {
-        this.scope = scope.getId();
-    }
-
-    public void setValue(Object value) {
-        this.value = new DataStorageValue(value, value.getClass());
     }
 
     public void setVersion(int version) {
@@ -177,12 +187,13 @@ public class DataStorage implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "DataStorage{" +
+        return "DataEntry{" +
             "id=" + id +
+            ", context='" + context + '\'' +
             ", scope='" + scope + '\'' +
             ", scopeId='" + scopeId + '\'' +
             ", key='" + key + '\'' +
-            ", value='" + value + '\'' +
+            ", data='" + data + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
@@ -191,9 +202,9 @@ public class DataStorage implements Persistable<Long> {
             '}';
     }
 
-    public record DataStorageValue(Object value, String classname) {
-        public DataStorageValue(Object value, Class<?> classValue) {
-            this(value, classValue.getName());
+    public record DataWrapper(Object data, String classname) {
+        public DataWrapper(Object data, Class<?> dataClass) {
+            this(data, dataClass.getName());
         }
     }
 }

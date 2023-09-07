@@ -17,7 +17,7 @@
 
 package com.bytechef.data.storage.remote.web.rest.service;
 
-import com.bytechef.hermes.component.definition.Context.DataStorageScope;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -45,29 +45,29 @@ public class DataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-value/{scope}/{scopeId}/{key}",
+        value = "/fetch-value/{context}/{scope}/{scopeId}/{key}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(
-        @PathVariable DataStorageScope scope, @PathVariable long scopeId, @PathVariable String key) {
+        @PathVariable String context, @PathVariable int scope, @PathVariable long scopeId,
+        @PathVariable String key) {
 
         return ResponseEntity.ok(
-            dataStorageService.fetchValue(scope, scopeId, key)
-                .orElse(null));
+            OptionalUtils.orElse(dataStorageService.fetchData(context, scope, scopeId, key), null));
     }
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/save/{scope}/{scopeId}/{key}",
+        value = "/save/{context}/{scope}/{scopeId}/{key}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable DataStorageScope scope, @PathVariable long scopeId, @PathVariable String key,
-        @RequestBody Object value) {
+        @PathVariable String context, @PathVariable int scope, @PathVariable long scopeId,
+        @PathVariable String key, @RequestBody Object data) {
 
-        dataStorageService.save(scope, scopeId, key, value);
+        dataStorageService.save(context, scope, scopeId, key, data);
 
         return ResponseEntity.noContent()
             .build();

@@ -15,31 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.db.service;
+package com.bytechef.hermes.configuration.workflow.contributor;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class DataStorageServiceTest {
+public class WorkflowReservedWordContributorImpl implements WorkflowReservedWordContributor {
 
-    @Disabled
-    @Test
-    public void testFetchValue() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testGetDataStorage() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testSave() {
-        // TODO
+    @Override
+    public List<String> getReservedWords() {
+        return List.of("triggers");
     }
 }

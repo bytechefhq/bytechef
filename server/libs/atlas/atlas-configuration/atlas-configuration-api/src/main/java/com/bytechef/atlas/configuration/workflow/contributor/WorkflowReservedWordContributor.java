@@ -15,19 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration;
-
-import com.bytechef.atlas.configuration.WorkflowReservedWordContributor;
+package com.bytechef.atlas.configuration.workflow.contributor;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowReservedWordContributorImpl implements WorkflowReservedWordContributor {
+public interface WorkflowReservedWordContributor {
 
-    @Override
-    public List<String> getReservedWord() {
-        return List.of("triggers");
-    }
+    List<String> getReservedWords();
 }

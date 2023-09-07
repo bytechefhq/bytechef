@@ -24,9 +24,7 @@ import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -41,9 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class FilesystemComponentHandlerIntTest {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
-
-    @Autowired
-    private FileStorageService fileStorageService;
 
     @Autowired
     private JobTestExecutor jobTestExecutor;
@@ -63,8 +58,8 @@ public class FilesystemComponentHandlerIntTest {
 
         Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
-        FileEntry fileEntry = fileStorageService.storeFileContent(
-            "data", "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
+        FileEntry fileEntry = workflowFileStorage.storeFileContent(
+            "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
         assertThat(outputs.get("readLocalFile"))
             .hasFieldOrPropertyWithValue("extension", "txt")
@@ -74,7 +69,7 @@ public class FilesystemComponentHandlerIntTest {
     }
 
     @Test
-    public void testWrite() throws IOException {
+    public void testWrite() {
         File sampleFile = getFile();
         File tempFile = Files.newTemporaryFile();
 
@@ -83,11 +78,8 @@ public class FilesystemComponentHandlerIntTest {
                 .encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                fileStorageService
-                    .storeFileContent(
-                        "data",
-                        sampleFile.getAbsolutePath(),
-                        Files.contentOf(getFile(), StandardCharsets.UTF_8))
+                workflowFileStorage
+                    .storeFileContent(sampleFile.getAbsolutePath(), Files.contentOf(getFile(), StandardCharsets.UTF_8))
                     .toMap(),
                 "filename",
                 tempFile.getAbsolutePath()));
