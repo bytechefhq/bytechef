@@ -17,8 +17,7 @@
 
 package com.bytechef.data.storage.db.service;
 
-import com.bytechef.data.storage.domain.DataStorage;
-import com.bytechef.hermes.component.definition.Context.DataStorageScope;
+import com.bytechef.data.storage.domain.DataEntry;
 import com.bytechef.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,21 +41,21 @@ public class DbDataStorageService implements DataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     @Transactional
-    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
-        return dataStorageRepository.findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
-            .map(dataStorage -> (T) dataStorage.getValue());
+    public <T> Optional<T> fetchData(String context, int scope, long scopeId, String key) {
+        return dataStorageRepository.findByContextAndScopeAndScopeIdAndKey(context, scope, scopeId, key)
+            .map(dataEntry -> (T) dataEntry.getData());
     }
 
     @Override
-    public void save(DataStorageScope scope, long scopeId, String key, Object value) {
+    public void save(String context, int scope, long scopeId, String key, Object data) {
         dataStorageRepository
-            .findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
+            .findByContextAndScopeAndScopeIdAndKey(context, scope, scopeId, key)
             .ifPresentOrElse(
-                dataStorage -> {
-                    dataStorage.setValue(value);
+                dataEntry -> {
+                    dataEntry.setData(data);
 
-                    dataStorageRepository.save(dataStorage);
+                    dataStorageRepository.save(dataEntry);
                 },
-                () -> dataStorageRepository.save(new DataStorage(key, scope.getId(), scopeId, value)));
+                () -> dataStorageRepository.save(new DataEntry(key, scope, scopeId, data)));
     }
 }

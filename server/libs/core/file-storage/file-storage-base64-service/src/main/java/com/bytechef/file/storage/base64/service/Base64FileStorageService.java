@@ -58,19 +58,21 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String context, String fileName, byte[] data) throws FileStorageException {
-        return new FileEntry(fileName, "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(data)));
+        return new FileEntry(
+            context, fileName, "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(data)));
     }
 
     @Override
     public FileEntry storeFileContent(String context, String fileName, String data) throws FileStorageException {
-        return new FileEntry(fileName, "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(data)));
+        return new FileEntry(
+            context, fileName, "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(data)));
     }
 
     @Override
     public FileEntry storeFileContent(String context, String fileName, InputStream inputStream) {
         try {
             return new FileEntry(
-                fileName,
+                context, fileName,
                 "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(toByteArray(inputStream))));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);

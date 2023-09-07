@@ -30,10 +30,10 @@ import java.util.Map;
 
 public class WorkflowFileStorageImpl implements WorkflowFileStorage {
 
-    private static final String CONTEXTS = "contexts";
-    public static final String DATA = "data";
-    public static final String JOBS = "jobs";
-    public static final String TASK_EXECUTIONS = "task_executions";
+    private static final String WORKFLOWS_CONTEXTS = "workflows/contexts";
+    private static final String WORKFLOWS_DATA = "workflows/data";
+    private static final String WORKFLOWS_JOBS = "workflows/jobs";
+    private static final String WORKFLOWS_TASK_EXECUTIONS = "workflows/task_executions";
 
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -45,37 +45,37 @@ public class WorkflowFileStorageImpl implements WorkflowFileStorage {
     }
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
-        return fileStorageService.getFileStream(DATA, fileEntry);
+    public InputStream getFileStream(String filename, String url) {
+        return fileStorageService.getFileStream(WORKFLOWS_DATA, new FileEntry(WORKFLOWS_DATA, filename, url));
     }
 
     @Override
     public Map<String, ?> readContextValue(FileEntry fileEntry) {
         return JsonUtils.read(
-            fileStorageService.readFileToString(CONTEXTS, fileEntry), new TypeReference<>() {}, objectMapper);
+            fileStorageService.readFileToString(WORKFLOWS_CONTEXTS, fileEntry), new TypeReference<>() {}, objectMapper);
     }
 
     @Override
-    public String readFileToString(FileEntry fileEntry) {
-        return fileStorageService.readFileToString(DATA, fileEntry);
+    public String readFileToString(String filename, String url) {
+        return fileStorageService.readFileToString(WORKFLOWS_DATA, new FileEntry(WORKFLOWS_DATA, filename, url));
     }
 
     @Override
     public Map<String, ?> readJobOutputs(FileEntry fileEntry) {
         return JsonUtils.read(
-            fileStorageService.readFileToString(JOBS, fileEntry), new TypeReference<>() {}, objectMapper);
+            fileStorageService.readFileToString(WORKFLOWS_JOBS, fileEntry), new TypeReference<>() {}, objectMapper);
     }
 
     @Override
     public Object readTaskExecutionOutput(FileEntry fileEntry) {
         return JsonUtils.read(
-            fileStorageService.readFileToString(TASK_EXECUTIONS, fileEntry), Object.class, objectMapper);
+            fileStorageService.readFileToString(WORKFLOWS_TASK_EXECUTIONS, fileEntry), Object.class, objectMapper);
     }
 
     @Override
     public FileEntry storeContextValue(long stackId, Context.Classname classname, Map<String, ?> value) {
         return fileStorageService.storeFileContent(
-            CONTEXTS, classname + "_" + stackId + ".json", JsonUtils.write(value, objectMapper));
+            WORKFLOWS_CONTEXTS, classname + "_" + stackId + ".json", JsonUtils.write(value, objectMapper));
     }
 
     @Override
@@ -83,28 +83,29 @@ public class WorkflowFileStorageImpl implements WorkflowFileStorage {
         long stackId, int subStackId, Context.Classname classname, Map<String, ?> value) {
 
         return fileStorageService.storeFileContent(
-            CONTEXTS, classname + "_" + stackId + "_" + subStackId + ".json",
+            WORKFLOWS_CONTEXTS, classname + "_" + stackId + "_" + subStackId + ".json",
             JsonUtils.write(value, objectMapper));
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, String data) {
-        return fileStorageService.storeFileContent(DATA, fileName, data);
+        return fileStorageService.storeFileContent(WORKFLOWS_DATA, fileName, data);
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, InputStream inputStream) {
-        return fileStorageService.storeFileContent(DATA, fileName, inputStream);
+        return fileStorageService.storeFileContent(WORKFLOWS_DATA, fileName, inputStream);
     }
 
     @Override
     public FileEntry storeJobOutputs(long jobId, Map<String, ?> outputs) {
-        return fileStorageService.storeFileContent(JOBS, jobId + ".json", JsonUtils.write(outputs, objectMapper));
+        return fileStorageService.storeFileContent(WORKFLOWS_JOBS, jobId + ".json",
+            JsonUtils.write(outputs, objectMapper));
     }
 
     @Override
     public FileEntry storeTaskExecutionOutput(Long taskExecutionId, Object output) {
         return fileStorageService.storeFileContent(
-            TASK_EXECUTIONS, taskExecutionId + ".json", JsonUtils.write(output, objectMapper));
+            WORKFLOWS_TASK_EXECUTIONS, taskExecutionId + ".json", JsonUtils.write(output, objectMapper));
     }
 }

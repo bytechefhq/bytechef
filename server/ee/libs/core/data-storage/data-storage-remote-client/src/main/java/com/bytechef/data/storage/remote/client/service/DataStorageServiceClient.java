@@ -18,7 +18,6 @@
 package com.bytechef.data.storage.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.component.definition.Context.DataStorageScope;
 import com.bytechef.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,7 +39,7 @@ public class DataStorageServiceClient implements DataStorageService {
     }
 
     @Override
-    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
+    public <T> Optional<T> fetchData(String context, int scope, long scopeId, String key) {
         return Optional.ofNullable(
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
@@ -51,12 +50,12 @@ public class DataStorageServiceClient implements DataStorageService {
     }
 
     @Override
-    public void save(DataStorageScope scope, long scopeId, String key, Object value) {
+    public void save(String context, int scope, long scopeId, String key, Object data) {
         loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/internal/data-storage-service/save/{scope}/{scopeId}/{key}")
-                .build(scope, scope, key),
-            value);
+                .path("/internal/data-storage-service/save/{context}/{scope}/{scopeId}/{key}")
+                .build(context, scope, scope, key),
+            data);
     }
 }

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class DataStorageRepositoryTest {
+public class DataEntryRepositoryTest {
 
     @Disabled
     @Test

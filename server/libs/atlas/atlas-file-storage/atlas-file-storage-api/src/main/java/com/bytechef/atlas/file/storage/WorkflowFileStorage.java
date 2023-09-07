@@ -28,11 +28,11 @@ import java.util.Map;
  */
 public interface WorkflowFileStorage {
 
-    InputStream getFileStream(FileEntry fileEntry);
+    InputStream getFileStream(String filename, String url);
 
     Map<String, ?> readContextValue(FileEntry fileEntry);
 
-    String readFileToString(FileEntry fileEntry);
+    String readFileToString(String filename, String url);
 
     Map<String, ?> readJobOutputs(FileEntry fileEntry);
 
