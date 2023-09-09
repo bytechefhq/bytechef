@@ -18,7 +18,10 @@
 package com.bytechef.component.xmlfile;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import java.io.File;
@@ -27,6 +30,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
@@ -44,10 +48,13 @@ public class XmlFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
+    private FileStorageService fileStorageService;
+
+    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Test
     public void testRead() {
@@ -57,14 +64,14 @@ public class XmlFileComponentHandlerIntTest {
             ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                workflowFileStorage.storeFileContent(
-                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                    .toMap()));
+                fileStorageService.storeFileContent(
+                    FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                    Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         Assertions.assertThat(Map.of(
             "Flower",
@@ -74,7 +81,7 @@ public class XmlFileComponentHandlerIntTest {
                 "color", "RED",
                 "petals", "9",
                 "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark"))))))
-            .isEqualTo((Map<?, ?>) outputs.get("readXMLFile"));
+            .isEqualTo(outputs.get("readXMLFile"));
     }
 
     @Test
@@ -95,15 +102,14 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
-        Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeXMLFile");
+        FileEntry fileEntry = MapUtils.get(outputs, "writeXMLFile", FileEntry.class);
 
-        Assertions.assertThat(fileEntryMap.get("name"))
+        Assertions.assertThat(fileEntry.getName())
             .isEqualTo("file.xml");
 
-        Assertions.assertThat(
-            workflowFileStorage.readFileToString((String) fileEntryMap.get("name"), (String) fileEntryMap.get("url")))
+        Assertions.assertThat(fileStorageService.readFileToString(FileEntryConstants.DOCUMENTS_DIR, fileEntry))
             .isEqualTo(
                 """
                     <root><Flower><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name><id>45</id><petals>9</petals></Flower></root>

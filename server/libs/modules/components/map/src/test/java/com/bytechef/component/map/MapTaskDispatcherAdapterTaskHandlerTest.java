@@ -19,11 +19,10 @@
 
 package com.bytechef.component.map;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -38,36 +37,55 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.FINALIZE;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.NAME;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PARAMETERS;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.POST;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PRE;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 
 /**
  * @author Arik Cohen
  */
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
-    private static final WorkflowFileStorage WORKFLOW_FILE_STORAGE_FACADE = new WorkflowFileStorageImpl(
-        new Base64FileStorageService(), new ObjectMapper());
+    private final ObjectMapper objectMapper = new ObjectMapper() {
+        {
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            registerModule(new JavaTimeModule());
+            registerModule(new Jdk8Module());
+        }
+    };
+
+    private final WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
+        new Base64FileStorageService(), objectMapper);
 
     @Test
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-            new ObjectMapper(), resolver);
+            objectMapper, resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(
-                Map.of(
-                    WorkflowConstants.NAME, "name",
-                    WorkflowConstants.TYPE, "type",
-                    WorkflowConstants.PARAMETERS, Map.of(
-                        "list", List.of(1, 2, 3),
-                        "iteratee",
-                        Map.of(
-                            WorkflowConstants.NAME, "name",
-                            "type", "var",
-                            WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))))
+            .workflowTask(
+                WorkflowTask.of(
+                    Map.of(
+                        NAME, "name",
+                        TYPE, "type",
+                        PARAMETERS, Map.of(
+                            "list", List.of(1, 2, 3),
+                            "iteratee",
+                            Map.of(
+                                NAME, "name",
+                                TYPE, "var",
+                                PARAMETERS, Map.of("value", "${item}"))))))
             .build();
 
         taskExecution.setJobId(4567L);
@@ -84,13 +102,13 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new ComponentExecutionException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                new ObjectMapper(), taskHandlerResolver);
+                objectMapper, taskHandlerResolver);
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
                     WorkflowTask.of(
                         Map.of(
-                            WorkflowConstants.PARAMETERS,
+                            PARAMETERS,
                             Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))))
                 .build();
 
@@ -102,7 +120,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
@@ -138,58 +156,51 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         TaskWorker worker = new TaskWorker(
             e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver,
-            WORKFLOW_FILE_STORAGE_FACADE);
+            workflowFileStorageFacade);
 
-        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(
-            new ObjectMapper(), taskHandlerResolver);
+        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
-                        WorkflowConstants.NAME,
-                        "name",
-                        "finalize",
-                        List.of(Map.of(
-                            "name",
-                            "output",
-                            "type",
-                            "map",
-                            WorkflowConstants.PARAMETERS,
+                        NAME, "name",
+                        TYPE, "pass",
+                        PRE, List.of(
+                            Map.of(
+                                NAME, "output",
+                                TYPE, "map",
+                                PARAMETERS,
+                                Map.of(
+                                    "list", Arrays.asList(1, 2, 3),
+                                    "iteratee",
+                                    Map.of(
+                                        NAME, "var",
+                                        TYPE, "var",
+                                        PARAMETERS, Map.of("value", "${item}"))))),
+                        POST, List.of(
+                            Map.of(
+                                NAME, "output",
+                                TYPE, "map",
+                                PARAMETERS,
+                                Map.of(
+                                    "list", Arrays.asList(1, 2, 3),
+                                    "iteratee",
+                                    Map.of(
+                                        NAME, "var",
+                                        TYPE, "var",
+                                        PARAMETERS, Map.of("value", "${item}"))))),
+                        FINALIZE, List.of(Map.of(
+                            NAME, "output",
+                            TYPE, "map",
+                            PARAMETERS,
                             Map.of(
                                 "list", Arrays.asList(1, 2, 3),
                                 "iteratee",
                                 Map.of(
-                                    "name", "var",
-                                    "type", "var",
-                                    WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
-                        "post",
-                        List.of(Map.of(
-                            "name",
-                            "output",
-                            "type",
-                            "map",
-                            WorkflowConstants.PARAMETERS,
-                            Map.of(
-                                "list", Arrays.asList(1, 2, 3),
-                                "iteratee",
-                                Map.of(
-                                    "name", "var",
-                                    "type", "var",
-                                    WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
-                        "pre",
-                        List.of(Map.of(
-                            "name", "output",
-                            "type", "map",
-                            WorkflowConstants.PARAMETERS,
-                            Map.of(
-                                "list", Arrays.asList(1, 2, 3),
-                                "iteratee",
-                                Map.of(
-                                    "name", "var",
-                                    "type", "var",
-                                    WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
-                        "type", "pass")))
+                                    NAME, "var",
+                                    TYPE, "var",
+                                    PARAMETERS, Map.of("value", "${item}"))))))))
             .build();
 
         taskExecution.setId(1234L);

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.data.storage.domain;
+package com.bytechef.data.storage.db.domain;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,6 +26,7 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -47,9 +48,6 @@ public class DataEntry implements Persistable<Long> {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @Column
-    private DataWrapper data;
-
     @Id
     private Long id;
 
@@ -70,17 +68,21 @@ public class DataEntry implements Persistable<Long> {
     @Column("scope_id")
     private Long scopeId;
 
+    @Column
+    private ValueWrapper value;
+
     @Version
     private int version;
 
     public DataEntry() {
     }
 
-    public DataEntry(String key, int scope, long scopeId, Object data) {
+    public DataEntry(String context, int scope, long scopeId, String key, Object value) {
+        this.context = context;
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
-        this.data = new DataWrapper(data, data.getClass());
+        this.value = new ValueWrapper(value, value.getClass());
     }
 
     public String getContext() {
@@ -93,14 +95,6 @@ public class DataEntry implements Persistable<Long> {
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
-    }
-
-    public Object getData() {
-        if (data == null) {
-            return null;
-        }
-
-        return data.data;
     }
 
     @Override
@@ -126,6 +120,14 @@ public class DataEntry implements Persistable<Long> {
 
     public Long getScopeId() {
         return scopeId;
+    }
+
+    public Object getValue() {
+        if (value == null) {
+            return null;
+        }
+
+        return value.value;
     }
 
     public int getVersion() {
@@ -157,32 +159,10 @@ public class DataEntry implements Persistable<Long> {
         return id == null;
     }
 
-    public void setContext(String context) {
-        this.context = context;
-    }
+    public void setValue(Object value) {
+        Assert.notNull(value, "'value' must not be null");
 
-    public void setData(Object value) {
-        this.data = new DataWrapper(value, value.getClass());
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setScope(int scope) {
-        this.scope = scope;
-    }
-
-    public void setScopeId(Long scopeId) {
-        this.scopeId = scopeId;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
+        this.value = new ValueWrapper(value, value.getClass());
     }
 
     @Override
@@ -193,7 +173,7 @@ public class DataEntry implements Persistable<Long> {
             ", scope='" + scope + '\'' +
             ", scopeId='" + scopeId + '\'' +
             ", key='" + key + '\'' +
-            ", data='" + data + '\'' +
+            ", value='" + value + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
@@ -202,9 +182,9 @@ public class DataEntry implements Persistable<Long> {
             '}';
     }
 
-    public record DataWrapper(Object data, String classname) {
-        public DataWrapper(Object data, Class<?> dataClass) {
-            this(data, dataClass.getName());
+    public record ValueWrapper(Object value, String classname) {
+        public ValueWrapper(Object value, Class<?> valueClass) {
+            this(value, valueClass.getName());
         }
     }
 }

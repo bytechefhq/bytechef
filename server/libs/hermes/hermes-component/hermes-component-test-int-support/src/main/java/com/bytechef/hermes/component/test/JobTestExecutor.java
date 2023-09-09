@@ -30,7 +30,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 
 import java.util.Map;
 
@@ -42,19 +42,21 @@ public class JobTestExecutor {
     private final ContextService contextService;
     private final JobService jobService;
     private final EventPublisher eventPublisher;
+    private final ObjectMapper objectMapper;
     private final TaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public JobTestExecutor(
-        ContextService contextService, JobService jobService, EventPublisher eventPublisher,
+        ContextService contextService, JobService jobService, EventPublisher eventPublisher, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
         WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.jobService = jobService;
         this.eventPublisher = eventPublisher;
+        this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
         this.workflowService = workflowService;
@@ -65,16 +67,10 @@ public class JobTestExecutor {
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
-        JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
-            .contextService(contextService)
-            .eventPublisher(eventPublisher)
-            .jobService(jobService)
-            .taskExecutionService(taskExecutionService)
-            .taskHandlerRegistry(MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get)
-            .workflowFileStorageFacade(
-                new WorkflowFileStorageImpl(new Base64FileStorageService(), new ObjectMapper()))
-            .workflowService(workflowService)
-            .build();
+        JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
+            contextService, eventPublisher, jobService, objectMapper, taskExecutionService,
+            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
+            new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }

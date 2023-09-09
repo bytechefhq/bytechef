@@ -65,10 +65,12 @@ public class ProjectWorkflowControllerIntTest {
             ]
         }
         """;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @MockBean
     private ProjectInstanceFacade projectInstanceFacade;
@@ -184,9 +186,9 @@ public class ProjectWorkflowControllerIntTest {
         }
     }
 
-    private static Workflow getWorkflow() throws JsonProcessingException {
+    private Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            DEFINITION, Workflow.Format.JSON, "1", OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}),
+            DEFINITION, Workflow.Format.JSON, "1", objectMapper.readValue(DEFINITION, new TypeReference<>() {}),
             Map.of());
     }
 }

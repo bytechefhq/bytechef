@@ -120,7 +120,8 @@ public class JsonFileWriteAction {
     }
 
     private static String getDefaultFileName(JsonFileTaskConstants.FileType fileType, String defaultFilename) {
-        return defaultFilename == null ? "file." + (fileType == JsonFileTaskConstants.FileType.JSON ? "json" : "jsonl")
+        return defaultFilename == null
+            ? "file." + (fileType == JsonFileTaskConstants.FileType.JSON ? "json" : "jsonl")
             : defaultFilename;
     }
 }

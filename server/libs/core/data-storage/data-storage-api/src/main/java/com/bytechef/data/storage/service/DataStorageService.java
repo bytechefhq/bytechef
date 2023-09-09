@@ -24,7 +24,9 @@ import java.util.Optional;
  */
 public interface DataStorageService {
 
-    <T> Optional<T> fetchData(String context, int scope, long scopeId, String key);
+    <T> Optional<T> fetch(String context, int scope, long scopeId, String key);
 
-    void save(String context, int scope, long scopeId, String key, Object data);
+    <T> T get(String context, int scope, long scopeId, String key);
+
+    void put(String context, int scope, long scopeId, String key, Object value);
 }

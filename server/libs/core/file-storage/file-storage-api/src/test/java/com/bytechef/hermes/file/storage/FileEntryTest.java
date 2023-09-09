@@ -17,15 +17,15 @@
 
 package com.bytechef.hermes.file.storage;
 
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.file.storage.domain.FileEntry;
 import java.util.Collections;
 import java.util.Map;
 
+import com.bytechef.file.storage.domain.FileEntry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,29 +36,29 @@ public class FileEntryTest {
 
     @Test
     public void testOf1() {
-        Assertions.assertThat(new FileEntry("context", "fileName.txt", "/tmp/fileName.txt"))
+        Assertions.assertThat(new FileEntry("fileName.txt", "base64:///tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "fileName.txt")
-            .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
+            .hasFieldOrPropertyWithValue("url", "base64:///tmp/fileName.txt");
     }
 
     @Test
     public void testOf2() {
-        Assertions.assertThat(new FileEntry("context", "name.txt", "/tmp/fileName.txt"))
+        Assertions.assertThat(new FileEntry("name.txt", "base64:///tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "name.txt")
-            .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
+            .hasFieldOrPropertyWithValue("url", "base64:///tmp/fileName.txt");
     }
 
     @Test
     public void testSpelEvaluation() {
         Map<String, Object> map = Evaluator.evaluate(
-            Map.of(WorkflowConstants.TYPE, "type", "result", "${fileEntry.name} ${fileEntry.url}"),
-            Collections.singletonMap("fileEntry", new FileEntry("context", "sample.txt", "/tmp/fileName.txt")));
+            Map.of(TYPE, "type", "result", "${fileEntry.name} ${fileEntry.url}"),
+            Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "base64:///tmp/fileName.txt")));
 
         assertEquals(
-            "sample.txt /tmp/fileName.txt", MapUtils.getString(map, "result"));
+            "sample.txt base64:///tmp/fileName.txt", MapUtils.getString(map, "result"));
     }
 }

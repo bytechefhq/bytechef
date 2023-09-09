@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.loop.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -46,12 +46,12 @@ public class LoopTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Bean
     TaskCompletionHandlerFactory loopTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 
     @Bean("loopBreakTaskDispatcherResolverFactory_v1")
@@ -62,6 +62,6 @@ public class LoopTaskDispatcherConfiguration {
     @Bean("loopTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory loopTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new LoopTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 }

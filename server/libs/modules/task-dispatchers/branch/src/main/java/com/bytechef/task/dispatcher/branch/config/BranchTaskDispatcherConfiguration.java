@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.branch.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -38,28 +38,28 @@ public class BranchTaskDispatcherConfiguration {
     private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
         ContextService contextService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
-        WorkflowFileStorage workflowFileStorage) {
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Bean("branchTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory branchTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 
     @Bean("branchTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory branchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 }

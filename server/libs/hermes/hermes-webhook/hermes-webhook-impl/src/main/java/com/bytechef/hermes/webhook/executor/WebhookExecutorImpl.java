@@ -19,7 +19,7 @@ package com.bytechef.hermes.webhook.executor;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
@@ -46,19 +46,19 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     private final JobSyncExecutor jobSyncExecutor;
     private final MessageBroker messageBroker;
     private final TriggerSyncExecutor triggerSyncExecutor;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
         InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
         JobSyncExecutor jobSyncExecutor, MessageBroker messageBroker, TriggerSyncExecutor triggerSyncExecutor,
-        WorkflowFileStorage workflowFileStorage) {
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
         this.jobSyncExecutor = jobSyncExecutor;
         this.messageBroker = messageBroker;
         this.triggerSyncExecutor = triggerSyncExecutor;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
             for (Object outputItem : collectionOutput) {
                 Job job = jobSyncExecutor.execute(createJobParameters(workflowExecutionId, inputs, outputItem));
 
-                outputsList.add(workflowFileStorage.readJobOutputs(job.getOutputs()));
+                outputsList.add(workflowFileStorageFacade.readJobOutputs(job.getOutputs()));
             }
 
             return outputsList;

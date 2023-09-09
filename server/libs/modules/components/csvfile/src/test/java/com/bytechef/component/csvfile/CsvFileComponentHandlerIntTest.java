@@ -17,12 +17,14 @@
 
 package com.bytechef.component.csvfile;
 
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import java.io.File;
@@ -30,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,10 +49,13 @@ public class CsvFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
+    private FileStorageService fileStorageService;
+
+    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Test
     public void testRead() throws JSONException {
@@ -57,14 +64,14 @@ public class CsvFileComponentHandlerIntTest {
         Job job = jobTestExecutor.execute(
             ENCODER.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                "fileEntry",
-                workflowFileStorage
-                    .storeFileContent(sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                    .toMap()));
+                FILE_ENTRY,
+                fileStorageService.storeFileContent(
+                    FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                    Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -75,15 +82,14 @@ public class CsvFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws JSONException {
         Job job = jobTestExecutor.execute(
-            ENCODER
-                .encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         assertThat(((Map) outputs.get("writeCsvFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.csv");
@@ -91,15 +97,14 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         job = jobTestExecutor.execute(
-            ENCODER
-                .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                "fileEntry",
-                workflowFileStorage
-                    .storeFileContent(sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                    .toMap()));
+                FILE_ENTRY,
+                fileStorageService.storeFileContent(
+                    FileEntryConstants.DOCUMENTS_DIR, sampleFile.getName(),
+                    Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
-        outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),

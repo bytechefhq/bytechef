@@ -82,7 +82,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Job getJob(@NonNull long id) {
+    public Job getJob(long id) {
         return OptionalUtils.get(jobRepository.findById(id));
     }
 

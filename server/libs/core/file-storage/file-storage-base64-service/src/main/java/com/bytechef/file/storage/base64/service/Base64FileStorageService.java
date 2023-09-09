@@ -17,7 +17,6 @@
 
 package com.bytechef.file.storage.base64.service;
 
-import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
@@ -37,43 +36,46 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public boolean fileExists(String context, FileEntry fileEntry) throws FileStorageException {
+    public boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException {
         return true;
     }
 
     @Override
-    public InputStream getFileStream(String context, FileEntry fileEntry) {
+    public InputStream getFileStream(String directory, FileEntry fileEntry) {
         String url = fileEntry.getUrl();
 
-        return new ByteArrayInputStream(
-            CompressionUtils.decompress(EncodingUtils.decodeBase64(url.replace("base64:", ""))));
+        return new ByteArrayInputStream(EncodingUtils.decodeBase64(url.replace("base64://", "")));
     }
 
     @Override
-    public String readFileToString(String context, FileEntry fileEntry) throws FileStorageException {
+    public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
         String url = fileEntry.getUrl();
 
-        return CompressionUtils.decompressToString(EncodingUtils.decodeBase64(url.replace("base64:", "")));
+        return EncodingUtils.decodeBase64(url.replace("base64://", ""));
     }
 
     @Override
-    public FileEntry storeFileContent(String context, String fileName, byte[] data) throws FileStorageException {
+    public String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException {
+        String url = fileEntry.getUrl();
+
+        return EncodingUtils.decodeBase64ToString(url.replace("base64://", ""));
+    }
+
+    @Override
+    public FileEntry storeFileContent(String directory, String fileName, byte[] data) throws FileStorageException {
         return new FileEntry(
-            context, fileName, "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(data)));
+            fileName, "base64://" + EncodingUtils.encodeBase64ToString(data));
     }
 
     @Override
-    public FileEntry storeFileContent(String context, String fileName, String data) throws FileStorageException {
-        return new FileEntry(
-            context, fileName, "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(data)));
+    public FileEntry storeFileContent(String directory, String fileName, String data) throws FileStorageException {
+        return new FileEntry(fileName, "base64://" + EncodingUtils.encodeBase64ToString(data));
     }
 
     @Override
-    public FileEntry storeFileContent(String context, String fileName, InputStream inputStream) {
+    public FileEntry storeFileContent(String directory, String fileName, InputStream inputStream) {
         try {
-            return new FileEntry(
-                context, fileName,
-                "base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(toByteArray(inputStream))));
+            return new FileEntry(fileName, "base64://" + EncodingUtils.encodeBase64ToString(toByteArray(inputStream)));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);
         }

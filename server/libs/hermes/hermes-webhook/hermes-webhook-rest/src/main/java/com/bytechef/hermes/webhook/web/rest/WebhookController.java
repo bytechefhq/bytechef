@@ -19,9 +19,9 @@ package com.bytechef.hermes.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.registry.ComponentOperation;
@@ -32,6 +32,7 @@ import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -65,7 +66,7 @@ import java.util.Map;
 @ConditionalOnEnabled("coordinator")
 public class WebhookController {
 
-    private final WorkflowFileStorage workflowFileStorage;
+    private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
@@ -73,11 +74,11 @@ public class WebhookController {
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        WorkflowFileStorage workflowFileStorage, ObjectMapper objectMapper,
+        FileStorageService fileStorageService, ObjectMapper objectMapper,
         TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
         WorkflowService workflowService) {
 
-        this.workflowFileStorage = workflowFileStorage;
+        this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
@@ -113,7 +114,8 @@ public class WebhookController {
                     if (isBinaryPart(part)) {
                         multipartFormDataMap.put(
                             part.getName(),
-                            workflowFileStorage.storeFileContent(part.getName(), part.getInputStream()));
+                            fileStorageService.storeFileContent(
+                                FileEntryConstants.DOCUMENTS_DIR, part.getName(), part.getInputStream()));
                     } else {
                         multipartFormDataMap.put(
                             part.getName(),
@@ -162,8 +164,8 @@ public class WebhookController {
                 body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
             } else if (mediaType.startsWith("application/")) {
                 body = new WebhookBodyImpl(
-                    workflowFileStorage.storeFileContent(
-                        getFilename(httpServletRequest.getContentType()),
+                    fileStorageService.storeFileContent(
+                        FileEntryConstants.DOCUMENTS_DIR, getFilename(httpServletRequest.getContentType()),
                         httpServletRequest.getInputStream()),
                     ContentType.BINARY, httpServletRequest.getContentType());
             } else {
