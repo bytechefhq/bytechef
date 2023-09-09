@@ -54,7 +54,7 @@ public class DataStorageServiceController {
         @PathVariable String key) {
 
         return ResponseEntity.ok(
-            OptionalUtils.orElse(dataStorageService.fetchData(context, scope, scopeId, key), null));
+            OptionalUtils.orElse(dataStorageService.fetch(context, scope, scopeId, key), null));
     }
 
     @RequestMapping(
@@ -67,7 +67,7 @@ public class DataStorageServiceController {
         @PathVariable String context, @PathVariable int scope, @PathVariable long scopeId,
         @PathVariable String key, @RequestBody Object data) {
 
-        dataStorageService.save(context, scope, scopeId, key, data);
+        dataStorageService.put(context, scope, scopeId, key, data);
 
         return ResponseEntity.noContent()
             .build();

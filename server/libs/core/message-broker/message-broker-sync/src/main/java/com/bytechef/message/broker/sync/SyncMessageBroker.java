@@ -19,14 +19,17 @@
 
 package com.bytechef.message.broker.sync;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.MessageRoute;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.util.Assert;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.message.broker.MessageRoute;
-import org.springframework.util.Assert;
 
 /**
  * a simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for testing.
@@ -36,7 +39,13 @@ import org.springframework.util.Assert;
  */
 public class SyncMessageBroker implements MessageBroker {
 
+    private final ObjectMapper objectMapper;
     private final Map<MessageRoute, List<Receiver>> receiverMap = new HashMap<>();
+
+    @SuppressFBWarnings("EI")
+    public SyncMessageBroker(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
@@ -44,10 +53,12 @@ public class SyncMessageBroker implements MessageBroker {
 
         List<Receiver> receivers = receiverMap.get(messageRoute);
 
-        Assert.isTrue(receivers != null && receivers.size() > 0, "no listeners subscribed for: " + messageRoute);
+        Assert.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
 
         for (Receiver receiver : receivers) {
-            receiver.receive(message);
+            receiver.receive(
+                objectMapper.convertValue(
+                    JsonUtils.read(JsonUtils.write(message, objectMapper), objectMapper), message.getClass()));
         }
     }
 

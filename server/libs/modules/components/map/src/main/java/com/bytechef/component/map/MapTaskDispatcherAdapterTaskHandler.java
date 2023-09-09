@@ -21,9 +21,9 @@ package com.bytechef.component.map;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -70,14 +70,14 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
-        WorkflowFileStorage workflowFileStorage = new WorkflowFileStorageImpl(
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
             new Base64FileStorageService(), objectMapper);
 
         messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, message -> {
             TaskExecution completionTaskExecution = (TaskExecution) message;
 
-            result.add(workflowFileStorage.readTaskExecutionOutput(completionTaskExecution.getOutput()));
+            result.add(workflowFileStorageFacade.readTaskExecutionOutput(completionTaskExecution.getOutput()));
         });
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
@@ -91,7 +91,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         });
 
         TaskWorker worker = new TaskWorker(
-            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver, workflowFileStorage);
+            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver, workflowFileStorageFacade);
 
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 
@@ -101,11 +101,11 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         contextService.push(
             Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION,
-            workflowFileStorage.storeTaskExecutionOutput(taskExecution.getId(), Collections.emptyMap()));
+            workflowFileStorageFacade.storeTaskExecutionOutput(taskExecution.getId(), Collections.emptyMap()));
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
             contextService, new CounterServiceImpl(new InMemoryCounterRepository()), messageBroker, worker::handle,
-            taskExecutionService, workflowFileStorage);
+            taskExecutionService, workflowFileStorageFacade);
 
         mapTaskDispatcher.dispatch(taskExecution);
 

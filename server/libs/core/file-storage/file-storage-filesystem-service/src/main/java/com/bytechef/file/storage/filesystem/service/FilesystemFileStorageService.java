@@ -20,6 +20,7 @@ package com.bytechef.file.storage.filesystem.service;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -49,7 +50,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory(context);
         String url = fileEntry.getUrl();
 
-        boolean deleted = path.resolve(url.replace("file:", ""))
+        boolean deleted = path.resolve(url.replace("file://", ""))
             .toFile()
             .delete();
 
@@ -59,70 +60,84 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public boolean fileExists(String context, FileEntry fileEntry) throws FileStorageException {
-        Path path = resolveDirectory(context);
+    public boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException {
+        Path path = resolveDirectory(directory);
         String url = fileEntry.getUrl();
 
-        return path.resolve(url.replace("file:", ""))
+        return path.resolve(url.replace("file://", ""))
             .toFile()
             .exists();
     }
 
     @Override
-    public InputStream getFileStream(String context, FileEntry fileEntry) {
-        Path path = resolveDirectory(context);
+    public InputStream getFileStream(String directory, FileEntry fileEntry) {
+        Path path = resolveDirectory(directory);
         String url = fileEntry.getUrl();
 
         try {
-            return Files.newInputStream(path.resolve(url.replace("file:", "")), StandardOpenOption.READ);
+            return Files.newInputStream(path.resolve(url.replace("file://", "")), StandardOpenOption.READ);
         } catch (IOException ioe) {
-            throw new FileStorageException("Failed to open file " + fileEntry, ioe);
+            throw new FileStorageException("Failed to open file " + url, ioe);
         }
     }
 
     @Override
-    public String readFileToString(String context, FileEntry fileEntry) throws FileStorageException {
-        Path path = resolveDirectory(context);
+    public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
+        Path path = resolveDirectory(directory);
         String url = fileEntry.getUrl();
 
         try {
-            return Files.readString(path.resolve(url.replace("file:", "")));
+            return Files.readAllBytes(path.resolve(url.replace("file://", "")));
         } catch (IOException ioe) {
-            throw new FileStorageException("Failed to open file " + fileEntry, ioe);
+            throw new FileStorageException("Failed to open file " + url, ioe);
         }
     }
 
     @Override
-    public FileEntry storeFileContent(String context, String fileName, byte[] data) throws FileStorageException {
-        Objects.requireNonNull(context, "context is required");
-        Objects.requireNonNull(fileName, "fileName is required");
-        Objects.requireNonNull(data, "data is required");
+    public String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException {
+        Path path = resolveDirectory(directory);
+        String url = fileEntry.getUrl();
 
-        return storeFileContent(context, fileName, new ByteArrayInputStream(data));
+        try {
+            return Files.readString(path.resolve(url.replace("file://", "")));
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to open file " + url, ioe);
+        }
     }
 
     @Override
-    public FileEntry storeFileContent(String context, String fileName, String data) throws FileStorageException {
-        Objects.requireNonNull(context, "context is required");
+    public FileEntry storeFileContent(String directory, String fileName, byte[] data) throws FileStorageException {
+        Objects.requireNonNull(directory, "context is required");
         Objects.requireNonNull(fileName, "fileName is required");
         Objects.requireNonNull(data, "data is required");
 
-        return storeFileContent(context, fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+        return storeFileContent(directory, fileName, new ByteArrayInputStream(data));
     }
 
     @Override
-    public FileEntry storeFileContent(String context, String fileName, InputStream inputStream)
+    public FileEntry storeFileContent(String directory, String fileName, String data) throws FileStorageException {
+        Objects.requireNonNull(directory, "context is required");
+        Objects.requireNonNull(fileName, "fileName is required");
+        Objects.requireNonNull(data, "data is required");
+
+        return storeFileContent(directory, fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    @Override
+    public FileEntry storeFileContent(String directory, String fileName, InputStream inputStream)
         throws FileStorageException {
 
-        Objects.requireNonNull(context, "context is required");
+        Objects.requireNonNull(directory, "context is required");
         Objects.requireNonNull(fileName, "fileName is required");
         Objects.requireNonNull(inputStream, "inputStream is required");
 
-        return doStoreFileContent(context, fileName, inputStream);
+        return doStoreFileContent(directory, fileName, inputStream);
     }
 
     private FileEntry doStoreFileContent(String context, String fileName, InputStream inputStream) {
-        Path path = resolveDirectory(context);
+        context = StringUtils.trimAllWhitespace(context.replaceAll("[^0-9a-zA-Z/_]", ""));
+
+        Path path = resolveDirectory(context.toLowerCase());
 
         path = path.resolve(generateUuid());
 
@@ -138,7 +153,7 @@ public class FilesystemFileStorageService implements FileStorageService {
             throw new FileStorageException("Failed to store empty file " + fileName);
         }
 
-        return new FileEntry(context, fileName, "file:" + path);
+        return new FileEntry(fileName, "file://" + path.toString());
     }
 
     private Path resolveDirectory(String context) {

@@ -42,7 +42,7 @@ public interface Context {
      * @return
      * @param <T>
      */
-    <T> Optional<T> fetchData(String context, int scope, long scopeId, String key);
+    <T> Optional<T> fetchValue(String context, int scope, long scopeId, String key);
 
     /**
      *
@@ -59,6 +59,17 @@ public interface Context {
 
     /**
      *
+     * @param context
+     * @param scope
+     * @param scopeId
+     * @param key
+     * @return
+     * @param <T>
+     */
+    <T> T getValue(String context, int scope, long scopeId, String key);
+
+    /**
+     *
      * @param fileEntry
      * @return
      */
@@ -70,7 +81,7 @@ public interface Context {
      * @param key
      * @param data
      */
-    void saveData(String context, int scope, long scopeId, String key, Object data);
+    void setValue(String context, int scope, long scopeId, String key, Object data);
 
     /**
      *

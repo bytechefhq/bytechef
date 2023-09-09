@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.component.test.config;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
@@ -155,12 +155,12 @@ public class ComponentTestIntConfiguration {
         @Bean
         JobTestExecutor componentWorkflowTestSupport(
             ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-            TaskExecutionService taskExecutionService,
+            ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
             Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
             WorkflowService workflowService) {
 
             return new JobTestExecutor(
-                contextService, jobService, eventPublisher, taskExecutionService,
+                contextService, jobService, eventPublisher, objectMapper, taskExecutionService,
                 MapUtils.concat(taskHandlerMap, taskHandlerMapFactory.getTaskHandlerMap()), workflowService);
         }
 
@@ -194,8 +194,8 @@ public class ComponentTestIntConfiguration {
     public static class WorkflowFileStorageConfiguration {
 
         @Bean
-        WorkflowFileStorage workflowFileStorageFacade(ObjectMapper objectMapper) {
-            return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
+        WorkflowFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

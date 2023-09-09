@@ -17,13 +17,14 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.TaskProgressedEvent;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.InputStream;
@@ -42,21 +43,21 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
     private final ConnectionService connectionService;
     private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final FileStorageService fileStorageService;
     private final Long taskExecutionId;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        Map<String, Long> connectionIdMap, ConnectionDefinitionService connectionDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService, Map<String, Long> connectionIdMap,
         ConnectionService connectionService, DataStorageService dataStorageService, EventPublisher eventPublisher,
-        Long taskExecutionId, WorkflowFileStorage workflowFileStorage) {
+        FileStorageService fileStorageService, Long taskExecutionId) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionIdMap = connectionIdMap;
         this.connectionService = connectionService;
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
-        this.workflowFileStorage = workflowFileStorage;
+        this.fileStorageService = fileStorageService;
         this.taskExecutionId = taskExecutionId;
     }
 
@@ -79,8 +80,8 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
     }
 
     @Override
-    public <T> Optional<T> fetchData(String context, int scope, long scopeId, String key) {
-        return dataStorageService.fetchData(context, scope, scopeId, key);
+    public <T> Optional<T> fetchValue(String context, int scope, long scopeId, String key) {
+        return dataStorageService.fetch(context, scope, scopeId, key);
     }
 
     @Override
@@ -102,8 +103,14 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
     }
 
     @Override
+    public <T> T getValue(String context, int scope, long scopeId, String key) {
+        return dataStorageService.get(context, scope, scopeId, key);
+    }
+
+    @Override
     public InputStream getFileStream(Context.FileEntry fileEntry) {
-        return workflowFileStorage.getFileStream(fileEntry.getName(), fileEntry.getUrl());
+        return fileStorageService.getFileStream(
+            FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
     }
 
     @Override
@@ -113,23 +120,26 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
 
     @Override
     public String readFileToString(Context.FileEntry fileEntry) {
-        return workflowFileStorage.readFileToString(fileEntry.getName(), fileEntry.getUrl());
+        return fileStorageService.readFileToString(
+            FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
     }
 
     @Override
-    public void saveData(String context, int scope, long scopeId, String key, Object data) {
-        dataStorageService.save(context, scope, scopeId, key, data);
+    public void setValue(String context, int scope, long scopeId, String key, Object value) {
+        dataStorageService.put(context, scope, scopeId, key, value);
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, String data) {
-        return new ContextFileEntryImpl(workflowFileStorage.storeFileContent(fileName, data));
+        return new ContextFileEntryImpl(
+            fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, data));
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, InputStream inputStream) {
         try {
-            return new ContextFileEntryImpl(workflowFileStorage.storeFileContent(fileName, inputStream));
+            return new ContextFileEntryImpl(
+                fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, inputStream));
         } catch (Exception exception) {
             throw new ComponentExecutionException("Unable to store file " + fileName, exception);
         }

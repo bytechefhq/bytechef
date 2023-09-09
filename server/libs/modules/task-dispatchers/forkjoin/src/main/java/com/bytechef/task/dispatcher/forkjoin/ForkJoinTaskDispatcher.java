@@ -26,7 +26,7 @@ import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatc
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -92,20 +92,20 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public ForkJoinTaskDispatcher(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        WorkflowFileStorage workflowFileStorage) {
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                                 branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, i))))
                     .build();
 
-                Map<String, ?> context = workflowFileStorage.readContextValue(
+                Map<String, ?> context = workflowFileStorageFacade.readContextValue(
                     contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
                 branchTaskExecution.evaluate(context);
@@ -165,11 +165,11 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 contextService.push(
                     branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION,
-                    workflowFileStorage.storeContextValue(
+                    workflowFileStorageFacade.storeContextValue(
                         branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
                 contextService.push(
                     taskExecution.getId(), i, Context.Classname.TASK_EXECUTION,
-                    workflowFileStorage.storeContextValue(taskExecution.getId(), i,
+                    workflowFileStorageFacade.storeContextValue(taskExecution.getId(), i,
                         Context.Classname.TASK_EXECUTION,
                         context));
 

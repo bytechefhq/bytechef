@@ -18,7 +18,10 @@
 package com.bytechef.component.jsonfile;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 
@@ -28,6 +31,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -50,7 +54,10 @@ public class JsonFileComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private FileStorageService fileStorageService;
+
+    @Autowired
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Test
     public void testRead() throws JSONException {
@@ -60,14 +67,15 @@ public class JsonFileComponentHandlerIntTest {
             ENCODER.encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                workflowFileStorage
-                    .storeFileContent(sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                    .toMap()));
+                fileStorageService
+                    .storeFileContent(
+                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
@@ -86,18 +94,15 @@ public class JsonFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        FileEntry fileEntry = MapUtils.get(
+            workflowFileStorageFacade.readJobOutputs(job.getOutputs()), "writeJSONFile", FileEntry.class);
 
-        Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeJSONFile");
-
-        Assertions.assertThat(fileEntryMap.get("name"))
+        Assertions.assertThat(fileEntry.getName())
             .isEqualTo("file.json");
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray(
-                workflowFileStorage.readFileToString(
-                    (String) fileEntryMap.get("name"), (String) fileEntryMap.get("url"))),
+            new JSONArray(fileStorageService.readFileToString(FileEntryConstants.DOCUMENTS_DIR, fileEntry)),
             true);
     }
 

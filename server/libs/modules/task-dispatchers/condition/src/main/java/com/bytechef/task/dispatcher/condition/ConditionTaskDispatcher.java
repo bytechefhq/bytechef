@@ -23,7 +23,7 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -52,18 +52,18 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public ConditionTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage) {
+        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            Map<String, ?> context = workflowFileStorage.readContextValue(
+            Map<String, ?> context = workflowFileStorageFacade.readContextValue(
                 contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
@@ -104,7 +104,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
             contextService.push(
                 Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
-                workflowFileStorage.storeContextValue(
+                workflowFileStorageFacade.storeContextValue(
                     subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);

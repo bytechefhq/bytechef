@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.forkjoin.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -46,7 +46,7 @@ public class ForkJoinTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Autowired
     private TaskExecutionService taskExecutionService;
@@ -55,13 +55,13 @@ public class ForkJoinTaskDispatcherConfiguration {
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
             taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
-            workflowFileStorage);
+            workflowFileStorageFacade);
     }
 
     @Bean("forkJoinTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory forkTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ForkJoinTaskDispatcher(
             contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
-            workflowFileStorage);
+            workflowFileStorageFacade);
     }
 }

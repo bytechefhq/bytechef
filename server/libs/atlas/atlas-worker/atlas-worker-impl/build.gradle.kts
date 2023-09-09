@@ -8,6 +8,8 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.springframework:spring-jdbc")
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))

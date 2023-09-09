@@ -20,17 +20,17 @@ package com.bytechef.hermes.component.oas.task.handler;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.hermes.component.definition.ContextFileEntryImpl;
 import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
@@ -564,7 +564,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("data", "text.txt", "This is text");
 
-        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new MockContextFileEntry(fileEntry)));
+        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new ContextFileEntryImpl(fileEntry)));
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -869,8 +869,8 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @Bean
-        WorkflowFileStorage workflowFileStorage(ObjectMapper objectMapper) {
-            return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
+        WorkflowFileStorageFacade workflowFileStorage(ObjectMapper objectMapper) {
+            return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
         }
 
         @TestConfiguration
@@ -901,29 +901,6 @@ public class OpenApiComponentTaskHandlerIntTest {
                     new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
                     new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
             }
-        }
-    }
-
-    private record MockContextFileEntry(FileEntry fileEntry) implements Context.FileEntry {
-
-        @Override
-        public String getExtension() {
-            return fileEntry.getExtension();
-        }
-
-        @Override
-        public String getMimeType() {
-            return fileEntry.getMimeType();
-        }
-
-        @Override
-        public String getName() {
-            return fileEntry.getName();
-        }
-
-        @Override
-        public String getUrl() {
-            return fileEntry.getUrl();
         }
     }
 }

@@ -17,9 +17,8 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -37,32 +36,49 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
 
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.FINALIZE;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.NAME;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PARAMETERS;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.POST;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PRE;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
+
 public class TaskWorkerTest {
 
-    private static final WorkflowFileStorage WORKFLOW_FILE_STORAGE_FACADE = new WorkflowFileStorageImpl(
-        new Base64FileStorageService(), new ObjectMapper());
+    private final ObjectMapper objectMapper = new ObjectMapper() {
+        {
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            registerModule(new JavaTimeModule());
+            registerModule(new Jdk8Module());
+        }
+    };
+    private final WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
+        new Base64FileStorageService(), objectMapper);
 
     @Test
     public void test1() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
             TaskMessageRoute.TASKS_COMPLETE,
             t -> Assertions.assertEquals(
-                "done", WORKFLOW_FILE_STORAGE_FACADE.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
+                "done", workflowFileStorageFacade.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
         messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
 
         TaskWorker worker =
-            new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> "done", WORKFLOW_FILE_STORAGE_FACADE);
+            new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> "done", workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -73,7 +89,7 @@ public class TaskWorkerTest {
 
     @Test
     public void test2() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
             SystemMessageRoute.ERRORS,
@@ -83,10 +99,10 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
             throw new IllegalArgumentException("bad input");
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -97,11 +113,11 @@ public class TaskWorkerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
             TaskMessageRoute.TASKS_COMPLETE, t -> Assertions.assertEquals(
-                "done", WORKFLOW_FILE_STORAGE_FACADE.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
+                "done", workflowFileStorageFacade.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
         messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
@@ -116,19 +132,20 @@ public class TaskWorkerTest {
             } else {
                 throw new IllegalArgumentException("unknown type: " + type);
             }
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution task = TaskExecution.builder()
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
-                        WorkflowConstants.NAME, "name",
-                        "pre",
-                        List.of(
+                        NAME, "name",
+                        TYPE, "var",
+                        PARAMETERS, Map.of("value", "${myVar}"),
+                        PRE, List.of(
                             Map.of(
-                                "name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
-                        "type", "var",
-                        WorkflowConstants.PARAMETERS, Map.of("value", "${myVar}"))))
+                                NAME, "myVar",
+                                TYPE, "var",
+                                PARAMETERS, Map.of("value", "done"))))))
             .build();
 
         task.setId(1234L);
@@ -144,7 +161,7 @@ public class TaskWorkerTest {
         String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString())
             .getAbsolutePath();
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
             TaskMessageRoute.TASKS_COMPLETE, t -> Assertions.assertFalse(new File(tempDir).exists()));
@@ -166,24 +183,24 @@ public class TaskWorkerTest {
             } else {
                 throw new IllegalArgumentException("unknown type: " + type);
             }
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
-                        WorkflowConstants.NAME, "name",
-                        "post", List.of(
+                        NAME, "name",
+                        TYPE, "pass",
+                        PRE, List.of(
                             Map.of(
-                                WorkflowConstants.NAME, "name",
-                                "type", "rm",
-                                WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
-                        "pre", List.of(
+                                NAME, "name",
+                                TYPE, "mkdir",
+                                PARAMETERS, Map.of("path", tempDir))),
+                        POST, List.of(
                             Map.of(
-                                WorkflowConstants.NAME, "name",
-                                "type", "mkdir",
-                                WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
-                        "type", "pass")))
+                                NAME, "name",
+                                TYPE, "rm",
+                                PARAMETERS, Map.of("path", tempDir))))))
             .build();
 
         taskExecution.setId(1234L);
@@ -199,7 +216,7 @@ public class TaskWorkerTest {
         String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString())
             .getAbsolutePath();
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
@@ -224,16 +241,24 @@ public class TaskWorkerTest {
             } else {
                 throw new IllegalArgumentException("unknown type: " + type);
             }
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
-                        WorkflowConstants.NAME, "name",
-                        "finalize", List.of(Map.of(WorkflowConstants.NAME, "name", "type", "rm", "path", tempDir)),
-                        "pre", List.of(Map.of(WorkflowConstants.NAME, "name", "type", "mkdir", "path", tempDir)),
-                        "type", "rogue")))
+                        NAME, "name",
+                        TYPE, "rogue",
+                        PRE, List.of(
+                            Map.of(
+                                NAME, "name",
+                                TYPE, "mkdir",
+                                PARAMETERS, Map.of("path", tempDir))),
+                        FINALIZE, List.of(
+                            Map.of(
+                                NAME, "name",
+                                TYPE, "rm",
+                                PARAMETERS, Map.of("path", tempDir))))))
             .build();
 
         taskExecution.setId(1234L);
@@ -246,7 +271,7 @@ public class TaskWorkerTest {
     @SuppressFBWarnings("NP")
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
             try {
@@ -256,10 +281,10 @@ public class TaskWorkerTest {
             }
 
             return null;
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -287,7 +312,7 @@ public class TaskWorkerTest {
     @SuppressFBWarnings("NP")
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
             try {
@@ -297,10 +322,10 @@ public class TaskWorkerTest {
             }
 
             return null;
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution1.setId(1111L);
@@ -310,7 +335,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.handle(taskExecution1));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution2.setId(3333L);
@@ -338,7 +363,7 @@ public class TaskWorkerTest {
     @SuppressFBWarnings("NP")
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
             try {
@@ -348,10 +373,10 @@ public class TaskWorkerTest {
             }
 
             return null;
-        }, WORKFLOW_FILE_STORAGE_FACADE);
+        }, workflowFileStorageFacade);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution1.setId(1111L);
@@ -361,7 +386,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.handle(taskExecution1));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution2.setId(3333L);

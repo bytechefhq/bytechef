@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
@@ -46,7 +46,7 @@ public class EachTaskDispatcherIntTest {
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -66,7 +66,7 @@ public class EachTaskDispatcherIntTest {
                 contextService, counterService, messageBroker, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new EachTaskDispatcher(
                         messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
-                        workflowFileStorage)),
+                        workflowFileStorageFacade)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(

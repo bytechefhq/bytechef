@@ -19,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.subflow.event;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.execution.domain.Job;
@@ -49,17 +49,17 @@ public class SubflowJobStatusEventListener implements EventListener {
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
         JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
-        WorkflowFileStorage workflowFileStorage) {
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class SubflowJobStatusEventListener implements EventListener {
 
                     if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(
-                            workflowFileStorage.storeTaskExecutionOutput(
+                            workflowFileStorageFacade.storeTaskExecutionOutput(
                                 completionTaskExecution.getId(), output));
                     } else {
                         // TODO check, it seems wrong

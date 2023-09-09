@@ -19,7 +19,8 @@ package com.bytechef.component.xlsxfile;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import java.io.File;
@@ -30,6 +31,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -49,10 +51,13 @@ public class XlsxFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
+    private FileStorageService fileStorageService;
+
+    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Test
     public void testRead() throws IOException, JSONException {
@@ -63,14 +68,13 @@ public class XlsxFileComponentHandlerIntTest {
                 ENCODER.encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
-                    workflowFileStorage
-                        .storeFileContent(sampleFile.getAbsolutePath(), fileInputStream)
-                        .toMap()));
+                    fileStorageService.storeFileContent(
+                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(), fileInputStream)));
 
             Assertions.assertThat(job.getStatus())
                 .isEqualTo(Job.Status.COMPLETED);
 
-            Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+            Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -90,7 +94,7 @@ public class XlsxFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         Assertions.assertThat(((Map) outputs.get("writeXlsxFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.xlsx");
@@ -102,11 +106,10 @@ public class XlsxFileComponentHandlerIntTest {
                 ENCODER.encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
-                    workflowFileStorage
-                        .storeFileContent(sampleFile.getName(), fileInputStream)
-                        .toMap()));
+                    fileStorageService.storeFileContent(
+                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getName(), fileInputStream)));
 
-            outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
+            outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),

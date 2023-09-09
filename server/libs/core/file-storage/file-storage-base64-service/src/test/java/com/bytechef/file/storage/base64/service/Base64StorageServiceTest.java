@@ -17,7 +17,6 @@
 
 package com.bytechef.file.storage.base64.service;
 
-import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import org.assertj.core.api.Assertions;
@@ -41,19 +40,18 @@ public class Base64StorageServiceTest {
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.getFileStream(
-            DATA,
-            new FileEntry(DATA, "file.text", EncodingUtils.encodeBase64ToString(CompressionUtils.compress(STRING))));
+            DATA, new FileEntry("file.text", "base64://" + EncodingUtils.encodeBase64ToString(STRING)));
 
-        Assertions.assertThat(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
+        Assertions.assertThat(
+            new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
             .isEqualTo(STRING);
     }
 
     @Test
     public void testRead() {
-        Assertions.assertThat(base64StorageService.readFileToString(
-            DATA,
-            new FileEntry(
-                DATA, "file.text", EncodingUtils.encodeBase64ToString(CompressionUtils.compress(STRING)))))
+        Assertions.assertThat(
+            base64StorageService.readFileToString(
+                DATA, new FileEntry("file.text", "base64://" + EncodingUtils.encodeBase64ToString(STRING))))
             .isEqualTo(STRING);
     }
 
@@ -63,6 +61,6 @@ public class Base64StorageServiceTest {
             DATA, "fileEntry", new ByteArrayInputStream(STRING.getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertThat(fileEntry.getUrl())
-            .isEqualTo("base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(STRING)));
+            .isEqualTo("base64://" + EncodingUtils.encodeBase64ToString(STRING));
     }
 }

@@ -28,7 +28,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
@@ -47,11 +47,11 @@ import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerRe
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,19 +66,33 @@ public class JobSyncExecutor {
     private final JobFacade jobFacade;
     private final JobService jobService;
 
-    @SuppressFBWarnings("EI")
-    private JobSyncExecutor(Builder builder) {
-        this.jobService = builder.jobService;
+    public JobSyncExecutor(
+        ContextService contextService, EventPublisher eventPublisher, JobService jobService, ObjectMapper objectMapper,
+        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
 
-        SyncMessageBroker syncMessageBroker = builder.syncMessageBroker;
+        this(
+            contextService, eventPublisher, jobService, objectMapper, null, List.of(), List.of(), List.of(),
+            taskExecutionService, taskHandlerRegistry, workflowFileStorageFacade, workflowService);
+    }
+
+    @SuppressFBWarnings("EI")
+    public JobSyncExecutor(
+        ContextService contextService, EventPublisher eventPublisher, JobService jobService, ObjectMapper objectMapper,
+        SyncMessageBroker syncMessageBroker, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
+        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowFileStorageFacade workflowFileStorageFacade,
+        WorkflowService workflowService) {
+
+        this.jobService = jobService;
 
         if (syncMessageBroker == null) {
-            syncMessageBroker = new SyncMessageBroker();
+            syncMessageBroker = new SyncMessageBroker(objectMapper);
         }
 
         this.jobFacade = new JobFacadeImpl(
-            builder.contextService, builder.eventPublisher, jobService, syncMessageBroker,
-            builder.workflowFileStorage, builder.workflowService);
+            contextService, eventPublisher, jobService, syncMessageBroker, workflowFileStorageFacade, workflowService);
 
         syncMessageBroker.receive(SystemMessageRoute.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
@@ -92,12 +106,11 @@ public class JobSyncExecutor {
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
-                new TaskDispatcherAdapterTaskHandlerResolver(
-                    builder.taskDispatcherAdapterFactories, taskHandlerResolverChain),
-                new DefaultTaskHandlerResolver(builder.taskHandlerRegistry)));
+                new TaskDispatcherAdapterTaskHandlerResolver(taskDispatcherAdapterFactories, taskHandlerResolverChain),
+                new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         TaskWorker worker = new TaskWorker(
-            builder.eventPublisher, syncMessageBroker, taskHandlerResolverChain, builder.workflowFileStorage);
+            eventPublisher, syncMessageBroker, taskHandlerResolverChain, workflowFileStorageFacade);
 
         syncMessageBroker.receive(TaskMessageRoute.TASKS, o -> worker.handle((TaskExecution) o));
 
@@ -105,138 +118,39 @@ public class JobSyncExecutor {
 
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
-                builder.taskDispatcherResolverFactories.stream()
+                taskDispatcherResolverFactories.stream()
                     .map(taskDispatcherFactory -> taskDispatcherFactory
                         .createTaskDispatcherResolver(taskDispatcherChain)),
                 Stream.of(new DefaultTaskDispatcher(syncMessageBroker, List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
-            builder.contextService, taskDispatcherChain, builder.taskExecutionService,
-            builder.workflowFileStorage, builder.workflowService);
+            contextService, taskDispatcherChain, taskExecutionService, workflowFileStorageFacade, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            builder.contextService, builder.eventPublisher, jobExecutor, jobService,
-            builder.taskExecutionService, builder.workflowFileStorage, builder.workflowService);
+            contextService, eventPublisher, jobExecutor, jobService, taskExecutionService, workflowFileStorageFacade,
+            workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
         taskCompletionHandlerChain.setTaskCompletionHandlers(
             CollectionUtils.concat(
-                builder.taskCompletionHandlerFactories.stream()
+                taskCompletionHandlerFactories.stream()
                     .map(taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
                         taskCompletionHandlerChain, taskDispatcherChain)),
                 Stream.of(defaultTaskCompletionHandler)));
 
         TaskCoordinator taskCoordinator = new TaskCoordinator(
-            builder.eventPublisher, jobExecutor, jobFacade, jobService, syncMessageBroker,
-            taskCompletionHandlerChain, taskDispatcherChain, builder.taskExecutionService);
+            eventPublisher, jobExecutor, jobFacade, jobService, syncMessageBroker, taskCompletionHandlerChain,
+            taskDispatcherChain, taskExecutionService);
 
         syncMessageBroker.receive(
             TaskMessageRoute.TASKS_COMPLETE, o -> taskCoordinator.handleTasksComplete((TaskExecution) o));
         syncMessageBroker.receive(TaskMessageRoute.JOBS_START, jobId -> taskCoordinator.handleJobsStart((Long) jobId));
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public Job execute(JobParameters jobParameters) {
         long jobId = jobFacade.createJob(jobParameters);
 
         return jobService.getJob(jobId);
-    }
-
-    @SuppressFBWarnings("EI")
-    public static final class Builder {
-
-        private ContextService contextService;
-        private EventPublisher eventPublisher;
-        private JobService jobService;
-        private SyncMessageBroker syncMessageBroker;
-        private List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = Collections.emptyList();
-        private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories = Collections.emptyList();
-        private List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories = Collections.emptyList();
-        private TaskExecutionService taskExecutionService;
-        private TaskHandlerRegistry taskHandlerRegistry;
-        private WorkflowFileStorage workflowFileStorage;
-        private WorkflowService workflowService;
-
-        private Builder() {
-        }
-
-        public Builder contextService(ContextService contextService) {
-            this.contextService = contextService;
-
-            return this;
-        }
-
-        public Builder eventPublisher(EventPublisher eventPublisher) {
-            this.eventPublisher = eventPublisher;
-
-            return this;
-        }
-
-        public Builder jobService(JobService jobService) {
-            this.jobService = jobService;
-
-            return this;
-        }
-
-        public Builder syncMessageBroker(SyncMessageBroker syncMessageBroker) {
-            this.syncMessageBroker = syncMessageBroker;
-
-            return this;
-        }
-
-        public Builder taskDispatcherAdapterFactories(
-            List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories) {
-
-            this.taskDispatcherAdapterFactories = taskDispatcherAdapterFactories;
-            return this;
-        }
-
-        public Builder taskCompletionHandlerFactories(
-            List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories) {
-
-            this.taskCompletionHandlerFactories = taskCompletionHandlerFactories;
-
-            return this;
-        }
-
-        public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
-            this.taskExecutionService = taskExecutionService;
-
-            return this;
-        }
-
-        public Builder taskHandlerRegistry(TaskHandlerRegistry taskHandlerRegistry) {
-            this.taskHandlerRegistry = taskHandlerRegistry;
-
-            return this;
-        }
-
-        public Builder taskDispatcherResolverFactories(
-            List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories) {
-
-            this.taskDispatcherResolverFactories = taskDispatcherResolverFactories;
-
-            return this;
-        }
-
-        public Builder workflowFileStorageFacade(WorkflowFileStorage workflowFileStorage) {
-            this.workflowFileStorage = workflowFileStorage;
-
-            return this;
-        }
-
-        public Builder workflowService(WorkflowService workflowService) {
-            this.workflowService = workflowService;
-
-            return this;
-        }
-
-        public JobSyncExecutor build() {
-            return new JobSyncExecutor(this);
-        }
     }
 }

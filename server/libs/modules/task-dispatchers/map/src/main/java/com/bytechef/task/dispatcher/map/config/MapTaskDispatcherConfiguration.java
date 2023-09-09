@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.map.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -51,18 +51,18 @@ public class MapTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Bean("mapTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory mapTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
-            taskCompletionHandler, counterService, workflowFileStorage);
+            taskCompletionHandler, counterService, workflowFileStorageFacade);
     }
 
     @Bean("mapTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory mapTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new MapTaskDispatcher(
             contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
-            workflowFileStorage);
+            workflowFileStorageFacade);
     }
 }
