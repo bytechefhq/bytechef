@@ -107,9 +107,9 @@ bytechef:
   discovery-service:
     provider: redis
   file-storage:
-    # File storage provider for binary data (base64 | filesystem) default: filesystem
+    # File storage provider for files (base64 | filesystem) default: filesystem
     provider: filesystem
-    file-storage-dir: /tmp/bytechef/files
+    file-storage-dir: ${user.home}/bytechef/files
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
