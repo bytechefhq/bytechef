@@ -17,27 +17,27 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.atlas.execution.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.execution.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.execution.converter.StringToWebhooksConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.execution.converter.WebhooksToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
-import com.bytechef.hermes.configuration.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.hermes.configuration.converter.WorkflowTriggerToStringConverter;
-import com.bytechef.hermes.execution.converter.StringToTriggerStateValueConverter;
-import com.bytechef.hermes.execution.converter.StringToWorkflowExecutionIdConverter;
-import com.bytechef.hermes.execution.converter.TriggerStateValueToStringConverter;
-import com.bytechef.hermes.execution.converter.WorkflowExecutionIdToStringConverter;
-import com.bytechef.data.storage.converter.DataWrapperToStringConverter;
-import com.bytechef.data.storage.converter.StringToDataWrapperConverter;
-import com.bytechef.file.storage.converter.FileEntryToStringConverter;
-import com.bytechef.file.storage.converter.StringToFileEntryConverter;
+import com.bytechef.hermes.execution.repository.converter.StringToWorkflowTriggerConverter;
+import com.bytechef.hermes.execution.repository.converter.WorkflowTriggerToStringConverter;
+import com.bytechef.hermes.execution.repository.converter.StringToTriggerStateValueConverter;
+import com.bytechef.hermes.execution.repository.converter.StringToWorkflowExecutionIdConverter;
+import com.bytechef.hermes.execution.repository.converter.TriggerStateValueToStringConverter;
+import com.bytechef.hermes.execution.repository.converter.WorkflowExecutionIdToStringConverter;
+import com.bytechef.data.storage.db.repository.converter.DataEntryValueWrapperToStringConverter;
+import com.bytechef.data.storage.db.repository.converter.StringToDataEntryValueWrapperConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -83,13 +83,13 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-            new DataWrapperToStringConverter(objectMapper),
+            new DataEntryValueWrapperToStringConverter(objectMapper),
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
             new FileEntryToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
-            new StringToDataWrapperConverter(objectMapper),
+            new StringToDataEntryValueWrapperConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToFileEntryConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),

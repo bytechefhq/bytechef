@@ -19,16 +19,16 @@ package com.bytechef.atlas.execution.repository.jdbc.config;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
-import com.bytechef.atlas.execution.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.execution.converter.StringToWebhooksConverter;
-import com.bytechef.atlas.execution.converter.WebhooksToStringConverter;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.converter.FileEntryToStringConverter;
-import com.bytechef.file.storage.converter.StringToFileEntryConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -59,8 +59,8 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
     }
 
     @Bean
-    WorkflowFileStorage workflowFileStorage(ObjectMapper objectMapper) {
-        return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
+    WorkflowFileStorageFacade workflowFileStorage(ObjectMapper objectMapper) {
+        return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
