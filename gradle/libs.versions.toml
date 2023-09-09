@@ -1,7 +1,7 @@
 [versions]
 ch-qos-logback = "1.4.11"
 com-google-auto-service = "1.1.1"
-info-picocli = "4.7.4"
+info-picocli = "4.7.5"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.0.2"
 org-springframework-cloud-dependencies = "2022.0.4"
@@ -12,7 +12,7 @@ ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.2"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
-com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-10"
+com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.1"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
@@ -23,7 +23,7 @@ io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.1
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.30.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
-org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
+org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.0.1"
 org-json = "org.json:json:20230618"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
@@ -33,10 +33,11 @@ org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processo
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-springdoc-springdoc-openapi-starter-webmvc-ui = "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.134"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.144"
 
 [plugins]
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.47.0"
+com-github-ben-manes-versions = "com.github.ben-manes.versions:0.48.0"
+com-github-spotbugs = "com.github.spotbugs:6.0.0-beta.3"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"
 org-openapi-generator = "org.openapi.generator:7.0.0"
 org-sonarqube = "org.sonarqube:4.2.1.3168"
