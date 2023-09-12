@@ -22,6 +22,7 @@ import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.config.FileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,17 +35,31 @@ import org.springframework.context.annotation.Configuration;
 public class WorkflowFileStorageConfiguration {
 
     @Bean
-    WorkflowFileStorageFacade workflowFileStorageFacade(
+    WorkflowFileStorageFacade workflowAsyncFileStorageFacade(
         FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
-        @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
+        @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
 
         return new WorkflowFileStorageFacadeImpl(
-            switch (workflowOutputStorageProvider) {
-                case "base64" -> new Base64FileStorageService();
-                case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFileStorageDir());
-                default -> throw new IllegalArgumentException(
-                    "Output storage %s does not exist".formatted(workflowOutputStorageProvider));
-            },
-            objectMapper);
+            getFileStorageService(fileStorageProperties, workflowAsyncOutputStorageProvider), objectMapper);
+    }
+
+    @Bean
+    WorkflowFileStorageFacade workflowSyncFileStorageFacade(
+        FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
+        @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
+
+        return new WorkflowFileStorageFacadeImpl(
+            getFileStorageService(fileStorageProperties, workflowAsyncOutputStorageProvider), objectMapper);
+    }
+
+    private static FileStorageService getFileStorageService(
+        FileStorageProperties fileStorageProperties, String workflowAsyncOutputStorageProvider) {
+
+        return switch (workflowAsyncOutputStorageProvider) {
+            case "base64" -> new Base64FileStorageService();
+            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFileStorageDir());
+            default -> throw new IllegalArgumentException(
+                "Output storage %s does not exist".formatted(workflowAsyncOutputStorageProvider));
+        };
     }
 }

@@ -39,6 +39,7 @@ import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -101,7 +102,7 @@ public class TaskWorkerConfiguration {
     @Bean
     TaskWorker taskWorker(
         EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return new TaskWorker(eventPublisher, messageBroker, taskHandlerResolver, workflowFileStorageFacade);
     }
