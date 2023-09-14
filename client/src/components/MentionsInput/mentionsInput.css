@@ -1,8 +1,3 @@
-.quill.focused .ql-editor {
-    @apply shadow-lg shadow-blue-200;
-    @apply ring ring-blue-500;
-}
-
 .ql-editor.ql-blank::before {
     @apply content-[attr(data-placeholder)];
     @apply absolute;
@@ -17,12 +12,11 @@
 }
 
 .ql-editor {
-    @apply border;
     @apply rounded-md;
     @apply p-2;
     @apply text-sm;
-    @apply leading-8;
-    @apply focus:outline-none focus:ring focus:ring-blue-500;
+    @apply leading-6;
+    @apply focus:outline-none;
 }
 
 .ql-mention-list-container {

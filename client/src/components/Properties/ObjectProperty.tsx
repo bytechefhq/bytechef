@@ -17,7 +17,10 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
 
     return (
         <>
-            <ul className={twMerge(label && 'ml-2 border-l')}>
+            <ul
+                key={property.name}
+                className={twMerge(label && 'ml-2 border-l')}
+            >
                 {(properties as PropertyType[])?.map((subProperty, index) => {
                     if (
                         subProperty.type === 'OBJECT' &&
