@@ -1,6 +1,6 @@
 import getRandomId from '@/pages/automation/project/utils/getRandomId';
 import QuillMention from 'quill-mention';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {ReactNode, useCallback, useMemo, useRef, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -26,10 +26,16 @@ const MentionInputListItem = (item: DataPillType) => `
 type MentionsInputProps = {
     data: Array<DataPillType>;
     label?: string;
+    leadingIcon?: ReactNode;
     placeholder?: string;
 };
 
-const MentionsInput = ({data, label, placeholder}: MentionsInputProps) => {
+const MentionsInput = ({
+    data,
+    label,
+    leadingIcon,
+    placeholder,
+}: MentionsInputProps) => {
     const [value, setValue] = useState('');
 
     const editorRef = useRef<ReactQuill>(null);
@@ -124,38 +130,54 @@ const MentionsInput = ({data, label, placeholder}: MentionsInputProps) => {
         toolbar: false,
     };
 
+    const isFocused = focusedInput?.props.id === elementId;
+
     return (
         <fieldset className="w-full">
             {label && (
                 <label
-                    className="block px-2 text-sm font-medium capitalize text-gray-700"
+                    className="mb-1 block px-2 text-sm font-medium capitalize text-gray-700"
                     htmlFor={elementId}
                 >
                     {label}
                 </label>
             )}
 
-            <ReactQuill
+            <div
                 className={twMerge(
-                    'h-full w-full mt-1',
-                    focusedInput?.props.id === elementId && 'focused'
+                    'flex items-center',
+                    isFocused && 'ring ring-blue-500 shadow-lg shadow-blue-200',
+                    leadingIcon && 'relative rounded-md border border-gray-300'
                 )}
-                formats={['bytechef-mention', 'mention']}
-                id={elementId}
-                key={elementId}
-                modules={modules}
-                onChange={setValue}
-                onFocus={() => {
-                    if (editorRef.current) {
-                        setFocusedInput(editorRef.current);
+            >
+                {leadingIcon && (
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-3">
+                        {leadingIcon}
+                    </span>
+                )}
 
-                        setDataPillPanelOpen(true);
-                    }
-                }}
-                placeholder={placeholder}
-                ref={editorRef}
-                value={value}
-            />
+                <ReactQuill
+                    className={twMerge(
+                        'h-full w-full',
+                        leadingIcon && 'border-0 pl-10'
+                    )}
+                    formats={['bytechef-mention', 'mention']}
+                    id={elementId}
+                    key={elementId}
+                    modules={modules}
+                    onChange={setValue}
+                    onFocus={() => {
+                        if (editorRef.current) {
+                            setFocusedInput(editorRef.current);
+
+                            setDataPillPanelOpen(true);
+                        }
+                    }}
+                    placeholder={placeholder}
+                    ref={editorRef}
+                    value={value}
+                />
+            </div>
         </fieldset>
     );
 };
