@@ -19,9 +19,9 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
@@ -31,7 +31,6 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -61,22 +60,18 @@ public class AwsS3ListObjectsAction {
         .perform(AwsS3ListObjectsAction::perform);
 
     protected static List<S3ObjectDescription> perform(
-        Map<String, ?> inputParameters, Context context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
 
-        Connection connection = context.getConnection();
-
-        Map<String, Object> connectionParameters = connection.getParameters();
-
-        try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
+        try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                .prefix(MapUtils.getRequiredString(inputParameters, PREFIX))
+                .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
+                .prefix(inputParameters.getRequiredString(PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
                 .map(o -> new S3ObjectDescription(
-                    MapUtils.getRequiredString(connectionParameters, BUCKET_NAME), o))
+                    connectionParameters.getRequiredString(BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }

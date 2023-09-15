@@ -17,10 +17,8 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Property.OutputProperty;
-
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -41,11 +39,11 @@ public interface OutputSchemaDataSource {
     interface OutputSchemaFunction {
 
         /**
-         *
-         * @param connection
          * @param inputParameters
+         * @param connectionParameters
          * @return
          */
-        OutputProperty<?> apply(Connection connection, Map<String, ?> inputParameters);
+        OutputProperty<?> apply(ParameterMap inputParameters, ParameterMap connectionParameters)
+            throws ComponentExecutionException;
     }
 }

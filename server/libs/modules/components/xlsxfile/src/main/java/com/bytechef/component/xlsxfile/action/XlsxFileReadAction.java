@@ -19,11 +19,12 @@ package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FileFormat;
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -110,16 +111,18 @@ public class XlsxFileReadAction {
         .outputSchema(array())
         .perform(XlsxFileReadAction::perform);
 
-    protected static List<Map<String, ?>> perform(Map<String, ?> inputParameters, Context context) {
-        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
-        boolean headerRow = MapUtils.getBoolean(inputParameters, HEADER_ROW, true);
-        boolean includeEmptyCells = MapUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
-        Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
-        boolean readAsString = MapUtils.getBoolean(inputParameters, READ_AS_STRING, false);
-        String sheetName = MapUtils.getString(inputParameters, SHEET_NAME);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        try (InputStream inputStream = context.getFileStream(fileEntry)) {
+        FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
+        String sheetName = inputParameters.getString(SHEET_NAME);
+
+        try (InputStream inputStream = context.file(file -> file.getStream(fileEntry))) {
             String extension = fileEntry.getExtension();
 
             FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());

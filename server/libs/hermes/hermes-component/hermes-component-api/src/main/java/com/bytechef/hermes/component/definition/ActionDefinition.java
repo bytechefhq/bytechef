@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
@@ -24,6 +25,7 @@ import com.bytechef.hermes.definition.Property.OutputProperty;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Ivica Cardic
@@ -130,11 +132,14 @@ public interface ActionDefinition {
     interface PerformFunction {
 
         /**
+         *
          * @param inputParameters
+         * @param connectionParameters
          * @param context
          * @return
          */
-        Object apply(Map<String, ?> inputParameters, ActionContext context);
+        Object apply(ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+            throws ComponentExecutionException;
     }
 
     /**
@@ -144,22 +149,16 @@ public interface ActionDefinition {
 
         /**
          *
-         * @param taskConnectionKey
-         * @return
+         * @param eventConsumer
          */
-        Optional<Connection> fetchConnection(String taskConnectionKey);
+        void event(Consumer<Event> eventConsumer);
 
-        /**
-         *
-         * @param workflowConnectionKey
-         * @return
-         */
-        Connection getConnection(String workflowConnectionKey);
-
-        /**
-         *
-         * @param progress
-         */
-        void publishActionProgressEvent(int progress);
+        interface Event {
+            /**
+             *
+             * @param progress
+             */
+            void publishActionProgressEvent(int progress);
+        }
     }
 }

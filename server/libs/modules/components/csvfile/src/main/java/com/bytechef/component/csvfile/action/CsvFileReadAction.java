@@ -19,11 +19,10 @@ package com.bytechef.component.csvfile.action;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -106,17 +105,20 @@ public class CsvFileReadAction {
         .outputSchema(array())
         .perform(CsvFileReadAction::perform);
 
-    protected static List<Map<String, Object>> perform(Map<String, ?> inputParameters, Context context) {
-        String delimiter = MapUtils.getString(inputParameters, DELIMITER, ",");
-        boolean headerRow = MapUtils.getBoolean(inputParameters, HEADER_ROW, true);
-        boolean includeEmptyCells = MapUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
-        Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
-        Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
-        boolean readAsString = MapUtils.getBoolean(inputParameters, READ_AS_STRING, false);
+    protected static List<Map<String, Object>> perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        throws ComponentExecutionException {
+
+        String delimiter = inputParameters.getString(DELIMITER, ",");
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
 
         try (
-            InputStream inputStream = context.getFileStream(
-                MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class))) {
+            InputStream inputStream = context.file(
+                file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 
@@ -129,12 +131,8 @@ public class CsvFileReadAction {
             return read(
                 inputStream,
                 new ReadConfiguration(
-                    delimiter,
-                    headerRow,
-                    includeEmptyCells,
-                    rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                    readAsString));
+                    delimiter, headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to stream CSV file", ioException);
         }
@@ -149,7 +147,8 @@ public class CsvFileReadAction {
             new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
             if (configuration.headerRow()) {
-                CsvSchema headerSchema = CsvSchema.emptySchema()
+                CsvSchema headerSchema = CsvSchema
+                    .emptySchema()
                     .withHeader();
 
                 MappingIterator<Map<String, String>> iterator = CsvFileConstants.CSV_MAPPER
@@ -224,7 +223,7 @@ public class CsvFileReadAction {
     private static Object processValue(String valueString, boolean includeEmptyCells, boolean readAsString) {
         Object value = null;
 
-        if (valueString == null || valueString.length() == 0) {
+        if (valueString == null || valueString.isEmpty()) {
             if (includeEmptyCells) {
                 value = "";
             }

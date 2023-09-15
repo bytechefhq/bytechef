@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -45,8 +44,9 @@ public class JdbcExecutor {
         this.jdbcDriverClassName = jdbcDriverClassName;
     }
 
-    public int[] batchUpdate(Connection connection, String sql, SqlParameterSource[] batchArgs) {
-        DataSource dataSource = dataSourceFactory.getDataSource(connection, databaseJdbcName, jdbcDriverClassName);
+    public int[] batchUpdate(Map<String, ?> connectionParameters, String sql, SqlParameterSource[] batchArgs) {
+        DataSource dataSource = dataSourceFactory.getDataSource(
+            connectionParameters, databaseJdbcName, jdbcDriverClassName);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 
@@ -55,21 +55,25 @@ public class JdbcExecutor {
         return transactionTemplate.execute(status -> jdbcTemplate.batchUpdate(sql, batchArgs));
     }
 
-    public <T> List<T> query(Connection connection, String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper)
+    public <T> List<T> query(
+        Map<String, ?> connectionParameters, String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper)
         throws DataAccessException {
-        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connection);
+
+        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connectionParameters);
 
         return jdbcTemplate.query(sql, paramMap, rowMapper);
     }
 
-    public int update(Connection connection, String sql, Map<String, ?> paramMap) throws DataAccessException {
-        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connection);
+    public int update(
+        Map<String, ?> connectionParameters, String sql, Map<String, ?> paramMap) throws DataAccessException {
+
+        NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connectionParameters);
 
         return jdbcTemplate.update(sql, paramMap);
     }
 
-    private NamedParameterJdbcTemplate getJdbcTemplate(Connection connection) {
+    private NamedParameterJdbcTemplate getJdbcTemplate(Map<String, ?> connectionParameters) {
         return new NamedParameterJdbcTemplate(
-            dataSourceFactory.getDataSource(connection, databaseJdbcName, jdbcDriverClassName));
+            dataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName));
     }
 }

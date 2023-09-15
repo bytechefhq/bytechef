@@ -27,6 +27,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +52,7 @@ public class MapTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
+    @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Bean("mapTaskCompletionHandlerFactory_v1")

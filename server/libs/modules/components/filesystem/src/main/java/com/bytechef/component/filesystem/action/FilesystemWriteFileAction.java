@@ -17,10 +17,10 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,11 +60,13 @@ public class FilesystemWriteFileAction {
         .outputSchema(object().properties(integer("bytes")))
         .perform(FilesystemWriteFileAction::perform);
 
-    protected static Map<String, Long> perform(Map<String, ?> inputParameters, Context context) {
-        String fileName = MapUtils.getRequiredString(inputParameters, FILENAME);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        try (InputStream inputStream = context.getFileStream(
-            MapUtils.getRequired(inputParameters, FILE_ENTRY, Context.FileEntry.class))) {
+        String fileName = inputParameters.getRequiredString(FILENAME);
+
+        try (InputStream inputStream = context.file(
+            file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
 
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException ioException) {

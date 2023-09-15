@@ -119,7 +119,7 @@
   "description": "The Random Helper allows you to generate random values.",
   "icon": "path:assets/randomhelper.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "randomHelper",
   "resources": null,

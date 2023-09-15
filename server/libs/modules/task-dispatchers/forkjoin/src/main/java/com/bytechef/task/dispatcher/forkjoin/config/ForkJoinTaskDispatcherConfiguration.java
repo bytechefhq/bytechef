@@ -27,6 +27,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,6 +47,7 @@ public class ForkJoinTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Autowired
+    @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Autowired

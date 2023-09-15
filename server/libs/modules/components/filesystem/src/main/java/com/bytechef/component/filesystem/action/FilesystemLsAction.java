@@ -17,18 +17,16 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,9 +57,11 @@ public class FilesystemLsAction {
                 .defaultValue(false))
         .perform(FilesystemLsAction::perform);
 
-    protected static List<FileInfo> perform(Map<String, ?> inputParameters, Context context) {
-        Path root = Paths.get(MapUtils.getRequiredString(inputParameters, PATH));
-        boolean recursive = MapUtils.getBoolean(inputParameters, RECURSIVE, false);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        Path root = Paths.get(inputParameters.getRequiredString(PATH));
+        boolean recursive = inputParameters.getBoolean(RECURSIVE, false);
 
         try (Stream<Path> stream = Files.walk(root)) {
             return stream.filter(p -> {

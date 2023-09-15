@@ -18,11 +18,12 @@
 package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
@@ -71,20 +72,21 @@ public class ScheduleCronTrigger {
     }
 
     protected void listenerDisable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        TriggerContext context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter, TriggerContext context) {
 
         triggerScheduler.scheduleScheduleTrigger(
-            "0 " + MapUtils.getString(inputParameters, EXPRESSION),
-            MapUtils.getString(inputParameters, TIMEZONE), Map.of(
-                EXPRESSION, MapUtils.getString(inputParameters, EXPRESSION),
-                TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
+            "0 " + inputParameters.getString(EXPRESSION), inputParameters.getString(TIMEZONE),
+            Map.of(
+                EXPRESSION, inputParameters.getString(EXPRESSION),
+                TIMEZONE, inputParameters.getString(TIMEZONE)),
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 }

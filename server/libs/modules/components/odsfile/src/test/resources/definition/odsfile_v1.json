@@ -647,7 +647,7 @@
   "description": "Reads and writes data from a ODS file.",
   "icon": "path:assets/odsfile.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "odsFile",
   "resources": null,

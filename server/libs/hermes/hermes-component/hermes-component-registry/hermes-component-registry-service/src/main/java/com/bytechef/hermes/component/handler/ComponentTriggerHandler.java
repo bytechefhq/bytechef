@@ -17,15 +17,19 @@
 
 package com.bytechef.hermes.component.handler;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.exception.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -35,28 +39,31 @@ public class ComponentTriggerHandler implements TriggerHandler {
     private final String componentName;
     private final int componentVersion;
     private final String triggerName;
-    private final TriggerDefinitionService triggerDefinitionService;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
 
     @SuppressFBWarnings("EI")
     public ComponentTriggerHandler(
         String componentName, int componentVersion, String triggerName,
-        TriggerDefinitionService triggerDefinitionService) {
+        TriggerDefinitionFacade triggerDefinitionFacade) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.triggerName = triggerName;
-        this.triggerDefinitionService = triggerDefinitionService;
+        this.triggerDefinitionFacade = triggerDefinitionFacade;
     }
 
     @Override
     public TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
+        Map<String, Long> connectIdMap = MapUtils.getMap(
+            triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
+
         try {
-            return triggerDefinitionService.executeTrigger(
+            return triggerDefinitionFacade.executeTrigger(
                 componentName, componentVersion, triggerName, triggerExecution.getParameters(),
                 triggerExecution.getState(),
                 MapUtils.getRequired(
                     triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-                MapUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+                OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }

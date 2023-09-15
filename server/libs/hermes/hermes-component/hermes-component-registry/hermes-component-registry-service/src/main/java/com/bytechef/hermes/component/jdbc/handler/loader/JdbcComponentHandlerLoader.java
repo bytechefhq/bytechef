@@ -44,9 +44,9 @@ public class JdbcComponentHandlerLoader implements ComponentHandlerLoader {
             componentHandlerEntries.add(
                 new ComponentHandlerEntry(
                     jdbcComponentHandler,
-                    (actionName, actionDefinitionService) -> new ComponentTaskHandler(
+                    (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
                         jdbcComponentHandler.getName(), jdbcComponentHandler.getVersion(), actionName,
-                        actionDefinitionService)));
+                        actionDefinitionFacade)));
         }
 
         return componentHandlerEntries;

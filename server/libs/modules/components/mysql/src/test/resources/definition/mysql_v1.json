@@ -1734,7 +1734,7 @@
   "description": "Query, insert and update data from MySQL.",
   "icon": "path:assets/mysql.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "mysql",
   "resources": null,

@@ -647,7 +647,7 @@
   "description": "Reads and writes data from a XLS/XLSX file.",
   "icon": "path:assets/xlsxfile.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "xlsxFile",
   "resources": null,

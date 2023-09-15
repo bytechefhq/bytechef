@@ -19,8 +19,11 @@ package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -31,34 +34,33 @@ import java.util.Map;
 public interface ActionDefinitionService {
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
-        String authorizationName);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
 
     String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
 
     List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
-        String authorizationName);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, String searchText, @Nullable Connection connection);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
 
     Object executePerform(
-        String componentName, int componentVersion, String actionName, long taskExecutionId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
 
     Object executeSampleOutput(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> actionParameters, @Nullable Connection connection);
 
-    ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName);
+    ActionDefinition getActionDefinition(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName);
 
-    List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
+    List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion);
 
-    List<ActionDefinition> getActionDefinitions(List<ComponentOperation> componentOperations);
+    List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations);
 }

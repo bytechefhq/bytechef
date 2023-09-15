@@ -18,17 +18,15 @@
 package com.bytechef.component.rabbitmq.action;
 
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.rabbitmq.client.Channel;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.MESSAGE;
@@ -59,19 +57,19 @@ public class RabbitMqSendMessageAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(RabbitMqSendMessageAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
-        Connection connection = context.getConnection();
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
         try (com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
-            MapUtils.getString(connection.getParameters(), HOSTNAME),
-            MapUtils.getInteger(connection.getParameters(), PORT, 5672),
-            MapUtils.getString(connection.getParameters(), USERNAME),
-            MapUtils.getString(connection.getParameters(), PASSWORD))) {
+            connectionParameters.getString(HOSTNAME),
+            connectionParameters.getInteger(PORT, 5672),
+            connectionParameters.getString(USERNAME),
+            connectionParameters.getString(PASSWORD))) {
 
             Channel channel = rabbitMqConnection.createChannel();
 
-            String queueName = MapUtils.getRequiredString(inputParameters, QUEUE);
-            String message = JsonUtils.write(MapUtils.getRequired(inputParameters, MESSAGE));
+            String queueName = inputParameters.getRequiredString(QUEUE);
+            String message = context.json(json -> json.write(inputParameters.getRequired(MESSAGE)));
 
             channel.queueDeclare(queueName, true, false, false, null);
             channel.basicPublish("", queueName, null, message.getBytes(StandardCharsets.UTF_8));
@@ -86,6 +84,6 @@ public class RabbitMqSendMessageAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (inputParameters, connection) -> null;
     }
 }

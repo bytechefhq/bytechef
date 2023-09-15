@@ -26,10 +26,11 @@ import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -58,21 +59,18 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    @SuppressFBWarnings("NP")
-    public ApplyResponse executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
-
+    public ApplyResponse executeAuthorizationApply(@NonNull Connection connection) {
         return defaultWebClient.post(
             uriBuilder -> toUri(
-                uriBuilder, componentName, "/connection-definition-service/execute-authorization-apply"),
-            new ConnectionRequest(componentName, connectionVersion, connectionParameters, authorizationName),
-            ApplyResponse.class);
+                uriBuilder, connection.getComponentName(),
+                "/connection-definition-service/execute-authorization-apply/{connectionId}", connection.getId()),
+            null, ApplyResponse.class);
     }
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
-        String redirectUri) {
+        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+        @NonNull String authorizationName, @NonNull String redirectUri) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(
@@ -84,19 +82,18 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public Optional<String> executeBaseUri(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
-
+    public Optional<String> executeBaseUri(@NonNull Connection connection) {
         return Optional.ofNullable(
             defaultWebClient.post(
-                uriBuilder -> toUri(uriBuilder, componentName, "/connection-definition-service/execute-base-uri"),
-                new ConnectionRequest(componentName, connectionVersion, connectionParameters, null),
-                String.class));
+                uriBuilder -> toUri(
+                    uriBuilder, connection.getComponentName(),
+                    "/connection-definition-service/execute-base-uri/{connectionId}", connection.getId()),
+                null, String.class));
     }
 
     @Override
     public AuthorizationType getAuthorizationType(
-        String authorizationName, String componentName, int connectionVersion) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
         return defaultWebClient.get(
             uriBuilder -> toUri(
@@ -108,7 +105,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
+    public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
@@ -118,7 +115,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
+    public List<ConnectionDefinition>
+        getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
@@ -149,7 +147,8 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+        @NonNull String authorizationName) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(

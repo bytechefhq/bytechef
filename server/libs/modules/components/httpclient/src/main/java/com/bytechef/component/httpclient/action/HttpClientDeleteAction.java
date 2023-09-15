@@ -19,13 +19,13 @@ package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.DELETE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
+import static com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 
 /**
  * @author Ivica Cardic
@@ -48,9 +48,11 @@ public class HttpClientDeleteAction {
 
                 HttpClientActionUtils.options(false)))
         .outputSchema(HttpClientConstants.OUTPUT_PROPERTIES)
-        .perform((inputParameters, actionContext) -> perform(inputParameters));
+        .perform(HttpClientDeleteAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters) {
-        return HttpClientActionUtils.execute(inputParameters, RequestMethod.DELETE);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        return HttpClientActionUtils.execute(inputParameters, RequestMethod.DELETE, context);
     }
 }

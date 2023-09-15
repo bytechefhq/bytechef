@@ -21,13 +21,11 @@ package com.bytechef.component.bash.action;
 
 import com.bytechef.component.bash.BashComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-
-import java.util.Map;
 
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 
@@ -39,18 +37,19 @@ public class BashExecuteActionTest {
 
     @Test
     public void testPerform() {
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            String script = "ls -l " + BashComponentHandlerTest.class
-                .getClassLoader()
-                .getResource("dependencies/test.txt")
-                .getFile();
+        String script = "ls -l " + BashComponentHandlerTest.class
+            .getClassLoader()
+            .getResource("dependencies/test.txt")
+            .getFile();
 
-            mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(SCRIPT)))
-                .thenReturn(script);
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            String output = BashExecuteAction.perform(Map.of(), Mockito.mock(ActionDefinition.ActionContext.class));
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(SCRIPT)))
+            .thenReturn(script);
 
-            Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
-        }
+        String output = BashExecuteAction.perform(
+            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+
+        Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }
 }

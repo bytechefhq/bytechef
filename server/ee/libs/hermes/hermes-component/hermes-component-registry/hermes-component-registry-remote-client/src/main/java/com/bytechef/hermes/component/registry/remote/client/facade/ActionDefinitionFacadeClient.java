@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -47,7 +48,8 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> actionParameters,
         Long connectionId) {
 
         return defaultWebClient.post(
@@ -59,7 +61,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
         return defaultWebClient.post(
@@ -72,7 +74,8 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> actionParameters,
         Long connectionId) {
 
         return defaultWebClient.post(
@@ -84,24 +87,37 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 
         return defaultWebClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-properties"),
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-dynamic-properties"),
             new PropertiesRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId, propertyName),
             new ParameterizedTypeReference<>() {});
     }
 
     @Override
+    public Object executePerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+
+        return defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/action-definition-facade/execute-perform"),
+            new PerformRequest(
+                componentName, componentVersion, actionName, taskExecutionId, inputParameters, connectionId),
+            Object.class);
+    }
+
+    @Override
     public Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-facade/execute-sample-output"),
-            new SampleOutputRequest(actionName, actionParameters, componentName, componentVersion, connectionId),
+            new SampleOutputRequest(actionName, inputParameters, componentName, componentVersion, connectionId),
             Object.class);
     }
 
@@ -118,6 +134,11 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient
     private record OutputSchemaRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
         Long connectionId) {
+    }
+
+    private record PerformRequest(
+        String componentName, int componentVersion, String actionName, long taskExecutionId,
+        Map<String, ?> inputParameters, Long connectionId) {
     }
 
     private record PropertiesRequest(

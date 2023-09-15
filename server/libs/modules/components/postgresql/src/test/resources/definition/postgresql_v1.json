@@ -1734,7 +1734,7 @@
   "description": "Query, insert and update data from PostgreSQL.",
   "icon": "path:assets/postgresql.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "postgresql",
   "resources": null,

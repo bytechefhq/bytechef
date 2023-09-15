@@ -169,7 +169,7 @@
   "description": "Converts between XML string and object/array.",
   "icon": "path:assets/xmlhelper.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "xmlHelper",
   "resources": null,

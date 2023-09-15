@@ -17,15 +17,14 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.MKDIR;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
@@ -53,9 +52,11 @@ public class FilesystemMkdirAction {
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
      */
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         try {
-            return Files.createDirectories(Paths.get(MapUtils.getRequiredString(inputParameters, PATH)));
+            return Files.createDirectories(Paths.get(inputParameters.getRequiredString(PATH)));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create directories " + inputParameters, ioException);
         }

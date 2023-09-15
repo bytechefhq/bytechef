@@ -298,7 +298,7 @@
   "description": "Sets a value which can then be referenced in other tasks.",
   "icon": "path:assets/var.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "var",
   "resources": null,

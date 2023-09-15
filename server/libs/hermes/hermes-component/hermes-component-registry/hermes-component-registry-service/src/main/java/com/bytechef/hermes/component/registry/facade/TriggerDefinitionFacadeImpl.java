@@ -18,12 +18,15 @@
 package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +35,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@Service
+@Service("triggerDefinitionFacade")
 public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     private final ConnectionService connectionService;
@@ -48,122 +51,128 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
+        @NonNull Map<String, Object> triggerParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, triggerName, triggerParameters, propertyName, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, triggerName, triggerParameters, propertyName, connection);
     }
 
     @Override
     public void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, DynamicWebhookEnableOutput output, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         triggerDefinitionService.executeDynamicWebhookDisable(
-            componentName, componentVersion, triggerName, triggerParameters,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName(), workflowExecutionId, output);
+            componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, outputParameters,
+            connection);
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId, String webhookUrl) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId,
+        @NonNull String webhookUrl) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicWebhookEnable(
             componentName, componentVersion, triggerName, triggerParameters,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName(),
-            createWebhookUrl(workflowExecutionId, webhookUrl), workflowExecutionId);
+            createWebhookUrl(workflowExecutionId, webhookUrl), workflowExecutionId, connection);
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeEditorDescription(
-            componentName, componentVersion, triggerName, triggerParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, triggerName, triggerParameters, connection);
     }
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         triggerDefinitionService.executeListenerDisable(
-            componentName, componentVersion, triggerName, triggerParameters,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName(), workflowExecutionId);
+            componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connection);
     }
 
     @Override
     public void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters,
+        @NonNull String workflowExecutionId, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         triggerDefinitionService.executeOnEnableListener(
-            componentName, componentVersion, triggerName, triggerParameters,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName(), workflowExecutionId);
+            componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, connection);
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> triggerParameters, Long connectionId, String searchText) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
+        @NonNull Map<String, ?> triggerParameters, Long connectionId, String searchText) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeOptions(
-            componentName, componentVersion, triggerName, triggerParameters, propertyName, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName(), searchText);
+            componentName, componentVersion, triggerName, triggerParameters, propertyName, searchText, connection);
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeOutputSchema(
-            componentName, componentVersion, triggerName, triggerParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, triggerName, triggerParameters, connection);
 
     }
 
     @Override
     public Object executeSampleOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeSampleOutput(
-            componentName, componentVersion, triggerName, triggerParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, triggerName, triggerParameters, connection);
 
+    }
+
+    @Override
+    public TriggerOutput executeTrigger(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, Long connectionId) {
+
+        return triggerDefinitionService.executeTrigger(
+            componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
+            connectionId == null ? null : connectionService.getConnection(connectionId));
+    }
+
+    @Override
+    public boolean executeWebhookValidate(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
+
+        return triggerDefinitionService.executeWebhookValidate(
+            componentName, componentVersion, triggerName, inputParameters, webhookRequest,
+            connectionId == null ? null : connectionService.getConnection(connectionId));
     }
 
     private String createWebhookUrl(String workflowExecutionId, String webhookUrl) {

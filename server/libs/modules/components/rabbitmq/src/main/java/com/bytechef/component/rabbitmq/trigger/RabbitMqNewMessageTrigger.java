@@ -18,14 +18,15 @@
 package com.bytechef.component.rabbitmq.trigger;
 
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class RabbitMqNewMessageTrigger {
 
-    private static final Map<String, com.rabbitmq.client.Connection> CONNECTION_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Connection> CONNECTION_MAP = new ConcurrentHashMap<>();
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newMessage")
         .title("New Message")
@@ -62,43 +63,42 @@ public class RabbitMqNewMessageTrigger {
         .listenerEnable(RabbitMqNewMessageTrigger::listenerEnable)
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
 
-    protected static void listenerEnable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter) {
+    protected static void listenerDisable(
+        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        TriggerContext context) {
+
+        Connection rabbitmqConnection = CONNECTION_MAP.remove(workflowExecutionId);
 
         try {
-            com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
-                MapUtils.getString(connection.getParameters(), HOSTNAME),
-                MapUtils.getInteger(connection.getParameters(), PORT, 5672),
-                MapUtils.getString(connection.getParameters(), USERNAME),
-                MapUtils.getString(connection.getParameters(), PASSWORD));
+            rabbitmqConnection.close();
+        } catch (IOException e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
+    }
+
+    protected static void listenerEnable(
+        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter, TriggerContext context) {
+
+        try {
+            Connection rabbitMqConnection = RabbitMqUtils.getConnection(
+                connectionParameters.getString(HOSTNAME), connectionParameters.getInteger(PORT, 5672),
+                connectionParameters.getString(USERNAME), connectionParameters.getString(PASSWORD));
 
             CONNECTION_MAP.put(workflowExecutionId, rabbitMqConnection);
 
             Channel channel = rabbitMqConnection.createChannel();
 
-            channel.queueDeclare(MapUtils.getRequiredString(inputParameters, QUEUE), true, false, false, null);
+            channel.queueDeclare(inputParameters.getRequiredString(QUEUE), true, false, false, null);
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 
-                listenerEmitter.emit(JsonUtils.read(message));
+                listenerEmitter.emit(context.json(json -> json.read(message)));
             };
 
-            channel.basicConsume(MapUtils.getString(inputParameters, QUEUE), true, deliverCallback, consumerTag -> {});
+            channel.basicConsume(inputParameters.getString(QUEUE), true, deliverCallback, consumerTag -> {});
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
-        }
-    }
-
-    protected static void listenerDisable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
-
-        com.rabbitmq.client.Connection rabbitmqConnection = CONNECTION_MAP.remove(workflowExecutionId);
-
-        try {
-            rabbitmqConnection.close();
-        } catch (IOException e) {
             throw new ComponentExecutionException(e.getMessage(), e);
         }
     }

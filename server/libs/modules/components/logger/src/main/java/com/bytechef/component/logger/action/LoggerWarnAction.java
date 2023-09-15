@@ -17,13 +17,12 @@
 
 package com.bytechef.component.logger.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 import static com.bytechef.component.logger.constant.LoggerConstants.TEXT;
 import static com.bytechef.component.logger.constant.LoggerConstants.WARN;
@@ -43,8 +42,10 @@ public class LoggerWarnAction {
         .properties(string(TEXT))
         .perform(LoggerWarnAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        logger.warn(MapUtils.getString(inputParameters, TEXT));
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        logger.warn(inputParameters.getString(TEXT));
 
         return null;
     }

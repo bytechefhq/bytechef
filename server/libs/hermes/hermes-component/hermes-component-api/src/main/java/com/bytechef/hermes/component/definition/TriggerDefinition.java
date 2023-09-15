@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
@@ -248,40 +248,15 @@ public interface TriggerDefinition {
 
         /**
          *
-         * @param context
+         * @param inputParameters
+         * @param connectionParameters
+         * @param outputParameters
+         * @param workflowExecutionId
          */
-        void accept(DynamicWebhookDisableContext context);
+        void accept(
+            ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
+            String workflowExecutionId, TriggerContext triggerContext);
 
-    }
-
-    /**
-     *
-     */
-    interface DynamicWebhookDisableContext {
-
-        /**
-         *
-         * @return
-         */
-        Connection connection();
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> inputParameters();
-
-        /**
-         *
-         * @return
-         */
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput();
-
-        /**
-         *
-         * @return
-         */
-        String workflowExecutionId();
     }
 
     /**
@@ -291,9 +266,16 @@ public interface TriggerDefinition {
     interface DynamicWebhookEnableFunction {
 
         /**
-         * @param context
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param webhookUrl
+         * @param workflowExecutionId
+         * @return
          */
-        DynamicWebhookEnableOutput apply(EnableDynamicWebhookContext context);
+        DynamicWebhookEnableOutput apply(
+            ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
+            String workflowExecutionId, TriggerContext triggerContext);
 
     }
 
@@ -304,10 +286,6 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record DynamicWebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
-
-        public Object getParameter(String key) {
-            return parameters.get(key);
-        }
     }
 
     /**
@@ -316,55 +294,7 @@ public interface TriggerDefinition {
     @FunctionalInterface
     interface DynamicWebhookRefreshFunction {
 
-        DynamicWebhookEnableOutput apply(DynamicWebhookEnableOutput dynamicWebhookEnableOutput);
-    }
-
-    /**
-     *
-     */
-    interface DynamicWebhookRequestContext {
-
-        /**
-         *
-         * @return
-         */
-        HttpHeaders headers();
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> inputParameters();
-
-        /**
-         *
-         * @return
-         */
-        HttpParameters parameters();
-
-        /**
-         *
-         * @return
-         */
-        WebhookBody body();
-
-        /**
-         *
-         * @return
-         */
-        WebhookMethod method();
-
-        /**
-         *
-         * @return
-         */
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput();
-
-        /**
-         *
-         * @return
-         */
-        TriggerContext triggerContext();
+        DynamicWebhookEnableOutput apply(ParameterMap outputParameters);
     }
 
     /**
@@ -375,79 +305,20 @@ public interface TriggerDefinition {
 
         /**
          *
-         * @param context
-         * @return
-         */
-        WebhookOutput apply(DynamicWebhookRequestContext context);
-
-    }
-
-    /**
-     *
-     */
-    interface EnableDynamicWebhookContext {
-
-        /**
-         *
-         * @return
-         */
-        Connection connection();
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> inputParameters();
-
-        /**
-         *
-         * @return
-         */
-        String webhookUrl();
-
-        /**
-         *
-         * @return
-         */
-        String workflowExecutionId();
-    }
-
-    /**
-     *
-     */
-    interface PollContext {
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> closureParameters();
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> inputParameters();
-
-        /**
-         *
-         * @return
-         */
-        TriggerContext triggerContext();
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface ListenerDisableConsumer {
-
-        /**
-         *
-         * @param connection
          * @param inputParameters
+         * @param getConnectionParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param output
+         * @param triggerContext
+         * @return
          */
-        void accept(Connection connection, Map<String, ?> inputParameters, String workflowExecutionId);
+        WebhookOutput apply(
+            ParameterMap inputParameters, ParameterMap getConnectionParameters, HttpHeaders headers,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+            TriggerContext triggerContext) throws ComponentExecutionException;
     }
 
     /**
@@ -519,6 +390,23 @@ public interface TriggerDefinition {
     /**
      *
      */
+    @FunctionalInterface
+    interface ListenerDisableConsumer {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param workflowExecutionId
+         */
+        void accept(
+            ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+            TriggerContext context);
+    }
+
+    /**
+     *
+     */
     interface ListenerEmitter {
 
         /**
@@ -534,13 +422,15 @@ public interface TriggerDefinition {
     interface ListenerEnableConsumer {
 
         /**
-         * @param connection
+         *
          * @param inputParameters
+         * @param connectionParameters
          * @param workflowExecutionId
+         * @param listenerEmitter
          */
         void accept(
-            Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
-            ListenerEmitter listenerEmitter);
+            ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+            ListenerEmitter listenerEmitter, TriggerContext context);
     }
 
     /**
@@ -551,10 +441,14 @@ public interface TriggerDefinition {
 
         /**
          *
-         * @param context
+         * @param inputParameters
+         * @param closureParameters
+         * @param triggerContext
          * @return
          */
-        PollOutput apply(PollContext context);
+        PollOutput apply(
+            ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext triggerContext)
+            throws ComponentExecutionException;
 
     }
 
@@ -578,57 +472,22 @@ public interface TriggerDefinition {
     /**
      *
      */
-    interface StaticWebhookRequestContext {
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> inputParameters();
-
-        /**
-         *
-         * @return
-         */
-        HttpHeaders headers();
-
-        /**
-         *
-         * @return
-         */
-        HttpParameters parameters();
-
-        /**
-         *
-         * @return
-         */
-        WebhookBody body();
-
-        /**
-         *
-         * @return
-         */
-        WebhookMethod method();
-
-        /**
-         *
-         * @return
-         */
-        TriggerContext triggerContext();
-    }
-
-    /**
-     *
-     */
     @FunctionalInterface
     interface StaticWebhookRequestFunction {
 
         /**
          *
-         * @param context
+         * @param inputParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param triggerContext
          * @return
          */
-        WebhookOutput apply(StaticWebhookRequestContext context);
+        WebhookOutput apply(
+            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext triggerContext) throws ComponentExecutionException;
 
     }
 
@@ -773,56 +632,21 @@ public interface TriggerDefinition {
     /**
      *
      */
-    interface WebhookValidateContext {
-
-        /**
-         *
-         * @return
-         */
-        Map<String, ?> inputParameters();
-
-        /**
-         *
-         * @return
-         */
-        HttpHeaders headers();
-
-        /**
-         *
-         * @return
-         */
-        HttpParameters parameters();
-
-        /**
-         *
-         * @return
-         */
-        WebhookBody body();
-
-        /**
-         *
-         * @return
-         */
-        WebhookMethod method();
-
-        /**
-         *
-         * @return
-         */
-        TriggerContext triggerContext();
-    }
-
-    /**
-     *
-     */
     @FunctionalInterface
     interface WebhookValidateFunction {
 
         /**
          *
-         * @param context
+         * @param inputParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param triggerContext
          * @return
          */
-        boolean apply(WebhookValidateContext context);
+        boolean apply(
+            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext triggerContext);
     }
 }

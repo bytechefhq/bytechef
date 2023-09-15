@@ -18,12 +18,10 @@
 package com.bytechef.component.randomhelper.action;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
 
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.END_INCLUSIVE;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_INT;
@@ -54,9 +52,11 @@ public class RandomHelperRandomIntAction {
     /**
      * Generates a random integer.
      */
-    public static int perform(Map<String, ?> inputParameters, Context context) {
-        int startInclusive = MapUtils.getInteger(inputParameters, START_INCLUSIVE, 0);
-        int endInclusive = MapUtils.getInteger(inputParameters, END_INCLUSIVE, 100);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        int startInclusive = inputParameters.getInteger(START_INCLUSIVE, 0);
+        int endInclusive = inputParameters.getInteger(END_INCLUSIVE, 100);
 
         return nextInt(startInclusive, endInclusive);
     }

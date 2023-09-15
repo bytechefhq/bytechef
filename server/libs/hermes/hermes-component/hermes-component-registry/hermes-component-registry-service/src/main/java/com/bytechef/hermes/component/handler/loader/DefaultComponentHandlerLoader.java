@@ -37,7 +37,7 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
             ActionHandlerFunction actionHandlerFunction = OptionalUtils.get(
                 componentHandler.getActionHandler());
 
-            return (inputParameters, context) -> actionHandlerFunction.apply(
+            return (inputParameters, connectionParameters, context) -> actionHandlerFunction.apply(
                 actionDefinition.getName(), inputParameters, context);
         };
 
@@ -56,7 +56,7 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     @Override
     protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(ComponentHandler componentHandler) {
-        return (actionName, actionDefinitionService) -> new ComponentTaskHandler(
-            componentHandler.getName(), componentHandler.getVersion(), actionName, actionDefinitionService);
+        return (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
+            componentHandler.getName(), componentHandler.getVersion(), actionName, actionDefinitionFacade);
     }
 }

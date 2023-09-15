@@ -18,17 +18,15 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,67 +41,61 @@ public class FilesystemLsActionTest {
     @Test
     public void testLs1() {
         File file = getLsFile();
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> Paths.get(MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
-                .thenReturn(file.getAbsolutePath());
-            mockedStatic.when(() -> MapUtils.getBoolean(
-                Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
-                .thenReturn(true);
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+            .thenReturn(file.getAbsolutePath());
+        Mockito.when(parameterMap.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
+            .thenReturn(true);
 
-            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
-                Map.of(), Mockito.mock(Context.class));
+        List<FilesystemLsAction.FileInfo> files = (List<FilesystemLsAction.FileInfo>) FilesystemLsAction.perform(
+            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            Assertions.assertEquals(
-                Set.of("C.txt", "B.txt", "A.txt"),
-                files.stream()
-                    .map(FilesystemLsAction.FileInfo::getName)
-                    .collect(Collectors.toSet()));
-        }
+        Assertions.assertEquals(
+            Set.of("C.txt", "B.txt", "A.txt"),
+            files.stream()
+                .map(FilesystemLsAction.FileInfo::getName)
+                .collect(Collectors.toSet()));
     }
 
     @Test
     public void testLs2() {
         File file = getLsFile();
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> Paths.get(MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
-                .thenReturn(file.getAbsolutePath());
-            mockedStatic.when(() -> MapUtils.getBoolean(
-                Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
-                .thenReturn(true);
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+            .thenReturn(file.getAbsolutePath());
+        Mockito.when(parameterMap.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
+            .thenReturn(true);
 
-            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
-                Map.of(), Mockito.mock(Context.class));
+        List<FilesystemLsAction.FileInfo> files = (List<FilesystemLsAction.FileInfo>) FilesystemLsAction.perform(
+            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            Assertions.assertEquals(
-                Set.of("sub1/C.txt", "B.txt", "A.txt"),
-                files.stream()
-                    .map(FilesystemLsAction.FileInfo::getRelativePath)
-                    .collect(Collectors.toSet()));
-        }
+        Assertions.assertEquals(
+            Set.of("sub1/C.txt", "B.txt", "A.txt"),
+            files.stream()
+                .map(FilesystemLsAction.FileInfo::getRelativePath)
+                .collect(Collectors.toSet()));
     }
 
     @Test
     public void testLs3() {
         File file = getLsFile();
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> Paths.get(MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
-                .thenReturn(file.getAbsolutePath());
-            mockedStatic.when(() -> MapUtils.getBoolean(
-                Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
-                .thenReturn(false);
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+            .thenReturn(file.getAbsolutePath());
+        Mockito.when(parameterMap.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
+            .thenReturn(false);
 
-            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
-                Map.of(), Mockito.mock(Context.class));
+        List<FilesystemLsAction.FileInfo> files = (List<FilesystemLsAction.FileInfo>) FilesystemLsAction.perform(
+            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            Assertions.assertEquals(
-                Set.of("B.txt", "A.txt"),
-                files.stream()
-                    .map(FilesystemLsAction.FileInfo::getName)
-                    .collect(Collectors.toSet()));
-        }
+        Assertions.assertEquals(
+            Set.of("B.txt", "A.txt"),
+            files.stream()
+                .map(FilesystemLsAction.FileInfo::getName)
+                .collect(Collectors.toSet()));
     }
 
     private static File getLsFile() {

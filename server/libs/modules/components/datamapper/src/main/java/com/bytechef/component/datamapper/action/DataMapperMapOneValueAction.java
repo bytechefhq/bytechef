@@ -17,13 +17,11 @@
 
 package com.bytechef.component.datamapper.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.DEFAULT_VALUE;
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.FROM;
@@ -260,14 +258,16 @@ public class DataMapperMapOneValueAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapOneValueAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         // TODO
         return null;
     }
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> switch (MapUtils.getRequiredInteger(inputParameters, TYPE)) {
+        return (inputParameters, connection) -> switch (inputParameters.getRequiredInteger(TYPE)) {
             case 1 -> array();
             case 2 -> bool();
             case 3 -> date();

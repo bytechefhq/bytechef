@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.openapitools.jackson.nullable.JsonNullableModule;
@@ -43,7 +44,16 @@ public class JacksonConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
-        return Jackson2ObjectMapperBuilder.json()
+        return buildMapper(Jackson2ObjectMapperBuilder.json(), dateFormat);
+    }
+
+    @Bean
+    XmlMapper xmlMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
+        return buildMapper(Jackson2ObjectMapperBuilder.xml(), dateFormat);
+    }
+
+    private static <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder json, String dateFormat) {
+        return json
             .dateFormat(new SimpleDateFormat(dateFormat))
             .timeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
             .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

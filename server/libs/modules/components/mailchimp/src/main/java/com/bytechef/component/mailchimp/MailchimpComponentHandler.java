@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
 import com.google.auto.service.AutoService;
@@ -32,7 +32,7 @@ import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Objects;
 
-import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
 /**
  * @author Ivica Cardic
@@ -55,10 +55,10 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     @Override
     public ModifiableConnectionDefinition
         modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
         return modifiableConnectionDefinition
-            .baseUri(connectionParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
-                MailchimpUtils.getMailChimpServer(
-                    MapUtils.getRequiredString(connectionParameters, ACCESS_TOKEN))));
+            .baseUri((connectionParameters) -> "https://%s.api.mailchimp.com/3.0".formatted(
+                MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN))));
     }
 
     @Override

@@ -17,11 +17,11 @@
 
 package com.bytechef.component.odsfile.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -99,16 +99,18 @@ public class OdsFileReadAction {
         .outputSchema(array())
         .perform(OdsFileReadAction::perform);
 
-    protected static List<Map<String, ?>> perform(Map<String, ?> inputParameters, Context context) {
-        boolean headerRow = MapUtils.getBoolean(inputParameters, HEADER_ROW, true);
-        boolean includeEmptyCells = MapUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
-        Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
-        boolean readAsString = MapUtils.getBoolean(inputParameters, READ_AS_STRING, false);
-        String sheetName = MapUtils.getString(inputParameters, SHEET_NAME);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        try (InputStream inputStream = context.getFileStream(
-            MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class))) {
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
+        String sheetName = inputParameters.getString(SHEET_NAME);
+
+        try (InputStream inputStream = context.file(
+            file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
 
             if (inputStream == null) {
                 throw new ComponentExecutionException("Unable to get file content from task " + inputParameters);

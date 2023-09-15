@@ -17,12 +17,10 @@
 
 package com.bytechef.component.xmlfile.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
-import com.bytechef.hermes.component.util.XmlUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
@@ -79,18 +76,19 @@ public class XmlFileWriteAction {
         .outputSchema(fileEntry())
         .perform(XmlFileWriteAction::perform);
 
-    protected static FileEntry perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
-        Object source = MapUtils.getRequired(inputParameters, SOURCE);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
+        Object source = inputParameters.getRequired(SOURCE);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
-            printWriter.println(XmlUtils.write(source));
+            printWriter.println((String) context.xml(xml -> xml.write(source)));
         }
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-            return context.storeFileContent(
-                MapUtils.getString(inputParameters, FILENAME, "file.xml"), inputStream);
+            return context.file(
+                file -> file.storeContent(inputParameters.getString(FILENAME, "file.xml"), inputStream));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }

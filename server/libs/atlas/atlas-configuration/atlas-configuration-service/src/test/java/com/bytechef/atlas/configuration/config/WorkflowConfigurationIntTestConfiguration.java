@@ -20,7 +20,7 @@ package com.bytechef.atlas.configuration.config;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 //import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;

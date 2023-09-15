@@ -46,7 +46,7 @@ public class WebhookAutoRespondWithHTTP200Trigger {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> object()
+        return (inputParameters, connectionParameters) -> object()
             .properties(
                 string(METHOD),
                 object(HEADERS),

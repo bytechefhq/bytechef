@@ -430,7 +430,7 @@
   "description": "Reads and writes data from a file stored inside the file storage.",
   "icon": "path:assets/filestorage.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "fileStorage",
   "resources": null,

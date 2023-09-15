@@ -22,6 +22,9 @@ import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.connection.domain.Connection;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -34,24 +37,25 @@ public interface ConnectionDefinitionService {
 
     boolean connectionExists(String componentName, int connectionVersion);
 
-    ApplyResponse executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
+    ApplyResponse executeAuthorizationApply(@NonNull Connection connection);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
-        String redirectUri);
+        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+        @NonNull String authorizationName, @NonNull String redirectUri);
 
-    Optional<String> executeBaseUri(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters);
+    Optional<String> executeBaseUri(@NonNull Connection connection);
 
-    AuthorizationType getAuthorizationType(String authorizationName, String componentName, int connectionVersion);
+    AuthorizationType getAuthorizationType(
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
 
-    ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion);
+    ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion);
 
     List<ConnectionDefinition> getConnectionDefinitions();
 
-    List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion);
+    List<ConnectionDefinition> getConnectionDefinitions(
+        @NonNull String componentName, @NonNull Integer componentVersion);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
+        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+        @NonNull String authorizationName);
 }

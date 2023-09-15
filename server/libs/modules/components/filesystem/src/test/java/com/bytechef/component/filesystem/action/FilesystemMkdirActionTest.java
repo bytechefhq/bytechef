@@ -17,16 +17,15 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
-import java.util.Map;
 import java.util.UUID;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
@@ -38,29 +37,29 @@ public class FilesystemMkdirActionTest {
 
     @Test
     public void testCreateDir1() {
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
         String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
             .toString()
             .replace("-", "");
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
-                .thenReturn(tempDir);
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+            .thenReturn(tempDir);
 
-            FilesystemMkdirAction.perform(Map.of(), Mockito.mock(Context.class));
+        FilesystemMkdirAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            Assertions.assertTrue(new File(tempDir).exists());
-        }
+        Assertions.assertTrue(new File(tempDir).exists());
     }
 
     @Test
     public void testCreateDir2() {
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            Assertions.assertThrows(ComponentExecutionException.class, () -> {
-                mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
-                    .thenReturn("/no/such/thing");
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-                FilesystemMkdirAction.perform(Map.of(), Mockito.mock(Context.class));
-            });
-        }
+        Assertions.assertThrows(ComponentExecutionException.class, () -> {
+            Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+                .thenReturn("/no/such/thing");
+
+            FilesystemMkdirAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        });
+
     }
 }

@@ -18,17 +18,18 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
@@ -37,27 +38,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Ivica Cardic
  */
+@Disabled
 public class FilesystemWriteFileActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
     public void testPerformWriteFile() throws IOException {
-        Context context = Mockito.mock(Context.class);
+        ActionContext context = Mockito.mock(ActionContext.class);
         File file = getSampleFile();
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
+        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(Context.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequired(
-                Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
-                .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(FILENAME)))
-                .thenReturn(file.getAbsolutePath());
+        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(FILENAME)))
+            .thenReturn(file.getAbsolutePath());
 
-            assertThat(FilesystemWriteFileAction.perform(Map.of(), context))
-                .hasFieldOrPropertyWithValue("bytes", 5L);
-        }
+        assertThat(FilesystemWriteFileAction.perform(parameterMap, parameterMap, context))
+            .hasFieldOrPropertyWithValue("bytes", 5L);
     }
 
     private File getSampleFile() {

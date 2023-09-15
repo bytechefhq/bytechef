@@ -17,12 +17,11 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import java.io.File;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.GET_FILE_PATH;
@@ -56,8 +55,10 @@ public class FilesystemGetFilePathAction {
      * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
      * the text before the last forward or backslash.
      */
-    protected static String perform(Map<String, ?> inputParameters, Context context) {
-        String filename = MapUtils.getRequiredString(inputParameters, FILENAME);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        String filename = inputParameters.getRequiredString(FILENAME);
 
         return filename.substring(0, filename.lastIndexOf(File.separator));
     }

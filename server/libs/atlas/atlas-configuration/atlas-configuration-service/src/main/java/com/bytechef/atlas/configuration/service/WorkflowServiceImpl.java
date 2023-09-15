@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.configuration.service;
+package com.bytechef.atlas.configuration.service;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;

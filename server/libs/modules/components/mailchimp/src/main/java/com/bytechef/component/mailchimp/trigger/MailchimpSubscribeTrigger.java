@@ -18,24 +18,22 @@
 package com.bytechef.component.mailchimp.trigger;
 
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.util.Map;
 
-import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -79,54 +77,47 @@ public class MailchimpSubscribeTrigger {
         .dynamicWebhookEnable(MailchimpSubscribeTrigger::dynamicWebhookEnable)
         .dynamicWebhookRequest(MailchimpSubscribeTrigger::dynamicWebhookRequest);
 
-    protected static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput = context.dynamicWebhookEnableOutput();
-        Connection connection = context.connection();
+    protected static void dynamicWebhookDisable(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
+        String workflowExecutionId, TriggerContext context) {
 
-        Map<String, Object> connectionParameters = connection.getParameters();
+        String server = MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        String server = MailchimpUtils.getMailChimpServer(
-            MapUtils.getRequiredString(connectionParameters, ACCESS_TOKEN));
-
-        Map<String, ?> inputParameters = context.inputParameters();
-
-        HttpClientUtils
-            .delete(
-                "https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks/$%s".formatted(
-                    server, MapUtils.getString(inputParameters, LIST_ID),
-                    dynamicWebhookEnableOutput.getParameter(LIST_ID)))
+        context.http(http -> http.delete(
+            "https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks/$%s".formatted(
+                server, inputParameters.getString(LIST_ID), outputParameters.get(LIST_ID))))
             .execute();
     }
 
-    protected static WebhookOutput dynamicWebhookRequest(DynamicWebhookRequestContext context) {
-        WebhookBody webhookBody = context.body();
+    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+        ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
+        String workflowExecutionId, TriggerContext context) {
 
-        return WebhookOutput.map((Map<?, ?>) webhookBody.content());
-    }
+        String server = MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(EnableDynamicWebhookContext context) {
-        Connection connection = context.connection();
-
-        String server = MailchimpUtils.getMailChimpServer(
-            MapUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN));
-
-        Map<String, ?> inputParameters = context.inputParameters();
-
-        Map<?, ?> response = (Map<?, ?>) HttpClientUtils
-            .post("https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
-                server, MapUtils.getString(inputParameters, LIST_ID)))
-            .body(Body.of(
+        Map<?, ?> response = (Map<?, ?>) context
+            .http(http -> http.post("https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
+                server, inputParameters.getString(LIST_ID))))
+            .body(Http.Body.of(
                 Map.of(
-                    "url", context.webhookUrl(),
+                    "url", webhookUrl,
                     "events", Map.of(SUBSCRIBE, true),
                     "sources", Map.of(
                         "user", true,
                         "admin", true,
                         "api", true))))
-            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .body();
 
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
+    }
+
+    protected static WebhookOutput dynamicWebhookRequest(
+        Map<String, ?> inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        TriggerContext context) {
+
+        return WebhookOutput.map((Map<?, ?>) body.content());
     }
 }

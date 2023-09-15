@@ -73,7 +73,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                 triggerDefinitionFacade.executeDynamicWebhookDisable(
                     componentOperation.componentName(), componentOperation.componentVersion(),
                     componentOperation.operationName(), triggerParameters, workflowExecutionId.toString(),
-                    output, connectionId);
+                    output.parameters(), connectionId);
 
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
             }

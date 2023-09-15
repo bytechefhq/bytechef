@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -26,22 +27,26 @@ import java.util.Map;
 public interface ActionDefinitionFacade {
 
     String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> actionParameters, Long connectionId);
 
     List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, String searchText);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> actionParameters, Long connectionId);
+
+    Object executePerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        Long connectionId);
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> inputParameters, Long connectionId);
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId);
 }

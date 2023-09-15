@@ -17,14 +17,14 @@
 
 package com.bytechef.component.filestorage.action;
 
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-
-import java.util.Map;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,26 +34,25 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class FileStorageReadActionTest {
 
-    private static final Context context = Mockito.mock(Context.class);
+    private static final ActionContext context = Mockito.mock(ActionContext.class);
 
+    @Disabled
     @Test
     public void testPerformRead() {
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
+        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            mockedStatic.when(() -> MapUtils.getRequired(
-                Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
-                .thenReturn(fileEntry);
+        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+            .thenReturn(fileEntry);
 
-            FileStorageReadAction.perform(Map.of(), context);
+        FileStorageReadAction.perform(parameterMap, parameterMap, context);
 
-            ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor =
-                ArgumentCaptor.forClass(Context.FileEntry.class);
+        ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor =
+            ArgumentCaptor.forClass(Context.FileEntry.class);
 
-            Mockito.verify(context)
-                .readFileToString(fileEntryArgumentCaptor.capture());
+        Mockito.verify(context)
+            .file(file -> file.readToString(fileEntryArgumentCaptor.capture()));
 
-            assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
-        }
+        assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
     }
 }

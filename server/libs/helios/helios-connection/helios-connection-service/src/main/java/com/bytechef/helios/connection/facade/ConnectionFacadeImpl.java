@@ -25,6 +25,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -79,12 +80,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionDTO.toConnection();
 
         if (StringUtils.hasText(connection.getAuthorizationName()) &&
-            connection.containsParameter(Authorization.CODE)) {
+            connection.containsParameter(AuthorizationConstants.CODE)) {
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
             Authorization.AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
-                connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
+                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationName());
 
             if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {

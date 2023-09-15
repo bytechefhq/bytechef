@@ -20,7 +20,7 @@ package com.bytechef.dione.configuration.config;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 
 import java.util.List;
 

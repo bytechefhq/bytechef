@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +39,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
+    public Map<String, Integer> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
         List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
         List<Map<String, ?>> rows = MapUtils.getList(
             inputParameters, JdbcConstants.ROWS, new ParameterizedTypeReference<>() {}, List.of());
@@ -49,7 +48,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String updateKey = MapUtils.getString(inputParameters, JdbcConstants.UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-            context.getConnection(),
+            connectionParameters,
             "UPDATE "
                 + schema
                 + "."

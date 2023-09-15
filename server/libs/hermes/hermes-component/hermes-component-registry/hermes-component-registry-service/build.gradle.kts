@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:core:message-broker:message-broker-api"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
-    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
     implementation(project(":server:libs:core:data-storage:data-storage-api"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
     implementation(project(":server:libs:hermes:hermes-worker:hermes-worker-api"))

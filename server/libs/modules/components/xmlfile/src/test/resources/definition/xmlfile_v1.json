@@ -400,7 +400,7 @@
   "description": "Reads and writes data from a XML file.",
   "icon": "path:assets/xmlfile.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "xmlFile",
   "resources": null,

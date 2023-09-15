@@ -17,11 +17,10 @@
 
 package com.bytechef.component.datastorage.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
@@ -52,7 +51,9 @@ public class DataStorageGetAllEntriesAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(DataStorageGetAllEntriesAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext actionContext) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         // TODO
 
         return null;
@@ -60,7 +61,7 @@ public class DataStorageGetAllEntriesAction {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> object()
+        return (inputParameters, connection) -> object()
             .properties(
                 array("item")
                     .items(
