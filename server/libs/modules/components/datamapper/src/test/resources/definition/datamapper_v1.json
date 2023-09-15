@@ -2323,7 +2323,7 @@
   "description": "The Data Mapper enables you to configure data mappings.",
   "icon": "path:assets/datamapper.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "dataMapper",
   "resources": null,

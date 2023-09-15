@@ -101,8 +101,8 @@ public class OpenApiComponentGenerator {
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ConnectionDefinition");
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
-    private static final ClassName HTTP_CLIENT_UTILS_CLASS = ClassName
-        .get("com.bytechef.hermes.component.util", "HttpClientUtils");
+    private static final ClassName CONTEXT_HTTP_CLASS = ClassName
+        .get("com.bytechef.hermes.component.definition", "Context", "Http");
     private static final ClassName OPEN_API_COMPONENT_HANDLER_CLASS = ClassName
         .get("com.bytechef.hermes.component", "OpenApiComponentHandler");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
@@ -211,7 +211,7 @@ public class OpenApiComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "time")
             .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
-            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseType")
+            .addStaticImport(CONTEXT_HTTP_CLASS, "BodyContentType", "ResponseType")
             .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
     }
 
@@ -827,7 +827,7 @@ public class OpenApiComponentGenerator {
                 Server server = servers.get(0);
 
                 if (!StringUtils.isEmpty(server.getUrl()) && !Objects.equals(server.getUrl(), "/")) {
-                    builder.add(".baseUri(connection -> $S)", server.getUrl());
+                    builder.add(".baseUri((connectionParameters) -> $S)", server.getUrl());
                 }
             } else {
                 List<CodeBlock> codeBlocks = new ArrayList<>();

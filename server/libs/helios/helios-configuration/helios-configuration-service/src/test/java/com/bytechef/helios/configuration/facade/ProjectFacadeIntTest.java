@@ -24,7 +24,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.category.domain.Category;

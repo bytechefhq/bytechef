@@ -23,21 +23,17 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.sql.DataSource;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -82,11 +78,6 @@ public class UpdateJdbcOperationIntTest {
 
     @Test
     public void testUpdate() {
-        Context context = Mockito.mock(Context.class);
-
-        Mockito.when(context.fetchConnection())
-            .thenReturn(Optional.of(Mockito.mock(Connection.class)));
-
         Map<String, ?> inputParameters = Map.of(
             COLUMNS, List.of("name"),
             ROWS, List.of(Map.of("id", "id2", "name", "name3")),
@@ -94,7 +85,7 @@ public class UpdateJdbcOperationIntTest {
             TABLE, "test",
             UPDATE_KEY, "id");
 
-        Map<String, Integer> result = updateJdbcOperation.execute(context, inputParameters);
+        Map<String, Integer> result = updateJdbcOperation.execute(inputParameters, Map.of());
 
         Assertions.assertEquals(1, result.get("rows"));
         Assertions.assertEquals(
@@ -115,7 +106,7 @@ public class UpdateJdbcOperationIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
 
                         return dataSource;
                     }

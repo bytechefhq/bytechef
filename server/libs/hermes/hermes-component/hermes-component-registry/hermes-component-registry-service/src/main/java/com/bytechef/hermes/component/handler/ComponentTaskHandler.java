@@ -20,11 +20,14 @@ package com.bytechef.hermes.component.handler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,29 +36,30 @@ import java.util.Objects;
 public class ComponentTaskHandler implements TaskHandler<Object> {
 
     private final String actionName;
-    private final ActionDefinitionService actionDefinitionService;
     private final String componentName;
     private final int componentVersion;
+    private final ActionDefinitionFacade actionDefinitionFacade;
 
-    @SuppressFBWarnings("EI2")
     public ComponentTaskHandler(
-        String componentName, int componentVersion, String actionName,
-        ActionDefinitionService actionDefinitionService) {
+        String componentName, int componentVersion, String actionName, ActionDefinitionFacade actionDefinitionFacade) {
 
         this.actionName = actionName;
-        this.actionDefinitionService = actionDefinitionService;
         this.componentName = componentName;
         this.componentVersion = componentVersion;
+        this.actionDefinitionFacade = actionDefinitionFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
+        Map<String, Long> connectIdMap = MapUtils.getMap(
+            taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
+
         try {
-            return actionDefinitionService.executePerform(
+            return actionDefinitionFacade.executePerform(
                 componentName, componentVersion, actionName, Objects.requireNonNull(taskExecution.getId()),
                 taskExecution.getParameters(),
-                MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+                OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

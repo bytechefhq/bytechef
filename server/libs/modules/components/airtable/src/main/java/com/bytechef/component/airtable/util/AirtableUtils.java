@@ -20,11 +20,8 @@ package com.bytechef.component.airtable.util;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
-import com.bytechef.hermes.component.util.TypeReference;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Option;
@@ -39,7 +36,6 @@ import java.util.Objects;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
@@ -57,10 +53,10 @@ public class AirtableUtils {
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
     public static ComponentOptionsFunction getBaseIdOptions() {
-        return (connection, inputParameters, searchText) -> {
-            Map<String, ?> response = HttpClientUtils
-                .get("https://api.airtable.com/v0/meta/bases")
-                .configuration(responseType(ResponseType.JSON))
+        return (inputParameters, connectionParameters, searchText, context) -> {
+            Map<String, List<Map<?, ?>>> response = context
+                .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody();
 
@@ -73,30 +69,29 @@ public class AirtableUtils {
     }
 
     public static ComponentPropertiesFunction getFieldsProperties() {
-        return (connection, inputParameters) -> {
+        return (inputParameters, connection, context) -> {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
-                MapUtils.getRequiredString(inputParameters, BASE_ID));
+                inputParameters.getRequiredString(BASE_ID));
 
-            Map<String, List<AirtableTable>> tablesMap = JsonUtils.read(
-                (String) HttpClientUtils
-                    .get(url)
-                    .configuration(responseType(HttpClientUtils.ResponseType.TEXT))
+            Map<String, List<AirtableTable>> tablesMap = context.json(json -> json.read(
+                (String) context.http(http -> http.get(url)
+                    .configuration(Http.responseType(Http.ResponseType.TEXT))
                     .execute()
-                    .body(),
-                new TypeReference<>() {});
+                    .body()),
+                new Context.TypeReference<>() {}));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Response for url='%s': %s".formatted(url, tablesMap));
             }
 
-            List<AirtableTable> tables = MapUtils.getList(tablesMap, "tables", AirtableTable.class);
+            List<AirtableTable> tables = tablesMap.get("tables");
 
             AirtableTable table = tables
                 .stream()
                 .filter(curTable -> Objects.equals(
-                    curTable.id(), MapUtils.getRequiredString(inputParameters, TABLE_ID)))
+                    curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Request Airtable table does not exist"));
 
@@ -149,15 +144,14 @@ public class AirtableUtils {
     }
 
     public static ComponentOptionsFunction getTableIdOptions() {
-        return (connection, inputParameters, searchText) -> {
+        return (inputParameters, connectionParameters, searchText, context) -> {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
-                MapUtils.getRequiredString(inputParameters, BASE_ID));
+                inputParameters.getRequiredString(BASE_ID));
 
-            Map<String, ?> response = HttpClientUtils
-                .get(url)
-                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
+            Map<String, List<Map<?, ?>>> response = context.http(http -> http.get(url)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody();
+                .getBody());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Response for url='%s': %s".formatted(url, response));
@@ -167,10 +161,10 @@ public class AirtableUtils {
         };
     }
 
-    private static List<Option<?>> getOptions(Map<String, ?> response, String name) {
+    private static List<Option<?>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
         List<Option<?>> options = new ArrayList<>();
 
-        for (Map<?, ?> list : MapUtils.getRequiredList(response, name, Map.class)) {
+        for (Map<?, ?> list : response.get(name)) {
             options.add(option((String) list.get("name"), list.get("id")));
         }
 

@@ -33,13 +33,12 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectio
 import com.bytechef.hermes.component.definition.ContextFileEntryImpl;
 import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
+import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.data.storage.service.DataStorageService;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -106,7 +105,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         @Override
         public ModifiableConnectionDefinition
             modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
-            modifiableConnectionDefinition.baseUri(connection -> "http://localhost:9999");
+            modifiableConnectionDefinition.baseUri((connectionParameters) -> "http://localhost:9999");
 
             return modifiableConnectionDefinition;
         }
@@ -124,7 +123,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     private Connection connection;
 
     @Autowired
-    private ActionDefinitionService actionDefinitionService;
+    private ActionDefinitionFacade actionDefinitionFacade;
 
     @BeforeEach
     public void beforeEach() {
@@ -148,7 +147,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         TaskExecution taskExecution = getTaskExecution(Map.of("petId", 1));
 
-        HttpClientUtils.Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
+        Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.statusCode());
 
@@ -751,7 +750,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        HttpClientUtils.Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
+        Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
@@ -797,7 +796,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        response = (HttpClientUtils.Response) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
@@ -805,7 +804,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
-            actionName, actionDefinitionService, PETSTORE_COMPONENT_HANDLER);
+            actionName, actionDefinitionFacade, PETSTORE_COMPONENT_HANDLER);
     }
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {

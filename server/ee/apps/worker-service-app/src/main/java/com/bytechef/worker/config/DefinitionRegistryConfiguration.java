@@ -19,14 +19,17 @@ package com.bytechef.worker.config;
 
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.component.registry.remote.client.service.ConnectionDefinitionServiceClient;
+import com.bytechef.hermes.connection.domain.Connection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -70,16 +73,13 @@ public class DefinitionRegistryConfiguration {
          * Called from the Context.Connection instance.
          */
         @Override
-        public ApplyResponse executeAuthorizationApply(
-            String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-            String authorizationName) {
+        public ApplyResponse executeAuthorizationApply(@NonNull Connection connection) {
+            if (connectionDefinitionService.connectionExists(
+                connection.getComponentName(), connection.getConnectionVersion())) {
 
-            if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
-                return connectionDefinitionService.executeAuthorizationApply(
-                    componentName, connectionVersion, connectionParameters, authorizationName);
+                return connectionDefinitionService.executeAuthorizationApply(connection);
             } else {
-                return connectionDefinitionServiceClient.executeAuthorizationApply(
-                    componentName, connectionVersion, connectionParameters, authorizationName);
+                return connectionDefinitionServiceClient.executeAuthorizationApply(connection);
             }
         }
 
@@ -87,9 +87,9 @@ public class DefinitionRegistryConfiguration {
          * Called from the ConnectionFacade instance.
          */
         @Override
-        public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-            String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-            String authorizationName, String redirectUri) {
+        public AuthorizationCallbackResponse executeAuthorizationCallback(
+            @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+            @NonNull String authorizationName, @NonNull String redirectUri) {
 
             return connectionDefinitionService.executeAuthorizationCallback(
                 componentName, connectionVersion, connectionParameters, authorizationName, redirectUri);
@@ -99,32 +99,32 @@ public class DefinitionRegistryConfiguration {
          * Called from the Context.Connection instance.
          */
         @Override
-        public Optional<String> executeBaseUri(
-            String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
-            if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
-                return connectionDefinitionService.executeBaseUri(
-                    componentName, connectionVersion, connectionParameters);
+        public Optional<String> executeBaseUri(@NonNull Connection connection) {
+            if (connectionDefinitionService.connectionExists(
+                connection.getComponentName(), connection.getConnectionVersion())) {
+
+                return connectionDefinitionService.executeBaseUri(connection);
             } else {
-                return connectionDefinitionServiceClient.executeBaseUri(
-                    componentName, connectionVersion, connectionParameters);
+                return connectionDefinitionServiceClient.executeBaseUri(connection);
             }
         }
 
         @Override
         public Authorization.AuthorizationType getAuthorizationType(
-            String authorizationName, String componentName, int connectionVersion) {
+            @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
             return connectionDefinitionService.getAuthorizationType(
-                authorizationName, componentName, connectionVersion);
+                componentName, connectionVersion, authorizationName);
         }
 
         @Override
-        public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
+        public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
             return connectionDefinitionService.getConnectionDefinition(componentName, componentVersion);
         }
 
         @Override
-        public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
+        public List<ConnectionDefinition>
+            getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
             return connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion);
         }
 
@@ -135,8 +135,8 @@ public class DefinitionRegistryConfiguration {
 
         @Override
         public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-            String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-            String authorizationName) {
+            @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+            @NonNull String authorizationName) {
 
             return connectionDefinitionService.getOAuth2AuthorizationParameters(
                 componentName, connectionVersion, connectionParameters, authorizationName);

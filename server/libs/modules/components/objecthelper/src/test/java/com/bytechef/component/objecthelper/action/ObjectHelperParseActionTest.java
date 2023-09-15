@@ -19,10 +19,9 @@ package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.definition.Context;
 
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ParameterMap;
+
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -36,44 +35,37 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ObjectHelperParseActionTest {
 
-    private static final Context context = Mockito.mock(Context.class);
-
     @Test
     public void testPerformParse() {
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
-            MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
+        Context context = Mockito.mock(Context.class);
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
-                .thenReturn(
-                    """
+        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+            .thenReturn(
+                """
+                    {
+                        "key": 3
+                    }
+                    """);
+        Mockito.when(context.json(Mockito.any()))
+            .thenReturn(Map.of("key", 3));
+
+        assertThat(ObjectHelperParseAction.perform(parameterMap, parameterMap, context))
+            .isEqualTo(Map.of("key", 3));
+
+        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+            .thenReturn(
+                """
+                    [
                         {
                             "key": 3
                         }
-                        """);
-            jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
-                .thenReturn(Map.of("key", 3));
+                    ]
+                    """);
+        Mockito.when(context.json(Mockito.any()))
+            .thenReturn(List.of(Map.of("key", 3)));
 
-            assertThat(ObjectHelperParseAction.perform(Map.of(), context))
-                .isEqualTo(Map.of("key", 3));
-        }
-
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
-            MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
-
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
-                .thenReturn(
-                    """
-                        [
-                            {
-                                "key": 3
-                            }
-                        ]
-                        """);
-            jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
-                .thenReturn(List.of(Map.of("key", 3)));
-
-            assertThat(ObjectHelperParseAction.perform(Map.of(), context))
-                .isEqualTo(List.of(Map.of("key", 3)));
-        }
+        assertThat(ObjectHelperParseAction.perform(parameterMap, parameterMap, context))
+            .isEqualTo(List.of(Map.of("key", 3)));
     }
 }

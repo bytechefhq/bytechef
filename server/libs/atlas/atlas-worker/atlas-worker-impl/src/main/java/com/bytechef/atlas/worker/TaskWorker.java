@@ -54,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.TaskCoordinator}.
@@ -83,7 +84,8 @@ public class TaskWorker {
 
     public TaskWorker(
         EventPublisher eventPublisher, MessageBroker messageBroker,
-        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskHandlerResolver taskHandlerResolver,
+        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.messageBroker = messageBroker;

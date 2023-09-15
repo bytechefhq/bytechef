@@ -23,6 +23,7 @@ import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@Service
+@Service("actionDefinitionFacade")
 public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     private final ActionDefinitionService actionDefinitionService;
@@ -47,67 +48,69 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, actionParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, actionName, propertyName, actionParameters, connection);
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> actionParameters,
         Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeEditorDescription(
-            componentName, componentVersion, actionName, actionParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, actionName, actionParameters, connection);
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
-            componentName, componentVersion, actionName, propertyName, actionParameters,
-            searchText, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, actionName, propertyName, actionParameters, searchText, connection);
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> actionParameters,
         Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeOutputSchema(
-            componentName, componentVersion, actionName, actionParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, actionName, actionParameters, connection);
+    }
+
+    @Override
+    public Object executePerform(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+
+        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+
+        return actionDefinitionService.executePerform(
+            componentName, componentVersion, actionName, taskExecutionId, inputParameters, connection);
     }
 
     @Override
     public Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeSampleOutput(
-            componentName, componentVersion, actionName, actionParameters, connectionId,
-            connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName());
+            componentName, componentVersion, actionName, inputParameters, connection);
     }
 }

@@ -17,12 +17,10 @@
 
 package com.bytechef.component.datastorage.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.DEFAULT_VALUE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
@@ -119,7 +117,9 @@ public class DataStorageGetValueAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(DataStorageGetValueAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext actionContext) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         // TODO
 
         return null;
@@ -127,7 +127,7 @@ public class DataStorageGetValueAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> switch (MapUtils.getRequiredInteger(inputParameters, TYPE)) {
+        return (inputParameters, connection) -> switch (inputParameters.getRequiredInteger(TYPE)) {
             case 1 -> array();
             case 2 -> bool();
             case 3 -> date();

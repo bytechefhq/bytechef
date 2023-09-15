@@ -17,12 +17,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -31,9 +30,13 @@ import java.util.Map;
 public interface ComponentOptionsFunction extends OptionsDataSource.OptionsFunction {
 
     /**
-     * @param connection
+     *
      * @param inputParameters
+     * @param connectionParameters
+     * @param searchText
      * @return
      */
-    List<Option<?>> apply(Connection connection, Map<String, ?> inputParameters, String searchText);
+    List<Option<?>> apply(
+        ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, Context context)
+        throws ComponentExecutionException;
 }

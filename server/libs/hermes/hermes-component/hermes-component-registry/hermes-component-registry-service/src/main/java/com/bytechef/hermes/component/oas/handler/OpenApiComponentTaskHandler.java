@@ -21,8 +21,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.handler.ComponentTaskHandler;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -35,12 +35,12 @@ public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentTaskHandler(
-        String actionName, ActionDefinitionService actionDefinitionService,
+        String actionName, ActionDefinitionFacade actionDefinitionFacade,
         OpenApiComponentHandler openApiComponentHandler) {
 
         super(
             openApiComponentHandler.getName(), openApiComponentHandler.getVersion(), actionName,
-            actionDefinitionService);
+            actionDefinitionFacade);
 
         this.actionName = actionName;
         this.openApiComponentHandler = openApiComponentHandler;

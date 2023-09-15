@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
@@ -28,13 +29,13 @@ import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest.WebhookBodyImpl;
-import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
@@ -71,18 +72,20 @@ public class WebhookController {
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
     private final WorkflowService workflowService;
+    private final XmlMapper xmlMapper;
 
     @SuppressFBWarnings("EI")
     public WebhookController(
         FileStorageService fileStorageService, ObjectMapper objectMapper,
         TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
-        WorkflowService workflowService) {
+        WorkflowService workflowService, XmlMapper xmlMapper) {
 
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
         this.workflowService = workflowService;
+        this.xmlMapper = xmlMapper;
     }
 
     @RequestMapping(
@@ -158,7 +161,8 @@ public class WebhookController {
                     content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
                 } else {
                     content = XmlUtils.read(
-                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
+                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
+                        xmlMapper);
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());

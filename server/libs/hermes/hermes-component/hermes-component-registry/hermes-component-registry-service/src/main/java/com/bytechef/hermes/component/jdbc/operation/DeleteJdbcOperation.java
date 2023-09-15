@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +40,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
+    public Map<String, Integer> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
         Map<String, Integer> result;
 
         String deleteKey = MapUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
@@ -54,7 +53,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
             result = Map.of("rows", 0);
         } else {
             int[] rowsAffected = jdbcExecutor.batchUpdate(
-                context.getConnection(),
+                connectionParameters,
                 "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
                 SqlParameterSourceUtils.createBatch(rows.toArray()));
 

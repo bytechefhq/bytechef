@@ -23,7 +23,6 @@ import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +37,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/internal/action-definition-facade")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ActionDefinitionFacadeController {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
@@ -58,7 +56,7 @@ public class ActionDefinitionFacadeController {
 
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
             editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
-            editorDescriptionRequest.actionName, editorDescriptionRequest.actionParameters,
+            editorDescriptionRequest.actionName, editorDescriptionRequest.inputParameters,
             editorDescriptionRequest.connectionId));
     }
 
@@ -73,23 +71,36 @@ public class ActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
-                optionsRequest.propertyName, optionsRequest.actionParameters, optionsRequest.connectionId,
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.connectionId,
                 optionsRequest.searchText));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-properties",
+        value = "/execute-dynamic-properties",
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValueProperty<?>>> executeProperties(
+    public ResponseEntity<List<? extends ValueProperty<?>>> executeDynamicProperties(
         @Valid @RequestBody PropertiesRequest propertiesRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
                 propertiesRequest.propertyName, propertiesRequest.actionParameters, propertiesRequest.connectionId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-perform",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Object> executePerform(@Valid @RequestBody PerformRequest performRequest) {
+        return ResponseEntity.ok(
+            actionDefinitionFacade.executePerform(
+                performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
+                performRequest.taskExecutionId, performRequest.actionParameters, performRequest.connectionId));
     }
 
     @RequestMapping(
@@ -104,7 +115,7 @@ public class ActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOutputSchema(
                 outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.actionName,
-                outputSchemaRequest.actionParameters, outputSchemaRequest.connectionId));
+                outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
     }
 
     @RequestMapping(
@@ -116,26 +127,26 @@ public class ActionDefinitionFacadeController {
     public ResponseEntity<Object> executeSampleOutput(@Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeSampleOutput(
-                sampleOutputRequest.actionName, sampleOutputRequest.componentName, sampleOutputRequest.componentVersion,
+                sampleOutputRequest.componentName, sampleOutputRequest.componentVersion, sampleOutputRequest.actionName,
                 sampleOutputRequest.actionParameters, sampleOutputRequest.connectionId));
     }
 
     @SuppressFBWarnings("EI")
     public record EditorDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, String searchText) {
+        Map<String, Object> inputParameters, Long connectionId, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
@@ -148,5 +159,11 @@ public class ActionDefinitionFacadeController {
     public record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, Long connectionId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record PerformRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String actionName, long taskExecutionId,
+        @NotNull Map<String, ?> actionParameters, Long connectionId) {
     }
 }

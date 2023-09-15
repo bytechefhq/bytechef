@@ -18,12 +18,11 @@
 package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.definition.Property;
-
-import java.util.Map;
 
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
@@ -63,12 +62,14 @@ public class ScriptRubyAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(ScriptRubyAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters);
     }
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (inputParameters, connection) -> null;
     }
 }

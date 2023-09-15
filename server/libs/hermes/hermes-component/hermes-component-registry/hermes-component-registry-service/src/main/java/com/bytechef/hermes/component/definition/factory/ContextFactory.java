@@ -21,14 +21,15 @@ import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ContextImpl;
+import com.bytechef.hermes.component.definition.HttpClientExecutor;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.domain.Connection;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -36,39 +37,45 @@ import java.util.Map;
 @Component
 public class ContextFactory {
 
-    private final ConnectionDefinitionService connectionDefinitionService;
-    private final ConnectionService connectionService;
     private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
+    private final HttpClientExecutor httpClientExecutor;
+    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService,
+        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
-        this.connectionDefinitionService = connectionDefinitionService;
-        this.connectionService = connectionService;
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
+        this.httpClientExecutor = httpClientExecutor;
+        this.objectMapper = objectMapper;
+        this.xmlMapper = xmlMapper;
     }
 
-    public ActionContext createActionContext(Map<String, Long> connectionIdMap, Long taskExecutionId) {
-        return createContextImpl(connectionIdMap, taskExecutionId);
+    public ActionContext createActionContext(Connection connection, Long taskExecutionId) {
+        return createContextImpl(connection, taskExecutionId);
     }
 
-    public ActionContext createActionContext(Map<String, Long> connectionIdMap) {
-        return createContextImpl(connectionIdMap, null);
+    public ActionContext createActionContext(Connection connection) {
+        return createContextImpl(connection, null);
     }
 
-    public TriggerContext createTriggerContext(Map<String, Long> connectionIdMap) {
-        return createContextImpl(connectionIdMap, null);
+    public Context createContext(Connection connection) {
+        return createContextImpl(connection, null);
     }
 
-    private ContextImpl createContextImpl(Map<String, Long> connectionIdMap, Long taskExecutionId) {
+    public TriggerContext createTriggerContext(Connection connection) {
+        return createContextImpl(connection, null);
+    }
+
+    private ContextImpl createContextImpl(Connection connection, Long taskExecutionId) {
         return new ContextImpl(
-            connectionDefinitionService, connectionIdMap, connectionService, dataStorageService, eventPublisher,
-            fileStorageService, taskExecutionId);
+            connection, dataStorageService, eventPublisher, objectMapper, fileStorageService,
+            httpClientExecutor, taskExecutionId, xmlMapper);
     }
 }

@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
@@ -581,7 +580,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String description;
         private String icon;
         private List<String> tags;
-        private FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitionsFunction;
+        private FilterCompatibleConnectionsFunction filterCompatibleConnectionsFunction;
         private Map<String, Object> metadata;
         private final String name;
         private Resources resources;
@@ -654,10 +653,10 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition filterCompatibleConnectionDefinitions(
-            FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitions) {
+        public ModifiableComponentDefinition filterCompatibleConnections(
+            FilterCompatibleConnectionsFunction filterCompatibleConnections) {
 
-            this.filterCompatibleConnectionDefinitionsFunction = filterCompatibleConnectionDefinitions;
+            this.filterCompatibleConnectionsFunction = filterCompatibleConnections;
 
             return this;
         }
@@ -753,8 +752,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<FilterCompatibleConnectionDefinitionsFunction> getFilterCompatibleConnectionDefinitions() {
-            return Optional.ofNullable(filterCompatibleConnectionDefinitionsFunction);
+        public Optional<FilterCompatibleConnectionsFunction> getFilterCompatibleConnections() {
+            return Optional.ofNullable(filterCompatibleConnectionsFunction);
         }
 
         @Override
@@ -906,7 +905,7 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public ModifiableAuthorization getAuthorization(String authorizationName) {
             if (authorizations == null) {
-                throw new ComponentExecutionException("Authorization %s does not exist".formatted(authorizationName));
+                throw new IllegalStateException("Authorization %s does not exist".formatted(authorizationName));
             }
 
             return authorizations.stream()

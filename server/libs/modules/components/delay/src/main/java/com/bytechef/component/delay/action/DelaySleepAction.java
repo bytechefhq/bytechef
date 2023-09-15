@@ -17,13 +17,12 @@
 
 package com.bytechef.component.delay.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
@@ -47,11 +46,13 @@ public class DelaySleepAction {
             .defaultValue(1))
         .perform(DelaySleepAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         if (inputParameters.containsKey(MILLIS)) {
-            sleep(MapUtils.getLong(inputParameters, MILLIS));
+            sleep(inputParameters.getLong(MILLIS));
         } else if (inputParameters.containsKey("duration")) {
-            Duration duration = MapUtils.getDuration(inputParameters, "duration");
+            Duration duration = inputParameters.getDuration("duration");
 
             sleep(duration.toMillis());
         } else {

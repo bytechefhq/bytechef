@@ -35,10 +35,10 @@ import java.util.function.Function;
 public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoader<OpenApiComponentHandler> {
 
     public static final Function<ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
-        actionDefinition -> (inputParameters, context) -> OpenApiClientUtils.execute(
+        actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
             OptionalUtils.orElse(actionDefinition.getOutputSchema(), null),
-            OptionalUtils.orElse(actionDefinition.getMetadata(), null));
+            OptionalUtils.orElse(actionDefinition.getMetadata(), null), context);
 
     public OpenApiComponentHandlerLoader() {
         super(
@@ -49,7 +49,7 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     @Override
     protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(OpenApiComponentHandler componentHandler) {
-        return (actionName, actionDefinitionService) -> new OpenApiComponentTaskHandler(actionName,
-            actionDefinitionService, componentHandler);
+        return (actionName, actionDefinitionFacade) -> new OpenApiComponentTaskHandler(actionName,
+            actionDefinitionFacade, componentHandler);
     }
 }

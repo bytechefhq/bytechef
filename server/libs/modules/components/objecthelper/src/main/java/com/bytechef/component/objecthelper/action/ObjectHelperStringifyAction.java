@@ -17,12 +17,9 @@
 
 package com.bytechef.component.objecthelper.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.STRINGIFY;
@@ -63,9 +60,11 @@ public class ObjectHelperStringifyAction {
         .outputSchema(string())
         .perform(ObjectHelperStringifyAction::perform);
 
-    protected static String perform(Map<String, ?> inputParameters, Context context) {
-        Object input = MapUtils.getRequired(inputParameters, SOURCE);
+    protected static String perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        return JsonUtils.write(input);
+        Object input = inputParameters.getRequired(SOURCE);
+
+        return context.json(json -> json.write(input));
     }
 }

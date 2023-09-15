@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,7 +32,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/internal/component-definition-facade")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ComponentDefinitionFacadeController {
 
     private final ComponentDefinitionFacade componentDefinitionFacade;

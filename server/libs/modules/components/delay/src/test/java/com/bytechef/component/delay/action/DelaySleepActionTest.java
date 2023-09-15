@@ -17,16 +17,15 @@
 
 package com.bytechef.component.delay.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 
@@ -37,44 +36,48 @@ public class DelaySleepActionTest {
 
     @Test
     public void test1() {
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getDuration(Mockito.anyMap(), Mockito.eq("duration")))
-                .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            long now = System.currentTimeMillis();
+        Mockito.when(parameterMap.containsKey(Mockito.eq("duration")))
+            .thenReturn(true);
+        Mockito.when(parameterMap.getDuration(Mockito.eq("duration")))
+            .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
-            DelaySleepAction.perform(Map.of("duration", "1.5S"), Mockito.mock(Context.class));
+        long now = System.currentTimeMillis();
 
-            long delta = System.currentTimeMillis() - now;
+        DelaySleepAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            Assertions.assertTrue(
-                delta >= 1500 && delta < 16000, String.format("Period %dms does not meet range [1500,16000>", delta));
-        }
+        long delta = System.currentTimeMillis() - now;
+
+        Assertions.assertTrue(
+            delta >= 1500 && delta < 16000, String.format("Period %dms does not meet range [1500,16000>", delta));
     }
 
     @Test
     public void test2() {
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getLong(Mockito.anyMap(), Mockito.eq(MILLIS)))
-                .thenReturn(500L);
+        Mockito.when(parameterMap.containsKey(Mockito.eq(MILLIS)))
+            .thenReturn(true);
+        Mockito.when(parameterMap.getLong(Mockito.eq(MILLIS)))
+            .thenReturn(500L);
 
-            long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
 
-            DelaySleepAction.perform(Map.of(MILLIS, 500L), Mockito.mock(Context.class));
+        DelaySleepAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            long delta = System.currentTimeMillis() - now;
+        long delta = System.currentTimeMillis() - now;
 
-            Assertions.assertTrue(
-                delta >= 500 && delta < 700, String.format("Period %dms does not meet range [500,700>", delta));
-        }
+        Assertions.assertTrue(
+            delta >= 500 && delta < 700, String.format("Period %dms does not meet range [500,700>", delta));
     }
 
     @Test
     public void test3() {
         long now = System.currentTimeMillis();
 
-        DelaySleepAction.perform(Map.of(), Mockito.mock(Context.class));
+        DelaySleepAction.perform(
+            Mockito.mock(ParameterMap.class), Mockito.mock(ParameterMap.class), Mockito.mock(ActionContext.class));
 
         long delta = System.currentTimeMillis() - now;
 

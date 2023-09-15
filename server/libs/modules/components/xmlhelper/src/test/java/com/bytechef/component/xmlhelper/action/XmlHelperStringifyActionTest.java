@@ -17,11 +17,10 @@
 
 package com.bytechef.component.xmlhelper.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
-import com.bytechef.hermes.component.util.XmlUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -36,24 +35,23 @@ public class XmlHelperStringifyActionTest {
 
     @Test
     public void testPerformStringify() {
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
-            MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
+        ActionDefinition.ActionContext context = Mockito.mock(ActionDefinition.ActionContext.class);
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
-                .thenReturn(Map.of("id", 45, "name", "Poppy"));
-            xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
-                .thenReturn("""
-                    {
-                        "key": 3
-                    }
-                    """);
+        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+            .thenReturn(Map.of("id", 45, "name", "Poppy"));
+        Mockito.when(context.xml(Mockito.any()))
+            .thenReturn("""
+                {
+                    "key": 3
+                }
+                """);
 
-            assertThat(XmlHelperStringifyAction.perform(Map.of(), Mockito.mock(Context.class)))
-                .isEqualTo("""
-                    {
-                        "key": 3
-                    }
-                    """);
-        }
+        assertThat(XmlHelperStringifyAction.perform(parameterMap, parameterMap, context))
+            .isEqualTo("""
+                {
+                    "key": 3
+                }
+                """);
     }
 }

@@ -19,10 +19,9 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -34,7 +33,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.DOWNLOAD;
@@ -68,9 +66,11 @@ public class FileStorageDownloadAction {
     /**
      * performs the download of a file (given its URL).
      */
-    protected static FileEntry perform(Map<String, ?> inputParameters, ActionContext context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         try {
-            URL url = new URL(MapUtils.getRequiredString(inputParameters, FileStorageConstants.URL));
+            URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.connect();
@@ -81,13 +81,14 @@ public class FileStorageDownloadAction {
 
                 try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
                     OutputStream outputStream = new ProgressingOutputStream(
-                        new FileOutputStream(downloadedFile), contentLength, context::publishActionProgressEvent)) {
+                        new FileOutputStream(downloadedFile), contentLength, progress -> context.event(
+                            event -> event.publishActionProgressEvent(progress)))) {
                     copy(inputStream, outputStream);
                 }
 
                 try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
-                    return context.storeFileContent(
-                        MapUtils.getRequiredString(inputParameters, FILENAME), fileInputStream);
+                    return context.file(file -> file.storeContent(
+                        inputParameters.getRequiredString(FILENAME), fileInputStream));
                 }
             }
 
@@ -104,8 +105,10 @@ public class FileStorageDownloadAction {
 
         while (-1 != (n = inputStream.read(buffer))) {
             outputStream.write(buffer, 0, n);
+
             count += n;
         }
+
         return count;
     }
 
@@ -137,6 +140,7 @@ public class FileStorageDownloadAction {
         @Override
         public void write(int b) throws IOException {
             this.out.write(b);
+
             ++this.count;
 
             report();

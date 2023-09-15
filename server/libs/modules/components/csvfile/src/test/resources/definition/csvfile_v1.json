@@ -521,7 +521,7 @@
   "description": "Reads and writes data from a csv file.",
   "icon": "path:assets/csvfile.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "csvFile",
   "resources": null,

@@ -32,6 +32,14 @@ public class ComponentExecutionException extends RuntimeException {
 
     /**
      *
+     * @param cause
+     */
+    public ComponentExecutionException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     *
      * @param message
      * @param cause
      */

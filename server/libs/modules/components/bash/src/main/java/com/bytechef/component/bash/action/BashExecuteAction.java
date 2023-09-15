@@ -17,10 +17,10 @@
 
 package com.bytechef.component.bash.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 import java.io.BufferedWriter;
@@ -33,7 +33,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Map;
 
 import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
@@ -56,11 +55,14 @@ public class BashExecuteAction {
         .outputSchema(string())
         .perform(BashExecuteAction::perform);
 
-    protected static String perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext actionContext) {
+    protected static String perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
+        throws ComponentExecutionException {
+
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
 
-            writeStringToFile(scriptFile, MapUtils.getRequiredString(inputParameters, SCRIPT));
+            writeStringToFile(scriptFile, inputParameters.getRequiredString(SCRIPT));
 
             try {
                 Runtime runtime = Runtime.getRuntime();
@@ -109,7 +111,7 @@ public class BashExecuteAction {
         return true;
     }
 
-    private static void writeStringToFile(File file, String str) {
+    private static void writeStringToFile(File file, String str) throws ComponentExecutionException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(str);
         } catch (IOException e) {

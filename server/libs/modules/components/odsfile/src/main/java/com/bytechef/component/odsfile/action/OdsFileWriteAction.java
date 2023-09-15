@@ -17,11 +17,11 @@
 
 package com.bytechef.component.odsfile.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -86,17 +86,16 @@ public class OdsFileWriteAction {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        String fileName = MapUtils.getString(inputParameters, FILENAME, "file.ods");
-        List<Map<String, ?>> rows = (List) MapUtils.getList(inputParameters, ROWS, List.of());
-        String sheetName = MapUtils.getString(inputParameters, SHEET_NAME, "Sheet");
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        try {
-            return context.storeFileContent(
-                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
-        }
+        String fileName = inputParameters.getString(FILENAME, "file.ods");
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
+        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
+
+        return context.file(
+            file -> file.storeContent(
+                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
     }
 
     private static Object[] getHeaderValues(Set<String> names) {

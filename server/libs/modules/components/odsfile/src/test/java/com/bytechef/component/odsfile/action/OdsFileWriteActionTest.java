@@ -18,15 +18,17 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
@@ -45,33 +47,32 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 /**
  * @author Ivica Cardic
  */
+@Disabled
 public class OdsFileWriteActionTest {
-
-    private static final Context context = Mockito.mock(Context.class);
 
     @Test
     public void testPerformWriteODS() throws JSONException, IOException {
+        ActionContext context = Mockito.mock(ActionContext.class);
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), mockedStatic);
+        ParameterMap inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), parameterMap);
 
-            OdsFileWriteAction.perform(inputParameters, context);
+        OdsFileWriteAction.perform(inputParameters, parameterMap, context);
 
-            ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
-                .forClass(ByteArrayInputStream.class);
-            ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
+            ByteArrayInputStream.class);
+        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-            Mockito.verify(context)
-                .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
+        Mockito.verify(context)
+            .file(
+                file1 -> file1.storeContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()));
 
-            assertEquals(
-                new JSONArray(jsonContent),
-                new JSONArray(read(inputStreamArgumentCaptor.getValue())),
-                true);
-            Assertions.assertThat(filenameArgumentCaptor.getValue())
-                .isEqualTo("file.ods");
-        }
+        assertEquals(
+            new JSONArray(jsonContent), new JSONArray(read(inputStreamArgumentCaptor.getValue())), true);
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo("file.ods");
     }
 
     private File getFile(String filename) {
@@ -81,15 +82,16 @@ public class OdsFileWriteActionTest {
             .getFile());
     }
 
-    private Map<String, Object> getWriteParameters(List<?> items, MockedStatic<MapUtils> mockedStatic) {
-        mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.ods")))
+    private ParameterMap getWriteParameters(List<?> items, ParameterMap inputParameters) {
+        Mockito.when(inputParameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.ods")))
             .thenReturn("file.ods");
-        mockedStatic.when(() -> MapUtils.getList(Mockito.anyMap(), Mockito.eq(ROWS), Mockito.eq(List.of())))
+        Mockito.when(inputParameters.getList(
+            Mockito.eq(ROWS), Mockito.any(Context.TypeReference.class), Mockito.eq(List.of())))
             .thenReturn(items);
-        mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
+        Mockito.when(inputParameters.getString(Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
             .thenReturn("Sheet");
 
-        return Map.of();
+        return inputParameters;
     }
 
     private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {

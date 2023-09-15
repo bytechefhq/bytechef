@@ -38,6 +38,7 @@ import com.bytechef.hermes.component.registry.service.ComponentDefinitionService
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +68,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     public WorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
         ProjectInstanceService projectInstanceService, ProjectService projectService,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
+        TaskExecutionService taskExecutionService,
+        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
         WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;

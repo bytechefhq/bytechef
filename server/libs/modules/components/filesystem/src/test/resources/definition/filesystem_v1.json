@@ -511,7 +511,7 @@
   "description": "Allows multiple operations over files on the filesystem.",
   "icon": "path:assets/filesystem.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "filesystem",
   "resources": null,

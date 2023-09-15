@@ -35,7 +35,7 @@ public interface ComponentDefinition {
      *
      * @return
      */
-    Optional<FilterCompatibleConnectionDefinitionsFunction> getFilterCompatibleConnectionDefinitions();
+    Optional<FilterCompatibleConnectionsFunction> getFilterCompatibleConnections();
 
     /**
      *
@@ -129,7 +129,7 @@ public interface ComponentDefinition {
      *
      */
     @FunctionalInterface
-    interface FilterCompatibleConnectionDefinitionsFunction {
+    interface FilterCompatibleConnectionsFunction {
 
         /**
          *

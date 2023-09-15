@@ -17,12 +17,13 @@
 
 package com.bytechef.component.csvfile.action;
 
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 import com.fasterxml.jackson.databind.SequenceWriter;
 
 import java.io.ByteArrayInputStream;
@@ -71,12 +72,13 @@ public class CsvFileWriteAction {
         .outputSchema(fileEntry())
         .perform(CsvFileWriteAction::perform);
 
-    @SuppressWarnings("unchecked")
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        List<Map<String, ?>> rows = (List<Map<String, ?>>) MapUtils.getList(inputParameters, ROWS, List.of());
+    protected static FileEntry perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        List<Map<String, ?>> rows = inputParameters.getList(ROWS, new Context.TypeReference<>() {}, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
-            return context.storeFileContent("file.csv", inputStream);
+            return context.file(file -> file.storeContent("file.csv", inputStream));
         } catch (IOException e) {
             throw new ComponentExecutionException(e.getMessage(), e);
         }

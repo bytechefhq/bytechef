@@ -19,18 +19,14 @@ package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -38,26 +34,12 @@ import java.util.Map;
 @Hidden
 @RestController
 @RequestMapping("/internal/action-definition-service")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ActionDefinitionServiceController {
 
     private final ActionDefinitionService actionDefinitionService;
 
     public ActionDefinitionServiceController(ActionDefinitionService actionDefinitionService) {
         this.actionDefinitionService = actionDefinitionService;
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-perform",
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<Object> executePerform(@RequestBody PerformRequest performRequest) {
-        return ResponseEntity.ok(
-            actionDefinitionService.executePerform(
-                performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
-                performRequest.taskExecutionId, performRequest.inputParameters, performRequest.connectionIdMap));
     }
 
     @RequestMapping(
@@ -85,11 +67,5 @@ public class ActionDefinitionServiceController {
         @PathVariable("componentVersion") Integer componentVersion) {
 
         return ResponseEntity.ok(actionDefinitionService.getActionDefinitions(componentName, componentVersion));
-    }
-
-    @SuppressFBWarnings("EI")
-    public record PerformRequest(
-        String componentName, int componentVersion, String actionName, long taskExecutionId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
     }
 }

@@ -19,19 +19,19 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACL;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
@@ -76,22 +76,21 @@ public class AwsS3PutObjectAction {
         .outputSchema(string())
         .perform(AwsS3PutObjectAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        Connection connection = context.getConnection();
-        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
+    protected static Object perform(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
+        throws ComponentExecutionException {
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
-        try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
-            Map<String, Object> connectionParameters = connection.getParameters();
+        try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
 
-            Files.copy(context.getFileStream(fileEntry), tempFilePath);
+            Files.copy((InputStream) context.file(file -> file.getStream(fileEntry)), tempFilePath);
 
             s3Client.putObject(
                 PutObjectRequest.builder()
-                    .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                    .key(MapUtils.getRequiredString(inputParameters, KEY))
-                    .acl(MapUtils.getString(inputParameters, ACL) != null
-                        ? ObjectCannedACL.fromValue(MapUtils.getString(inputParameters, ACL))
+                    .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
+                    .key(inputParameters.getRequiredString(KEY))
+                    .acl(inputParameters.getString(ACL) != null
+                        ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
                         : null)
                     .build(),
                 tempFilePath);

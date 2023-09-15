@@ -21,7 +21,9 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
@@ -32,13 +34,20 @@ import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.util.AuthorizationUtils;
+import com.bytechef.hermes.component.definition.ParameterMapImpl;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.bytechef.hermes.component.definition.ConnectionDefinition.*;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CODE;
 
 /**
  * @author Ivica Cardic
@@ -68,22 +77,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Authorization.ApplyResponse executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
-
+    public ApplyResponse executeAuthorizationApply(@NonNull Connection connection) {
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationName());
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
 
-        return applyFunction.apply(connectionParameters);
+        return applyFunction.apply(new ParameterMapImpl(connection.getParameters()));
     }
 
     @Override
-    public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
-        String redirectUri) {
+    public AuthorizationCallbackResponse executeAuthorizationCallback(
+        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+        @NonNull String authorizationName, @NonNull String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -108,26 +115,25 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 objectMapper));
 
         return authorizationCallbackFunction.apply(
-            connectionParameters, MapUtils.getString(connectionParameters, Authorization.CODE), redirectUri,
+            new ParameterMapImpl(connectionParameters), MapUtils.getString(connectionParameters, CODE), redirectUri,
             verifier);
     }
 
     @Override
-    public Optional<String> executeBaseUri(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
-
+    public Optional<String> executeBaseUri(@NonNull Connection connection) {
         com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition =
-            componentDefinitionRegistry.getComponentConnectionDefinition(componentName, connectionVersion);
+            componentDefinitionRegistry.getConnectionDefinition(
+                connection.getComponentName(), connection.getConnectionVersion());
 
-        com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction baseUriFunction =
+        BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(connectionDefinition.getBaseUri(), AuthorizationUtils::getDefaultBaseUri);
 
-        return Optional.ofNullable(baseUriFunction.apply(connectionParameters));
+        return Optional.ofNullable(baseUriFunction.apply(new ParameterMapImpl(connection.getParameters())));
     }
 
     @Override
     public AuthorizationType getAuthorizationType(
-        String authorizationName, String componentName, int connectionVersion) {
+        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -137,7 +143,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public ConnectionDefinition getConnectionDefinition(
-        String componentName, int componentVersion) {
+        @NonNull String componentName, int componentVersion) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -157,8 +163,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-        String authorizationName) {
+        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
+        @NonNull String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -171,13 +177,14 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getScopes(), AuthorizationUtils::getDefaultScopes);
 
         return new OAuth2AuthorizationParameters(
-            authorizationUrlFunction.apply(connectionParameters),
-            clientIdFunction.apply(connectionParameters),
-            scopesFunction.apply(connectionParameters));
+            authorizationUrlFunction.apply(new ParameterMapImpl(connectionParameters)),
+            clientIdFunction.apply(new ParameterMapImpl(connectionParameters)),
+            scopesFunction.apply(new ParameterMapImpl(connectionParameters)));
     }
 
     @Override
-    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
+    public List<ConnectionDefinition>
+        getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
         return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
             .stream()
             .map(ConnectionDefinition::new)

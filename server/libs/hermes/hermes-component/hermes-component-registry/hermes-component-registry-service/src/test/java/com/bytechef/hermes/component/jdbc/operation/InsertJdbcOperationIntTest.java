@@ -22,21 +22,17 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.sql.DataSource;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -77,18 +73,13 @@ public class InsertJdbcOperationIntTest {
 
     @Test
     public void testInsert() {
-        Context context = Mockito.mock(Context.class);
-
-        Mockito.when(context.fetchConnection())
-            .thenReturn(Optional.of(Mockito.mock(Connection.class)));
-
         Map<String, ?> inputParameters = Map.of(
             COLUMNS, List.of("id", "name"),
             ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
             SCHEMA, "public",
             TABLE, "test");
 
-        Map<String, Integer> result = insertJdbcOperation.execute(context, inputParameters);
+        Map<String, Integer> result = insertJdbcOperation.execute(inputParameters, Map.of());
 
         Assertions.assertEquals(2, result.get("rows"));
     }
@@ -107,7 +98,7 @@ public class InsertJdbcOperationIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
+                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassNamee) {
 
                         return dataSource;
                     }

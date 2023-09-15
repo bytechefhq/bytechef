@@ -37,6 +37,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -62,7 +63,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @SuppressFBWarnings("EI")
     public LoopTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskExecutionService taskExecutionService,
+        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;

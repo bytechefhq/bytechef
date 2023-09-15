@@ -17,21 +17,17 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.util.Map;
-import java.util.Optional;
 import javax.sql.DataSource;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -64,11 +60,6 @@ public class ExecuteJdbcOperationIntTest {
 
     @Test
     public void testPerform() {
-        Context context = Mockito.mock(Context.class);
-
-        Mockito.when(context.fetchConnection())
-            .thenReturn(Optional.of(Mockito.mock(Connection.class)));
-
         Map<String, ?> inputParameters = Map.of(
             JdbcConstants.EXECUTE,
             """
@@ -78,7 +69,7 @@ public class ExecuteJdbcOperationIntTest {
                     )
                 """);
 
-        executeJdbcOperation.execute(context, inputParameters);
+        executeJdbcOperation.execute(inputParameters, Map.of());
 
         Assertions.assertEquals(0, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
 
@@ -86,7 +77,7 @@ public class ExecuteJdbcOperationIntTest {
             JdbcConstants.PARAMETERS, Map.of("id", "id1", "name", "name1"),
             JdbcConstants.EXECUTE, "INSERT INTO test VALUES(:id, :name)");
 
-        executeJdbcOperation.execute(context, inputParameters);
+        executeJdbcOperation.execute(inputParameters, Map.of());
 
         Assertions.assertEquals(1, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
     }
@@ -105,7 +96,7 @@ public class ExecuteJdbcOperationIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
 
                         return dataSource;
                     }

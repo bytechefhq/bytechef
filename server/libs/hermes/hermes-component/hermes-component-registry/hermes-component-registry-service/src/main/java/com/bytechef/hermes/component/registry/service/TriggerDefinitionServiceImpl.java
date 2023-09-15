@@ -18,28 +18,21 @@
 package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
-import com.bytechef.hermes.component.definition.DynamicWebhookDisableContextImpl;
-import com.bytechef.hermes.component.definition.DynamicWebhookRequestContextImpl;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
-import com.bytechef.hermes.component.definition.EnableDynamicWebhookContextImpl;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.PollContextImpl;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
-import com.bytechef.hermes.component.definition.StaticWebhookRequestContextImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
@@ -48,19 +41,17 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookR
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
-import com.bytechef.hermes.component.definition.WebhookValidateContextImpl;
-import com.bytechef.hermes.component.definition.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.definition.factory.ContextFactory;
 import com.bytechef.hermes.component.definition.HttpHeadersImpl;
 import com.bytechef.hermes.component.definition.HttpParametersImpl;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
+import com.bytechef.hermes.component.definition.ParameterMapImpl;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.execution.message.broker.ListenerParameters;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.Option;
@@ -72,6 +63,8 @@ import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.message.broker.MessageBroker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -86,253 +79,189 @@ import java.util.Map;
 public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
-    private final ContextConnectionFactory contextConnectionFactory;
     private final ContextFactory contextFactory;
     private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
     public TriggerDefinitionServiceImpl(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
-        ContextFactory contextFactory, MessageBroker messageBroker) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        MessageBroker messageBroker) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
-        this.contextConnectionFactory = contextConnectionFactory;
         this.contextFactory = contextFactory;
         this.messageBroker = messageBroker;
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable Connection connection) {
 
         ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        return ComponentContextSupplier.get(
-            getTriggerContext(componentName, connectionId),
-            () -> {
-                List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
-                    propertiesFunction.apply(
-                        contextConnectionFactory.createConnection(
-                            componentName, componentVersion, connectionParameters, authorizationName),
-                        triggerParameters);
+        List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
+            propertiesFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+                contextFactory.createContext(connection));
 
-                return valueProperties.stream()
-                    .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
-                    .toList();
-            });
+        return valueProperties.stream()
+            .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
+            .toList();
     }
 
     @Override
     public void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId,
-        DynamicWebhookEnableOutput output) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, Connection connection) {
 
         DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = getDynamicWebhookDisableConsumer(
             componentName, componentVersion, triggerName);
 
-        DynamicWebhookDisableContext context = new DynamicWebhookDisableContextImpl(
-            triggerParameters, contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            output, workflowExecutionId);
-
-        dynamicWebhookDisableConsumer.accept(context);
+        dynamicWebhookDisableConsumer.accept(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            new ParameterMapImpl(outputParameters), workflowExecutionId,
+            contextFactory.createTriggerContext(connection));
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName, String webhookUrl, String workflowExecutionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
+        Connection connection) {
 
         DynamicWebhookEnableFunction dynamicWebhookEnableFunction = getDynamicWebhookEnableFunction(
             componentName, componentVersion, triggerName);
 
-        EnableDynamicWebhookContext context = new EnableDynamicWebhookContextImpl(
-            triggerParameters, contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            webhookUrl, workflowExecutionId);
-
-        return dynamicWebhookEnableFunction.apply(context);
+        return dynamicWebhookEnableFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            webhookUrl, workflowExecutionId, contextFactory.createTriggerContext(connection));
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> outputParameters) {
 
         DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
             componentName, componentVersion, triggerName);
 
-        return dynamicWebhookRefreshFunction.apply(output);
+        return dynamicWebhookRefreshFunction.apply(new ParameterMapImpl(outputParameters));
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters,
+        Connection connection) {
 
         EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
             componentName, componentVersion, triggerName);
 
-        return ComponentContextSupplier.get(
-            getTriggerContext(componentName, connectionId),
-            () -> {
-                return editorDescriptionFunction.apply(
-                    contextConnectionFactory.createConnection(
-                        componentName, componentVersion, connectionParameters, authorizationName),
-                    triggerParameters);
-            });
+        return editorDescriptionFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()));
     }
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Connection connection) {
 
         ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
             componentName, componentVersion, triggerName);
 
         listenerDisableConsumer.accept(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters, workflowExecutionId);
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            workflowExecutionId, contextFactory.createTriggerContext(connection));
     }
 
     @Override
     public void executeOnEnableListener(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Connection connection) {
 
         ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
             componentName, componentVersion, triggerName);
 
         listenerEnableConsumer.accept(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters, workflowExecutionId,
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            workflowExecutionId,
             output -> messageBroker.send(
                 TriggerMessageRoute.LISTENERS,
-                new ListenerParameters(WorkflowExecutionId.parse(workflowExecutionId), output)));
+                new ListenerParameters(WorkflowExecutionId.parse(workflowExecutionId), output)),
+            contextFactory.createTriggerContext(connection));
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName,
-        String searchText) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
+        Connection connection) {
 
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        return ComponentContextSupplier.get(
-            getTriggerContext(componentName, connectionId),
-            () -> {
-                List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
-                    contextConnectionFactory.createConnection(
-                        componentName, componentVersion, connectionParameters, authorizationName),
-                    triggerParameters, searchText);
+        List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            searchText, contextFactory.createTriggerContext(connection));
 
-                return options.stream()
-                    .map(Option::new)
-                    .toList();
-            });
-    }
-
-    @Override
-    public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
-
-        OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
-            componentName, componentVersion, triggerName);
-
-        return ComponentContextSupplier.get(
-            getTriggerContext(componentName, connectionId),
-            () -> Property.toProperty(
-                outputSchemaFunction.apply(
-                    contextConnectionFactory.createConnection(
-                        componentName, componentVersion, connectionParameters, authorizationName),
-                    triggerParameters)));
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
-
-        SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
-            componentName, componentVersion, triggerName);
-
-        return ComponentContextSupplier.get(
-            getTriggerContext(componentName, connectionId),
-            () -> sampleOutputFunction.apply(
-                contextConnectionFactory.createConnection(
-                    componentName, componentVersion, connectionParameters, authorizationName),
-                triggerParameters));
-    }
-
-    @Override
-    public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
-
-        TriggerContext triggerContext =
-            contextFactory.createTriggerContext(connectionIdMap);
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
-
-        return ComponentContextSupplier.get(triggerContext, () -> doExecuteTrigger(
-            inputParameters, triggerState, webhookRequest, triggerContext, triggerDefinition));
-    }
-
-    @Override
-    public boolean executeWebhookValidate(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
-
-        TriggerContext triggerContext =
-            contextFactory.createTriggerContext(connectionIdMap);
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
-
-        return executeWebhookValidate(triggerDefinition, triggerContext, inputParameters, webhookRequest);
-    }
-
-    @Override
-    public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
-        return new TriggerDefinition(
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName));
-    }
-
-    @Override
-    public List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
-        return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
-            .stream()
-            .map(TriggerDefinition::new)
+        return options.stream()
+            .map(Option::new)
             .toList();
     }
 
     @Override
-    public WebhookTriggerFlags getWebhookTriggerFlags(String componentName, int componentVersion, String triggerName) {
-        TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
+    public List<? extends ValueProperty<?>> executeOutputSchema(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
-        return new WebhookTriggerFlags(
-            triggerDefinition.isWebhookRawBody(), triggerDefinition.isWorkflowSyncExecution(),
-            triggerDefinition.isWorkflowSyncValidation());
+        OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
+            componentName, componentVersion, triggerName);
+
+        return Property.toProperty(
+            outputSchemaFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.getParameters())));
     }
 
+    @Override
+    public Object executeSampleOutput(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
+
+        SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
+            componentName, componentVersion, triggerName);
+
+        return sampleOutputFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()));
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    private TriggerOutput doExecuteTrigger(
-        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        TriggerContext triggerContext, com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition) {
+    public TriggerOutput executeTrigger(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, Object triggerState, @NonNull WebhookRequest webhookRequest,
+        Connection connection) {
+
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(connection);
 
         TriggerOutput triggerOutput;
         TriggerType triggerType = triggerDefinition.getType();
 
         if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
             !executeWebhookValidate(
-                triggerDefinition, triggerContext, inputParameters, webhookRequest)) {
+                triggerDefinition, new ParameterMapImpl(inputParameters), webhookRequest, triggerContext)) {
 
             throw new IllegalStateException("Invalid trigger signature.");
         }
@@ -340,18 +269,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getDynamicWebhookRequest()
                 .map(dynamicWebhookRequestFunction -> executeDynamicWebhookTrigger(
-                    triggerContext, inputParameters, (DynamicWebhookEnableOutput) triggerState, webhookRequest,
-                    dynamicWebhookRequestFunction))
+                    inputParameters, (DynamicWebhookEnableOutput) triggerState, webhookRequest,
+                    connection, triggerContext, dynamicWebhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getStaticWebhookRequest()
                 .map(staticWebhookRequestFunction -> executeStaticWebhookTrigger(
-                    triggerContext, inputParameters, webhookRequest, staticWebhookRequestFunction))
+                    inputParameters, webhookRequest, triggerContext, staticWebhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             triggerOutput = triggerDefinition.getPoll()
                 .map(pollFunction -> executePollingTrigger(
-                    triggerDefinition, triggerContext, inputParameters, (Map<String, Object>) triggerState,
+                    triggerDefinition, inputParameters, (Map<String, ?>) triggerState, triggerContext,
                     pollFunction))
                 .orElseThrow();
         } else {
@@ -361,33 +290,76 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return triggerOutput;
     }
 
+    @Override
+    public boolean executeWebhookValidate(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Connection connection) {
+
+        TriggerContext triggerContext = contextFactory.createTriggerContext(connection);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        return executeWebhookValidate(
+            triggerDefinition, new ParameterMapImpl(inputParameters), webhookRequest, triggerContext);
+    }
+
+    @Override
+    public TriggerDefinition getTriggerDefinition(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
+
+        return new TriggerDefinition(
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName));
+    }
+
+    @Override
+    public List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion) {
+        return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
+            .stream()
+            .map(TriggerDefinition::new)
+            .toList();
+    }
+
+    @Override
+    public WebhookTriggerFlags getWebhookTriggerFlags(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
+
+        TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        return new WebhookTriggerFlags(
+            triggerDefinition.isWebhookRawBody(), triggerDefinition.isWorkflowSyncExecution(),
+            triggerDefinition.isWorkflowSyncValidation());
+    }
+
     private static TriggerOutput executeDynamicWebhookTrigger(
-        TriggerContext triggerContext, Map<String, ?> inputParameters, DynamicWebhookEnableOutput triggerState,
-        WebhookRequest webhookRequest, DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
+        Map<String, ?> inputParameters, DynamicWebhookEnableOutput output, WebhookRequest webhookRequest,
+        Connection connection, TriggerContext triggerContext,
+        DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
 
         WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
-            new DynamicWebhookRequestContextImpl(
-                inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
-                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                triggerState, triggerContext));
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            new HttpHeadersImpl(webhookRequest.headers()),
+            new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+            output, triggerContext);
 
         return new TriggerOutput(webhookOutput.getValue(), null, false);
     }
 
     private static TriggerOutput executePollingTrigger(
         com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition,
-        TriggerContext triggerContext, Map<String, ?> inputParameters, Map<String, Object> triggerState,
+        Map<String, ?> inputParameters, Map<String, ?> closureParameters, TriggerContext triggerContext,
         PollFunction pollFunction) {
 
         PollOutput pollOutput = pollFunction.apply(
-            new PollContextImpl(triggerState, inputParameters, triggerContext));
+            new ParameterMapImpl(inputParameters), new ParameterMapImpl(closureParameters), triggerContext);
 
         List<Map<?, ?>> records = new ArrayList<>(
             pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
 
         while (pollOutput.pollImmediately()) {
             pollOutput = pollFunction.apply(
-                new PollContextImpl(pollOutput.closureParameters(), inputParameters, triggerContext));
+                new ParameterMapImpl(inputParameters), new ParameterMapImpl(pollOutput.closureParameters()),
+                triggerContext);
 
             records.addAll(pollOutput.records());
         }
@@ -398,30 +370,26 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private static TriggerOutput executeStaticWebhookTrigger(
-        TriggerContext triggerContext,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext triggerContext,
         StaticWebhookRequestFunction staticWebhookRequestFunction) {
 
         WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
-            new StaticWebhookRequestContextImpl(
-                inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
-                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                triggerContext));
+            new ParameterMapImpl(inputParameters), new HttpHeadersImpl(webhookRequest.headers()),
+            new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+            triggerContext);
 
         return new TriggerOutput(webhookOutput.getValue(), null, false);
     }
 
     private boolean executeWebhookValidate(
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, TriggerContext triggerContext,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest) {
-
-        WebhookValidateContext context = new WebhookValidateContextImpl(
-            inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
-            new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-            triggerContext);
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, ParameterMap inputParameters,
+        WebhookRequest webhookRequest, TriggerContext triggerContext) {
 
         return triggerDefinition.getWebhookValidate()
-            .map(webhookValidateFunction -> webhookValidateFunction.apply(context))
+            .map(webhookValidateFunction -> webhookValidateFunction.apply(
+                inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
+                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+                triggerContext))
             .orElse(true);
     }
 
@@ -486,8 +454,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (Context.Connection connection, Map<String, ?> inputParameters) -> componentDefinition.getTitle() +
-                ": " + triggerDefinition.getTitle());
+            (inputParameters, connectionParameters) -> componentDefinition.getTitle() + ": " +
+                triggerDefinition.getTitle());
     }
 
     private ListenerDisableConsumer getListenerDisableConsumer(
@@ -531,10 +499,4 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return sampleOutputDataSource.getSampleOutput();
     }
-
-    private TriggerContext getTriggerContext(String componentName, Long connectionId) {
-        return contextFactory.createTriggerContext(
-            connectionId == null ? Map.of() : Map.of(componentName, connectionId));
-    }
-
 }

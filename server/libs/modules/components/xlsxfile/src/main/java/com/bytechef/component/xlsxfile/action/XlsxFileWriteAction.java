@@ -18,11 +18,10 @@
 package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ParameterMap;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -87,17 +86,15 @@ public class XlsxFileWriteAction {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        String fileName = MapUtils.getString(inputParameters, FILENAME, getaDefaultFileName());
-        List<Map<String, ?>> rows = (List) MapUtils.getList(inputParameters, ROWS, List.of());
-        String sheetName = MapUtils.getString(inputParameters, SHEET_NAME, "Sheet");
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        try {
-            return context.storeFileContent(
-                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
-        }
+        String fileName = inputParameters.getString(FILENAME, getaDefaultFileName());
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
+        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
+
+        return context.file(file -> file.storeContent(
+            fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
     }
 
     private static String getaDefaultFileName() {

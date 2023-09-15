@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -48,61 +50,56 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient implemen
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
-        String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
-        String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, String searchText, Connection connection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, long taskExecutionId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
-
-        return defaultWebClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, "/action-definition-service/execute-perform"),
-            new PerformRequest(
-                componentName, componentVersion, actionName, taskExecutionId, inputParameters, connectionIdMap),
-            Object.class);
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
+    public Object executeSampleOutput(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> actionParameters, Connection connection) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ActionDefinition getActionDefinition(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
@@ -112,9 +109,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient implemen
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(
-        String componentName, int componentVersion) {
-
+    public List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
@@ -124,14 +119,9 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient implemen
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(List<ComponentOperation> componentOperations) {
+    public List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations) {
         // TODO implement this method
 
         throw new UnsupportedOperationException();
-    }
-
-    private record PerformRequest(
-        String componentName, int componentVersion, String actionName, long taskExecutionId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
     }
 }

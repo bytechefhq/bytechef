@@ -407,6 +407,17 @@ public final class MapUtils {
         return Collections.unmodifiableMap(toMap(value, entry -> (K2) entry.getKey(), Map.Entry::getValue));
     }
 
+    @SuppressWarnings("unchecked")
+    public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType) {
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        if (!map.containsValue(key)) {
+            return null;
+        }
+
+        return getMap(map, key, (Class<V>) resolvableType.getRawClass());
+    }
+
     public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key, Map<K2, ?> defaultValue) {
         @SuppressWarnings("unchecked")
         Map<K2, ?> value = get(map, key, Map.class);
@@ -438,6 +449,15 @@ public final class MapUtils {
         return value == null ? Collections.unmodifiableMap(defaultValue) : value;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <K1, K2, V> Map<K2, V> getMap(
+        Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType, Map<K2, V> defaultValue) {
+
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        return getMap(map, key, (Class<V>) resolvableType.getRawClass(), defaultValue);
+    }
+
     public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key, List<Class<?>> valueTypes) {
         Map<K2, ?> mapValue = getMap(map, key);
 
@@ -460,15 +480,6 @@ public final class MapUtils {
         }
 
         return mapValue;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <K1, K2, V> Map<K2, V> getMap(
-        Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType, Map<K2, V> defaultValue) {
-
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
-
-        return getMap(map, key, (Class<V>) resolvableType.getRawClass(), defaultValue);
     }
 
     public static <K> Object getRequired(Map<K, ?> map, K key) {
@@ -615,6 +626,14 @@ public final class MapUtils {
 
     public static <K1, K2> Map<K2, ?> getRequiredMap(Map<K1, ?> map, K1 key) {
         Map<K2, ?> value = getMap(map, key);
+
+        Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static long getRequiredLong(Map<String, ?> map, String key) {
+        Long value = getLong(map, key);
 
         Objects.requireNonNull(value, "Unknown value for : " + key);
 

@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 
@@ -40,12 +39,12 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
     }
 
     @Override
-    public List<Map<String, Object>> execute(Context context, Map<String, ?> inputParameters) {
+    public List<Map<String, Object>> execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
         Map<String, ?> paramMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
         String queryStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.QUERY);
 
         return jdbcExecutor.query(
-            context.getConnection(), queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
+            connectionParameters, queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
                 Map<String, Object> row = new HashMap<>();
 
                 ResultSetMetaData rsMetaData = rs.getMetaData();

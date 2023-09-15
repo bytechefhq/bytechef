@@ -18,21 +18,22 @@
 package com.bytechef.component.hubspot.trigger;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -149,44 +150,52 @@ public class HubspotSubscribeTrigger {
         .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
         .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
 
-    protected static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
-        HttpClientUtils
-            .delete("/webhooks/v3/%s/settings".formatted(MapUtils.getString(context.inputParameters(), APP_ID)))
+    protected static void dynamicWebhookDisable(
+        ParameterMap inputParameters, ParameterMap connectionParameters, Map<String, ?> outputParameters,
+        String workflowExecutionId, TriggerContext context) {
+
+        context
+            .http(http -> http.delete("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
             .execute();
     }
 
-    @SuppressWarnings("unchecked")
-    protected static WebhookOutput dynamicWebhookRequest(DynamicWebhookRequestContext context) {
-        WebhookBody webhookBody = context.body();
-
-        return WebhookOutput.list((List<Map<?, ?>>) webhookBody.content());
-    }
-
     @SuppressFBWarnings("RV")
-    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(EnableDynamicWebhookContext context) {
-        HttpClientUtils
-            .put("/webhooks/v3/%s/settings".formatted(MapUtils.getString(context.inputParameters(), APP_ID)))
-            .body(HttpClientUtils.Body.of(
+    protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
+        ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
+
+        context
+            .http(http -> http.put("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
+            .body(Http.Body.of(
                 Map.of(
                     "throttling", Map.of(
                         "period", "SECONDLY",
                         "maxConcurrentRequests", 10),
-                    "targetUrl", context.webhookUrl())))
-            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
+                    "targetUrl", webhookUrl)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .body();
 
-        HttpClientUtils
-            .put("/webhooks/v3/%s/subscriptions".formatted(MapUtils.getString(context.inputParameters(), APP_ID)))
-            .body(HttpClientUtils.Body.of(
+        context
+            .http(http -> http.put("/webhooks/v3/%s/subscriptions".formatted(inputParameters.getString(APP_ID))))
+            .body(Http.Body.of(
                 Map.of(
-                    "eventType", MapUtils.getString(context.inputParameters(), EVENT_TYPE),
-                    "propertyName", MapUtils.getString(context.inputParameters(), PROPERTY_NAME, ""),
+                    "eventType", inputParameters.getString(EVENT_TYPE),
+                    "propertyName", inputParameters.getString(PROPERTY_NAME, ""),
                     "active", true)))
-            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .body();
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static WebhookOutput dynamicWebhookRequest(
+        Map<String, ?> inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+        TriggerContext context) {
+
+        return WebhookOutput.list((List<Map<?, ?>>) body.content());
     }
 }

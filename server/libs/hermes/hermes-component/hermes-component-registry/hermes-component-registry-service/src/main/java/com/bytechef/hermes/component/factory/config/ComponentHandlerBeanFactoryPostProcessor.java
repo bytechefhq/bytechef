@@ -33,9 +33,9 @@ import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerL
 import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.hermes.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
 import com.bytechef.hermes.component.handler.loader.DefaultComponentHandlerLoader;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.factory.ComponentHandlerListFactory;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
 import org.springframework.beans.BeansException;
@@ -78,14 +78,14 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             "componentTaskHandlerMapFactory",
             BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerMapFactory.class)
                 .addConstructorArgValue(componentHandlerEntries)
-                .addConstructorArgReference("actionDefinitionService")
+                .addConstructorArgReference("actionDefinitionFacade")
                 .getBeanDefinition());
 
         beanDefinitionRegistry.registerBeanDefinition(
             "componentTriggerHandlerMapFactory",
             BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerMapFactory.class)
                 .addConstructorArgValue(componentHandlerEntries)
-                .addConstructorArgReference("triggerDefinitionService")
+                .addConstructorArgReference("triggerDefinitionFacade")
                 .getBeanDefinition());
     }
 
@@ -94,7 +94,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
     }
 
     private record ComponentTaskHandlerMapFactory(
-        List<ComponentHandlerEntry> componentHandlerEntries, ActionDefinitionService actionDefinitionService)
+        List<ComponentHandlerEntry> componentHandlerEntries, ActionDefinitionFacade actionDefinitionFacade)
         implements TaskHandlerMapFactory {
 
         @Override
@@ -121,7 +121,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
                                         componentHandlerEntry.componentTaskHandlerFunction();
 
                                     return componentTaskHandlerFunction.apply(
-                                        actionDefinition.getName(), actionDefinitionService);
+                                        actionDefinition.getName(), actionDefinitionFacade);
                                 }));
                 })
                 .reduce(Map.of(), MapUtils::concat);
@@ -129,7 +129,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
     }
 
     private record ComponentTriggerHandlerMapFactory(
-        List<ComponentHandlerEntry> componentHandlerEntries, TriggerDefinitionService triggerDefinitionService)
+        List<ComponentHandlerEntry> componentHandlerEntries, TriggerDefinitionFacade triggerDefinitionFacade)
         implements TriggerHandlerMapFactory {
 
         @Override
@@ -153,7 +153,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
                             triggerDefinition.getName()),
                         triggerDefinition -> new ComponentTriggerHandler(
                             componentDefinition.getName(), componentDefinition.getVersion(),
-                            triggerDefinition.getName(), triggerDefinitionService)));
+                            triggerDefinition.getName(), triggerDefinitionFacade)));
         }
     }
 
