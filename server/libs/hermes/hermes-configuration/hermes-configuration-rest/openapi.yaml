@@ -28,14 +28,14 @@ paths:
       operationId: "getActionDefinitions"
       parameters:
       - name: "taskTypes"
-        description: "The list of task types defined in workflows."
+        description: "The list of task types defined in workflows.(E.g. mailchimp/v1/addMemberToList)"
         in: "query"
-        required: true
+        required: false
         schema:
           type: "array"
           items:
             type: "string"
-          example: "httpClient/v1/get,httpClient/v1/post"
+          example: "mailchimp/v1/addMemberToList,httpClient/v1/get,httpClient/v1/post"
       responses:
         "200":
           description: "Successful operation."
@@ -875,6 +875,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskDispatcherDefinition"
+  /trigger-definitions:
+    get:
+      description: "Get all trigger definitions."
+      summary: "Get all trigger definitions"
+      tags:
+        - "trigger-definition"
+      operationId: "getTriggerDefinitions"
+      parameters:
+        - name: "triggerTypes"
+          description: "The list of trigger types defined in workflows.(E.g. mailchimp/v1/subscribe)"
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+            example: "mailchimp/v1/subscribe"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TriggerDefinition"
 components:
   schemas:
     ActionDefinition:
@@ -887,6 +913,12 @@ components:
       required:
       - "name"
       properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
         description:
           description: "The description."
           type: "string"
@@ -1526,6 +1558,12 @@ components:
       - "name"
       - "type"
       properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
         description:
           description: "The description."
           type: "string"
