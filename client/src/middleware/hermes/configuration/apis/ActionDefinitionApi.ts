@@ -35,7 +35,7 @@ import {
 } from '../models/index';
 
 export interface GetActionDefinitionsRequest {
-    taskTypes: Array<string>;
+    taskTypes?: Array<string>;
 }
 
 export interface GetComponentActionDefinitionRequest {
@@ -97,10 +97,6 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get all action definitions
      */
     async getActionDefinitionsRaw(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionModel>>> {
-        if (requestParameters.taskTypes === null || requestParameters.taskTypes === undefined) {
-            throw new runtime.RequiredError('taskTypes','Required parameter requestParameters.taskTypes was null or undefined when calling getActionDefinitions.');
-        }
-
         const queryParameters: any = {};
 
         if (requestParameters.taskTypes) {
@@ -123,7 +119,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get all action definitions.
      * Get all action definitions
      */
-    async getActionDefinitions(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionModel>> {
+    async getActionDefinitions(requestParameters: GetActionDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionModel>> {
         const response = await this.getActionDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
