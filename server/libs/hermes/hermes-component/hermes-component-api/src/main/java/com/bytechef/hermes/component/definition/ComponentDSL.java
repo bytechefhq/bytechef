@@ -98,6 +98,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String componentName;
         private String componentDescription;
         private String componentTitle;
+        private int componentVersion;
         private Boolean deprecated;
         private String description;
         private EditorDescriptionFunction editorDescriptionFunction;
@@ -123,6 +124,7 @@ public final class ComponentDSL extends DefinitionDSL {
             this.componentName = componentDefinition.getName();
             this.componentTitle = componentDefinition.getTitle()
                 .orElse(null);
+            this.componentVersion = componentDefinition.getVersion();
         }
 
         public ModifiableActionDefinition batch(boolean batch) {
@@ -282,6 +284,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<String> getComponentTitle() {
             return Optional.ofNullable(componentTitle);
+        }
+
+        @Override
+        public int getComponentVersion() {
+            return componentVersion;
         }
 
         @Override
@@ -612,6 +619,7 @@ public final class ComponentDSL extends DefinitionDSL {
                 actionDefinition.componentName = this.getName();
                 actionDefinition.componentTitle = this.getTitle()
                     .orElse(null);
+                actionDefinition.componentVersion = this.getVersion();
             }
 
             return this;
@@ -740,6 +748,7 @@ public final class ComponentDSL extends DefinitionDSL {
                 triggerDefinition.componentName = this.getName();
                 triggerDefinition.componentTitle = this.getTitle()
                     .orElse(null);
+                triggerDefinition.componentVersion = this.getVersion();
             }
 
             return this;
@@ -1079,6 +1088,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String componentName;
         private String componentDescription;
         private String componentTitle;
+        private int componentVersion;
         private DeduplicateFunction deduplicateFunction;
         private Boolean deprecated;
         private String description;
@@ -1328,6 +1338,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<String> getComponentTitle() {
             return Optional.ofNullable(componentTitle);
+        }
+
+        @Override
+        public int getComponentVersion() {
+            return componentVersion;
         }
 
         @Override

@@ -4,6 +4,7 @@
     "componentName": "mailchimp",
     "componentDescription": "Mailchimp REST API documentation",
     "componentTitle": "Mailchimp",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Add a new member to the list.",
     "sampleOutput": {
@@ -1934,6 +1935,7 @@
     "componentDescription": "Mailchimp REST API documentation",
     "componentTitle": "Mailchimp",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Triggers when an Audience subscriber is added to the list.",
     "dynamicWebhookDisable": { },

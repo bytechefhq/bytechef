@@ -4,6 +4,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns all deals. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-all-deals\" target=\"_blank\" rel=\"noopener noreferrer\">getting all deals</a>.",
     "sampleOutput": {
@@ -2738,6 +2739,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Adds a new deal. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the dealFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/creating-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">adding a deal</a>.",
     "sampleOutput": {
@@ -5451,6 +5453,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Searches all deals by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found deals can be filtered by the person ID and the organization ID.",
     "sampleOutput": {
@@ -6443,6 +6446,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
     "sampleOutput": {
@@ -6579,6 +6583,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns the details of a specific deal. Note that this also returns some additional fields which are not present when asking for all deals – such as deal age and stay in pipeline stages. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of dealFields. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-details-of-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">getting details of a deal</a>.",
     "sampleOutput": {
@@ -9513,6 +9518,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest. Pagination can be controlled using `limit` and `start` query parameters. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals.\n",
     "sampleOutput": {
@@ -10371,6 +10377,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Creates a lead. A lead always has to be linked to a person or an organization or both. All leads created through the Pipedrive API will have a lead source `API` assigned. Here's the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-a-lead\" target=\"_blank\" rel=\"noopener noreferrer\">adding a lead</a>. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals. See an example given in the <a href=\"https://pipedrive.readme.io/docs/updating-custom-field-value\" target=\"_blank\" rel=\"noopener noreferrer\">updating custom fields' values tutorial</a>.",
     "sampleOutput": {
@@ -11167,6 +11174,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Deletes a specific lead.",
     "sampleOutput": {
@@ -11301,6 +11309,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns details of a specific lead. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields’ structure from deals.",
     "sampleOutput": {
@@ -11840,6 +11849,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Searches all leads by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found leads can be filtered by the person ID and the organization ID.",
     "sampleOutput": {
@@ -12821,6 +12831,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns all organizations.",
     "sampleOutput": {
@@ -14838,6 +14849,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Adds a new organization. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the organizationFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-an-organization\" target=\"_blank\" rel=\"noopener noreferrer\">adding an organization</a>.",
     "sampleOutput": {
@@ -16696,6 +16708,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
     "sampleOutput": {
@@ -17355,6 +17368,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
     "sampleOutput": {
@@ -17491,6 +17505,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns the details of an organization. Note that this also returns some additional fields which are not present when asking for all organizations. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of organizationFields.",
     "sampleOutput": {
@@ -19540,6 +19555,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns all persons.",
     "sampleOutput": {
@@ -21687,6 +21703,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Adds a new person. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the personFields and look for `key` values.<br>If a company uses the [Campaigns product](https://pipedrive.readme.io/docs/campaigns-in-pipedrive-api), then this endpoint will also accept and return the `data.marketing_status` field.",
     "sampleOutput": {
@@ -23537,6 +23554,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Searches all persons by name, email, phone, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found persons can be filtered by organization ID.",
     "sampleOutput": {
@@ -24367,6 +24385,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
     "sampleOutput": {
@@ -24503,6 +24522,7 @@
     "componentName": "pipedrive",
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Returns the details of a person. Note that this also returns some additional fields which are not present when asking for all persons. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of personFields.<br>If a company uses the [Campaigns product](https://pipedrive.readme.io/docs/campaigns-in-pipedrive-api), then this endpoint will also return the `data.marketing_status` field.",
     "sampleOutput": {
@@ -26545,6 +26565,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever a new activity is added.",
     "dynamicWebhookDisable": { },
@@ -27964,6 +27985,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever a new deal is added.",
     "dynamicWebhookDisable": { },
@@ -29778,6 +29800,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever a new organization is added.",
     "dynamicWebhookDisable": { },
@@ -31016,6 +31039,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever a new person is added.",
     "dynamicWebhookDisable": { },
@@ -32544,6 +32568,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever an existing deal is updated.",
     "dynamicWebhookDisable": { },
@@ -34358,6 +34383,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever an existing organization is updated.",
     "dynamicWebhookDisable": { },
@@ -35596,6 +35622,7 @@
     "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
     "componentTitle": "Pipedrive",
     "deduplicate": null,
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off whenever an existing person is updated.",
     "dynamicWebhookDisable": { },

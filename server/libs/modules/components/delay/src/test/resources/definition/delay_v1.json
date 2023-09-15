@@ -4,6 +4,7 @@
     "componentName": "delay",
     "componentDescription": "Sets a value which can then be referenced in other tasks.",
     "componentTitle": "Delay",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Delay action execution.",
     "sampleOutput": null,
