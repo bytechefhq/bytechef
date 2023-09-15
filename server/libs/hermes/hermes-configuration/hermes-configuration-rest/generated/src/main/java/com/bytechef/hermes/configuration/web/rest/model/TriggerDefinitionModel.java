@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
+import java.util.NoSuchElementException;
+import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -28,8 +30,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:22:57.688736+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:39:13.348118+02:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
+
+  private String componentName;
+
+  private JsonNullable<Object> componentVersion = JsonNullable.undefined();
 
   private String description;
 
@@ -58,6 +64,46 @@ public class TriggerDefinitionModel {
   public TriggerDefinitionModel(String name, TriggerTypeModel type) {
     this.name = name;
     this.type = type;
+  }
+
+  public TriggerDefinitionModel componentName(String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+  */
+  
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentName")
+  public String getComponentName() {
+    return componentName;
+  }
+
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  public TriggerDefinitionModel componentVersion(Object componentVersion) {
+    this.componentVersion = JsonNullable.of(componentVersion);
+    return this;
+  }
+
+  /**
+   * The component version.
+   * @return componentVersion
+  */
+  
+  @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentVersion")
+  public JsonNullable<Object> getComponentVersion() {
+    return componentVersion;
+  }
+
+  public void setComponentVersion(JsonNullable<Object> componentVersion) {
+    this.componentVersion = componentVersion;
   }
 
   public TriggerDefinitionModel description(String description) {
@@ -237,7 +283,9 @@ public class TriggerDefinitionModel {
       return false;
     }
     TriggerDefinitionModel triggerDefinition = (TriggerDefinitionModel) o;
-    return Objects.equals(this.description, triggerDefinition.description) &&
+    return Objects.equals(this.componentName, triggerDefinition.componentName) &&
+        equalsNullable(this.componentVersion, triggerDefinition.componentVersion) &&
+        Objects.equals(this.description, triggerDefinition.description) &&
         Objects.equals(this.sampleOutput, triggerDefinition.sampleOutput) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
@@ -247,15 +295,28 @@ public class TriggerDefinitionModel {
         Objects.equals(this.type, triggerDefinition.type);
   }
 
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(description, sampleOutput, help, name, outputSchema, properties, title, type);
+    return Objects.hash(componentName, hashCodeNullable(componentVersion), description, sampleOutput, help, name, outputSchema, properties, title, type);
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TriggerDefinitionModel {\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
