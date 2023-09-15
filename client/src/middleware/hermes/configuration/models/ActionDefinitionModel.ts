@@ -33,6 +33,18 @@ import {
  */
 export interface ActionDefinitionModel {
     /**
+     * The component name.
+     * @type {string}
+     * @memberof ActionDefinitionModel
+     */
+    componentName?: string;
+    /**
+     * The component version.
+     * @type {string}
+     * @memberof ActionDefinitionModel
+     */
+    componentVersion?: string;
+    /**
      * The description.
      * @type {string}
      * @memberof ActionDefinitionModel
@@ -96,6 +108,8 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
+        'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
@@ -115,6 +129,8 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
     }
     return {
         
+        'componentName': value.componentName,
+        'componentVersion': value.componentVersion,
         'description': value.description,
         'sampleOutput': value.sampleOutput,
         'help': HelpModelToJSON(value.help),

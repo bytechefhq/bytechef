@@ -39,6 +39,18 @@ import {
  */
 export interface TriggerDefinitionModel {
     /**
+     * The component name.
+     * @type {string}
+     * @memberof TriggerDefinitionModel
+     */
+    componentName?: string;
+    /**
+     * The component version.
+     * @type {any}
+     * @memberof TriggerDefinitionModel
+     */
+    componentVersion?: any | null;
+    /**
      * The description.
      * @type {string}
      * @memberof TriggerDefinitionModel
@@ -109,6 +121,8 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
+        'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
@@ -129,6 +143,8 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
     }
     return {
         
+        'componentName': value.componentName,
+        'componentVersion': value.componentVersion,
         'description': value.description,
         'sampleOutput': value.sampleOutput,
         'help': HelpModelToJSON(value.help),
