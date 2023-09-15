@@ -17,15 +17,15 @@
 
 package com.bytechef.component.pipedrive.connection;
 
-import static com.bytechef.hermes.component.definition.Authorization.ADD_TO;
 import static com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.hermes.component.definition.Authorization.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ADD_TO;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class PipedriveConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(connection -> "https://api.pipedrive.com/v1")
+        .baseUri((connectionParameters) -> "https://api.pipedrive.com/v1")
         .authorizations(authorization(
             AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
                 .title("API Key")

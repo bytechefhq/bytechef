@@ -26533,7 +26533,7 @@
   "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
   "icon": "path:assets/pipedrive.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "pipedrive",
   "resources": null,

@@ -18,13 +18,13 @@
 package com.bytechef.component.petstore.connection;
 
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.hermes.component.definition.Authorization.KEY;
-import static com.bytechef.hermes.component.definition.Authorization.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.KEY;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class PetstoreConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(connection -> "https://petstore3.swagger.io/api/v3")
+        .baseUri((connectionParameters) -> "https://petstore3.swagger.io/api/v3")
         .authorizations(authorization(
             AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
                 .title("OAuth2 Implicit")

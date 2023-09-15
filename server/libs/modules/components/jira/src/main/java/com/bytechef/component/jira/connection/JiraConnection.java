@@ -18,13 +18,13 @@
 package com.bytechef.component.jira.connection;
 
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.hermes.component.definition.Authorization.PASSWORD;
-import static com.bytechef.hermes.component.definition.Authorization.USERNAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class JiraConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(connection -> "https://your-domain.atlassian.net")
+        .baseUri((connectionParameters) -> "https://your-domain.atlassian.net")
         .authorizations(authorization(
             AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")

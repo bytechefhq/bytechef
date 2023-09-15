@@ -18,11 +18,11 @@
 package com.bytechef.component.hubspot.connection;
 
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class HubspotConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(connection -> "https://api.hubapi.com/")
+        .baseUri((connectionParameters) -> "https://api.hubapi.com/")
         .authorizations(authorization(
             AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
