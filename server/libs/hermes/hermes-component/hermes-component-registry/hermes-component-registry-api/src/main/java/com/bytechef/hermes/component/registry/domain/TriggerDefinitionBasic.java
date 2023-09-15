@@ -33,6 +33,8 @@ public class TriggerDefinitionBasic {
 
     protected boolean batch;
     protected String description;
+    protected String componentName;
+    protected int componentVersion;
     protected Help help;
     protected String name;
     protected String title;
@@ -43,6 +45,8 @@ public class TriggerDefinitionBasic {
 
     public TriggerDefinitionBasic(TriggerDefinition triggerDefinition) {
         this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
+        this.componentName = triggerDefinition.getComponentName();
+        this.componentVersion = triggerDefinition.getComponentVersion();
         this.description = Objects.requireNonNull(getDescription(triggerDefinition));
         this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
         this.name = Objects.requireNonNull(triggerDefinition.getName());
@@ -50,8 +54,12 @@ public class TriggerDefinitionBasic {
         this.type = Objects.requireNonNull(triggerDefinition.getType());
     }
 
-    public boolean isBatch() {
-        return batch;
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
     }
 
     public String getDescription() {
@@ -87,6 +95,10 @@ public class TriggerDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(batch, description, help, name, title, type);
+    }
+
+    public boolean isBatch() {
+        return batch;
     }
 
     @Override

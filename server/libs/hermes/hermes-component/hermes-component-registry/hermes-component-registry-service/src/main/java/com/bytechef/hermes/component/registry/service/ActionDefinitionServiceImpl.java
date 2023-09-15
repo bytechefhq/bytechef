@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.registry.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
@@ -175,11 +176,20 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations) {
-        return componentOperations.stream()
-            .map(componentOperation -> getActionDefinition(
-                componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName()))
-            .toList();
+        List<ActionDefinition> actionDefinitions;
+
+        if (componentOperations.isEmpty()) {
+            actionDefinitions = CollectionUtils.map(
+                componentDefinitionRegistry.getActionDefinitions(), ActionDefinition::new);
+        } else {
+            actionDefinitions = CollectionUtils.map(
+                componentOperations,
+                componentOperation -> getActionDefinition(
+                    componentOperation.componentName(), componentOperation.componentVersion(),
+                    componentOperation.operationName()));
+        }
+
+        return actionDefinitions;
     }
 
     private ComponentOptionsFunction getComponentOptionsFunction(

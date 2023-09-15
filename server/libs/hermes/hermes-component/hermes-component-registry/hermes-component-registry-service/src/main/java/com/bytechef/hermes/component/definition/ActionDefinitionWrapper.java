@@ -37,6 +37,7 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     protected final String componentName;
     protected final String componentDescription;
     protected final String componentTitle;
+    protected final int componentVersion;
     protected final Boolean deprecated;
     protected final String description;
     protected final EditorDescriptionDataSource editorDescriptionDataSource;
@@ -58,6 +59,7 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.componentName = actionDefinition.getComponentName();
         this.componentDescription = OptionalUtils.orElse(actionDefinition.getComponentDescription(), null);
         this.componentTitle = OptionalUtils.orElse(actionDefinition.getComponentTitle(), null);
+        this.componentVersion = actionDefinition.getComponentVersion();
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
         this.editorDescriptionDataSource =
@@ -97,6 +99,11 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     @Override
     public Optional<String> getComponentTitle() {
         return Optional.ofNullable(componentTitle);
+    }
+
+    @Override
+    public int getComponentVersion() {
+        return componentVersion;
     }
 
     @Override

@@ -4,6 +4,7 @@
     "componentName": "htmlHelper",
     "componentDescription": "Helper component which contains operations to help you work with HTML.",
     "componentTitle": "HTML Helper",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Send an email to any address.",
     "help": null,

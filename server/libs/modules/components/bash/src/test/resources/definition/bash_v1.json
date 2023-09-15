@@ -4,6 +4,7 @@
     "componentName": "bash",
     "componentDescription": "Allows you to run arbitrary Bash scripts.",
     "componentTitle": "Bash",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Executes the script.",
     "sampleOutput": null,

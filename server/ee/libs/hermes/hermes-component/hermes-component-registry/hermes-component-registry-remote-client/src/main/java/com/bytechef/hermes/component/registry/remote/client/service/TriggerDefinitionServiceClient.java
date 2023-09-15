@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -182,6 +183,13 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
                 "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}", componentName,
                 componentVersion),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<TriggerDefinition> getTriggerDefinitions(List<ComponentOperation> componentOperations) {
+        // TODO implement this method
+
+        throw new UnsupportedOperationException();
     }
 
     @Override
