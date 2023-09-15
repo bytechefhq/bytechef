@@ -46,10 +46,10 @@ export interface TriggerDefinitionModel {
     componentName?: string;
     /**
      * The component version.
-     * @type {any}
+     * @type {number}
      * @memberof TriggerDefinitionModel
      */
-    componentVersion?: any | null;
+    componentVersion?: number;
     /**
      * The description.
      * @type {string}
