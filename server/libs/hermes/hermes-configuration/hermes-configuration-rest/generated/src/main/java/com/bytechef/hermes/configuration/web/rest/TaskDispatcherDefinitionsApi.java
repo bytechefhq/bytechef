@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:22:57.688736+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:39:13.348118+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-dispatcher-definition", description = "The Core Task Dispatcher Definition API")
 public interface TaskDispatcherDefinitionsApi {

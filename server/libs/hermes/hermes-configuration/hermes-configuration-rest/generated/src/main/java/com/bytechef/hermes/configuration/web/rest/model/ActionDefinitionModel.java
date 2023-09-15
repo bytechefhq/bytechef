@@ -26,8 +26,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:22:57.688736+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:39:13.348118+02:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
+
+  private String componentName;
+
+  private String componentVersion;
 
   private String description;
 
@@ -53,6 +57,46 @@ public class ActionDefinitionModel {
    */
   public ActionDefinitionModel(String name) {
     this.name = name;
+  }
+
+  public ActionDefinitionModel componentName(String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+  */
+  
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentName")
+  public String getComponentName() {
+    return componentName;
+  }
+
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  public ActionDefinitionModel componentVersion(String componentVersion) {
+    this.componentVersion = componentVersion;
+    return this;
+  }
+
+  /**
+   * The component version.
+   * @return componentVersion
+  */
+  
+  @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentVersion")
+  public String getComponentVersion() {
+    return componentVersion;
+  }
+
+  public void setComponentVersion(String componentVersion) {
+    this.componentVersion = componentVersion;
   }
 
   public ActionDefinitionModel description(String description) {
@@ -212,7 +256,9 @@ public class ActionDefinitionModel {
       return false;
     }
     ActionDefinitionModel actionDefinition = (ActionDefinitionModel) o;
-    return Objects.equals(this.description, actionDefinition.description) &&
+    return Objects.equals(this.componentName, actionDefinition.componentName) &&
+        Objects.equals(this.componentVersion, actionDefinition.componentVersion) &&
+        Objects.equals(this.description, actionDefinition.description) &&
         Objects.equals(this.sampleOutput, actionDefinition.sampleOutput) &&
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
@@ -223,13 +269,15 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, sampleOutput, help, name, outputSchema, properties, title);
+    return Objects.hash(componentName, componentVersion, description, sampleOutput, help, name, outputSchema, properties, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ActionDefinitionModel {\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
