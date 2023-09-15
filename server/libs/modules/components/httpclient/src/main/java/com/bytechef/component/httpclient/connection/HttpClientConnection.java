@@ -19,21 +19,22 @@ package com.bytechef.component.httpclient.connection;
 
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.definition.Property;
 
-import static com.bytechef.hermes.component.definition.Authorization.ADD_TO;
-import static com.bytechef.hermes.component.definition.Authorization.AUTHORIZATION_URL;
-import static com.bytechef.hermes.component.definition.Authorization.HEADER_PREFIX;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ADD_TO;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.AUTHORIZATION_URL;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.HEADER_PREFIX;
 import static com.bytechef.hermes.component.definition.ConnectionDefinition.BASE_URI;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.hermes.component.definition.Authorization.KEY;
-import static com.bytechef.hermes.component.definition.Authorization.PASSWORD;
-import static com.bytechef.hermes.component.definition.Authorization.SCOPES;
-import static com.bytechef.hermes.component.definition.Authorization.TOKEN;
-import static com.bytechef.hermes.component.definition.Authorization.TOKEN_URL;
-import static com.bytechef.hermes.component.definition.Authorization.USERNAME;
-import static com.bytechef.hermes.component.definition.Authorization.VALUE;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.KEY;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.SCOPES;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN_URL;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 
@@ -53,7 +54,7 @@ public class HttpClientConnection {
                         string(KEY)
                             .label("Key")
                             .required(true)
-                            .defaultValue(Authorization.API_TOKEN),
+                            .defaultValue(AuthorizationConstants.API_TOKEN),
                         string(VALUE).label("Value")
                             .required(true),
                         string(ADD_TO)
@@ -112,7 +113,7 @@ public class HttpClientConnection {
                             .required(true),
                         string(HEADER_PREFIX)
                             .label("Header Prefix")
-                            .defaultValue(Authorization.BEARER),
+                            .defaultValue(AuthorizationConstants.BEARER),
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
@@ -134,7 +135,7 @@ public class HttpClientConnection {
                             .required(true),
                         string(HEADER_PREFIX)
                             .label("Header Prefix")
-                            .defaultValue(Authorization.BEARER),
+                            .defaultValue(AuthorizationConstants.BEARER),
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
@@ -155,7 +156,7 @@ public class HttpClientConnection {
                             .required(true),
                         string(HEADER_PREFIX)
                             .label("Header Prefix")
-                            .defaultValue(Authorization.BEARER),
+                            .defaultValue(AuthorizationConstants.BEARER),
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")

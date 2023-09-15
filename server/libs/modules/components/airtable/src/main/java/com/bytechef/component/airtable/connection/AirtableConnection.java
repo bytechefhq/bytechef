@@ -18,10 +18,10 @@
 package com.bytechef.component.airtable.connection;
 
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.Authorization.TOKEN;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 
@@ -32,7 +32,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
  */
 public class AirtableConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(connection -> "https://api.airtable.com/v0")
+        .baseUri((connectionParameters) -> "https://api.airtable.com/v0")
         .authorizations(authorization(
             AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")

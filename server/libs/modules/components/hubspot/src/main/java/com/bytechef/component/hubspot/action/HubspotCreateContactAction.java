@@ -20,13 +20,12 @@ package com.bytechef.component.hubspot.action;
 import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputForCreateProperties;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-
 import java.util.Map;
 
 /**
@@ -56,5 +55,5 @@ public class HubspotCreateContactAction {
         .outputSchema(object().properties(HubspotSimplePublicObjectProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", HttpClientUtils.ResponseType.JSON)));
+                    "responseType", ResponseType.JSON)));
 }

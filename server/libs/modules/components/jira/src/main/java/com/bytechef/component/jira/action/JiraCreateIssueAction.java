@@ -29,8 +29,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.time;
-import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
+import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.jira.property.JiraCreatedIssueProperties;
 import com.bytechef.component.jira.property.JiraIssueUpdateDetailsProperties;

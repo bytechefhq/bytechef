@@ -1922,7 +1922,7 @@
   "description": "Mailchimp REST API documentation",
   "icon": "path:assets/mailchimp.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "mailchimp",
   "resources": null,
