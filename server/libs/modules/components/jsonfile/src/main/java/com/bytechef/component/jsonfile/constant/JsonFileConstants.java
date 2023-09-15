@@ -20,7 +20,7 @@ package com.bytechef.component.jsonfile.constant;
 /**
  * @author Ivica Cardic
  */
-public class JsonFileTaskConstants {
+public class JsonFileConstants {
 
     public static final String FILE_TYPE = "fileType";
     public static final String IS_ARRAY = "isArray";

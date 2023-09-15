@@ -17,7 +17,7 @@
 
 package com.bytechef.component.jsonfile;
 
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.JSON_FILE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.JSON_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.jsonfile.action.JsonFileReadAction;

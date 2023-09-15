@@ -18,7 +18,7 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
-import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
+import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapUtils;
@@ -39,9 +39,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILENAME;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILENAME;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.SOURCE;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
@@ -66,7 +66,7 @@ public class JsonFileWriteActionTest {
             mapUtilsMockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(null);
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSON");
             mapUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
@@ -104,7 +104,7 @@ public class JsonFileWriteActionTest {
             mapUtilsMockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(null);
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSON");
             mapUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
@@ -137,7 +137,7 @@ public class JsonFileWriteActionTest {
             mapUtilsMockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn("test.json");
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSON");
             mapUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
@@ -166,7 +166,7 @@ public class JsonFileWriteActionTest {
             mapUtilsMockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(null);
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSONL");
             mapUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
@@ -207,7 +207,7 @@ public class JsonFileWriteActionTest {
             mapUtilsMockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn("test.jsonl");
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSONL");
             mapUtilsMockedStatic.when(() -> MapUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());

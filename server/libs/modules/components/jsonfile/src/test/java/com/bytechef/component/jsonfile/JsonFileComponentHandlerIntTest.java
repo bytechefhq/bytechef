@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.SOURCE;
 
 /**
  * @author Ivica Cardic

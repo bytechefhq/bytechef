@@ -41,5 +41,4 @@ public class DelayComponentHandler implements ComponentHandler {
     public ComponentDefinition getDefinition() {
         return COMPONENT_DEFINITION;
     }
-
 }
