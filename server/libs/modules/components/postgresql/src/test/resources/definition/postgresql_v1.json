@@ -2,7 +2,7 @@
   "actions": [ {
     "batch": null,
     "componentName": "postgresql",
-    "componentDescription": "Query, insert nd update data from PostgreSQL.",
+    "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
     "deprecated": null,
     "description": "Execute an SQL query.",
@@ -142,7 +142,7 @@
   }, {
     "batch": null,
     "componentName": "postgresql",
-    "componentDescription": "Query, insert nd update data from PostgreSQL.",
+    "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
     "deprecated": null,
     "description": "Insert rows in database.",
@@ -502,7 +502,7 @@
   }, {
     "batch": null,
     "componentName": "postgresql",
-    "componentDescription": "Query, insert nd update data from PostgreSQL.",
+    "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
     "deprecated": null,
     "description": "Update rows in database.",
@@ -880,7 +880,7 @@
   }, {
     "batch": null,
     "componentName": "postgresql",
-    "componentDescription": "Query, insert nd update data from PostgreSQL.",
+    "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
     "deprecated": null,
     "description": "Delete rows from database.",
@@ -1221,7 +1221,7 @@
   }, {
     "batch": null,
     "componentName": "postgresql",
-    "componentDescription": "Query, insert nd update data from PostgreSQL.",
+    "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
@@ -1632,7 +1632,7 @@
     "authorizations": null,
     "baseUri": null,
     "componentName": "postgresql",
-    "componentDescription": "Query, insert nd update data from PostgreSQL.",
+    "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
     "properties": [ {
       "advancedOption": null,
@@ -1731,7 +1731,7 @@
   },
   "customAction": null,
   "customActionHelp": null,
-  "description": "Query, insert nd update data from PostgreSQL.",
+  "description": "Query, insert and update data from PostgreSQL.",
   "icon": "path:assets/postgresql.svg",
   "tags": null,
   "filterCompatibleConnectionDefinitions": null,

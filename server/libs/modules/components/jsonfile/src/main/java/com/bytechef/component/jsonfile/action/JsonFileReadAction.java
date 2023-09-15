@@ -17,7 +17,7 @@
 
 package com.bytechef.component.jsonfile.action;
 
-import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
+import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -36,13 +36,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_ENTRY;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.IS_ARRAY;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_NUMBER;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_SIZE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PATH;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.READ;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_ENTRY;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.IS_ARRAY;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_SIZE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PATH;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.READ;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
@@ -64,9 +64,9 @@ public class JsonFileReadAction {
                 .label("File Type")
                 .description("The file type to choose.")
                 .options(
-                    option("JSON", FileType.JSON.name()),
-                    option("JSON Line", FileType.JSONL.name()))
-                .defaultValue(FileType.JSON.name())
+                    option("JSON", JsonFileConstants.FileType.JSON.name()),
+                    option("JSON Line", JsonFileConstants.FileType.JSONL.name()))
+                .defaultValue(JsonFileConstants.FileType.JSON.name())
                 .required(true),
             fileEntry(FILE_ENTRY)
                 .label("File")
@@ -100,7 +100,7 @@ public class JsonFileReadAction {
     protected static Object perform(Map<String, ?> inputParameters, Context context)
         throws ComponentExecutionException {
 
-        FileType fileType = getFileType(inputParameters);
+        JsonFileConstants.FileType fileType = getFileType(inputParameters);
         FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean isArray = MapUtils.getBoolean(inputParameters, IS_ARRAY, true);
         Object result;
@@ -110,7 +110,7 @@ public class JsonFileReadAction {
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
-            if (fileType == FileType.JSON) {
+            if (fileType == JsonFileConstants.FileType.JSON) {
                 if (path == null) {
                     try (Stream<Map<String, ?>> stream = JsonUtils.stream(inputStream)) {
                         items = stream.toList();
@@ -155,10 +155,10 @@ public class JsonFileReadAction {
         return result;
     }
 
-    protected static FileType getFileType(Map<String, ?> inputParameters) {
-        String fileType = MapUtils.getString(inputParameters, FILE_TYPE, FileType.JSON.name());
+    protected static JsonFileConstants.FileType getFileType(Map<String, ?> inputParameters) {
+        String fileType = MapUtils.getString(inputParameters, FILE_TYPE, JsonFileConstants.FileType.JSON.name());
 
-        return FileType.valueOf(fileType.toUpperCase());
+        return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
     }
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
