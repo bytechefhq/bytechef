@@ -1,9 +1,10 @@
-apis/AutomationProjectApi.ts
-apis/AutomationProjectCategoryApi.ts
-apis/AutomationProjectInstanceApi.ts
-apis/AutomationProjectInstanceTagApi.ts
-apis/AutomationProjectTagApi.ts
-apis/AutomationWorkflowApi.ts
+.openapi-generator-ignore
+apis/ProjectApi.ts
+apis/ProjectCategoryApi.ts
+apis/ProjectInstanceApi.ts
+apis/ProjectInstanceTagApi.ts
+apis/ProjectTagApi.ts
+apis/ProjectWorkflowApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

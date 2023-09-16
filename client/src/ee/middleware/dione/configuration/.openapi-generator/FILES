@@ -1,7 +1,7 @@
-apis/EmbeddedIntegrationApi.ts
-apis/EmbeddedIntegrationCategoryApi.ts
-apis/EmbeddedIntegrationTagApi.ts
-apis/EmbeddedWorkflowApi.ts
+apis/IntegrationApi.ts
+apis/IntegrationCategoryApi.ts
+apis/IntegrationTagApi.ts
+apis/IntegrationWorkflowApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

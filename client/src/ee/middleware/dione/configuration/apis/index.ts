@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './EmbeddedIntegrationApi';
-export * from './EmbeddedIntegrationCategoryApi';
-export * from './EmbeddedIntegrationTagApi';
-export * from './EmbeddedWorkflowApi';
+export * from './IntegrationApi';
+export * from './IntegrationCategoryApi';
+export * from './IntegrationTagApi';
+export * from './IntegrationWorkflowApi';
