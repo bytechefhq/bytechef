@@ -18,8 +18,6 @@
 package com.bytechef.helios.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
@@ -36,63 +34,26 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ConnectionController implements ConnectionsApi {
+public class ProjectConnectionTagApiController implements ProjectConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public ProjectConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
+    public ResponseEntity<List<TagModel>> getConnectionTags() {
         return ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.create(conversionService.convert(connectionModel, ConnectionDTO.class)),
-                ConnectionModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteConnection(Long id) {
-        connectionFacade.delete(id);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public ResponseEntity<ConnectionModel> getConnection(Long id) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.getConnection(id), ConnectionModel.class)
-                .parameters(null));
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public ResponseEntity<List<ConnectionModel>> getConnections(
-        String componentName, Integer connectionVersion, Long tagId) {
-
-        return ResponseEntity.ok(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId)
+            connectionFacade.getConnectionTags()
                 .stream()
-                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
-                    .parameters(null))
+                .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
-    }
-
-    @Override
-    public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
-                ConnectionModel.class));
     }
 
     @Override

@@ -33,9 +33,9 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionsApi {
+public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionApi {
 
     private final ConversionService conversionService;
     private final RemoteTaskDispatcherDefinitionService taskDispatcherDefinitionService;

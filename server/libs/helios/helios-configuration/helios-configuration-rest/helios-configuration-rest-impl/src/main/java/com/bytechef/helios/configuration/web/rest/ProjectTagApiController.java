@@ -19,7 +19,9 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
-import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
+import com.bytechef.helios.configuration.web.rest.model.TagModel;
+import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -32,25 +34,39 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectCategoryController implements ProjectCategoriesApi {
+public class ProjectTagApiController implements ProjectTagApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectCategoryController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectTagApiController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }
 
     @Override
-    public ResponseEntity<List<CategoryModel>> getProjectCategories() {
-        return ResponseEntity.ok(
-            projectFacade.getProjectCategories()
-                .stream()
-                .map(category -> conversionService.convert(category, CategoryModel.class))
+    public ResponseEntity<List<TagModel>> getProjectTags() {
+        return ResponseEntity.ok(projectFacade.getProjectTags()
+            .stream()
+            .map(tag -> conversionService.convert(tag, TagModel.class))
+            .toList());
+    }
+
+    @Override
+    public ResponseEntity<Void> updateProjectTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
+        List<TagModel> tagModels = updateTagsRequestModel.getTags();
+
+        projectFacade.updateProjectTags(
+            id,
+            tagModels.stream()
+                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
                 .toList());
+
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 }

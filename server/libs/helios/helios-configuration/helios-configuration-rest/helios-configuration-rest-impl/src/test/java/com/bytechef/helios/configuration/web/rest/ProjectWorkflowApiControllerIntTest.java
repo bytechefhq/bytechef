@@ -51,8 +51,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = ProjectConfigurationRestTestConfiguration.class)
-@WebMvcTest(ProjectWorkflowController.class)
-public class ProjectWorkflowControllerIntTest {
+@WebMvcTest(ProjectWorkflowApiController.class)
+public class ProjectWorkflowApiControllerIntTest {
 
     public static final String DEFINITION = """
         {
@@ -95,7 +95,7 @@ public class ProjectWorkflowControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/automation/workflows/1")
+                .uri("/workflows/1")
                 .exchange()
                 .expectStatus()
                 .isEqualTo(204);
@@ -117,7 +117,7 @@ public class ProjectWorkflowControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/automation/workflows/1")
+                .uri("/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -135,7 +135,7 @@ public class ProjectWorkflowControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/automation/workflows")
+                .uri("/workflows")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -161,7 +161,7 @@ public class ProjectWorkflowControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/automation/workflows/1")
+                .uri("/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)

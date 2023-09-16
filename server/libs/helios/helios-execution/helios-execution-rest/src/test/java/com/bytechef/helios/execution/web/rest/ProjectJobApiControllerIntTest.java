@@ -25,16 +25,41 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(value = ProjectWorkflowExecutionController.class)
-public class ProjectWorkflowExecutionControllerIntTest {
+@WebMvcTest(ProjectJobApiController.class)
+public class ProjectJobApiControllerIntTest {
 
     @Test
-    public void testGetProjectWorkflowExecution() {
-// TODO
+    public void testGetJob() {
+        // TODO
     }
 
     @Test
-    public void testSearchProjectWorkflowExecutions() {
-// TODO
+    public void testGetJobTaskExecutions() {
+        // TODO
+    }
+
+    @Test
+    public void testGetJobs() {
+        // TODO
+    }
+
+    @Test
+    public void testGetLatestJob() {
+        // TODO
+    }
+
+    @Test
+    public void testPostJob() {
+        // TODO
+    }
+
+    @Test
+    public void testRestartJob() {
+        // TODO
+    }
+
+    @Test
+    public void testStopJob() {
+        // TODO
     }
 }

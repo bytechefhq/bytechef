@@ -53,8 +53,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(value = ConnectionController.class)
-public class ConnectionControllerIntTest {
+@WebMvcTest(value = ProjectConnectionApiController.class)
+public class ProjectConnectionApiControllerIntTest {
 
     @MockBean
     private ConnectionFacade connectionFacade;
@@ -79,7 +79,7 @@ public class ConnectionControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/automation/connections/1")
+                .uri("/connections/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -104,7 +104,7 @@ public class ConnectionControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/automation/connections/1")
+                .uri("/connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -124,7 +124,7 @@ public class ConnectionControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/automation/connection-tags")
+                .uri("/connection-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -151,7 +151,7 @@ public class ConnectionControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/automation/connections")
+            .uri("/connections")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -165,7 +165,7 @@ public class ConnectionControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/automation/connections?componentNames=component1")
+            .uri("/connections?componentNames=component1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -177,7 +177,7 @@ public class ConnectionControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/automation/connections?tagIds=1")
+            .uri("/connections?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -189,7 +189,7 @@ public class ConnectionControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/automation/connections?componentNames=component1&tagIds=1")
+            .uri("/connections?componentNames=component1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -210,7 +210,7 @@ public class ConnectionControllerIntTest {
             assert connectionDTO.id() != null;
             this.webTestClient
                 .post()
-                .uri("/automation/connections")
+                .uri("/connections")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(connectionModel)
@@ -257,7 +257,7 @@ public class ConnectionControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/automation/connections/1")
+                .uri("/connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(connectionModel)
@@ -281,7 +281,7 @@ public class ConnectionControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/automation/connections/1/tags")
+                .uri("/connections/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))

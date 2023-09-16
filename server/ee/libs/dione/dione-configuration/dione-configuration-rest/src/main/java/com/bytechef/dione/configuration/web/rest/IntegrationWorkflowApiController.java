@@ -19,6 +19,7 @@ package com.bytechef.dione.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.dione.configuration.facade.IntegrationFacade;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -34,15 +35,17 @@ import java.util.List;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/embedded")
-public class IntegrationWorkflowController implements WorkflowsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class IntegrationWorkflowApiController implements IntegrationWorkflowApi {
 
+    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationWorkflowController(
-        ConversionService conversionService, WorkflowService workflowService) {
+    public IntegrationWorkflowApiController(
+        IntegrationFacade integrationFacade, ConversionService conversionService, WorkflowService workflowService) {
+        this.integrationFacade = integrationFacade;
 
         this.conversionService = conversionService;
         this.workflowService = workflowService;
@@ -55,6 +58,15 @@ public class IntegrationWorkflowController implements WorkflowsApi {
         return ResponseEntity
             .noContent()
             .build();
+    }
+
+    @Override
+    public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(Long id) {
+        return ResponseEntity.ok(
+            integrationFacade.getIntegrationWorkflows(id)
+                .stream()
+                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                .toList());
     }
 
     @Override

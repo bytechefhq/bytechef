@@ -17,14 +17,11 @@
 
 package com.bytechef.dione.configuration.web.rest;
 
-import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
 import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
-import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +34,14 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/embedded")
-public class IntegrationController implements IntegrationsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationController(ConversionService conversionService, IntegrationFacade integrationFacade) {
+    public IntegrationApiController(ConversionService conversionService, IntegrationFacade integrationFacade) {
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
     }
@@ -70,15 +67,6 @@ public class IntegrationController implements IntegrationsApi {
             integrationFacade.getIntegrations(categoryId, tagId)
                 .stream()
                 .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-                .toList());
-    }
-
-    @Override
-    public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(Long id) {
-        return ResponseEntity.ok(
-            integrationFacade.getIntegrationWorkflows(id)
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
                 .toList());
     }
 
@@ -113,22 +101,5 @@ public class IntegrationController implements IntegrationsApi {
             conversionService.convert(
                 integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
                 IntegrationModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Void> updateIntegrationTags(
-        Long id, UpdateTagsRequestModel updateIntegrationTagsRequestModel) {
-
-        List<TagModel> tagModels = updateIntegrationTagsRequestModel.getTags();
-
-        integrationFacade.update(
-            id,
-            tagModels.stream()
-                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                .toList());
-
-        return ResponseEntity
-            .noContent()
-            .build();
     }
 }

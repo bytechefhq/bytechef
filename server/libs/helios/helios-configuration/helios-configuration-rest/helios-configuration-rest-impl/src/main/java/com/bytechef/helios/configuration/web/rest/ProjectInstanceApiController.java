@@ -22,9 +22,6 @@ import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
-import com.bytechef.helios.configuration.web.rest.model.TagModel;
-import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -37,15 +34,15 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectInstanceController implements ProjectInstancesApi {
+public class ProjectInstanceApiController implements ProjectInstanceApi {
 
     private final ConversionService conversionService;
     private final ProjectInstanceFacade projectInstanceFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceController(
+    public ProjectInstanceApiController(
         ConversionService conversionService, ProjectInstanceFacade projectInstanceFacade) {
 
         this.conversionService = conversionService;
@@ -121,20 +118,5 @@ public class ProjectInstanceController implements ProjectInstancesApi {
             projectInstanceFacade.updateProjectInstance(
                 conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
             ProjectInstanceModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Void> updateProjectInstanceTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
-        List<TagModel> tagModels = updateTagsRequestModel.getTags();
-
-        projectInstanceFacade.updateProjectInstanceTags(
-            id,
-            tagModels.stream()
-                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                .toList());
-
-        return ResponseEntity
-            .noContent()
-            .build();
     }
 }
