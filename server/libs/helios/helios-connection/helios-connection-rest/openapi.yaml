@@ -1,22 +1,22 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Automation Connection API"
+  title: "Project Connection API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api/automation"
+- url: "http://localhost:5173/api"
 tags:
-- name: "automation-connection-tag"
-  description: "The Automation Connection Tag API"
-- name: "automation-connection"
-  description: "The Automation Connection API"
+- name: "project-connection-tag"
+  description: "The Project Connection Tag API"
+- name: "project-connection"
+  description: "The Project Connection API"
 paths:
-  /connection-tags:
+  /project-connection-tags:
     get:
       description: "Get connection tags."
       summary: "Get connection tags"
       tags:
-      - "automation-connection-tag"
+      - "project-connection-tag"
       operationId: "getConnectionTags"
       responses:
         "200":
@@ -28,12 +28,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Tag"
-  /connections:
+  /project-connections:
     get:
       description: "Get all connections."
       summary: "Get all connections"
       tags:
-      - "automation-connection"
+      - "project-connection"
       operationId: "getConnections"
       parameters:
       - name: "componentName"
@@ -68,7 +68,7 @@ paths:
       description: "Create a new connection."
       summary: "Create a new connection"
       tags:
-      - "automation-connection"
+      - "project-connection"
       operationId: "createConnection"
       requestBody:
         content:
@@ -83,12 +83,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-  /connections/{id}:
+  /project-connections/{id}:
     delete:
       description: "Delete a connection."
       summary: "Delete a connection"
       tags:
-      - "automation-connection"
+      - "project-connection"
       operationId: "deleteConnection"
       parameters:
       - name: "id"
@@ -105,7 +105,7 @@ paths:
       description: "Get a connection by id."
       summary: "Get a connection by id"
       tags:
-      - "automation-connection"
+      - "project-connection"
       operationId: "getConnection"
       parameters:
       - name: "id"
@@ -126,7 +126,7 @@ paths:
       description: "Update an existing connection."
       summary: "Update an existing connection"
       tags:
-      - "automation-connection"
+      - "project-connection"
       operationId: "updateConnection"
       parameters:
       - name: "id"
@@ -149,12 +149,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-  /connections/{id}/connection-tags:
+  /project-connections/{id}/project-connection-tags:
     put:
       description: "Updates tags of an existing connection."
       summary: "Updates tags of an existing connection"
       tags:
-      - "automation-connection-tag"
+      - "project-connection-tag"
       operationId: "updateConnectionTags"
       parameters:
       - name: "id"
