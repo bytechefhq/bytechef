@@ -6,6 +6,7 @@
 package com.bytechef.helios.connection.web.rest;
 
 import com.bytechef.helios.connection.web.rest.model.TagModel;
+import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,17 +33,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:17.507364+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:14.429797+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-connection-tag", description = "The Automation Connection Tag API")
-public interface ConnectionTagsApi {
+@Tag(name = "project-connection-tag", description = "The Project Connection Tag API")
+public interface ProjectConnectionTagApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /connection-tags : Get connection tags
+     * GET /project-connection-tags : Get connection tags
      * Get connection tags.
      *
      * @return A list of connection tags. (status code 200)
@@ -51,7 +52,7 @@ public interface ConnectionTagsApi {
         operationId = "getConnectionTags",
         summary = "Get connection tags",
         description = "Get connection tags.",
-        tags = { "automation-connection-tag" },
+        tags = { "project-connection-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connection tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
@@ -60,7 +61,7 @@ public interface ConnectionTagsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-tags",
+        value = "/project-connection-tags",
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getConnectionTags(
@@ -75,6 +76,37 @@ public interface ConnectionTagsApi {
                 }
             }
         });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /project-connections/{id}/project-connection-tags : Updates tags of an existing connection
+     * Updates tags of an existing connection.
+     *
+     * @param id The id of the connection. (required)
+     * @param updateTagsRequestModel  (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "updateConnectionTags",
+        summary = "Updates tags of an existing connection",
+        description = "Updates tags of an existing connection.",
+        tags = { "project-connection-tag" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/project-connections/{id}/project-connection-tags",
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Void> updateConnectionTags(
+        @Parameter(name = "id", description = "The id of the connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

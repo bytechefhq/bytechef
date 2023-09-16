@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T08:31:26.598462+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T10:17:07.736895+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "task-dispatcher-definition", description = "The Core Task Dispatcher Definition API")
-public interface TaskDispatcherDefinitionsApi {
+@Tag(name = "task-dispatcher-definition", description = "The Task Dispatcher Definition API")
+public interface TaskDispatcherDefinitionApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();

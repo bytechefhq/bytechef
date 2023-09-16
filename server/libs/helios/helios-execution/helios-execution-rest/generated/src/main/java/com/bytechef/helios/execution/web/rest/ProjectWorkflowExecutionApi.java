@@ -34,17 +34,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:18.469889+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:15.466008+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-execution", description = "The Automation Execution API")
-public interface WorkflowExecutionsApi {
+@Tag(name = "project-workflow-execution", description = "The Project Workflow Execution API")
+public interface ProjectWorkflowExecutionApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /workflow-executions/{id} : Get workflow executions by id
+     * GET /project-workflow-executions/{id} : Get workflow executions by id
      * Get workflow execution by id.
      *
      * @param id The id of an execution. (required)
@@ -54,7 +54,7 @@ public interface WorkflowExecutionsApi {
         operationId = "getExecution",
         summary = "Get workflow executions by id",
         description = "Get workflow execution by id.",
-        tags = { "automation-execution" },
+        tags = { "project-workflow-execution" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The execution object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowExecutionModel.class))
@@ -63,7 +63,7 @@ public interface WorkflowExecutionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflow-executions/{id}",
+        value = "/project-workflow-executions/{id}",
         produces = { "application/json" }
     )
     default ResponseEntity<WorkflowExecutionModel> getExecution(
@@ -84,7 +84,7 @@ public interface WorkflowExecutionsApi {
 
 
     /**
-     * GET /workflow-executions : Get project workflow executions
+     * GET /project-workflow-executions : Get project workflow executions
      * Get project workflow executions.
      *
      * @param jobStatus The status of an executed job (optional)
@@ -100,7 +100,7 @@ public interface WorkflowExecutionsApi {
         operationId = "getExecutions",
         summary = "Get project workflow executions",
         description = "Get project workflow executions.",
-        tags = { "automation-execution" },
+        tags = { "project-workflow-execution" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The page of workflow executions.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = org.springframework.data.domain.Page.class))
@@ -109,7 +109,7 @@ public interface WorkflowExecutionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflow-executions",
+        value = "/project-workflow-executions",
         produces = { "application/json" }
     )
     default ResponseEntity<org.springframework.data.domain.Page> getExecutions(
