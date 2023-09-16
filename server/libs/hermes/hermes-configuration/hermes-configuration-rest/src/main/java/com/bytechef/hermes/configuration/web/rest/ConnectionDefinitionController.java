@@ -18,41 +18,55 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
-import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
+import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+/**
+ * @author Ivica Cardic
+ */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ConnectionDefinitionController implements ConnectionDefinitionsApi {
+public class ConnectionDefinitionController implements ConnectionDefinitionApi {
 
+    private final RemoteConnectionDefinitionService connectionDefinitionService;
     private final ConversionService conversionService;
-    private final OAuth2ParameterFacade oAuth2ParameterFacade;
 
-    @SuppressFBWarnings("EI")
     public ConnectionDefinitionController(
-        ConversionService conversionService, OAuth2ParameterFacade oAuth2ParameterFacade) {
+        RemoteConnectionDefinitionService connectionDefinitionService, ConversionService conversionService) {
 
+        this.connectionDefinitionService = connectionDefinitionService;
         this.conversionService = conversionService;
-        this.oAuth2ParameterFacade = oAuth2ParameterFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<OAuth2AuthorizationParametersModel> getOAuth2AuthorizationParameters(
-        GetOAuth2AuthorizationParametersRequestModel parametersRequestModel) {
+    public ResponseEntity<ConnectionDefinitionModel> getComponentConnectionDefinition(
+        String componentName, Integer componentVersion) {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                oAuth2ParameterFacade.getOAuth2AuthorizationParameters(
-                    parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
-                    parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
-                OAuth2AuthorizationParametersModel.class));
+                connectionDefinitionService.getConnectionDefinition(componentName, componentVersion),
+                ConnectionDefinitionModel.class));
+    }
+
+    @Override
+    public ResponseEntity<List<ConnectionDefinitionBasicModel>> getComponentConnectionDefinitions(
+        String componentName, Integer componentVersion) {
+
+        return ResponseEntity.ok(
+            connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion)
+                .stream()
+                .map(connectionDefinition -> conversionService.convert(
+                    connectionDefinition, ConnectionDefinitionBasicModel.class))
+                .toList());
     }
 }

@@ -18,9 +18,13 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.configuration.service.OAuth2Service;
+import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
+import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,15 +33,34 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class OAuth2PropertiesController implements Oauth2PropertiesApi {
+public class OAuth2Controller implements Oauth2Api {
 
+    private final ConversionService conversionService;
+    private final OAuth2ParameterFacade oAuth2ParameterFacade;
     private final OAuth2Service oAuth2Service;
 
     @SuppressFBWarnings("EI")
-    public OAuth2PropertiesController(OAuth2Service oAuth2Service) {
+    public OAuth2Controller(
+        ConversionService conversionService, OAuth2ParameterFacade oAuth2ParameterFacade, OAuth2Service oAuth2Service) {
+
+        this.conversionService = conversionService;
+        this.oAuth2ParameterFacade = oAuth2ParameterFacade;
         this.oAuth2Service = oAuth2Service;
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
+    public ResponseEntity<OAuth2AuthorizationParametersModel> getOAuth2AuthorizationParameters(
+        GetOAuth2AuthorizationParametersRequestModel parametersRequestModel) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                oAuth2ParameterFacade.getOAuth2AuthorizationParameters(
+                    parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
+                    parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
+                OAuth2AuthorizationParametersModel.class));
     }
 
     @Override

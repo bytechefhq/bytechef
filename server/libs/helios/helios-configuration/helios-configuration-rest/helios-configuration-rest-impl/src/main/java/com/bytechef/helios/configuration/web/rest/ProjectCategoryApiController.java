@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.configuration.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.dione.configuration.facade.IntegrationFacade;
-import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import com.bytechef.helios.configuration.facade.ProjectFacade;
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -31,25 +32,25 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/embedded")
-public class IntegrationCategoryController implements IntegrationCategoriesApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@ConditionalOnEnabled("coordinator")
+public class ProjectCategoryApiController implements ProjectCategoryApi {
 
-    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
+    private final ProjectFacade projectFacade;
 
-    @SuppressFBWarnings("EI2")
-    public IntegrationCategoryController(
-        IntegrationFacade integrationFacade, ConversionService conversionService) {
-
-        this.integrationFacade = integrationFacade;
+    @SuppressFBWarnings("EI")
+    public ProjectCategoryApiController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
+        this.projectFacade = projectFacade;
     }
 
     @Override
-    public ResponseEntity<List<CategoryModel>> getIntegrationCategories() {
-        return ResponseEntity.ok(integrationFacade.getIntegrationCategories()
-            .stream()
-            .map(category -> conversionService.convert(category, CategoryModel.class))
-            .toList());
+    public ResponseEntity<List<CategoryModel>> getProjectCategories() {
+        return ResponseEntity.ok(
+            projectFacade.getProjectCategories()
+                .stream()
+                .map(category -> conversionService.convert(category, CategoryModel.class))
+                .toList());
     }
 }

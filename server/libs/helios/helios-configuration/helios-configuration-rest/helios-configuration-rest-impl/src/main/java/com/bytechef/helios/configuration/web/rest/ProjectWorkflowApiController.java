@@ -20,6 +20,7 @@ package com.bytechef.helios.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -35,16 +36,20 @@ import java.util.List;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectWorkflowController implements WorkflowsApi {
+public class ProjectWorkflowApiController implements ProjectWorkflowApi {
 
     private final ConversionService conversionService;
+    private final ProjectFacade projectFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public ProjectWorkflowController(ConversionService conversionService, WorkflowService workflowService) {
+    public ProjectWorkflowApiController(
+        ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
+
         this.conversionService = conversionService;
+        this.projectFacade = projectFacade;
         this.workflowService = workflowService;
     }
 
@@ -55,6 +60,15 @@ public class ProjectWorkflowController implements WorkflowsApi {
         return ResponseEntity
             .noContent()
             .build();
+    }
+
+    @Override
+    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
+        return ResponseEntity.ok(
+            projectFacade.getProjectWorkflows(id)
+                .stream()
+                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                .toList());
     }
 
     @Override

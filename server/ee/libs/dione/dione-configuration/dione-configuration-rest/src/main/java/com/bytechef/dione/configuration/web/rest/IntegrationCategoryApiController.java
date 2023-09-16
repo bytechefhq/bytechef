@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.web.rest;
+package com.bytechef.dione.configuration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.helios.connection.facade.ConnectionFacade;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
+import com.bytechef.dione.configuration.facade.IntegrationFacade;
+import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -32,25 +31,25 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
-@ConditionalOnEnabled("coordinator")
-public class ConnectionTagController implements ConnectionTagsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class IntegrationCategoryApiController implements IntegrationCategoryApi {
 
-    private final ConnectionFacade connectionFacade;
+    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
 
-    @SuppressFBWarnings("EI")
-    public ConnectionTagController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        this.connectionFacade = connectionFacade;
+    @SuppressFBWarnings("EI2")
+    public IntegrationCategoryApiController(
+        IntegrationFacade integrationFacade, ConversionService conversionService) {
+
+        this.integrationFacade = integrationFacade;
         this.conversionService = conversionService;
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getConnectionTags() {
-        return ResponseEntity.ok(
-            connectionFacade.getConnectionTags()
-                .stream()
-                .map(tag -> conversionService.convert(tag, TagModel.class))
-                .toList());
+    public ResponseEntity<List<CategoryModel>> getIntegrationCategories() {
+        return ResponseEntity.ok(integrationFacade.getIntegrationCategories()
+            .stream()
+            .map(category -> conversionService.convert(category, CategoryModel.class))
+            .toList());
     }
 }

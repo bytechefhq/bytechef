@@ -15,40 +15,38 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.configuration.web.rest;
+package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.dione.configuration.facade.IntegrationFacade;
-import com.bytechef.dione.configuration.web.rest.model.TagModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.helios.execution.web.rest.model.JobModel;
+import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
+import com.bytechef.hermes.test.executor.JobTestExecutor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/embedded")
-public class IntegrationTagController implements IntegrationTagsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class ProjectWorkflowTestApiController implements ProjectWorkflowTestApi {
 
-    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
+    private final JobTestExecutor jobTestExecutor;
 
-    @SuppressFBWarnings("EI2")
-    public IntegrationTagController(IntegrationFacade integrationFacade, ConversionService conversionService) {
-        this.integrationFacade = integrationFacade;
+    public ProjectWorkflowTestApiController(ConversionService conversionService,
+        JobTestExecutor jobTestExecutor) {
         this.conversionService = conversionService;
+        this.jobTestExecutor = jobTestExecutor;
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getIntegrationTags() {
+    public ResponseEntity<JobModel> testWorkflow(TestParametersModel testParametersModel) {
         return ResponseEntity.ok(
-            integrationFacade.getIntegrationTags()
-                .stream()
-                .map(tag -> conversionService.convert(tag, TagModel.class))
-                .toList());
+            conversionService.convert(
+                jobTestExecutor.execute(conversionService.convert(testParametersModel, JobParameters.class)),
+                JobModel.class));
     }
 }
