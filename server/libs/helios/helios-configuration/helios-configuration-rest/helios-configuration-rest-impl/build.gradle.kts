@@ -8,7 +8,8 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
         mapOf(
             "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
-            "useSpringBoot3" to "true"
+            "useSpringBoot3" to "true",
+            "useTags" to "true"
         )
     )
     generatorName.set("spring")
