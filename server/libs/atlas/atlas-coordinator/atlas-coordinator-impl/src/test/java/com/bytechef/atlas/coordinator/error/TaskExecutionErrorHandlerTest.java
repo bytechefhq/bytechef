@@ -29,8 +29,8 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import java.util.List;
@@ -41,8 +41,8 @@ import org.junit.jupiter.api.Test;
  */
 public class TaskExecutionErrorHandlerTest {
 
-    private final JobService jobService = mock(JobService.class);
-    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+    private final RemoteJobService jobService = mock(RemoteJobService.class);
+    private final RemoteTaskExecutionService taskExecutionService = mock(RemoteTaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final EventPublisher eventPublisher = mock(EventPublisher.class);

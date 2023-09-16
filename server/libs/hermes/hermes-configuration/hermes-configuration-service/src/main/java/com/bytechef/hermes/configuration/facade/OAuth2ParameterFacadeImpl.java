@@ -19,7 +19,7 @@ package com.bytechef.hermes.configuration.facade;
 
 import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +31,12 @@ import java.util.Map;
 @Service
 public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
 
-    private final ConnectionDefinitionService connectionDefinitionService;
+    private final RemoteConnectionDefinitionService connectionDefinitionService;
     private final OAuth2Service oAuth2Service;
 
     @SuppressFBWarnings("EI")
     public OAuth2ParameterFacadeImpl(
-        ConnectionDefinitionService connectionDefinitionService, OAuth2Service oAuth2Service) {
+        RemoteConnectionDefinitionService connectionDefinitionService, OAuth2Service oAuth2Service) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.oAuth2Service = oAuth2Service;

@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Transactional
-public class JobServiceImpl implements JobService {
+public class JobServiceImpl implements JobService, RemoteJobService {
 
     private final JobRepository jobRepository;
 

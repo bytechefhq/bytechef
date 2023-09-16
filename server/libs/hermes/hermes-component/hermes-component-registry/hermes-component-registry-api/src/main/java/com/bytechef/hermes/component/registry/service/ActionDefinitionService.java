@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.registry.domain.ActionDefinition;
-import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
@@ -56,11 +54,4 @@ public interface ActionDefinitionService {
     Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> actionParameters, @Nullable Connection connection);
-
-    ActionDefinition getActionDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName);
-
-    List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion);
-
-    List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations);
 }

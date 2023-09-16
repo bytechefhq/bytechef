@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.component.registry.facade;
 
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -33,14 +33,14 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service("actionDefinitionFacade")
-public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
+public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, RemoteActionDefinitionFacade {
 
+    private final RemoteConnectionService connectionService;
     private final ActionDefinitionService actionDefinitionService;
-    private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
+        RemoteConnectionService connectionService, ActionDefinitionService actionDefinitionService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.connectionService = connectionService;
@@ -72,7 +72,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 

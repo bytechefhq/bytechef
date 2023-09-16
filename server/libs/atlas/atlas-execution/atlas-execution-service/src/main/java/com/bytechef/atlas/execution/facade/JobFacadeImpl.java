@@ -17,17 +17,17 @@
 
 package com.bytechef.atlas.execution.facade;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
 /**
  * @author Ivica Cardic
  */
-public class JobFacadeImpl implements JobFacade {
+public class JobFacadeImpl implements JobFacade, RemoteJobFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
 
@@ -47,13 +47,13 @@ public class JobFacadeImpl implements JobFacade {
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
-    private final WorkflowService workflowService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker, WorkflowFileStorageFacade workflowFileStorageFacade,
-        WorkflowService workflowService) {
+        RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;

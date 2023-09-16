@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
-public class ProjectServiceImpl implements ProjectService {
+public class ProjectServiceImpl implements ProjectService, RemoteProjectService {
 
     private final ProjectRepository projectRepository;
 

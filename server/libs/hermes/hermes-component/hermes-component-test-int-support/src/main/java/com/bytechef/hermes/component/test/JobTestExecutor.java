@@ -21,10 +21,10 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -39,19 +39,20 @@ import java.util.Map;
  */
 public class JobTestExecutor {
 
-    private final ContextService contextService;
-    private final JobService jobService;
+    private final RemoteContextService contextService;
+    private final RemoteJobService jobService;
     private final EventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
-    private final WorkflowService workflowService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public JobTestExecutor(
-        ContextService contextService, JobService jobService, EventPublisher eventPublisher, ObjectMapper objectMapper,
-        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-        WorkflowService workflowService) {
+        RemoteContextService contextService, RemoteJobService jobService, EventPublisher eventPublisher,
+        ObjectMapper objectMapper,
+        RemoteTaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.jobService = jobService;

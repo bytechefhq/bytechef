@@ -20,9 +20,9 @@ package com.bytechef.task.dispatcher.parallel.config;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
@@ -38,16 +38,16 @@ import org.springframework.context.annotation.Configuration;
 public class ParallelTaskDispatcherConfiguration {
 
     @Autowired
-    private ContextService contextService;
+    private RemoteContextService contextService;
 
     @Autowired
-    private CounterService counterService;
+    private RemoteCounterService counterService;
 
     @Autowired
     private MessageBroker messageBroker;
 
     @Autowired
-    private TaskExecutionService taskExecutionService;
+    private RemoteTaskExecutionService taskExecutionService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")

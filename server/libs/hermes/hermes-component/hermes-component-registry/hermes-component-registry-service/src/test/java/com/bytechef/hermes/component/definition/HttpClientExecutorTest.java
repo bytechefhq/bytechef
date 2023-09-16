@@ -21,7 +21,7 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -61,7 +61,8 @@ public class HttpClientExecutorTest {
     private final Base64.Encoder encoder = Base64.getEncoder();
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
-            Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FileStorageService.class), new ObjectMapper(),
+            Mockito.mock(RemoteConnectionDefinitionService.class), Mockito.mock(FileStorageService.class),
+            new ObjectMapper(),
             new XmlMapper());
 
     @Test

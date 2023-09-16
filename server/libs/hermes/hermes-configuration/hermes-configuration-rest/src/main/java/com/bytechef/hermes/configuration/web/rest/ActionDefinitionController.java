@@ -21,7 +21,7 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -38,12 +38,12 @@ import java.util.List;
 @ConditionalOnEnabled("coordinator")
 public class ActionDefinitionController implements ActionDefinitionsApi {
 
-    private final ActionDefinitionService actionDefinitionService;
+    private final RemoteActionDefinitionService actionDefinitionService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionController(
-        ActionDefinitionService actionDefinitionService, ConversionService conversionService) {
+        RemoteActionDefinitionService actionDefinitionService, ConversionService conversionService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.conversionService = conversionService;

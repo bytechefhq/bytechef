@@ -45,14 +45,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.bytechef.hermes.component.definition.ConnectionDefinition.*;
+import static com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CODE;
 
 /**
  * @author Ivica Cardic
  */
 @Service("connectionDefinitionService")
-public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
+public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService, RemoteConnectionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ObjectMapper objectMapper;

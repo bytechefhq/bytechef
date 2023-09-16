@@ -18,6 +18,7 @@
 package com.bytechef.atlas.configuration.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public interface WorkflowService {
 
     List<Workflow> getWorkflows();
 
-    Workflow update(String id, String definition);
-
     List<Workflow> getWorkflows(List<String> workflowIds);
+
+    Workflow update(String id, String definition);
 }

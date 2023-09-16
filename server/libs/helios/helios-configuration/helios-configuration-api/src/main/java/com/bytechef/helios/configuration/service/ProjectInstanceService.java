@@ -20,7 +20,6 @@ package com.bytechef.helios.configuration.service;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -30,8 +29,6 @@ public interface ProjectInstanceService {
     ProjectInstance create(ProjectInstance projectInstance);
 
     void delete(long id);
-
-    Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId);
 
     ProjectInstance getProjectInstance(long id);
 

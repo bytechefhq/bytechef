@@ -46,7 +46,8 @@ public class ContextFactory {
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
-        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService,
+        DataStorageService dataStorageService, EventPublisher eventPublisher,
+        FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
         this.dataStorageService = dataStorageService;

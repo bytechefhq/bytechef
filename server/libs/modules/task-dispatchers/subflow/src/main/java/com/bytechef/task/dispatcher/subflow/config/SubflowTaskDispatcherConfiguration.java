@@ -20,8 +20,8 @@ package com.bytechef.task.dispatcher.subflow.config;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
@@ -47,7 +47,7 @@ public class SubflowTaskDispatcherConfiguration {
 
         @Bean
         SubflowJobStatusEventListener subflowJobStatusEventListener(
-            JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+            RemoteJobService jobService, MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService,
             @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
             return new SubflowJobStatusEventListener(

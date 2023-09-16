@@ -33,13 +33,13 @@ import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
-import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
@@ -88,19 +88,19 @@ import java.util.Map;
 public class TaskCoordinatorIntTest {
 
     @Autowired
-    private ContextService contextService;
+    private RemoteContextService contextService;
 
     @Autowired
-    private JobService jobService;
+    private RemoteJobService jobService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private TaskExecutionService taskExecutionService;
+    private RemoteTaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowService workflowService;
+    private RemoteWorkflowService workflowService;
 
     @Test
     public void testPerformWorkflowJson() {
@@ -137,12 +137,12 @@ public class TaskCoordinatorIntTest {
     public static class CoordinatorIntTestConfiguration {
 
         @Bean
-        ContextService contextService(JdbcContextRepository jdbcContextRepository) {
+        RemoteContextService contextService(JdbcContextRepository jdbcContextRepository) {
             return new ContextServiceImpl(jdbcContextRepository);
         }
 
         @Bean
-        JobService jobService(JdbcJobRepository jdbcJobRepository) {
+        RemoteJobService jobService(JdbcJobRepository jdbcJobRepository) {
             return new JobServiceImpl(jdbcJobRepository);
         }
 
@@ -159,12 +159,12 @@ public class TaskCoordinatorIntTest {
         }
 
         @Bean
-        TaskExecutionService taskExecutionService(JdbcTaskExecutionRepository jdbcTaskExecutionRepository) {
+        RemoteTaskExecutionService taskExecutionService(JdbcTaskExecutionRepository jdbcTaskExecutionRepository) {
             return new TaskExecutionServiceImpl(jdbcTaskExecutionRepository);
         }
 
         @Bean
-        WorkflowService workflowService(
+        RemoteWorkflowService workflowService(
             List<WorkflowCrudRepository> workflowCrudRepositories, List<WorkflowRepository> workflowRepositories) {
 
             return new WorkflowServiceImpl(

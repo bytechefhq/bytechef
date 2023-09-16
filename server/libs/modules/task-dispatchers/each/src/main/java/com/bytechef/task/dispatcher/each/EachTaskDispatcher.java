@@ -27,9 +27,9 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -56,17 +56,17 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private static final String ITEM_INDEX = "itemIndex";
     private static final String ITEM = "item";
 
-    private final ContextService contextService;
-    private final CounterService counterService;
+    private final RemoteContextService contextService;
+    private final RemoteCounterService counterService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public EachTaskDispatcher(
-        MessageBroker messageBroker, ContextService contextService, CounterService counterService,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        MessageBroker messageBroker, RemoteContextService contextService, RemoteCounterService counterService,
+        TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.taskDispatcher = taskDispatcher;

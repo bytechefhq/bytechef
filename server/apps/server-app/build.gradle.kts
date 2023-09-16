@@ -49,7 +49,7 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest"))
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-service"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl"))
-    implementation(project(":server:libs:core:data-storage:data-storage-db-service"))
+    implementation(project(":server:libs:core:data-storage:data-storage-db:data-storage-db-service"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))

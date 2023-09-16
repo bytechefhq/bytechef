@@ -17,21 +17,23 @@
 
 package com.bytechef.helios.connection.facade;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
-import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
+import com.bytechef.hermes.configuration.service.RemoteOAuth2Service;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.hermes.configuration.service.OAuth2Service;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -68,7 +70,7 @@ public class ConnectionFacadeIntTest {
     private ConnectionRepository connectionRepository;
 
     @MockBean
-    private OAuth2Service oAuth2Service;
+    private RemoteOAuth2Service oAuth2Service;
 
     @Autowired
     private TagRepository tagRepository;
@@ -261,10 +263,10 @@ public class ConnectionFacadeIntTest {
     public static class ConnectionFacadeIntTestConfiguration {
 
         @MockBean
-        ConnectionDefinitionService connectionDefinitionService;
+        RemoteConnectionDefinitionService connectionDefinitionService;
 
         @MockBean
-        WorkflowService workflowService;
+        RemoteWorkflowService workflowService;
 
         @Bean
         ConnectionService connectionService(ConnectionRepository connectionRepository) {
@@ -272,7 +274,7 @@ public class ConnectionFacadeIntTest {
         }
 
         @Bean
-        ProjectInstanceWorkflowService projectInstanceWorkflowService(
+        RemoteProjectInstanceWorkflowService projectInstanceWorkflowService(
             ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository,
             ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository) {
 

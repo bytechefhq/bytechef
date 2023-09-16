@@ -18,8 +18,10 @@
 package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.RemoteConnectionService;
+import com.bytechef.hermes.execution.facade.RemoteTriggerLifecycleFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.message.broker.MessageBroker;
 
@@ -46,27 +48,19 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class ProjectIntTestConfiguration {
 
     @MockBean
-    private ConnectionService connectionService;
+    private RemoteConnectionService connectionService;
 
     @MockBean
     private EventPublisher eventPublisher;
 
     @MockBean
-    private JobFacade jobFacade;
+    private RemoteJobFacade jobFacade;
 
     @MockBean
     private MessageBroker messageBroker;
 
     @MockBean
-    private TriggerLifecycleFacade triggerLifecycleFacade;
-
-//    @MockBean
-//    ComponentDefinitionRegistry componentDefinitionRegistry;
-
-//    @Bean
-//    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
-//        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
-//    }
+    private RemoteTriggerLifecycleFacade triggerLifecycleFacade;
 
     @EnableCaching
     @TestConfiguration

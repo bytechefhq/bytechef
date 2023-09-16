@@ -17,14 +17,14 @@
 
 package com.bytechef.hermes.webhook.config;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -74,12 +74,12 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookExecutor webhookExecutor(
-        ContextService contextService, CounterService counterService,
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobService jobService,
-        MessageBroker messageBroker, ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
+        RemoteContextService contextService, RemoteCounterService counterService,
+        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, RemoteJobService jobService,
+        MessageBroker messageBroker, ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, TriggerSyncExecutor triggerSyncExecutor,
         @Qualifier("workflowSyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
-        WorkflowService workflowService) {
+        RemoteWorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
@@ -100,7 +100,7 @@ public class WebhookConfiguration {
     }
 
     private EventPublisher getEventPublisher(
-        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+        RemoteJobService jobService, MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         List<EventListener> eventListeners = List.of(
@@ -115,7 +115,8 @@ public class WebhookConfiguration {
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService,
+        RemoteContextService contextService, RemoteCounterService counterService,
+        RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return List.of(
@@ -157,8 +158,8 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(

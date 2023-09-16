@@ -36,7 +36,8 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkflowService {
+public class ProjectInstanceWorkflowServiceImpl
+    implements ProjectInstanceWorkflowService, RemoteProjectInstanceWorkflowService {
 
     private final ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository;
     private final ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository;

@@ -18,15 +18,15 @@
 package com.bytechef.hermes.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
-import com.bytechef.hermes.execution.service.TriggerStateService;
+import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
+import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -39,13 +39,13 @@ import java.util.Map;
 public class TriggerCompletionHandler {
 
     private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
-    private final JobFacade jobFacade;
-    private final TriggerExecutionService triggerExecutionService;
-    private final TriggerStateService triggerStateService;
+    private final RemoteJobFacade jobFacade;
+    private final RemoteTriggerExecutionService triggerExecutionService;
+    private final RemoteTriggerStateService triggerStateService;
 
     public TriggerCompletionHandler(
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobFacade jobFacade,
-        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService) {
+        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, RemoteJobFacade jobFacade,
+        RemoteTriggerExecutionService triggerExecutionService, RemoteTriggerStateService triggerStateService) {
 
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
         this.jobFacade = jobFacade;

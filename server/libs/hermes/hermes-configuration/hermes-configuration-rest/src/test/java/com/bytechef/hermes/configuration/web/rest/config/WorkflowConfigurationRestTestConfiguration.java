@@ -17,17 +17,17 @@
 
 package com.bytechef.hermes.configuration.web.rest.config;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +45,7 @@ public class WorkflowConfigurationRestTestConfiguration {
     private ActionDefinitionFacade actionDefinitionFacade;
 
     @MockBean
-    private ActionDefinitionService actionDefinitionService;
+    private RemoteActionDefinitionService actionDefinitionService;
 
     @MockBean
     private ComponentDefinitionFacade componentDefinitionFacade;
@@ -54,7 +54,7 @@ public class WorkflowConfigurationRestTestConfiguration {
     private ComponentDefinitionService componentDefinitionService;
 
     @MockBean
-    private ConnectionDefinitionService connectionDefinitionService;
+    private RemoteConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private MessageBroker messageBroker;
@@ -69,7 +69,7 @@ public class WorkflowConfigurationRestTestConfiguration {
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
     @MockBean
-    private TriggerDefinitionService triggerDefinitionService;
+    private RemoteTriggerDefinitionService triggerDefinitionService;
 
     @MockBean
     private WorkflowService workflowService;

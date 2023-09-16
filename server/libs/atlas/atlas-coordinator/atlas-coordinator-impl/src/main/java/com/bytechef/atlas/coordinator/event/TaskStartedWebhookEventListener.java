@@ -24,7 +24,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.event.TaskStartedEvent;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.Event;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
@@ -41,12 +41,12 @@ public class TaskStartedWebhookEventListener implements EventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskStartedWebhookEventListener.class);
 
-    private final JobService jobService;
+    private final RemoteJobService jobService;
 
     private final RestTemplate rest = new RestTemplate();
 
     @SuppressFBWarnings("EI2")
-    public TaskStartedWebhookEventListener(JobService jobService) {
+    public TaskStartedWebhookEventListener(RemoteJobService jobService) {
         this.jobService = jobService;
     }
 
