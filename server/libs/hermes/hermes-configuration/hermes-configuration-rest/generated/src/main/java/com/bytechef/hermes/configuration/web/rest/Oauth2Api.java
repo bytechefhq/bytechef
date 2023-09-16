@@ -7,6 +7,7 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
+import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,17 +34,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T08:31:26.598462+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T10:17:07.736895+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "connection-definition", description = "The Core Connection Definition API")
-public interface ConnectionDefinitionsApi {
+@Tag(name = "oauth2", description = "the oauth2 API")
+public interface Oauth2Api {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /connection-definitions/oauth2 : Retrieves oauth2 authorization parameters
+     * POST /oauth2/authorization-parameters : Retrieves oauth2 authorization parameters
      * Retrieves oauth2 authorization parameters.
      *
      * @param getOAuth2AuthorizationParametersRequestModel  (required)
@@ -53,7 +54,7 @@ public interface ConnectionDefinitionsApi {
         operationId = "getOAuth2AuthorizationParameters",
         summary = "Retrieves oauth2 authorization parameters",
         description = "Retrieves oauth2 authorization parameters.",
-        tags = { "connection-definition" },
+        tags = { "oauth2" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The object with oauth2 authorization parameters.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = OAuth2AuthorizationParametersModel.class))
@@ -62,7 +63,7 @@ public interface ConnectionDefinitionsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definitions/oauth2",
+        value = "/oauth2/authorization-parameters",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -73,6 +74,45 @@ public interface ConnectionDefinitionsApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"clientId\" : \"clientId\", \"authorizationUrl\" : \"authorizationUrl\", \"scopes\" : [ \"scopes\", \"scopes\" ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /oauth2/properties : Get OAuth2 properties
+     * Get OAuth2 properties.
+     *
+     * @return The OAuth2Properties object. (status code 200)
+     */
+    @Operation(
+        operationId = "getOAuth2Properties",
+        summary = "Get OAuth2 properties",
+        description = "Get OAuth2 properties.",
+        tags = { "oauth2" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The OAuth2Properties object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OAuth2PropertiesModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/oauth2/properties",
+        produces = { "application/json" }
+    )
+    default ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties(
+        
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"redirectUri\" : \"redirectUri\", \"predefinedApps\" : [ \"predefinedApps\", \"predefinedApps\" ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

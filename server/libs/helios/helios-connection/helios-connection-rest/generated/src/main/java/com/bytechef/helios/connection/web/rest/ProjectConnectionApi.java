@@ -6,7 +6,6 @@
 package com.bytechef.helios.connection.web.rest;
 
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
-import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,17 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:17.507364+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:14.429797+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-connection", description = "The Automation Connection API")
-public interface ConnectionsApi {
+@Tag(name = "project-connection", description = "The Project Connection API")
+public interface ProjectConnectionApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /connections : Create a new connection
+     * POST /project-connections : Create a new connection
      * Create a new connection.
      *
      * @param connectionModel  (required)
@@ -53,7 +52,7 @@ public interface ConnectionsApi {
         operationId = "createConnection",
         summary = "Create a new connection",
         description = "Create a new connection.",
-        tags = { "automation-connection" },
+        tags = { "project-connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The connection object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
@@ -62,7 +61,7 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connections",
+        value = "/project-connections",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -84,7 +83,7 @@ public interface ConnectionsApi {
 
 
     /**
-     * DELETE /connections/{id} : Delete a connection
+     * DELETE /project-connections/{id} : Delete a connection
      * Delete a connection.
      *
      * @param id The id of a connection. (required)
@@ -94,14 +93,14 @@ public interface ConnectionsApi {
         operationId = "deleteConnection",
         summary = "Delete a connection",
         description = "Delete a connection.",
-        tags = { "automation-connection" },
+        tags = { "project-connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/connections/{id}"
+        value = "/project-connections/{id}"
     )
     default ResponseEntity<Void> deleteConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
@@ -112,7 +111,7 @@ public interface ConnectionsApi {
 
 
     /**
-     * GET /connections/{id} : Get a connection by id
+     * GET /project-connections/{id} : Get a connection by id
      * Get a connection by id.
      *
      * @param id The id of a connection. (required)
@@ -122,7 +121,7 @@ public interface ConnectionsApi {
         operationId = "getConnection",
         summary = "Get a connection by id",
         description = "Get a connection by id.",
-        tags = { "automation-connection" },
+        tags = { "project-connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The connection object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
@@ -131,7 +130,7 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connections/{id}",
+        value = "/project-connections/{id}",
         produces = { "application/json" }
     )
     default ResponseEntity<ConnectionModel> getConnection(
@@ -152,7 +151,7 @@ public interface ConnectionsApi {
 
 
     /**
-     * GET /connections : Get all connections
+     * GET /project-connections : Get all connections
      * Get all connections.
      *
      * @param componentName The component name used for filtering connections. (optional)
@@ -164,7 +163,7 @@ public interface ConnectionsApi {
         operationId = "getConnections",
         summary = "Get all connections",
         description = "Get all connections.",
-        tags = { "automation-connection" },
+        tags = { "project-connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connections.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectionModel.class)))
@@ -173,7 +172,7 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connections",
+        value = "/project-connections",
         produces = { "application/json" }
     )
     default ResponseEntity<List<ConnectionModel>> getConnections(
@@ -196,7 +195,7 @@ public interface ConnectionsApi {
 
 
     /**
-     * PUT /connections/{id} : Update an existing connection
+     * PUT /project-connections/{id} : Update an existing connection
      * Update an existing connection.
      *
      * @param id The id of a connection. (required)
@@ -207,7 +206,7 @@ public interface ConnectionsApi {
         operationId = "updateConnection",
         summary = "Update an existing connection",
         description = "Update an existing connection.",
-        tags = { "automation-connection" },
+        tags = { "project-connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated connection object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
@@ -216,7 +215,7 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/connections/{id}",
+        value = "/project-connections/{id}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -233,37 +232,6 @@ public interface ConnectionsApi {
                 }
             }
         });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /connections/{id}/connection-tags : Updates tags of an existing connection
-     * Updates tags of an existing connection.
-     *
-     * @param id The id of the connection. (required)
-     * @param updateTagsRequestModel  (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "updateConnectionTags",
-        summary = "Updates tags of an existing connection",
-        description = "Updates tags of an existing connection.",
-        tags = { "automation-connection-tag" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/connections/{id}/connection-tags",
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<Void> updateConnectionTags(
-        @Parameter(name = "id", description = "The id of the connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
-    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

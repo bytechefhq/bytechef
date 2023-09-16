@@ -32,17 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:21.897054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-workflow", description = "The Automation Workflow API")
-public interface WorkflowsApi {
+@Tag(name = "project-workflow", description = "The Project Workflow API")
+public interface ProjectWorkflowApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * DELETE /workflows/{id} : Delete a workflow
+     * DELETE /project-workflows/{id} : Delete a workflow
      * Delete a workflow.
      *
      * @param id The id of the workflow to delete. (required)
@@ -52,14 +52,14 @@ public interface WorkflowsApi {
         operationId = "deleteWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "automation-workflow" },
+        tags = { "project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/workflows/{id}"
+        value = "/project-workflows/{id}"
     )
     default ResponseEntity<Void> deleteWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
@@ -70,7 +70,47 @@ public interface WorkflowsApi {
 
 
     /**
-     * GET /workflows/{id} : Get a workflow by id
+     * GET /projects/{id}/project-workflows : Get workflows for particular project.
+     * Get workflows for particular project.
+     *
+     * @param id The id of a project. (required)
+     * @return The updated project object. (status code 200)
+     */
+    @Operation(
+        operationId = "getProjectWorkflows",
+        summary = "Get workflows for particular project.",
+        description = "Get workflows for particular project.",
+        tags = { "project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/projects/{id}/project-workflows",
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"triggers\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ], \"__version\" : 1, \"maxRetries\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ] }, { \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"triggers\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ], \"__version\" : 1, \"maxRetries\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ] } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /project-workflows/{id} : Get a workflow by id
      * Get a workflow by id.
      *
      * @param id The id of the workflow to get. (required)
@@ -80,7 +120,7 @@ public interface WorkflowsApi {
         operationId = "getWorkflow",
         summary = "Get a workflow by id",
         description = "Get a workflow by id.",
-        tags = { "automation-workflow" },
+        tags = { "project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -89,7 +129,7 @@ public interface WorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflows/{id}",
+        value = "/project-workflows/{id}",
         produces = { "application/json" }
     )
     default ResponseEntity<WorkflowModel> getWorkflow(
@@ -110,7 +150,7 @@ public interface WorkflowsApi {
 
 
     /**
-     * GET /workflows : Get workflow definitions
+     * GET /project-workflows : Get workflow definitions
      * Get workflow definitions.
      *
      * @return A list of workflows. (status code 200)
@@ -119,7 +159,7 @@ public interface WorkflowsApi {
         operationId = "getWorkflows",
         summary = "Get workflow definitions",
         description = "Get workflow definitions.",
-        tags = { "automation-workflow" },
+        tags = { "project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -128,7 +168,7 @@ public interface WorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflows",
+        value = "/project-workflows",
         produces = { "application/json" }
     )
     default ResponseEntity<List<WorkflowModel>> getWorkflows(
@@ -149,7 +189,7 @@ public interface WorkflowsApi {
 
 
     /**
-     * PUT /workflows/{id} : Update an existing workflow
+     * PUT /project-workflows/{id} : Update an existing workflow
      * Update an existing workflow.
      *
      * @param id The id of the workflow to update. (required)
@@ -160,7 +200,7 @@ public interface WorkflowsApi {
         operationId = "updateWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "automation-workflow" },
+        tags = { "project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -169,7 +209,7 @@ public interface WorkflowsApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/workflows/{id}",
+        value = "/project-workflows/{id}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )

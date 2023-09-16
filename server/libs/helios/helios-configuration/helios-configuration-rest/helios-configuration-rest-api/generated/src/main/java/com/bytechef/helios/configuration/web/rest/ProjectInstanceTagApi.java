@@ -5,7 +5,8 @@
  */
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
+import com.bytechef.helios.configuration.web.rest.model.TagModel;
+import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,38 +33,38 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:21.897054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-project-category", description = "The Automation Project Category API")
-public interface ProjectCategoriesApi {
+@Tag(name = "project-instance-tag", description = "The Project Project Instance Tag API")
+public interface ProjectInstanceTagApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /project-categories : Get categories
-     * Get categories.
+     * GET /project-instance-tags : Get project instance tags
+     * Get project instance tags.
      *
-     * @return A list of categories. (status code 200)
+     * @return A list of project tags. (status code 200)
      */
     @Operation(
-        operationId = "getProjectCategories",
-        summary = "Get categories",
-        description = "Get categories.",
-        tags = { "automation-project-category" },
+        operationId = "getProjectInstanceTags",
+        summary = "Get project instance tags",
+        description = "Get project instance tags.",
+        tags = { "project-instance-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
+            @ApiResponse(responseCode = "200", description = "A list of project tags.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-categories",
+        value = "/project-instance-tags",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<CategoryModel>> getProjectCategories(
+    default ResponseEntity<List<TagModel>> getProjectInstanceTags(
         
     ) {
         getRequest().ifPresent(request -> {
@@ -75,6 +76,37 @@ public interface ProjectCategoriesApi {
                 }
             }
         });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /project-instances/{id}/project-instance-tags : Updates tags of an existing project instance
+     * Updates tags of an existing project instance.
+     *
+     * @param id The id of a project instance. (required)
+     * @param updateTagsRequestModel  (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "updateProjectInstanceTags",
+        summary = "Updates tags of an existing project instance",
+        description = "Updates tags of an existing project instance.",
+        tags = { "project-instance-tag" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/project-instances/{id}/project-instance-tags",
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Void> updateProjectInstanceTags(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

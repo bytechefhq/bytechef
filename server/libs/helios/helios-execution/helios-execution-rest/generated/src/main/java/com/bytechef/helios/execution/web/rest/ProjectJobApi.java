@@ -34,17 +34,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:18.469889+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:15.466008+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-job", description = "The Automation Job API")
-public interface JobsApi {
+@Tag(name = "project-job", description = "The Project Job API")
+public interface ProjectJobApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /jobs : Create a request for running a new job
+     * POST /project-jobs : Create a request for running a new job
      * Create a request for running a new job.
      *
      * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
@@ -54,7 +54,7 @@ public interface JobsApi {
         operationId = "createJob",
         summary = "Create a request for running a new job",
         description = "Create a request for running a new job.",
-        tags = { "automation-job" },
+        tags = { "project-job" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CreateJob200ResponseModel.class))
@@ -63,7 +63,7 @@ public interface JobsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/jobs",
+        value = "/project-jobs",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -85,7 +85,7 @@ public interface JobsApi {
 
 
     /**
-     * GET /jobs/{id} : Get a job by id
+     * GET /project-jobs/{id} : Get a job by id
      * Get a job by id.
      *
      * @param id The id of a job to return. (required)
@@ -95,7 +95,7 @@ public interface JobsApi {
         operationId = "getJob",
         summary = "Get a job by id",
         description = "Get a job by id.",
-        tags = { "automation-job" },
+        tags = { "project-job" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The job object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
@@ -104,7 +104,7 @@ public interface JobsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/jobs/{id}",
+        value = "/project-jobs/{id}",
         produces = { "application/json" }
     )
     default ResponseEntity<JobModel> getJob(
@@ -125,7 +125,7 @@ public interface JobsApi {
 
 
     /**
-     * GET /jobs : Get a page of jobs
+     * GET /project-jobs : Get a page of jobs
      * Get a page of jobs.
      *
      * @param pageNumber The number of the page to return. (optional, default to 0)
@@ -135,7 +135,7 @@ public interface JobsApi {
         operationId = "getJobs",
         summary = "Get a page of jobs",
         description = "Get a page of jobs.",
-        tags = { "automation-job" },
+        tags = { "project-job" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The page of jobs.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = org.springframework.data.domain.Page.class))
@@ -144,7 +144,7 @@ public interface JobsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/jobs",
+        value = "/project-jobs",
         produces = { "application/json" }
     )
     default ResponseEntity<org.springframework.data.domain.Page> getJobs(
@@ -165,7 +165,7 @@ public interface JobsApi {
 
 
     /**
-     * GET /jobs/latest : Get the latest job
+     * GET /project-jobs/latest : Get the latest job
      * Get the latest job.
      *
      * @return The latest job. (status code 200)
@@ -174,7 +174,7 @@ public interface JobsApi {
         operationId = "getLatestJob",
         summary = "Get the latest job",
         description = "Get the latest job.",
-        tags = { "automation-job" },
+        tags = { "project-job" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The latest job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
@@ -183,7 +183,7 @@ public interface JobsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/jobs/latest",
+        value = "/project-jobs/latest",
         produces = { "application/json" }
     )
     default ResponseEntity<JobModel> getLatestJob(
@@ -204,7 +204,7 @@ public interface JobsApi {
 
 
     /**
-     * PUT /jobs/{id}/restart : Restart a job
+     * PUT /project-jobs/{id}/restart : Restart a job
      * Restart a job.
      *
      * @param id The id of a job to restart. (required)
@@ -214,14 +214,14 @@ public interface JobsApi {
         operationId = "restartJob",
         summary = "Restart a job",
         description = "Restart a job.",
-        tags = { "automation-job" },
+        tags = { "project-job" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/jobs/{id}/restart"
+        value = "/project-jobs/{id}/restart"
     )
     default ResponseEntity<Void> restartJob(
         @Parameter(name = "id", description = "The id of a job to restart.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
@@ -232,7 +232,7 @@ public interface JobsApi {
 
 
     /**
-     * PUT /jobs/{id}/stop : Stop a job
+     * PUT /project-jobs/{id}/stop : Stop a job
      * Stop a job.
      *
      * @param id The id of a job to stop. (required)
@@ -242,14 +242,14 @@ public interface JobsApi {
         operationId = "stopJob",
         summary = "Stop a job",
         description = "Stop a job.",
-        tags = { "automation-job" },
+        tags = { "project-job" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/jobs/{id}/stop"
+        value = "/project-jobs/{id}/stop"
     )
     default ResponseEntity<Void> stopJob(
         @Parameter(name = "id", description = "The id of a job to stop.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
