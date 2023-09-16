@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,14 +36,14 @@ import java.util.function.Predicate;
  * @author Ivica Cardic
  */
 @Service
-public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade {
+public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade, RemoteComponentDefinitionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
-    private final ConnectionService connectionService;
+    private final RemoteConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ConnectionService connectionService) {
+        ComponentDefinitionService componentDefinitionService, RemoteConnectionService connectionService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.connectionService = connectionService;

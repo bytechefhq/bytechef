@@ -24,9 +24,9 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,17 +48,17 @@ public class JobExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
 
-    private final ContextService contextService;
+    private final RemoteContextService contextService;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
-    private final WorkflowService workflowService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobExecutor(
-        ContextService contextService, TaskDispatcher<? super TaskExecution> taskDispatcher,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
-        WorkflowService workflowService) {
+        RemoteContextService contextService, TaskDispatcher<? super TaskExecution> taskDispatcher,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
+        RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;

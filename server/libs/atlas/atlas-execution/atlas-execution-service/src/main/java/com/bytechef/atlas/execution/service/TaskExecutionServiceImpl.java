@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Transactional
-public class TaskExecutionServiceImpl implements TaskExecutionService {
+public class TaskExecutionServiceImpl implements TaskExecutionService, RemoteTaskExecutionService {
 
     private final TaskExecutionRepository taskExecutionRepository;
 

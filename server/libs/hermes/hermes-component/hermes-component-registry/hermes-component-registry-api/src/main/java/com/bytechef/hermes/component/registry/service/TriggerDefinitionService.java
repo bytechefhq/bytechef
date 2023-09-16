@@ -17,15 +17,12 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.registry.domain.Option;
-import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.registry.domain.ValueProperty;
-import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -37,23 +34,19 @@ import java.util.Map;
  */
 public interface TriggerDefinitionService {
 
-    List<? extends ValueProperty<?>> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable Connection connection);
-
     void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @NonNull Map<String, ?> outputParameters, @Nullable Connection connection);
 
-    DynamicWebhookEnableOutput executeDynamicWebhookEnable(
+    List<? extends ValueProperty<?>> executeDynamicProperties(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable Connection connection);
+
+    TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
         @Nullable Connection connection);
-
-    DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters);
 
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
@@ -89,14 +82,4 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         @Nullable Connection connection);
-
-    TriggerDefinition getTriggerDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName);
-
-    List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion);
-
-    List<TriggerDefinition> getTriggerDefinitions(@NonNull List<ComponentOperation> componentOperations);
-
-    WebhookTriggerFlags getWebhookTriggerFlags(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName);
 }

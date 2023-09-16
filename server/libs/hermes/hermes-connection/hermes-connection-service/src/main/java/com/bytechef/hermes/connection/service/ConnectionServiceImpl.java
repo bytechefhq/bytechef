@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
  */
 @Service("connectionService")
 @Transactional
-public class ConnectionServiceImpl implements ConnectionService {
+public class ConnectionServiceImpl implements ConnectionService, RemoteConnectionService {
 
     private final ConnectionRepository connectionRepository;
 

@@ -24,14 +24,14 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -59,18 +59,18 @@ public class TaskCoordinator {
 
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
-    private final JobFacade jobFacade;
-    private final JobService jobService;
+    private final RemoteJobFacade jobFacade;
+    private final RemoteJobService jobService;
     private final MessageBroker messageBroker;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
     public TaskCoordinator(
-        EventPublisher eventPublisher, JobExecutor jobExecutor, JobFacade jobFacade,
-        JobService jobService, MessageBroker messageBroker, TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+        EventPublisher eventPublisher, JobExecutor jobExecutor, RemoteJobFacade jobFacade,
+        RemoteJobService jobService, MessageBroker messageBroker, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService) {
 
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;

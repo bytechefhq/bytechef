@@ -18,12 +18,12 @@
 package com.bytechef.hermes.webhook.executor;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
@@ -33,8 +33,8 @@ import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
-import com.bytechef.hermes.execution.service.TriggerStateService;
+import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
+import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -49,18 +49,18 @@ import java.util.Objects;
 public class TriggerSyncExecutor {
 
     private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
-    private final TriggerExecutionService triggerExecutionService;
+    private final RemoteTriggerDefinitionFacade triggerDefinitionFacade;
+    private final RemoteTriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
-    private final TriggerStateService triggerStateService;
-    private final WorkflowService workflowService;
+    private final RemoteTriggerStateService triggerStateService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerSyncExecutor(
         InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
-        TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
+        RemoteTriggerDefinitionFacade triggerDefinitionFacade, RemoteTriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+        RemoteTriggerStateService triggerStateService, RemoteWorkflowService workflowService) {
 
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;

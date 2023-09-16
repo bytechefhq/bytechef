@@ -29,8 +29,8 @@ import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.event.Event;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -47,14 +47,14 @@ import java.util.Objects;
  */
 public class SubflowJobStatusEventListener implements EventListener {
 
-    private final JobService jobService;
+    private final RemoteJobService jobService;
     private final MessageBroker messageBroker;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+        RemoteJobService jobService, MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.jobService = jobService;

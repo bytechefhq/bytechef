@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -34,17 +32,17 @@ import java.util.Optional;
  */
 public interface ConnectionDefinitionService {
 
-    boolean connectionExists(String componentName, int connectionVersion);
+    Authorization.ApplyResponse executeAuthorizationApply(@NonNull Connection connection);
 
-    ApplyResponse executeAuthorizationApply(@NonNull Connection connection);
-
-    AuthorizationCallbackResponse executeAuthorizationCallback(
+    Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
         @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
         @NonNull String authorizationName, @NonNull String redirectUri);
 
+    boolean connectionExists(String componentName, int connectionVersion);
+
     Optional<String> executeBaseUri(@NonNull Connection connection);
 
-    AuthorizationType getAuthorizationType(
+    Authorization.AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
 
     ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion);

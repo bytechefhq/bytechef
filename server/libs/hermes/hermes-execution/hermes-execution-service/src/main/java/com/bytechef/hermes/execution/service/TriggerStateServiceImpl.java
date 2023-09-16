@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 @Service("triggerStorageService")
 @Transactional
-public class TriggerStateServiceImpl implements TriggerStateService {
+public class TriggerStateServiceImpl implements TriggerStateService, RemoteTriggerStateService {
 
     private final TriggerStateRepository triggerStateRepository;
 

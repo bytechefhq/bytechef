@@ -20,8 +20,8 @@ package com.bytechef.task.dispatcher.branch.config;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
@@ -36,14 +36,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BranchTaskDispatcherConfiguration {
 
-    private final ContextService contextService;
+    private final RemoteContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
-        ContextService contextService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+        RemoteContextService contextService, MessageBroker messageBroker,
+        RemoteTaskExecutionService taskExecutionService,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;

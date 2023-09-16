@@ -23,8 +23,8 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.hermes.component.registry.service.RemoteComponentDefinitionService;
 import com.bytechef.hermes.test.executor.JobTestExecutorImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -32,15 +32,15 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
@@ -82,17 +82,18 @@ public class TestExecutorConfiguration {
 
     @Bean
     JobTestExecutor jobTestExecutor(
-        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
-        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
+        RemoteComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
+        TaskHandlerRegistry taskHandlerRegistry, RemoteWorkflowService workflowService) {
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
-        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
+        RemoteContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+        RemoteCounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
-        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
-        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
+        RemoteJobService jobService =
+            new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
+        RemoteTaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
             new Base64FileStorageService(), objectMapper);
@@ -113,7 +114,7 @@ public class TestExecutorConfiguration {
     }
 
     private EventPublisher getEventPublisher(
-        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+        RemoteJobService jobService, MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         List<EventListener> eventListeners = List.of(
@@ -128,7 +129,8 @@ public class TestExecutorConfiguration {
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService,
+        RemoteContextService contextService, RemoteCounterService counterService,
+        RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return List.of(
@@ -169,8 +171,8 @@ public class TestExecutorConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(

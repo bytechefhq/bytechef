@@ -22,11 +22,11 @@ import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class ComponentDefinitionControllerIntTest {
     private ActionDefinitionFacade actionDefinitionFacade;
 
     @MockBean
-    private ActionDefinitionService actionDefinitionService;
+    private RemoteActionDefinitionService actionDefinitionService;
 
     @MockBean
     private ComponentDefinitionFacade componentDefinitionFacade;
@@ -65,7 +65,7 @@ public class ComponentDefinitionControllerIntTest {
     private ComponentDefinitionService componentDefinitionService;
 
     @MockBean
-    private ConnectionDefinitionService connectionDefinitionService;
+    private RemoteConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -74,7 +74,7 @@ public class ComponentDefinitionControllerIntTest {
     TriggerDefinitionFacade triggerDefinitionFacade;
 
     @MockBean
-    private TriggerDefinitionService triggerDefinitionService;
+    private RemoteTriggerDefinitionService triggerDefinitionService;
 
     @Autowired
     private MockMvc mockMvc;

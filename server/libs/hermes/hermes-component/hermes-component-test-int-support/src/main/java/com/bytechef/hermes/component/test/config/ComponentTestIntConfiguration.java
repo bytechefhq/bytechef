@@ -22,11 +22,11 @@ import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.data.storage.service.DataStorageService;
+import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -34,15 +34,15 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
-import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.test.JobTestExecutor;
@@ -85,7 +85,7 @@ import java.util.Map;
 public class ComponentTestIntConfiguration {
 
     @MockBean(name = "connectionService")
-    private ConnectionService connectionService;
+    private RemoteConnectionService connectionService;
 
     @MockBean(name = "dataStorageService")
     private DataStorageService dataStorageService;
@@ -143,7 +143,7 @@ public class ComponentTestIntConfiguration {
     public static class WorkflowConfiguration {
 
         @Bean
-        WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
+        RemoteWorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
             return new WorkflowServiceImpl(
                 new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
         }
@@ -154,10 +154,10 @@ public class ComponentTestIntConfiguration {
 
         @Bean
         JobTestExecutor componentWorkflowTestSupport(
-            ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-            ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
+            RemoteContextService contextService, EventPublisher eventPublisher, RemoteJobService jobService,
+            ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
             Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
-            WorkflowService workflowService) {
+            RemoteWorkflowService workflowService) {
 
             return new JobTestExecutor(
                 contextService, jobService, eventPublisher, objectMapper, taskExecutionService,
@@ -165,22 +165,22 @@ public class ComponentTestIntConfiguration {
         }
 
         @Bean
-        ContextService contextService() {
+        RemoteContextService contextService() {
             return new ContextServiceImpl(new InMemoryContextRepository());
         }
 
         @Bean
-        CounterService counterService() {
+        RemoteCounterService counterService() {
             return new CounterServiceImpl(new InMemoryCounterRepository());
         }
 
         @Bean
-        JobService jobService(ObjectMapper objectMapper) {
+        RemoteJobService jobService(ObjectMapper objectMapper) {
             return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
         }
 
         @Bean
-        TaskExecutionService taskExecutionService() {
+        RemoteTaskExecutionService taskExecutionService() {
             return new TaskExecutionServiceImpl(taskExecutionRepository());
         }
 

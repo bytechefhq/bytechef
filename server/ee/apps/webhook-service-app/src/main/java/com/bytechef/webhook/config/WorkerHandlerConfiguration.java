@@ -23,7 +23,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.RemoteActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +38,7 @@ import java.util.Objects;
 public class WorkerHandlerConfiguration {
 
     @Bean
-    TaskHandlerRegistry taskHandlerRegistry(ActionDefinitionFacade actionDefinitionFacade) {
+    TaskHandlerRegistry taskHandlerRegistry(RemoteActionDefinitionFacade actionDefinitionFacade) {
         return type -> (TaskHandler<?>) taskExecution -> {
             ComponentOperation componentOperation = ComponentOperation.ofType(type);
 

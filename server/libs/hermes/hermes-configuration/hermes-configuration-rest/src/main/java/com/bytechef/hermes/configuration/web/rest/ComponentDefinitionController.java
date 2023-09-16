@@ -19,13 +19,13 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
-import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.facade.RemoteActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.RemoteComponentDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteComponentDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
@@ -54,22 +54,23 @@ import java.util.List;
 @ConditionalOnEnabled("coordinator")
 public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
-    private final ActionDefinitionFacade actionDefinitionFacade;
-    private final ActionDefinitionService actionDefinitionService;
-    private final ConnectionDefinitionService connectionDefinitionService;
+    private final RemoteActionDefinitionFacade actionDefinitionFacade;
+    private final RemoteActionDefinitionService actionDefinitionService;
+    private final RemoteConnectionDefinitionService connectionDefinitionService;
     private final ConversionService conversionService;
-    private final ComponentDefinitionFacade componentDefinitionFacade;
-    private final ComponentDefinitionService componentDefinitionService;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
-    private final TriggerDefinitionService triggerDefinitionService;
+    private final RemoteComponentDefinitionFacade componentDefinitionFacade;
+    private final RemoteComponentDefinitionService componentDefinitionService;
+    private final RemoteTriggerDefinitionFacade triggerDefinitionFacade;
+    private final RemoteTriggerDefinitionService triggerDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionController(
-        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
-        ConnectionDefinitionService connectionDefinitionService, ConversionService conversionService,
-        ComponentDefinitionFacade componentDefinitionFacade, ComponentDefinitionService componentDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService) {
+        RemoteActionDefinitionFacade actionDefinitionFacade, RemoteActionDefinitionService actionDefinitionService,
+        RemoteConnectionDefinitionService connectionDefinitionService, ConversionService conversionService,
+        RemoteComponentDefinitionFacade componentDefinitionFacade,
+        RemoteComponentDefinitionService componentDefinitionService,
+        RemoteTriggerDefinitionFacade triggerDefinitionFacade,
+        RemoteTriggerDefinitionService triggerDefinitionService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;

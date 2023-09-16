@@ -18,12 +18,12 @@
 package com.bytechef.hermes.scheduler.job;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
@@ -45,9 +45,9 @@ import java.time.LocalDateTime;
  */
 public class DynamicWebhookTriggerRefreshJob implements Job {
 
-    private TriggerDefinitionService triggerDefinitionService;
+    private RemoteTriggerDefinitionService triggerDefinitionService;
     private TriggerStateService triggerStateService;
-    private WorkflowService workflowService;
+    private RemoteWorkflowService workflowService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -77,7 +77,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     @Autowired
-    public void setTriggerDefinitionService(TriggerDefinitionService triggerDefinitionService) {
+    public void setTriggerDefinitionService(RemoteTriggerDefinitionService triggerDefinitionService) {
         this.triggerDefinitionService = triggerDefinitionService;
     }
 
@@ -88,7 +88,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public void setWorkflowService(WorkflowService workflowService) {
+    public void setWorkflowService(RemoteWorkflowService workflowService) {
         this.workflowService = workflowService;
     }
 

@@ -48,7 +48,7 @@ import java.util.TimeZone;
  * @author Ivica Cardic
  */
 @Component
-public class TriggerSchedulerImpl implements TriggerScheduler {
+public class TriggerSchedulerImpl implements TriggerScheduler, RemoteTriggerScheduler {
 
     private final ObjectMapper objectMapper;
     private final Scheduler scheduler;

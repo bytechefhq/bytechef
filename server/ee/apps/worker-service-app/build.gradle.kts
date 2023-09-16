@@ -33,7 +33,7 @@ dependencies {
     implementation(project(":server:ee:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-remote-client"))
     implementation(project(":server:ee:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-remote-rest"))
     implementation(project(":server:ee:libs:hermes:hermes-connection:hermes-connection-remote-client"))
-    implementation(project(":server:ee:libs:core:data-storage:data-storage-remote-client"))
+    implementation(project(":server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-client"))
     implementation(project(":server:ee:libs:hermes:hermes-scheduler:hermes-scheduler-remote-client"))
 
     implementation(project(":server:libs:modules:components:airtable"))

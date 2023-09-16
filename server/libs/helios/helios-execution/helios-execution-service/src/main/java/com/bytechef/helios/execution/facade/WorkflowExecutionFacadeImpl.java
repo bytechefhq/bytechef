@@ -21,20 +21,20 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
-import com.bytechef.helios.configuration.service.ProjectInstanceService;
-import com.bytechef.helios.configuration.service.ProjectService;
+import com.bytechef.helios.configuration.service.RemoteProjectInstanceService;
+import com.bytechef.helios.configuration.service.RemoteProjectService;
 import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteComponentDefinitionService;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,22 +55,22 @@ import java.util.Objects;
 @Service
 public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
-    private final ComponentDefinitionService componentDefinitionService;
-    private final ContextService contextService;
+    private final RemoteComponentDefinitionService componentDefinitionService;
+    private final RemoteContextService contextService;
     private final JobService jobService;
-    private final ProjectInstanceService projectInstanceService;
-    private final ProjectService projectService;
+    private final RemoteProjectInstanceService projectInstanceService;
+    private final RemoteProjectService projectService;
     private final TaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
-    private final WorkflowService workflowService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
-        ProjectInstanceService projectInstanceService, ProjectService projectService,
+        RemoteComponentDefinitionService componentDefinitionService, RemoteContextService contextService,
+        JobService jobService, RemoteProjectInstanceService projectInstanceService, RemoteProjectService projectService,
         TaskExecutionService taskExecutionService,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
-        WorkflowService workflowService) {
+        RemoteWorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;

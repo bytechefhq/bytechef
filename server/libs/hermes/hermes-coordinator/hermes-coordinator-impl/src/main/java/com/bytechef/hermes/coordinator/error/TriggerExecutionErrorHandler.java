@@ -20,7 +20,7 @@ package com.bytechef.hermes.coordinator.error;
 import com.bytechef.error.ErrorHandler;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +37,9 @@ public class TriggerExecutionErrorHandler implements ErrorHandler<TriggerExecuti
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerExecutionErrorHandler.class);
 
-    private final TriggerExecutionService triggerExecutionService;
+    private final RemoteTriggerExecutionService triggerExecutionService;
 
-    public TriggerExecutionErrorHandler(TriggerExecutionService triggerExecutionService) {
+    public TriggerExecutionErrorHandler(RemoteTriggerExecutionService triggerExecutionService) {
         this.triggerExecutionService = triggerExecutionService;
     }
 

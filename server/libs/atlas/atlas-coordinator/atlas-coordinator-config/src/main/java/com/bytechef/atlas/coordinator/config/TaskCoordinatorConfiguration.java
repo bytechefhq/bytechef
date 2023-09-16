@@ -34,15 +34,15 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
-import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
@@ -67,16 +67,16 @@ import org.springframework.context.annotation.Primary;
 public class TaskCoordinatorConfiguration {
 
     @Autowired
-    private ContextService contextService;
+    private RemoteContextService contextService;
 
     @Autowired
     private EventPublisher eventPublisher;
 
     @Autowired
-    private JobFacade jobFacade;
+    private RemoteJobFacade jobFacade;
 
     @Autowired
-    private JobService jobService;
+    private RemoteJobService jobService;
 
     @Autowired
     private MessageBroker messageBroker;
@@ -91,14 +91,14 @@ public class TaskCoordinatorConfiguration {
     private List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = Collections.emptyList();
 
     @Autowired
-    private TaskExecutionService taskExecutionService;
+    private RemoteTaskExecutionService taskExecutionService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Autowired
-    private WorkflowService workflowService;
+    private RemoteWorkflowService workflowService;
 
     @Bean
     ControlTaskDispatcher controlTaskDispatcher() {

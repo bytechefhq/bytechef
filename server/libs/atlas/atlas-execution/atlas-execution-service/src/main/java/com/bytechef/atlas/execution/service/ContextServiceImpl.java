@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 @Transactional
-public class ContextServiceImpl implements ContextService {
+public class ContextServiceImpl implements ContextService, RemoteContextService {
 
     private final ContextRepository contextRepository;
 

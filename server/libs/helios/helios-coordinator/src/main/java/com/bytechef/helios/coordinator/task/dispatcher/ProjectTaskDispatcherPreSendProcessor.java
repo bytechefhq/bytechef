@@ -20,11 +20,11 @@ package com.bytechef.helios.coordinator.task.dispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
-import com.bytechef.helios.configuration.service.ProjectInstanceService;
-import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.RemoteProjectInstanceService;
+import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
@@ -42,13 +42,13 @@ import java.util.Objects;
 public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TaskDispatcherPreSendProcessor {
 
-    private final JobService jobService;
-    private final ProjectInstanceService projectInstanceService;
+    private final RemoteJobService jobService;
+    private final RemoteProjectInstanceService projectInstanceService;
 
     @SuppressFBWarnings("EI")
     public ProjectTaskDispatcherPreSendProcessor(
-        JobService jobService, ProjectInstanceService projectInstanceService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        RemoteJobService jobService, RemoteProjectInstanceService projectInstanceService,
+        RemoteProjectInstanceWorkflowService projectInstanceWorkflowService) {
 
         super(projectInstanceWorkflowService);
 

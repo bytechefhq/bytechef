@@ -20,7 +20,7 @@ package com.bytechef.hermes.configuration.web.rest;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +38,10 @@ import java.util.List;
 public class TriggerDefinitionController implements TriggerDefinitionsApi {
 
     private final ConversionService conversionService;
-    private final TriggerDefinitionService triggerDefinitionService;
+    private final RemoteTriggerDefinitionService triggerDefinitionService;
 
     public TriggerDefinitionController(
-        ConversionService conversionService, TriggerDefinitionService triggerDefinitionService) {
+        ConversionService conversionService, RemoteTriggerDefinitionService triggerDefinitionService) {
 
         this.conversionService = conversionService;
         this.triggerDefinitionService = triggerDefinitionService;

@@ -24,6 +24,9 @@ import org.springframework.lang.NonNull;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Ivica Cardic
+ */
 public interface ActionDefinitionFacade {
 
     String executeEditorDescription(

@@ -20,17 +20,20 @@ package com.bytechef.atlas.execution.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-
 /**
  * @author Ivica Cardic
  */
 public interface JobService {
+
+    Job getJob(long id);
+
+    Page<Job> getJobs(int pageNumber);
 
     Job create(JobParameters jobParameters, Workflow workflow);
 
@@ -38,21 +41,7 @@ public interface JobService {
 
     List<Job> getJobs();
 
-    Page<Job> getJobs(int pageNumber);
-
-    Job getJob(long id);
-
-    Job getTaskExecutionJob(long taskExecutionId);
-
-    Job resumeToStatusStarted(long id);
-
     Page<Job> getJobs(
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber);
-
-    Job setStatusToStarted(long id);
-
-    Job setStatusToStopped(long id);
-
-    Job update(Job job);
 }

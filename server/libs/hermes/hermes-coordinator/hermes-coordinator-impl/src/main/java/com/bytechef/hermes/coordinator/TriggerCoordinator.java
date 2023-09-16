@@ -18,7 +18,7 @@
 package com.bytechef.hermes.coordinator;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -32,8 +32,8 @@ import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
-import com.bytechef.hermes.execution.service.TriggerStateService;
+import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
+import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
@@ -58,16 +58,16 @@ public class TriggerCoordinator {
     private final MessageBroker messageBroker;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
-    private final TriggerExecutionService triggerExecutionService;
-    private final TriggerStateService triggerStateService;
-    private final WorkflowService workflowService;
+    private final RemoteTriggerExecutionService triggerExecutionService;
+    private final RemoteTriggerStateService triggerStateService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, MessageBroker messageBroker,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
-        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService,
-        WorkflowService workflowService) {
+        RemoteTriggerExecutionService triggerExecutionService, RemoteTriggerStateService triggerStateService,
+        RemoteWorkflowService workflowService) {
 
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
         this.messageBroker = messageBroker;

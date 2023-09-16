@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.sync.executor;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
@@ -25,29 +26,35 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -55,6 +62,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Ivica Cardic
@@ -63,13 +71,14 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private final JobFacade jobFacade;
-    private final JobService jobService;
+    private final RemoteJobFacade jobFacade;
+    private final RemoteJobService jobService;
 
     public JobSyncExecutor(
-        ContextService contextService, EventPublisher eventPublisher, JobService jobService, ObjectMapper objectMapper,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+        RemoteContextService contextService, EventPublisher eventPublisher, RemoteJobService jobService,
+        ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowFileStorageFacade workflowFileStorageFacade,
+        RemoteWorkflowService workflowService) {
 
         this(
             contextService, eventPublisher, jobService, objectMapper, null, List.of(), List.of(), List.of(),
@@ -78,12 +87,14 @@ public class JobSyncExecutor {
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        ContextService contextService, EventPublisher eventPublisher, JobService jobService, ObjectMapper objectMapper,
-        SyncMessageBroker syncMessageBroker, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        RemoteContextService contextService, EventPublisher eventPublisher, RemoteJobService jobService,
+        ObjectMapper objectMapper, SyncMessageBroker syncMessageBroker,
+        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
-        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
+        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
+        RemoteTaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowFileStorageFacade workflowFileStorageFacade,
-        WorkflowService workflowService) {
+        RemoteWorkflowService workflowService) {
 
         this.jobService = jobService;
 
@@ -92,7 +103,8 @@ public class JobSyncExecutor {
         }
 
         this.jobFacade = new JobFacadeImpl(
-            contextService, eventPublisher, jobService, syncMessageBroker, workflowFileStorageFacade, workflowService);
+            new ContextServiceImpl(contextService), eventPublisher, new JobServiceImpl(jobService), syncMessageBroker,
+            workflowFileStorageFacade, workflowService);
 
         syncMessageBroker.receive(SystemMessageRoute.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
@@ -152,5 +164,64 @@ public class JobSyncExecutor {
         long jobId = jobFacade.createJob(jobParameters);
 
         return jobService.getJob(jobId);
+    }
+
+    private record ContextServiceImpl(RemoteContextService remoteContextService) implements ContextService {
+
+        @Override
+        public FileEntry peek(long stackId, Context.Classname classname) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void push(long stackId, Context.Classname classname, FileEntry value) {
+            remoteContextService.push(stackId, classname, value);
+        }
+
+        @Override
+        public void push(long stackId, int subStackId, Context.Classname classname, FileEntry value) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private record JobServiceImpl(RemoteJobService remoteJobService) implements JobService {
+
+        @Override
+        public Job getJob(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Page<Job> getJobs(int pageNumber) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Job create(JobParameters jobParameters, Workflow workflow) {
+            return remoteJobService.create(jobParameters, workflow);
+        }
+
+        @Override
+        public Optional<Job> fetchLatestJob() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<Job> getJobs() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Page<Job> getJobs(
+            String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId,
+            List<String> workflowIds, Integer pageNumber) {
+
+            throw new UnsupportedOperationException();
+        }
     }
 }

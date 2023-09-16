@@ -34,7 +34,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class ProjectInstanceServiceImpl implements ProjectInstanceService {
+public class ProjectInstanceServiceImpl implements ProjectInstanceService, RemoteProjectInstanceService {
 
     private final ProjectInstanceRepository projectInstanceRepository;
 

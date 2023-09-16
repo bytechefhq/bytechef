@@ -18,13 +18,13 @@
 package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -36,14 +36,14 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service("triggerDefinitionFacade")
-public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
+public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade, RemoteTriggerDefinitionFacade {
 
-    private final ConnectionService connectionService;
+    private final RemoteConnectionService connectionService;
     private final TriggerDefinitionService triggerDefinitionService;
 
     @SuppressFBWarnings("EI")
     public TriggerDefinitionFacadeImpl(
-        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
+        RemoteConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
 
         this.connectionService = connectionService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -157,8 +157,9 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters,
+        Object triggerState, @NonNull WebhookRequest webhookRequest, Long connectionId) {
 
         return triggerDefinitionService.executeTrigger(
             componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
@@ -167,8 +168,9 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public boolean executeWebhookValidate(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters,
+        @NonNull WebhookRequest webhookRequest, Long connectionId) {
 
         return triggerDefinitionService.executeWebhookValidate(
             componentName, componentVersion, triggerName, inputParameters, webhookRequest,

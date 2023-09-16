@@ -26,15 +26,9 @@ import java.util.List;
  */
 public interface TaskExecutionService {
 
-    TaskExecution create(TaskExecution taskExecution);
-
     TaskExecution getTaskExecution(long id);
 
     List<TaskExecution> getJobTaskExecutions(long jobId);
 
     List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds);
-
-    List<TaskExecution> getParentTaskExecutions(long parentId);
-
-    TaskExecution update(TaskExecution taskExecution);
 }

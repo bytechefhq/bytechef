@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
-public class TriggerExecutionServiceImpl implements TriggerExecutionService {
+public class TriggerExecutionServiceImpl implements TriggerExecutionService, RemoteTriggerExecutionService {
 
     private final TriggerExecutionRepository triggerExecutionRepository;
 

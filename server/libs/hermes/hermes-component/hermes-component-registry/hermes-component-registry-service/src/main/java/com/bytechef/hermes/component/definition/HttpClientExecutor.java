@@ -28,7 +28,7 @@ import com.bytechef.hermes.component.definition.Context.Http.Configuration;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 import com.bytechef.hermes.component.definition.Context.Http.Response;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,14 +70,14 @@ import java.util.stream.Collectors;
 @Component
 public class HttpClientExecutor {
 
-    private final ConnectionDefinitionService connectionDefinitionService;
+    private final RemoteConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper;
 
     @SuppressFBWarnings("EI")
     public HttpClientExecutor(
-        ConnectionDefinitionService connectionDefinitionService, FileStorageService fileStorageService,
+        RemoteConnectionDefinitionService connectionDefinitionService, FileStorageService fileStorageService,
         ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
         this.connectionDefinitionService = connectionDefinitionService;

@@ -44,12 +44,12 @@ import org.springframework.util.ObjectUtils;
  * @author Ivica Cardic
  */
 @Transactional
-public class WorkflowServiceImpl implements WorkflowService {
+public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowService {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
 
-    private static final String CACHE_ALL = WorkflowService.class.getName() + ".all";
-    private static final String CACHE_ONE = WorkflowService.class.getName() + ".one";
+    private static final String CACHE_ALL = RemoteWorkflowService.class.getName() + ".all";
+    private static final String CACHE_ONE = RemoteWorkflowService.class.getName() + ".one";
 
     private final CacheManager cacheManager;
     private final List<WorkflowCrudRepository> workflowCrudRepositories;
