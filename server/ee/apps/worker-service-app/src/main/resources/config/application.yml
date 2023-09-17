@@ -45,10 +45,6 @@ management:
         enabled: true
         step: 60
 
-openapi:
-  openAPIDefinition:
-    base-path: /api
-
 spring:
   application:
     name: worker-service-app
