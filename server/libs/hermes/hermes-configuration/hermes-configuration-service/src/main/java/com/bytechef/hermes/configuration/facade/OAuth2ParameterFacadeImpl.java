@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 

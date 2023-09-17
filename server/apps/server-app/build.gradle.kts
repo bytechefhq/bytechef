@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-service"))
     implementation(project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl"))
     implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-service"))
     implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-impl"))

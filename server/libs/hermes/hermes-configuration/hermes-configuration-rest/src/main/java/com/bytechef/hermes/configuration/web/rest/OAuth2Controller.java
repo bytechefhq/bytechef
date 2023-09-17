@@ -18,11 +18,11 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
-import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
+import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

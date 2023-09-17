@@ -95,7 +95,7 @@ public class ProjectWorkflowApiControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/workflows/1")
+                .uri("/project-workflows/1")
                 .exchange()
                 .expectStatus()
                 .isEqualTo(204);
@@ -117,7 +117,7 @@ public class ProjectWorkflowApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/workflows/1")
+                .uri("/project-workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -135,7 +135,7 @@ public class ProjectWorkflowApiControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/workflows")
+                .uri("/project-workflows")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -161,7 +161,7 @@ public class ProjectWorkflowApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/workflows/1")
+                .uri("/project-workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)

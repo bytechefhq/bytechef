@@ -26,12 +26,12 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
-import com.bytechef.hermes.configuration.service.RemoteOAuth2Service;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,7 +55,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private final RemoteConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
-    private final RemoteOAuth2Service oAuth2Service;
+    private final OAuth2Service oAuth2Service;
     private final RemoteProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
     private final RemoteWorkflowService workflowService;
@@ -63,7 +63,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         RemoteConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        RemoteOAuth2Service oAuth2Service, RemoteProjectInstanceWorkflowService projectInstanceWorkflowService,
+        OAuth2Service oAuth2Service, RemoteProjectInstanceWorkflowService projectInstanceWorkflowService,
         TagService tagService, RemoteWorkflowService workflowService) {
 
         this.connectionDefinitionService = connectionDefinitionService;

@@ -14,6 +14,8 @@ dependencies {
     implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message-broker:message-broker-redis"))
@@ -21,8 +23,7 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-impl"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-rest"))
-    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
