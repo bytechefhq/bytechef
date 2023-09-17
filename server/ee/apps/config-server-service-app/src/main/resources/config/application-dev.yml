@@ -1,0 +1,9 @@
+server:
+  port: 6111
+
+spring:
+  devtools:
+    livereload:
+      port: 34731
+    restart:
+      enabled: true

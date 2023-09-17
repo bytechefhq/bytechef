@@ -9,7 +9,6 @@ dependencies {
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
-    implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
     implementation(project(":server:libs:configs:liquibase-config"))
     implementation(project(":server:libs:core:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message-broker:message-broker-kafka"))

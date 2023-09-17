@@ -47,16 +47,13 @@ management:
 
 spring:
   application:
-    name: worker-service-app
+    name: workerservice
   cloud:
     redis:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
   profiles:
     active: #spring.profiles.active#
-    group:
-      dev:
-        - dev
   jmx:
     enabled: false
 #  main:
