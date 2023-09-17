@@ -18,13 +18,13 @@
 package com.bytechef.hermes.configuration.web.rest.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
 import com.bytechef.message.broker.MessageBroker;
@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.hermes.configuration.web.rest", "com.bytechef.hermes.definition.registry"
+    "com.bytechef.hermes.configuration.web.rest"
 })
 @Configuration
 public class WorkflowConfigurationRestTestConfiguration {

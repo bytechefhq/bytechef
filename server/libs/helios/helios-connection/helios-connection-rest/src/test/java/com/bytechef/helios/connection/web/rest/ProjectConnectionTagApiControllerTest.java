@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.service;
+package com.bytechef.helios.connection.web.rest;
 
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface OAuth2Service {
+public class ProjectConnectionTagApiControllerTest {
 
-    Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> connectionParameters);
-
-    String getRedirectUri();
-
-    List<String> getPredefinedApps();
+    @Disabled
+    @Test
+    public void test() {
+        // TODO
+    }
 }

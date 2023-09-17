@@ -15,16 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.service;
+package com.bytechef.hermes.oauth2.service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface RemoteOAuth2Service {
+public interface OAuth2Service {
 
     Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> connectionParameters);
 
     String getRedirectUri();
+
+    List<String> getPredefinedApps();
 }

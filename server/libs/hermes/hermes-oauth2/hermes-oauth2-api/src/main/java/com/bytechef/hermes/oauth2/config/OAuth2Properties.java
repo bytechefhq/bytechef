@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.hermes.configuration.config;
+package com.bytechef.hermes.oauth2.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Arik Cohen
+ * @author Ivica Cardic
  */
 @Component
-@ConfigurationProperties(prefix = "bytechef.connection.oauth2")
+@ConfigurationProperties(prefix = "bytechef.oauth2")
 @SuppressFBWarnings("EI")
 public class OAuth2Properties {
 

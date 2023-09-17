@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.service;
+package com.bytechef.hermes.oauth2.service;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
-import com.bytechef.hermes.configuration.config.OAuth2Properties;
+import com.bytechef.hermes.oauth2.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service
-public class OAuth2ServiceImpl implements OAuth2Service, RemoteOAuth2Service {
+public class OAuth2ServiceImpl implements OAuth2Service {
 
     private final OAuth2Properties oAuth2Properties;
 

@@ -118,9 +118,6 @@ bytechef:
   cache:
     # Cache provider (redis | simple) default: simple
     provider: simple
-  connection:
-    oauth2:
-      redirectUri: ${bytechef.publicUrl}/callback
   data-storage:
     provider: db
   file-storage:
@@ -129,6 +126,12 @@ bytechef:
     file-storage-dir: ${user.home}/bytechef/files
   encryption:
     provider: filesystem
+  oauth2:
+#    predefinedApps:
+#      mailchimp:
+#        clientId: 123456789
+#        clientSecret: 123456789
+    redirectUri: ${bytechef.publicUrl}/callback
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
     provider: jms
