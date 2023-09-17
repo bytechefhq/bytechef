@@ -1,11 +1,11 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
-    EmbeddedIntegrationApi,
-    EmbeddedIntegrationCategoryApi,
-    EmbeddedIntegrationTagApi,
-    EmbeddedWorkflowApi,
+    IntegrationApi,
+    IntegrationCategoryApi,
     IntegrationModel,
+    IntegrationTagApi,
+    IntegrationWorkflowApi,
     TagModel,
     WorkflowModel,
 } from 'ee/middleware/dione/configuration';
@@ -29,12 +29,12 @@ export const IntegrationKeys = {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         IntegrationKeys.integrationCategories,
-        () => new EmbeddedIntegrationCategoryApi().getIntegrationCategories()
+        () => new IntegrationCategoryApi().getIntegrationCategories()
     );
 
 export const useGetIntegrationTagsQuery = () =>
     useQuery<TagModel[], Error>(IntegrationKeys.integrationTags, () =>
-        new EmbeddedIntegrationTagApi().getIntegrationTags()
+        new IntegrationTagApi().getIntegrationTags()
     );
 
 export const useGetIntegrationQuery = (
@@ -43,7 +43,7 @@ export const useGetIntegrationQuery = (
 ) =>
     useQuery<IntegrationModel, Error>(
         IntegrationKeys.integration(id),
-        () => new EmbeddedIntegrationApi().getIntegration({id}),
+        () => new IntegrationApi().getIntegration({id}),
         {
             initialData,
         }
@@ -55,14 +55,14 @@ export const useGetIntegrationsQuery = (filters: {
 }) =>
     useQuery<IntegrationModel[], Error>(
         IntegrationKeys.integrationList(filters),
-        () => new EmbeddedIntegrationApi().getIntegrations(filters)
+        () => new IntegrationApi().getIntegrations(filters)
     );
 
 export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
         () =>
-            new EmbeddedWorkflowApi().getIntegrationWorkflows({
+            new IntegrationWorkflowApi().getIntegrationWorkflows({
                 id,
             })
     );

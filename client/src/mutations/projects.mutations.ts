@@ -1,14 +1,14 @@
 import {useMutation} from '@tanstack/react-query';
 import {
-    AutomationProjectApi,
-    AutomationProjectInstanceApi,
-    AutomationProjectInstanceTagApi,
-    AutomationProjectTagApi,
     CreateProjectWorkflowRequest,
     EnableProjectInstanceRequest,
     EnableProjectInstanceWorkflowRequest,
+    ProjectApi,
+    ProjectInstanceApi,
     ProjectInstanceModel,
+    ProjectInstanceTagApi,
     ProjectModel,
+    ProjectTagApi,
     UpdateProjectInstanceTagsRequest,
     UpdateProjectTagsRequest,
     WorkflowModel,
@@ -24,7 +24,7 @@ export const useCreateProjectMutation = (
 ) =>
     useMutation({
         mutationFn: (projectModel: ProjectModel) => {
-            return new AutomationProjectApi().createProject({
+            return new ProjectApi().createProject({
                 projectModel,
             });
         },
@@ -45,7 +45,7 @@ export const useCreateProjectInstanceMutation = (
 ) =>
     useMutation({
         mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
-            return new AutomationProjectInstanceApi().createProjectInstance({
+            return new ProjectInstanceApi().createProjectInstance({
                 projectInstanceModel,
             });
         },
@@ -66,7 +66,7 @@ export const useCreateProjectWorkflowRequestMutation = (
 ) => {
     return useMutation({
         mutationFn: async (request: CreateProjectWorkflowRequest) => {
-            return new AutomationProjectApi().createProjectWorkflow(request);
+            return new ProjectApi().createProjectWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -83,7 +83,7 @@ export const useDeleteProjectMutation = (
 ) =>
     useMutation({
         mutationFn: (id: number) => {
-            return new AutomationProjectApi().deleteProject({id: id});
+            return new ProjectApi().deleteProject({id: id});
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -99,7 +99,7 @@ export const useDeleteProjectInstanceMutation = (
 ) =>
     useMutation({
         mutationFn: (id: number) => {
-            return new AutomationProjectInstanceApi().deleteProjectInstance({
+            return new ProjectInstanceApi().deleteProjectInstance({
                 id: id,
             });
         },
@@ -117,7 +117,7 @@ export const useDuplicateProjectMutation = (
 ) =>
     useMutation({
         mutationFn: (id: number) => {
-            return new AutomationProjectApi().duplicateProject({
+            return new ProjectApi().duplicateProject({
                 id: id,
             });
         },
@@ -135,7 +135,7 @@ export const useUpdateProjectMutation = (
 ) =>
     useMutation({
         mutationFn: (projectModel: ProjectModel) => {
-            return new AutomationProjectApi().updateProject({
+            return new ProjectApi().updateProject({
                 id: projectModel.id!,
                 projectModel,
             });
@@ -157,7 +157,7 @@ export const useUpdateProjectInstanceMutation = (
 ) =>
     useMutation({
         mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
-            return new AutomationProjectInstanceApi().updateProjectInstance({
+            return new ProjectInstanceApi().updateProjectInstance({
                 id: projectInstanceModel.id!,
                 projectInstanceModel,
             });
@@ -176,7 +176,7 @@ export const useUpdateProjectTagsMutation = (
 ) =>
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
-            return new AutomationProjectTagApi().updateProjectTags(request);
+            return new ProjectTagApi().updateProjectTags(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -198,7 +198,7 @@ export const useUpdateProjectInstanceTagsMutation = (
 ) =>
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
-            return new AutomationProjectInstanceTagApi().updateProjectInstanceTags(
+            return new ProjectInstanceTagApi().updateProjectInstanceTags(
                 request
             );
         },
@@ -216,9 +216,7 @@ export const useEnableProjectInstanceMutation = (
 ) =>
     useMutation({
         mutationFn: (request: EnableProjectInstanceRequest) => {
-            return new AutomationProjectInstanceApi().enableProjectInstance(
-                request
-            );
+            return new ProjectInstanceApi().enableProjectInstance(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -240,7 +238,7 @@ export const useEnableProjectInstanceWorkflowMutation = (
 ) =>
     useMutation({
         mutationFn: (request: EnableProjectInstanceWorkflowRequest) => {
-            return new AutomationProjectInstanceApi().enableProjectInstanceWorkflow(
+            return new ProjectInstanceApi().enableProjectInstanceWorkflow(
                 request
             );
         },
