@@ -7,7 +7,6 @@ springBoot {
 
 dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
-    implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
 
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
 

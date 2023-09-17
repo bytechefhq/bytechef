@@ -178,6 +178,7 @@ include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
 include("server:ee:apps:api-gateway-service-app")
+include("server:ee:apps:config-server-service-app")
 include("server:ee:apps:configuration-service-app")
 include("server:ee:apps:connection-service-app")
 include("server:ee:apps:coordinator-service-app")

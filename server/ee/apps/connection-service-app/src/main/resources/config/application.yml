@@ -62,7 +62,7 @@ openapi:
 
 spring:
   application:
-    name: connection-service-app
+    name: connectionservice
   cloud:
     redis:
       discovery:
