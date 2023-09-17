@@ -5,7 +5,7 @@ import IntegrationConnection from '@/ee/pages/embedded/integration/IntegrationCo
 import IntegrationUserMetadata from '@/ee/pages/embedded/integration/IntegrationUserMetadata';
 import IntegrationWorkflowEditor from '@/ee/pages/embedded/integration/IntegrationWorkflowEditor';
 import Integrations from '@/ee/pages/embedded/integrations/Integrations';
-import {AutomationProjectApi} from '@/middleware/helios/configuration';
+import {ProjectApi} from '@/middleware/helios/configuration';
 import Connections from '@/pages/automation/connections/Connections';
 import OAuthPopup from '@/pages/automation/connections/oauth2/OAuthPopup';
 import WorkflowExecutions from '@/pages/automation/executions/WorkflowExecutions';
@@ -43,7 +43,7 @@ export const router = createBrowserRouter([
                                     parseInt(params.projectId!)
                                 ),
                                 () =>
-                                    new AutomationProjectApi().getProject({
+                                    new ProjectApi().getProject({
                                         id: parseInt(params.projectId!),
                                     })
                             ),
