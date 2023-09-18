@@ -29,6 +29,4 @@ public interface TaskExecutionService {
     TaskExecution getTaskExecution(long id);
 
     List<TaskExecution> getJobTaskExecutions(long jobId);
-
-    List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds);
 }

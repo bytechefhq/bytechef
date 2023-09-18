@@ -19,7 +19,6 @@ package com.bytechef.server.config;
 
 import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
@@ -52,11 +51,6 @@ public class WorkflowExecutionConfiguration {
     @Bean
     ContextService contextService(ContextRepository contextRepository) {
         return new ContextServiceImpl(contextRepository);
-    }
-
-    @Bean
-    CounterService counterService(CounterRepository counterRepository) {
-        return new CounterServiceImpl(counterRepository);
     }
 
     @Bean

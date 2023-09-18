@@ -62,11 +62,6 @@ public class TaskExecutionServiceImpl implements TaskExecutionService, RemoteTas
     }
 
     @Override
-    public List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds) {
-        return taskExecutionRepository.findAllByJobIdInOrderByCreatedDate(jobIds);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return taskExecutionRepository.findAllByParentId(parentId);

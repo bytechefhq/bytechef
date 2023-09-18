@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
+import com.bytechef.hermes.connection.domain.Connection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
@@ -47,19 +47,17 @@ import java.util.Map;
 public class RemoteConnectionDefinitionServiceController {
 
     private final RemoteConnectionDefinitionService connectionDefinitionService;
-    private final RemoteConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public RemoteConnectionDefinitionServiceController(
-        RemoteConnectionDefinitionService connectionDefinitionService, RemoteConnectionService connectionService) {
+        RemoteConnectionDefinitionService connectionDefinitionService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
-        this.connectionService = connectionService;
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-authorization-apply/{connectionId}",
+        value = "/execute-authorization-apply",
         consumes = {
             "application/json"
         },
@@ -67,10 +65,10 @@ public class RemoteConnectionDefinitionServiceController {
             "application/json"
         })
     public ResponseEntity<Authorization.ApplyResponse> executeAuthorizationApply(
-        @PathVariable Long connectionId) {
+        @RequestBody Connection connection) {
 
         return ResponseEntity.ok(
-            connectionDefinitionService.executeAuthorizationApply(connectionService.getConnection(connectionId)));
+            connectionDefinitionService.executeAuthorizationApply(connection));
     }
 
     @RequestMapping(
@@ -95,9 +93,9 @@ public class RemoteConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-base-uri/{connectionId}")
-    public ResponseEntity<String> executeBaseUri(@PathVariable long connectionId) {
-        return connectionDefinitionService.executeBaseUri(connectionService.getConnection(connectionId))
+        value = "/execute-base-uri")
+    public ResponseEntity<String> executeBaseUri(@RequestBody Connection connection) {
+        return connectionDefinitionService.executeBaseUri(connection)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
                 .build());
