@@ -20,7 +20,6 @@ package com.bytechef.hermes.configuration.web.rest;
 import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
@@ -56,9 +55,6 @@ public class TaskDispatcherDefinitionControllerIntTest {
 
     @MockBean
     private RemoteActionDefinitionService actionDefinitionService;
-
-    @MockBean
-    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;

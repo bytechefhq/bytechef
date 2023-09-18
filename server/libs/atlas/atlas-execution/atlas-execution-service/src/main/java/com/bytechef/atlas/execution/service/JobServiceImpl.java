@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,14 +69,6 @@ public class JobServiceImpl implements JobService, RemoteJobService {
     @Transactional(readOnly = true)
     public Optional<Job> fetchLatestJob() {
         return jobRepository.findLatestJob();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Job> getJobs() {
-        return StreamSupport.stream(jobRepository.findAll()
-            .spliterator(), false)
-            .toList();
     }
 
     @Override

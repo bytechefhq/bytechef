@@ -37,14 +37,6 @@ public interface TaskExecutionRepository {
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
 
     /**
-     * Return the execution steps of the given jobs
-     *
-     * @param jobIds
-     * @return List<TaskExecution>
-     */
-    List<TaskExecution> findAllByJobIdInOrderByCreatedDate(List<Long> jobIds);
-
-    /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
      *
      * @param jobId

@@ -169,23 +169,8 @@ public class JobSyncExecutor {
     private record ContextServiceImpl(RemoteContextService remoteContextService) implements ContextService {
 
         @Override
-        public FileEntry peek(long stackId, Context.Classname classname) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public void push(long stackId, Context.Classname classname, FileEntry value) {
             remoteContextService.push(stackId, classname, value);
-        }
-
-        @Override
-        public void push(long stackId, int subStackId, Context.Classname classname, FileEntry value) {
-            throw new UnsupportedOperationException();
         }
     }
 
@@ -208,11 +193,6 @@ public class JobSyncExecutor {
 
         @Override
         public Optional<Job> fetchLatestJob() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<Job> getJobs() {
             throw new UnsupportedOperationException();
         }
 

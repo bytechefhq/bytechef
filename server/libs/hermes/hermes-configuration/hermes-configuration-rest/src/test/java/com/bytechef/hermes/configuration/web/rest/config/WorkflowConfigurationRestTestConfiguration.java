@@ -19,7 +19,6 @@ package com.bytechef.hermes.configuration.web.rest.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
@@ -46,9 +45,6 @@ public class WorkflowConfigurationRestTestConfiguration {
 
     @MockBean
     private RemoteActionDefinitionService actionDefinitionService;
-
-    @MockBean
-    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;

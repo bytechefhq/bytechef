@@ -41,9 +41,6 @@ public interface JdbcTaskExecutionRepository
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
 
     @Override
-    List<TaskExecution> findAllByJobIdInOrderByCreatedDate(List<Long> jobIds);
-
-    @Override
     List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId);
 
     @Override

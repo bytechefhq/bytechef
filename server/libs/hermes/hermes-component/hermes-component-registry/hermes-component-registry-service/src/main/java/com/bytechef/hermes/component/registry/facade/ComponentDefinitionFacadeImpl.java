@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  * @author Ivica Cardic
  */
 @Service
-public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade, RemoteComponentDefinitionFacade {
+public class ComponentDefinitionFacadeImpl implements RemoteComponentDefinitionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final RemoteConnectionService connectionService;

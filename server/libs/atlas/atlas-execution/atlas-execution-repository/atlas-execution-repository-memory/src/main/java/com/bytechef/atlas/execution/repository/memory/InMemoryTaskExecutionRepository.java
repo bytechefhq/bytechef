@@ -61,11 +61,6 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findAllByJobIdInOrderByCreatedDate(List<Long> jobIds) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<TaskExecution> findById(long id) {
         TaskExecution taskExecution = taskExecutions.get(id);
 
