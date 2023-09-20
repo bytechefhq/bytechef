@@ -1,0 +1,137 @@
+---
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  metrics:
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
+
+openapi:
+  openAPIDefinition:
+    base-path:
+      automation: /api/automation
+      core: /api/core
+      embedded: /api/embedded
+
+spring:
+  cloud:
+    redis:
+      discovery:
+        instanceId: ${spring.application.name}:${random.value}
+  jmx:
+    enabled: false
+  liquibase:
+    contexts: configuration
+  output:
+    ansi:
+      console-available: true
+    group:
+      dev:
+        - dev
+        - api-docs
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+
+#####
+
+bytechef:
+  data-storage:
+    provider: db
+  discovery-service:
+    provider: redis
+  encryption:
+    provider: filesystem
+  file-storage:
+    # File storage provider for files (base64 | filesystem) default: filesystem
+    provider: filesystem
+    file-storage-dir: ${user.home}/bytechef/files
+  message-broker:
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+    provider: redis
+  oauth2:
+    #    predefinedApps:
+    #      mailchimp:
+    #        clientId: 123456789
+    #        clientSecret: 123456789
+    redirectUri: ${bytechef.publicUrl}/callback
+  publicUrl: http://127.0.0.1:5173
+  webhookUrl: http://127.0.0.1:7888
+  worker:
+    task:
+      subscriptions:
+        tasks: "10"
+  workflow:
+    async:
+      output-storage:
+        # Output storage provider for sync workflow output data (base64 | filesystem) default: base64
+        provider: base64
+    repository:
+      classpath:
+        enabled: false
+      filesystem:
+        enabled: true
+        location-pattern: ${user.home}/bytechef/**/*.yaml
+      jdbc:
+        enabled: true
+    sync:
+      output-storage:
+        # Output storage provider for async workflow output data (base64 | filesystem) default: base64
+        provider: base64

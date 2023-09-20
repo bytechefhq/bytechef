@@ -1,0 +1,25 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: configuration-service
+          uri: lb://configuration-service-app
+          predicates:
+          - Path=/api/oauth2/authorization-parameters,/api/oauth2-properties,/api/project-categories/**,/api/project-tags/**,/api/project-workflows/**,/api/projects/**,/api/project-instances/**,/api/project-instance-tags/**,/api/action-definitions/**,/api/component-definitions/**,/api/connection-definitions/**,/api/task-dispatcher-definitions/**,/api/integration-categories/**,/api/integration-tags/**,/api/integration-workflows/**,/api/integrations/**
+        - id: connection-service
+          uri: lb://connection-service-app
+          predicates:
+            - Path=/api/project-connection-tags/**,/api/project-connections/**
+        - id: execution-service
+          uri: lb://execution-service-app
+          predicates:
+            - Path=/api/project-jobs/**,/api/project-workflow-executions/**,/api/project-workflow-tests
+
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true

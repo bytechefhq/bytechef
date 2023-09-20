@@ -2,5 +2,14 @@ server:
   port: 9999
 
 bytechef:
+  file-storage:
+    provider: base64
   message-broker:
     provider: jms
+  workflow:
+    async:
+      output-storage:
+        provider: base64
+    sync:
+      output-storage:
+        provider: base64
