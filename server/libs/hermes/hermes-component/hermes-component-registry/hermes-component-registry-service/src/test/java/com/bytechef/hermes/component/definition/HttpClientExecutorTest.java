@@ -21,8 +21,8 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -62,8 +62,7 @@ public class HttpClientExecutorTest {
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
             Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FileStorageService.class),
-            new ObjectMapper(),
-            new XmlMapper());
+            new ObjectMapper(), new XmlMapper());
 
     @Test
     public void testCreateBodyHandler() {
@@ -187,7 +186,7 @@ public class HttpClientExecutorTest {
         HttpClient httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Http.allowUnauthorizedCerts(true)
                 .build(),
-            new Connection());
+            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertTrue(httpClient.authenticator()
             .isEmpty());
@@ -209,7 +208,9 @@ public class HttpClientExecutorTest {
 
         Map<String, List<String>> headers = new HashMap<>();
 
-        httpClientExecutor.createHttpClient(headers, new HashMap<>(), configuration, new Connection());
+        httpClientExecutor.createHttpClient(
+            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
+            Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of(AuthorizationConstants.API_TOKEN, List.of("token_value")), headers);
 
@@ -227,7 +228,9 @@ public class HttpClientExecutorTest {
 
         Map<String, List<String>> queryParameters = new HashMap<>();
 
-        httpClientExecutor.createHttpClient(new HashMap<>(), queryParameters, configuration, new Connection());
+        httpClientExecutor.createHttpClient(
+            new HashMap<>(), queryParameters, configuration, "componentName",
+            new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of(AuthorizationConstants.API_TOKEN, List.of("token_value")), queryParameters);
 
@@ -244,7 +247,9 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        httpClientExecutor.createHttpClient(headers, new HashMap<>(), configuration, new Connection());
+        httpClientExecutor.createHttpClient(
+            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
+            Mockito.mock(Context.class));
 
         Assertions.assertEquals(
             Map.of(
@@ -264,7 +269,9 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        httpClientExecutor.createHttpClient(headers, new HashMap<>(), configuration, new Connection());
+        httpClientExecutor.createHttpClient(
+            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
+            Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
@@ -281,7 +288,9 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        httpClientExecutor.createHttpClient(headers, new HashMap<>(), configuration, new Connection());
+        httpClientExecutor.createHttpClient(
+            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
+            Mockito.mock(Context.class));
 
         Assertions.assertEquals(
             Map.of(
@@ -300,7 +309,9 @@ public class HttpClientExecutorTest {
 
         headers = new HashMap<>();
 
-        httpClientExecutor.createHttpClient(headers, new HashMap<>(), configuration, new Connection());
+        httpClientExecutor.createHttpClient(
+            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
+            Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
@@ -309,7 +320,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Http.followRedirect(true)
                 .build(),
-            new Connection());
+            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
@@ -318,7 +329,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Http.followAllRedirects(true)
                 .build(),
-            new Connection());
+            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
@@ -327,7 +338,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Http.proxy("10.11.12.13:30")
                 .build(),
-            new Connection());
+            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertTrue(httpClient.proxy()
             .isPresent());
@@ -337,7 +348,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Http.timeout(Duration.ofMillis(2000))
                 .build(),
-            new Connection());
+            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(
             Duration.ofMillis(2000), httpClient.connectTimeout()
@@ -347,8 +358,9 @@ public class HttpClientExecutorTest {
     @Test
     public void testCreateHTTPRequest() {
         HttpRequest httpRequest = httpClientExecutor.createHTTPRequest(
-            "http://localhost:8080", Http.RequestMethod.DELETE,
-            Map.of("header1", List.of("value1")), Map.of("param1", List.of("value1")), null, new Connection());
+            "http://localhost:8080", Http.RequestMethod.DELETE, Map.of("header1", List.of("value1")),
+            Map.of("param1", List.of("value1")), null, "componentName", new ComponentConnection(1, Map.of(), null),
+            Mockito.mock(Context.class));
 
         Assertions.assertEquals(Http.RequestMethod.DELETE.name(), httpRequest.method());
         Assertions.assertEquals(

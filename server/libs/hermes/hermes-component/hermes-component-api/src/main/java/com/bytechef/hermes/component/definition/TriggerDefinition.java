@@ -273,7 +273,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
-            String workflowExecutionId, TriggerContext triggerContext);
+            String workflowExecutionId, TriggerContext context);
 
     }
 
@@ -312,7 +312,7 @@ public interface TriggerDefinition {
     @FunctionalInterface
     interface DynamicWebhookRefreshFunction {
 
-        DynamicWebhookEnableOutput apply(ParameterMap outputParameters);
+        DynamicWebhookEnableOutput apply(ParameterMap outputParameters, Context context);
     }
 
     /**
@@ -330,13 +330,13 @@ public interface TriggerDefinition {
          * @param body
          * @param method
          * @param output
-         * @param triggerContext
+         * @param context
          * @return
          */
         WebhookOutput apply(
             ParameterMap inputParameters, ParameterMap getConnectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
-            TriggerContext triggerContext) throws ComponentExecutionException;
+            TriggerContext context) throws ComponentExecutionException;
     }
 
     /**
@@ -461,11 +461,11 @@ public interface TriggerDefinition {
          *
          * @param inputParameters
          * @param closureParameters
-         * @param triggerContext
+         * @param context
          * @return
          */
         PollOutput apply(
-            ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext triggerContext)
+            ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context)
             throws ComponentExecutionException;
 
     }
@@ -500,12 +500,12 @@ public interface TriggerDefinition {
          * @param parameters
          * @param body
          * @param method
-         * @param triggerContext
+         * @param context
          * @return
          */
         WebhookOutput apply(
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext triggerContext) throws ComponentExecutionException;
+            WebhookMethod method, TriggerContext context) throws ComponentExecutionException;
 
     }
 
@@ -660,11 +660,11 @@ public interface TriggerDefinition {
          * @param parameters
          * @param body
          * @param method
-         * @param triggerContext
+         * @param context
          * @return
          */
         boolean apply(
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext triggerContext);
+            WebhookMethod method, TriggerContext context);
     }
 }

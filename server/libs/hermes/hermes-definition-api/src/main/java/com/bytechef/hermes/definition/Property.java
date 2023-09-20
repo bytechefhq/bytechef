@@ -17,22 +17,7 @@
 
 package com.bytechef.hermes.definition;
 
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableAnyProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableArrayProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNullProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNumberProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableTimeProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,8 +29,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public sealed interface Property
-    permits ModifiableProperty, Property.DynamicPropertiesProperty, Property.InputProperty, Property.ValueProperty {
+public interface Property {
 
     /**
      *
@@ -147,8 +131,7 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface DynamicPropertiesProperty extends InputProperty, Property
-        permits ModifiableDynamicPropertiesProperty {
+    interface DynamicPropertiesProperty extends InputProperty, Property {
 
         /**
          *
@@ -159,10 +142,7 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface ValueProperty<V> extends Property
-        permits AnyProperty, ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty, IntegerProperty,
-        NullProperty, NumberProperty, ObjectProperty, OutputProperty, StringProperty, TimeProperty,
-        ModifiableValueProperty {
+    interface ValueProperty<V> extends Property {
 
         /**
          *
@@ -183,16 +163,14 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface AnyProperty extends OutputProperty<Object>, ValueProperty<Object>
-        permits ModifiableAnyProperty {
+    interface AnyProperty extends OutputProperty<Object>, ValueProperty<Object> {
     }
 
     /**
      *
      */
-    sealed interface ArrayProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Object[]>, ValueProperty<Object[]>
-        permits ModifiableArrayProperty {
+    interface ArrayProperty
+        extends DynamicOptionsProperty, InputProperty, OutputProperty<Object[]>, ValueProperty<Object[]> {
 
         /**
          *
@@ -208,17 +186,15 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface BooleanProperty
-        extends InputProperty, OutputProperty<Boolean>, OptionsProperty, ValueProperty<Boolean>
-        permits ModifiableBooleanProperty {
+    interface BooleanProperty
+        extends InputProperty, OutputProperty<Boolean>, OptionsProperty, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
-    sealed interface DateProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<LocalDate>, ValueProperty<LocalDate>
-        permits ModifiableDateProperty {
+    interface DateProperty
+        extends DynamicOptionsProperty, InputProperty, OutputProperty<LocalDate>, ValueProperty<LocalDate> {
     }
 
     /**
@@ -229,18 +205,14 @@ public sealed interface Property
         permits ModifiableDateTimeProperty {
     }
 
-    sealed interface InputProperty extends Property
-        permits ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty, DynamicPropertiesProperty,
-        IntegerProperty, ModifiableInputProperty, NullProperty, NumberProperty, ObjectProperty, StringProperty,
-        TimeProperty {
+    interface InputProperty extends Property {
     }
 
     /**
      *
      */
-    sealed interface IntegerProperty extends
-        DynamicOptionsProperty, InputProperty, OutputProperty<Integer>, ValueProperty<Integer>
-        permits ModifiableIntegerProperty {
+    interface IntegerProperty extends
+        DynamicOptionsProperty, InputProperty, OutputProperty<Integer>, ValueProperty<Integer> {
 
         /**
          *
@@ -256,16 +228,14 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface NullProperty extends InputProperty, OutputProperty<Void>, ValueProperty<Void>
-        permits ModifiableNullProperty {
+    interface NullProperty extends InputProperty, OutputProperty<Void>, ValueProperty<Void> {
     }
 
     /**
      *
      */
-    sealed interface NumberProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Double>, ValueProperty<Double>
-        permits ModifiableNumberProperty {
+    interface NumberProperty
+        extends DynamicOptionsProperty, InputProperty, OutputProperty<Double>, ValueProperty<Double> {
 
         /**
          *
@@ -286,9 +256,8 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface ObjectProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Object>, ValueProperty<Object>
-        permits ModifiableObjectProperty {
+    interface ObjectProperty
+        extends DynamicOptionsProperty, InputProperty, OutputProperty<Object>, ValueProperty<Object> {
 
         /**
          *
@@ -311,18 +280,14 @@ public sealed interface Property
         Optional<List<? extends ValueProperty<?>>> getProperties();
     }
 
-    sealed interface OutputProperty<V> extends ValueProperty<V>
-        permits AnyProperty, ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty,
-        IntegerProperty, NullProperty, ModifiableOutputProperty, NumberProperty, ObjectProperty, StringProperty,
-        TimeProperty {
+    interface OutputProperty<V> extends ValueProperty<V> {
     }
 
     /**
      *
      */
-    sealed interface StringProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<String>, ValueProperty<String>
-        permits ModifiableStringProperty {
+    interface StringProperty
+        extends DynamicOptionsProperty, InputProperty, OutputProperty<String>, ValueProperty<String> {
 
         /**
          *
@@ -340,9 +305,8 @@ public sealed interface Property
     /**
      *
      */
-    sealed interface TimeProperty extends
-        DynamicOptionsProperty, InputProperty, OutputProperty<LocalTime>, ValueProperty<LocalTime>
-        permits ModifiableTimeProperty {
+    interface TimeProperty extends
+        DynamicOptionsProperty, InputProperty, OutputProperty<LocalTime>, ValueProperty<LocalTime> {
     }
 }
 // CHECKSTYLE:ON

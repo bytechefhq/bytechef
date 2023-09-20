@@ -23,7 +23,7 @@ import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
@@ -45,7 +45,7 @@ import java.time.LocalDateTime;
  */
 public class DynamicWebhookTriggerRefreshJob implements Job {
 
-    private RemoteTriggerDefinitionService triggerDefinitionService;
+    private RemoteTriggerDefinitionFacade remoteTriggerDefinitionFacade;
     private TriggerStateService triggerStateService;
     private RemoteWorkflowService workflowService;
 
@@ -77,8 +77,8 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     @Autowired
-    public void setTriggerDefinitionService(RemoteTriggerDefinitionService triggerDefinitionService) {
-        this.triggerDefinitionService = triggerDefinitionService;
+    public void setRemoteTriggerDefinitionFacade(RemoteTriggerDefinitionFacade triggerDefinitionService) {
+        this.remoteTriggerDefinitionFacade = triggerDefinitionService;
     }
 
     @Autowired
@@ -105,7 +105,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         DynamicWebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
 
-        output = triggerDefinitionService.executeDynamicWebhookRefresh(
+        output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
             componentOperation.componentName(), componentOperation.componentVersion(),
             componentOperation.operationName(), output.parameters());
 

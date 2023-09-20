@@ -116,7 +116,7 @@ public class JdbcComponentHandler implements ComponentHandler {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> null;
+        return (inputParameters, connection, context) -> null;
     }
 
     private ComponentDefinition getComponentDefinition(String description, String name, String icon, String title) {

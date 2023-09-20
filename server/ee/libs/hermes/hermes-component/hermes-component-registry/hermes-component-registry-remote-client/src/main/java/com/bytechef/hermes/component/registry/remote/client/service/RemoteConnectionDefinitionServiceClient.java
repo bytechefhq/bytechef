@@ -19,14 +19,10 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
-import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -37,8 +33,6 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -53,39 +47,6 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
         DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
         super(defaultWebClient, discoveryClient, objectMapper);
-    }
-
-    @Override
-    public ApplyResponse executeAuthorizationApply(@NonNull Connection connection) {
-        return defaultWebClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, connection.getComponentName(),
-                CONNECTION_DEFINITION_SERVICE + "/execute-authorization-apply", connection),
-            connection, ApplyResponse.class);
-    }
-
-    @Override
-    public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName, @NonNull String redirectUri) {
-
-        return defaultWebClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, CONNECTION_DEFINITION_SERVICE + "/execute-authorization-callback"),
-            new AuthorizationCallbackRequest(
-                new ConnectionRequest(componentName, connectionVersion, connectionParameters, authorizationName),
-                redirectUri),
-            AuthorizationCallbackResponse.class);
-    }
-
-    @Override
-    public Optional<String> executeBaseUri(@NonNull Connection connection) {
-        return Optional.ofNullable(
-            defaultWebClient.post(
-                uriBuilder -> toUri(
-                    uriBuilder, connection.getComponentName(),
-                    CONNECTION_DEFINITION_SERVICE + "/execute-base-uri"),
-                connection, String.class));
     }
 
     @Override
@@ -143,30 +104,11 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
             .block();
     }
 
-    @Override
-    public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName) {
-
-        return defaultWebClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, CONNECTION_DEFINITION_SERVICE + "/get-oauth2-authorization-parameters"),
-            new ConnectionRequest(componentName, connectionVersion, connectionParameters, authorizationName),
-            OAuth2AuthorizationParameters.class);
-    }
-
     @SuppressWarnings("unchecked")
     private List<ConnectionDefinition> toConnectionDefinitions(Object[] objectArray) {
         return Arrays.stream(objectArray)
             .map(object -> (List<ConnectionDefinition>) object)
             .flatMap(Collection::stream)
             .toList();
-    }
-
-    private record AuthorizationCallbackRequest(ConnectionRequest connection, String redirectUri) {
-    }
-
-    private record ConnectionRequest(
-        String componentName, int connectionVersion, Map<String, ?> parameters, String authorizationName) {
     }
 }

@@ -18,13 +18,15 @@
 package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,15 +34,17 @@ import java.util.Optional;
  */
 public interface ConnectionDefinitionService {
 
-    Authorization.ApplyResponse executeAuthorizationApply(@NonNull Connection connection);
+    ApplyResponse executeAuthorizationApply(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 
-    Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName, @NonNull String redirectUri);
+    AuthorizationCallbackResponse executeAuthorizationCallback(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
+        @NonNull String redirectUri);
 
     boolean connectionExists(String componentName, int connectionVersion);
 
-    Optional<String> executeBaseUri(@NonNull Connection connection);
+    Optional<String> executeBaseUri(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 
     Authorization.AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
@@ -53,6 +57,5 @@ public interface ConnectionDefinitionService {
         @NonNull String componentName, @NonNull Integer componentVersion);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName);
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 }

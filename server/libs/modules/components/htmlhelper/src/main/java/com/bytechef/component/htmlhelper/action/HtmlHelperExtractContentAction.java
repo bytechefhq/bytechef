@@ -77,7 +77,7 @@ public class HtmlHelperExtractContentAction {
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
         .perform(HtmlHelperExtractContentAction::perform)
-        .outputSchema((OutputSchemaDataSource.OutputSchemaFunction) (inputParameters, connection) -> null);
+        .outputSchema((OutputSchemaDataSource.OutputSchemaFunction) (inputParameters, connection, context) -> null);
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {

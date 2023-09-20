@@ -64,7 +64,7 @@ public class DataMapperMapListToObjectAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> {
+        return (inputParameters, connection, context) -> {
             return object();
         };
     }

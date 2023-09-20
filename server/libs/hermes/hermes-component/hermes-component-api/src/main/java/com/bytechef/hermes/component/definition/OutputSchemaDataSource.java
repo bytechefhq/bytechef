@@ -41,9 +41,10 @@ public interface OutputSchemaDataSource {
         /**
          * @param inputParameters
          * @param connectionParameters
+         * @param context
          * @return
          */
-        OutputProperty<?> apply(ParameterMap inputParameters, ParameterMap connectionParameters)
+        OutputProperty<?> apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
             throws ComponentExecutionException;
     }
 }

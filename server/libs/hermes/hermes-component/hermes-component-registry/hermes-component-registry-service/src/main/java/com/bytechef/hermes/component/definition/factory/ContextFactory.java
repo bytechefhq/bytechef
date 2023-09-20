@@ -24,11 +24,13 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.HttpClientExecutor;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,8 +48,7 @@ public class ContextFactory {
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
-        DataStorageService dataStorageService, EventPublisher eventPublisher,
-        FileStorageService fileStorageService,
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
         this.dataStorageService = dataStorageService;
@@ -58,25 +59,28 @@ public class ContextFactory {
         this.xmlMapper = xmlMapper;
     }
 
-    public ActionContext createActionContext(Connection connection, Long taskExecutionId) {
-        return createContextImpl(connection, taskExecutionId);
+    public ActionContext createActionContext(
+        @NonNull String componentName, @Nullable ComponentConnection connection, @NonNull Long taskExecutionId) {
+
+        return createContextImpl(componentName, connection, taskExecutionId);
     }
 
-    public ActionContext createActionContext(Connection connection) {
-        return createContextImpl(connection, null);
+    public ActionContext createActionContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
+        return createContextImpl(componentName, connection, null);
     }
 
-    public Context createContext(Connection connection) {
-        return createContextImpl(connection, null);
+    public Context createContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
+        return createContextImpl(componentName, connection, null);
     }
 
-    public TriggerContext createTriggerContext(Connection connection) {
-        return createContextImpl(connection, null);
+    public TriggerContext
+        createTriggerContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
+        return createContextImpl(componentName, connection, null);
     }
 
-    private ContextImpl createContextImpl(Connection connection, Long taskExecutionId) {
+    private ContextImpl createContextImpl(String componentName, ComponentConnection connection, Long taskExecutionId) {
         return new ContextImpl(
-            connection, dataStorageService, eventPublisher, objectMapper, fileStorageService,
+            componentName, connection, dataStorageService, eventPublisher, objectMapper, fileStorageService,
             httpClientExecutor, taskExecutionId, xmlMapper);
     }
 }

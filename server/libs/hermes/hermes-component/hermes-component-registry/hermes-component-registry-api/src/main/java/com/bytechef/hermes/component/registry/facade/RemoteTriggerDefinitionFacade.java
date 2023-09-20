@@ -46,6 +46,10 @@ public interface RemoteTriggerDefinitionFacade {
         @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId,
         @NonNull String webhookUrl);
 
+    DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> outputParameters);
+
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, Long connectionId);

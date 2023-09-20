@@ -19,14 +19,19 @@ package com.bytechef.hermes.component.util;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
+import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.ClientSecretFunction;
+import com.bytechef.hermes.component.definition.Authorization.Pkce;
+import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -51,13 +56,13 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class AuthorizationUtils {
+public class ConnectionDefinitionUtils {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-    public static Authorization.ApplyFunction getDefaultApply(Authorization.AuthorizationType type) {
+    public static ApplyFunction getDefaultApply(AuthorizationType type) {
         return switch (type) {
-            case API_KEY -> (ParameterMap connectionParameters) -> {
+            case API_KEY -> (ParameterMap connectionParameters, Context context) -> {
                 String addTo = MapUtils.getString(
                     connectionParameters, AuthorizationConstants.ADD_TO, ApiTokenLocation.HEADER.name());
 
@@ -77,7 +82,7 @@ public class AuthorizationUtils {
                                 MapUtils.getString(connectionParameters, AuthorizationConstants.VALUE, ""))));
                 }
             };
-            case BASIC_AUTH, DIGEST_AUTH -> (ParameterMap connectionParameters) -> {
+            case BASIC_AUTH, DIGEST_AUTH -> (ParameterMap connectionParameters, Context context) -> {
                 String valueToEncode =
                     MapUtils.getString(connectionParameters, AuthorizationConstants.USERNAME) +
                         ":" +
@@ -88,16 +93,16 @@ public class AuthorizationUtils {
                         "Authorization",
                         List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
             };
-            case BEARER_TOKEN -> (ParameterMap connectionParameters) -> ApplyResponse.ofHeaders(
+            case BEARER_TOKEN -> (ParameterMap connectionParameters, Context context) -> ApplyResponse.ofHeaders(
                 Map.of(
                     AuthorizationConstants.AUTHORIZATION,
                     List.of(
                         AuthorizationConstants.BEARER + " " +
                             MapUtils.getString(connectionParameters, AuthorizationConstants.TOKEN))));
-            case CUSTOM -> (ParameterMap connectionParameters) -> null;
+            case CUSTOM -> (ParameterMap connectionParameters, Context context) -> null;
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
-                    ParameterMap connectionParameters) -> ApplyResponse.ofHeaders(
+                    ParameterMap connectionParameters, Context context) -> ApplyResponse.ofHeaders(
                         Map.of(
                             AuthorizationConstants.AUTHORIZATION,
                             List.of(
@@ -114,11 +119,11 @@ public class AuthorizationUtils {
         ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
         TokenUrlFunction tokenUrlFunction, ObjectMapper objectMapper) {
 
-        return (connectionParameters, code, redirectUri, codeVerifier) -> {
+        return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
-            builder.query("client_id", clientIdFunction.apply(connectionParameters));
-            builder.query("client_secret", clientSecretFunction.apply(connectionParameters));
+            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
+            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
             builder.query("code", code);
             builder.query("grant_type", "authorization_code");
             builder.query("redirect_uri", redirectUri);
@@ -136,7 +141,7 @@ public class AuthorizationUtils {
                 httpResponse = httpClient.send(
                     HttpRequest.newBuilder()
                         .POST(builder.build())
-                        .uri(URI.create(tokenUrlFunction.apply(connectionParameters)))
+                        .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
                         .build(),
                     BodyHandlers.ofString());
             } catch (IOException | InterruptedException e) {
@@ -153,7 +158,7 @@ public class AuthorizationUtils {
 
             Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class, objectMapper);
 
-            return new Authorization.AuthorizationCallbackResponse(
+            return new AuthorizationCallbackResponse(
                 (String) body.get(AuthorizationConstants.ACCESS_TOKEN),
                 (String) body.get(AuthorizationConstants.REFRESH_TOKEN));
         };
@@ -175,15 +180,17 @@ public class AuthorizationUtils {
         return MapUtils.getString(connectionParameters, AuthorizationConstants.CLIENT_SECRET);
     }
 
-    public static Authorization.PkceFunction getDefaultPkce() {
-        return Authorization.Pkce::new;
+    public static PkceFunction getDefaultPkce() {
+        return (verifier, challenge, challengeMethod, context) -> new Pkce(verifier, challenge, challengeMethod);
     }
 
-    public static String getDefaultRefreshUrl(ParameterMap connectionParameters, TokenUrlFunction tokenUrlFunction) {
+    public static String getDefaultRefreshUrl(
+        ParameterMap connectionParameters, TokenUrlFunction tokenUrlFunction, Context context) {
+
         String refreshUrl = MapUtils.getString(connectionParameters, AuthorizationConstants.REFRESH_URL);
 
         if (refreshUrl == null) {
-            refreshUrl = tokenUrlFunction.apply(connectionParameters);
+            refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
         }
 
         return refreshUrl;

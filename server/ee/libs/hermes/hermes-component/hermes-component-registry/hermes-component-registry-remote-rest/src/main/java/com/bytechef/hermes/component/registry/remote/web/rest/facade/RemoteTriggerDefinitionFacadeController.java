@@ -88,6 +88,23 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/execute-dynamic-webhook-refresh",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<DynamicWebhookEnableOutput> executeDynamicWebhookRefresh(
+        @Valid @RequestBody DynamicWebhookRefreshRequest dynamicWebhookRefreshRequest) {
+
+        return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookRefresh(
+            dynamicWebhookRefreshRequest.componentName, dynamicWebhookRefreshRequest.componentVersion,
+            dynamicWebhookRefreshRequest.triggerName, dynamicWebhookRefreshRequest.outputParameters));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = "/execute-editor-description",
         consumes = {
             "application/json"
@@ -242,6 +259,12 @@ public class RemoteTriggerDefinitionFacadeController {
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
         @NotNull Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, @NotNull String webhookUrl,
         Long connectionId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record DynamicWebhookRefreshRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        @NotNull Map<String, Long> outputParameters) {
     }
 
     @SuppressFBWarnings("EI")

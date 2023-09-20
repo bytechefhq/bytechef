@@ -28,8 +28,8 @@ import com.bytechef.hermes.component.definition.Context.Http.Configuration;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 import com.bytechef.hermes.component.definition.Context.Http.Response;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -88,11 +88,14 @@ public class HttpClientExecutor {
 
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
-        Configuration configuration, RequestMethod requestMethod, Connection connection) throws Exception {
+        Configuration configuration, RequestMethod requestMethod, String componentName, ComponentConnection connection,
+        Context context)
+        throws Exception {
 
-        HttpClient httpClient = createHttpClient(headers, queryParameters, configuration, connection);
+        HttpClient httpClient = createHttpClient(
+            headers, queryParameters, configuration, componentName, connection, context);
         HttpRequest httpRequest = createHTTPRequest(
-            urlString, requestMethod, headers, queryParameters, body, connection);
+            urlString, requestMethod, headers, queryParameters, body, componentName, connection, context);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
@@ -143,7 +146,7 @@ public class HttpClientExecutor {
 
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
-        Connection connection) {
+        String componentName, ComponentConnection connection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder()
             .version(HttpClient.Version.HTTP_1_1);
@@ -162,7 +165,7 @@ public class HttpClientExecutor {
             }
         }
 
-        applyAuthorization(headers, queryParameters, connection);
+        applyAuthorization(headers, queryParameters, componentName, connection, context);
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(HttpClient.Redirect.NORMAL);
@@ -187,7 +190,8 @@ public class HttpClientExecutor {
 
     HttpRequest createHTTPRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Body body, Connection connection) {
+        Map<String, List<String>> queryParameters, Body body, String componentName, ComponentConnection connection,
+        Context context) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
             .method(requestMethod.name(), createBodyPublisher(body));
@@ -200,7 +204,7 @@ public class HttpClientExecutor {
 
         httpRequestBuilder.uri(
             createURI(
-                getConnectionUrl(urlString, connection),
+                getConnectionUrl(urlString, componentName, connection, context),
                 Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
 
         return httpRequestBuilder.build();
@@ -248,13 +252,17 @@ public class HttpClientExecutor {
     }
 
     private void applyAuthorization(
-        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Connection connection) {
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, String componentName,
+        ComponentConnection connection, Context context) {
 
-        ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(connection);
+        if (connection != null) {
+            ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
+                componentName, connection, context);
 
-        if (applyResponse != null) {
-            headers.putAll(applyResponse.getHeaders());
-            queryParameters.putAll(applyResponse.getQueryParameters());
+            if (applyResponse != null) {
+                headers.putAll(applyResponse.getHeaders());
+                queryParameters.putAll(applyResponse.getQueryParameters());
+            }
         }
     }
 
@@ -277,16 +285,14 @@ public class HttpClientExecutor {
         return uri;
     }
 
-    private String getConnectionUrl(String urlString, Connection connection) {
-        if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
-            return urlString;
-        }
+    private String getConnectionUrl(
+        String urlString, String componentName, ComponentConnection connection, Context context) {
 
-        if (connection == null) {
+        if (urlString.startsWith("http://") || urlString.startsWith("https://") || connection == null) {
             return urlString;
         } else {
             return OptionalUtils.map(
-                connectionDefinitionService.executeBaseUri(connection),
+                connectionDefinitionService.executeBaseUri(componentName, connection, context),
                 baseUri -> baseUri + urlString);
         }
     }

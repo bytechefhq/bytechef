@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
@@ -33,7 +32,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -49,18 +47,6 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient
         DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
         super(defaultWebClient, discoveryClient, objectMapper);
-    }
-
-    @Override
-    public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters) {
-
-        return defaultWebClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_SERVICE + "/execute-dynamic-webhook-refresh"),
-            new DynamicWebhookRefresh(componentName, componentVersion, triggerName, outputParameters),
-            DynamicWebhookEnableOutput.class);
     }
 
     @Override
@@ -106,9 +92,5 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient
                     "/{triggerName}",
                 componentName, componentVersion, triggerName),
             WebhookTriggerFlags.class);
-    }
-
-    private record DynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters) {
     }
 }

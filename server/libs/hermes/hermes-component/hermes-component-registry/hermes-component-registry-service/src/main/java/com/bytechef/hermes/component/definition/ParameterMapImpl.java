@@ -21,6 +21,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -62,6 +63,7 @@ public final class ParameterMapImpl implements ParameterMap {
     }
 
     @Override
+    @NonNull
     public Set<Entry<String, Object>> entrySet() {
         return map.entrySet();
     }
@@ -184,7 +186,9 @@ public final class ParameterMapImpl implements ParameterMap {
     @Override
     public <T> List<T> getList(String key, Context.TypeReference<T> elementTypeReference) {
         return MapUtils.getList(map, key, new ParameterizedTypeReference<>() {
+
             @Override
+            @NonNull
             public Type getType() {
                 return elementTypeReference.getType();
             }
@@ -199,7 +203,9 @@ public final class ParameterMapImpl implements ParameterMap {
     @Override
     public <T> List<T> getList(String key, Context.TypeReference<T> elementTypeReference, List<T> defaultValue) {
         return MapUtils.getList(map, key, new ParameterizedTypeReference<>() {
+
             @Override
+            @NonNull
             public Type getType() {
                 return elementTypeReference.getType();
             }
@@ -274,7 +280,9 @@ public final class ParameterMapImpl implements ParameterMap {
     @Override
     public <V> Map<String, V> getMap(String key, Context.TypeReference<V> valueTypeReference) {
         return MapUtils.getMap(map, key, new ParameterizedTypeReference<>() {
+
             @Override
+            @NonNull
             public Type getType() {
                 return valueTypeReference.getType();
             }
@@ -290,7 +298,9 @@ public final class ParameterMapImpl implements ParameterMap {
     public <V> Map<String, V>
         getMap(String key, Context.TypeReference<V> valueTypeReference, Map<String, V> defaultValue) {
         return MapUtils.getMap(map, key, new ParameterizedTypeReference<>() {
+
             @Override
+            @NonNull
             public Type getType() {
                 return valueTypeReference.getType();
             }
@@ -372,7 +382,9 @@ public final class ParameterMapImpl implements ParameterMap {
     @Override
     public <T> List<T> getRequiredList(String key, Context.TypeReference<T> elementTypeReference) {
         return MapUtils.getRequiredList(map, key, new ParameterizedTypeReference<>() {
+
             @Override
+            @NonNull
             public Type getType() {
                 return elementTypeReference.getType();
             }
@@ -412,7 +424,9 @@ public final class ParameterMapImpl implements ParameterMap {
     @Override
     public <V> Map<String, V> getRequiredMap(String key, Context.TypeReference<V> valueTypeReference) {
         return MapUtils.getRequiredMap(map, key, new ParameterizedTypeReference<>() {
+
             @Override
+            @NonNull
             public Type getType() {
                 return valueTypeReference.getType();
             }
@@ -440,6 +454,7 @@ public final class ParameterMapImpl implements ParameterMap {
     }
 
     @Override
+    @NonNull
     public Set<String> keySet() {
         return map.keySet();
     }
@@ -450,7 +465,7 @@ public final class ParameterMapImpl implements ParameterMap {
     }
 
     @Override
-    public void putAll(Map<? extends String, ?> m) {
+    public void putAll(@NonNull Map<? extends String, ?> m) {
         throw new UnsupportedOperationException();
     }
 
@@ -465,6 +480,7 @@ public final class ParameterMapImpl implements ParameterMap {
     }
 
     @Override
+    @NonNull
     public Collection<Object> values() {
         return map.values();
     }

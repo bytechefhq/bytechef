@@ -22,14 +22,16 @@ import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
@@ -53,6 +55,7 @@ import java.util.Objects;
 @Transactional
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
+    private final RemoteConnectionDefinitionFacade connectionDefinitionFacade;
     private final RemoteConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final OAuth2Service oAuth2Service;
@@ -62,10 +65,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
+        RemoteConnectionDefinitionFacade connectionDefinitionFacade,
         RemoteConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
         OAuth2Service oAuth2Service, RemoteProjectInstanceWorkflowService projectInstanceWorkflowService,
         TagService tagService, RemoteWorkflowService workflowService) {
 
+        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.oAuth2Service = oAuth2Service;
@@ -84,18 +89,21 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
-            Authorization.AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
+            AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
                 connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationName());
 
-            if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
-                authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
+                authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-                AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionService
+                AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionFacade
                     .executeAuthorizationCallback(
-                        connection.getComponentName(), connection.getConnectionVersion(),
-                        oAuth2Service.checkPredefinedParameters(
-                            connection.getComponentName(), connection.getParameters()),
-                        connection.getAuthorizationName(), oAuth2Service.getRedirectUri());
+                        connection.getComponentName(),
+                        new ComponentConnection(
+                            connection.getConnectionVersion(),
+                            oAuth2Service.checkPredefinedParameters(
+                                connection.getComponentName(), connection.getParameters()),
+                            connection.getAuthorizationName()),
+                        oAuth2Service.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.toMap());
             }

@@ -29,6 +29,4 @@ public interface ComponentDefinitionService {
     ComponentDefinition getComponentDefinition(String name, Integer version);
 
     List<ComponentDefinition> getComponentDefinitions();
-
-    List<ComponentDefinition> getComponentDefinitionVersions(String name);
 }

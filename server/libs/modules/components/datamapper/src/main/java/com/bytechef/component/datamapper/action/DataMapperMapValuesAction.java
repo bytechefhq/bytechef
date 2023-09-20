@@ -165,7 +165,7 @@ public class DataMapperMapValuesAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> {
+        return (inputParameters, connection, context) -> {
             if (inputParameters.getInteger(TYPE, 1) == 1) {
                 return object();
             } else {

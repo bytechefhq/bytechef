@@ -18,7 +18,8 @@
 package com.bytechef.hermes.configuration.facade;
 
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
@@ -31,14 +32,14 @@ import java.util.Map;
 @Service
 public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
 
-    private final RemoteConnectionDefinitionService connectionDefinitionService;
+    private final RemoteConnectionDefinitionFacade connectionDefinitionFacade;
     private final OAuth2Service oAuth2Service;
 
     @SuppressFBWarnings("EI")
     public OAuth2ParameterFacadeImpl(
-        RemoteConnectionDefinitionService connectionDefinitionService, OAuth2Service oAuth2Service) {
+        RemoteConnectionDefinitionFacade connectionDefinitionFacade, OAuth2Service oAuth2Service) {
 
-        this.connectionDefinitionService = connectionDefinitionService;
+        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.oAuth2Service = oAuth2Service;
     }
 
@@ -46,9 +47,10 @@ public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
-        return connectionDefinitionService.getOAuth2AuthorizationParameters(
-            componentName, connectionVersion,
-            oAuth2Service.checkPredefinedParameters(componentName, connectionParameters),
-            authorizationName);
+        return connectionDefinitionFacade.getOAuth2AuthorizationParameters(
+            componentName,
+            new ComponentConnection(
+                connectionVersion, oAuth2Service.checkPredefinedParameters(componentName, connectionParameters),
+                authorizationName));
     }
 }

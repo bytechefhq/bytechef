@@ -25,6 +25,7 @@ import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConne
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
 import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
+import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -60,6 +61,9 @@ import java.util.stream.Collectors;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 public class ConnectionFacadeIntTest {
+
+    @MockBean
+    RemoteConnectionDefinitionFacade remoteConnectionDefinitionFacade;
 
     @Autowired
     private ConnectionFacade connectionFacade;

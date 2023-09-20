@@ -81,7 +81,8 @@ public class MailchimpSubscribeTrigger {
         ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        String server = MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN));
+        String server = MailchimpUtils.getMailChimpServer(
+            connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
         context.http(http -> http.delete(
             "https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks/$%s".formatted(
@@ -93,7 +94,8 @@ public class MailchimpSubscribeTrigger {
         ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        String server = MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN));
+        String server = MailchimpUtils.getMailChimpServer(
+            connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
         Map<?, ?> response = (Map<?, ?>) context
             .http(http -> http.post("https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
