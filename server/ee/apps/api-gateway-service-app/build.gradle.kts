@@ -6,6 +6,7 @@ springBoot {
 }
 
 dependencies {
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
 
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))

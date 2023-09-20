@@ -10,6 +10,7 @@ dependencies {
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework:spring-webflux")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))

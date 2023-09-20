@@ -30,7 +30,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.bytechef")
 @EnableConfigServer
 public class ConfigServerApplication {
     private static final Logger logger = LoggerFactory.getLogger(ConfigServerApplication.class);
@@ -77,9 +77,7 @@ public class ConfigServerApplication {
                 \tExternal: \t{}://{}:{}{}
                 \tProfile(s): \t{}
                 ----------------------------------------------------------""",
-            environment.getProperty("spring.application.name") == null
-                ? "configserver"
-                : environment.getProperty("spring.application.name"),
+            environment.getProperty("spring.application.name"),
             protocol,
             serverPort,
             contextPath,

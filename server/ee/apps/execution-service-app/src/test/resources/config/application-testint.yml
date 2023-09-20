@@ -1,2 +1,24 @@
 server:
   port: 9999
+
+openapi:
+  openAPIDefinition:
+    base-path:
+      automation: /api/automation
+      core: /api/core
+      embedded: /api/embedded
+
+bytechef:
+  data-storage:
+    provider: db
+  file-storage:
+    provider: base64
+  message-broker:
+    provider: jms
+  workflow:
+    async:
+      output-storage:
+        provider: base64
+    sync:
+      output-storage:
+        provider: base64

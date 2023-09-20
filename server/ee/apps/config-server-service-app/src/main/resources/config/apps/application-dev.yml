@@ -3,17 +3,10 @@ logging:
     ROOT: INFO
     com.bytechef: DEBUG
 
-server:
-  port: 7111
-
 spring:
   devtools:
     restart:
       enabled: true
-  jackson:
-    serialization:
-      indent-output: true
   h2:
     console:
       enabled: false
-

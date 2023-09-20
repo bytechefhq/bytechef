@@ -1,0 +1,10 @@
+server:
+  port: 7222
+
+#####
+
+bytechef:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bytechef_configuration
+    username: postgres
+    password: postgres

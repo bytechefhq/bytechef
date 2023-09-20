@@ -2,5 +2,15 @@ server:
   port: 9999
 
 bytechef:
+  discovery-service:
+    provider: redis
+  data-storage:
+    provider: db
+  file-storage:
+    provider: base64
   message-broker:
     provider: jms
+  workflow:
+    async:
+      output-storage:
+        provider: base64
