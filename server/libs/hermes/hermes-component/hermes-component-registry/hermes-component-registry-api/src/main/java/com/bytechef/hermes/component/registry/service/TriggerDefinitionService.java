@@ -17,10 +17,11 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import org.springframework.lang.NonNull;
@@ -37,49 +38,61 @@ public interface TriggerDefinitionService {
     void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> outputParameters, @Nullable ComponentConnection connection,
+        @NonNull TriggerContext context);
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookEnable(
+    DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
-        @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl,
+        @NonNull String workflowExecutionId, @Nullable ComponentConnection connection,
+        @NonNull TriggerContext context);
+
+    DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
 
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> triggerParameters, @Nullable ComponentConnection connection,
+        @NonNull TriggerContext context);
 
     void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Connection connection);
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     void executeOnEnableListener(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Connection connection);
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable String searchText,
-        @Nullable Connection connection);
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull TriggerContext context);
 
     Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull TriggerContext context);
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Object triggerState, @NonNull WebhookRequest webhookRequest,
-        @Nullable Connection connection);
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     boolean executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
-        @Nullable Connection connection);
+        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 }

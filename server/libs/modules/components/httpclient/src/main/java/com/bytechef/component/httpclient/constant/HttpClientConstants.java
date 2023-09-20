@@ -106,7 +106,7 @@ public class HttpClientConstants {
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
     public static final OutputSchemaDataSource.OutputSchemaFunction OUTPUT_PROPERTIES =
-        (inputParameters, connection) -> {
+        (inputParameters, connection, context) -> {
             if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
                 return object()
                     .properties(any("body"), object("headers"), integer("status"));

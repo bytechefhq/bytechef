@@ -30,19 +30,19 @@ import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.component.util.AuthorizationUtils;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.util.ConnectionDefinitionUtils;
 import com.bytechef.hermes.component.definition.ParameterMapImpl;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
@@ -76,58 +76,76 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ApplyResponse executeAuthorizationApply(@NonNull Connection connection) {
+    public ApplyResponse executeAuthorizationApply(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationName());
+            componentName, connection.version(), connection.authorizationName());
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
-            authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
+            authorization.getApply(), ConnectionDefinitionUtils.getDefaultApply(authorization.getType()));
 
-        return applyFunction.apply(new ParameterMapImpl(connection.getParameters()));
+        return applyFunction.apply(new ParameterMapImpl(connection.parameters()), context);
     }
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName, @NonNull String redirectUri) {
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
+        @NonNull String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            componentName, connection.version(), connection.authorizationName());
         String verifier = null;
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
             PkceFunction pkceFunction = OptionalUtils.orElse(
-                authorization.getPkce(), AuthorizationUtils.getDefaultPkce());
+                authorization.getPkce(), ConnectionDefinitionUtils.getDefaultPkce());
 
             // TODO pkce
-            Authorization.Pkce pkce = pkceFunction.apply(null, null, "SHA256");
+            Authorization.Pkce pkce = pkceFunction.apply(null, null, "SHA256", context);
 
             verifier = pkce.verifier();
         }
 
         AuthorizationCallbackFunction authorizationCallbackFunction = OptionalUtils.orElse(
             authorization.getAuthorizationCallback(),
-            AuthorizationUtils.getDefaultAuthorizationCallbackFunction(
-                OptionalUtils.orElse(authorization.getClientId(), AuthorizationUtils::getDefaultClientId),
-                OptionalUtils.orElse(authorization.getClientSecret(), AuthorizationUtils::getDefaultClientSecret),
-                OptionalUtils.orElse(authorization.getTokenUrl(), AuthorizationUtils::getDefaultTokenUrl),
+            ConnectionDefinitionUtils.getDefaultAuthorizationCallbackFunction(
+                OptionalUtils.orElse(
+                    authorization.getClientId(),
+                    (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultClientId(
+                        connectionParameters)),
+                OptionalUtils.orElse(
+                    authorization.getClientSecret(),
+                    (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultClientSecret(
+                        connectionParameters)),
+                OptionalUtils.orElse(
+                    authorization.getTokenUrl(),
+                    (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultTokenUrl(
+                        connectionParameters)),
                 objectMapper));
 
         return authorizationCallbackFunction.apply(
-            new ParameterMapImpl(connectionParameters), MapUtils.getString(connectionParameters, CODE), redirectUri,
-            verifier);
+            new ParameterMapImpl(connection.parameters()), MapUtils.getString(connection.parameters(), CODE),
+            redirectUri, verifier, context);
     }
 
     @Override
-    public Optional<String> executeBaseUri(@NonNull Connection connection) {
+    public Optional<String> executeBaseUri(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+
         com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition =
-            componentDefinitionRegistry.getConnectionDefinition(
-                connection.getComponentName(), connection.getConnectionVersion());
+            componentDefinitionRegistry.getConnectionDefinition(componentName, connection.version());
 
         BaseUriFunction baseUriFunction =
-            OptionalUtils.orElse(connectionDefinition.getBaseUri(), AuthorizationUtils::getDefaultBaseUri);
+            OptionalUtils.orElse(
+                connectionDefinition.getBaseUri(),
+                (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultBaseUri(connectionParameters));
 
-        return Optional.ofNullable(baseUriFunction.apply(new ParameterMapImpl(connection.getParameters())));
+        return Optional.ofNullable(
+            baseUriFunction.apply(
+                new ParameterMapImpl(
+                    connection.parameters()),
+                context));
     }
 
     @Override
@@ -162,23 +180,27 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName) {
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            componentName, connection.version(), connection.authorizationName());
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
-            authorization.getAuthorizationUrl(), AuthorizationUtils::getDefaultAuthorizationUrl);
+            authorization.getAuthorizationUrl(),
+            (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultAuthorizationUrl(
+                connectionParameters));
         ClientIdFunction clientIdFunction = OptionalUtils.orElse(
-            authorization.getClientId(), AuthorizationUtils::getDefaultClientId);
+            authorization.getClientId(),
+            (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultClientId(connectionParameters));
         ScopesFunction scopesFunction = OptionalUtils.orElse(
-            authorization.getScopes(), AuthorizationUtils::getDefaultScopes);
+            authorization.getScopes(),
+            (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultScopes(connectionParameters));
+
+        ParameterMapImpl connectionParameters = new ParameterMapImpl(connection.parameters());
 
         return new OAuth2AuthorizationParameters(
-            authorizationUrlFunction.apply(new ParameterMapImpl(connectionParameters)),
-            clientIdFunction.apply(new ParameterMapImpl(connectionParameters)),
-            scopesFunction.apply(new ParameterMapImpl(connectionParameters)));
+            authorizationUrlFunction.apply(connectionParameters, context),
+            clientIdFunction.apply(connectionParameters, context), scopesFunction.apply(connectionParameters, context));
     }
 
     @Override

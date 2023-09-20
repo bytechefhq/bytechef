@@ -61,7 +61,7 @@ public class DataStorageGetAllEntriesAction {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> object()
+        return (inputParameters, connection, context) -> object()
             .properties(
                 array("item")
                     .items(

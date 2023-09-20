@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class PipedriveConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters) -> "https://api.pipedrive.com/v1")
+        .baseUri((connectionParameters, context) -> "https://api.pipedrive.com/v1")
         .authorizations(authorization(
             AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
                 .title("API Key")
@@ -63,9 +63,10 @@ public class PipedriveConnection {
                             string(CLIENT_SECRET)
                                 .label("Client Secret")
                                 .required(true))
-                        .authorizationUrl(connection -> "https://oauth.pipedrive.com/oauth/authorize")
-                        .scopes(connection -> List.of("deals:full", "contacts:full", "search:read", "leads:read",
-                            "leads:full", "contacts:read", "deals:read"))
-                        .tokenUrl(connection -> "https://oauth.pipedrive.com/oauth/token")
-                        .refreshUrl(connection -> "https://oauth.pipedrive.com/oauth/token"));
+                        .authorizationUrl((connection, context) -> "https://oauth.pipedrive.com/oauth/authorize")
+                        .scopes(
+                            (connection, context) -> List.of("deals:full", "contacts:full", "search:read", "leads:read",
+                                "leads:full", "contacts:read", "deals:read"))
+                        .tokenUrl((connection, context) -> "https://oauth.pipedrive.com/oauth/token")
+                        .refreshUrl((connection, context) -> "https://oauth.pipedrive.com/oauth/token"));
 }

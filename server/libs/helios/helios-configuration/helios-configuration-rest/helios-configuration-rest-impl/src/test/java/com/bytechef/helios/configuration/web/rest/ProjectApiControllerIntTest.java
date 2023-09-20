@@ -138,7 +138,7 @@ public class ProjectApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/project-categories")
+                .uri("/categories")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -157,7 +157,7 @@ public class ProjectApiControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/project-tags")
+                .uri("/projects/tags")
                 .exchange()
                 .expectStatus()
                 .isOk()

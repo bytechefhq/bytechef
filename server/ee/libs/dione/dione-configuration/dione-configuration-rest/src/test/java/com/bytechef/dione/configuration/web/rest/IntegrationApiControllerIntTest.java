@@ -153,7 +153,7 @@ public class IntegrationApiControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/integration-tags")
+                .uri("/integrations/tags")
                 .exchange()
                 .expectStatus()
                 .isOk()

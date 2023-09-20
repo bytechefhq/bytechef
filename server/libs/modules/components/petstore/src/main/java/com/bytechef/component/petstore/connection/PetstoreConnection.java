@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class PetstoreConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters) -> "https://petstore3.swagger.io/api/v3")
+        .baseUri((connectionParameters, context) -> "https://petstore3.swagger.io/api/v3")
         .authorizations(authorization(
             AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
                 .title("OAuth2 Implicit")
@@ -47,8 +47,8 @@ public class PetstoreConnection {
                     string(CLIENT_SECRET)
                         .label("Client Secret")
                         .required(true))
-                .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
-                .scopes(connection -> List.of("write:pets", "read:pets")),
+                .authorizationUrl((connection, context) -> "https://petstore3.swagger.io/oauth/authorize")
+                .scopes((connection, context) -> List.of("write:pets", "read:pets")),
             authorization(
                 AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
                     .title("API Key")

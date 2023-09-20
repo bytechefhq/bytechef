@@ -57,8 +57,8 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
         modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
         return modifiableConnectionDefinition
-            .baseUri((connectionParameters) -> "https://%s.api.mailchimp.com/3.0".formatted(
-                MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN))));
+            .baseUri((connectionParameters, context) -> "https://%s.api.mailchimp.com/3.0".formatted(
+                MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context)));
     }
 
     @Override

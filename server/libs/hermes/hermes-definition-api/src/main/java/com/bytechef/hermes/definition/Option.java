@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
+public interface Option<T> {
 
     /**
      *
@@ -46,5 +46,5 @@ public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
      *
      * @return
      */
-    Object getValue();
+    T getValue();
 }

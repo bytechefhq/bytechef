@@ -61,7 +61,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connectionParameters) -> object()
+        return (inputParameters, connectionParameters, context) -> object()
             .properties(
                 string(METHOD),
                 object(HEADERS),

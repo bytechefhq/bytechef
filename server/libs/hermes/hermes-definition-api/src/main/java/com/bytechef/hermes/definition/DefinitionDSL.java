@@ -1490,7 +1490,7 @@ public abstract class DefinitionDSL {
         }
 
         @Override
-        public Object getValue() {
+        public T getValue() {
             return value;
         }
     }

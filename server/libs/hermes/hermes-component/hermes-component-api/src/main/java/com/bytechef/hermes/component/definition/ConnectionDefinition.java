@@ -91,11 +91,11 @@ public interface ConnectionDefinition {
     interface BaseUriFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context);
     }
 
     /**
@@ -105,9 +105,9 @@ public interface ConnectionDefinition {
     interface TestConsumer {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          */
-        void accept(ParameterMap connectionParameters);
+        void accept(ParameterMap connectionParameters, Context context);
     }
 }
