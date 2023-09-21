@@ -53,6 +53,7 @@ public class RedisRegistryAutoConfiguration {
     @Bean
     RedisAutoServiceRegistration redisAutoServiceRegistration(
         RedisServiceRegistry redisServiceRegistry, AutoServiceRegistrationProperties properties) {
+
         return new RedisAutoServiceRegistration(redisServiceRegistry, properties, redisRegistration());
     }
 
