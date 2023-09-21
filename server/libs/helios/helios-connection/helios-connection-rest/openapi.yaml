@@ -4,36 +4,19 @@ info:
   title: "Project Connection API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api"
+- url: "http://localhost:5173/api/automation"
 tags:
-- name: "project-connection-tag"
-  description: "The Project Connection Tag API"
-- name: "project-connection"
-  description: "The Project Connection API"
+- name: "connection-tag"
+  description: "The Automation Connection Tag API"
+- name: "connection"
+  description: "The Automation Connection API"
 paths:
-  /project-connection-tags:
-    get:
-      description: "Get connection tags."
-      summary: "Get connection tags"
-      tags:
-      - "project-connection-tag"
-      operationId: "getConnectionTags"
-      responses:
-        "200":
-          description: "A list of connection tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
-  /project-connections:
+  /connections:
     get:
       description: "Get all connections."
       summary: "Get all connections"
       tags:
-      - "project-connection"
+      - "connection"
       operationId: "getConnections"
       parameters:
       - name: "componentName"
@@ -68,7 +51,7 @@ paths:
       description: "Create a new connection."
       summary: "Create a new connection"
       tags:
-      - "project-connection"
+      - "connection"
       operationId: "createConnection"
       requestBody:
         content:
@@ -83,12 +66,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-  /project-connections/{id}:
+  /connections/tags:
+    get:
+      description: "Get connection tags."
+      summary: "Get connection tags"
+      tags:
+      - "connection-tag"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "A list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /connections/{id}:
     delete:
       description: "Delete a connection."
       summary: "Delete a connection"
       tags:
-      - "project-connection"
+      - "connection"
       operationId: "deleteConnection"
       parameters:
       - name: "id"
@@ -105,7 +105,7 @@ paths:
       description: "Get a connection by id."
       summary: "Get a connection by id"
       tags:
-      - "project-connection"
+      - "connection"
       operationId: "getConnection"
       parameters:
       - name: "id"
@@ -126,7 +126,7 @@ paths:
       description: "Update an existing connection."
       summary: "Update an existing connection"
       tags:
-      - "project-connection"
+      - "connection"
       operationId: "updateConnection"
       parameters:
       - name: "id"
@@ -149,12 +149,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-  /project-connections/{id}/project-connection-tags:
+  /connections/{id}/tags:
     put:
       description: "Updates tags of an existing connection."
       summary: "Updates tags of an existing connection"
       tags:
-      - "project-connection-tag"
+      - "connection-tag"
       operationId: "updateConnectionTags"
       parameters:
       - name: "id"

@@ -4,18 +4,18 @@ info:
   title: "Definition API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api"
+- url: "http://localhost:5173/api/core"
 tags:
 - name: "action-definition"
-  description: "The Action Definition API"
+  description: "The Core Action Definition API"
 - name: "component-definition"
-  description: "The Component Definition API"
+  description: "The Core Component Definition API"
 - name: "connection-definition"
-  description: "The Connection Definition API"
+  description: "The Core Connection Definition API"
 - name: "task-dispatcher-definition"
-  description: "The Task Dispatcher Definition API"
+  description: "The Core Task Dispatcher Definition API"
 - name: "trigger-definition"
-  description: "The Trigger Definition API"
+  description: "The Core Trigger Definition API"
 paths:
   /action-definitions:
     get:

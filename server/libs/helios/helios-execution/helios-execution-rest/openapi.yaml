@@ -4,21 +4,21 @@ info:
   title: "Project Execution API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api"
+- url: "http://localhost:5173/api/automation"
 tags:
-- name: "project-job"
-  description: "The Project Job API"
-- name: "project-workflow-execution"
-  description: "The Project Workflow Execution API"
-- name: "project-workflow-test"
-  description: "The Project Workflow Test API"
+- name: "job"
+  description: "The Automation Job API"
+- name: "workflow-execution"
+  description: "The Automation Workflow Execution API"
+- name: "workflow-test"
+  description: "The Automation Workflow Test API"
 paths:
-  /project-jobs:
+  /jobs:
     get:
       description: "Get a page of jobs."
       summary: "Get a page of jobs"
       tags:
-      - "project-job"
+      - "job"
       operationId: "getJobs"
       parameters:
       - name: "pageNumber"
@@ -40,7 +40,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "project-job"
+      - "job"
       operationId: "createJob"
       requestBody:
         description: "Parameters required to run a job, for example '{\"workflowId\"\
@@ -62,12 +62,12 @@ paths:
                     description: "The id of an executed job."
                     type: "integer"
                     format: "int64"
-  /project-jobs/latest:
+  /jobs/latest:
     get:
       description: "Get the latest job."
       summary: "Get the latest job"
       tags:
-      - "project-job"
+      - "job"
       operationId: "getLatestJob"
       responses:
         "200":
@@ -76,12 +76,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Job"
-  /project-jobs/{id}:
+  /jobs/{id}:
     get:
       description: "Get a job by id."
       summary: "Get a job by id"
       tags:
-      - "project-job"
+      - "job"
       operationId: "getJob"
       parameters:
       - name: "id"
@@ -98,12 +98,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Job"
-  /project-jobs/{id}/restart:
+  /jobs/{id}/restart:
     put:
       description: "Restart a job."
       summary: "Restart a job"
       tags:
-      - "project-job"
+      - "job"
       operationId: "restartJob"
       parameters:
       - name: "id"
@@ -116,12 +116,12 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /project-jobs/{id}/stop:
+  /jobs/{id}/stop:
     put:
       description: "Stop a job."
       summary: "Stop a job"
       tags:
-      - "project-job"
+      - "job"
       operationId: "stopJob"
       parameters:
       - name: "id"
@@ -134,12 +134,12 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /project-workflow-executions:
+  /workflow-executions:
     get:
       description: "Get project workflow executions."
       summary: "Get project workflow executions"
       tags:
-      - "project-workflow-execution"
+      - "workflow-execution"
       operationId: "getExecutions"
       parameters:
       - name: "jobStatus"
@@ -203,12 +203,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
-  /project-workflow-executions/{id}:
+  /workflow-executions/{id}:
     get:
       description: "Get workflow execution by id."
       summary: "Get workflow executions by id"
       tags:
-      - "project-workflow-execution"
+      - "workflow-execution"
       operationId: "getExecution"
       parameters:
       - name: "id"
@@ -225,12 +225,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowExecution"
-  /project-workflow-tests:
+  /workflows/tests:
     post:
       description: "Execute a workflow synchronously for testing purposes."
       summary: "Execute a workflow synchronously for testing purpose"
       tags:
-      - "project-workflow-test"
+      - "workflow-test"
       operationId: "testWorkflow"
       requestBody:
         description: "Parameters required to run a test job, for example '{\"workflowId\"\
