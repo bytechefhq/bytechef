@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:42.114175+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-instance-tag", description = "The Project Project Instance Tag API")
+@Tag(name = "project-instance-tag", description = "The Automation Project Instance Tag API")
 public interface ProjectInstanceTagApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -43,7 +43,7 @@ public interface ProjectInstanceTagApi {
     }
 
     /**
-     * GET /project-instance-tags : Get project instance tags
+     * GET /project-instances/tags : Get project instance tags
      * Get project instance tags.
      *
      * @return A list of project tags. (status code 200)
@@ -61,7 +61,7 @@ public interface ProjectInstanceTagApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-instance-tags",
+        value = "/project-instances/tags",
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getProjectInstanceTags(
@@ -70,7 +70,7 @@ public interface ProjectInstanceTagApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ]";
+                    String exampleString = "[ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -82,7 +82,7 @@ public interface ProjectInstanceTagApi {
 
 
     /**
-     * PUT /project-instances/{id}/project-instance-tags : Updates tags of an existing project instance
+     * PUT /project-instances/{id}/tags : Updates tags of an existing project instance
      * Updates tags of an existing project instance.
      *
      * @param id The id of a project instance. (required)
@@ -100,7 +100,7 @@ public interface ProjectInstanceTagApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/project-instances/{id}/project-instance-tags",
+        value = "/project-instances/{id}/tags",
         consumes = { "application/json" }
     )
     default ResponseEntity<Void> updateProjectInstanceTags(

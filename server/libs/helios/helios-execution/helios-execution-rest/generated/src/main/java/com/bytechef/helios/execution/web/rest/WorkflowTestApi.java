@@ -3,9 +3,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.helios.configuration.web.rest;
+package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
+import com.bytechef.helios.execution.web.rest.model.JobModel;
+import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,44 +33,46 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:39.139558+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-category", description = "The Project Category API")
-public interface ProjectCategoryApi {
+@Tag(name = "workflow-test", description = "The Automation Workflow Test API")
+public interface WorkflowTestApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /project-categories : Get categories
-     * Get categories.
+     * POST /workflows/tests : Execute a workflow synchronously for testing purpose
+     * Execute a workflow synchronously for testing purposes.
      *
-     * @return A list of categories. (status code 200)
+     * @param testParametersModel Parameters required to run a test job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
+     * @return The output expected by the workflow. (status code 200)
      */
     @Operation(
-        operationId = "getProjectCategories",
-        summary = "Get categories",
-        description = "Get categories.",
-        tags = { "project-category" },
+        operationId = "testWorkflow",
+        summary = "Execute a workflow synchronously for testing purpose",
+        description = "Execute a workflow synchronously for testing purposes.",
+        tags = { "workflow-test" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
+            @ApiResponse(responseCode = "200", description = "The output expected by the workflow.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
             })
         }
     )
     @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/project-categories",
-        produces = { "application/json" }
+        method = RequestMethod.POST,
+        value = "/workflows/tests",
+        produces = { "application/json" },
+        consumes = { "application/json" }
     )
-    default ResponseEntity<List<CategoryModel>> getProjectCategories(
-        
+    default ResponseEntity<JobModel> testWorkflow(
+        @Parameter(name = "TestParametersModel", description = "Parameters required to run a test job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody TestParametersModel testParametersModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ]";
+                    String exampleString = "null";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

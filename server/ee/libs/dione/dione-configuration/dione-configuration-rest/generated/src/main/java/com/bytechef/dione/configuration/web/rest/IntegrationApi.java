@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:19.930975+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:41.304415+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "integration", description = "The Integration API")
+@Tag(name = "integration", description = "The Embedded Integration API")
 public interface IntegrationApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -85,7 +85,7 @@ public interface IntegrationApi {
 
 
     /**
-     * POST /integrations/{id}/integration-workflows : Create new workflow and adds it to an existing integration
+     * POST /integrations/{id}/workflows : Create new workflow and adds it to an existing integration
      * Create new workflow and adds it to an existing integration.
      *
      * @param id The id of an integration. (required)
@@ -105,7 +105,7 @@ public interface IntegrationApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/integrations/{id}/integration-workflows",
+        value = "/integrations/{id}/workflows",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
