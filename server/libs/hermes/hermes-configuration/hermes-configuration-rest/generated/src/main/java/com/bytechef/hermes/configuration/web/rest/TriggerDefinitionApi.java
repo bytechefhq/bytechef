@@ -36,9 +36,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T10:17:07.736895+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:40.155708+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "trigger-definition", description = "The Trigger Definition API")
+@Tag(name = "trigger-definition", description = "The Core Trigger Definition API")
 public interface TriggerDefinitionApi {
 
     default Optional<NativeWebRequest> getRequest() {

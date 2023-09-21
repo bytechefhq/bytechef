@@ -32,17 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:42.114175+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-workflow", description = "The Project Workflow API")
-public interface ProjectWorkflowApi {
+@Tag(name = "workflow", description = "The Automation Workflow API")
+public interface WorkflowApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * DELETE /project-workflows/{id} : Delete a workflow
+     * DELETE /workflows/{id} : Delete a workflow
      * Delete a workflow.
      *
      * @param id The id of the workflow to delete. (required)
@@ -52,14 +52,14 @@ public interface ProjectWorkflowApi {
         operationId = "deleteWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "project-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/project-workflows/{id}"
+        value = "/workflows/{id}"
     )
     default ResponseEntity<Void> deleteWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
@@ -70,7 +70,7 @@ public interface ProjectWorkflowApi {
 
 
     /**
-     * GET /projects/{id}/project-workflows : Get workflows for particular project.
+     * GET /projects/{id}/workflows : Get workflows for particular project.
      * Get workflows for particular project.
      *
      * @param id The id of a project. (required)
@@ -80,7 +80,7 @@ public interface ProjectWorkflowApi {
         operationId = "getProjectWorkflows",
         summary = "Get workflows for particular project.",
         description = "Get workflows for particular project.",
-        tags = { "project-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -89,7 +89,7 @@ public interface ProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/projects/{id}/project-workflows",
+        value = "/projects/{id}/workflows",
         produces = { "application/json" }
     )
     default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
@@ -110,7 +110,7 @@ public interface ProjectWorkflowApi {
 
 
     /**
-     * GET /project-workflows/{id} : Get a workflow by id
+     * GET /workflows/{id} : Get a workflow by id
      * Get a workflow by id.
      *
      * @param id The id of the workflow to get. (required)
@@ -120,7 +120,7 @@ public interface ProjectWorkflowApi {
         operationId = "getWorkflow",
         summary = "Get a workflow by id",
         description = "Get a workflow by id.",
-        tags = { "project-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -129,7 +129,7 @@ public interface ProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-workflows/{id}",
+        value = "/workflows/{id}",
         produces = { "application/json" }
     )
     default ResponseEntity<WorkflowModel> getWorkflow(
@@ -150,7 +150,7 @@ public interface ProjectWorkflowApi {
 
 
     /**
-     * GET /project-workflows : Get workflow definitions
+     * GET /workflows : Get workflow definitions
      * Get workflow definitions.
      *
      * @return A list of workflows. (status code 200)
@@ -159,7 +159,7 @@ public interface ProjectWorkflowApi {
         operationId = "getWorkflows",
         summary = "Get workflow definitions",
         description = "Get workflow definitions.",
-        tags = { "project-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -168,7 +168,7 @@ public interface ProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-workflows",
+        value = "/workflows",
         produces = { "application/json" }
     )
     default ResponseEntity<List<WorkflowModel>> getWorkflows(
@@ -189,7 +189,7 @@ public interface ProjectWorkflowApi {
 
 
     /**
-     * PUT /project-workflows/{id} : Update an existing workflow
+     * PUT /workflows/{id} : Update an existing workflow
      * Update an existing workflow.
      *
      * @param id The id of the workflow to update. (required)
@@ -200,7 +200,7 @@ public interface ProjectWorkflowApi {
         operationId = "updateWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "project-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -209,7 +209,7 @@ public interface ProjectWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/project-workflows/{id}",
+        value = "/workflows/{id}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )

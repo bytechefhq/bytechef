@@ -1,10 +1,10 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/dione/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/dione/configuration/web/rest/CategoryApi.java
 src/main/java/com/bytechef/dione/configuration/web/rest/IntegrationApi.java
-src/main/java/com/bytechef/dione/configuration/web/rest/IntegrationCategoryApi.java
 src/main/java/com/bytechef/dione/configuration/web/rest/IntegrationTagApi.java
-src/main/java/com/bytechef/dione/configuration/web/rest/IntegrationWorkflowApi.java
+src/main/java/com/bytechef/dione/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/dione/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/dione/configuration/web/rest/model/CreateIntegrationWorkflowRequestModel.java
 src/main/java/com/bytechef/dione/configuration/web/rest/model/InputModel.java

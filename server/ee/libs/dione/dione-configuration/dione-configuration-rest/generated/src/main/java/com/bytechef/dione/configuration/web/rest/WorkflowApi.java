@@ -32,17 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:19.930975+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:41.304415+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "integration-workflow", description = "The Integration Workflow API")
-public interface IntegrationWorkflowApi {
+@Tag(name = "workflow", description = "The Embedded Workflow API")
+public interface WorkflowApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * DELETE /integration-workflows/{id} : Delete a workflow
+     * DELETE /workflows/{id} : Delete a workflow
      * Delete a workflow.
      *
      * @param id The id of the workflow to delete. (required)
@@ -52,14 +52,14 @@ public interface IntegrationWorkflowApi {
         operationId = "deleteWorkflow",
         summary = "Delete a workflow",
         description = "Delete a workflow.",
-        tags = { "integration-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/integration-workflows/{id}"
+        value = "/workflows/{id}"
     )
     default ResponseEntity<Void> deleteWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
@@ -70,7 +70,7 @@ public interface IntegrationWorkflowApi {
 
 
     /**
-     * GET /integrations/{id}/integration-workflows : Get integration workflows for particular integration
+     * GET /integrations/{id}/workflows : Get integration workflows for particular integration
      * Get integration workflows for particular integration.
      *
      * @param id The id of an integration. (required)
@@ -80,7 +80,7 @@ public interface IntegrationWorkflowApi {
         operationId = "getIntegrationWorkflows",
         summary = "Get integration workflows for particular integration",
         description = "Get integration workflows for particular integration.",
-        tags = { "integration-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -89,7 +89,7 @@ public interface IntegrationWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integrations/{id}/integration-workflows",
+        value = "/integrations/{id}/workflows",
         produces = { "application/json" }
     )
     default ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(
@@ -110,7 +110,7 @@ public interface IntegrationWorkflowApi {
 
 
     /**
-     * GET /integration-workflows/{id} : Get a workflow by id
+     * GET /workflows/{id} : Get a workflow by id
      * Get a workflow by id.
      *
      * @param id The id of the workflow to get. (required)
@@ -120,7 +120,7 @@ public interface IntegrationWorkflowApi {
         operationId = "getWorkflow",
         summary = "Get a workflow by id",
         description = "Get a workflow by id.",
-        tags = { "integration-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -129,7 +129,7 @@ public interface IntegrationWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integration-workflows/{id}",
+        value = "/workflows/{id}",
         produces = { "application/json" }
     )
     default ResponseEntity<WorkflowModel> getWorkflow(
@@ -150,7 +150,7 @@ public interface IntegrationWorkflowApi {
 
 
     /**
-     * GET /integration-workflows : Get integration workflow definitions
+     * GET /workflows : Get integration workflow definitions
      * Get integration workflow definitions.
      *
      * @return A list of workflows. (status code 200)
@@ -159,7 +159,7 @@ public interface IntegrationWorkflowApi {
         operationId = "getWorkflows",
         summary = "Get integration workflow definitions",
         description = "Get integration workflow definitions.",
-        tags = { "integration-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
@@ -168,7 +168,7 @@ public interface IntegrationWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integration-workflows",
+        value = "/workflows",
         produces = { "application/json" }
     )
     default ResponseEntity<List<WorkflowModel>> getWorkflows(
@@ -189,7 +189,7 @@ public interface IntegrationWorkflowApi {
 
 
     /**
-     * PUT /integration-workflows/{id} : Update an existing workflow
+     * PUT /workflows/{id} : Update an existing workflow
      * Update an existing workflow.
      *
      * @param id The id of the workflow to update. (required)
@@ -200,7 +200,7 @@ public interface IntegrationWorkflowApi {
         operationId = "updateWorkflow",
         summary = "Update an existing workflow",
         description = "Update an existing workflow.",
-        tags = { "integration-workflow" },
+        tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -209,7 +209,7 @@ public interface IntegrationWorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/integration-workflows/{id}",
+        value = "/workflows/{id}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
