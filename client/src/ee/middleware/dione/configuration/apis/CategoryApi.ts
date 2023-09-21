@@ -25,7 +25,7 @@ import {
 /**
  * 
  */
-export class IntegrationCategoryApi extends runtime.BaseAPI {
+export class CategoryApi extends runtime.BaseAPI {
 
     /**
      * Get integration categories.
@@ -37,7 +37,7 @@ export class IntegrationCategoryApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/integration-categories`,
+            path: `/categories`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

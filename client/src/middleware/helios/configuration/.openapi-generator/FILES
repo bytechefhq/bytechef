@@ -1,10 +1,9 @@
-.openapi-generator-ignore
+apis/CategoryApi.ts
 apis/ProjectApi.ts
-apis/ProjectCategoryApi.ts
 apis/ProjectInstanceApi.ts
 apis/ProjectInstanceTagApi.ts
 apis/ProjectTagApi.ts
-apis/ProjectWorkflowApi.ts
+apis/WorkflowApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

@@ -1,9 +1,0 @@
-.openapi-generator-ignore
-apis/Oauth2Api.ts
-apis/index.ts
-index.ts
-models/GetOAuth2AuthorizationParametersRequestModel.ts
-models/OAuth2AuthorizationParametersModel.ts
-models/OAuth2PropertiesModel.ts
-models/index.ts
-runtime.ts

@@ -120,7 +120,7 @@ export class ProjectApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/projects/{id}/project-workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

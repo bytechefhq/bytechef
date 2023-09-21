@@ -1,7 +1,6 @@
-.openapi-generator-ignore
-apis/ProjectJobApi.ts
-apis/ProjectWorkflowExecutionApi.ts
-apis/ProjectWorkflowTestApi.ts
+apis/JobApi.ts
+apis/WorkflowExecutionApi.ts
+apis/WorkflowTestApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
