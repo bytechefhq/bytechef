@@ -32,7 +32,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Service("connectionDefinitionFacade")
-public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacade, RemoteConnectionDefinitionFacade {
+public class ConnectionDefinitionFacadeImpl implements RemoteConnectionDefinitionFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ContextFactory contextFactory;

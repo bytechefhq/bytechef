@@ -33,15 +33,15 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectConnectionApiController implements ProjectConnectionApi {
+public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ProjectConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public ConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }

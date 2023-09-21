@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +44,7 @@ public class RemoteConnectionDefinitionFacadeController {
     private final RemoteConnectionDefinitionFacade remoteConnectionDefinitionFacade;
 
     public RemoteConnectionDefinitionFacadeController(
-        RemoteConnectionDefinitionFacade remoteConnectionDefinitionFacade) {
+        @Qualifier("connectionDefinitionFacade") RemoteConnectionDefinitionFacade remoteConnectionDefinitionFacade) {
 
         this.remoteConnectionDefinitionFacade = remoteConnectionDefinitionFacade;
     }

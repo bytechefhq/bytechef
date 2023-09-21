@@ -15,51 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.web.rest;
+package com.bytechef.helios.connection.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 /**
  * @author Ivica Cardic
  */
-@Disabled
-@WebMvcTest(ProjectJobApiController.class)
-public class ProjectJobApiControllerIntTest {
+public class ConnectionTagApiControllerTest {
 
+    @Disabled
     @Test
-    public void testGetJob() {
-        // TODO
-    }
-
-    @Test
-    public void testGetJobTaskExecutions() {
-        // TODO
-    }
-
-    @Test
-    public void testGetJobs() {
-        // TODO
-    }
-
-    @Test
-    public void testGetLatestJob() {
-        // TODO
-    }
-
-    @Test
-    public void testPostJob() {
-        // TODO
-    }
-
-    @Test
-    public void testRestartJob() {
-        // TODO
-    }
-
-    @Test
-    public void testStopJob() {
+    public void test() {
         // TODO
     }
 }

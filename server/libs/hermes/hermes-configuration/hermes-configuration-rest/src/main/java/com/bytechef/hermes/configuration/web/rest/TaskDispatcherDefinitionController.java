@@ -33,7 +33,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnEnabled("coordinator")
 public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionApi {
 
