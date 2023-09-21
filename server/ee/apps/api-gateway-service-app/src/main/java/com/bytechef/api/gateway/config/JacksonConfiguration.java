@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.scheduler.config;
+package com.bytechef.api.gateway.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -49,7 +48,7 @@ public class JacksonConfiguration {
             .featuresToDisable(SerializationFeature.INDENT_OUTPUT)
             .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .serializationInclusion(JsonInclude.Include.NON_NULL)
-            .modules(new JavaTimeModule(), new Jdk8Module(), new JsonNullableModule())
+            .modules(new JavaTimeModule(), new Jdk8Module())
             .build();
     }
 }

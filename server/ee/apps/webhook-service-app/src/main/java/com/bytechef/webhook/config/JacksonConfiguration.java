@@ -21,17 +21,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.openapitools.jackson.nullable.JsonNullableModule;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.TimeZone;
 
@@ -43,18 +42,18 @@ public class JacksonConfiguration {
 
     @Bean
     @Primary
-    public ObjectMapper objectMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
-        return buildMapper(Jackson2ObjectMapperBuilder.json(), dateFormat);
+    public ObjectMapper objectMapper() {
+        return buildMapper(Jackson2ObjectMapperBuilder.json());
     }
 
     @Bean
-    XmlMapper xmlMapper(@Value("${bytechef.serialization.date-format}") String dateFormat) {
-        return buildMapper(Jackson2ObjectMapperBuilder.xml(), dateFormat);
+    XmlMapper xmlMapper() {
+        return buildMapper(Jackson2ObjectMapperBuilder.xml());
     }
 
-    private static <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder json, String dateFormat) {
-        return json
-            .dateFormat(new SimpleDateFormat(dateFormat))
+    private static <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder objectMapperBuilder) {
+        return objectMapperBuilder
+            .dateFormat(new StdDateFormat().withColonInTimeZone(true))
             .timeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
             .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .featuresToDisable(SerializationFeature.INDENT_OUTPUT)
