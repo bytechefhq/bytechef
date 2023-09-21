@@ -1,5 +1,5 @@
 group = "com.bytechef.server"
-description = "Monolith ByteChef server app"
+description = "ByteChef server app"
 
 springBoot {
     mainClass.set("com.bytechef.server.ServerApplication")
@@ -8,6 +8,7 @@ springBoot {
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation(libs.org.openapitools.jackson.databind.nullable)
+    implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
