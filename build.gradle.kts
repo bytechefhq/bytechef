@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.com.github.ben.manes.versions)
     id("com.bytechef.java-common-conventions")
+    id("jacoco-report-aggregation")
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
 }
 
@@ -20,25 +21,18 @@ subprojects {
     }
 }
 
-//val publishedProjects = subprojects.findAll()
-//
-//val jacocoRootReport by tasks.registering(JacocoReport::class) {
-//    description = "Generates an aggregate report from all subprojects"
-//    group = "Coverage reports"
-//
-//    dependsOn(publishedProjects.test)
-//
-//    additionalSourceDirs.setFrom(files(publishedProjects.sourceSets.main.allSource.srcDirs))
-//    sourceDirectories.setFrom(files(publishedProjects.sourceSets.main.allSource.srcDirs))
-//    classDirectories.setFrom(files(publishedProjects.sourceSets.main.output))
-//    executionData.setFrom(files(publishedProjects.jacocoTestReport.executionData))
-//
-//    reports {
-//        html.required.set(true) // human readable
-//        xml.required.set(true) // required by codecov
-//    }
-//}
-//
-//wrapper {
-//    gradleVersion = "8.3"
-//}
+reporting {
+    reports {
+        @Suppress("UnstableApiUsage")
+        val jacocoRootReport by registering(JacocoCoverageReport::class) {
+            testType.set(TestSuiteType.UNIT_TEST)
+
+            dependencies {
+                project.subprojects
+                    .filter { it.plugins.findPlugin("jacoco") != null }
+                    .forEach { jacocoAggregation(it) }
+            }
+        }
+
+    }
+}
