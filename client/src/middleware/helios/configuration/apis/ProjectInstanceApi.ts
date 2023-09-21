@@ -121,7 +121,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}/project-workflows/{workflowId}/project-jobs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
+            path: `/project-instances/{id}/workflows/{workflowId}/jobs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -227,7 +227,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}/project-workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters.enable))),
+            path: `/project-instances/{id}/workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters.enable))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

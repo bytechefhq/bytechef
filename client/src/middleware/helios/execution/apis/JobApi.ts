@@ -54,7 +54,7 @@ export interface StopJobRequest {
 /**
  * 
  */
-export class ProjectJobApi extends runtime.BaseAPI {
+export class JobApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.
@@ -72,7 +72,7 @@ export class ProjectJobApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-jobs`,
+            path: `/jobs`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -105,7 +105,7 @@ export class ProjectJobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-jobs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/jobs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -137,7 +137,7 @@ export class ProjectJobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-jobs`,
+            path: `/jobs`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -165,7 +165,7 @@ export class ProjectJobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-jobs/latest`,
+            path: `/jobs/latest`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -197,7 +197,7 @@ export class ProjectJobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-jobs/{id}/restart`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/jobs/{id}/restart`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -228,7 +228,7 @@ export class ProjectJobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-jobs/{id}/stop`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/jobs/{id}/stop`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

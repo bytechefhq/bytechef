@@ -45,7 +45,7 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instance-tags`,
+            path: `/project-instances/tags`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -83,7 +83,7 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-instances/{id}/project-instance-tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/project-instances/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

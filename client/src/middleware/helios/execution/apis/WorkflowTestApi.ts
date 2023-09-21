@@ -32,7 +32,7 @@ export interface TestWorkflowRequest {
 /**
  * 
  */
-export class ProjectWorkflowTestApi extends runtime.BaseAPI {
+export class WorkflowTestApi extends runtime.BaseAPI {
 
     /**
      * Execute a workflow synchronously for testing purposes.
@@ -50,7 +50,7 @@ export class ProjectWorkflowTestApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-workflow-tests`,
+            path: `/workflows/tests`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
