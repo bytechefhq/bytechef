@@ -30,15 +30,15 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class IntegrationCategoryApiController implements IntegrationCategoryApi {
+@RestController("com.bytechef.dione.configuration.web.rest.categoryApiController")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
+public class CategoryApiController implements CategoryApi {
 
     private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationCategoryApiController(
+    public CategoryApiController(
         IntegrationFacade integrationFacade, ConversionService conversionService) {
 
         this.integrationFacade = integrationFacade;

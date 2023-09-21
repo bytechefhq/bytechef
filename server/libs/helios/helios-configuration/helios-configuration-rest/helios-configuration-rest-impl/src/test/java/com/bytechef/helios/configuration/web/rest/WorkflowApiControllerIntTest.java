@@ -51,8 +51,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = ProjectConfigurationRestTestConfiguration.class)
-@WebMvcTest(ProjectWorkflowApiController.class)
-public class ProjectWorkflowApiControllerIntTest {
+@WebMvcTest(WorkflowApiController.class)
+public class WorkflowApiControllerIntTest {
 
     public static final String DEFINITION = """
         {

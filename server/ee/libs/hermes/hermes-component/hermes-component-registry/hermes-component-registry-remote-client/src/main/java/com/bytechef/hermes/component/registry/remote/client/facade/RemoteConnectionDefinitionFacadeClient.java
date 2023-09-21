@@ -24,7 +24,6 @@ import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -35,7 +34,6 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
 public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     implements RemoteConnectionDefinitionFacade {
 

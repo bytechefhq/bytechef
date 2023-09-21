@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.registry.service;
 
+import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Authorization;
@@ -31,18 +33,32 @@ import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.component.util.ConnectionDefinitionUtils;
 import com.bytechef.hermes.component.definition.ParameterMapImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mizosoft.methanol.FormBodyPublisher;
+import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
@@ -65,6 +81,168 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         this.objectMapper = objectMapper;
     }
 
+    public static ApplyFunction getDefaultApply(AuthorizationType type) {
+        return switch (type) {
+            case API_KEY -> (ParameterMap connectionParameters, Context context) -> {
+                String addTo = MapUtils.getString(
+                    connectionParameters, AuthorizationConstants.ADD_TO, Authorization.ApiTokenLocation.HEADER.name());
+
+                if (Authorization.ApiTokenLocation
+                    .valueOf(addTo.toUpperCase()) == Authorization.ApiTokenLocation.HEADER) {
+                    return ApplyResponse.ofHeaders(
+                        Map.of(
+                            MapUtils.getString(
+                                connectionParameters, AuthorizationConstants.KEY, AuthorizationConstants.API_TOKEN),
+                            List.of(
+                                MapUtils.getString(connectionParameters, AuthorizationConstants.VALUE, ""))));
+                } else {
+                    return ApplyResponse.ofQueryParameters(
+                        Map.of(
+                            MapUtils.getString(
+                                connectionParameters, AuthorizationConstants.KEY, AuthorizationConstants.API_TOKEN),
+                            List.of(
+                                MapUtils.getString(connectionParameters, AuthorizationConstants.VALUE, ""))));
+                }
+            };
+            case BASIC_AUTH, DIGEST_AUTH -> (ParameterMap connectionParameters, Context context) -> {
+                String valueToEncode =
+                    MapUtils.getString(connectionParameters, AuthorizationConstants.USERNAME) +
+                        ":" +
+                        MapUtils.getString(connectionParameters, AuthorizationConstants.PASSWORD);
+
+                return ApplyResponse.ofHeaders(
+                    Map.of(
+                        "Authorization",
+                        List.of(
+                            "Basic " +
+                                EncodingUtils.encodeBase64ToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
+            };
+            case BEARER_TOKEN -> (ParameterMap connectionParameters, Context context) -> ApplyResponse.ofHeaders(
+                Map.of(
+                    AuthorizationConstants.AUTHORIZATION,
+                    List.of(
+                        AuthorizationConstants.BEARER + " " +
+                            MapUtils.getString(connectionParameters, AuthorizationConstants.TOKEN))));
+            case CUSTOM -> (ParameterMap connectionParameters, Context context) -> null;
+            case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
+                OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
+                    ParameterMap connectionParameters, Context context) -> ApplyResponse.ofHeaders(
+                        Map.of(
+                            AuthorizationConstants.AUTHORIZATION,
+                            List.of(
+                                MapUtils.getString(
+                                    connectionParameters, AuthorizationConstants.HEADER_PREFIX,
+                                    AuthorizationConstants.BEARER) +
+                                    " " +
+                                    MapUtils.getString(
+                                        connectionParameters, AuthorizationConstants.ACCESS_TOKEN))));
+        };
+    }
+
+    public static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
+        ClientIdFunction clientIdFunction, Authorization.ClientSecretFunction clientSecretFunction,
+        Authorization.TokenUrlFunction tokenUrlFunction, ObjectMapper objectMapper) {
+
+        return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
+            FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
+
+            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
+            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+            builder.query("code", code);
+            builder.query("grant_type", "authorization_code");
+            builder.query("redirect_uri", redirectUri);
+
+            if (codeVerifier != null) {
+                builder.query("code_verifier", codeVerifier);
+            }
+
+            HttpClient httpClient = Methanol.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
+            HttpResponse<String> httpResponse;
+
+            try {
+                httpResponse = httpClient.send(
+                    HttpRequest.newBuilder()
+                        .POST(builder.build())
+                        .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
+                        .build(),
+                    HttpResponse.BodyHandlers.ofString());
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (httpResponse.statusCode() != 200) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            if (httpResponse.body() == null) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class, objectMapper);
+
+            return new AuthorizationCallbackResponse(
+                (String) body.get(AuthorizationConstants.ACCESS_TOKEN),
+                (String) body.get(AuthorizationConstants.REFRESH_TOKEN));
+        };
+    }
+
+    public static String getDefaultAuthorizationUrl(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.AUTHORIZATION_URL);
+    }
+
+    public static String getDefaultBaseUri(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters,
+            com.bytechef.hermes.component.definition.ConnectionDefinition.BASE_URI);
+    }
+
+    public static String getDefaultClientId(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.CLIENT_ID);
+    }
+
+    public static String getDefaultClientSecret(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.CLIENT_SECRET);
+    }
+
+    public static PkceFunction getDefaultPkce() {
+        return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
+            challengeMethod);
+    }
+
+    public static String getDefaultRefreshUrl(
+        ParameterMap connectionParameters, Authorization.TokenUrlFunction tokenUrlFunction, Context context) {
+
+        String refreshUrl = MapUtils.getString(connectionParameters, AuthorizationConstants.REFRESH_URL);
+
+        if (refreshUrl == null) {
+            refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
+        }
+
+        return refreshUrl;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getDefaultScopes(ParameterMap connectionParameters) {
+        Object scopes = MapUtils.get(connectionParameters, AuthorizationConstants.SCOPES);
+
+        if (scopes == null) {
+            return Collections.emptyList();
+        } else if (scopes instanceof List<?>) {
+            return (List<String>) scopes;
+        } else {
+            return Arrays.stream(((String) scopes).split(","))
+                .filter(Objects::nonNull)
+                .filter(scope -> !scope.isBlank())
+                .map(String::trim)
+                .toList();
+        }
+    }
+
+    public static String getDefaultTokenUrl(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.TOKEN_URL);
+    }
+
     @Override
     public boolean connectionExists(String componentName, int connectionVersion) {
         return componentDefinitionRegistry.getComponentDefinitions()
@@ -83,7 +261,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             componentName, connection.version(), connection.authorizationName());
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
-            authorization.getApply(), ConnectionDefinitionUtils.getDefaultApply(authorization.getType()));
+            authorization.getApply(), getDefaultApply(authorization.getType()));
 
         return applyFunction.apply(new ParameterMapImpl(connection.parameters()), context);
     }
@@ -99,7 +277,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
             PkceFunction pkceFunction = OptionalUtils.orElse(
-                authorization.getPkce(), ConnectionDefinitionUtils.getDefaultPkce());
+                authorization.getPkce(), getDefaultPkce());
 
             // TODO pkce
             Authorization.Pkce pkce = pkceFunction.apply(null, null, "SHA256", context);
@@ -109,18 +287,18 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         AuthorizationCallbackFunction authorizationCallbackFunction = OptionalUtils.orElse(
             authorization.getAuthorizationCallback(),
-            ConnectionDefinitionUtils.getDefaultAuthorizationCallbackFunction(
+            getDefaultAuthorizationCallbackFunction(
                 OptionalUtils.orElse(
                     authorization.getClientId(),
-                    (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultClientId(
+                    (connectionParameters, context1) -> getDefaultClientId(
                         connectionParameters)),
                 OptionalUtils.orElse(
                     authorization.getClientSecret(),
-                    (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultClientSecret(
+                    (connectionParameters, context1) -> getDefaultClientSecret(
                         connectionParameters)),
                 OptionalUtils.orElse(
                     authorization.getTokenUrl(),
-                    (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultTokenUrl(
+                    (connectionParameters, context1) -> getDefaultTokenUrl(
                         connectionParameters)),
                 objectMapper));
 
@@ -139,7 +317,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(
                 connectionDefinition.getBaseUri(),
-                (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultBaseUri(connectionParameters));
+                (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
         return Optional.ofNullable(
             baseUriFunction.apply(
@@ -187,14 +365,14 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
             authorization.getAuthorizationUrl(),
-            (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultAuthorizationUrl(
+            (connectionParameters, context1) -> getDefaultAuthorizationUrl(
                 connectionParameters));
         ClientIdFunction clientIdFunction = OptionalUtils.orElse(
             authorization.getClientId(),
-            (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultClientId(connectionParameters));
+            (connectionParameters, context1) -> getDefaultClientId(connectionParameters));
         ScopesFunction scopesFunction = OptionalUtils.orElse(
             authorization.getScopes(),
-            (connectionParameters, context1) -> ConnectionDefinitionUtils.getDefaultScopes(connectionParameters));
+            (connectionParameters, context1) -> getDefaultScopes(connectionParameters));
 
         ParameterMapImpl connectionParameters = new ParameterMapImpl(connection.parameters());
 

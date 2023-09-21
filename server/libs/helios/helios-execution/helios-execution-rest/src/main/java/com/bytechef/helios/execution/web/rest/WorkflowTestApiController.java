@@ -30,13 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class ProjectWorkflowTestApiController implements ProjectWorkflowTestApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
+public class WorkflowTestApiController implements WorkflowTestApi {
 
     private final ConversionService conversionService;
     private final JobTestExecutor jobTestExecutor;
 
-    public ProjectWorkflowTestApiController(ConversionService conversionService,
+    public WorkflowTestApiController(ConversionService conversionService,
         JobTestExecutor jobTestExecutor) {
         this.conversionService = conversionService;
         this.jobTestExecutor = jobTestExecutor;
