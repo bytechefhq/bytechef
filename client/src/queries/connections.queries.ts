@@ -1,8 +1,8 @@
 import {
+    ConnectionApi,
     ConnectionModel,
+    ConnectionTagApi,
     GetConnectionsRequest,
-    ProjectConnectionApi,
-    ProjectConnectionTagApi,
     TagModel,
 } from '@/middleware/helios/connection';
 import {
@@ -31,13 +31,13 @@ export const useGetConnectionsQuery = (
 ) =>
     useQuery<ConnectionModel[], Error>(
         ConnectionKeys.connectionList(filters),
-        () => new ProjectConnectionApi().getConnections(filters),
+        () => new ConnectionApi().getConnections(filters),
         {enabled: false || enabledCondition}
     );
 
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>(ConnectionKeys.connectionTags, () =>
-        new ProjectConnectionTagApi().getConnectionTags()
+        new ConnectionTagApi().getConnectionTags()
     );
 
 export const useGetOAuth2AuthorizationParametersQuery = (
