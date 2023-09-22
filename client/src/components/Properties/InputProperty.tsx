@@ -65,7 +65,6 @@ const InputProperty = ({
                     data={dataPills}
                     label={label}
                     leadingIcon={leadingIcon}
-                    placeholder="Mention datapills using '${'"
                 />
             )}
 
