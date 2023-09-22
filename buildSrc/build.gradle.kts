@@ -13,9 +13,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.21.0")
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.0-beta.3")
-    implementation("com.google.cloud.tools:jib-gradle-plugin:3.3.2")
-    implementation("com.gorylenko.gradle-git-properties:gradle-git-properties:2.4.1")
-    implementation("org.springframework.boot:spring-boot-gradle-plugin:3.1.4")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:${libs.versions.spotless.plugin.gradle.get()}")
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:${libs.versions.spotbugs.gradle.plugin.get()}")
+    implementation("com.google.cloud.tools:jib-gradle-plugin:${libs.versions.jib.gradle.plugin.get()}")
+    implementation("com.gorylenko.gradle-git-properties:gradle-git-properties:${libs.versions.gradle.git.properties.get()}")
+    implementation("org.springframework.boot:spring-boot-gradle-plugin:${libs.versions.spring.boot.get()}")
 }
