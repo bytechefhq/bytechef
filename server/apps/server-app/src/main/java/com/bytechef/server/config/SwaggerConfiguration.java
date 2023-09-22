@@ -47,15 +47,4 @@ public class SwaggerConfiguration {
             })
             .build();
     }
-
-    @Bean
-    public GroupedOpenApi embeddedOpenApi() {
-        return GroupedOpenApi.builder()
-            .group("embedded")
-            .displayName("Embedded API")
-            .pathsToMatch(new String[] {
-                "/api/embedded/**"
-            })
-            .build();
-    }
 }
