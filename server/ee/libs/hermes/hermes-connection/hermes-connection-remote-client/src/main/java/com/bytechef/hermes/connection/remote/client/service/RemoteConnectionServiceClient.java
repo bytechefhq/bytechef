@@ -45,7 +45,7 @@ public class RemoteConnectionServiceClient implements RemoteConnectionService {
         return Optional.ofNullable(
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
-                    .host("connection-service-app")
+                    .host("connection-app")
                     .path("/remote/connection-service/fetch-connection/{id}")
                     .build(id),
                 Connection.class));
@@ -60,7 +60,7 @@ public class RemoteConnectionServiceClient implements RemoteConnectionService {
     public List<Connection> getConnections() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host("connection-service-app")
+                .host("connection-app")
                 .path("/remote/connection-service/get-connections")
                 .build(),
             new ParameterizedTypeReference<>() {});

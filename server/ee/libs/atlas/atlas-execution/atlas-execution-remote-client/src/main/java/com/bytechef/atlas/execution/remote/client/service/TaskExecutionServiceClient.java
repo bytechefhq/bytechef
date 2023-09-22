@@ -32,7 +32,7 @@ import java.util.List;
 @Component
 public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
 
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
     private static final String TASK_EXECUTION_SERVICE = "/remote/task-execution-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -46,7 +46,7 @@ public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
     public TaskExecution create(TaskExecution taskExecution) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/create")
                 .build(),
             taskExecution, TaskExecution.class);
@@ -56,7 +56,7 @@ public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
     public List<TaskExecution> getJobTaskExecutions(long jobId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/get-job-task-executions/{jobId}")
                 .build(jobId),
             new ParameterizedTypeReference<>() {});
@@ -66,7 +66,7 @@ public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/get-parent-task-executions/{parentId}")
                 .build(parentId),
             new ParameterizedTypeReference<>() {});
@@ -76,7 +76,7 @@ public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
     public TaskExecution getTaskExecution(long id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/get-task-execution/{id}")
                 .build(id),
             TaskExecution.class);
@@ -86,7 +86,7 @@ public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
     public TaskExecution update(TaskExecution taskExecution) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/update")
                 .build(),
             taskExecution, TaskExecution.class);

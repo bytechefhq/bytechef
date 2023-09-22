@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class RemoteCounterServiceClient implements RemoteCounterService {
 
     private static final String COUNTER_SERVICE = "/remote/counter-service";
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -42,7 +42,7 @@ public class RemoteCounterServiceClient implements RemoteCounterService {
     public void delete(long id) {
         loadBalancedWebClient.delete(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(COUNTER_SERVICE + "/delete/{id}")
                 .build(id));
     }
@@ -52,7 +52,7 @@ public class RemoteCounterServiceClient implements RemoteCounterService {
     public long decrement(long id) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(COUNTER_SERVICE + "/decrement/{id}")
                 .build(id),
             null, Long.class);
@@ -62,7 +62,7 @@ public class RemoteCounterServiceClient implements RemoteCounterService {
     public void set(long id, long value) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(COUNTER_SERVICE + "/set/{id}/{value}")
                 .build(id, value),
             null);

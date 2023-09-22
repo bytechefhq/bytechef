@@ -76,7 +76,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     public List<ConnectionDefinition>
         getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(
@@ -93,7 +93,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions() {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(

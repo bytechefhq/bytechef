@@ -61,7 +61,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(uriBuilder, serviceInstance,
@@ -75,7 +75,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(uriBuilder, serviceInstance,

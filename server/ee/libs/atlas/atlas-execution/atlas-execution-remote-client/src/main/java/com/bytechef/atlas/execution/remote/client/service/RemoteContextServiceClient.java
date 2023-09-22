@@ -33,7 +33,7 @@ import java.util.Map;
 @Component
 public class RemoteContextServiceClient implements RemoteContextService {
 
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
     private static final String INTERNAL_CONTEXT_SERVICE = "/remote/context-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -47,7 +47,7 @@ public class RemoteContextServiceClient implements RemoteContextService {
     public FileEntry peek(long stackId, Classname classname) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(INTERNAL_CONTEXT_SERVICE + "/peek/{stackId}/{classname}")
                 .build(stackId, classname),
             FileEntry.class);
@@ -57,7 +57,7 @@ public class RemoteContextServiceClient implements RemoteContextService {
     public FileEntry peek(long stackId, int subStackId, Classname classname) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(INTERNAL_CONTEXT_SERVICE + "/peek/{stackId}/{subStackId}/{classname}")
                 .build(stackId, subStackId, classname),
             FileEntry.class);
@@ -67,7 +67,7 @@ public class RemoteContextServiceClient implements RemoteContextService {
     public void push(long stackId, Classname classname, FileEntry value) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(INTERNAL_CONTEXT_SERVICE + "/push/{stackId}/{classname}")
                 .build(stackId, classname),
             value, FileEntry.class);
@@ -77,7 +77,7 @@ public class RemoteContextServiceClient implements RemoteContextService {
     public void push(long stackId, int subStackId, Classname classname, FileEntry value) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(INTERNAL_CONTEXT_SERVICE + "/push/{stackId}/{subStackId}/{classname}")
                 .build(stackId, classname),
             value, new ParameterizedTypeReference<Map<String, Object>>() {});

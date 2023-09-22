@@ -57,7 +57,7 @@ public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
         Boolean triggerDefinitions, List<String> include) {
 
         return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(

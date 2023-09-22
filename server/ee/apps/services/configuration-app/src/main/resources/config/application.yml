@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: configuration-app
+#  cloud:
+#    config:
+#      discovery:
+#        enabled: true
+#        service-id: config-server-app
+  config:
+    import: optional:configserver:http://localhost:6111
+  profiles:
+    active: #spring.profiles.active#

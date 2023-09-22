@@ -32,7 +32,7 @@ import java.util.Map;
 @Component
 public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
 
-    private static final String SCHEDULER_SERVICE_APP = "scheduler-service-app";
+    private static final String SCHEDULER_APP = "scheduler-app";
     private static final String TRIGGER_SCHEDULER = "/remote/trigger-scheduler";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -46,7 +46,7 @@ public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(SCHEDULER_SERVICE_APP)
+                .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/cancel-dynamic-webhook-trigger-refresh")
                 .build(),
             workflowExecutionId);
@@ -56,7 +56,7 @@ public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
     public void cancelPollingTrigger(String workflowExecutionId) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(SCHEDULER_SERVICE_APP)
+                .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/cancel-polling-trigger")
                 .build(),
             workflowExecutionId);
@@ -66,7 +66,7 @@ public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
     public void cancelScheduleTrigger(String workflowExecutionId) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(SCHEDULER_SERVICE_APP)
+                .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/cancel-schedule-trigger")
                 .build(),
             workflowExecutionId);
@@ -79,7 +79,7 @@ public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
 
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(SCHEDULER_SERVICE_APP)
+                .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/schedule-dynamic-webhook-trigger-refresh")
                 .build(),
             new DynamicWebhookRefreshTaskRequest(
@@ -90,7 +90,7 @@ public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(SCHEDULER_SERVICE_APP)
+                .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/schedule-polling-trigger")
                 .build(),
             workflowExecutionId);
@@ -102,7 +102,7 @@ public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
 
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(SCHEDULER_SERVICE_APP)
+                .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/schedule-schedule-trigger")
                 .build(),
             new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output));
