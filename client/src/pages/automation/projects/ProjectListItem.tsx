@@ -226,6 +226,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     createWorkflowRequestMutation={
                         createProjectWorkflowRequestMutation
                     }
+                    onClose={() => setShowWorkflowDialog(false)}
                 />
             )}
         </>
