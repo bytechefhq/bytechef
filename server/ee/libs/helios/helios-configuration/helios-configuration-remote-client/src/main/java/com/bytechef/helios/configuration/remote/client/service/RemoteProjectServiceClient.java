@@ -32,7 +32,7 @@ import java.util.List;
 @Component
 public class RemoteProjectServiceClient implements RemoteProjectService {
 
-    private static final String CONFIGURATION_SERVICE_APP = "configuration-service-app";
+    private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_SERVICE = "/remote/project-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -46,7 +46,7 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
     public Project getProject(long id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-project/{id}")
                 .build(id),
             Project.class);
@@ -56,7 +56,7 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
     public List<Project> getProjects() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-projects")
                 .build(),
             new ParameterizedTypeReference<>() {});
@@ -66,7 +66,7 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
     public Project getWorkflowProject(String workflowId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-workflow-project/{workflowId}")
                 .build(workflowId),
             Project.class);

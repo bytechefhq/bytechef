@@ -32,7 +32,7 @@ import java.util.List;
 @Component
 public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
 
-    private static final String CONFIGURATION_SERVICE_APP = "configuration-service-app";
+    private static final String CONFIGURATION_APP = "configuration-app";
     private static final String WORKFLOW_SERVICE = "/remote/workflow-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -46,7 +46,7 @@ public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
     public Workflow getWorkflow(String id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(WORKFLOW_SERVICE + "/get-workflow/{id}")
                 .build(id),
             Workflow.class);
@@ -56,7 +56,7 @@ public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
     public List<Workflow> getWorkflows() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(WORKFLOW_SERVICE + "/get-workflows")
                 .build(),
             new ParameterizedTypeReference<>() {});
@@ -66,7 +66,7 @@ public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
     public List<Workflow> getWorkflows(List<String> workflowIds) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(WORKFLOW_SERVICE + "/get-workflows/" + String.join(",", workflowIds))
                 .build(),
             new ParameterizedTypeReference<>() {});

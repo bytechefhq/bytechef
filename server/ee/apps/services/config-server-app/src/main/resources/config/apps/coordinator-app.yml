@@ -1,0 +1,4 @@
+spring:
+  task:
+    execution:
+      thread-name-prefix: coordinator-app-task-

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteJobServiceClient implements RemoteJobService {
 
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
     private static final String JOB_SERVICE = "/remote/job-service";
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -44,7 +44,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job create(JobParameters jobParameters, Workflow workflow) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/create")
                 .build(),
             new JobCreateRequest(jobParameters, workflow), Job.class);
@@ -54,7 +54,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job getJob(long id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/get-job/{id}")
                 .build(id),
             Job.class);
@@ -64,7 +64,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job getTaskExecutionJob(long taskExecutionId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/get-task-execution-job/{taskExecutionId}")
                 .build(taskExecutionId),
             Job.class);
@@ -74,7 +74,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job resumeToStatusStarted(long id) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/resume-to-status-started/{id}")
                 .build(id),
             null, Job.class);
@@ -84,7 +84,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job setStatusToStarted(long id) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/set-status-to-started/{id}")
                 .build(id),
             null, Job.class);
@@ -94,7 +94,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job setStatusToStopped(long id) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/set-status-to-stopped/{id}")
                 .build(id),
             null, Job.class);
@@ -104,7 +104,7 @@ public class RemoteJobServiceClient implements RemoteJobService {
     public Job update(Job job) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/update")
                 .build(),
             job, Job.class);

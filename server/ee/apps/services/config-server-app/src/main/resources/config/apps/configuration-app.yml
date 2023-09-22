@@ -1,0 +1,20 @@
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,db
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${bytechef.datasource.url}
+    username: ${bytechef.datasource.username}
+    password: ${bytechef.datasource.password}
+    hikari:
+      poolName: Hikari
+  liquibase:
+    contexts: configuration
+  task:
+    execution:
+      thread-name-prefix: configuration-app-task-

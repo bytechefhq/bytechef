@@ -32,7 +32,7 @@ import java.util.Map;
 
 public abstract class AbstractWorkerClient {
 
-    protected static final String WORKER_SERVICE_APP = "worker-service-app";
+    protected static final String WORKER_APP = "worker-app";
     protected final DefaultWebClient defaultWebClient;
 
     protected final DiscoveryClient discoveryClient;
@@ -70,7 +70,7 @@ public abstract class AbstractWorkerClient {
 
     private UriBuilder build(UriBuilder uriBuilder, String componentName, String path) {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
-            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, objectMapper);
+            discoveryClient.getInstances(WORKER_APP), componentName, objectMapper);
 
         return build(uriBuilder, serviceInstance, path);
     }

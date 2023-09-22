@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: config-server-app
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: classpath:/config/apps
+  profiles:
+    active: dev,native
+bytechef:
+  discovery-service:
+    provider: redis

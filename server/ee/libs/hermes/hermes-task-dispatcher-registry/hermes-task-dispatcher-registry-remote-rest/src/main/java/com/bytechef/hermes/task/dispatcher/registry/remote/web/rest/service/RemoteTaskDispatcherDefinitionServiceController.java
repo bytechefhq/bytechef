@@ -35,7 +35,7 @@ import java.util.List;
 @Hidden
 @RestController
 @RequestMapping("/remote/task-dispatcher-definition-service")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "coordinator-service-app")
+@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "coordinator-app")
 public class RemoteTaskDispatcherDefinitionServiceController {
 
     private final RemoteTaskDispatcherDefinitionService taskDispatcherDefinitionService;

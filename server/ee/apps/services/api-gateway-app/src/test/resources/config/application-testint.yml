@@ -1,0 +1,14 @@
+server:
+  port: 9999
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: connection-service
+          uri: lb://connection-app
+          predicates:
+            - Path=/api/automation/connections/**

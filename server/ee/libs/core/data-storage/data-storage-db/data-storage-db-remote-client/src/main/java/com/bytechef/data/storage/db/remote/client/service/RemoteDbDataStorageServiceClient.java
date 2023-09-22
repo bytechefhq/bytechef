@@ -29,7 +29,7 @@ import java.util.Optional;
  */
 public class RemoteDbDataStorageServiceClient implements RemoteDbDataStorageService {
 
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
     private static final String DATA_STORAGE_SERVICE = "/remote/db-ddata-storage-service";
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -53,7 +53,7 @@ public class RemoteDbDataStorageServiceClient implements RemoteDbDataStorageServ
     public void put(String context, int scope, long scopeId, String key, Object value) {
         loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE + "/save/{context}/{scope}/{scopeId}/{key}")
                 .build(context, scope, scope, key),
             value);
@@ -62,7 +62,7 @@ public class RemoteDbDataStorageServiceClient implements RemoteDbDataStorageServ
     private <T> T get(int scope, long scopeId, String key, ParameterizedTypeReference<T> responseTypeRef) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE + "/fetch-value/{scope}/{scopeId}/{key}")
                 .build(scope, scopeId, key),
             responseTypeRef);
