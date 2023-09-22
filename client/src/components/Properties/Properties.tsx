@@ -21,6 +21,7 @@ import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
 import Input from '../Input/Input';
+import MentionsInput from '../MentionsInput/MentionsInput';
 import ArrayProperty from './ArrayProperty';
 import InputProperty from './InputProperty';
 import ObjectProperty from './ObjectProperty';
@@ -171,7 +172,19 @@ export const Property = ({
                     />
                 )}
 
-            {controlType === 'INTEGER' && (
+            {controlType === 'INTEGER' && !!dataPills?.length && (
+                <MentionsInput
+                    controlType={controlType}
+                    data={dataPills}
+                    description={description}
+                    fieldsetClassName="flex-1 mb-0"
+                    key={name}
+                    label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                />
+            )}
+
+            {controlType === 'INTEGER' && !dataPills?.length && (
                 <Input
                     description={description}
                     error={hasError(name!)}
