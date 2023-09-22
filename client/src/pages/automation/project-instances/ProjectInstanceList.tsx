@@ -2,7 +2,6 @@ import {
     useGetProjectInstanceTagsQuery,
     useGetProjectInstancesQuery,
 } from '@/queries/projects.queries';
-import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import {
     Accordion,
     AccordionContent,
@@ -11,8 +10,6 @@ import {
 import {ProjectModel} from 'middleware/helios/configuration';
 import {useSearchParams} from 'react-router-dom';
 
-import EmptyList from '../../../components/EmptyList/EmptyList';
-import ProjectInstanceDialog from './ProjectInstanceDialog';
 import ProjectInstanceListItem from './ProjectInstanceListItem';
 import ProjectInstanceWorkflowList from './ProjectInstanceWorkflowList';
 
@@ -38,68 +35,55 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
 
             {error && !isLoading && `An error has occurred: ${error.message}`}
 
-            {!isLoading &&
-                !error &&
-                (projectInstances?.length === 0 ? (
-                    <EmptyList
-                        button={<ProjectInstanceDialog />}
-                        icon={
-                            <FolderPlusIcon className="h-12 w-12 text-gray-400" />
+            {!isLoading && !error && projectInstances.length > 0 && (
+                <Accordion type="multiple" className="mb-8">
+                    <h3 className="mb-1 px-2 text-xl font-semibold text-gray-900">
+                        {project.name}
+                    </h3>
+
+                    {projectInstances.map((projectInstance) => {
+                        const projectTagIds = projectInstance.tags?.map(
+                            (tag) => tag.id
+                        );
+
+                        if (!project.id) {
+                            return;
                         }
-                        message="Get started by creating a new project instance."
-                        title="No instances of projects"
-                    />
-                ) : (
-                    <Accordion type="multiple" className="mb-8">
-                        <h3 className="mb-1 px-2 text-xl font-semibold text-gray-900">
-                            {project.name}
-                        </h3>
 
-                        {projectInstances.map((projectInstance) => {
-                            const projectTagIds = projectInstance.tags?.map(
-                                (tag) => tag.id
-                            );
+                        return (
+                            <AccordionItem
+                                value={projectInstance.id!.toString()}
+                                key={projectInstance.id}
+                                className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
+                            >
+                                <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50">
+                                    <ProjectInstanceListItem
+                                        projectInstance={projectInstance}
+                                        key={projectInstance.id}
+                                        remainingTags={tags?.filter(
+                                            (tag) =>
+                                                !projectTagIds?.includes(tag.id)
+                                        )}
+                                        project={project}
+                                    />
+                                </div>
 
-                            if (!project.id) {
-                                return;
-                            }
-
-                            return (
-                                <AccordionItem
-                                    value={projectInstance.id!.toString()}
-                                    key={projectInstance.id}
-                                    className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
-                                >
-                                    <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50">
-                                        <ProjectInstanceListItem
-                                            projectInstance={projectInstance}
-                                            key={projectInstance.id}
-                                            remainingTags={tags?.filter(
-                                                (tag) =>
-                                                    !projectTagIds?.includes(
-                                                        tag.id
-                                                    )
-                                            )}
-                                            project={project}
-                                        />
-                                    </div>
-
-                                    <AccordionContent>
-                                        <ProjectInstanceWorkflowList
-                                            projectId={project.id}
-                                            projectInstanceEnabled={
-                                                projectInstance.enabled
-                                            }
-                                            projectInstanceWorkflows={
-                                                projectInstance.projectInstanceWorkflows
-                                            }
-                                        />
-                                    </AccordionContent>
-                                </AccordionItem>
-                            );
-                        })}
-                    </Accordion>
-                ))}
+                                <AccordionContent>
+                                    <ProjectInstanceWorkflowList
+                                        projectId={project.id}
+                                        projectInstanceEnabled={
+                                            projectInstance.enabled
+                                        }
+                                        projectInstanceWorkflows={
+                                            projectInstance.projectInstanceWorkflows
+                                        }
+                                    />
+                                </AccordionContent>
+                            </AccordionItem>
+                        );
+                    })}
+                </Accordion>
+            )}
         </div>
     );
 };
