@@ -103,6 +103,13 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
     }
 
     @Override
+    public Workflow duplicateWorkflow(String id) {
+        Workflow workflow = getWorkflow(id);
+
+        return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
+    }
+
+    @Override
     @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
     public Workflow getWorkflow(@NonNull String id) {
