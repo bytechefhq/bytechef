@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:40.155708+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-23T06:45:09.319464+02:00[Europe/Zagreb]")
 public class NumberPropertyModel extends PropertyModel {
 
   private Integer maxValue;
@@ -156,52 +156,52 @@ public class NumberPropertyModel extends PropertyModel {
 
 
   public NumberPropertyModel advancedOption(Boolean advancedOption) {
-    super.setAdvancedOption(advancedOption);
+    super.advancedOption(advancedOption);
     return this;
   }
 
   public NumberPropertyModel description(String description) {
-    super.setDescription(description);
+    super.description(description);
     return this;
   }
 
   public NumberPropertyModel displayCondition(String displayCondition) {
-    super.setDisplayCondition(displayCondition);
+    super.displayCondition(displayCondition);
     return this;
   }
 
   public NumberPropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+    super.expressionEnabled(expressionEnabled);
     return this;
   }
 
   public NumberPropertyModel hidden(Boolean hidden) {
-    super.setHidden(hidden);
+    super.hidden(hidden);
     return this;
   }
 
   public NumberPropertyModel label(String label) {
-    super.setLabel(label);
+    super.label(label);
     return this;
   }
 
   public NumberPropertyModel name(String name) {
-    super.setName(name);
+    super.name(name);
     return this;
   }
 
   public NumberPropertyModel placeholder(String placeholder) {
-    super.setPlaceholder(placeholder);
+    super.placeholder(placeholder);
     return this;
   }
 
   public NumberPropertyModel required(Boolean required) {
-    super.setRequired(required);
+    super.required(required);
     return this;
   }
 
   public NumberPropertyModel type(PropertyTypeModel type) {
-    super.setType(type);
+    super.type(type);
     return this;
   }
   @Override

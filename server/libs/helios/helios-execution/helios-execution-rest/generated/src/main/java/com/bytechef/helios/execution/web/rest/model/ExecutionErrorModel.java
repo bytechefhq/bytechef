@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:39.139558+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-23T06:45:08.050350+02:00[Europe/Zagreb]")
 public class ExecutionErrorModel {
 
   private String message;

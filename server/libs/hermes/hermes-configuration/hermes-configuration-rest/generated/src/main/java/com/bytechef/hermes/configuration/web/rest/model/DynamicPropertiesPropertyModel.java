@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:40.155708+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-23T06:45:09.319464+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private PropertiesDataSourceModel propertiesDataSource;
@@ -55,52 +55,52 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
 
 
   public DynamicPropertiesPropertyModel advancedOption(Boolean advancedOption) {
-    super.setAdvancedOption(advancedOption);
+    super.advancedOption(advancedOption);
     return this;
   }
 
   public DynamicPropertiesPropertyModel description(String description) {
-    super.setDescription(description);
+    super.description(description);
     return this;
   }
 
   public DynamicPropertiesPropertyModel displayCondition(String displayCondition) {
-    super.setDisplayCondition(displayCondition);
+    super.displayCondition(displayCondition);
     return this;
   }
 
   public DynamicPropertiesPropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+    super.expressionEnabled(expressionEnabled);
     return this;
   }
 
   public DynamicPropertiesPropertyModel hidden(Boolean hidden) {
-    super.setHidden(hidden);
+    super.hidden(hidden);
     return this;
   }
 
   public DynamicPropertiesPropertyModel label(String label) {
-    super.setLabel(label);
+    super.label(label);
     return this;
   }
 
   public DynamicPropertiesPropertyModel name(String name) {
-    super.setName(name);
+    super.name(name);
     return this;
   }
 
   public DynamicPropertiesPropertyModel placeholder(String placeholder) {
-    super.setPlaceholder(placeholder);
+    super.placeholder(placeholder);
     return this;
   }
 
   public DynamicPropertiesPropertyModel required(Boolean required) {
-    super.setRequired(required);
+    super.required(required);
     return this;
   }
 
   public DynamicPropertiesPropertyModel type(PropertyTypeModel type) {
-    super.setType(type);
+    super.type(type);
     return this;
   }
   @Override

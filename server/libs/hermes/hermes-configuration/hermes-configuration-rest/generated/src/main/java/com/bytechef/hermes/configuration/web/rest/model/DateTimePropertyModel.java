@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateTimeProperty", description = "A date-time property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:40.155708+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-23T06:45:09.319464+02:00[Europe/Zagreb]")
 public class DateTimePropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -91,67 +91,67 @@ public class DateTimePropertyModel extends ValuePropertyModel {
 
 
   public DateTimePropertyModel controlType(ControlTypeModel controlType) {
-    super.setControlType(controlType);
+    super.controlType(controlType);
     return this;
   }
 
   public DateTimePropertyModel defaultValue(Object defaultValue) {
-    super.setDefaultValue(defaultValue);
+    super.defaultValue(defaultValue);
     return this;
   }
 
   public DateTimePropertyModel exampleValue(Object exampleValue) {
-    super.setExampleValue(exampleValue);
+    super.exampleValue(exampleValue);
     return this;
   }
 
   public DateTimePropertyModel advancedOption(Boolean advancedOption) {
-    super.setAdvancedOption(advancedOption);
+    super.advancedOption(advancedOption);
     return this;
   }
 
   public DateTimePropertyModel description(String description) {
-    super.setDescription(description);
+    super.description(description);
     return this;
   }
 
   public DateTimePropertyModel displayCondition(String displayCondition) {
-    super.setDisplayCondition(displayCondition);
+    super.displayCondition(displayCondition);
     return this;
   }
 
   public DateTimePropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+    super.expressionEnabled(expressionEnabled);
     return this;
   }
 
   public DateTimePropertyModel hidden(Boolean hidden) {
-    super.setHidden(hidden);
+    super.hidden(hidden);
     return this;
   }
 
   public DateTimePropertyModel label(String label) {
-    super.setLabel(label);
+    super.label(label);
     return this;
   }
 
   public DateTimePropertyModel name(String name) {
-    super.setName(name);
+    super.name(name);
     return this;
   }
 
   public DateTimePropertyModel placeholder(String placeholder) {
-    super.setPlaceholder(placeholder);
+    super.placeholder(placeholder);
     return this;
   }
 
   public DateTimePropertyModel required(Boolean required) {
-    super.setRequired(required);
+    super.required(required);
     return this;
   }
 
   public DateTimePropertyModel type(PropertyTypeModel type) {
-    super.setType(type);
+    super.type(type);
     return this;
   }
   @Override

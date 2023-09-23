@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:40.155708+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-23T06:45:09.319464+02:00[Europe/Zagreb]")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -198,67 +198,67 @@ public class ObjectPropertyModel extends ValuePropertyModel {
 
 
   public ObjectPropertyModel controlType(ControlTypeModel controlType) {
-    super.setControlType(controlType);
+    super.controlType(controlType);
     return this;
   }
 
   public ObjectPropertyModel defaultValue(Object defaultValue) {
-    super.setDefaultValue(defaultValue);
+    super.defaultValue(defaultValue);
     return this;
   }
 
   public ObjectPropertyModel exampleValue(Object exampleValue) {
-    super.setExampleValue(exampleValue);
+    super.exampleValue(exampleValue);
     return this;
   }
 
   public ObjectPropertyModel advancedOption(Boolean advancedOption) {
-    super.setAdvancedOption(advancedOption);
+    super.advancedOption(advancedOption);
     return this;
   }
 
   public ObjectPropertyModel description(String description) {
-    super.setDescription(description);
+    super.description(description);
     return this;
   }
 
   public ObjectPropertyModel displayCondition(String displayCondition) {
-    super.setDisplayCondition(displayCondition);
+    super.displayCondition(displayCondition);
     return this;
   }
 
   public ObjectPropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+    super.expressionEnabled(expressionEnabled);
     return this;
   }
 
   public ObjectPropertyModel hidden(Boolean hidden) {
-    super.setHidden(hidden);
+    super.hidden(hidden);
     return this;
   }
 
   public ObjectPropertyModel label(String label) {
-    super.setLabel(label);
+    super.label(label);
     return this;
   }
 
   public ObjectPropertyModel name(String name) {
-    super.setName(name);
+    super.name(name);
     return this;
   }
 
   public ObjectPropertyModel placeholder(String placeholder) {
-    super.setPlaceholder(placeholder);
+    super.placeholder(placeholder);
     return this;
   }
 
   public ObjectPropertyModel required(Boolean required) {
-    super.setRequired(required);
+    super.required(required);
     return this;
   }
 
   public ObjectPropertyModel type(PropertyTypeModel type) {
-    super.setType(type);
+    super.type(type);
     return this;
   }
   @Override
