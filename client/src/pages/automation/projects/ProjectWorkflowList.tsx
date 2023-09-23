@@ -7,11 +7,14 @@ import {
 } from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {ProjectModel} from 'middleware/helios/configuration';
+import {ProjectModel, WorkflowModel} from 'middleware/helios/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
+import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
+
+import ProjectInstanceEditWorkflowDialog from '../project-instances/ProjectInstanceEditWorkflowDialog';
 
 const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(project.id!);
@@ -28,6 +31,12 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const workflowTaskDispatcherDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
+
+    const [selectedWorkflow, setSelectedWorkflow] = useState<
+        WorkflowModel | undefined
+    >(undefined);
+
+    const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
     return (
         <div className="border-b border-b-gray-100 py-2">
@@ -91,6 +100,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                                     workflowComponentDefinitions[
                                                         name
                                                     ];
+
                                                 const taskDispatcherDefinition =
                                                     workflowTaskDispatcherDefinitions[
                                                         name
@@ -144,14 +154,14 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                         {
                                             label: 'Edit',
                                             onClick: () => {
-                                                console.log('TODO');
+                                                setSelectedWorkflow(workflow);
+
+                                                setShowEditWorkflowDialog(true);
                                             },
                                         },
                                         {
                                             label: 'Duplicate',
-                                            onClick: () => {
-                                                console.log('TODO');
-                                            },
+                                            onClick: () => console.log('TODO'),
                                         },
                                         {
                                             separator: true,
@@ -166,6 +176,17 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                     ]}
                                 />
                             </div>
+
+                            {showEditWorkflowDialog && (
+                                <ProjectInstanceEditWorkflowDialog
+                                    workflow={selectedWorkflow!}
+                                    showTrigger={false}
+                                    visible
+                                    onClose={() =>
+                                        setShowEditWorkflowDialog(false)
+                                    }
+                                />
+                            )}
                         </li>
                     );
                 })}
