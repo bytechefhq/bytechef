@@ -26,6 +26,10 @@ export interface DeleteWorkflowRequest {
     id: string;
 }
 
+export interface DuplicateWorkflowRequest {
+    id: string;
+}
+
 export interface GetProjectWorkflowsRequest {
     id: number;
 }
@@ -73,6 +77,38 @@ export class WorkflowApi extends runtime.BaseAPI {
      */
     async deleteWorkflow(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteWorkflowRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Duplicates existing workflow.
+     * Duplicates existing workflow.
+     */
+    async duplicateWorkflowRaw(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling duplicateWorkflow.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/duplicate`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Duplicates existing workflow.
+     * Duplicates existing workflow.
+     */
+    async duplicateWorkflow(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
+        const response = await this.duplicateWorkflowRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
