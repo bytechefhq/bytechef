@@ -608,6 +608,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /workflows/{id}/duplicate:
+    post:
+      description: "Duplicates existing workflow."
+      summary: "Duplicates existing workflow."
+      tags:
+        - "workflow"
+      operationId: "duplicateWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The duplicated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
 components:
   schemas:
     Category:
