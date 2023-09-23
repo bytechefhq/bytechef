@@ -6,9 +6,6 @@ import {
 } from '@/components/ui/tooltip';
 import {TagModel} from '@/middleware/helios/configuration';
 import {DataPillType} from '@/types/types';
-
-/// <reference types="vite-plugin-svgr/client" />
-
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
