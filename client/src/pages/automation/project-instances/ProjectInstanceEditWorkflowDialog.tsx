@@ -1,20 +1,25 @@
 import Button from '@/components/Button/Button';
 import Dialog from '@/components/Dialog/Dialog';
-import {WorkflowModel} from '@/middleware/helios/configuration';
+import {
+    ProjectInstanceModel,
+    WorkflowModel,
+} from '@/middleware/helios/configuration';
 import {Close} from '@radix-ui/react-dialog';
 import {useState} from 'react';
+import {UseFormRegister} from 'react-hook-form';
 
 import {ProjectInstanceDialogWorkflowListItem} from './ProjectInstanceDialogWorkflowsStep';
 
 interface ProjectInstanceEditWorkflowDialogProps {
-    workflow: WorkflowModel;
-    showTrigger?: boolean;
-    visible?: boolean;
     onClose?: () => void;
+    register?: UseFormRegister<ProjectInstanceModel>;
+    visible?: boolean;
+    workflow: WorkflowModel;
 }
 
 const ProjectInstanceEditWorkflowDialog = ({
     onClose,
+    register,
     visible = false,
     workflow,
 }: ProjectInstanceEditWorkflowDialogProps) => {
@@ -48,6 +53,7 @@ const ProjectInstanceEditWorkflowDialog = ({
                         key={workflow.id!}
                         workflow={workflow}
                         label="Enable"
+                        register={register}
                     />
 
                     <div className="mt-4 flex w-full justify-end space-x-2 self-end">

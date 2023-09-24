@@ -2,6 +2,7 @@ import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
+    ProjectInstanceModel,
     ProjectInstanceWorkflowModel,
     WorkflowModel,
 } from '@/middleware/helios/configuration';
@@ -11,6 +12,7 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefi
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
+import {UseFormRegister} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 
@@ -20,10 +22,12 @@ const ProjectInstanceWorkflowList = ({
     projectId,
     projectInstanceEnabled,
     projectInstanceWorkflows,
+    register,
 }: {
     projectId: number;
     projectInstanceEnabled?: boolean;
     projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
+    register: UseFormRegister<ProjectInstanceModel>;
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
@@ -190,12 +194,12 @@ const ProjectInstanceWorkflowList = ({
 
                             {showEditWorkflowDialog && (
                                 <ProjectInstanceEditWorkflowDialog
-                                    workflow={selectedWorkflow!}
-                                    showTrigger={false}
-                                    visible
                                     onClose={() =>
                                         setShowEditWorkflowDialog(false)
                                     }
+                                    register={register}
+                                    visible
+                                    workflow={selectedWorkflow!}
                                 />
                             )}
                         </li>
