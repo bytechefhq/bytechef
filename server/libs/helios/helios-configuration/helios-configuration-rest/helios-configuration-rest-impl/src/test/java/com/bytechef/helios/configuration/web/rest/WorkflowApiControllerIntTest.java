@@ -188,7 +188,7 @@ public class WorkflowApiControllerIntTest {
 
     private Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            DEFINITION, Workflow.Format.JSON, "1", objectMapper.readValue(DEFINITION, new TypeReference<>() {}),
+            "1", DEFINITION, Workflow.Format.JSON, objectMapper.readValue(DEFINITION, new TypeReference<>() {}),
             Map.of());
     }
 }
