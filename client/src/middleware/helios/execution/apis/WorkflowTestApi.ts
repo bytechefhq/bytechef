@@ -50,7 +50,7 @@ export class WorkflowTestApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/tests`,
+            path: `/tests/workflows`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
