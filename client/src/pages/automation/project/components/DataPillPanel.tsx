@@ -10,6 +10,7 @@ import {
 } from '@/middleware/hermes/configuration';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
+import {PropertyType} from '@/types/projectTypes';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -75,22 +76,35 @@ const DataPillPanel = () => {
         !!componentActions?.length
     );
 
-    const componentActionData = actionData?.map((actionDatum, index) => {
+    if (!actionData?.length) {
+        return <></>;
+    }
+
+    const previousActions = actionData.filter((action) =>
+        previousComponentNames.includes(action.componentName!)
+    );
+
+    const componentActionData = previousActions.map((action, index) => {
         const componentData = previousComponents?.find(
             (component) =>
                 component.name === normalizedPreviousComponentNames[index]
         );
 
-        return {
-            ...actionDatum,
-            component: componentData,
-            workflowAlias: componentNames[index],
-        };
+        if (previousComponentNames.includes(action.componentName!)) {
+            return {
+                ...action,
+                component: componentData,
+                workflowAlias: componentNames[index],
+            };
+        }
     });
 
-    if (!componentActionData?.length) {
-        return <></>;
-    }
+    const dataPillComponentData = componentActionData.filter(
+        (action) =>
+            action!.workflowAlias !== currentNode.name &&
+            action!.component &&
+            (action!.outputSchema as PropertyType).properties
+    );
 
     return (
         <Dialog.Root
@@ -157,13 +171,10 @@ const DataPillPanel = () => {
                                 value={dataPillFilterQuery}
                             />
 
-                            {actionData?.length && (
+                            {dataPillComponentData?.length && (
                                 <DataPillPanelBody
-                                    actionData={actionData}
-                                    componentActionData={
-                                        componentActionData.filter(
-                                            (data) => data.component
-                                        ) as Array<ComponentActionData>
+                                    componentData={
+                                        dataPillComponentData as Array<ComponentActionData>
                                     }
                                     containerHeight={panelContainerHeight}
                                     dataPillFilterQuery={dataPillFilterQuery}

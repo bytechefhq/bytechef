@@ -266,12 +266,14 @@ const NodeDetailsDialog = () => {
 
                     setComponentActions(componentActions);
                 } else {
+                    const otherComponentActions = componentActions.filter(
+                        (action) =>
+                            action.workflowAlias !==
+                            currentComponent?.workflowAlias
+                    );
+
                     setComponentActions([
-                        ...componentActions.filter(
-                            (action) =>
-                                action.workflowAlias !==
-                                currentComponent?.workflowAlias
-                        ),
+                        ...otherComponentActions,
                         {
                             actionName: currentAction.name,
                             componentName: currentComponent.name,
