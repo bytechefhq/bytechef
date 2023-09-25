@@ -88,12 +88,14 @@ const WorkflowExecutionDetailsDialog = () => {
                         </Dialog.Title>
 
                         {!!workflowExecution?.job?.taskExecutions?.length && (
-                            <WorkflowTaskListAccordion
-                                allTasksCompleted={!!allTasksCompleted}
-                                taskExecutions={
-                                    workflowExecution.job.taskExecutions
-                                }
-                            />
+                            <div className="overflow-y-auto">
+                                <WorkflowTaskListAccordion
+                                    allTasksCompleted={!!allTasksCompleted}
+                                    taskExecutions={
+                                        workflowExecution.job.taskExecutions
+                                    }
+                                />
+                            </div>
                         )}
                     </div>
 
