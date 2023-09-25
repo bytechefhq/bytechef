@@ -1,4 +1,3 @@
-import {ActionDefinitionModel} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
 import {
     Accordion,
@@ -14,25 +13,23 @@ import DataPill from './DataPill';
 import {ComponentActionData} from './DataPillPanel';
 
 type DataPillPanelBodyProps = {
-    actionData: ActionDefinitionModel[];
-    componentActionData: Array<ComponentActionData>;
+    componentData: Array<ComponentActionData>;
     containerHeight: number;
     dataPillFilterQuery: string;
 };
 
 const DataPillPanelBody = ({
-    actionData,
-    componentActionData,
+    componentData,
     containerHeight,
     dataPillFilterQuery,
 }: DataPillPanelBodyProps) => (
     <Accordion className="h-full" collapsible type="single">
-        {componentActionData?.map(
+        {componentData.map(
             (componentAction: ComponentActionData, index: number) => {
                 const {icon, title} = componentAction.component;
 
                 const outputSchema: PropertyType | undefined =
-                    actionData[index]?.outputSchema;
+                    componentData[index]?.outputSchema;
 
                 const properties = outputSchema?.properties?.length
                     ? outputSchema.properties
