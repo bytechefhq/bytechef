@@ -225,7 +225,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowExecution"
-  /workflows/tests:
+  /tests/workflows:
     post:
       description: "Execute a workflow synchronously for testing purposes."
       summary: "Execute a workflow synchronously for testing purpose"
