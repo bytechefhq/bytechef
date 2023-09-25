@@ -5,7 +5,8 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import getRandomId from '@/pages/automation/project/utils/getRandomId';
-import QuillMention from 'quill-mention';
+
+import 'quill-mention';
 import React, {ReactNode, useCallback, useMemo, useRef, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
@@ -19,16 +20,21 @@ import {twMerge} from 'tailwind-merge';
 
 import MentionBlot from './MentionBlot';
 
-Quill.register('modules/mentions', QuillMention);
 Quill.register('formats/bytechef-mention', MentionBlot);
 
-const MentionInputListItem = (item: DataPillType) => `
-    <div>
-        <span>${item.icon}</span>
+const MentionInputListItem = (item: DataPillType) => {
+    const div = document.createElement('div');
 
-        <span>${item.value}</span>
-    </div>
-`;
+    div.innerHTML = `
+        <div>
+            <span>${item.icon}</span>
+
+            <span>${item.value}</span>
+        </div>
+    `;
+
+    return div;
+};
 
 type MentionsInputProps = {
     controlType?: string;
@@ -61,7 +67,7 @@ const MentionsInput = ({
     const modules = {
         mention: {
             allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
-            blotName: 'mention',
+            blotName: 'bytechef-mention',
             dataAttributes: ['component'],
             fixMentionsToQuill: true,
             mentionDenotationChars: ['{'],
