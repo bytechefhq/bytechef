@@ -8,15 +8,19 @@ spring:
         - id: configuration-service
           uri: lb://configuration-app
           predicates:
-          - Path=/api/oauth2/authorization-parameters,/api/oauth2-properties,/api/project-categories/**,/api/project-tags/**,/api/project-workflows/**,/api/projects/**,/api/project-instances/**,/api/project-instance-tags/**,/api/action-definitions/**,/api/component-definitions/**,/api/connection-definitions/**,/api/task-dispatcher-definitions/**,/api/integration-categories/**,/api/integration-tags/**,/api/integration-workflows/**,/api/integrations/**
+          - Path=/api/automation/categories/**,/api/automation/projects/**,/api/automation/project-instances/**,/api/automation/project-instances/tags/**,/api/automation/projects/tags/**,/api/automation/workflows/**,/api/core/oauth2/authorization-parameters,/api/core/oauth2/properties,/api/core/action-definitions/**,/api/core/component-definitions/**,/api/core/connection-definitions/**,/api/core/task-dispatcher-definitions/**,/api/embedded/categories/**,/api/embedded/integrations/tags/**,/api/embedded/integrations/**,/api/embedded/workflows/**
         - id: connection-service
           uri: lb://connection-app
           predicates:
-            - Path=/api/project-connection-tags/**,/api/project-connections/**
+            - Path=/api/automation/connections/tags/**,/api/automation/connections/**
         - id: execution-service
           uri: lb://execution-app
           predicates:
-            - Path=/api/project-jobs/**,/api/project-workflow-executions/**,/api/project-workflow-tests
+            - Path=/api/automation/jobs/**,/api/automation/workflow-executions/**,/api/automation/tests/workflows
+        - id: webhook-service
+          uri: lb://webhook-app
+          predicates:
+            - Path=/webhooks/**
 
 server:
   servlet:

@@ -214,7 +214,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade, Rem
             Connection connection = connectionService.getConnection(connectionId);
 
             componentConnection = new ComponentConnection(
-                connection.getVersion(), connection.getParameters(), connection.getAuthorizationName());
+                connection.getConnectionVersion(), connection.getParameters(), connection.getAuthorizationName());
         }
 
         return componentConnection;

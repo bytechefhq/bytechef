@@ -20,27 +20,12 @@ package com.bytechef.atlas.configuration.workflow.mapper;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Map;
-
 /**
  * @author Ivica Cardic
  */
 class JsonWorkflowMapper extends AbstractWorkflowMapper {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    @Override
-    public Workflow readWorkflow(WorkflowResource workflowResource) {
-        return readWorkflow(workflowResource, OBJECT_MAPPER);
-    }
-
-    @Override
-    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
-        return readWorkflowMap(workflowResource, OBJECT_MAPPER);
-    }
-
-    @Override
-    public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == Workflow.Format.JSON ? this : null;
+    JsonWorkflowMapper() {
+        super(Workflow.Format.JSON, new ObjectMapper());
     }
 }

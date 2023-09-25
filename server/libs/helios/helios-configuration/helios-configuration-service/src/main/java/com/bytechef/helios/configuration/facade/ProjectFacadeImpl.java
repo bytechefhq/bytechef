@@ -127,6 +127,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         project.setId(null);
         project.setName(generateName(project.getName()));
         project.setVersion(0);
+        project.setTagIds(project.getTagIds());
         project.setWorkflowIds(copyWorkflowIds(project.getWorkflowIds()));
 
         project = projectService.create(project);

@@ -47,7 +47,7 @@ public class RemoteJobServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/create/",
+        value = "/create",
         produces = {
             "application/json"
         })

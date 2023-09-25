@@ -227,13 +227,13 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeTrigger(
                 triggerRequest.componentName, triggerRequest.componentVersion,
-                triggerRequest.triggerName, triggerRequest.triggerParameter, triggerRequest.state,
+                triggerRequest.triggerName, triggerRequest.triggerParameters, triggerRequest.state,
                 triggerRequest.webhookRequest, triggerRequest.connectionId));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/validate-webhook-trigger",
+        value = "/execute-webhook-validate",
         produces = {
             "application/json"
         })
@@ -243,7 +243,7 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeWebhookValidate(
                 webhookValidateRequest.componentName, webhookValidateRequest.componentVersion,
-                webhookValidateRequest.triggerName, webhookValidateRequest.triggerParameter,
+                webhookValidateRequest.triggerName, webhookValidateRequest.triggerParameters,
                 webhookValidateRequest.webhookRequest, webhookValidateRequest.connectionId));
     }
 
@@ -311,13 +311,13 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String componentName, int componentVersion, String triggerName, @NotNull Map<String, ?> triggerParameter,
+        String componentName, int componentVersion, String triggerName, @NotNull Map<String, ?> triggerParameters,
         Object state, @NotNull WebhookRequest webhookRequest, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record WebhookValidateRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> triggerParameter, @NotNull WebhookRequest webhookRequest, Long connectionId) {
+        @NotNull Map<String, ?> triggerParameters, @NotNull WebhookRequest webhookRequest, Long connectionId) {
     }
 }

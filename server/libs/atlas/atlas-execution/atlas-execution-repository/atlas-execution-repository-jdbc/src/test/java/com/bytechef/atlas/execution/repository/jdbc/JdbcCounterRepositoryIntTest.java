@@ -101,7 +101,6 @@ public class JdbcCounterRepositoryIntTest {
         Counter counter = new Counter();
 
         counter.setId(taskExecutionId);
-        counter.setNew(true);
         counter.setValue(3L);
 
         return counter;
