@@ -38,7 +38,7 @@ public class ResourceWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(2)
-    @ConditionalOnProperty(prefix = "bytechef", name = "workflowrepository.filesystem.enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
     WorkflowRepository filesystemBasedWorkflowRepository(
         @Value("${bytechef.workflow.repository.filesystem.location-pattern}") String locationPattern) {
         return new FilesystemResourceWorkflowRepository(locationPattern);

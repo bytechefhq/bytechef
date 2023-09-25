@@ -406,7 +406,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Override
     public String toString() {
         return "TriggerExecution{" + "id="
-            + id + ", jobId="
+            + id + ", status="
             + status + ", startDate="
             + startDate + ", endDate="
             + endDate + ", executionTime="

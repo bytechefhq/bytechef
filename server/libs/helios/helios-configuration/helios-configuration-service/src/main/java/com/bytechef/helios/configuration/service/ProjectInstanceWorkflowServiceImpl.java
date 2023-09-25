@@ -78,8 +78,8 @@ public class ProjectInstanceWorkflowServiceImpl
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
         Assert.notNull(workflowId, "'workflowId' must not be null");
 
-        return projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId)
-            .orElseThrow();
+        return OptionalUtils.get(
+            projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId));
     }
 
     @Override

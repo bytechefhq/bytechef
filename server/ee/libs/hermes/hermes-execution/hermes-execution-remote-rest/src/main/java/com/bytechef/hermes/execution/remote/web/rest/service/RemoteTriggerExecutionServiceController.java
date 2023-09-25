@@ -52,7 +52,7 @@ public class RemoteTriggerExecutionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<TriggerExecution> create(TriggerExecution triggerExecution) {
+    public ResponseEntity<TriggerExecution> create(@RequestBody TriggerExecution triggerExecution) {
         return ResponseEntity.ok(triggerExecutionService.create(triggerExecution));
     }
 
@@ -70,7 +70,7 @@ public class RemoteTriggerExecutionServiceController {
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.PUT,
         value = "/update",
         consumes = {
             "application/json"

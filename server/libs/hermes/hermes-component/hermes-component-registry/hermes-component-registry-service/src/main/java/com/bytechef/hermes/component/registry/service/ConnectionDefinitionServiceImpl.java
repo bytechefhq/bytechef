@@ -22,6 +22,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
@@ -85,10 +86,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return switch (type) {
             case API_KEY -> (ParameterMap connectionParameters, Context context) -> {
                 String addTo = MapUtils.getString(
-                    connectionParameters, AuthorizationConstants.ADD_TO, Authorization.ApiTokenLocation.HEADER.name());
+                    connectionParameters, AuthorizationConstants.ADD_TO, ApiTokenLocation.HEADER.name());
 
-                if (Authorization.ApiTokenLocation
-                    .valueOf(addTo.toUpperCase()) == Authorization.ApiTokenLocation.HEADER) {
+                if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
                     return ApplyResponse.ofHeaders(
                         Map.of(
                             MapUtils.getString(

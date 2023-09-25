@@ -72,8 +72,7 @@ public class RemoteTriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/trigger-definition-service/get-webhook-trigger-flags/{componentName}/{componentVersion}" +
-            "/{triggerName}",
+        value = "/get-webhook-trigger-flags/{componentName}/{componentVersion}/{triggerName}",
         produces = {
             "application/json"
         })

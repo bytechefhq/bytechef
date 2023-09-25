@@ -23,7 +23,6 @@ import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -44,9 +43,6 @@ public final class Counter implements Persistable<Long> {
 
     @Id
     private Long id;
-
-    @Transient
-    private boolean isNew;
 
     private Long value;
 
@@ -96,15 +92,11 @@ public final class Counter implements Persistable<Long> {
 
     @Override
     public boolean isNew() {
-        return isNew;
+        return id != null;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setNew(boolean isNew) {
-        this.isNew = isNew;
     }
 
     public void setValue(Long value) {
@@ -114,8 +106,7 @@ public final class Counter implements Persistable<Long> {
     @Override
     public String toString() {
         return "Counter{" + "id="
-            + id + ", isNew="
-            + isNew + ", value="
+            + id + ", value="
             + value + ", createdBy='"
             + createdBy + '\'' + ", createdDate="
             + createdDate + '}';

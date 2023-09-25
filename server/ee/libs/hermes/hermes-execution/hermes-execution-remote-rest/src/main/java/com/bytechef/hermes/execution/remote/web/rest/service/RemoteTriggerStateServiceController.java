@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("/remote/trigger-storage-service")
+@RequestMapping("/remote/trigger-state-service")
 public class RemoteTriggerStateServiceController {
 
     private final RemoteTriggerStateService triggerStateService;
@@ -47,7 +47,7 @@ public class RemoteTriggerStateServiceController {
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/fetch-value/{workflowExecutionId}",
-        consumes = {
+        produces = {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(@PathVariable String workflowExecutionId) {

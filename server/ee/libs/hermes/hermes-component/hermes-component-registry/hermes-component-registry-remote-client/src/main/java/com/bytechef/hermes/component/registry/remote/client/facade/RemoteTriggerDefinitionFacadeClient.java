@@ -255,12 +255,12 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     private record TriggerRequest(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters, Object state,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters, Object state,
         WebhookRequest webhookRequest, Long connectionId) {
     }
 
     private record WebhookValidateRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         WebhookRequest webhookRequest, Long connectionId) {
     }
 }

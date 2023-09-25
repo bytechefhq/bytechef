@@ -61,8 +61,7 @@ public class DefinitionRegistryConfiguration {
             @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
             if (connectionDefinitionService.connectionExists(componentName, connection.version())) {
-                return connectionDefinitionService.executeAuthorizationApply(
-                    componentName, connection, context);
+                return connectionDefinitionService.executeAuthorizationApply(componentName, connection, context);
             } else {
                 return connectionDefinitionFacadeClient.executeAuthorizationApply(componentName, connection);
             }

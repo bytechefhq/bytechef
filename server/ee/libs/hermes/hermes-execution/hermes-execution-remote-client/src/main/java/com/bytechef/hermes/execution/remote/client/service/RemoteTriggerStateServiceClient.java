@@ -33,7 +33,7 @@ import java.util.Optional;
 public class RemoteTriggerStateServiceClient implements RemoteTriggerStateService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String TRIGGER_STORAGE_SERVICE = "/remote/trigger-storage-service";
+    private static final String TRIGGER_STORAGE_SERVICE = "/remote/trigger-state-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
 
