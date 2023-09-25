@@ -142,7 +142,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     private void sleep() {
         try {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(100);
         } catch (InterruptedException ex) {
             // ignore
         }
