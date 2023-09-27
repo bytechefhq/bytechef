@@ -1,3 +1,4 @@
+import {DataPillType} from '@/types/types';
 import {PlusIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
 import ContextualDialog from 'components/ContextualDialog/ContextualDialog';
@@ -7,9 +8,15 @@ import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
-import {Property} from './Properties';
+import Property from './Property';
 
-const ObjectProperty = ({property}: {property: PropertyType}) => {
+const ObjectProperty = ({
+    dataPills,
+    property,
+}: {
+    dataPills?: Array<DataPillType>;
+    property: PropertyType;
+}) => {
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] =
         useState(false);
 
@@ -33,7 +40,9 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
                                 'last-of-type:pb-0',
                                 label && 'mb-0 pb-4 pl-2'
                             )}
+                            dataPills={dataPills}
                             key={`${property.name}_${subProperty.name}_${index}`}
+                            mention={!!dataPills?.length}
                             property={subProperty}
                         />
                     );

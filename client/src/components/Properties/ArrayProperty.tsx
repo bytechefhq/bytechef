@@ -1,11 +1,18 @@
+import {DataPillType} from '@/types/types';
 import {PlusIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
 import DropdownMenu from 'components/DropdownMenu/DropdownMenu';
 import {PropertyType} from 'types/projectTypes';
 
-import {Property} from './Properties';
+import Property from './Property';
 
-const ArrayProperty = ({property}: {property: PropertyType}) => {
+const ArrayProperty = ({
+    dataPills,
+    property,
+}: {
+    dataPills?: Array<DataPillType>;
+    property: PropertyType;
+}) => {
     const {items} = property;
 
     const formattedArrayItems = items?.map((item) => ({
@@ -18,7 +25,9 @@ const ArrayProperty = ({property}: {property: PropertyType}) => {
             {items?.map((item, index) => (
                 <Property
                     customClassName="border-l ml-2 pl-2 last-of-type:mb-0"
+                    dataPills={dataPills}
                     key={`${item.name}_${index}`}
+                    mention={!!dataPills?.length}
                     property={item}
                 />
             ))}
