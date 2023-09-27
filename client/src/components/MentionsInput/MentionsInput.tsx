@@ -43,6 +43,7 @@ type MentionsInputProps = {
     fieldsetClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
+    onKeyPress?: (event: KeyboardEvent) => void;
     placeholder?: string;
 };
 
@@ -53,6 +54,7 @@ const MentionsInput = ({
     fieldsetClassName,
     label,
     leadingIcon,
+    onKeyPress,
     placeholder = "Mention datapills using '{'",
 }: MentionsInputProps) => {
     const [value, setValue] = useState('');
@@ -66,7 +68,6 @@ const MentionsInput = ({
 
     const modules = {
         mention: {
-            allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
             blotName: 'bytechef-mention',
             dataAttributes: ['component'],
             fixMentionsToQuill: true,
@@ -151,20 +152,6 @@ const MentionsInput = ({
 
     const isFocused = focusedInput?.props.id === elementId;
 
-    const isNumberKey = (event: KeyboardEvent) => {
-        const {key} = event;
-
-        return (
-            (key >= '0' && key <= '9') ||
-            key === 'Backspace' ||
-            key === 'Delete' ||
-            key === 'ArrowLeft' ||
-            key === 'ArrowRight' ||
-            key === 'Tab' ||
-            key === '{'
-        );
-    };
-
     return (
         <fieldset className={twMerge('w-full', fieldsetClassName)}>
             {label && (
@@ -200,6 +187,7 @@ const MentionsInput = ({
                     label && 'mt-1',
                     leadingIcon && 'relative rounded-md border border-gray-300'
                 )}
+                title={controlType}
             >
                 {leadingIcon && (
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-3">
@@ -216,24 +204,7 @@ const MentionsInput = ({
                     id={elementId}
                     key={elementId}
                     modules={modules}
-                    onChange={(value) => {
-                        if (controlType === 'INTEGER') {
-                            if (value.startsWith('<p><div')) {
-                                setValue(value);
-                            } else {
-                                const integerOnlyValue = value.replace(
-                                    /[^0-9]/g,
-                                    ''
-                                );
-
-                                if (integerOnlyValue) {
-                                    setValue(`<p>${integerOnlyValue}</p>`);
-                                }
-                            }
-                        } else {
-                            setValue(value);
-                        }
-                    }}
+                    onChange={setValue}
                     onFocus={() => {
                         if (editorRef.current) {
                             setFocusedInput(editorRef.current);
@@ -241,11 +212,7 @@ const MentionsInput = ({
                             setDataPillPanelOpen(true);
                         }
                     }}
-                    onKeyPress={(event: KeyboardEvent) => {
-                        if (controlType === 'INTEGER' && !isNumberKey(event)) {
-                            event.preventDefault();
-                        }
-                    }}
+                    onKeyPress={onKeyPress}
                     placeholder={placeholder}
                     ref={editorRef}
                     value={value}

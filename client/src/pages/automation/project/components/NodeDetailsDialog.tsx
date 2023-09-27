@@ -406,7 +406,9 @@ const NodeDetailsDialog = () => {
                                                     properties={
                                                         currentAction.properties
                                                     }
-                                                    mention
+                                                    mention={
+                                                        !!dataPills?.length
+                                                    }
                                                 />
                                             )}
 
