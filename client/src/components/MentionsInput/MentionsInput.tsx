@@ -197,7 +197,7 @@ const MentionsInput = ({
 
                 <ReactQuill
                     className={twMerge(
-                        'h-full w-full',
+                        'h-full w-full bg-white rounded-md',
                         leadingIcon && 'border-0 pl-10'
                     )}
                     formats={['bytechef-mention', 'mention']}
