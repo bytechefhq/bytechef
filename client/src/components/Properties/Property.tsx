@@ -81,6 +81,10 @@ const Property = ({
             }) as ISelectOption
     );
 
+    if (controlType === 'SELECT' && !formattedOptions?.length) {
+        return <></>;
+    }
+
     return (
         <li
             className={twMerge(
@@ -152,12 +156,12 @@ const Property = ({
                     />
                 )}
 
-            {controlType === 'SELECT' && (
+            {controlType === 'SELECT' && !!formattedOptions?.length && (
                 <Select
                     description={description}
                     label={label}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    options={formattedOptions!}
+                    options={formattedOptions}
                     triggerClassName="w-full border border-gray-300"
                 />
             )}
