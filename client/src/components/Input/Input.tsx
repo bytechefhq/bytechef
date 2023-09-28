@@ -22,8 +22,10 @@ type InputProps = {
     labelClassName?: string;
     leadingIcon?: ReactNode;
     name: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     trailing?: ReactNode;
     type?: string;
+    value?: string;
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -39,10 +41,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             labelClassName,
             leadingIcon,
             name,
+            onChange,
             required,
             title,
             trailing,
             type = 'text',
+            value,
             ...props
         },
         ref
@@ -117,9 +121,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         disabled={disabled}
                         id={id || name}
                         name={name}
+                        onChange={onChange}
                         ref={ref}
                         type={type}
                         required={required}
+                        value={value}
                         {...props}
                     />
 
