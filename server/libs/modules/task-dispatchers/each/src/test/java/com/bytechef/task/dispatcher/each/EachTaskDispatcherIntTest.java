@@ -63,7 +63,7 @@ public class EachTaskDispatcherIntTest {
                 (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                     counterService, taskCompletionHandler, taskExecutionService)),
             (
-                contextService, counterService, messageBroker, taskExecutionService) -> List.of(
+                messageBroker, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new EachTaskDispatcher(
                         messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
                         workflowFileStorageFacade)),

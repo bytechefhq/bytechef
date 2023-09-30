@@ -17,15 +17,17 @@
 
 package com.bytechef.task.dispatcher.subflow.config;
 
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.message.broker.MessageBroker;
+
 import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
-import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
+import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,25 +35,26 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class SubflowTaskDispatcherConfiguration {
 
     @Bean("subflowTaskDispatcherResolverFactory_v1")
-    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(MessageBroker messageBroker) {
-        return (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker);
+    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(RemoteJobFacade jobFacade) {
+        return (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade);
     }
 
     @Configuration
-    @ConditionalOnEnabled("coordinator")
+    @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
     public static class SubflowJobStatusEventListenerConfiguration {
 
         @Bean
         SubflowJobStatusEventListener subflowJobStatusEventListener(
-            RemoteJobService jobService, MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService,
+            ApplicationEventPublisher eventPublisher, RemoteJobService jobService,
+            RemoteTaskExecutionService taskExecutionService,
             @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
             return new SubflowJobStatusEventListener(
-                jobService, messageBroker, taskExecutionService, workflowFileStorageFacade);
+                eventPublisher, jobService, taskExecutionService, workflowFileStorageFacade);
         }
     }
 }

@@ -20,12 +20,7 @@
 package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.message.broker.MessageBroker;
+
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
@@ -35,12 +30,13 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -50,7 +46,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("worker")
+@ConditionalOnProperty(prefix = "bytechef", name = "worker.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(TaskWorkerProperties.class)
 public class TaskWorkerConfiguration {
 
@@ -62,17 +58,6 @@ public class TaskWorkerConfiguration {
 
         this.taskDispatcherAdapterTaskHandlerFactories = taskDispatcherAdapterTaskHandlerFactories == null
             ? Collections.emptyList() : taskDispatcherAdapterTaskHandlerFactories;
-    }
-
-    @Bean
-    TaskHandlerRegistry taskHandlerRegistry(
-        Map<String, TaskHandler<?>> taskHandlerMap,
-        @Autowired(required = false) TaskHandlerMapFactory taskHandlerMapFactory) {
-
-        return MapUtils.concat(
-            taskHandlerMap,
-            taskHandlerMapFactory.getTaskHandlerMap() == null
-                ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap())::get;
     }
 
     @Bean
@@ -101,9 +86,9 @@ public class TaskWorkerConfiguration {
 
     @Bean
     TaskWorker taskWorker(
-        EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver,
+        ApplicationEventPublisher eventPublisher, TaskHandlerResolver taskHandlerResolver,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
-        return new TaskWorker(eventPublisher, messageBroker, taskHandlerResolver, workflowFileStorageFacade);
+        return new TaskWorker(eventPublisher, taskHandlerResolver, workflowFileStorageFacade);
     }
 }

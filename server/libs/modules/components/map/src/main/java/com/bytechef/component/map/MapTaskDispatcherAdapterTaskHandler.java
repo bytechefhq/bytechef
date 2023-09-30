@@ -19,15 +19,17 @@
 
 package com.bytechef.component.map;
 
+import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
@@ -40,9 +42,11 @@ import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
+import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +55,7 @@ import java.util.Objects;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Feb, 21 2020
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
@@ -70,28 +75,33 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
         WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
             new Base64FileStorageService(), objectMapper);
 
-        messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, message -> {
-            TaskExecution completionTaskExecution = (TaskExecution) message;
+        syncMessageBroker.receive(CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, message -> {
+            TaskExecution completionTaskExecution = ((TaskExecutionCompleteEvent) message).getTaskExecution();
 
             result.add(workflowFileStorageFacade.readTaskExecutionOutput(completionTaskExecution.getOutput()));
         });
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
-        messageBroker.receive(SystemMessageRoute.ERRORS, message -> {
-            TaskExecution erroredTaskExecution = (TaskExecution) message;
+        syncMessageBroker.receive(
+            CoordinatorMessageRoute.ERROR_EVENTS, message -> {
+                TaskExecution erroredTaskExecution = ((TaskExecutionErrorEvent) message).getTaskExecution();
 
-            ExecutionError error = erroredTaskExecution.getError();
+                ExecutionError error = erroredTaskExecution.getError();
 
-            errors.add(error);
-        });
+                errors.add(error);
+            });
+
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            e -> {});
 
         TaskWorker worker = new TaskWorker(
-            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver, workflowFileStorageFacade);
+            getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(),
+            taskHandlerResolver, workflowFileStorageFacade);
 
         RemoteTaskExecutionService taskExecutionService =
             new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
@@ -105,7 +115,9 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             workflowFileStorageFacade.storeTaskExecutionOutput(taskExecution.getId(), Collections.emptyMap()));
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
-            contextService, new CounterServiceImpl(new InMemoryCounterRepository()), messageBroker, worker::handle,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            contextService, new CounterServiceImpl(new InMemoryCounterRepository()),
+            curTaskExecution -> worker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
             taskExecutionService, workflowFileStorageFacade);
 
         mapTaskDispatcher.dispatch(taskExecution);
@@ -115,7 +127,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
             for (ExecutionError error : errors) {
                 if (errorMessage.length() > 3000) {
-                    errorMessage.append("\n")
+                    errorMessage
+                        .append("\n")
                         .append("...");
 
                     break;
@@ -125,7 +138,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                     errorMessage.append("\n");
                 }
 
-                errorMessage.append(error.getMessage())
+                errorMessage
+                    .append(error.getMessage())
                     .append("\n")
                     .append(String.join("\n", error.getStackTrace()));
             }
@@ -134,5 +148,9 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         }
 
         return result;
+    }
+
+    private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
+        return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
     }
 }

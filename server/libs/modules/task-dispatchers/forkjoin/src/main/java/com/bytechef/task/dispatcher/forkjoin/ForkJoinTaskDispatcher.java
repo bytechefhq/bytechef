@@ -26,9 +26,8 @@ import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatc
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -44,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
@@ -87,22 +87,22 @@ import org.springframework.util.Assert;
  */
 public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final RemoteContextService contextService;
     private final RemoteCounterService counterService;
-    private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public ForkJoinTaskDispatcher(
-        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
-        TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+        RemoteCounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
+        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
-        this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
@@ -128,7 +128,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
             Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
@@ -137,7 +137,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
                 List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(i);
 
-                Assert.isTrue(branchWorkflowTasks.size() > 0, "branch " + i + " does not contain any tasks");
+                Assert.isTrue(!branchWorkflowTasks.isEmpty(), "branch " + i + " does not contain any tasks");
 
                 WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(0);
 

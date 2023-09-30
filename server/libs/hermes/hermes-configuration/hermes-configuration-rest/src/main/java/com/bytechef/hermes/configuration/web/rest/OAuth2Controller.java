@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
@@ -28,13 +27,14 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * @author Ivica Cardic
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class OAuth2Controller implements Oauth2Api {
 
     private final ConversionService conversionService;

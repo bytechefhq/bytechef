@@ -29,11 +29,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -44,11 +44,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.bytechef.message.broker.MessageRoute;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Arik Cohen
@@ -58,7 +58,7 @@ public class BranchTaskDispatcherTest {
 
     private final Base64FileStorageService base64FileStorageService = new Base64FileStorageService();
     private final RemoteContextService contextService = mock(RemoteContextService.class);
-    private final MessageBroker messageBroker = mock(MessageBroker.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final RemoteTaskExecutionService taskExecutionService = mock(RemoteTaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
@@ -72,7 +72,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -121,7 +121,7 @@ public class BranchTaskDispatcherTest {
             base64FileStorageService.storeFileContent("", "", "{}"));
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -154,7 +154,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -201,7 +201,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -227,14 +227,15 @@ public class BranchTaskDispatcherTest {
 
         branchTaskDispatcher.dispatch(taskExecution);
 
-        ArgumentCaptor<MessageRoute> arg1 = ArgumentCaptor.forClass(MessageRoute.class);
-        ArgumentCaptor<TaskExecution> arg2 = ArgumentCaptor.forClass(TaskExecution.class);
+        ArgumentCaptor<TaskExecutionCompleteEvent> taskExecutionCompleteEventArgumentCaptor = ArgumentCaptor.forClass(
+            TaskExecutionCompleteEvent.class);
 
-        verify(messageBroker, times(1)).send(arg1.capture(), arg2.capture());
+        verify(eventPublisher, times(1)).publishEvent(taskExecutionCompleteEventArgumentCaptor.capture());
 
-        TaskExecution value = arg2.getValue();
+        TaskExecutionCompleteEvent taskExecutionCompleteEvent = taskExecutionCompleteEventArgumentCaptor.getValue();
 
-        Assertions.assertEquals(
-            "1234", workflowFileStorageFacade.readTaskExecutionOutput(value.getOutput()));
+        taskExecution = taskExecutionCompleteEvent.getTaskExecution();
+
+        Assertions.assertEquals("1234", workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
     }
 }

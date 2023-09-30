@@ -11,9 +11,10 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation(project(":server:libs:configs:liquibase-config"))
-    implementation(project(":server:libs:core:message-broker:message-broker-amqp"))
-    implementation(project(":server:libs:core:message-broker:message-broker-kafka"))
-    implementation(project(":server:libs:core:message-broker:message-broker-redis"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
+    implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl"))
 
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))

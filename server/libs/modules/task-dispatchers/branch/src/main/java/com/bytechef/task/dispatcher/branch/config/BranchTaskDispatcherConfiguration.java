@@ -19,7 +19,6 @@ package com.bytechef.task.dispatcher.branch.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -27,6 +26,7 @@ import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,19 +36,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BranchTaskDispatcherConfiguration {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final RemoteContextService contextService;
-    private final MessageBroker messageBroker;
     private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
-        RemoteContextService contextService, MessageBroker messageBroker,
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
         RemoteTaskExecutionService taskExecutionService,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
+        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
-        this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
@@ -62,6 +62,6 @@ public class BranchTaskDispatcherConfiguration {
     @Bean("branchTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory branchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new BranchTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 }

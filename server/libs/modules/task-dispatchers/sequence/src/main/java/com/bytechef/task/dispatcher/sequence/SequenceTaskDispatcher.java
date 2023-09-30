@@ -21,9 +21,8 @@ import static com.bytechef.task.dispatcher.sequence.constant.SequenceTaskDispatc
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -32,6 +31,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -45,20 +45,21 @@ import java.util.Objects;
  */
 public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    private final ApplicationEventPublisher eventPublisher;
     public static final String TASKS = "tasks";
     private final RemoteContextService contextService;
-    private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public SequenceTaskDispatcher(
-        RemoteContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+        TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService,
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
+        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
-        this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
@@ -80,7 +81,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 

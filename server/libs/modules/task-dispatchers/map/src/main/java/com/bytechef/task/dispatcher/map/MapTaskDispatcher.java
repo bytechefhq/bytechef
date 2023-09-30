@@ -28,9 +28,8 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -40,6 +39,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -53,22 +53,22 @@ import java.util.Objects;
  */
 public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
     private final RemoteTaskExecutionService taskExecutionService;
-    private final MessageBroker messageBroker;
     private final RemoteContextService contextService;
     private final RemoteCounterService counterService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public MapTaskDispatcher(
-        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
-        TaskDispatcher<? super TaskExecution> taskDispatcher, RemoteTaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+        RemoteCounterService counterService, TaskDispatcher<? super TaskExecution> taskDispatcher,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
+        this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
-        this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
@@ -90,9 +90,9 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(taskExecution.getId(), list.size());
+            counterService.set(Objects.requireNonNull(taskExecution.getId()), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);

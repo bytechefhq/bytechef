@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.task.dispatcher.registry.service.RemoteTaskDispatcherDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
@@ -26,6 +25,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionApi {
 
     private final ConversionService conversionService;

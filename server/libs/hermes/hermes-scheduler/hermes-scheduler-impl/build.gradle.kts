@@ -6,4 +6,5 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.quartz-scheduler:quartz")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-api"))
 }

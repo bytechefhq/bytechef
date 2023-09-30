@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
+import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;

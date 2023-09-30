@@ -103,11 +103,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public void createProjectInstanceWorkflowJob(Long id, String workflowId) {
+    public long createProjectInstanceWorkflowJob(Long id, String workflowId) {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
 
-        jobFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
+        return jobFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
     }
 
     @Override

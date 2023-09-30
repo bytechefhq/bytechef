@@ -17,16 +17,19 @@
 
 package com.bytechef.atlas.worker;
 
+import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
+import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.commons.util.MapUtils;
 import java.io.File;
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.bytechef.message.event.MessageEvent;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -69,13 +73,18 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
-            TaskMessageRoute.TASKS_COMPLETE,
+            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
-                "done", workflowFileStorageFacade.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
-        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
+                "done", workflowFileStorageFacade.readTaskExecutionOutput(
+                    ((TaskExecutionCompleteEvent) t).getTaskExecution()
+                        .getOutput())));
+        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            t -> {});
 
         TaskWorker worker =
-            new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> "done", workflowFileStorageFacade);
+            new TaskWorker(
+                event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+                task -> taskExecution -> "done", workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -84,7 +93,7 @@ public class TaskWorkerTest {
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
 
-        worker.handle(taskExecution);
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
 
     @Test
@@ -92,14 +101,18 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
-            SystemMessageRoute.ERRORS,
-            t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
+            CoordinatorMessageRoute.ERROR_EVENTS,
+            t -> Assertions.assertEquals("bad input", ((TaskExecutionErrorEvent) t).getTaskExecution()
+                .getError()
                 .getMessage()));
-        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
+        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            t -> {});
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
-            throw new IllegalArgumentException("bad input");
-        }, workflowFileStorageFacade);
+        TaskWorker worker = new TaskWorker(
+            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> taskExecution -> {
+                throw new IllegalArgumentException("bad input");
+            }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -108,7 +121,7 @@ public class TaskWorkerTest {
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
 
-        worker.handle(taskExecution);
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
 
     @Test
@@ -116,25 +129,32 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
-            TaskMessageRoute.TASKS_COMPLETE, t -> Assertions.assertEquals(
-                "done", workflowFileStorageFacade.readTaskExecutionOutput(((TaskExecution) t).getOutput())));
-        messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
-            TaskExecution taskExecution = (TaskExecution) t;
+            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            t -> Assertions.assertEquals(
+                "done", workflowFileStorageFacade.readTaskExecutionOutput(
+                    ((TaskExecutionCompleteEvent) t).getTaskExecution()
+                        .getOutput())));
+        messageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
+            t -> {
+                TaskExecution taskExecution = (TaskExecution) t;
 
-            Assertions.assertNull(taskExecution.getError());
-        });
-        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
+                Assertions.assertNull(taskExecution.getError());
+            });
+        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            t -> {});
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> {
-            String type = task.getType();
-            if ("var".equals(type)) {
-                return taskExecution -> MapUtils.getRequired(taskExecution.getParameters(), "value");
-            } else {
-                throw new IllegalArgumentException("unknown type: " + type);
-            }
-        }, workflowFileStorageFacade);
+        TaskWorker worker = new TaskWorker(
+            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> {
+                String type = task.getType();
+                if ("var".equals(type)) {
+                    return taskExecution -> MapUtils.getRequired(taskExecution.getParameters(), "value");
+                } else {
+                    throw new IllegalArgumentException("unknown type: " + type);
+                }
+            }, workflowFileStorageFacade);
 
-        TaskExecution task = TaskExecution.builder()
+        TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
@@ -148,10 +168,10 @@ public class TaskWorkerTest {
                                 PARAMETERS, Map.of("value", "done"))))))
             .build();
 
-        task.setId(1234L);
-        task.setJobId(4567L);
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
 
-        worker.handle(task);
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
 
     @Test
@@ -164,26 +184,31 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
         messageBroker.receive(
-            TaskMessageRoute.TASKS_COMPLETE, t -> Assertions.assertFalse(new File(tempDir).exists()));
-        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
+            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            t -> Assertions.assertFalse(new File(tempDir).exists()));
+        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            t -> {});
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> {
-            String type = task.getType();
-            if ("var".equals(type)) {
-                return taskExecution -> MapUtils.getRequired(taskExecution.getParameters(), "value");
-            } else if ("mkdir".equals(type)) {
-                return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path")).mkdirs();
-            } else if ("rm".equals(type)) {
-                return taskExecution -> FileSystemUtils
-                    .deleteRecursively(new File(MapUtils.getString(taskExecution.getParameters(), "path")));
-            } else if ("pass".equals(type)) {
-                Assertions.assertTrue(new File(tempDir).exists());
+        TaskWorker worker = new TaskWorker(
+            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> {
+                String type = task.getType();
+                if ("var".equals(type)) {
+                    return taskExecution -> MapUtils.getRequired(taskExecution.getParameters(), "value");
+                } else if ("mkdir".equals(type)) {
+                    return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path"))
+                        .mkdirs();
+                } else if ("rm".equals(type)) {
+                    return taskExecution -> FileSystemUtils
+                        .deleteRecursively(new File(MapUtils.getString(taskExecution.getParameters(), "path")));
+                } else if ("pass".equals(type)) {
+                    Assertions.assertTrue(new File(tempDir).exists());
 
-                return taskExecution -> null;
-            } else {
-                throw new IllegalArgumentException("unknown type: " + type);
-            }
-        }, workflowFileStorageFacade);
+                    return taskExecution -> null;
+                } else {
+                    throw new IllegalArgumentException("unknown type: " + type);
+                }
+            }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -206,7 +231,7 @@ public class TaskWorkerTest {
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
 
-        worker.handle(taskExecution);
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
 
     @Test
@@ -218,30 +243,35 @@ public class TaskWorkerTest {
 
         SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
 
-        messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
-            Assertions.assertFalse(new File(tempDir).exists());
-        });
-        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
+        messageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
+            t -> {
+                Assertions.assertFalse(new File(tempDir).exists());
+            });
+        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            t -> {});
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> {
-            String type = task.getType();
-            if ("var".equals(type)) {
-                return taskExecution -> MapUtils.getRequired(taskExecution.getParameters(), "value");
-            } else if ("mkdir".equals(type)) {
-                return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path")).mkdirs();
-            } else if ("rm".equals(type)) {
-                return taskExecution -> FileSystemUtils.deleteRecursively(
-                    new File(MapUtils.getString(taskExecution.getParameters(), "path")));
-            } else if ("rogue".equals(type)) {
-                Assertions.assertTrue(new File(tempDir).exists());
+        TaskWorker worker = new TaskWorker(
+            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> {
+                String type = task.getType();
+                if ("var".equals(type)) {
+                    return taskExecution -> MapUtils.getRequired(taskExecution.getParameters(), "value");
+                } else if ("mkdir".equals(type)) {
+                    return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path"))
+                        .mkdirs();
+                } else if ("rm".equals(type)) {
+                    return taskExecution -> FileSystemUtils.deleteRecursively(
+                        new File(MapUtils.getString(taskExecution.getParameters(), "path")));
+                } else if ("rogue".equals(type)) {
+                    Assertions.assertTrue(new File(tempDir).exists());
 
-                return taskExecution -> {
-                    throw new TaskExecutionException("Unexpected task type: rogue");
-                };
-            } else {
-                throw new IllegalArgumentException("unknown type: " + type);
-            }
-        }, workflowFileStorageFacade);
+                    return taskExecution -> {
+                        throw new TaskExecutionException("Unexpected task type: rogue");
+                    };
+                } else {
+                    throw new IllegalArgumentException("unknown type: " + type);
+                }
+            }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -264,24 +294,28 @@ public class TaskWorkerTest {
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
 
-        worker.handle(taskExecution);
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException interruptedException) {
-                throw new TaskExecutionException("Unable to sleep due interruption");
-            }
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
-            return null;
-        }, workflowFileStorageFacade);
+        TaskWorker worker = new TaskWorker(
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> taskExecution -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException interruptedException) {
+                    throw new TaskExecutionException("Unable to sleep due interruption");
+                }
+
+                return null;
+            }, workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -291,7 +325,7 @@ public class TaskWorkerTest {
         taskExecution.setJobId(4567L);
 
         // execute the task
-        executorService.submit(() -> worker.handle(taskExecution));
+        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution)));
 
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
@@ -300,7 +334,8 @@ public class TaskWorkerTest {
             .size());
 
         // cancel the execution of the task
-        worker.handle(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId()));
+        worker.onCancelControlTaskEvent(
+            new CancelControlTaskEvent(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId())));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 
@@ -312,17 +347,21 @@ public class TaskWorkerTest {
     @SuppressFBWarnings("NP")
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException interruptedException) {
-                throw new TaskExecutionException("Unable to sleep due interruption");
-            }
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
-            return null;
-        }, workflowFileStorageFacade);
+        TaskWorker worker = new TaskWorker(
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> taskExecution -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException interruptedException) {
+                    throw new TaskExecutionException("Unable to sleep due interruption");
+                }
+
+                return null;
+            }, workflowFileStorageFacade);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -332,7 +371,7 @@ public class TaskWorkerTest {
         taskExecution1.setJobId(2222L);
 
         // execute the task
-        executorService.submit(() -> worker.handle(taskExecution1));
+        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -342,7 +381,7 @@ public class TaskWorkerTest {
         taskExecution2.setJobId(4444L);
 
         // execute the task
-        executorService.submit(() -> worker.handle(taskExecution2));
+        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
@@ -351,7 +390,8 @@ public class TaskWorkerTest {
             .size());
 
         // cancel the execution of the task
-        worker.handle(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId()));
+        worker.onCancelControlTaskEvent(
+            new CancelControlTaskEvent(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId())));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 
@@ -363,17 +403,21 @@ public class TaskWorkerTest {
     @SuppressFBWarnings("NP")
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        TaskWorker worker = new TaskWorker(e -> {}, messageBroker, task -> taskExecution -> {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException interruptedException) {
-                throw new TaskExecutionException("Unable to sleep due interruption");
-            }
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
-            return null;
-        }, workflowFileStorageFacade);
+        TaskWorker worker = new TaskWorker(
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            task -> taskExecution -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException interruptedException) {
+                    throw new TaskExecutionException("Unable to sleep due interruption");
+                }
+
+                return null;
+            }, workflowFileStorageFacade);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -383,7 +427,7 @@ public class TaskWorkerTest {
         taskExecution1.setJobId(2222L);
 
         // execute the task
-        executorService.submit(() -> worker.handle(taskExecution1));
+        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -394,7 +438,7 @@ public class TaskWorkerTest {
         taskExecution2.setParentId(taskExecution1.getId());
 
         // execute the task
-        executorService.submit(() -> worker.handle(taskExecution2));
+        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
@@ -403,7 +447,8 @@ public class TaskWorkerTest {
             .size());
 
         // cancel the execution of the task
-        worker.handle(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId()));
+        worker.onCancelControlTaskEvent(
+            new CancelControlTaskEvent(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId())));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 

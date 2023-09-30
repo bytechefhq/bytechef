@@ -66,9 +66,9 @@ public class SequenceTaskDispatcherIntTest {
                 (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
                     contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
                     workflowFileStorageFacade)),
-            (contextService, counterService, messageBroker, taskExecutionService) -> List.of(
+            (messageBroker, contextService, counterService, taskExecutionService) -> List.of(
                 (taskDispatcher) -> new SequenceTaskDispatcher(
-                    contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade)),
+                    messageBroker, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(1, (Integer) testVarTaskHandler.get("value1"));

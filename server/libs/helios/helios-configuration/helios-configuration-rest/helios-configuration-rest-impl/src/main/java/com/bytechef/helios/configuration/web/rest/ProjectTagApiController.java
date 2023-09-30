@@ -17,12 +17,12 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +35,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class ProjectTagApiController implements ProjectTagApi {
 
     private final ConversionService conversionService;

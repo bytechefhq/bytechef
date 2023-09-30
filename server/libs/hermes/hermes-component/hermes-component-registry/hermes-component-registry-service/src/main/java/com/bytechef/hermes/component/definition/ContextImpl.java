@@ -20,8 +20,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.data.storage.service.DataStorageService;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.TaskProgressedEvent;
+import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
@@ -31,6 +30,7 @@ import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -55,8 +55,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, ComponentConnection connection, DataStorageService dataStorageService,
-        EventPublisher eventPublisher, ObjectMapper objectMapper, FileStorageService fileStorageService,
+        ApplicationEventPublisher eventPublisher, String componentName, ComponentConnection connection,
+        DataStorageService dataStorageService, ObjectMapper objectMapper, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor, Long taskExecutionId, XmlMapper xmlMapper) {
 
         this.data = new DataImpl(dataStorageService);
@@ -143,17 +143,17 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     private static class EventImpl implements Event {
 
-        private final EventPublisher eventPublisher;
+        private final ApplicationEventPublisher eventPublisher;
         private final long taskExecutionId;
 
-        public EventImpl(EventPublisher eventPublisher, long taskExecutionId) {
+        public EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) {
             this.eventPublisher = eventPublisher;
             this.taskExecutionId = taskExecutionId;
         }
 
         @Override
         public void publishActionProgressEvent(int progress) {
-            eventPublisher.publishEvent(new TaskProgressedEvent(taskExecutionId, progress));
+            eventPublisher.publishEvent(new TaskProgressedApplicationEvent(taskExecutionId, progress));
         }
     }
 

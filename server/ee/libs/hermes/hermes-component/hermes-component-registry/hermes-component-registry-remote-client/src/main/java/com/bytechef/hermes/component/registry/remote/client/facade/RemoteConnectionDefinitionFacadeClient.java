@@ -47,8 +47,7 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Authorization.ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName,
-        @NonNull ComponentConnection connection) {
+        @NonNull String componentName, @NonNull ComponentConnection connection) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(

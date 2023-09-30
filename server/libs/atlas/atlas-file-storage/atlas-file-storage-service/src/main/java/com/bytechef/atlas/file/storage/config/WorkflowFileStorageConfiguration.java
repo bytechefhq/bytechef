@@ -60,7 +60,7 @@ public class WorkflowFileStorageConfiguration {
 
         return switch (workflowAsyncOutputStorageProvider) {
             case "base64" -> new Base64FileStorageService();
-            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFileStorageDir());
+            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFilesystemDir());
             default -> throw new IllegalArgumentException(
                 "Output storage %s does not exist".formatted(workflowAsyncOutputStorageProvider));
         };

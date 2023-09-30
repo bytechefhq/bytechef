@@ -41,41 +41,59 @@ public class TaskCoordinatorProperties {
 
     public static class TaskCoordinatorSubscriptions {
 
-        private int jobsStart = 1;
-        private int jobsResume = 1;
-        private int jobsStop = 1;
-        private int tasksComplete = 1;
+        private int applicationEvents = 1;
+        private int jobResumeEvents = 1;
+        private int jobStartEvents = 1;
+        private int jobStopEvents = 1;
+        private int taskExecutionCompleteEvents = 1;
+        private int taskExecutionErrorEvents = 1;
 
-        public int getJobsStart() {
-            return jobsStart;
+        public int getApplicationEvents() {
+            return applicationEvents;
         }
 
-        public int getJobsResume() {
-            return jobsResume;
+        public int getJobResumeEvents() {
+            return jobResumeEvents;
         }
 
-        public int getJobsStop() {
-            return jobsStop;
+        public int getJobStartEvents() {
+            return jobStartEvents;
         }
 
-        public int getTasksComplete() {
-            return tasksComplete;
+        public int getJobStopEvents() {
+            return jobStopEvents;
         }
 
-        public void setTasksComplete(int tasksComplete) {
-            this.tasksComplete = tasksComplete;
+        public int getTaskExecutionCompleteEvents() {
+            return taskExecutionCompleteEvents;
         }
 
-        public void setJobsStart(int jobsStart) {
-            this.jobsStart = jobsStart;
+        public int getTaskExecutionErrorEvents() {
+            return taskExecutionErrorEvents;
         }
 
-        public void setJobsResume(int jobsResume) {
-            this.jobsResume = jobsResume;
+        public void setApplicationEvents(int applicationEvents) {
+            this.applicationEvents = applicationEvents;
         }
 
-        public void setJobsStop(int jobsStop) {
-            this.jobsStop = jobsStop;
+        public void setJobResumeEvents(int jobResumeEvents) {
+            this.jobResumeEvents = jobResumeEvents;
+        }
+
+        public void setJobStartEvents(int jobStartEvents) {
+            this.jobStartEvents = jobStartEvents;
+        }
+
+        public void setJobStopEvents(int jobStopEvents) {
+            this.jobStopEvents = jobStopEvents;
+        }
+
+        public void setTaskExecutionCompleteEvents(int taskExecutionCompleteEvents) {
+            this.taskExecutionCompleteEvents = taskExecutionCompleteEvents;
+        }
+
+        public void setTaskExecutionErrorEvents(int taskExecutionErrorEvents) {
+            this.taskExecutionErrorEvents = taskExecutionErrorEvents;
         }
     }
 }

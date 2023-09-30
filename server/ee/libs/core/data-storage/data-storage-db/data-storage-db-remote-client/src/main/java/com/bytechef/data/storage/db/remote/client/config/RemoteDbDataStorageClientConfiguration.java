@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.data-storage", name = "provider", havingValue = "db")
+@ConditionalOnProperty(prefix = "bytechef", name = "data-storage.provider", havingValue = "db")
 public class RemoteDbDataStorageClientConfiguration {
 
     @Bean

@@ -12,8 +12,6 @@ subprojects {
         implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
         implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
         implementation(project(":server:libs:core:commons:commons-util"))
-        implementation(project(":server:libs:core:event:event-listener:event-listener-api"))
-        implementation(project(":server:libs:core:message-broker:message-broker-api"))
         implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-api"))
 
         testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))

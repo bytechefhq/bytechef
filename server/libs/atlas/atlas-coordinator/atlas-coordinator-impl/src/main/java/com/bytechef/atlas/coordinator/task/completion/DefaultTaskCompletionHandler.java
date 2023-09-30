@@ -28,8 +28,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.JobStatusEvent;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
@@ -45,6 +44,7 @@ import java.util.Objects;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -57,8 +57,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
+    private final ApplicationEventPublisher eventPublisher;
     private final RemoteContextService contextService;
-    private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
     private final RemoteJobService jobService;
     private final RemoteTaskExecutionService taskExecutionService;
@@ -67,10 +67,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
-        RemoteContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor,
-        RemoteJobService jobService,
-        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
-        RemoteWorkflowService workflowService) {
+        RemoteContextService contextService, ApplicationEventPublisher eventPublisher,
+        JobExecutor jobExecutor, RemoteJobService jobService, RemoteTaskExecutionService taskExecutionService,
+        WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
@@ -155,7 +154,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         job = jobService.update(job);
 
-        eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+        eventPublisher
+            .publishEvent(new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
