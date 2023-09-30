@@ -21,7 +21,6 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -43,6 +42,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
@@ -167,17 +167,20 @@ public class LoopTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
-        RemoteTaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+        RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade),
-            (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade),
+            (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade),
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade),
             (taskDispatcher) -> new SequenceTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade));
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade));
     }
 
     private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {

@@ -132,18 +132,18 @@ bytechef:
   file-storage:
     # File storage provider for files (base64 | filesystem) default: filesystem
     provider: filesystem
-    file-storage-dir: ${user.home}/bytechef/files
+    filesystem-dir: ${user.home}/bytechef/files
   oauth2:
 #    predefinedApps:
 #      mailchimp:
 #        clientId: 123456789
 #        clientSecret: 123456789
-    redirectUri: ${bytechef.publicUrl}/callback
+    redirect-uri: ${bytechef.public-url}/callback
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
     provider: jms
-  publicUrl: http://127.0.0.1:5173
-  webhookUrl: http://127.0.0.1:9555
+  public-url: http://127.0.0.1:5173
+  webhook-url: http://127.0.0.1:9555
   # When the worker is enabled, subscribe to the default "tasks" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.

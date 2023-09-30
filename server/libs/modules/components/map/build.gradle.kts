@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
-    implementation(project(":server:libs:core:message-broker:message-broker-sync"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:modules:task-dispatchers:map"))

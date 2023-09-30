@@ -19,10 +19,11 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
+import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.ControlTask;
-import com.bytechef.message.broker.SystemMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.configuration.task.Task;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Objects;
 
@@ -32,15 +33,17 @@ import java.util.Objects;
  */
 public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskDispatcherResolver {
 
-    private final MessageBroker messageBroker;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public ControlTaskDispatcher(MessageBroker messageBroker) {
-        this.messageBroker = Objects.requireNonNull(messageBroker);
+    public ControlTaskDispatcher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     @Override
     public void dispatch(ControlTask controlTask) {
-        messageBroker.send(SystemMessageRoute.CONTROL, controlTask);
+        if (controlTask instanceof CancelControlTask cancelControlTask) {
+            eventPublisher.publishEvent(new CancelControlTaskEvent(cancelControlTask));
+        }
     }
 
     @Override

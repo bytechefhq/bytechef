@@ -17,11 +17,10 @@
 
 package com.bytechef.hermes.worker.config;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.worker.TriggerWorker;
-import com.bytechef.message.broker.SystemMessageRoute;
+import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,17 +28,19 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("worker")
+@ConditionalOnExpression("'${bytechef.worker.enabled:true}' == 'true'")
 public class TriggerWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(TriggerWorker triggerWorker) {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS, 1, triggerWorker, "handle");
+                listenerEndpointRegistrar, WorkerMessageRoute.CONTROL_EVENTS, 1, triggerWorker,
+                "onCancelControlTriggerEvent");
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, SystemMessageRoute.CONTROL, 1, triggerWorker, "handle");
+                listenerEndpointRegistrar, WorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, triggerWorker,
+                "onTriggerExecutionEvent");
         };
     }
 }

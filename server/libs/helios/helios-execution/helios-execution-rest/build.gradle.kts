@@ -65,7 +65,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
-    implementation(project(":server:libs:core:autoconfigure-annotations"))
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api"))
     implementation(project(":server:libs:helios:helios-execution:helios-execution-api"))

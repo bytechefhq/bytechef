@@ -20,7 +20,7 @@
 package com.bytechef.atlas.worker.task.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
+import com.bytechef.atlas.worker.exception.TaskExecutionException;
 
 /**
  * A strategy interface used for executing a {@link TaskExecution}.

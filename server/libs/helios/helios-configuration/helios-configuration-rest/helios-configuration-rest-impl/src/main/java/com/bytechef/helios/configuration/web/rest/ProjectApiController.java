@@ -17,13 +17,13 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class ProjectApiController implements ProjectApi {
 
     private final ConversionService conversionService;

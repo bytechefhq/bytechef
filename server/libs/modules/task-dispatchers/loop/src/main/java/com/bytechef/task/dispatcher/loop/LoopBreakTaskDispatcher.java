@@ -21,8 +21,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_BREAK;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -31,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
 /**
@@ -38,12 +38,14 @@ import org.springframework.util.Assert;
  */
 public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final MessageBroker messageBroker;
+    private final ApplicationEventPublisher eventPublisher;
     private final RemoteTaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI2")
-    public LoopBreakTaskDispatcher(MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService) {
-        this.messageBroker = messageBroker;
+    public LoopBreakTaskDispatcher(
+        ApplicationEventPublisher eventPublisher, RemoteTaskExecutionService taskExecutionService) {
+
+        this.eventPublisher = eventPublisher;
         this.taskExecutionService = taskExecutionService;
     }
 
@@ -53,7 +55,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         loopTaskExecution.setEndDate(LocalDateTime.now());
 
-        messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, loopTaskExecution);
+        eventPublisher.publishEvent(new TaskExecutionCompleteEvent(loopTaskExecution));
     }
 
     private TaskExecution findLoopTaskExecution(Long taskExecutionId) {

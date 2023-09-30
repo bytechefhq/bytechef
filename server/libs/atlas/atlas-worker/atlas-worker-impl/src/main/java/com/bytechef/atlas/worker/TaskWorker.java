@@ -21,19 +21,19 @@ package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.TaskStartedEvent;
-import com.bytechef.message.Controllable;
-import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.SystemMessageRoute;
+import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -55,6 +55,7 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.TaskCoordinator}.
@@ -64,7 +65,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * {@link com.bytechef.atlas.coordinator.TaskCoordinator} process and most likely on a seperate node altogether.
  *
  * <p>
- * Communication between the two is decoupled through the {@link MessageBroker} interface.
+ * Communication between the two is decoupled through the {@link MessageBroker} interface via
+ * {@link ApplicationEventPublisher}.
  *
  * @author Arik Cohen
  * @since Jun 12, 2016
@@ -75,31 +77,28 @@ public class TaskWorker {
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
-    private final EventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
     private ExecutorService executorService = Executors.newCachedThreadPool();
-    private final MessageBroker messageBroker;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     public TaskWorker(
-        EventPublisher eventPublisher, MessageBroker messageBroker,
+        ApplicationEventPublisher eventPublisher,
         TaskHandlerResolver taskHandlerResolver,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
-        this.messageBroker = messageBroker;
         this.taskHandlerResolver = taskHandlerResolver;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     public TaskWorker(
-        EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
+        ApplicationEventPublisher eventPublisher, ExecutorService executorService,
         TaskHandlerResolver taskHandlerResolver, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
-        this.messageBroker = messageBroker;
         this.taskHandlerResolver = taskHandlerResolver;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
@@ -107,24 +106,26 @@ public class TaskWorker {
     /**
      * Handle the execution of a {@link TaskExecution}. Implementors are expected to execute the task asynchronously.
      *
-     * @param taskExecution The task to execute.
+     * @param taskExecutionEvent The task event which contains task to execute.
      */
     @SuppressFBWarnings("NP")
-    public void handle(TaskExecution taskExecution) {
-        logger.debug("Received task: {}", taskExecution);
+    public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
+        logger.debug("Received task execution event: {}", taskExecutionEvent);
 
+        TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
         CountDownLatch latch = new CountDownLatch(1);
 
         Future<?> future = executorService.submit(() -> {
             try {
                 eventPublisher.publishEvent(
-                    new TaskStartedEvent(
+                    new TaskStartedApplicationEvent(
                         Objects.requireNonNull(taskExecution.getJobId()),
                         Objects.requireNonNull(taskExecution.getId())));
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, completedTaskExecution);
+                eventPublisher.publishEvent(
+                    new TaskExecutionCompleteEvent(completedTaskExecution));
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -158,14 +159,16 @@ public class TaskWorker {
     }
 
     /**
-     * Handle control tasks. Control tasks are used by the Coordinator to control Worker instances. For example, to stop
-     * an ongoing task or to adjust something on a worker outside the context of a job.
+     * Handle cancel control tasks to stop an ongoing task or to adjust something on a worker outside the context of a
+     * job.
      */
-    public void handle(Controllable controllable) {
-        if (controllable instanceof CancelControlTask controlTask) {
-            logger.debug("Received control task: {}", controlTask);
+    public void onCancelControlTaskEvent(MessageEvent<?> event) {
+        if (event instanceof CancelControlTaskEvent cancelControlTaskEvent) {
+            CancelControlTask cancelControlTask = cancelControlTaskEvent.getControlTask();
 
-            Long jobId = controlTask.getJobId();
+            logger.debug("Received cancel control task: {}", cancelControlTask);
+
+            Long jobId = cancelControlTask.getJobId();
 
             for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutions.values()) {
                 if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
@@ -278,7 +281,7 @@ public class TaskWorker {
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         taskExecution.setStatus(Status.FAILED);
 
-        messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
+        eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
     }
 
     private long calculateTimeout(TaskExecution taskExecution) {

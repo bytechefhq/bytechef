@@ -18,11 +18,12 @@
 package com.bytechef.hermes.coordinator.trigger.dispatcher;
 
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.hermes.worker.trigger.event.TriggerExecutionEvent;
+import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,14 +36,15 @@ public class TriggerDispatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerDispatcher.class);
 
-    private final MessageBroker messageBroker;
+    private final ApplicationEventPublisher eventPublisher;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
 
     @SuppressFBWarnings("EI")
     public TriggerDispatcher(
-        MessageBroker messageBroker, List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors) {
+        ApplicationEventPublisher eventPublisher,
+        List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors) {
 
-        this.messageBroker = messageBroker;
+        this.eventPublisher = eventPublisher;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
     }
 
@@ -52,10 +54,10 @@ public class TriggerDispatcher {
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "Trigger id={}, type='{}' sent to route='{}'", triggerExecution.getId(), triggerExecution.getType(),
-                TriggerMessageRoute.TRIGGERS);
+                WorkerMessageRoute.TRIGGER_EXECUTION_EVENTS);
         }
 
-        messageBroker.send(TriggerMessageRoute.TRIGGERS, triggerExecution);
+        eventPublisher.publishEvent(new TriggerExecutionEvent(triggerExecution));
     }
 
     private TriggerExecution preProcess(TriggerExecution triggerExecution) {

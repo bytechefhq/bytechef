@@ -26,7 +26,6 @@ import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinition
 import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
-import com.bytechef.message.broker.MessageBroker;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -51,9 +50,6 @@ public class WorkflowConfigurationRestTestConfiguration {
 
     @MockBean
     private RemoteConnectionDefinitionService connectionDefinitionService;
-
-    @MockBean
-    private MessageBroker messageBroker;
 
     @MockBean
     private OAuth2ParameterFacade oAuth2ParameterFacade;

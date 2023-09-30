@@ -17,12 +17,12 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +35,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class ProjectInstanceApiController implements ProjectInstanceApi {
 
     private final ConversionService conversionService;
@@ -63,10 +63,9 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     public ResponseEntity<CreateProjectInstanceWorkflowJob200ResponseModel> createProjectInstanceWorkflowJob(
         Long id, String workflowId) {
 
-        projectInstanceFacade.createProjectInstanceWorkflowJob(id, workflowId);
-
-        return ResponseEntity.ok()
-            .build();
+        return ResponseEntity.ok(
+            new CreateProjectInstanceWorkflowJob200ResponseModel().jobId(
+                projectInstanceFacade.createProjectInstanceWorkflowJob(id, workflowId)));
     }
 
     @Override

@@ -41,41 +41,59 @@ public class TriggerCoordinatorProperties {
 
     public static class TriggerCoordinatorSubscriptions {
 
-        private int listeners = 1;
-        private int polls = 1;
-        private int triggersComplete = 1;
-        private int webhooks = 1;
+        private int applicationEvents = 1;
+        private int triggerExecutionCompleteEvents = 1;
+        private int triggerExecutionErrorEvents = 1;
+        private int triggerListenerEvents = 1;
+        private int triggerPollEvents = 1;
+        private int triggerWebhookEvents = 1;
 
-        public int getListeners() {
-            return listeners;
+        public int getApplicationEvents() {
+            return applicationEvents;
         }
 
-        public int getPolls() {
-            return polls;
+        public int getTriggerExecutionCompleteEvents() {
+            return triggerExecutionCompleteEvents;
         }
 
-        public int getTriggersComplete() {
-            return triggersComplete;
+        public int getTriggerExecutionErrorEvents() {
+            return triggerExecutionErrorEvents;
         }
 
-        public int getWebhooks() {
-            return webhooks;
+        public int getTriggerListenerEvents() {
+            return triggerListenerEvents;
         }
 
-        public void setListeners(int listeners) {
-            this.listeners = listeners;
+        public int getTriggerPollEvents() {
+            return triggerPollEvents;
         }
 
-        public void setPolls(int polls) {
-            this.polls = polls;
+        public int getTriggerWebhookEvents() {
+            return triggerWebhookEvents;
         }
 
-        public void setTriggersComplete(int triggersComplete) {
-            this.triggersComplete = triggersComplete;
+        public void setApplicationEvents(int applicationEvents) {
+            this.applicationEvents = applicationEvents;
         }
 
-        public void setWebhooks(int webhooks) {
-            this.webhooks = webhooks;
+        public void setTriggerExecutionCompleteEvents(int triggerExecutionCompleteEvents) {
+            this.triggerExecutionCompleteEvents = triggerExecutionCompleteEvents;
+        }
+
+        public void setTriggerExecutionErrorEvents(int triggerExecutionErrorEvents) {
+            this.triggerExecutionErrorEvents = triggerExecutionErrorEvents;
+        }
+
+        public void setTriggerListenerEvents(int triggerListenerEvents) {
+            this.triggerListenerEvents = triggerListenerEvents;
+        }
+
+        public void setTriggerPollEvents(int triggerPollEvents) {
+            this.triggerPollEvents = triggerPollEvents;
+        }
+
+        public void setTriggerWebhookEvents(int triggerWebhookEvents) {
+            this.triggerWebhookEvents = triggerWebhookEvents;
         }
     }
 }

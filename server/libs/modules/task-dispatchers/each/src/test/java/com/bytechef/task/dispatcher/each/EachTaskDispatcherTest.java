@@ -29,10 +29,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -46,15 +46,16 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Arik Cohen
  */
 public class EachTaskDispatcherTest {
 
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final RemoteContextService contextService = mock(RemoteContextService.class);
     private final RemoteCounterService counterService = mock(RemoteCounterService.class);
-    private final MessageBroker messageBroker = mock(MessageBroker.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final RemoteTaskExecutionService taskExecutionService = mock(RemoteTaskExecutionService.class);
@@ -65,7 +66,7 @@ public class EachTaskDispatcherTest {
     public void testDispatch1() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
                 workflowFileStorageFacade);
 
             dispatcher.dispatch(TaskExecution.builder()
@@ -81,7 +82,7 @@ public class EachTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
             workflowFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
@@ -102,13 +103,13 @@ public class EachTaskDispatcherTest {
         dispatcher.dispatch(taskExecution);
 
         verify(taskDispatcher, times(3)).dispatch(any());
-        verify(messageBroker, times(0)).send(any(), any());
+        verify(eventPublisher, times(0)).publishEvent(any());
     }
 
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
             workflowFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(
@@ -129,6 +130,6 @@ public class EachTaskDispatcherTest {
         dispatcher.dispatch(taskExecution);
 
         verify(taskDispatcher, times(0)).dispatch(any());
-        verify(messageBroker, times(1)).send(any(), any());
+        verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionCompleteEvent.class));
     }
 }

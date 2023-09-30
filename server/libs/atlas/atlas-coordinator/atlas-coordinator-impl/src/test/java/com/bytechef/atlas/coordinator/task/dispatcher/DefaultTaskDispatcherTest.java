@@ -20,12 +20,14 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import java.util.List;
 import java.util.Map;
 
+import com.bytechef.message.event.MessageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +40,9 @@ public class DefaultTaskDispatcherTest {
     @Test
     public void test1() {
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
-            (k, m) -> Assertions.assertEquals(TaskMessageRoute.TASKS, k), List.of());
+            event -> Assertions.assertEquals(
+                WorkerMessageRoute.TASK_EXECUTION_EVENTS, ((MessageEvent<?>) event).getRoute()),
+            List.of());
 
         defaultTaskDispatcher.dispatch(
             TaskExecution.builder()
@@ -58,7 +62,9 @@ public class DefaultTaskDispatcherTest {
                 .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
-            (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofWorkerRoute("encoder"), k), List.of());
+            event -> Assertions.assertEquals(
+                WorkerMessageRoute.ofTaskMessageRoute("encoder"), ((MessageEvent<?>) event).getRoute()),
+            List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
     }
@@ -74,7 +80,9 @@ public class DefaultTaskDispatcherTest {
                 .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
-            (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofWorkerRoute("encoder.xlarge"), k), List.of());
+            event -> Assertions.assertEquals(
+                WorkerMessageRoute.ofTaskMessageRoute("encoder.xlarge"), ((MessageEvent<?>) event).getRoute()),
+            List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
     }

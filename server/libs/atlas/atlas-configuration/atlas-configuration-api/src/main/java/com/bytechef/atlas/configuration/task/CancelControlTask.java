@@ -19,14 +19,12 @@
 
 package com.bytechef.atlas.configuration.task;
 
-import com.bytechef.message.AbstractControllable;
-
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  * @since Apr 19, 2017
  */
-public class CancelControlTask extends AbstractControllable implements ControlTask {
+public class CancelControlTask implements ControlTask {
 
     public static final String TYPE_CANCEL = "task.cancel";
 
@@ -37,8 +35,6 @@ public class CancelControlTask extends AbstractControllable implements ControlTa
     }
 
     public CancelControlTask(long jobId, long taskExecutionId) {
-        super(TYPE_CANCEL);
-
         this.jobId = jobId;
         this.taskExecutionId = taskExecutionId;
     }
@@ -54,5 +50,10 @@ public class CancelControlTask extends AbstractControllable implements ControlTa
     @Override
     public String toString() {
         return "CancelControlTask{" + "jobId=" + jobId + ", taskExecutionId=" + taskExecutionId + '}';
+    }
+
+    @Override
+    public String getType() {
+        return TYPE_CANCEL;
     }
 }

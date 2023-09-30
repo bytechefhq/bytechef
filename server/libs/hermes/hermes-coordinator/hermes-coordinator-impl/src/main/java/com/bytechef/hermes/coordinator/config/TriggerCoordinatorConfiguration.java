@@ -19,7 +19,7 @@
 
 package com.bytechef.hermes.coordinator.config;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(TriggerCoordinatorProperties.class)
 public class TriggerCoordinatorConfiguration {
 }

@@ -23,10 +23,18 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.hermes.coordinator.event.ApplicationEvent;
+import com.bytechef.hermes.coordinator.event.ErrorEvent;
+import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
+import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
+import com.bytechef.hermes.coordinator.event.TriggerListenerEvent;
+import com.bytechef.hermes.coordinator.event.TriggerPollEvent;
+import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
+import com.bytechef.hermes.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.hermes.coordinator.event.listener.ErrorEventListener;
+import com.bytechef.hermes.coordinator.event.listener.TriggerExecutionErrorEventListener;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
-import com.bytechef.hermes.execution.message.broker.ListenerParameters;
-import com.bytechef.hermes.execution.message.broker.WebhookParameters;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
@@ -35,14 +43,14 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
 import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.SystemMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,62 +62,92 @@ public class TriggerCoordinator {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerCoordinator.class);
 
+    private final List<ApplicationEventListener> applicationEventListeners;
+    private final List<ErrorEventListener> errorEventListeners;
+    private final ApplicationEventPublisher eventPublisher;
     private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
-    private final MessageBroker messageBroker;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
+    private final TriggerExecutionErrorEventListener triggerExecutionErrorEventListener;
     private final RemoteTriggerExecutionService triggerExecutionService;
     private final RemoteTriggerStateService triggerStateService;
     private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, MessageBroker messageBroker,
+        List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
+        ApplicationEventPublisher eventPublisher, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
+        TriggerExecutionErrorEventListener triggerExecutionErrorEventListener,
         RemoteTriggerExecutionService triggerExecutionService, RemoteTriggerStateService triggerStateService,
         RemoteWorkflowService workflowService) {
 
+        this.applicationEventListeners = applicationEventListeners;
+        this.errorEventListeners = errorEventListeners;
+        this.eventPublisher = eventPublisher;
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
-        this.messageBroker = messageBroker;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
+        this.triggerExecutionErrorEventListener = triggerExecutionErrorEventListener;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
 
     /**
-     * Complete a trigger of a given workflow execution.
      *
-     * @param triggerExecution The trigger to complete.
+     * @param applicationEvent
      */
-    public void handleTriggersComplete(TriggerExecution triggerExecution) {
-        try {
-            triggerCompletionHandler.handle(triggerExecution);
-        } catch (Exception e) {
-            triggerExecution.setError(
-                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-            messageBroker.send(SystemMessageRoute.ERRORS, triggerExecution);
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
+            applicationEventListener.onApplicationEvent(applicationEvent);
         }
     }
 
-    public void handleListeners(ListenerParameters listenerParameters) {
+    public void onErrorEvent(ErrorEvent errorEvent) {
+        for (ErrorEventListener errorEventListener : errorEventListeners) {
+            errorEventListener.onErrorEvent(errorEvent);
+        }
+    }
+
+    public void onTriggerExecutionErrorEvent(TriggerExecutionErrorEvent triggerExecutionErrorEvent) {
+        triggerExecutionErrorEventListener.onTriggerExecutionErrorEvent(triggerExecutionErrorEvent);
+    }
+
+    /**
+     * Complete a trigger of a given workflow execution.
+     *
+     * @param triggerExecutionCompleteEvent The trigger execution event to complete.
+     */
+    // TODO @Transactional
+    public void onTriggerExecutionCompleteEvent(TriggerExecutionCompleteEvent triggerExecutionCompleteEvent) {
+        TriggerExecution triggerExecution = triggerExecutionCompleteEvent.getTriggerExecution();
+
+        handleTriggerExecutionCompletion(triggerExecution);
+    }
+
+    // TODO @Transactional
+    public void onTriggerListenerEvent(TriggerListenerEvent triggerListenerEvent) {
+        TriggerListenerEvent.ListenerParameters listenerParameters = triggerListenerEvent.getListenerParameters();
+
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .output(listenerParameters.output())
             .workflowExecutionId(listenerParameters.workflowExecutionId())
             .build();
 
-        handleTriggersComplete(triggerExecution);
+        handleTriggerExecutionCompletion(triggerExecution);
     }
 
     /**
      * Invoked every poll interval (5 mins by default) for a given workflow execution to dispatch request for trigger's
      * handler execution.
      *
-     * @param workflowExecutionId The workflowExecutionId.
+     * @param triggerPollEvent The trigger poll event.
      */
-    public void handlePolls(WorkflowExecutionId workflowExecutionId) {
+    // TODO @Transactional
+    public void onTriggerPollEvent(TriggerPollEvent triggerPollEvent) {
+        WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
+
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .workflowExecutionId(workflowExecutionId)
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
@@ -127,9 +165,12 @@ public class TriggerCoordinator {
 
     /**
      *
-     * @param webhookParameters
+     * @param triggerWebhookEvent
      */
-    public void handleWebhooks(WebhookParameters webhookParameters) {
+    // TODO @Transactional
+    public void onTriggerWebhookEvent(TriggerWebhookEvent triggerWebhookEvent) {
+        TriggerWebhookEvent.WebhookParameters webhookParameters = triggerWebhookEvent.getWebhookParameters();
+
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookParameters.webhookRequest()))
             .workflowExecutionId(webhookParameters.workflowExecutionId())
@@ -165,7 +206,18 @@ public class TriggerCoordinator {
             triggerExecution.setError(
                 new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            messageBroker.send(SystemMessageRoute.ERRORS, triggerExecution);
+            eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
+        }
+    }
+
+    private void handleTriggerExecutionCompletion(TriggerExecution triggerExecution) {
+        try {
+            triggerCompletionHandler.handle(triggerExecution);
+        } catch (Exception e) {
+            triggerExecution.setError(
+                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
+            eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
         }
     }
 

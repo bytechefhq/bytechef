@@ -53,7 +53,7 @@ public interface ActionDefinitionService {
         @NonNull ActionContext context);
 
     Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 

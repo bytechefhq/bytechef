@@ -1,12 +1,10 @@
 dependencies {
     implementation("org.springframework:spring-context")
-
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:atlas:atlas-sync-executor"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:core:event:event-listener:event-listener-api"))
-    implementation(project(":server:libs:core:message-broker:message-broker-sync"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-api"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-api"))

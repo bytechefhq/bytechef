@@ -17,10 +17,8 @@
 
 package com.bytechef.hermes.configuration.trigger;
 
-import com.bytechef.message.Controllable;
-
 /**
  * @author Ivica Cardic
  */
-public interface ControlTrigger extends Trigger, Controllable {
+public interface ControlTrigger extends Trigger {
 }

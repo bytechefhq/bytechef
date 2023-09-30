@@ -27,9 +27,8 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.message.broker.MessageBroker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
@@ -44,11 +43,11 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final MessageBroker messageBroker;
+    private final RemoteJobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public SubflowTaskDispatcher(MessageBroker messageBroker) {
-        this.messageBroker = messageBroker;
+    public SubflowTaskDispatcher(RemoteJobFacade jobFacade) {
+        this.jobFacade = jobFacade;
     }
 
     @Override
@@ -58,7 +57,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution.getId(),
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 
-        messageBroker.send(TaskMessageRoute.JOBS_CREATE, jobParameters);
+        jobFacade.createJob(jobParameters);
     }
 
     @Override

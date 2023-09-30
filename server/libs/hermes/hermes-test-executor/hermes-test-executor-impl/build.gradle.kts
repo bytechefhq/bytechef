@@ -1,6 +1,7 @@
 dependencies {
 
     implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
@@ -8,11 +9,9 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     implementation(project(":server:libs:atlas:atlas-sync-executor"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
-    implementation(project(":server:libs:core:autoconfigure-annotations"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:commons:commons-data"))
-    implementation(project(":server:libs:core:event:event-listener:event-listener-api"))
-    implementation(project(":server:libs:core:message-broker:message-broker-sync"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
     implementation(project(":server:libs:modules:components:map"))

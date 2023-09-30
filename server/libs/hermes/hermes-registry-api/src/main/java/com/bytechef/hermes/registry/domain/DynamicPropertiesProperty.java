@@ -62,6 +62,6 @@ public class DynamicPropertiesProperty extends Property {
     public String toString() {
         return "DynamicPropertiesProperty{" +
             "propertiesDataSource=" + propertiesDataSource +
-            "} " + super.toString();
+            "} ";
     }
 }

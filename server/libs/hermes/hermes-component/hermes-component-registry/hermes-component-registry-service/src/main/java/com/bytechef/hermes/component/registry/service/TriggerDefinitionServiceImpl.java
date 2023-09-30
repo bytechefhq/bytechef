@@ -53,17 +53,16 @@ import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.hermes.execution.message.broker.ListenerParameters;
+import com.bytechef.hermes.coordinator.event.TriggerListenerEvent;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
-import com.bytechef.message.broker.MessageBroker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -79,15 +78,16 @@ import java.util.Map;
 @Service("triggerDefinitionService")
 public class TriggerDefinitionServiceImpl implements TriggerDefinitionService, RemoteTriggerDefinitionService {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
-    private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
     public TriggerDefinitionServiceImpl(
-        ComponentDefinitionRegistry componentDefinitionRegistry, MessageBroker messageBroker) {
+        ApplicationEventPublisher eventPublisher,
+        ComponentDefinitionRegistry componentDefinitionRegistry) {
 
+        this.eventPublisher = eventPublisher;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
-        this.messageBroker = messageBroker;
     }
 
     @Override
@@ -192,9 +192,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService, R
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()),
             workflowExecutionId,
-            output -> messageBroker.send(
-                TriggerMessageRoute.LISTENERS,
-                new ListenerParameters(WorkflowExecutionId.parse(workflowExecutionId), output)),
+            output -> eventPublisher.publishEvent(
+                new TriggerListenerEvent(
+                    new TriggerListenerEvent.ListenerParameters(WorkflowExecutionId.parse(workflowExecutionId),
+                        output))),
             context);
     }
 
@@ -211,9 +212,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService, R
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
 
-        return options.stream()
-            .map(Option::new)
-            .toList();
+        return CollectionUtils.map(options, Option::new);
     }
 
     @Override

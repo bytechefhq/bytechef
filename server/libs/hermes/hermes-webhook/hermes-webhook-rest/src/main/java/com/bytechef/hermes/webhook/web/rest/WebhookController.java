@@ -19,7 +19,7 @@ package com.bytechef.hermes.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -39,6 +39,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -64,7 +65,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class WebhookController {
 
     private final FileStorageService fileStorageService;
