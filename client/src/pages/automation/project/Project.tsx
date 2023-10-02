@@ -127,6 +127,7 @@ const Project: React.FC = () => {
                             {currentWorkflow && !!projectWorkflows && (
                                 <Select
                                     defaultValue={workflowId}
+                                    name="projectWorkflowSelect"
                                     onValueChange={(value) => {
                                         setCurrentWorkflow(
                                             projectWorkflows.find(
@@ -145,7 +146,7 @@ const Project: React.FC = () => {
                                             value: workflow.id!,
                                         })
                                     )}
-                                    value={currentWorkflow.id!}
+                                    value={currentWorkflow.id || workflowId}
                                 />
                             )}
 
