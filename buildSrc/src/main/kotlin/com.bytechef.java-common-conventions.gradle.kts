@@ -37,6 +37,8 @@ val compileJava by tasks.existing(JavaCompile::class) {
 idea {
     module {
         excludeDirs.addAll(files("node_modules"))
+        sourceDirs.add(file("build/generated/sources/annotationProcessor/java/main"))
+        generatedSourceDirs.add(file("build/generated/sources/annotationProcessor/java/main"))
     }
 }
 
