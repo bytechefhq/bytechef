@@ -1,9 +1,4 @@
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PropertyType} from '@/types/projectTypes';
 import {DataPillType} from '@/types/types';
 import Editor from '@monaco-editor/react';

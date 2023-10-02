@@ -1,9 +1,4 @@
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {
