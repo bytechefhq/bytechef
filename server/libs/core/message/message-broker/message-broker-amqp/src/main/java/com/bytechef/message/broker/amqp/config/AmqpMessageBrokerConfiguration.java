@@ -20,6 +20,8 @@ package com.bytechef.message.broker.amqp.config;
 import com.bytechef.message.broker.amqp.AmqpMessageBroker;
 import com.bytechef.message.route.SystemMessageRoute;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -36,6 +38,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "amqp")
 public class AmqpMessageBrokerConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
+
+    public AmqpMessageBrokerConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Message broker provider type enabled: amqp");
+        }
+    }
 
     @Bean
     AmqpMessageBroker amqpMessageBroker(AmqpTemplate amqpTemplate) {
