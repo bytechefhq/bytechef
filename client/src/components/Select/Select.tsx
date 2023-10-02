@@ -45,6 +45,7 @@ type SelectProps = {
     fieldsetClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
+    name?: string;
     onValueChange?(value: string): void;
     placeholder?: string;
     triggerClassName?: string;
@@ -58,9 +59,10 @@ const Select = ({
     fieldsetClassName,
     label,
     leadingIcon,
+    name,
     onValueChange,
     options,
-    placeholder,
+    placeholder = 'Select...',
     triggerClassName,
     value,
 }: SelectProps) => (
@@ -75,15 +77,13 @@ const Select = ({
                 <span>{label}</span>
 
                 {description && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <QuestionMarkCircledIcon />
-                            </TooltipTrigger>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <QuestionMarkCircledIcon />
+                        </TooltipTrigger>
 
-                            <TooltipContent>{description}</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                        <TooltipContent>{description}</TooltipContent>
+                    </Tooltip>
                 )}
             </Label>
         )}
@@ -91,7 +91,8 @@ const Select = ({
         <Root
             defaultValue={defaultValue}
             onValueChange={onValueChange}
-            value={value}
+            value={value || defaultValue}
+            name={name}
         >
             <Trigger asChild aria-label="Select">
                 <Button
@@ -107,7 +108,7 @@ const Select = ({
                         </div>
                     )}
 
-                    <Value placeholder={placeholder || 'Select...'} />
+                    <Value placeholder={placeholder} />
 
                     <Icon className="ml-auto pl-2">
                         <ChevronDownIcon />
@@ -119,7 +120,7 @@ const Select = ({
                 <Content
                     align="start"
                     className={twMerge(
-                        'max-h-select-content-available-height min-w-select-trigger-width',
+                        'flex max-h-select-content-available-height min-w-select-trigger-width',
                         contentClassName
                     )}
                     position="popper"
@@ -135,9 +136,13 @@ const Select = ({
                                 <Item
                                     key={option.value}
                                     value={option.value}
-                                    className="radix-disabled:opacity-50 relative cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none"
+                                    className={twMerge(
+                                        'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none',
+                                        option.value ===
+                                            (value || defaultValue) && 'px-2'
+                                    )}
                                 >
-                                    <ItemIndicator className="absolute left-2 inline-flex items-center">
+                                    <ItemIndicator className="inline-flex items-center pl-0 pr-2">
                                         <CheckIcon />
                                     </ItemIndicator>
 
