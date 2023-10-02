@@ -2,7 +2,15 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/pages/automation/project/utils/getRandomId';
 
 import 'quill-mention';
-import React, {ReactNode, useCallback, useMemo, useRef, useState} from 'react';
+import {
+    ReactNode,
+    memo,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -147,6 +155,16 @@ const MentionsInput = ({
 
     const isFocused = focusedInput?.props.id === elementId;
 
+    useEffect(() => {
+        if (editorRef.current === null) {
+            return;
+        }
+
+        const keyboard = editorRef.current.getEditor().getModule('keyboard');
+
+        delete keyboard.bindings[9];
+    }, [editorRef]);
+
     return (
         <fieldset className={twMerge('w-full', fieldsetClassName)}>
             {label && (
@@ -217,4 +235,4 @@ const MentionsInput = ({
     );
 };
 
-export default React.memo(MentionsInput);
+export default memo(MentionsInput);
