@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
+
 import {TooltipProvider} from './components/ui/tooltip';
 
 const user = {
