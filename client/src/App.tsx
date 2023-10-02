@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
+import {TooltipProvider} from './components/ui/tooltip';
 
 const user = {
     email: 'emily.selman@example.com',
@@ -61,20 +62,24 @@ function App() {
 
     return (
         <div className="flex h-full">
-            <MobileSidebar
-                user={user}
-                navigation={navigation}
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-            />
+            <TooltipProvider>
+                <MobileSidebar
+                    user={user}
+                    navigation={navigation}
+                    mobileMenuOpen={mobileMenuOpen}
+                    setMobileMenuOpen={setMobileMenuOpen}
+                />
 
-            <DesktopSidebar navigation={navigation} />
+                <DesktopSidebar navigation={navigation} />
 
-            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
+                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                    <MobileTopNavigation
+                        setMobileMenuOpen={setMobileMenuOpen}
+                    />
 
-                <Outlet />
-            </div>
+                    <Outlet />
+                </div>
+            </TooltipProvider>
         </div>
     );
 }

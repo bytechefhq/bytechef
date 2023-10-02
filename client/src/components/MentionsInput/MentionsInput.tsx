@@ -167,15 +167,15 @@ const MentionsInput = ({
                     </label>
 
                     {description && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <QuestionMarkCircledIcon />
-                                </TooltipTrigger>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <QuestionMarkCircledIcon />
+                            </TooltipTrigger>
 
-                                <TooltipContent>{description}</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                            <TooltipContent className="max-w-[250px]">
+                                {description}
+                            </TooltipContent>
+                        </Tooltip>
                     )}
                 </div>
             )}

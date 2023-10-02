@@ -817,17 +817,15 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
         <div className="flex">
             <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
 
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <QuestionMarkCircledIcon />
-                    </TooltipTrigger>
+            <Tooltip>
+                <TooltipTrigger>
+                    <QuestionMarkCircledIcon />
+                </TooltipTrigger>
 
-                    <TooltipContent>
-                        OAuth permission scopes used for this connection.
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
+                <TooltipContent>
+                    OAuth permission scopes used for this connection.
+                </TooltipContent>
+            </Tooltip>
         </div>
 
         <div className="space-y-1">
