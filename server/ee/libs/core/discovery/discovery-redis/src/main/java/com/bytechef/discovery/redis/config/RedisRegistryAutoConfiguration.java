@@ -25,6 +25,8 @@ import com.bytechef.discovery.redis.registry.RedisAutoServiceRegistration;
 import com.bytechef.discovery.redis.registry.RedisRegistration;
 import com.bytechef.discovery.redis.registry.RedisServiceRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -49,6 +51,14 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 })
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 public class RedisRegistryAutoConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisRegistryAutoConfiguration.class);
+
+    public RedisRegistryAutoConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Discovery service provider type enabled: redis");
+        }
+    }
 
     @Bean
     RedisAutoServiceRegistration redisAutoServiceRegistration(

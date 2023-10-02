@@ -25,13 +25,43 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "bytechef.file-storage")
 public class FileStorageProperties {
 
-    private String filesystemDir;
+    private Filesystem filesystem;
 
-    public String getFilesystemDir() {
-        return filesystemDir;
+    public Filesystem getFilesystem() {
+        return filesystem;
     }
 
-    public void setFilesystemDir(String fileStorageDir) {
-        this.filesystemDir = fileStorageDir;
+    public String getFilesystemDirectory() {
+        return filesystem.getDirectory();
+    }
+
+    public boolean isFilesystemWatch() {
+        return filesystem.isWatch();
+    }
+
+    public void setFilesystem(Filesystem filesystem) {
+        this.filesystem = filesystem;
+    }
+
+    public static class Filesystem {
+
+        private String directory;
+        private boolean watch;
+
+        public String getDirectory() {
+            return directory;
+        }
+
+        public void setDirectory(String directory) {
+            this.directory = directory;
+        }
+
+        public boolean isWatch() {
+            return watch;
+        }
+
+        public void setWatch(boolean watch) {
+            this.watch = watch;
+        }
     }
 }

@@ -18,16 +18,29 @@
 package com.bytechef.atlas.configuration.repository.git.config;
 
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.git.enabled", havingValue = "true")
 @EnableConfigurationProperties(GitWorkflowRepositoryProperties.class)
 public class GitWorkflowRepositoryConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepositoryConfiguration.class);
+
+    public GitWorkflowRepositoryConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Workflow repository type enabled: git");
+        }
+    }
 
     @Bean
     @Order(4)

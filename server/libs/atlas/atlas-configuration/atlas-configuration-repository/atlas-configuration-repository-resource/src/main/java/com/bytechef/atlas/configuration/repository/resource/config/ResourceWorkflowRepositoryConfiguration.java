@@ -20,6 +20,8 @@ package com.bytechef.atlas.configuration.repository.resource.config;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.FilesystemResourceWorkflowRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -29,10 +31,16 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class ResourceWorkflowRepositoryConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(ResourceWorkflowRepositoryConfiguration.class);
+
     @Bean
     @Order(1)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.classpath.enabled", havingValue = "true")
     WorkflowRepository classpathBasedWorkflowRepository() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Workflow repository type enabled: classpath");
+        }
+
         return new ClassPathResourceWorkflowRepository();
     }
 
@@ -41,6 +49,11 @@ public class ResourceWorkflowRepositoryConfiguration {
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
     WorkflowRepository filesystemBasedWorkflowRepository(
         @Value("${bytechef.workflow.repository.filesystem.location-pattern}") String locationPattern) {
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Workflow repository type enabled: filesystem");
+        }
+
         return new FilesystemResourceWorkflowRepository(locationPattern);
     }
 }
