@@ -43,8 +43,12 @@
     @apply rounded-md;
     @apply cursor-pointer;
     @apply border-2 border-transparent;
-    @apply hover:border-2 hover:border-gray-400;
     @apply flex;
+    @apply hover:border-gray-400;
+}
+
+.ql-mention-list-item.selected {
+    @apply border-gray-400;
 }
 
 .ql-mention-list-item div {
@@ -54,20 +58,6 @@
 }
 
 .ql-mention-list-item svg {
-    @apply h-4;
-    @apply w-4;
-}
-
-.mention {
-    @apply border;
-    @apply bg-gray-100;
-    @apply px-2 py-1;
-    @apply rounded-full;
-}
-
-.mention::before {
-    @apply bg-[url(data-icon)];
-    @apply content-[''];
     @apply h-4 w-4;
 }
 
