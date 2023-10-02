@@ -119,7 +119,7 @@ const DataPillPanel = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-2 right-[472px] top-16 z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
+                    className="fixed inset-y-2 right-[472px] top-16 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                     onOpenAutoFocus={(event) => event.preventDefault()}
                 >
@@ -131,19 +131,17 @@ const DataPillPanel = () => {
                             <Dialog.Title className="flex content-center items-center text-lg font-medium text-gray-900">
                                 <span>Data Pill Panel</span>
 
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <InfoCircledIcon className="ml-1 h-4 w-4" />
-                                        </TooltipTrigger>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <InfoCircledIcon className="ml-1 h-4 w-4" />
+                                    </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            To use data from the previous step
-                                            drag its datapill into a field, or
-                                            click on the datapill.
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                    <TooltipContent>
+                                        To use data from the previous step drag
+                                        its datapill into a field, or click on
+                                        the datapill.
+                                    </TooltipContent>
+                                </Tooltip>
 
                                 <Button
                                     aria-label="Close the data pill panel"

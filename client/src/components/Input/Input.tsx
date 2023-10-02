@@ -70,15 +70,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     {required && <span className="pr-1 text-red-500">*</span>}
 
                     {description && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <QuestionMarkCircledIcon />
-                                </TooltipTrigger>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <QuestionMarkCircledIcon />
+                            </TooltipTrigger>
 
-                                <TooltipContent>{description}</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                            <TooltipContent>{description}</TooltipContent>
+                        </Tooltip>
                     )}
                 </div>
             )}

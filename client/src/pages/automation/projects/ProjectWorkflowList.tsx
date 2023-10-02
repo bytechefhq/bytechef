@@ -111,30 +111,26 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                                         key={name}
                                                         className="mr-0.5 flex items-center justify-center rounded-full border p-1"
                                                     >
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger>
-                                                                    <InlineSVG
-                                                                        className="h-5 w-5 flex-none"
-                                                                        key={
-                                                                            name
-                                                                        }
-                                                                        src={
-                                                                            componentDefinition?.icon
-                                                                                ? componentDefinition?.icon
-                                                                                : taskDispatcherDefinition?.icon ??
-                                                                                  ''
-                                                                        }
-                                                                    />
-                                                                </TooltipTrigger>
-
-                                                                <TooltipContent side="right">
-                                                                    {
-                                                                        componentDefinition?.title
+                                                        <Tooltip>
+                                                            <TooltipTrigger>
+                                                                <InlineSVG
+                                                                    className="h-5 w-5 flex-none"
+                                                                    key={name}
+                                                                    src={
+                                                                        componentDefinition?.icon
+                                                                            ? componentDefinition?.icon
+                                                                            : taskDispatcherDefinition?.icon ??
+                                                                              ''
                                                                     }
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
+                                                                />
+                                                            </TooltipTrigger>
+
+                                                            <TooltipContent side="right">
+                                                                {
+                                                                    componentDefinition?.title
+                                                                }
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                     </div>
                                                 );
                                             }
