@@ -172,7 +172,9 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     }
 
     public void setConnections(List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections) {
-        this.projectInstanceWorkflowConnections = new HashSet<>(projectInstanceWorkflowConnections);
+        if (projectInstanceWorkflowConnections != null) {
+            this.projectInstanceWorkflowConnections = new HashSet<>(projectInstanceWorkflowConnections);
+        }
     }
 
     public void setEnabled(boolean enabled) {

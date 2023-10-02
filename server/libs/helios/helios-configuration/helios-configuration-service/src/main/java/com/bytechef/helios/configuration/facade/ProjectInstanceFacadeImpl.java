@@ -90,16 +90,28 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstance.setTags(tags);
         }
 
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService.create(
-            projectInstanceDTO.projectInstanceWorkflows() == null
-                ? List.of()
-                : projectInstanceDTO.projectInstanceWorkflows());
-
         projectInstance = projectInstanceService.create(projectInstance);
+
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
+            projectInstanceDTO.projectInstanceWorkflows(), projectInstance);
 
         return new ProjectInstanceDTO(
             getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
             projectInstanceWorkflows, projectService.getProject(projectInstance.getProjectId()), tags);
+    }
+
+    private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows, ProjectInstance projectInstance) {
+
+        projectInstanceWorkflows = projectInstanceWorkflows == null
+            ? List.of()
+            : projectInstanceWorkflows;
+
+        projectInstanceWorkflows = projectInstanceWorkflowService.create(
+            projectInstanceWorkflows.stream()
+                .peek(projectInstanceWorkflow -> projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId()))
+                .toList());
+        return projectInstanceWorkflows;
     }
 
     @Override
