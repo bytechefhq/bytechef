@@ -66,7 +66,7 @@ public class CsvFileComponentHandlerIntTest {
             Map.of(
                 FILE_ENTRY,
                 fileStorageService.storeFileContent(
-                    FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -101,7 +101,7 @@ public class CsvFileComponentHandlerIntTest {
             Map.of(
                 FILE_ENTRY,
                 fileStorageService.storeFileContent(
-                    FileEntryConstants.DOCUMENTS_DIR, sampleFile.getName(),
+                    FileEntryConstants.FILES_DIR, sampleFile.getName(),
                     Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());

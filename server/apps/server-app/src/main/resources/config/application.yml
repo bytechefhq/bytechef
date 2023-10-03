@@ -132,7 +132,8 @@ bytechef:
   file-storage:
     # File storage provider for files (base64 | filesystem) default: filesystem
     provider: filesystem
-    filesystem-dir: ${user.home}/bytechef/files
+    filesystem:
+      basedir: ${user.home}/bytechef/data/file-storage
   oauth2:
 #    predefinedApps:
 #      mailchimp:
@@ -172,6 +173,7 @@ bytechef:
         enabled: true
         # Location of workflows on the file system
         location-pattern: ${user.home}/bytechef/**/*.yaml
+        watch: true
       git:
         # Enable a git-based workflow repository
         enabled: false

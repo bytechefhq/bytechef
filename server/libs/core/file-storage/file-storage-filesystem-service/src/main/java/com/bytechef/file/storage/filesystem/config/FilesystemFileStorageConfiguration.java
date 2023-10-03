@@ -17,7 +17,6 @@
 
 package com.bytechef.file.storage.filesystem.config;
 
-import com.bytechef.file.storage.config.FileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import org.slf4j.Logger;
@@ -31,22 +30,22 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@EnableConfigurationProperties(FileStorageProperties.class)
+@EnableConfigurationProperties(FilesystemFileStorageProperties.class)
 @ConditionalOnProperty(prefix = "bytechef", name = "file-storage.provider", havingValue = "filesystem")
 public class FilesystemFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(FilesystemFileStorageConfiguration.class);
 
-    public FilesystemFileStorageConfiguration(FileStorageProperties storageProperties) {
+    public FilesystemFileStorageConfiguration(FilesystemFileStorageProperties storageProperties) {
         if (logger.isInfoEnabled()) {
             logger.info(
                 "File storage provider type enabled: filesystem, directory %s".formatted(
-                    storageProperties.getFilesystemDirectory()));
+                    storageProperties.getBasedir()));
         }
     }
 
     @Bean
-    FileStorageService filesystemFileStorageService(FileStorageProperties storageProperties) {
-        return new FilesystemFileStorageService(storageProperties.getFilesystemDirectory());
+    FileStorageService filesystemFileStorageService(FilesystemFileStorageProperties filesystemFileStorageProperties) {
+        return new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
     }
 }

@@ -69,7 +69,7 @@ public class JsonFileComponentHandlerIntTest {
                 "fileEntry",
                 fileStorageService
                     .storeFileContent(
-                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                        FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
@@ -102,7 +102,7 @@ public class JsonFileComponentHandlerIntTest {
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray(fileStorageService.readFileToString(FileEntryConstants.DOCUMENTS_DIR, fileEntry)),
+            new JSONArray(fileStorageService.readFileToString(FileEntryConstants.FILES_DIR, fileEntry)),
             true);
     }
 

@@ -15,12 +15,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.constants;
+package com.bytechef.file.storage.filesystem.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Ivica Cardic
  */
-public class FileEntryConstants {
+@ConfigurationProperties(prefix = "bytechef.file-storage.filesystem")
+public class FilesystemFileStorageProperties {
 
-    public static final String FILES_DIR = "files";
+    private String basedir;
+
+    public String getBasedir() {
+        return basedir;
+    }
+
+    public void setBasedir(String basedir) {
+        this.basedir = basedir;
+    }
 }
