@@ -128,9 +128,6 @@ public class ProjectOrphanFilesystemWorkflowChecker {
     private List<Long> getTagIds(Workflow.SourceType sourceType) {
         String sourceTypeName = sourceType.name();
 
-        return tagService.save(List.of(new Tag(sourceTypeName.toLowerCase())))
-            .stream()
-            .map(Tag::getId)
-            .toList();
+        return CollectionUtils.map(tagService.save(List.of(new Tag(sourceTypeName.toLowerCase()))), Tag::getId);
     }
 }
