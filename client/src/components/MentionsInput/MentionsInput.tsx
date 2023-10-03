@@ -2,15 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/pages/automation/project/utils/getRandomId';
 
 import 'quill-mention';
-import {
-    ReactNode,
-    memo,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import {ReactNode, memo, useEffect, useMemo, useRef, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -75,14 +67,14 @@ const MentionsInput = ({
             dataAttributes: ['component'],
             fixMentionsToQuill: true,
             mentionDenotationChars: ['{'],
-            onOpen: useCallback(() => {
+            onOpen: () => {
                 if (!editorRef.current) {
                     return;
                 }
 
-                // @ts-expect-error Quill false positive
-                const editorContainer = editorRef.current.getEditor().container;
-
+                const editorContainer =
+                    // @ts-expect-error Quill false positive
+                    editorRef.current.getEditor().container;
                 const {height} = editorContainer.getBoundingClientRect();
 
                 const mentionListParentElement = editorContainer.querySelector(
@@ -92,63 +84,54 @@ const MentionsInput = ({
                 mentionListParentElement.style.top = `${
                     height + editorContainer.offsetTop + 10
                 }px`;
-            }, []),
-            onSelect: useCallback(
-                (
-                    item: DataPillType,
-                    insertItem: (
-                        data: DataPillType,
-                        programmaticInsert: boolean,
-                        overriddenOptions: object
-                    ) => void
-                ) => {
-                    const component = JSON.parse(item.component as string);
+            },
+            onSelect: (
+                item: DataPillType,
+                insertItem: (
+                    data: DataPillType,
+                    programmaticInsert: boolean,
+                    overriddenOptions: object
+                ) => void
+            ) => {
+                const component = JSON.parse(item.component as string);
 
-                    insertItem(
-                        {
-                            component,
-                            icon: component.icon,
-                            id: item.id,
-                            value: item.value,
-                        },
-                        false,
-                        {
-                            blotName: 'bytechef-mention',
-                        }
-                    );
-                },
-                []
-            ),
-            renderItem: useCallback(
-                (item: DataPillType) => MentionInputListItem(item),
-                []
-            ),
-            showDenotationChar: false,
-            source: useCallback(
-                (
-                    searchTerm: string,
-                    renderList: (arg1: Array<object>, arg2: string) => void
-                ) => {
-                    const formattedData = data.map((datum) => ({
-                        ...datum,
-                        icon: JSON.parse(datum.component as string).icon,
-                    }));
-
-                    if (searchTerm.length === 0) {
-                        renderList(formattedData, searchTerm);
-                    } else {
-                        const matches = formattedData.filter(
-                            (datum) =>
-                                ~datum.value
-                                    .toLowerCase()
-                                    .indexOf(searchTerm.toLowerCase())
-                        );
-
-                        renderList(matches, searchTerm);
+                insertItem(
+                    {
+                        component,
+                        icon: component.icon,
+                        id: item.id,
+                        value: item.value,
+                    },
+                    false,
+                    {
+                        blotName: 'bytechef-mention',
                     }
-                },
-                [data]
-            ),
+                );
+            },
+            renderItem: (item: DataPillType) => MentionInputListItem(item),
+            showDenotationChar: false,
+            source: (
+                searchTerm: string,
+                renderList: (arg1: Array<object>, arg2: string) => void
+            ) => {
+                const formattedData = data.map((datum) => ({
+                    ...datum,
+                    icon: JSON.parse(datum.component as string).icon,
+                }));
+
+                if (searchTerm.length === 0) {
+                    renderList(formattedData, searchTerm);
+                } else {
+                    const matches = formattedData.filter(
+                        (datum) =>
+                            ~datum.value
+                                .toLowerCase()
+                                .indexOf(searchTerm.toLowerCase())
+                    );
+
+                    renderList(matches, searchTerm);
+                }
+            },
         },
         toolbar: false,
     };
@@ -156,7 +139,7 @@ const MentionsInput = ({
     const isFocused = focusedInput?.props.id === elementId;
 
     useEffect(() => {
-        if (editorRef.current === null) {
+        if (!editorRef.current) {
             return;
         }
 
@@ -216,7 +199,8 @@ const MentionsInput = ({
                     formats={['bytechef-mention', 'mention']}
                     id={elementId}
                     key={elementId}
-                    modules={modules}
+                    // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
+                    modules={useMemo(() => modules, [])}
                     onChange={setValue}
                     onFocus={() => {
                         if (editorRef.current) {
