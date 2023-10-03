@@ -528,6 +528,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /projects/{id}/workflows/{workflowId}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+        - "workflow"
+      operationId: "deleteProjectWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
   /projects/{id}/workflows/{workflowId}/duplicate:
     post:
       description: "Duplicates existing workflow."
@@ -573,22 +597,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/Workflow"
   /workflows/{id}:
-    delete:
-      description: "Delete a workflow."
-      summary: "Delete a workflow"
-      tags:
-      - "workflow"
-      operationId: "deleteWorkflow"
-      parameters:
-      - name: "id"
-        description: "The id of the workflow to delete."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
     get:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
