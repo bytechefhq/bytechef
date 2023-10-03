@@ -528,6 +528,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /projects/{id}/workflows/{workflowId}/duplicate:
+    post:
+      description: "Duplicates existing workflow."
+      summary: "Duplicates existing workflow."
+      tags:
+        - "workflow"
+      operationId: "duplicateWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The duplicated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
   /workflows:
     get:
       description: "Get workflow definitions."
@@ -604,27 +632,6 @@ paths:
       responses:
         "200":
           description: "The updated workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Workflow"
-  /workflows/{id}/duplicate:
-    post:
-      description: "Duplicates existing workflow."
-      summary: "Duplicates existing workflow."
-      tags:
-        - "workflow"
-      operationId: "duplicateWorkflow"
-      parameters:
-        - name: "id"
-          description: "The id of a workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "The duplicated workflow object."
           content:
             application/json:
               schema:
