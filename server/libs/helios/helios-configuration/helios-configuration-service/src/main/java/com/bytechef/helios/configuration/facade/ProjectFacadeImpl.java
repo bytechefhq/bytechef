@@ -143,6 +143,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public Workflow duplicateWorkflow(long id, String workflowId) {
+        Workflow workflow = workflowService.duplicateWorkflow(workflowId);
+
+        projectService.addWorkflow(id, workflow.getId());
+
+        return workflow;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectDTO getProject(long id) {
         Project project = projectService.getProject(id);

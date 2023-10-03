@@ -37,6 +37,8 @@ public interface ProjectFacade {
 
     ProjectDTO duplicateProject(long id);
 
+    Workflow duplicateWorkflow(long id, String workflowId);
+
     ProjectDTO getProject(long id);
 
     List<Category> getProjectCategories();
@@ -50,5 +52,4 @@ public interface ProjectFacade {
     ProjectDTO updateProject(ProjectDTO projectDTO);
 
     void updateProjectTags(long id, List<Tag> tags);
-
 }
