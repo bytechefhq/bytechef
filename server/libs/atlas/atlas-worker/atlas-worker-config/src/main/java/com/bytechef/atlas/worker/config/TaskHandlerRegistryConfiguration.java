@@ -37,7 +37,6 @@ public class TaskHandlerRegistryConfiguration {
 
         return MapUtils.concat(
             taskHandlerMap,
-            taskHandlerMapFactory.getTaskHandlerMap() == null
-                ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap())::get;
+            taskHandlerMapFactory == null ? Map.of() : taskHandlerMapFactory.getTaskHandlerMap())::get;
     }
 }
