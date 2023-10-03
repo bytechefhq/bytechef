@@ -132,7 +132,8 @@ bytechef:
   file-storage:
     # File storage provider for files (base64 | filesystem) default: filesystem
     provider: filesystem
-    filesystem-dir: ${user.home}/bytechef/files
+    filesystem:
+      basedir: ${user.home}/bytechef/data/file-storage
   oauth2:
 #    predefinedApps:
 #      mailchimp:

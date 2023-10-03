@@ -65,7 +65,7 @@ public class XmlFileComponentHandlerIntTest {
             Map.of(
                 FILE_ENTRY,
                 fileStorageService.storeFileContent(
-                    FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
@@ -109,7 +109,7 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(fileEntry.getName())
             .isEqualTo("file.xml");
 
-        Assertions.assertThat(fileStorageService.readFileToString(FileEntryConstants.DOCUMENTS_DIR, fileEntry))
+        Assertions.assertThat(fileStorageService.readFileToString(FileEntryConstants.FILES_DIR, fileEntry))
             .isEqualTo(
                 """
                     <root><Flower><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name><id>45</id><petals>9</petals></Flower></root>
