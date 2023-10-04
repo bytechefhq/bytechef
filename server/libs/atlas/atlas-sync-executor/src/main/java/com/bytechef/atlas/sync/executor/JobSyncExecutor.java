@@ -62,6 +62,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -128,7 +129,8 @@ public class JobSyncExecutor {
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         TaskWorker worker = new TaskWorker(
-            getEventPublisher(syncMessageBroker), taskHandlerResolverChain, workflowFileStorageFacade);
+            getEventPublisher(syncMessageBroker), Executors.newCachedThreadPool(), taskHandlerResolverChain,
+            workflowFileStorageFacade);
 
         syncMessageBroker.receive(
             WorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));

@@ -21,11 +21,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,16 +35,16 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
 
     private static final Logger logger = LoggerFactory.getLogger(RedisServiceRegistry.class);
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
     private RedisRegistration redisRegistration;
     private final RedisTemplate<String, RedisRegistration> redisTemplate;
     private boolean stopped;
 
     @SuppressFBWarnings("EI2")
-    public RedisServiceRegistry(RedisTemplate<String, RedisRegistration> redisTemplate) {
+    public RedisServiceRegistry(
+        RedisTemplate<String, RedisRegistration> redisTemplate, TaskExecutor taskExecutor) {
         this.redisTemplate = redisTemplate;
 
-        executorService.submit(this::periodicallyRegisterService);
+        taskExecutor.execute(this::periodicallyRegisterService);
     }
 
     @Override
@@ -68,14 +67,6 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
     @Override
     public void close() {
         stopped = true;
-
-        executorService.shutdownNow();
-
-        try {
-            executorService.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            // ignore
-        }
 
         logger.info("Redis Service Registry is closed");
     }
