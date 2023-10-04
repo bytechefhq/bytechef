@@ -140,7 +140,7 @@ const DataPillPanel = () => {
 
                                 <Button
                                     aria-label="Close the data pill panel"
-                                    className="ml-auto"
+                                    className="ml-auto pr-0"
                                     displayType="icon"
                                     icon={
                                         <Cross1Icon
