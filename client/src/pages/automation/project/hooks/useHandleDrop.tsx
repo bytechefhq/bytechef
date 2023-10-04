@@ -1,3 +1,4 @@
+import getRandomId from '@/utils/getRandomId';
 import {PlayIcon} from '@heroicons/react/24/outline';
 import {
     ComponentDefinitionBasicModel,
@@ -7,7 +8,6 @@ import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 
 import getFormattedName from '../utils/getFormattedName';
-import getRandomId from '../utils/getRandomId';
 
 export default function useHandleDrop(): [
     (
