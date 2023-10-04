@@ -79,7 +79,7 @@ public class DemoProjectConfiguration implements InitializingBean {
             for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.yaml")) {
                 Workflow workflow = workflowService.create(
                     resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
-                    ProjectConstants.PROJECT_WORKFLOW_TYPE);
+                    ProjectConstants.PROJECT_TYPE);
 
                 projectService.addWorkflow(Objects.requireNonNull(project.getId()), workflow.getId());
             }

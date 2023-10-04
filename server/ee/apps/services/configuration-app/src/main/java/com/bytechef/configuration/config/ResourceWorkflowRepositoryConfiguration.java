@@ -61,7 +61,7 @@ public class ResourceWorkflowRepositoryConfiguration {
         return new ClassPathResourceWorkflowRepository(
             resourcePatternResolver,
             new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, basePath), "classpath"));
+                Map.of(ProjectConstants.PROJECT_TYPE, basePath), "classpath"));
     }
 
     @Bean
@@ -78,6 +78,6 @@ public class ResourceWorkflowRepositoryConfiguration {
         return new FilesystemResourceWorkflowRepository(
             resourcePatternResolver,
             new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, basePath), "file"));
+                Map.of(ProjectConstants.PROJECT_TYPE, basePath), "file"));
     }
 }

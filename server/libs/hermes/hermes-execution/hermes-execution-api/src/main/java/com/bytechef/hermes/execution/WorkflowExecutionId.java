@@ -28,22 +28,21 @@ import java.io.Serializable;
 public class WorkflowExecutionId implements Serializable {
 
     private long instanceId;
-    private String instanceType;
+    private int instanceType;
     private String workflowId;
     private String triggerName;
 
     private WorkflowExecutionId() {
     }
 
-    private WorkflowExecutionId(String instanceType, long instanceId, String workflowId, String triggerName) {
+    private WorkflowExecutionId(int instanceType, long instanceId, String workflowId, String triggerName) {
         this.instanceId = instanceId;
         this.instanceType = instanceType;
         this.triggerName = triggerName;
         this.workflowId = workflowId;
     }
 
-    public static WorkflowExecutionId of(String instanceType, long instanceId, String workflowId, String triggerName) {
-        Assert.notNull(instanceType, "'instanceType' must not be null");
+    public static WorkflowExecutionId of(int instanceType, long instanceId, String workflowId, String triggerName) {
         Assert.hasText(workflowId, "'workflowId' must not be null");
         Assert.hasText(triggerName, "'workflowTriggerName' must not be null");
 
@@ -55,14 +54,14 @@ public class WorkflowExecutionId implements Serializable {
 
         String[] items = id.split(":");
 
-        return WorkflowExecutionId.of(items[0], Long.parseLong(items[1]), items[2], items[3]);
+        return WorkflowExecutionId.of(Integer.parseInt(items[0]), Long.parseLong(items[1]), items[2], items[3]);
     }
 
     public long getInstanceId() {
         return instanceId;
     }
 
-    public String getInstanceType() {
+    public int getInstanceType() {
         return instanceType;
     }
 

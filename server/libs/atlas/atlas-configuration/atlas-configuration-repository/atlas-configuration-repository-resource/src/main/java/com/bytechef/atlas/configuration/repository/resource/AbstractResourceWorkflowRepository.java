@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.configuration.repository.resource;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
@@ -62,9 +63,9 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             Resource[] resources = resourcePatternResolver.getResources(
                 String.format(
-                    "%s:%s",
+                    "%s:%s/**/*.{json|yml|yaml}",
                     resourceWorkflowRepositoryProperties.protocol(),
-                    resourceWorkflowRepositoryProperties.getLocationPattern(type)));
+                    resourceWorkflowRepositoryProperties.getBasePath(type)));
 
             return Arrays.stream(resources)
                 .map(resource -> read(resource, type))
@@ -100,7 +101,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
         return readWorkflow(
             new WorkflowResource(
-                EncodingUtils.encodeBase64ToString(substring), Map.of("path", uri), resource,
+                EncodingUtils.encodeBase64ToString(substring), Map.of(WorkflowConstants.PATH, uri), resource,
                 Workflow.Format.parse(uri)),
             type);
     }

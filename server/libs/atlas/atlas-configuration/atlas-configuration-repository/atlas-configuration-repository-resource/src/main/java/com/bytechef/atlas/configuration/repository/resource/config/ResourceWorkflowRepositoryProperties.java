@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public record ResourceWorkflowRepositoryProperties(Map<Integer, String> properties, String protocol) {
 
-    public String getLocationPattern(int type) {
+    public String getBasePath(int type) {
         return properties.get(type);
     }
 }

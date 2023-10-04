@@ -74,7 +74,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         Workflow workflow = workflowService.create(
-            definition, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_WORKFLOW_TYPE);
+            definition, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
 
         projectService.addWorkflow(id, workflow.getId());
 
@@ -96,7 +96,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (org.springframework.util.CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
-                null, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_WORKFLOW_TYPE);
+                null, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
 
             project.setWorkflowIds(List.of(Objects.requireNonNull(workflow.getId())));
         }
@@ -270,7 +270,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             workflow = workflowService.create(
                 workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(),
-                ProjectConstants.PROJECT_WORKFLOW_TYPE);
+                ProjectConstants.PROJECT_TYPE);
 
             newWorkflowIds.add(workflow.getId());
         }

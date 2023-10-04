@@ -22,6 +22,5 @@ package com.bytechef.dione.configuration.constant;
  */
 public class IntegrationConstants {
 
-    public static final String INTEGRATION = "INTEGRATION";
-    public static final int INTEGRATION_WORKFLOW_TYPE = 2;
+    public static final int INTEGRATION_TYPE = 2;
 }

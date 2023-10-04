@@ -69,7 +69,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         Workflow workflow = workflowService.create(
-            definition, Format.JSON, SourceType.JDBC, IntegrationConstants.INTEGRATION_WORKFLOW_TYPE);
+            definition, Format.JSON, SourceType.JDBC, IntegrationConstants.INTEGRATION_TYPE);
 
         integrationService.addWorkflow(id, workflow.getId());
 
