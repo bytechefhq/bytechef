@@ -100,8 +100,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             e -> {});
 
         TaskWorker worker = new TaskWorker(
-            getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(),
-            taskHandlerResolver, workflowFileStorageFacade);
+            getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(), taskHandlerResolver,
+            workflowFileStorageFacade);
 
         RemoteTaskExecutionService taskExecutionService =
             new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
