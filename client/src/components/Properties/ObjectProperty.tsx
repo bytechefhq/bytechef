@@ -20,10 +20,10 @@ const ObjectProperty = ({
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] =
         useState(false);
 
-    const {additionalProperties, label, properties} = property;
+    const {additionalProperties, label, name, properties} = property;
 
     return (
-        <div key={property.name}>
+        <div key={name}>
             <ul className={twMerge(label && 'ml-2 border-l')}>
                 {(properties as PropertyType[])?.map((subProperty, index) => {
                     if (

@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import getRandomId from '@/pages/automation/project/utils/getRandomId';
+import getRandomId from '@/utils/getRandomId';
 
 import 'quill-mention';
 import {ReactNode, memo, useEffect, useMemo, useRef, useState} from 'react';
@@ -75,6 +75,7 @@ const MentionsInput = ({
                 const editorContainer =
                     // @ts-expect-error Quill false positive
                     editorRef.current.getEditor().container;
+
                 const {height} = editorContainer.getBoundingClientRect();
 
                 const mentionListParentElement = editorContainer.querySelector(

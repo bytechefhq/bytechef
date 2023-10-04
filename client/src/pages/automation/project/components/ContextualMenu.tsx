@@ -2,6 +2,7 @@ import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
 } from '@/middleware/hermes/configuration';
+import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
 import {memo, useEffect, useState} from 'react';
@@ -11,7 +12,6 @@ import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 import WorkflowNodesList from '../components/WorkflowNodesList';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import getFormattedName from '../utils/getFormattedName';
-import getRandomId from '../utils/getRandomId';
 
 interface ContextualMenuProps {
     components: ComponentDefinitionBasicModel[] | undefined;
