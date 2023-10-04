@@ -169,7 +169,7 @@ const MentionsInput = ({
                                 <QuestionMarkCircledIcon />
                             </TooltipTrigger>
 
-                            <TooltipContent className="max-w-[250px]">
+                            <TooltipContent className="max-w-tooltip-sm">
                                 {description}
                             </TooltipContent>
                         </Tooltip>
