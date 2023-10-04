@@ -29,6 +29,7 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -36,9 +37,6 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
@@ -48,8 +46,6 @@ import java.util.concurrent.TimeUnit;
 public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, DisposableBean,
     MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
 
-    private static final ExecutorService executorService = Executors.newCachedThreadPool();
-
     private final List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers;
     private MessageListenerAdapter messageListenerAdapter;
     private final RedisConnectionFactory redisConnectionFactory;
@@ -57,13 +53,14 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     private RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisMessageDeserializer redisMessageDeserializer;
     private final RedisSMQ redisSMQ;
+    private final TaskExecutor taskExecutor;
 
     @SuppressFBWarnings("EI2")
     public RedisMessageBrokerListenerRegistrarConfiguration(
         @Autowired(
             required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
         RedisConnectionFactory redisConnectionFactory, RedisMessageDeserializer redisMessageDeserializer,
-        RedisSMQ redisSMQ) {
+        RedisSMQ redisSMQ, TaskExecutor taskExecutor) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList()
@@ -71,12 +68,13 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
         this.redisConnectionFactory = redisConnectionFactory;
         this.redisMessageDeserializer = redisMessageDeserializer;
         this.redisSMQ = redisSMQ;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
     public void afterSingletonsInstantiated() {
         redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
-            executorService, redisMessageDeserializer, redisSMQ);
+            redisMessageDeserializer, redisSMQ, taskExecutor);
 
         redisMessageListenerContainer = new RedisMessageListenerContainer();
         messageListenerAdapter = new MessageListenerAdapter(redisListenerEndpointRegistrar);
@@ -98,10 +96,6 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     public void destroy() throws InterruptedException {
         redisListenerEndpointRegistrar.stop();
         redisMessageListenerContainer.stop();
-
-        executorService.shutdownNow();
-
-        executorService.awaitTermination(1, TimeUnit.SECONDS);
     }
 
     @Override

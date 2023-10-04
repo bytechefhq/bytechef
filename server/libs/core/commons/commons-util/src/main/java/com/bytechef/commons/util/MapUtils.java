@@ -658,6 +658,12 @@ public final class MapUtils {
         return value != null ? value : defaultValue;
     }
 
+    public static int size(Map<?, ?> map) {
+        Objects.requireNonNull(map, "'map' must not be null");
+
+        return map.size();
+    }
+
     public static <K, V> Stream<Map.Entry<K, V>> stream(Map<K, V> map) {
         Objects.requireNonNull(map, "'map' must not be null");
 

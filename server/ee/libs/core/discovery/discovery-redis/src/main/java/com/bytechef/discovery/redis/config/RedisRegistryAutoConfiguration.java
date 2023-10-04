@@ -36,6 +36,7 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationP
 import org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -88,8 +89,9 @@ public class RedisRegistryAutoConfiguration {
     }
 
     @Bean
-    RedisServiceRegistry redisServiceRegistry(RedisTemplate<String, RedisRegistration> redisTemplate) {
-        return new RedisServiceRegistry(redisTemplate);
+    RedisServiceRegistry redisServiceRegistry(
+        RedisTemplate<String, RedisRegistration> redisTemplate, TaskExecutor taskExecutor) {
+        return new RedisServiceRegistry(redisTemplate, taskExecutor);
     }
 
     @Bean

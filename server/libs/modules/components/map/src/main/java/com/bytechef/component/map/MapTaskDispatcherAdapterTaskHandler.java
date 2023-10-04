@@ -28,6 +28,7 @@ import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -41,7 +42,6 @@ import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,7 +66,6 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     @SuppressFBWarnings("EI")
     public MapTaskDispatcherAdapterTaskHandler(ObjectMapper objectMapper, TaskHandlerResolver taskHandlerResolver) {
         this.objectMapper = objectMapper;
-
         this.taskHandlerResolver = taskHandlerResolver;
     }
 
