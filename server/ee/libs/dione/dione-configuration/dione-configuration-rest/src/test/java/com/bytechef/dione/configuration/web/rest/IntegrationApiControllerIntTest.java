@@ -173,7 +173,7 @@ public class IntegrationApiControllerIntTest {
     @Test
     public void testGetIntegrationWorkflows() {
         try {
-            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON);
+            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON, 0);
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
                 List.of(workflow));
@@ -298,7 +298,7 @@ public class IntegrationApiControllerIntTest {
                 .description("workflowDescription");
         Workflow workflow = new Workflow(
             "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
-            Workflow.Format.JSON);
+            Workflow.Format.JSON, 0);
 
         when(integrationFacade.addWorkflow(anyLong(), any(), any(), any()))
             .thenReturn(workflow);

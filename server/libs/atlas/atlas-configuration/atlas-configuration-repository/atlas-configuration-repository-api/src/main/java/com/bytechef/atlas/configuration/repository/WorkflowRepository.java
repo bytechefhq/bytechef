@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 public interface WorkflowRepository {
 
-    List<Workflow> findAll();
+    List<Workflow> findAll(int type);
 
     Optional<Workflow> findById(String id);
 

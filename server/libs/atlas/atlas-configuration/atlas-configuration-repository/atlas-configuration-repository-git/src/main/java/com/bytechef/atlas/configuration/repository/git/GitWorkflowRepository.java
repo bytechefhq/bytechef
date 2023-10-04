@@ -21,46 +21,61 @@ package com.bytechef.atlas.configuration.repository.git;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.repository.git.config.GitWorkflowRepositoryProperties;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
 import com.bytechef.atlas.configuration.repository.git.operations.JGitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public class GitWorkflowRepository implements WorkflowRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepository.class);
 
-    private final GitWorkflowOperations gitWorkflowOperations;
+    private final Map<Integer, GitWorkflowOperations> gitWorkflowOperationsMap;
 
-    public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperations) {
-        this.gitWorkflowOperations = gitWorkflowOperations;
+    public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperationsMap) {
+        this.gitWorkflowOperationsMap = Map.of(0, gitWorkflowOperationsMap);
     }
 
-    public GitWorkflowRepository(String url, String branch, String[] searchPaths, String username, String password) {
-        this.gitWorkflowOperations = new JGitWorkflowOperations(
-            url, branch, List.of("yaml", "yml"), Arrays.asList(searchPaths), username, password);
+    public GitWorkflowRepository(Map<Integer, GitWorkflowRepositoryProperties> gitWorkflowRepositoryPropertiesMap) {
+        this.gitWorkflowOperationsMap = MapUtils.toMap(
+            gitWorkflowRepositoryPropertiesMap,
+            Map.Entry::getKey,
+            entry -> {
+                GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties = entry.getValue();
+
+                return new JGitWorkflowOperations(
+                    gitWorkflowRepositoryProperties.getUrl(), gitWorkflowRepositoryProperties.getBranch(),
+                    List.of("yaml", "yml"), Arrays.asList(gitWorkflowRepositoryProperties.getSearchPaths()),
+                    gitWorkflowRepositoryProperties.getUsername(), gitWorkflowRepositoryProperties.getPassword());
+            });
     }
 
     @Override
-    public List<Workflow> findAll() {
+    public List<Workflow> findAll(int type) {
         synchronized (this) {
+            GitWorkflowOperations gitWorkflowOperations = gitWorkflowOperationsMap.get(type);
+
             List<WorkflowResource> resources = gitWorkflowOperations.getHeadFiles();
 
             return resources.stream()
-                .map(GitWorkflowRepository::readWorkflow)
+                .map(resource -> readWorkflow(resource, type))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         }
@@ -69,9 +84,18 @@ public class GitWorkflowRepository implements WorkflowRepository {
     @Override
     public Optional<Workflow> findById(String id) {
         synchronized (this) {
-            WorkflowResource resource = gitWorkflowOperations.getFile(decode(id));
+            WorkflowResource resource = gitWorkflowOperationsMap.keySet()
+                .stream()
+                .map(type -> {
+                    GitWorkflowOperations gitWorkflowOperations = gitWorkflowOperationsMap.get(type);
 
-            return Optional.ofNullable(resource == null ? null : readWorkflow(resource));
+                    return gitWorkflowOperations.getFile(decode(id));
+                })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+            return Optional.ofNullable(resource == null ? null : readWorkflow(resource, 0));
         }
     }
 
@@ -81,11 +105,11 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     @SuppressFBWarnings("NP")
-    private static Workflow readWorkflow(WorkflowResource resource) {
+    private static Workflow readWorkflow(WorkflowResource resource, int type) {
         Workflow workflow = null;
 
         try {
-            workflow = WorkflowReader.readWorkflow(resource);
+            workflow = WorkflowReader.readWorkflow(resource, type);
 
             workflow.setId(encode(Objects.requireNonNull(workflow.getId())));
         } catch (Exception e) {

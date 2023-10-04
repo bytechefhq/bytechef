@@ -19,6 +19,7 @@ package com.bytechef.atlas.configuration.repository.resource;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 
@@ -36,7 +37,6 @@ import com.bytechef.commons.util.EncodingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
@@ -46,23 +46,28 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractResourceWorkflowRepository.class);
 
-    private static final String PREFIX = "workflows/";
+    private final ResourcePatternResolver resourcePatternResolver;
+    private final ResourceWorkflowRepositoryProperties resourceWorkflowRepositoryProperties;
 
-    private final String locationPattern;
+    public AbstractResourceWorkflowRepository(
+        ResourcePatternResolver resourcePatternResolver,
+        ResourceWorkflowRepositoryProperties resourceWorkflowRepositoryProperties) {
 
-    public AbstractResourceWorkflowRepository(String locationPattern) {
-        this.locationPattern = locationPattern;
+        this.resourcePatternResolver = resourcePatternResolver;
+        this.resourceWorkflowRepositoryProperties = resourceWorkflowRepositoryProperties;
     }
 
     @Override
-    public List<Workflow> findAll() {
+    public List<Workflow> findAll(int type) {
         try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-
-            Resource[] resources = resolver.getResources(locationPattern);
+            Resource[] resources = resourcePatternResolver.getResources(
+                String.format(
+                    "%s:%s",
+                    resourceWorkflowRepositoryProperties.protocol(),
+                    resourceWorkflowRepositoryProperties.getLocationPattern(type)));
 
             return Arrays.stream(resources)
-                .map(this::read)
+                .map(resource -> read(resource, type))
                 .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -71,12 +76,16 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
     @Override
     public Optional<Workflow> findById(String id) {
-        List<Workflow> workflows = findAll();
+        List<Workflow> workflows = resourceWorkflowRepositoryProperties.properties()
+            .keySet()
+            .stream()
+            .flatMap(type -> CollectionUtils.stream(findAll(type)))
+            .toList();
 
         return CollectionUtils.findFirst(workflows, workflow -> Objects.equals(workflow.getId(), id));
     }
 
-    private Workflow read(Resource resource) {
+    private Workflow read(Resource resource, int type) {
         URI resourceURI;
 
         try {
@@ -87,17 +96,18 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
         String uri = resourceURI.toString();
 
-        String substring = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
+        String substring = uri.substring(uri.lastIndexOf("/") + 1, uri.lastIndexOf('.'));
 
         return readWorkflow(
             new WorkflowResource(
                 EncodingUtils.encodeBase64ToString(substring), Map.of("path", uri), resource,
-                Workflow.Format.parse(uri)));
+                Workflow.Format.parse(uri)),
+            type);
     }
 
-    private static Workflow readWorkflow(WorkflowResource workflowResource) {
+    private static Workflow readWorkflow(WorkflowResource workflowResource, int type) {
         try {
-            return WorkflowReader.readWorkflow(workflowResource);
+            return WorkflowReader.readWorkflow(workflowResource, type);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

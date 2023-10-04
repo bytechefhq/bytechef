@@ -55,12 +55,14 @@ local.properties
 # IntelliJ
 ######################
 .idea/
+.ideaDataSources
 *.iml
 *.iws
 *.ipr
 *.ids
 *.orig
 classes/
+dataSources
 **/out/
 **/dist/
 

@@ -18,14 +18,19 @@
 package com.bytechef.atlas.configuration.repository.resource;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @author Ivica Cardic
  */
 public class ClassPathResourceWorkflowRepository extends AbstractResourceWorkflowRepository {
 
-    public ClassPathResourceWorkflowRepository() {
-        super("classpath:workflows/**/*.{json|yml|yaml}");
+    public ClassPathResourceWorkflowRepository(
+        ResourcePatternResolver resourcePatternResolver,
+        ResourceWorkflowRepositoryProperties resourceWorkflowRepositoryProperties) {
+
+        super(resourcePatternResolver, resourceWorkflowRepositoryProperties);
     }
 
     @Override

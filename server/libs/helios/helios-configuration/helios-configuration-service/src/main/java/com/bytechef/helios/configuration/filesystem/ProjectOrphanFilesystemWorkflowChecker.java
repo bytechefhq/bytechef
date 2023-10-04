@@ -15,68 +15,69 @@
  * limitations under the License.
  */
 
-package com.bytechef.demo.config;
+package com.bytechef.helios.configuration.filesystem;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.category.domain.Category;
-import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
-@Configuration
-public class OrphanWorkflowLoadConfiguration implements InitializingBean {
+@Component
+@ConditionalOnExpression("""
+    '${bytechef.coordinator.enabled:true}' == 'true' and '${bytechef.workflow.repository.filesystem.enabled}' == 'true'
+    """)
+public class ProjectOrphanFilesystemWorkflowChecker {
 
-    private static final String WORKFLOWS = "Workflows";
+    private static final Logger logger = LoggerFactory.getLogger(ProjectOrphanFilesystemWorkflowChecker.class);
 
-    private final CategoryService categoryService;
+    private final String basePath;
     private final ProjectService projectService;
     private final TagService tagService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public OrphanWorkflowLoadConfiguration(
-        CategoryService categoryService, ProjectService projectService, TagService tagService,
-        WorkflowService workflowService) {
+    public ProjectOrphanFilesystemWorkflowChecker(
+        @Value("${bytechef.workflow.repository.filesystem.projects.base-path:}") String basePath,
+        ProjectService projectService, TagService tagService, WorkflowService workflowService) {
 
-        this.categoryService = categoryService;
+        this.basePath = basePath;
         this.projectService = projectService;
         this.tagService = tagService;
         this.workflowService = workflowService;
     }
 
-    @Override
-    @SuppressFBWarnings("NP")
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void afterPropertiesSet() {
+    @SuppressFBWarnings("NP")
+    public void onApplicationReadyEvent() {
         List<Project> projects = projectService.getProjects();
-        List<Workflow> workflows = workflowService.getWorkflows();
-
-        List<String> projectWorkflowIds = CollectionUtils.map(projects, Project::getWorkflowIds)
-            .stream()
-            .flatMap(Collection::stream)
-            .toList();
+        List<Workflow> workflows = workflowService.getFilesystemWorkflows(ProjectConstants.PROJECT_TYPE);
 
         List<Workflow> orphanWorkflows = new ArrayList<>();
+        List<String> projectWorkflowIds = CollectionUtils.flatMap(projects, Project::getWorkflowIds);
 
         for (Workflow workflow : workflows) {
             String workflowId = workflow.getId();
@@ -88,38 +89,28 @@ public class OrphanWorkflowLoadConfiguration implements InitializingBean {
 
         if (!orphanWorkflows.isEmpty()) {
             for (Workflow workflow : orphanWorkflows) {
-                Long categoryId;
+                String path = (String) workflow.getMetadata(WorkflowConstants.PATH);
                 String projectName;
 
-                if (StringUtils.hasText((String) workflow.getMetadata(WorkflowConstants.PATH))) {
-                    String path = (String) workflow.getMetadata(WorkflowConstants.PATH);
+                path = path.replace("file:" + basePath + (basePath.endsWith(File.separator) ? "" : File.separator), "");
 
-                    String[] items = path.split("/");
+                String[] items = Objects.requireNonNull(StringUtils.tokenizeToStringArray(path, File.separator));
 
-                    if (items.length > 2) {
-                        String categoryName = StringUtils.capitalize(items[items.length - 3]);
-
-                        Category category = categoryService.save(new Category(categoryName));
-
-                        categoryId = category.getId();
-
-                        projectName = categoryName + " " + getProjectName(items[items.length - 2]);
-                    } else if (items.length > 1) {
-                        categoryId = null;
-                        projectName = getProjectName(items[items.length - 2]);
-                    } else {
-                        categoryId = null;
-                        projectName = WORKFLOWS;
-                    }
+                if (items.length == 2) {
+                    projectName = getProjectName(items[0]);
                 } else {
-                    categoryId = null;
-                    projectName = WORKFLOWS;
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(
+                            "Workflow id={} is in the wrong location, cannot be assigned to any project",
+                            workflow.getId());
+                    }
+
+                    continue;
                 }
 
                 Project project = projectService.fetchProject(projectName)
                     .orElseGet(() -> projectService.create(
                         Project.builder()
-                            .categoryId(categoryId)
                             .name(projectName)
                             .status(Project.Status.PUBLISHED)
                             .tagIds(getTagIds(workflow.getSourceType()))
@@ -131,9 +122,7 @@ public class OrphanWorkflowLoadConfiguration implements InitializingBean {
     }
 
     private String getProjectName(String name) {
-        return Arrays.stream(name.split("_"))
-            .map(StringUtils::capitalize)
-            .collect(Collectors.joining(" "));
+        return String.join(" ", name.split("_"));
     }
 
     private List<Long> getTagIds(Workflow.SourceType sourceType) {

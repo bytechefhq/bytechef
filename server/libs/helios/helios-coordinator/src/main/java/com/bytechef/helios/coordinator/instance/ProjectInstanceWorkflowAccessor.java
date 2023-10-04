@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.coordinator.instance;
 
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
@@ -33,8 +34,6 @@ public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor
 
     private final RemoteProjectInstanceWorkflowService projectInstanceWorkflowService;
 
-    public static final String PROJECT = "PROJECT";
-
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowAccessor(RemoteProjectInstanceWorkflowService projectInstanceWorkflowService) {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
@@ -50,6 +49,6 @@ public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor
 
     @Override
     public String getType() {
-        return PROJECT;
+        return ProjectConstants.PROJECT;
     }
 }

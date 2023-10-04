@@ -27,7 +27,7 @@ public interface RemoteWorkflowService {
 
     Workflow getWorkflow(String id);
 
-    List<Workflow> getWorkflows();
+    List<Workflow> getWorkflows(int type);
 
     List<Workflow> getWorkflows(List<String> workflowIds);
 }

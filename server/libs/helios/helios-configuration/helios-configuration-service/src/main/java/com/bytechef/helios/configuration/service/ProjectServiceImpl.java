@@ -80,7 +80,7 @@ public class ProjectServiceImpl implements ProjectService, RemoteProjectService 
     @Override
     @Transactional(readOnly = true)
     public Optional<Project> fetchProject(String name) {
-        return projectRepository.findByName(name);
+        return projectRepository.findByNameIgnoreCase(name);
     }
 
     @Override
@@ -92,6 +92,11 @@ public class ProjectServiceImpl implements ProjectService, RemoteProjectService 
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
+    }
+
+    @Override
+    public Project getProject(String name) {
+        return OptionalUtils.get(fetchProject(name));
     }
 
     @Override

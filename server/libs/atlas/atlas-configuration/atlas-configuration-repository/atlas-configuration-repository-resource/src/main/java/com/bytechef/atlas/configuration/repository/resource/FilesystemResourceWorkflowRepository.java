@@ -18,14 +18,19 @@
 package com.bytechef.atlas.configuration.repository.resource;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @author Ivica Cardic
  */
 public class FilesystemResourceWorkflowRepository extends AbstractResourceWorkflowRepository {
 
-    public FilesystemResourceWorkflowRepository(String locationPattern) {
-        super(String.format("file:%s", locationPattern));
+    public FilesystemResourceWorkflowRepository(
+        ResourcePatternResolver resourcePatternResolver,
+        ResourceWorkflowRepositoryProperties resourceWorkflowRepositoryProperties) {
+
+        super(resourcePatternResolver, resourceWorkflowRepositoryProperties);
     }
 
     @Override

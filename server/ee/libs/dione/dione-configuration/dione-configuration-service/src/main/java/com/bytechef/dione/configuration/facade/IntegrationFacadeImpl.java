@@ -20,6 +20,7 @@ package com.bytechef.dione.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.domain.Category;
+import com.bytechef.dione.configuration.constant.IntegrationConstants;
 import com.bytechef.dione.configuration.domain.Integration;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
@@ -62,11 +63,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     public Workflow addWorkflow(long id, String label, String description, String definition) {
         if (definition == null) {
-            definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}"
-                .formatted(label, description);
+            definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}".formatted(label, description);
         }
 
-        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+        Workflow workflow = workflowService.create(
+            definition, Workflow.Format.JSON, Workflow.SourceType.JDBC, IntegrationConstants.INTEGRATION_WORKFLOW_TYPE);
 
         integrationService.addWorkflow(id, workflow.getId());
 
