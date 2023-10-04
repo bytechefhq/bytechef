@@ -29,7 +29,7 @@ import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
 
-const tabs = [
+const TABS = [
     {
         label: 'Description',
         name: 'description',
@@ -104,6 +104,19 @@ const NodeDetailsDialog = ({
             },
             !!currentComponent?.actions
         );
+
+    const currentActionProperties = currentAction?.properties?.filter(
+        (property: PropertyType) => {
+            if (
+                property.controlType === 'SELECT' &&
+                (!property.options || !property.options.length)
+            ) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    );
 
     const componentDefinitionNames = componentDefinitions.map(
         (component) => component.name
@@ -211,34 +224,25 @@ const NodeDetailsDialog = ({
         }
     });
 
-    const selectsWithOptions = currentAction?.properties?.find(
-        (property: PropertyType) =>
-            property.controlType === 'SELECT' && property.options?.length
-    );
+    const nodeTabs = TABS.filter(({name}) => {
+        if (name === 'connection') {
+            const componentHasConnection =
+                currentComponent?.name &&
+                componentDefinitionNames?.includes(currentComponent.name);
 
-    const componentTabs = tabs.filter((tab) => {
-        const {name} = tab;
-
-        const componentHasConnection =
-            currentComponent?.name &&
-            componentDefinitionNames?.includes(currentComponent.name);
-
-        if (
-            (name === 'connection' && !componentHasConnection) ||
-            (name === 'output' && !currentAction?.outputSchema) ||
-            (name === 'properties' &&
-                (!currentAction?.properties?.length || !selectsWithOptions))
-        ) {
-            return;
-        } else {
-            return tab;
+            return componentHasConnection;
         }
-    });
 
-    const showPropertiesTabContent =
-        activeTab === 'properties' &&
-        currentAction?.properties &&
-        selectsWithOptions;
+        if (name === 'output') {
+            return currentAction?.outputSchema;
+        }
+
+        if (name === 'properties') {
+            return currentActionProperties?.length;
+        }
+
+        return true;
+    });
 
     useEffect(() => {
         if (availableDataPills) {
@@ -249,7 +253,7 @@ const NodeDetailsDialog = ({
 
     useEffect(() => {
         if (currentActionFetched) {
-            if (!currentAction?.properties?.length) {
+            if (!currentActionProperties?.length) {
                 setActiveTab('description');
             }
 
@@ -266,7 +270,7 @@ const NodeDetailsDialog = ({
             setActiveTab('description');
         }
 
-        if (activeTab === 'properties' && !showPropertiesTabContent) {
+        if (activeTab === 'properties' && !currentActionProperties) {
             setActiveTab('description');
         }
     }, [
@@ -274,8 +278,8 @@ const NodeDetailsDialog = ({
         componentDefinitionNames,
         currentAction,
         currentActionFetched,
+        currentActionProperties,
         currentComponent?.name,
-        showPropertiesTabContent,
     ]);
 
     useEffect(() => {
@@ -378,25 +382,27 @@ const NodeDetailsDialog = ({
                                     />
                                 )}
 
-                                {componentTabs.length > 1 && (
-                                    <div className="flex justify-center pt-4">
-                                        {componentTabs.map((tab) => (
-                                            <Button
-                                                className={twMerge(
-                                                    'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                    activeTab === tab?.name &&
-                                                        'border-blue-500 text-blue-500 hover:text-blue-500'
-                                                )}
-                                                key={tab.name}
-                                                label={tab.label}
-                                                name={tab.name}
-                                                onClick={() =>
-                                                    setActiveTab(tab.name)
-                                                }
-                                            />
-                                        ))}
-                                    </div>
-                                )}
+                                {currentActionFetched &&
+                                    nodeTabs.length > 1 && (
+                                        <div className="flex justify-center pt-4">
+                                            {nodeTabs.map((tab) => (
+                                                <Button
+                                                    className={twMerge(
+                                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                        activeTab ===
+                                                            tab?.name &&
+                                                            'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                    )}
+                                                    key={tab.name}
+                                                    label={tab.label}
+                                                    name={tab.name}
+                                                    onClick={() =>
+                                                        setActiveTab(tab.name)
+                                                    }
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
 
                                 <div className="relative h-full">
                                     <div className="absolute left-0 top-0 h-full w-full">
@@ -406,17 +412,22 @@ const NodeDetailsDialog = ({
                                             />
                                         )}
 
-                                        {showPropertiesTabContent && (
-                                            <Properties
-                                                actionName={currentActionName}
-                                                customClassName="p-4 overflow-y-auto relative"
-                                                dataPills={dataPills}
-                                                properties={
-                                                    currentAction.properties!
-                                                }
-                                                mention={!!dataPills?.length}
-                                            />
-                                        )}
+                                        {activeTab === 'properties' &&
+                                            !!currentActionProperties?.length && (
+                                                <Properties
+                                                    actionName={
+                                                        currentActionName
+                                                    }
+                                                    customClassName="p-4 overflow-y-auto relative"
+                                                    dataPills={dataPills}
+                                                    properties={
+                                                        currentActionProperties
+                                                    }
+                                                    mention={
+                                                        !!dataPills?.length
+                                                    }
+                                                />
+                                            )}
 
                                         {activeTab === 'connection' &&
                                             currentComponent.connection && (

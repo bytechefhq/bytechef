@@ -76,7 +76,7 @@ const Property = ({
             }) as ISelectOption
     );
 
-    if (controlType === 'SELECT' && !formattedOptions?.length) {
+    if (!name) {
         return <></>;
     }
 
@@ -226,6 +226,8 @@ const Property = ({
             )}
 
             {type === 'NULL' && <span>NULL</span>}
+
+            {type === 'DYNAMIC_PROPERTIES' && <span>Dynamic properties</span>}
         </li>
     );
 };
