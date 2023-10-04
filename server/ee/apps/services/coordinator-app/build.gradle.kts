@@ -6,8 +6,6 @@ springBoot {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework:spring-webflux")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
@@ -15,11 +13,16 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
+    implementation(project(":server:libs:core:async-config"))
+    implementation(project(":server:libs:core:environment-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
+    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    implementation(project(":server:libs:core:jackson-config"))
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:helios:helios-coordinator"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl"))
@@ -30,8 +33,6 @@ dependencies {
     implementation(project(":server:ee:libs:helios:helios-configuration:helios-configuration-remote-client"))
     implementation(project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-client"))
     implementation(project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-client"))
-    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:ee:libs:hermes:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-remote-rest"))
 
     implementation(project(":server:libs:modules:task-dispatchers:branch"))

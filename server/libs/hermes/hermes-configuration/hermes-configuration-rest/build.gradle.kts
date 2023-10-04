@@ -59,7 +59,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-api"))
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
     implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-api"))
+    implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-api"))
 }
