@@ -121,8 +121,8 @@ public final class CollectionUtils {
             elseObject);
     }
 
-    public static <T, R> List<? extends R> flatMap(
-        List<T> list, Function<? super T, ? extends Collection<? extends R>> mapper) {
+    public static <T, R> List<R> flatMap(
+        List<T> list, Function<? super T, ? extends Collection<R>> mapper) {
 
         Objects.requireNonNull(list, "'list' must not be null");
         Objects.requireNonNull(mapper, "'mapper' must not be null");

@@ -23,4 +23,5 @@ package com.bytechef.helios.configuration.constant;
 public class ProjectConstants {
 
     public static final String PROJECT = "PROJECT";
+    public static final int PROJECT_WORKFLOW_TYPE = 1;
 }

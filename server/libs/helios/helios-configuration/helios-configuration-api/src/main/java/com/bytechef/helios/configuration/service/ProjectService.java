@@ -39,6 +39,8 @@ public interface ProjectService {
 
     Project getProject(long id);
 
+    Project getProject(String name);
+
     List<Project> getProjects();
 
     List<Project> getProjects(List<Long> ids);

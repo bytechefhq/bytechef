@@ -19,6 +19,9 @@
 
 package com.bytechef.atlas.coordinator;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -32,7 +35,6 @@ import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksCo
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
-import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.RemoteJobService;
@@ -61,12 +63,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
@@ -131,10 +135,19 @@ public class TaskCoordinatorIntTest {
     @ComponentScan("com.bytechef.liquibase.config")
     @EnableAutoConfiguration
     @Import({
-        PostgreSQLContainerConfiguration.class, ResourceWorkflowRepositoryConfiguration.class
+        PostgreSQLContainerConfiguration.class
     })
     @Configuration
     public static class CoordinatorIntTestConfiguration {
+
+        @Bean
+        ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
+            ResourcePatternResolver resourcePatternResolver) {
+
+            return new ClassPathResourceWorkflowRepository(
+                resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
+                    Map.of(0, "workflows"), "classpath", WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
+        }
 
         @Bean
         RemoteContextService contextService(JdbcContextRepository jdbcContextRepository) {
@@ -174,10 +187,11 @@ public class TaskCoordinatorIntTest {
         @EnableJdbcRepositories(basePackages = {
             "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.atlas.execution.repository.jdbc"
         })
+        @TestConfiguration
         public static class CoordinatorIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
         }
 
-        @Configuration
+        @TestConfiguration
         public static class JdbcConfiguration extends AbstractJdbcConfiguration {
 
             private final ObjectMapper objectMapper;

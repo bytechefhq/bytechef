@@ -53,12 +53,12 @@ public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
     }
 
     @Override
-    public List<Workflow> getWorkflows() {
+    public List<Workflow> getWorkflows(int type) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
-                .path(WORKFLOW_SERVICE + "/get-workflows")
-                .build(),
+                .path(WORKFLOW_SERVICE + "/get-workflows/{type}")
+                .build(type),
             new ParameterizedTypeReference<>() {});
     }
 

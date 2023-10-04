@@ -43,7 +43,7 @@ public class GitWorkflowRepositoryTest {
     public void test1() {
         GitWorkflowRepository workflowRepository = new GitWorkflowRepository(new DummyGitWorkflowOperations());
 
-        Iterable<Workflow> iterable = workflowRepository.findAll();
+        Iterable<Workflow> iterable = workflowRepository.findAll(0);
 
         Iterator<Workflow> iterator = iterable.iterator();
 

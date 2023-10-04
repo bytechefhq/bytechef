@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.configuration.repository.git.config;
+package com.bytechef.server.config;
 
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,12 +27,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+import java.util.Map;
+
 /**
  * @author Ivica Cardic
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.git.enabled", havingValue = "true")
-@EnableConfigurationProperties(GitWorkflowRepositoryProperties.class)
+@EnableConfigurationProperties(GitWorkflowRepositoryTypeProperties.class)
 public class GitWorkflowRepositoryConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepositoryConfiguration.class);
@@ -44,10 +47,10 @@ public class GitWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(4)
-    GitWorkflowRepository gitWorkflowRepository(GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties) {
+    GitWorkflowRepository gitWorkflowRepository(
+        GitWorkflowRepositoryTypeProperties gitWorkflowRepositoryTypeProperties) {
+
         return new GitWorkflowRepository(
-            gitWorkflowRepositoryProperties.getUrl(), gitWorkflowRepositoryProperties.getBranch(),
-            gitWorkflowRepositoryProperties.getSearchPaths(), gitWorkflowRepositoryProperties.getUsername(),
-            gitWorkflowRepositoryProperties.getPassword());
+            Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, gitWorkflowRepositoryTypeProperties.getProjects()));
     }
 }

@@ -50,7 +50,7 @@ public class WorkflowServiceIntTest {
     public void testCreate() {
         Workflow workflow = getWorkflow();
 
-        workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC);
+        workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC, 0);
 
         Assertions.assertEquals(workflow, OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
     }
@@ -73,13 +73,13 @@ public class WorkflowServiceIntTest {
 
     @Test
     public void testGetWorkflows() {
-        for (Workflow workflow : workflowCrudRepository.findAll()) {
+        for (Workflow workflow : workflowCrudRepository.findAll(0)) {
             workflowCrudRepository.deleteById(workflow.getId());
         }
 
         workflowCrudRepository.save(getWorkflow());
 
-        Assertions.assertEquals(1, CollectionUtils.size(workflowService.getWorkflows()));
+        Assertions.assertEquals(1, CollectionUtils.size(workflowService.getWorkflows(0)));
     }
 
     @Test

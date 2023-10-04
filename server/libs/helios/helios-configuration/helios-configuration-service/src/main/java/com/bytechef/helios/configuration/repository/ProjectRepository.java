@@ -52,7 +52,7 @@ public interface ProjectRepository
         """)
     List<Project> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
-    Optional<Project> findByName(String name);
+    Optional<Project> findByNameIgnoreCase(String name);
 
     @Query("""
             SELECT project.* FROM project

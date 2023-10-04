@@ -20,6 +20,7 @@ package com.bytechef.helios.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -87,7 +88,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
-        for (Workflow workflow : workflowService.getWorkflows()) {
+        for (Workflow workflow : workflowService.getWorkflows(ProjectConstants.PROJECT_WORKFLOW_TYPE)) {
             workflowModels.add(conversionService.convert(workflow, WorkflowModel.class));
         }
 

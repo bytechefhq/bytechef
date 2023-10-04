@@ -22,8 +22,12 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -36,6 +40,9 @@ public interface JdbcWorkflowRepository
 
     @Override
     void deleteById(String id);
+
+    @Query("SELECT * FROM workflow WHERE type = :type")
+    List<Workflow> findAll(@Param("type") int type);
 
     @Override
     default Workflow.SourceType getSourceType() {

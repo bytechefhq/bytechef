@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +130,7 @@ public class WorkflowApiControllerIntTest {
 
     @Test
     public void testGetWorkflows() throws JsonProcessingException {
-        when(workflowService.getWorkflows()).thenReturn(List.of(getWorkflow()));
+        when(workflowService.getWorkflows(anyInt())).thenReturn(List.of(getWorkflow()));
 
         try {
             this.webTestClient

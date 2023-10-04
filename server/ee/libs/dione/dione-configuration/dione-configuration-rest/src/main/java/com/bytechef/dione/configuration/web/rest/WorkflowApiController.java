@@ -19,6 +19,7 @@ package com.bytechef.dione.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.dione.configuration.constant.IntegrationConstants;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -80,7 +81,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
-        for (Workflow workflow : workflowService.getWorkflows()) {
+        for (Workflow workflow : workflowService.getWorkflows(IntegrationConstants.INTEGRATION_WORKFLOW_TYPE)) {
             workflowModels.add(
                 conversionService.convert(workflow, WorkflowModel.class)
                     .definition(null));

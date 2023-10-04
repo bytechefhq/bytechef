@@ -20,12 +20,11 @@
 package com.bytechef.atlas.configuration.repository.git.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
-@ConfigurationProperties(prefix = "bytechef.workflow.repository.git")
 public class GitWorkflowRepositoryProperties {
 
     private boolean enabled = false;

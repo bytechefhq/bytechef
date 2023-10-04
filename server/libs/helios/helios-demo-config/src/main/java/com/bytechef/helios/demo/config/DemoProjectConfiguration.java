@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.demo.config;
+package com.bytechef.helios.demo.config;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
@@ -77,7 +78,8 @@ public class DemoProjectConfiguration implements InitializingBean {
 
             for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.yaml")) {
                 Workflow workflow = workflowService.create(
-                    resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC);
+                    resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
+                    ProjectConstants.PROJECT_WORKFLOW_TYPE);
 
                 projectService.addWorkflow(Objects.requireNonNull(project.getId()), workflow.getId());
             }
