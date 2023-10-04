@@ -98,7 +98,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     private long instanceId;
 
     @Column("instance_type")
-    private String instanceType;
+    private int instanceType;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -234,7 +234,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return instanceId;
     }
 
-    public String getInstanceType() {
+    public int getInstanceType() {
         return instanceType;
     }
 

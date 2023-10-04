@@ -51,6 +51,6 @@ public class GitWorkflowRepositoryConfiguration {
         GitWorkflowRepositoryTypeProperties gitWorkflowRepositoryTypeProperties) {
 
         return new GitWorkflowRepository(
-            Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, gitWorkflowRepositoryTypeProperties.getProjects()));
+            Map.of(ProjectConstants.PROJECT_TYPE, gitWorkflowRepositoryTypeProperties.getProjects()));
     }
 }

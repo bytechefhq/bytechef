@@ -81,7 +81,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
-        for (Workflow workflow : workflowService.getWorkflows(IntegrationConstants.INTEGRATION_WORKFLOW_TYPE)) {
+        for (Workflow workflow : workflowService.getWorkflows(IntegrationConstants.INTEGRATION_TYPE)) {
             workflowModels.add(
                 conversionService.convert(workflow, WorkflowModel.class)
                     .definition(null));

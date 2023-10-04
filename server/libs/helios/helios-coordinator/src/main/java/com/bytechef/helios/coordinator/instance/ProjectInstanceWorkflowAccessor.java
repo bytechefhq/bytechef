@@ -48,7 +48,7 @@ public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor
     }
 
     @Override
-    public String getType() {
-        return ProjectConstants.PROJECT;
+    public int getType() {
+        return ProjectConstants.PROJECT_TYPE;
     }
 }

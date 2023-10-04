@@ -202,7 +202,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private boolean isConnectionUsed(long id) {
-        List<Workflow> workflows = workflowService.getWorkflows(ProjectConstants.PROJECT_WORKFLOW_TYPE);
+        List<Workflow> workflows = workflowService.getWorkflows(ProjectConstants.PROJECT_TYPE);
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {

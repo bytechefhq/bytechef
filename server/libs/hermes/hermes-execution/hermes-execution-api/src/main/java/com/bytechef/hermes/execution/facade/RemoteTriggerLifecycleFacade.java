@@ -25,10 +25,10 @@ import java.util.Map;
 public interface RemoteTriggerLifecycleFacade {
 
     void executeTriggerDisable(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId);
 
     void executeTriggerEnable(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl);
 }

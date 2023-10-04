@@ -61,13 +61,13 @@ public class ResourceWorkflowRepositoryConfiguration {
         return new ClassPathResourceWorkflowRepository(
             resourcePatternResolver,
             new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, basePath), "classpath"));
+                Map.of(ProjectConstants.PROJECT_TYPE, basePath), "classpath"));
     }
 
     @Bean
     @Order(2)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
-    WorkflowRepository filesystemBasedWorkflowRepository(
+    WorkflowRepository filesystemBasFedWorkflowRepository(
         @Value("${bytechef.workflow.repository.filesystem.projects.base-path}") String basePath) {
 
         if (logger.isInfoEnabled()) {
@@ -78,6 +78,6 @@ public class ResourceWorkflowRepositoryConfiguration {
         return new FilesystemResourceWorkflowRepository(
             resourcePatternResolver,
             new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, basePath), "file"));
+                Map.of(ProjectConstants.PROJECT_TYPE, basePath), "file"));
     }
 }
