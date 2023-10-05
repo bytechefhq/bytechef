@@ -15,20 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.configuration.repository.resource.config;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.util.Map;
+package com.bytechef.atlas.configuration.repository.config.contributor;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record ResourceWorkflowRepositoryProperties(
-    Map<Integer, String> properties, String urlPrefix, String locationPattern) {
+public interface ResourceWorkflowRepositoryPropertiesContributor {
 
-    public String getBasePath(int type) {
-        return properties.get(type);
-    }
+    String getBasePath();
+
+    int getType();
 }

@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.configuration.config;
+package com.bytechef.atlas.configuration.repository.config.contributor;
 
-import com.bytechef.atlas.configuration.repository.git.config.GitWorkflowRepositoryProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-@ConfigurationProperties(prefix = "bytechef.workflow.repository.git")
-public class GitWorkflowRepositoryTypeProperties {
+/**
+ * @author Ivica Cardic
+ */
+public interface GitWorkflowRepositoryPropertiesContributor {
 
-    private GitWorkflowRepositoryProperties projects;
+    GitWorkflowRepositoryProperties getGitWorkflowRepositoryProperties();
 
-    public GitWorkflowRepositoryProperties getProjects() {
-        return projects;
-    }
+    int getType();
 
-    public void setProjects(GitWorkflowRepositoryProperties projects) {
-        this.projects = projects;
+    @SuppressFBWarnings("EI")
+    record GitWorkflowRepositoryProperties(
+        String branch, String[] searchPaths, String password, String url, String username) {
     }
 }

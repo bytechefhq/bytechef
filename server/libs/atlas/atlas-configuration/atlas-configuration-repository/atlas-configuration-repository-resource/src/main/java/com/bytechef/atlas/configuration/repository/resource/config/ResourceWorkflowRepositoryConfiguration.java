@@ -15,22 +15,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.atlas.configuration.repository.resource.config;
 
-import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.repository.config.contributor.ClasspathResourceWorkflowRepositoryPropertiesContributor;
+import com.bytechef.atlas.configuration.repository.config.contributor.FilesystemResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.FilesystemResourceWorkflowRepository;
-import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,34 +51,43 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Bean
     @Order(1)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.classpath.enabled", havingValue = "true")
-    WorkflowRepository classpathBasedWorkflowRepository(
-        @Value("${bytechef.workflow.repository.classpath.projects.base-path}") String basePath) {
+    ClassPathResourceWorkflowRepository classpathBasedWorkflowRepository(
+        List<ClasspathResourceWorkflowRepositoryPropertiesContributor> accessors) {
 
         if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow repository type enabled: classpath, location pattern for projects: {}", basePath);
+            logger.info("Workflow repository type enabled: classpath");
+        }
+
+        Map<Integer, String> propertiesMap = new HashMap<>();
+
+        for (ClasspathResourceWorkflowRepositoryPropertiesContributor accessor : accessors) {
+            propertiesMap.put(accessor.getType(), accessor.getBasePath());
         }
 
         return new ClassPathResourceWorkflowRepository(
             resourcePatternResolver,
-            new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_TYPE, basePath), "classpath"));
+            new ResourceWorkflowRepositoryProperties(propertiesMap, "classpath",
+                WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
     }
 
     @Bean
     @Order(2)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
-    WorkflowRepository filesystemBasFedWorkflowRepository(
-        @Value("${bytechef.workflow.repository.filesystem.projects.base-path}") String basePath) {
+    FilesystemResourceWorkflowRepository filesystemResourceWorkflowRepository(
+        List<FilesystemResourceWorkflowRepositoryPropertiesContributor> accessors) {
 
         if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow repository type enabled: filesystem, location pattern for projects: {}", basePath);
+            logger.info("Workflow repository type enabled: filesystem");
+        }
+
+        Map<Integer, String> propertiesMap = new HashMap<>();
+
+        for (FilesystemResourceWorkflowRepositoryPropertiesContributor accessor : accessors) {
+            propertiesMap.put(accessor.getType(), accessor.getBasePath());
         }
 
         return new FilesystemResourceWorkflowRepository(
-            resourcePatternResolver,
-            new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_TYPE, basePath), "file"));
+            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(propertiesMap, "file",
+                WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
     }
 }

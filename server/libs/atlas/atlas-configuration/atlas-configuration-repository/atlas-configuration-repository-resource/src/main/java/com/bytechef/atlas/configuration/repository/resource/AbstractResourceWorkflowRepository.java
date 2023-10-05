@@ -63,9 +63,9 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             Resource[] resources = resourcePatternResolver.getResources(
                 String.format(
-                    "%s:%s/**/*.{json|yml|yaml}",
-                    resourceWorkflowRepositoryProperties.protocol(),
-                    resourceWorkflowRepositoryProperties.getBasePath(type)));
+                    "%s:%s%s", resourceWorkflowRepositoryProperties.urlPrefix(),
+                    resourceWorkflowRepositoryProperties.getBasePath(type),
+                    resourceWorkflowRepositoryProperties.locationPattern()));
 
             return Arrays.stream(resources)
                 .map(resource -> read(resource, type))
