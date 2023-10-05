@@ -18,6 +18,8 @@
 package com.bytechef.dione.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.configuration.constant.IntegrationConstants;
@@ -67,7 +69,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         Workflow workflow = workflowService.create(
-            definition, Workflow.Format.JSON, Workflow.SourceType.JDBC, IntegrationConstants.INTEGRATION_WORKFLOW_TYPE);
+            definition, Format.JSON, SourceType.JDBC, IntegrationConstants.INTEGRATION_WORKFLOW_TYPE);
 
         integrationService.addWorkflow(id, workflow.getId());
 
@@ -111,6 +113,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 // TODO find a way to delete ll tags not referenced anymore
 //        integration.getTagIds()
 //            .forEach(tagService::delete);
+    }
+
+    @Override
+    public void deleteWorkflow(long id, String workflowId) {
+        integrationService.removeWorkflow(id, workflowId);
+
+        workflowService.delete(workflowId);
     }
 
     @Override

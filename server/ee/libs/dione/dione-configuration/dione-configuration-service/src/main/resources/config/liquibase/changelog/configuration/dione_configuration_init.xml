@@ -69,6 +69,11 @@
 
         <addUniqueConstraint constraintName="uk_integration_name" tableName="integration" columnNames="name" />
 
+        <addUniqueConstraint
+            tableName="integration_workflow"
+            columnNames="workflow_id"
+            constraintName="uk_integration_workflow_workflow_id" />
+
         <addForeignKeyConstraint
             baseColumnNames="category_id"
             baseTableName="integration"
