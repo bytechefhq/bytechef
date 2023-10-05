@@ -45,7 +45,9 @@ public class FilesystemFileStorageConfiguration {
     }
 
     @Bean
-    FileStorageService filesystemFileStorageService(FilesystemFileStorageProperties filesystemFileStorageProperties) {
+    FileStorageService fileStorageService(
+        FilesystemFileStorageProperties filesystemFileStorageProperties) {
+
         return new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
     }
 }

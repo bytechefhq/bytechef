@@ -41,7 +41,7 @@ public class Base64FileStorageConfiguration {
     }
 
     @Bean
-    FileStorageService base64FileStorageService() {
+    FileStorageService fileStorageService() {
         return new Base64FileStorageService();
     }
 }
