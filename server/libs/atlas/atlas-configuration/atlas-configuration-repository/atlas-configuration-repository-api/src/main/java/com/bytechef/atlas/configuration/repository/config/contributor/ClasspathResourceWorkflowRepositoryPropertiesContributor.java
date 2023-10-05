@@ -15,21 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.atlas.configuration.repository.config.contributor;
 
-import com.bytechef.atlas.configuration.repository.git.config.GitWorkflowRepositoryProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix = "bytechef.workflow.repository.git")
-public class GitWorkflowRepositoryTypeProperties {
-
-    private GitWorkflowRepositoryProperties projects;
-
-    public GitWorkflowRepositoryProperties getProjects() {
-        return projects;
-    }
-
-    public void setProjects(GitWorkflowRepositoryProperties projects) {
-        this.projects = projects;
-    }
+/**
+ * @author Ivica Cardic
+ */
+public interface ClasspathResourceWorkflowRepositoryPropertiesContributor
+    extends ResourceWorkflowRepositoryPropertiesContributor {
 }
