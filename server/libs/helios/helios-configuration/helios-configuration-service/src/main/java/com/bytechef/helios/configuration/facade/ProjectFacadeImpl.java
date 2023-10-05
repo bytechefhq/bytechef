@@ -126,6 +126,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public void deleteWorkflow(long id, String workflowId) {
+        projectService.removeWorkflow(id, workflowId);
+
+        workflowService.delete(workflowId);
+    }
+
+    @Override
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
 

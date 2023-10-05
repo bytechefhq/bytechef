@@ -231,6 +231,13 @@ public final class Project implements Persistable<Long> {
         return id == null;
     }
 
+    public void removeWorkflow(String workflowId) {
+        projectWorkflows.stream()
+            .filter(integrationWorkflow -> Objects.equals(integrationWorkflow.getWorkflowId(), workflowId))
+            .findFirst()
+            .ifPresent(projectWorkflows::remove);
+    }
+
     public void removeWorkflowId(String workflowId) {
         projectWorkflows.stream()
             .filter(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId))

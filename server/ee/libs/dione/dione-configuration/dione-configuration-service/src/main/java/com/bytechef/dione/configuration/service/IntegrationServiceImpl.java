@@ -96,6 +96,17 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
+    @Transactional
+    public void removeWorkflow(long id, String workflowId) {
+        Integration integration = getIntegration(id);
+
+        integration.removeWorkflow(workflowId);
+
+        update(integration);
+    }
+
+    @Override
+    @Transactional
     public Integration update(long id, List<Long> tagIds) {
         Integration integration = getIntegration(id);
 

@@ -51,33 +51,33 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Order(1)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.classpath.enabled", havingValue = "true")
     WorkflowRepository classpathBasedWorkflowRepository(
-        @Value("${bytechef.workflow.repository.classpath.projects.location-pattern}") String locationPattern) {
+        @Value("${bytechef.workflow.repository.classpath.projects.base-path}") String basePath) {
 
         if (logger.isInfoEnabled()) {
             logger.info(
-                "Workflow repository type enabled: classpath, location pattern for projects: {}", locationPattern);
+                "Workflow repository type enabled: classpath, base path for projects: {}", basePath);
         }
 
         return new ClassPathResourceWorkflowRepository(
             resourcePatternResolver,
             new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, locationPattern), "classpath"));
+                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, basePath), "classpath"));
     }
 
     @Bean
     @Order(2)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
     WorkflowRepository filesystemBasedWorkflowRepository(
-        @Value("${bytechef.workflow.repository.filesystem.projects.location-pattern}") String locationPattern) {
+        @Value("${bytechef.workflow.repository.filesystem.projects.base-path}") String basePath) {
 
         if (logger.isInfoEnabled()) {
             logger.info(
-                "Workflow repository type enabled: filesystem, location pattern for projects: {}", locationPattern);
+                "Workflow repository type enabled: filesystem, base path for projects: {}", basePath);
         }
 
         return new FilesystemResourceWorkflowRepository(
             resourcePatternResolver,
             new ResourceWorkflowRepositoryProperties(
-                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, locationPattern), "file"));
+                Map.of(ProjectConstants.PROJECT_WORKFLOW_TYPE, basePath), "file"));
     }
 }
