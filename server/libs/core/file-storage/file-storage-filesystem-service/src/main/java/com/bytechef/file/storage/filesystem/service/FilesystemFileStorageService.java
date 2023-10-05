@@ -40,10 +40,10 @@ import java.util.UUID;
  */
 public class FilesystemFileStorageService implements FileStorageService {
 
-    private final Path rootLocation;
+    private final Path baseDirPath;
 
-    public FilesystemFileStorageService(String fileStorageDir) {
-        this.rootLocation = Paths.get(fileStorageDir);
+    public FilesystemFileStorageService(String baseDir) {
+        this.baseDirPath = Paths.get(baseDir);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     private Path resolveDirectoryPath(String directory) {
         try {
-            return Files.createDirectories(rootLocation.resolve(directory));
+            return Files.createDirectories(baseDirPath.resolve(directory));
         } catch (IOException ioe) {
             throw new FileStorageException("Could not initialize storage", ioe);
         }
