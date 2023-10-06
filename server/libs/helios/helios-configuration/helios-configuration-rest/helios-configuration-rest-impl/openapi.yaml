@@ -147,7 +147,7 @@ paths:
         required: true
       responses:
         "200":
-          description: "The updated project instnce object."
+          description: "The updated project instance object."
           content:
             application/json:
               schema:
@@ -230,6 +230,41 @@ paths:
       responses:
         "200":
           description: "Successful operation."
+  /project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}:
+    put:
+      description: "Update an existing project instance workflow."
+      summary: "Update an existing project instance workflow"
+      tags:
+        - "project-instance"
+      operationId: "updateProjectInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a project instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectInstanceWorkflowId"
+          description: "The id of a project instance workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInstanceWorkflow"
+        required: true
+      responses:
+        "200":
+          description: "The updated project instance workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInstanceWorkflow"
   /project-instances/{id}/workflows/{workflowId}/jobs:
     post:
       description: "Create a request for running a new job."
@@ -990,6 +1025,7 @@ components:
         projectInstanceId:
           description: "The id of a project instance."
           type: "integer"
+          format: "int64"
         workflowId:
           description: "The id of a workflow."
           type: "string"
