@@ -7,6 +7,7 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
+import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-03T20:45:10.034999+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T20:36:52.146752+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instance", description = "The Automation Project Instance API")
 public interface ProjectInstanceApi {
@@ -303,7 +304,7 @@ public interface ProjectInstanceApi {
      *
      * @param id The id of a project instance. (required)
      * @param projectInstanceModel  (required)
-     * @return The updated project instnce object. (status code 200)
+     * @return The updated project instance object. (status code 200)
      */
     @Operation(
         operationId = "updateProjectInstance",
@@ -311,7 +312,7 @@ public interface ProjectInstanceApi {
         description = "Update an existing project instance.",
         tags = { "project-instance" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated project instnce object.", content = {
+            @ApiResponse(responseCode = "200", description = "The updated project instance object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
             })
         }
@@ -330,6 +331,51 @@ public interface ProjectInstanceApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"enabled\" : true, \"tags\" : [ { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 }, { \"__version\" : 9, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 7 } ], \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectInstanceWorkflows\" : [ { \"projectInstanceId\" : 5, \"__version\" : 2, \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 1, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 1, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : \"workflowId\" }, { \"projectInstanceId\" : 5, \"__version\" : 2, \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 1, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 1, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : \"workflowId\" } ], \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 0, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 6 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId} : Update an existing project instance workflow
+     * Update an existing project instance workflow.
+     *
+     * @param id The id of a project instance. (required)
+     * @param projectInstanceWorkflowId The id of a project instance workflow. (required)
+     * @param projectInstanceWorkflowModel  (required)
+     * @return The updated project instance workflow object. (status code 200)
+     */
+    @Operation(
+        operationId = "updateProjectInstanceWorkflow",
+        summary = "Update an existing project instance workflow",
+        description = "Update an existing project instance workflow.",
+        tags = { "project-instance" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated project instance workflow object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceWorkflowModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<ProjectInstanceWorkflowModel> updateProjectInstanceWorkflow(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "projectInstanceWorkflowId", description = "The id of a project instance workflow.", required = true, in = ParameterIn.PATH) @PathVariable("projectInstanceWorkflowId") Long projectInstanceWorkflowId,
+        @Parameter(name = "ProjectInstanceWorkflowModel", description = "", required = true) @Valid @RequestBody ProjectInstanceWorkflowModel projectInstanceWorkflowModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"projectInstanceId\" : 5, \"__version\" : 2, \"inputs\" : { \"key\" : \"{}\" }, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"connectionId\" : 1, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 1, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"enabled\" : true, \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

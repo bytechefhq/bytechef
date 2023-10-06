@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-03T20:45:10.034999+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T20:36:52.146752+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
@@ -45,7 +45,7 @@ public class ProjectInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastExecutionDate;
 
-  private Integer projectInstanceId;
+  private Long projectInstanceId;
 
   private String workflowId;
 
@@ -167,7 +167,7 @@ public class ProjectInstanceWorkflowModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ProjectInstanceWorkflowModel projectInstanceId(Integer projectInstanceId) {
+  public ProjectInstanceWorkflowModel projectInstanceId(Long projectInstanceId) {
     this.projectInstanceId = projectInstanceId;
     return this;
   }
@@ -179,11 +179,11 @@ public class ProjectInstanceWorkflowModel {
   
   @Schema(name = "projectInstanceId", description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstanceId")
-  public Integer getProjectInstanceId() {
+  public Long getProjectInstanceId() {
     return projectInstanceId;
   }
 
-  public void setProjectInstanceId(Integer projectInstanceId) {
+  public void setProjectInstanceId(Long projectInstanceId) {
     this.projectInstanceId = projectInstanceId;
   }
 
