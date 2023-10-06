@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   CreateProjectInstanceWorkflowJob200ResponseModel,
   ProjectInstanceModel,
+  ProjectInstanceWorkflowModel,
 } from '../models/index';
 import {
     CreateProjectInstanceWorkflowJob200ResponseModelFromJSON,
     CreateProjectInstanceWorkflowJob200ResponseModelToJSON,
     ProjectInstanceModelFromJSON,
     ProjectInstanceModelToJSON,
+    ProjectInstanceWorkflowModelFromJSON,
+    ProjectInstanceWorkflowModelToJSON,
 } from '../models/index';
 
 export interface CreateProjectInstanceRequest {
@@ -61,6 +64,12 @@ export interface GetProjectInstancesRequest {
 export interface UpdateProjectInstanceRequest {
     id: number;
     projectInstanceModel: ProjectInstanceModel;
+}
+
+export interface UpdateProjectInstanceWorkflowRequest {
+    id: number;
+    projectInstanceWorkflowId: number;
+    projectInstanceWorkflowModel: ProjectInstanceWorkflowModel;
 }
 
 /**
@@ -348,6 +357,49 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      */
     async updateProjectInstance(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.updateProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Update an existing project instance workflow.
+     * Update an existing project instance workflow
+     */
+    async updateProjectInstanceWorkflowRaw(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceWorkflowModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectInstanceWorkflow.');
+        }
+
+        if (requestParameters.projectInstanceWorkflowId === null || requestParameters.projectInstanceWorkflowId === undefined) {
+            throw new runtime.RequiredError('projectInstanceWorkflowId','Required parameter requestParameters.projectInstanceWorkflowId was null or undefined when calling updateProjectInstanceWorkflow.');
+        }
+
+        if (requestParameters.projectInstanceWorkflowModel === null || requestParameters.projectInstanceWorkflowModel === undefined) {
+            throw new runtime.RequiredError('projectInstanceWorkflowModel','Required parameter requestParameters.projectInstanceWorkflowModel was null or undefined when calling updateProjectInstanceWorkflow.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"projectInstanceWorkflowId"}}`, encodeURIComponent(String(requestParameters.projectInstanceWorkflowId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ProjectInstanceWorkflowModelToJSON(requestParameters.projectInstanceWorkflowModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceWorkflowModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Update an existing project instance workflow.
+     * Update an existing project instance workflow
+     */
+    async updateProjectInstanceWorkflow(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceWorkflowModel> {
+        const response = await this.updateProjectInstanceWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
