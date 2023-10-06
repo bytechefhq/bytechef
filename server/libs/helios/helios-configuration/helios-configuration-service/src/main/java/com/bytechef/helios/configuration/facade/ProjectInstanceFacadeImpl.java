@@ -124,17 +124,20 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public void deleteProjectInstance(long id) {
-        projectInstanceService.delete(id);
-
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(id);
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             if (projectInstanceWorkflow.isEnabled()) {
                 throw new IllegalStateException(
-                    "ProjectInstanceWorkflow with id=%s must be disabled.".formatted(projectInstanceWorkflow.getId()));
+                    "The ProjectInstanceWorkflow instance id=%s must be disabled.".formatted(
+                        projectInstanceWorkflow.getId()));
             }
+
+            projectInstanceWorkflowService.delete(projectInstanceWorkflow.getId());
         }
+
+        projectInstanceService.delete(id);
 
 // TODO find a way to delete ll tags not referenced anymore
 //        project.getTagIds()

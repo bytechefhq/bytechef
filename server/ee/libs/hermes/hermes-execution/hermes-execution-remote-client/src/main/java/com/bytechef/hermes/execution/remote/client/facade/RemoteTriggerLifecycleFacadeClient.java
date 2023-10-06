@@ -43,7 +43,7 @@ public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycl
     @Override
     public void executeTriggerDisable(
         String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, Long connectionId) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
@@ -55,7 +55,7 @@ public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycl
     @Override
     public void executeTriggerEnable(
         String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
+        Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable",

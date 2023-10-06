@@ -77,11 +77,11 @@ public class WorkflowExecutionId implements Serializable {
     public String toString() {
         return EncodingUtils.encodeBase64ToString(
             instanceType +
-                ':' +
+                ":" +
                 instanceId +
-                ':' +
+                ":" +
                 workflowId +
-                ':' +
+                ":" +
                 triggerName);
     }
 }
