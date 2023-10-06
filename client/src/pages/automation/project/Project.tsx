@@ -12,7 +12,7 @@ import {
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -40,7 +40,7 @@ const headerToggleItems: IToggleItem[] = [
     },
 ];
 
-const Project: React.FC = () => {
+const Project = () => {
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [view, setView] = useState('designer');
@@ -49,7 +49,6 @@ const Project: React.FC = () => {
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
 
     const {projectId, workflowId} = useParams();
-
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();

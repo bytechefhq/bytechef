@@ -5,6 +5,7 @@ import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
+import {ChangeEvent} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
@@ -33,8 +34,10 @@ interface PropertyProps {
     actionName?: string;
     customClassName?: string;
     dataPills?: DataPillType[];
+    defaultValue?: string;
     formState?: FormState<FieldValues>;
     mention?: boolean;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     property: PropertyType;
     register?: UseFormRegister<PropertyFormProps>;
@@ -44,15 +47,16 @@ const Property = ({
     actionName,
     customClassName,
     dataPills,
+    defaultValue,
     formState,
     mention,
+    onChange,
     path = 'parameters',
     property,
     register,
 }: PropertyProps) => {
     const {
         controlType,
-        defaultValue = '',
         description,
         hidden,
         label,
@@ -114,7 +118,7 @@ const Property = ({
             {register && controlType === 'TEXT' && (
                 <Input
                     description={description}
-                    defaultValue={defaultValue as string}
+                    defaultValue={defaultValue}
                     error={hasError(name!)}
                     fieldsetClassName="flex-1 mb-0"
                     key={name}
@@ -133,7 +137,7 @@ const Property = ({
                     <InputProperty
                         controlType={controlType}
                         dataPills={dataPills}
-                        defaultValue={defaultValue as string}
+                        defaultValue={defaultValue}
                         description={description}
                         error={hasError(name!)}
                         fieldsetClassName="flex-1 mb-0"
@@ -144,6 +148,7 @@ const Property = ({
                         }
                         mention={mention}
                         name={name!}
+                        onChange={onChange}
                         required={required}
                         type={type}
                     />
