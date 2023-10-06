@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-03T14:11:58.057897+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T20:36:47.577089+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "job", description = "The Automation Job API")
 public interface JobApi {
