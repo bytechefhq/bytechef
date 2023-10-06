@@ -18,7 +18,7 @@
 package com.bytechef.data.storage.db.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.data.storage.db.service.RemoteDbDataStorageService;
+import com.bytechef.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class RemoteDbDataStorageServiceClient implements RemoteDbDataStorageService {
+public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String DATA_STORAGE_SERVICE = "/remote/db-ddata-storage-service";

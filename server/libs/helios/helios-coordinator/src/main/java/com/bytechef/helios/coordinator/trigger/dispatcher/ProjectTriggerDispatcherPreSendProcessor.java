@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.coordinator.trigger.dispatcher;
 
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
@@ -35,7 +35,7 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
 
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
-        RemoteProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
         super(projectInstanceWorkflowService);
     }
 

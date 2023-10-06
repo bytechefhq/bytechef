@@ -20,6 +20,14 @@ package com.bytechef.hermes.task.dispatcher.test.config;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.ContextServiceImpl;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.CounterServiceImpl;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
@@ -27,15 +35,7 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
-import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
@@ -78,25 +78,25 @@ public class TaskDispatcherIntTestConfiguration {
         }
 
         @Bean
-        RemoteContextService contextService() {
+        ContextService contextService() {
             return new ContextServiceImpl(new InMemoryContextRepository());
         }
 
         @Bean
-        RemoteCounterService counterService() {
+        CounterService counterService() {
             return new CounterServiceImpl(new InMemoryCounterRepository());
         }
 
         @Bean
-        RemoteJobService jobService(ObjectMapper objectMapper) {
+        JobService jobService(ObjectMapper objectMapper) {
             return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
         }
 
         @Bean
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
-            RemoteContextService contextService, RemoteCounterService counterService, RemoteJobService jobService,
-            ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
-            WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
+            ContextService contextService, CounterService counterService, JobService jobService,
+            ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
+            WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
                 contextService, counterService, jobService, objectMapper, taskExecutionService,
@@ -104,7 +104,7 @@ public class TaskDispatcherIntTestConfiguration {
         }
 
         @Bean
-        RemoteTaskExecutionService taskExecutionService() {
+        TaskExecutionService taskExecutionService() {
             return new TaskExecutionServiceImpl(taskExecutionRepository());
         }
 
@@ -114,7 +114,7 @@ public class TaskDispatcherIntTestConfiguration {
         }
 
         @Bean
-        RemoteWorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
+        WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
             return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(),
                 workflowRepositories);
         }

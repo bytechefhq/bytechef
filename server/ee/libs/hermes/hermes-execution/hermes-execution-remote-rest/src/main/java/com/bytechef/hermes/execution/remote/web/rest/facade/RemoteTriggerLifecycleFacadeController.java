@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.execution.remote.web.rest.facade;
 
-import com.bytechef.hermes.execution.facade.RemoteTriggerLifecycleFacade;
+import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +34,10 @@ import java.util.Map;
 @RequestMapping("/remote/trigger-lifecycle-facade")
 public class RemoteTriggerLifecycleFacadeController {
 
-    private final RemoteTriggerLifecycleFacade triggerLifecycleFacade;
+    private final TriggerLifecycleFacade triggerLifecycleFacade;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerLifecycleFacadeController(RemoteTriggerLifecycleFacade triggerLifecycleFacade) {
+    public RemoteTriggerLifecycleFacadeController(TriggerLifecycleFacade triggerLifecycleFacade) {
         this.triggerLifecycleFacade = triggerLifecycleFacade;
     }
 

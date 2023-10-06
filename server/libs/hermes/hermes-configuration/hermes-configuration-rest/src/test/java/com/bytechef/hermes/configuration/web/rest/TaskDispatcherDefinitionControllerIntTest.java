@@ -21,10 +21,10 @@ import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRe
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
 
@@ -54,13 +54,13 @@ public class TaskDispatcherDefinitionControllerIntTest {
     private ActionDefinitionFacade actionDefinitionFacade;
 
     @MockBean
-    private RemoteActionDefinitionService actionDefinitionService;
+    private ActionDefinitionService actionDefinitionService;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
 
     @MockBean
-    private RemoteConnectionDefinitionService connectionDefinitionService;
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -69,7 +69,7 @@ public class TaskDispatcherDefinitionControllerIntTest {
     TriggerDefinitionFacade triggerDefinitionFacade;
 
     @MockBean
-    private RemoteTriggerDefinitionService triggerDefinitionService;
+    private TriggerDefinitionService triggerDefinitionService;
 
     @Autowired
     private MockMvc mockMvc;

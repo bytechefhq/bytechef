@@ -19,9 +19,9 @@ package com.bytechef.task.dispatcher.map.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
@@ -36,20 +36,20 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnBean(RemoteContextService.class)
+@ConditionalOnBean(ContextService.class)
 public class MapTaskDispatcherConfiguration {
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private RemoteContextService contextService;
+    private ContextService contextService;
 
     @Autowired
-    private RemoteCounterService counterService;
+    private CounterService counterService;
 
     @Autowired
-    private RemoteTaskExecutionService taskExecutionService;
+    private TaskExecutionService taskExecutionService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")

@@ -52,7 +52,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service("actionDefinitionService")
-public class ActionDefinitionServiceImpl implements ActionDefinitionService, RemoteActionDefinitionService {
+public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 

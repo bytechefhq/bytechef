@@ -21,13 +21,13 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.message.event.MessageEvent;
@@ -40,19 +40,19 @@ import java.util.Map;
 
 public class TaskDispatcherWorkflowTestSupport {
 
-    private final RemoteContextService contextService;
-    private final RemoteCounterService counterService;
-    private final RemoteJobService jobService;
+    private final ContextService contextService;
+    private final CounterService counterService;
+    private final JobService jobService;
     private final ObjectMapper objectMapper;
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
-    private final RemoteWorkflowService workflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherWorkflowTestSupport(
-        RemoteContextService contextService, RemoteCounterService counterService, RemoteJobService jobService,
-        ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
+        ContextService contextService, CounterService counterService, JobService jobService,
+        ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
+        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
@@ -95,14 +95,14 @@ public class TaskDispatcherWorkflowTestSupport {
     @FunctionalInterface
     public interface TaskCompletionHandlerFactoriesFunction {
         List<TaskCompletionHandlerFactory> apply(
-            RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService);
+            CounterService counterService, TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface
     public interface TaskDispatcherResolverFactoriesFunction {
         List<TaskDispatcherResolverFactory> apply(
-            ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
-            RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService);
+            ApplicationEventPublisher eventPublisher, ContextService contextService,
+            CounterService counterService, TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface

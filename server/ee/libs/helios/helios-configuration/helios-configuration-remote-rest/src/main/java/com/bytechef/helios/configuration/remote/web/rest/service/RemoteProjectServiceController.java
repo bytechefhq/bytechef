@@ -18,7 +18,7 @@
 package com.bytechef.helios.configuration.remote.web.rest.service;
 
 import com.bytechef.helios.configuration.domain.Project;
-import com.bytechef.helios.configuration.service.RemoteProjectService;
+import com.bytechef.helios.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +37,10 @@ import java.util.List;
 @RequestMapping("/remote/project-service")
 public class RemoteProjectServiceController {
 
-    private final RemoteProjectService projectService;
+    private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
-    public RemoteProjectServiceController(RemoteProjectService projectService) {
+    public RemoteProjectServiceController(ProjectService projectService) {
         this.projectService = projectService;
     }
 

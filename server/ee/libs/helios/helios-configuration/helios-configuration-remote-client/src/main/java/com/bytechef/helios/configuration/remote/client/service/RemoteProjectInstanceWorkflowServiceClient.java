@@ -20,15 +20,17 @@ package com.bytechef.helios.configuration.remote.client.service;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProjectInstanceWorkflowService {
+public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstanceWorkflowService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_WORKFLOW_SERVICE = "/remote/project-instance-workflow-service";
@@ -37,6 +39,16 @@ public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProject
     @SuppressFBWarnings("EI")
     public RemoteProjectInstanceWorkflowServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
         this.loadBalancedWebClient = loadBalancedWebClient;
+    }
+
+    @Override
+    public List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void delete(Long id) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -79,5 +91,25 @@ public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProject
                         "/{operationName}/{key}")
                 .build(workflowConnectionOperationName, workflowConnectionKey),
             Long.class);
+    }
+
+    @Override
+    public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateEnabled(Long id, boolean enable) {
+        throw new UnsupportedOperationException();
     }
 }

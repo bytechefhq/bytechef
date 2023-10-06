@@ -21,7 +21,7 @@ import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
-import com.bytechef.hermes.component.registry.service.RemoteComponentDefinitionService;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -39,7 +39,7 @@ import java.util.List;
 @Component
 @ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
 public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
-    implements RemoteComponentDefinitionService {
+    implements ComponentDefinitionService {
 
     private static final String COMPONENT_DEFINITION_SERVICE = "/component-definition-service";
 

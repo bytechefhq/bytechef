@@ -19,7 +19,7 @@ package com.bytechef.atlas.configuration.config;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +52,7 @@ public class WorkflowConfigurationIntTestConfiguration {
     }
 
     @Bean
-    RemoteWorkflowService workflowService(
+    WorkflowService workflowService(
         CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
 

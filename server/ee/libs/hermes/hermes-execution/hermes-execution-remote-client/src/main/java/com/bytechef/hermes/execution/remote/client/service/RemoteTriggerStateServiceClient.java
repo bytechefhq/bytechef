@@ -19,7 +19,7 @@ package com.bytechef.hermes.execution.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Component("triggerStorageService")
-public class RemoteTriggerStateServiceClient implements RemoteTriggerStateService {
+public class RemoteTriggerStateServiceClient implements TriggerStateService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String TRIGGER_STORAGE_SERVICE = "/remote/trigger-state-service";

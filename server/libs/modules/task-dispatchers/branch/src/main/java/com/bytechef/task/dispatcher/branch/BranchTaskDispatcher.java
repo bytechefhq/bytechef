@@ -30,8 +30,8 @@ import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -57,15 +57,15 @@ import org.springframework.util.Assert;
 public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final RemoteContextService contextService;
+    private final ContextService contextService;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcher(
-        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
-        TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService,
+        ApplicationEventPublisher eventPublisher, ContextService contextService,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;

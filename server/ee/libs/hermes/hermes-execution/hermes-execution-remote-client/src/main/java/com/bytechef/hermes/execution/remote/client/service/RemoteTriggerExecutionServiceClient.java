@@ -19,7 +19,7 @@ package com.bytechef.hermes.execution.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTriggerExecutionServiceClient implements RemoteTriggerExecutionService {
+public class RemoteTriggerExecutionServiceClient implements TriggerExecutionService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String TRIGGER_EXECUTION_SERVICE = "/remote/trigger-execution-service";

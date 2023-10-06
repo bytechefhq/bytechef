@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
-import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,9 +36,9 @@ import java.util.List;
 @RequestMapping("/remote/action-definition-service")
 public class RemoteActionDefinitionServiceController {
 
-    private final RemoteActionDefinitionService actionDefinitionService;
+    private final ActionDefinitionService actionDefinitionService;
 
-    public RemoteActionDefinitionServiceController(RemoteActionDefinitionService actionDefinitionService) {
+    public RemoteActionDefinitionServiceController(ActionDefinitionService actionDefinitionService) {
         this.actionDefinitionService = actionDefinitionService;
     }
 

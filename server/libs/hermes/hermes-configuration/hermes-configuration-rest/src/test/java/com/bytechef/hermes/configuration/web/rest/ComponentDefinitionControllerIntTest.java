@@ -17,16 +17,16 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.component.registry.facade.RemoteComponentDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 
 import java.util.List;
 
@@ -56,16 +56,16 @@ public class ComponentDefinitionControllerIntTest {
     private ActionDefinitionFacade actionDefinitionFacade;
 
     @MockBean
-    private RemoteActionDefinitionService actionDefinitionService;
+    private ActionDefinitionService actionDefinitionService;
 
     @MockBean
-    private RemoteComponentDefinitionFacade componentDefinitionFacade;
+    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
 
     @MockBean
-    private RemoteConnectionDefinitionService connectionDefinitionService;
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -74,7 +74,7 @@ public class ComponentDefinitionControllerIntTest {
     TriggerDefinitionFacade triggerDefinitionFacade;
 
     @MockBean
-    private RemoteTriggerDefinitionService triggerDefinitionService;
+    private TriggerDefinitionService triggerDefinitionService;
 
     @Autowired
     private MockMvc mockMvc;

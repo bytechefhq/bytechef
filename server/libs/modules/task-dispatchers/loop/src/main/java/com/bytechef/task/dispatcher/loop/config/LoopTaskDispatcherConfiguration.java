@@ -19,8 +19,8 @@ package com.bytechef.task.dispatcher.loop.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.loop.LoopBreakTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
@@ -41,10 +41,10 @@ public class LoopTaskDispatcherConfiguration {
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private RemoteContextService contextService;
+    private ContextService contextService;
 
     @Autowired
-    private RemoteTaskExecutionService taskExecutionService;
+    private TaskExecutionService taskExecutionService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")

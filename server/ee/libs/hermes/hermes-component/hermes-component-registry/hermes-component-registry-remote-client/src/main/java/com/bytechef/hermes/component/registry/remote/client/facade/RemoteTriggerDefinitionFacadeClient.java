@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registry.remote.client.facade;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.registry.domain.Option;
@@ -40,7 +40,7 @@ import java.util.Map;
  */
 @Component
 @ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
-public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient implements RemoteTriggerDefinitionFacade {
+public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient implements TriggerDefinitionFacade {
 
     private static final String TRIGGER_DEFINITION_FACADE = "/trigger-definition-facade";
 

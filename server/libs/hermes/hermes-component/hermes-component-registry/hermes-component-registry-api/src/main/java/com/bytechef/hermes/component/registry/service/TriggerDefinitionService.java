@@ -19,7 +19,10 @@ package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
+import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.registry.domain.Option;
@@ -95,4 +98,14 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+
+    TriggerDefinition getTriggerDefinition(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName);
+
+    List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion);
+
+    List<TriggerDefinition> getTriggerDefinitions(@NonNull List<ComponentOperation> componentOperations);
+
+    WebhookTriggerFlags getWebhookTriggerFlags(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName);
 }

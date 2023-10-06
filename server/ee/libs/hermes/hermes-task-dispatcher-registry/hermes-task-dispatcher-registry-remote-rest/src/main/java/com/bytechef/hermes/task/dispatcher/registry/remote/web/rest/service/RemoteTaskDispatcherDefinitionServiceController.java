@@ -18,7 +18,7 @@
 package com.bytechef.hermes.task.dispatcher.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.hermes.task.dispatcher.registry.service.RemoteTaskDispatcherDefinitionService;
+import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +38,10 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "coordinator-app")
 public class RemoteTaskDispatcherDefinitionServiceController {
 
-    private final RemoteTaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     public RemoteTaskDispatcherDefinitionServiceController(
-        RemoteTaskDispatcherDefinitionService taskDispatcherDefinitionService) {
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
 
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }

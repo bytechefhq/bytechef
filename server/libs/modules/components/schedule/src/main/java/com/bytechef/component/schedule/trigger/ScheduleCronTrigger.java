@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.scheduler.RemoteTriggerScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
 
@@ -65,9 +65,9 @@ public class ScheduleCronTrigger {
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 
-    private final RemoteTriggerScheduler triggerScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public ScheduleCronTrigger(RemoteTriggerScheduler triggerScheduler) {
+    public ScheduleCronTrigger(TriggerScheduler triggerScheduler) {
         this.triggerScheduler = triggerScheduler;
     }
 

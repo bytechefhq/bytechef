@@ -22,7 +22,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
@@ -39,11 +39,11 @@ import org.springframework.util.Assert;
 public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI2")
     public LoopBreakTaskDispatcher(
-        ApplicationEventPublisher eventPublisher, RemoteTaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, TaskExecutionService taskExecutionService) {
 
         this.eventPublisher = eventPublisher;
         this.taskExecutionService = taskExecutionService;

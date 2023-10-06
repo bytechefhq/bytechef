@@ -20,7 +20,7 @@ package com.bytechef.atlas.execution.facade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.repository.JobRepository;
@@ -68,7 +68,7 @@ public class JobFacadeIntTest {
         private ContextService contextService;
 
         @MockBean
-        private RemoteWorkflowService workflowService;
+        private WorkflowService workflowService;
 
         @MockBean
         private WorkflowFileStorageFacade workflowFileStorageFacade;

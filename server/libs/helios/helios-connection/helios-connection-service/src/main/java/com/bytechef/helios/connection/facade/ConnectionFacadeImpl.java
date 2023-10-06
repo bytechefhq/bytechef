@@ -18,18 +18,18 @@
 package com.bytechef.helios.connection.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
@@ -56,20 +56,20 @@ import java.util.Objects;
 @Transactional
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
-    private final RemoteConnectionDefinitionFacade connectionDefinitionFacade;
-    private final RemoteConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionDefinitionFacade connectionDefinitionFacade;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final OAuth2Service oAuth2Service;
-    private final RemoteProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
-    private final RemoteWorkflowService workflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
-        RemoteConnectionDefinitionFacade connectionDefinitionFacade,
-        RemoteConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        OAuth2Service oAuth2Service, RemoteProjectInstanceWorkflowService projectInstanceWorkflowService,
-        TagService tagService, RemoteWorkflowService workflowService) {
+        ConnectionDefinitionFacade connectionDefinitionFacade,
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        OAuth2Service oAuth2Service, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        TagService tagService, WorkflowService workflowService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;

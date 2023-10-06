@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
-import com.bytechef.hermes.component.registry.facade.RemoteActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,9 +39,9 @@ import java.util.Map;
 @RequestMapping("/remote/action-definition-facade")
 public class RemoteActionDefinitionFacadeController {
 
-    private final RemoteActionDefinitionFacade actionDefinitionFacade;
+    private final ActionDefinitionFacade actionDefinitionFacade;
 
-    public RemoteActionDefinitionFacadeController(RemoteActionDefinitionFacade actionDefinitionFacade) {
+    public RemoteActionDefinitionFacadeController(ActionDefinitionFacade actionDefinitionFacade) {
         this.actionDefinitionFacade = actionDefinitionFacade;
     }
 

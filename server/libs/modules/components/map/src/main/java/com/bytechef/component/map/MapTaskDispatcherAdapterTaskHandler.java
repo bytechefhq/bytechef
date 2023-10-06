@@ -35,8 +35,8 @@ import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
@@ -102,12 +102,12 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(), taskHandlerResolver,
             workflowFileStorageFacade);
 
-        RemoteTaskExecutionService taskExecutionService =
+        TaskExecutionService taskExecutionService =
             new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 
         taskExecution = taskExecutionService.create(taskExecution);
 
-        RemoteContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(
             Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION,

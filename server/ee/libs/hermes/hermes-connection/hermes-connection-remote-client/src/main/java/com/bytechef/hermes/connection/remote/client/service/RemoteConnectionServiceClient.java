@@ -19,7 +19,7 @@ package com.bytechef.hermes.connection.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -31,13 +31,23 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteConnectionServiceClient implements RemoteConnectionService {
+public class RemoteConnectionServiceClient implements ConnectionService {
 
     private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
     public RemoteConnectionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
         this.loadBalancedWebClient = loadBalancedWebClient;
+    }
+
+    @Override
+    public Connection create(Connection connection) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -64,5 +74,30 @@ public class RemoteConnectionServiceClient implements RemoteConnectionService {
                 .path("/remote/connection-service/get-connections")
                 .build(),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<Connection> getConnections(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getConnections(String componentName, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection update(long id, List<Long> tagIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection update(Connection connection) {
+        throw new UnsupportedOperationException();
     }
 }

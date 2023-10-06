@@ -18,7 +18,7 @@
 package com.bytechef.helios.configuration.remote.web.rest.service;
 
 import com.bytechef.helios.configuration.domain.ProjectInstance;
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceService;
+import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/project-instance-service")
 public class RemoteProjectInstanceServiceController {
 
-    private final RemoteProjectInstanceService projectInstanceService;
+    private final ProjectInstanceService projectInstanceService;
 
     @SuppressFBWarnings("EI")
-    public RemoteProjectInstanceServiceController(RemoteProjectInstanceService projectInstanceService) {
+    public RemoteProjectInstanceServiceController(ProjectInstanceService projectInstanceService) {
         this.projectInstanceService = projectInstanceService;
     }
 

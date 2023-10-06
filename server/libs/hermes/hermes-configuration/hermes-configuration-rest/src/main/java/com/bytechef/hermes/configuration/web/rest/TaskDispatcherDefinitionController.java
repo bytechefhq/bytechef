@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.task.dispatcher.registry.service.RemoteTaskDispatcherDefinitionService;
+import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,10 +38,10 @@ import java.util.List;
 public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionApi {
 
     private final ConversionService conversionService;
-    private final RemoteTaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     public TaskDispatcherDefinitionController(
-        ConversionService conversionService, RemoteTaskDispatcherDefinitionService taskDispatcherDefinitionService) {
+        ConversionService conversionService, TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
 
         this.conversionService = conversionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;

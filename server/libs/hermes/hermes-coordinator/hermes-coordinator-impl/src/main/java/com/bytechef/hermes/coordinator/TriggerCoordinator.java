@@ -18,7 +18,7 @@
 package com.bytechef.hermes.coordinator;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -40,8 +40,8 @@ import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
-import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -69,9 +69,9 @@ public class TriggerCoordinator {
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionErrorEventListener triggerExecutionErrorEventListener;
-    private final RemoteTriggerExecutionService triggerExecutionService;
-    private final RemoteTriggerStateService triggerStateService;
-    private final RemoteWorkflowService workflowService;
+    private final TriggerExecutionService triggerExecutionService;
+    private final TriggerStateService triggerStateService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
@@ -79,8 +79,8 @@ public class TriggerCoordinator {
         ApplicationEventPublisher eventPublisher, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionErrorEventListener triggerExecutionErrorEventListener,
-        RemoteTriggerExecutionService triggerExecutionService, RemoteTriggerStateService triggerStateService,
-        RemoteWorkflowService workflowService) {
+        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService,
+        WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;

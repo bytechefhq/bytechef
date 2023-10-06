@@ -15,23 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registry.service;
+package com.bytechef.hermes.component.registry.facade;
 
-import com.bytechef.hermes.component.registry.domain.ActionDefinition;
-import com.bytechef.hermes.component.registry.ComponentOperation;
-import org.springframework.lang.NonNull;
+import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface RemoteActionDefinitionService {
+public interface ComponentDefinitionFacade {
 
-    ActionDefinition getActionDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName);
-
-    List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion);
-
-    List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations);
+    List<ComponentDefinition> getComponentDefinitions(
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions, List<String> include);
 }

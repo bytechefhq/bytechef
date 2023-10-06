@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.definition.factory.ContextFactory;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,15 +35,15 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service("actionDefinitionFacade")
-public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, RemoteActionDefinitionFacade {
+public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
-    private final RemoteConnectionService connectionService;
+    private final ConnectionService connectionService;
     private final ContextFactory contextFactory;
     private final ActionDefinitionService actionDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        RemoteConnectionService connectionService, ContextFactory contextFactory,
+        ConnectionService connectionService, ContextFactory contextFactory,
         ActionDefinitionService actionDefinitionService) {
 
         this.contextFactory = contextFactory;

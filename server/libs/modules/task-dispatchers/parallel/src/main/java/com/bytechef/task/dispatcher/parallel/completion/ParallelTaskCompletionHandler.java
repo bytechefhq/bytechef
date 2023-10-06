@@ -23,8 +23,8 @@ import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispat
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Objects;
@@ -42,14 +42,14 @@ import java.util.Objects;
  */
 public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final RemoteCounterService counterService;
+    private final CounterService counterService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
     public ParallelTaskCompletionHandler(
-        RemoteCounterService counterService, TaskCompletionHandler taskCompletionHandler,
-        RemoteTaskExecutionService taskExecutionService) {
+        CounterService counterService, TaskCompletionHandler taskCompletionHandler,
+        TaskExecutionService taskExecutionService) {
 
         this.counterService = counterService;
         this.taskCompletionHandler = taskCompletionHandler;

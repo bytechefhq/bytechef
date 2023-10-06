@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.web.rest.service;
 
 import com.bytechef.atlas.execution.domain.Context.Classname;
-import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -38,10 +38,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/context-service")
 public class RemoteContextServiceController {
 
-    private final RemoteContextService contextService;
+    private final ContextService contextService;
 
     @SuppressFBWarnings("EI")
-    public RemoteContextServiceController(RemoteContextService contextService) {
+    public RemoteContextServiceController(ContextService contextService) {
         this.contextService = contextService;
     }
 

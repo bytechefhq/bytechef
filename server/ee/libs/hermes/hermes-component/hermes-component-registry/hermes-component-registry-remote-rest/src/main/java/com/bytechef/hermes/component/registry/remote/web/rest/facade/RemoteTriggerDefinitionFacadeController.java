@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.registry.domain.Option;
@@ -42,9 +42,9 @@ import java.util.Map;
 @RequestMapping("/remote/trigger-definition-facade")
 public class RemoteTriggerDefinitionFacadeController {
 
-    private final RemoteTriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
 
-    public RemoteTriggerDefinitionFacadeController(RemoteTriggerDefinitionFacade triggerDefinitionFacade) {
+    public RemoteTriggerDefinitionFacadeController(TriggerDefinitionFacade triggerDefinitionFacade) {
         this.triggerDefinitionFacade = triggerDefinitionFacade;
     }
 

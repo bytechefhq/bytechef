@@ -18,7 +18,7 @@
 package com.bytechef.data.storage.db.remote.web.rest.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.data.storage.db.service.RemoteDbDataStorageService;
+import com.bytechef.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/db-data-storage-service")
 public class RemoteDbDataStorageServiceController {
 
-    private final RemoteDbDataStorageService dataStorageService;
+    private final DbDataStorageService dataStorageService;
 
     @SuppressFBWarnings("EI")
-    public RemoteDbDataStorageServiceController(RemoteDbDataStorageService dataStorageService) {
+    public RemoteDbDataStorageServiceController(DbDataStorageService dataStorageService) {
         this.dataStorageService = dataStorageService;
     }
 

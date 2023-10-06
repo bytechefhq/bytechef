@@ -19,17 +19,18 @@ package com.bytechef.helios.configuration.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceService;
+import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class RemoteProjectInstanceServiceClient implements RemoteProjectInstanceService {
+public class RemoteProjectInstanceServiceClient implements ProjectInstanceService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_SERVICE = "/remote/project-instance-service";
@@ -41,6 +42,16 @@ public class RemoteProjectInstanceServiceClient implements RemoteProjectInstance
     }
 
     @Override
+    public ProjectInstance create(ProjectInstance projectInstance) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId) {
         return Optional.ofNullable(
             loadBalancedWebClient.get(
@@ -49,5 +60,40 @@ public class RemoteProjectInstanceServiceClient implements RemoteProjectInstance
                     .path(PROJECT_INSTANCE_SERVICE + "/fetch-workflow-project-instance/{workflowId}")
                     .build(workflowId),
                 ProjectInstance.class));
+    }
+
+    @Override
+    public ProjectInstance getProjectInstance(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Long> getProjectIds() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectInstance> getProjectInstances() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectInstance> getProjectInstances(Long projectId, Long tagId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProjectInstance update(long id, List<Long> tagIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProjectInstance update(ProjectInstance projectInstance) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateEnabled(long id, boolean enabled) {
+        throw new UnsupportedOperationException();
     }
 }

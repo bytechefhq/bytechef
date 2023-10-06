@@ -27,7 +27,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.execution.facade.RemoteJobFacade;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -43,10 +43,10 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final RemoteJobFacade jobFacade;
+    private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public SubflowTaskDispatcher(RemoteJobFacade jobFacade) {
+    public SubflowTaskDispatcher(JobFacade jobFacade) {
         this.jobFacade = jobFacade;
     }
 

@@ -25,5 +25,11 @@ import com.bytechef.file.storage.domain.FileEntry;
  */
 public interface ContextService {
 
+    FileEntry peek(long stackId, Context.Classname classname);
+
+    FileEntry peek(long stackId, int subStackId, Context.Classname classname);
+
     void push(long stackId, Context.Classname classname, FileEntry value);
+
+    void push(long stackId, int subStackId, Context.Classname classname, FileEntry value);
 }

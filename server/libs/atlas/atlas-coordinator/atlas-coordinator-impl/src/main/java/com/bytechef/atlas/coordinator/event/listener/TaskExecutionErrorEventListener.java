@@ -25,8 +25,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,14 +48,14 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
     private static final Logger logger = LoggerFactory.getLogger(TaskExecutionErrorEventListener.class);
 
     private final ApplicationEventPublisher eventPublisher;
-    private final RemoteJobService jobService;
+    private final JobService jobService;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI2")
     public TaskExecutionErrorEventListener(
-        ApplicationEventPublisher eventPublisher, RemoteJobService jobService,
-        TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, JobService jobService,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
 
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;

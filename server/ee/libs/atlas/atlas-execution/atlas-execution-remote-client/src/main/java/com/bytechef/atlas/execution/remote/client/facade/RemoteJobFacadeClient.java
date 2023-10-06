@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.RemoteJobFacade;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteJobFacadeClient implements RemoteJobFacade {
+public class RemoteJobFacadeClient implements JobFacade {
 
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -45,5 +45,15 @@ public class RemoteJobFacadeClient implements RemoteJobFacade {
                 .path("/remote/job-facade/create-job")
                 .build(),
             jobParameters, Long.class);
+    }
+
+    @Override
+    public void restartJob(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void stopJob(Long id) {
+        throw new UnsupportedOperationException();
     }
 }
