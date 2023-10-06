@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.facade;
 
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.tag.domain.Tag;
 
@@ -46,4 +47,6 @@ public interface ProjectInstanceFacade {
     ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
     void updateProjectInstanceTags(long id, List<Tag> tags);
+
+    ProjectInstanceWorkflow updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow);
 }

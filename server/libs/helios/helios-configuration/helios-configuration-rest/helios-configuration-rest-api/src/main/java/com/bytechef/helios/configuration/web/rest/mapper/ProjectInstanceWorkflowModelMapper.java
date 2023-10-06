@@ -32,9 +32,11 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
-public interface ProjectInstanceModelMapper extends Converter<ProjectInstanceModel, ProjectInstanceDTO> {
+public interface ProjectInstanceWorkflowModelMapper
+    extends Converter<ProjectInstanceWorkflowModel, ProjectInstanceWorkflow> {
 
     @Override
-    @Mapping(target = "project", ignore = true)
-    ProjectInstanceDTO convert(ProjectInstanceModel projectInstanceModel);
+    ProjectInstanceWorkflow convert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+
+    ProjectInstanceWorkflowConnection map(ProjectInstanceWorkflowConnectionModel value);
 }

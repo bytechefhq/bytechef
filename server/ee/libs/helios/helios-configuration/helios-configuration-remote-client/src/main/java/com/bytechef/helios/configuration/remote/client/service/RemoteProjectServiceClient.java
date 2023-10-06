@@ -99,7 +99,7 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId) {
+    public List<Project> getPublishedProjects(Long categoryId, List<Long> ids, Long tagId) {
         throw new UnsupportedOperationException();
     }
 
