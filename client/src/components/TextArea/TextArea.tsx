@@ -5,12 +5,12 @@ import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type TextAreaProps = {
-    label?: string;
-    name: string;
     description?: string;
     error?: string | undefined;
     fieldsetClassName?: string;
+    label?: string;
     labelClassName?: string;
+    name: string;
 } & React.DetailedHTMLProps<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
     HTMLTextAreaElement
