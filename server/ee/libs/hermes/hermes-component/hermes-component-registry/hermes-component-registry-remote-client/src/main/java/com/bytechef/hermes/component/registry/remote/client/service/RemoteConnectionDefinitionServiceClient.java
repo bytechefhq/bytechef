@@ -19,10 +19,15 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -33,13 +38,14 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @Component
 public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClient
-    implements RemoteConnectionDefinitionService {
+    implements ConnectionDefinitionService {
 
     private static final String CONNECTION_DEFINITION_SERVICE = "/connection-definition-service";
 
@@ -47,6 +53,37 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
         DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
         super(defaultWebClient, discoveryClient, objectMapper);
+    }
+
+    @Override
+    public ApplyResponse executeAuthorizationApply(
+        String componentName, ComponentConnection connection, Context context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AuthorizationCallbackResponse executeAuthorizationCallback(
+        String componentName, ComponentConnection connection, Context context, String redirectUri) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean connectionExists(String componentName, int connectionVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection, Context context) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
+        String componentName, ComponentConnection connection, Context context) {
+
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.execution.remote.client.service;
 
-import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteCounterServiceClient implements RemoteCounterService {
+public class RemoteCounterServiceClient implements CounterService {
 
     private static final String COUNTER_SERVICE = "/remote/counter-service";
     private static final String EXECUTION_APP = "execution-app";

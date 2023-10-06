@@ -19,7 +19,7 @@ package com.bytechef.helios.configuration.remote.web.rest.service;
 
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/project-instance-workflow-service")
 public class RemoteProjectInstanceWorkflowServiceController {
 
-    private final RemoteProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
     @SuppressFBWarnings("EI")
     public RemoteProjectInstanceWorkflowServiceController(
-        RemoteProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
 
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
     }

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.remote.client.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
+public class RemoteWorkflowServiceClient implements WorkflowService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String WORKFLOW_SERVICE = "/remote/workflow-service";
@@ -40,6 +40,26 @@ public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
     @SuppressFBWarnings("EI")
     public RemoteWorkflowServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
         this.loadBalancedWebClient = loadBalancedWebClient;
+    }
+
+    @Override
+    public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType, int type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void delete(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Workflow duplicateWorkflow(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Workflow> getFilesystemWorkflows(int type) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -70,5 +90,15 @@ public class RemoteWorkflowServiceClient implements RemoteWorkflowService {
                 .path(WORKFLOW_SERVICE + "/get-workflows/" + String.join(",", workflowIds))
                 .build(),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public void refreshCache(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Workflow update(String id, String definition) {
+        throw new UnsupportedOperationException();
     }
 }

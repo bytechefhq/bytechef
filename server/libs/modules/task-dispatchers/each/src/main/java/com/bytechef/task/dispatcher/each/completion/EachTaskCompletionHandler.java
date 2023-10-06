@@ -23,8 +23,8 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -36,14 +36,14 @@ import java.util.Objects;
  */
 public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final RemoteCounterService counterService;
+    private final CounterService counterService;
 
     @SuppressFBWarnings("EI")
     public EachTaskCompletionHandler(
-        RemoteCounterService counterService, TaskCompletionHandler taskCompletionHandler,
-        RemoteTaskExecutionService taskExecutionService) {
+        CounterService counterService, TaskCompletionHandler taskCompletionHandler,
+        TaskExecutionService taskExecutionService) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;

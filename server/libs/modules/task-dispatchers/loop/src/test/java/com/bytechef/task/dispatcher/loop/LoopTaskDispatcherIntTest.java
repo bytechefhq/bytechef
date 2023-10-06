@@ -21,9 +21,9 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -53,10 +53,10 @@ public class LoopTaskDispatcherIntTest {
     private TestVarTaskHandler<List<Object>, Object> testVarTaskHandler;
 
     @Autowired
-    protected RemoteContextService contextService;
+    protected ContextService contextService;
 
     @Autowired
-    protected RemoteTaskExecutionService taskExecutionService;
+    protected TaskExecutionService taskExecutionService;
 
     @Autowired
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
@@ -153,7 +153,7 @@ public class LoopTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService) {
+        CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
@@ -167,8 +167,8 @@ public class LoopTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
-        RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, ContextService contextService,
+        CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(

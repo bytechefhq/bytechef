@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.component.registry.facade.RemoteActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
@@ -38,7 +38,7 @@ import java.util.Map;
 @Component
 @ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
 public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
-    implements RemoteActionDefinitionFacade {
+    implements ActionDefinitionFacade {
 
     private static final String ACTION_DEFINITION_FACADE = "/action-definition-facade";
 

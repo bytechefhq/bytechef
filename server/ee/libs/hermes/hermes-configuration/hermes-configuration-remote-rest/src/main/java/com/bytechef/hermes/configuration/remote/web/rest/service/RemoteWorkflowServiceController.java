@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.remote.web.rest.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +39,10 @@ import java.util.stream.Stream;
 @RequestMapping("/remote/workflow-service")
 public class RemoteWorkflowServiceController {
 
-    private final RemoteWorkflowService workflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public RemoteWorkflowServiceController(RemoteWorkflowService workflowService) {
+    public RemoteWorkflowServiceController(WorkflowService workflowService) {
         this.workflowService = workflowService;
     }
 

@@ -19,18 +19,19 @@ package com.bytechef.helios.configuration.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.helios.configuration.domain.Project;
-import com.bytechef.helios.configuration.service.RemoteProjectService;
+import com.bytechef.helios.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class RemoteProjectServiceClient implements RemoteProjectService {
+public class RemoteProjectServiceClient implements ProjectService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_SERVICE = "/remote/project-service";
@@ -40,6 +41,31 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
     @SuppressFBWarnings("EI")
     public RemoteProjectServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
         this.loadBalancedWebClient = loadBalancedWebClient;
+    }
+
+    @Override
+    public Project addWorkflow(long id, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long countProjects() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Project create(Project project) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Project> fetchProject(String name) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -53,6 +79,11 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
     }
 
     @Override
+    public Project getProject(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Project> getProjects() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -63,6 +94,16 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
     }
 
     @Override
+    public List<Project> getProjects(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Project getWorkflowProject(String workflowId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -70,5 +111,20 @@ public class RemoteProjectServiceClient implements RemoteProjectService {
                 .path(PROJECT_SERVICE + "/get-workflow-project/{workflowId}")
                 .build(workflowId),
             Project.class);
+    }
+
+    @Override
+    public void removeWorkflow(long id, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Project update(long id, List<Long> tagIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Project update(Project project) {
+        throw new UnsupportedOperationException();
     }
 }

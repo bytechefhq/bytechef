@@ -18,7 +18,7 @@
 package com.bytechef.data.storage.db.config;
 
 import com.bytechef.data.storage.db.repository.DataStorageRepository;
-import com.bytechef.data.storage.db.service.DbDataStorageService;
+import com.bytechef.data.storage.db.service.DbDataStorageServiceImpl;
 import com.bytechef.data.storage.service.DataStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +44,16 @@ public class DbDataStorageConfiguration {
     }
 
     @Bean
-    DbDataStorageService dbDataStorageService(DataStorageRepository dataStorageRepository) {
-        return new DbDataStorageService(dataStorageRepository);
+    DbDataStorageServiceImpl dbDataStorageService(DataStorageRepository dataStorageRepository) {
+        return new DbDataStorageServiceImpl(dataStorageRepository);
     }
 
     @Bean
-    DataStorageService dataStorageService(DbDataStorageService dbDataStorageService) {
+    DataStorageService dataStorageService(DbDataStorageServiceImpl dbDataStorageService) {
         return new DataStorageServiceImpl(dbDataStorageService);
     }
 
-    private record DataStorageServiceImpl(DbDataStorageService dbDataStorageService) implements DataStorageService {
+    private record DataStorageServiceImpl(DbDataStorageServiceImpl dbDataStorageService) implements DataStorageService {
 
         @Override
         public <T> Optional<T> fetch(String context, int scope, long scopeId, String key) {

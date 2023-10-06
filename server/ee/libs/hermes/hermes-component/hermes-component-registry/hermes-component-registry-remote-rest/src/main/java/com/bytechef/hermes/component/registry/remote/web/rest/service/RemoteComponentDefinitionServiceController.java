@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.component.registry.service.RemoteComponentDefinitionService;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,9 +36,9 @@ import java.util.List;
 @RequestMapping("/remote/component-definition-service")
 public class RemoteComponentDefinitionServiceController {
 
-    private final RemoteComponentDefinitionService componentDefinitionService;
+    private final ComponentDefinitionService componentDefinitionService;
 
-    public RemoteComponentDefinitionServiceController(RemoteComponentDefinitionService componentDefinitionService) {
+    public RemoteComponentDefinitionServiceController(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
     }
 

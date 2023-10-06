@@ -28,8 +28,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Service
-public class TaskDispatcherDefinitionServiceImpl
-    implements TaskDispatcherDefinitionService, RemoteTaskDispatcherDefinitionService {
+public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefinitionService {
 
     private final TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry;
 

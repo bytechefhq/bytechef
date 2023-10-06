@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -41,12 +41,12 @@ import java.util.Objects;
 @RequestMapping("/remote/connection-definition-facade")
 public class RemoteConnectionDefinitionFacadeController {
 
-    private final RemoteConnectionDefinitionFacade remoteConnectionDefinitionFacade;
+    private final ConnectionDefinitionFacade connectionDefinitionFacade;
 
     public RemoteConnectionDefinitionFacadeController(
-        @Qualifier("connectionDefinitionFacade") RemoteConnectionDefinitionFacade remoteConnectionDefinitionFacade) {
+        @Qualifier("connectionDefinitionFacade") ConnectionDefinitionFacade connectionDefinitionFacade) {
 
-        this.remoteConnectionDefinitionFacade = remoteConnectionDefinitionFacade;
+        this.connectionDefinitionFacade = connectionDefinitionFacade;
     }
 
     @RequestMapping(
@@ -62,7 +62,7 @@ public class RemoteConnectionDefinitionFacadeController {
         @RequestBody ConnectionRequest connectionRequest) {
 
         return ResponseEntity.ok(
-            remoteConnectionDefinitionFacade.executeAuthorizationApply(
+            connectionDefinitionFacade.executeAuthorizationApply(
                 connectionRequest.componentName, Objects.requireNonNull(connectionRequest.connection)));
     }
 
@@ -79,7 +79,7 @@ public class RemoteConnectionDefinitionFacadeController {
         @Valid @RequestBody AuthorizationCallbackRequest authorizationCallbackRequest) {
 
         return ResponseEntity.ok(
-            remoteConnectionDefinitionFacade.executeAuthorizationCallback(
+            connectionDefinitionFacade.executeAuthorizationCallback(
                 authorizationCallbackRequest.componentName, authorizationCallbackRequest.connection,
                 authorizationCallbackRequest.redirectUri()));
     }
@@ -88,7 +88,7 @@ public class RemoteConnectionDefinitionFacadeController {
         method = RequestMethod.POST,
         value = "/execute-base-uri")
     public ResponseEntity<String> executeBaseUri(@RequestBody ConnectionRequest connectionRequest) {
-        return remoteConnectionDefinitionFacade.executeBaseUri(
+        return connectionDefinitionFacade.executeBaseUri(
             connectionRequest.componentName, connectionRequest.connection)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
@@ -108,7 +108,7 @@ public class RemoteConnectionDefinitionFacadeController {
         @Valid @RequestBody ConnectionRequest connectionRequest) {
 
         return ResponseEntity.ok(
-            remoteConnectionDefinitionFacade.getOAuth2AuthorizationParameters(
+            connectionDefinitionFacade.getOAuth2AuthorizationParameters(
                 connectionRequest.componentName, connectionRequest.connection));
     }
 

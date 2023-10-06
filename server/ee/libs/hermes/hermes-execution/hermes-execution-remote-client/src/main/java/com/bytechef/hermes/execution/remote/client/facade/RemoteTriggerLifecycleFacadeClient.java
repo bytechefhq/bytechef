@@ -18,7 +18,7 @@
 package com.bytechef.hermes.execution.remote.client.facade;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.execution.facade.RemoteTriggerLifecycleFacade;
+import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycleFacade {
+public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
 
     private static final String TRIGGER_LIFECYCLE_FACADE = "/remote/trigger-lifecycle-facade";
     private static final String EXECUTION_APP = "execution-app";

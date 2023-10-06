@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registry.facade;
+package com.bytechef.data.storage.db.service;
 
-import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-
-import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface RemoteComponentDefinitionFacade {
+public interface DbDataStorageService {
 
-    List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions, List<String> include);
+    <T> Optional<T> fetch(String context, int scope, long scopeId, String key);
+
+    <T> T get(String context, int scope, long scopeId, String key);
+
+    void put(String context, int scope, long scopeId, String key, Object value);
 }

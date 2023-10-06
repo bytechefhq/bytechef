@@ -19,9 +19,9 @@ package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,14 +36,14 @@ import java.util.function.Predicate;
  * @author Ivica Cardic
  */
 @Service
-public class ComponentDefinitionFacadeImpl implements RemoteComponentDefinitionFacade {
+public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
-    private final RemoteConnectionService connectionService;
+    private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, RemoteConnectionService connectionService) {
+        ComponentDefinitionService componentDefinitionService, ConnectionService connectionService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.connectionService = connectionService;

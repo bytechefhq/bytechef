@@ -17,16 +17,16 @@
 
 package com.bytechef.hermes.webhook.config;
 
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.facade.RemoteJobFacade;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -76,13 +76,13 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookExecutor webhookExecutor(
-        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
-        RemoteCounterService counterService, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
-        RemoteJobFacade jobFacade, RemoteJobService jobService, ObjectMapper objectMapper,
-        RemoteTaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        ApplicationEventPublisher eventPublisher, ContextService contextService,
+        CounterService counterService, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
+        JobFacade jobFacade, JobService jobService, ObjectMapper objectMapper,
+        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         TriggerSyncExecutor triggerSyncExecutor,
         @Qualifier("workflowSyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
-        RemoteWorkflowService workflowService) {
+        WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
@@ -103,8 +103,8 @@ public class WebhookConfiguration {
     }
 
     private List<ApplicationEventListener> getApplicationEventListeners(
-        RemoteJobService jobService, SyncMessageBroker syncMessageBroker,
-        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        JobService jobService, SyncMessageBroker syncMessageBroker,
+        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         SubflowJobStatusEventListener subflowJobStatusEventListener = new SubflowJobStatusEventListener(
             getEventPublisher(syncMessageBroker), jobService, taskExecutionService, workflowFileStorageFacade);
@@ -117,8 +117,8 @@ public class WebhookConfiguration {
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        RemoteContextService contextService, RemoteCounterService counterService,
-        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        ContextService contextService, CounterService counterService,
+        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
@@ -159,8 +159,8 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        RemoteContextService contextService, RemoteCounterService counterService, RemoteJobFacade jobFacade,
-        SyncMessageBroker syncMessageBroker, RemoteTaskExecutionService taskExecutionService,
+        ContextService contextService, CounterService counterService, JobFacade jobFacade,
+        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);

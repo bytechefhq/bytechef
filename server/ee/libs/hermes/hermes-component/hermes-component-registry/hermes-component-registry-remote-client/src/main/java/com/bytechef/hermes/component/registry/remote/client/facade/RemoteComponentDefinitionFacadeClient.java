@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.registry.remote.client.facade;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.component.registry.facade.RemoteComponentDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -41,7 +41,7 @@ import java.util.Map;
 @Component
 @ConditionalOnMissingClass(value = "com.bytechef.worker.WorkerApplication")
 public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
-    implements RemoteComponentDefinitionFacade {
+    implements ComponentDefinitionFacade {
 
     private static final String COMPONENT_DEFINITION_FACADE = "/component-definition-facade";
 

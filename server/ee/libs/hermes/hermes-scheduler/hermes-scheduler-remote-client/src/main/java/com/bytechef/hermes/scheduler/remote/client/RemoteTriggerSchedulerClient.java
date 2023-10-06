@@ -18,7 +18,7 @@
 package com.bytechef.hermes.scheduler.remote.client;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.scheduler.RemoteTriggerScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTriggerSchedulerClient implements RemoteTriggerScheduler {
+public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     private static final String SCHEDULER_APP = "scheduler-app";
     private static final String TRIGGER_SCHEDULER = "/remote/trigger-scheduler";

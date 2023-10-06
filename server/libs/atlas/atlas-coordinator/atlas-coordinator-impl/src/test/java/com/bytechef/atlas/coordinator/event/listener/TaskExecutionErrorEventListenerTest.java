@@ -29,8 +29,8 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import java.util.List;
@@ -42,8 +42,8 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class TaskExecutionErrorEventListenerTest {
 
-    private final RemoteJobService jobService = mock(RemoteJobService.class);
-    private final RemoteTaskExecutionService taskExecutionService = mock(RemoteTaskExecutionService.class);
+    private final JobService jobService = mock(JobService.class);
+    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);

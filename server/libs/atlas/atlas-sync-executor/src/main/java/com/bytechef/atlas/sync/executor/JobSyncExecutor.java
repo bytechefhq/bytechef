@@ -18,6 +18,7 @@
 package com.bytechef.atlas.sync.executor;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
@@ -38,6 +39,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.coordinator.event.JobStartEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -49,10 +51,6 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -83,13 +81,13 @@ public class JobSyncExecutor {
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
     private final JobFacade jobFacade;
-    private final RemoteJobService jobService;
+    private final JobService jobService;
 
     public JobSyncExecutor(
-        @NonNull RemoteContextService contextService, @NonNull RemoteJobService jobService,
-        @NonNull ObjectMapper objectMapper, @NonNull RemoteTaskExecutionService taskExecutionService,
+        @NonNull ContextService contextService, @NonNull JobService jobService,
+        @NonNull ObjectMapper objectMapper, @NonNull TaskExecutionService taskExecutionService,
         @NonNull TaskHandlerRegistry taskHandlerRegistry, @NonNull WorkflowFileStorageFacade workflowFileStorageFacade,
-        @NonNull RemoteWorkflowService workflowService) {
+        @NonNull WorkflowService workflowService) {
 
         this(
             List.of(), contextService, jobService, new SyncMessageBroker(objectMapper), List.of(),
@@ -99,13 +97,13 @@ public class JobSyncExecutor {
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        @NonNull List<ApplicationEventListener> applicationEventListeners, @NonNull RemoteContextService contextService,
-        @NonNull RemoteJobService jobService, @NonNull SyncMessageBroker syncMessageBroker,
+        @NonNull List<ApplicationEventListener> applicationEventListeners, @NonNull ContextService contextService,
+        @NonNull JobService jobService, @NonNull SyncMessageBroker syncMessageBroker,
         @NonNull List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         @NonNull List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         @NonNull List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
-        @NonNull RemoteTaskExecutionService taskExecutionService, @NonNull TaskHandlerRegistry taskHandlerRegistry,
-        @NonNull WorkflowFileStorageFacade workflowFileStorageFacade, @NonNull RemoteWorkflowService workflowService) {
+        @NonNull TaskExecutionService taskExecutionService, @NonNull TaskHandlerRegistry taskHandlerRegistry,
+        @NonNull WorkflowFileStorageFacade workflowFileStorageFacade, @NonNull WorkflowService workflowService) {
 
         this.jobService = jobService;
         this.jobFacade = new JobFacadeImpl(
@@ -189,15 +187,30 @@ public class JobSyncExecutor {
             .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(taskDispatcherChain));
     }
 
-    private record ContextServiceImpl(RemoteContextService remoteContextService) implements ContextService {
+    private record ContextServiceImpl(ContextService contextService) implements ContextService {
+
+        @Override
+        public FileEntry peek(long stackId, Context.Classname classname) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
+            throw new UnsupportedOperationException();
+        }
 
         @Override
         public void push(long stackId, Context.Classname classname, FileEntry value) {
-            remoteContextService.push(stackId, classname, value);
+            contextService.push(stackId, classname, value);
+        }
+
+        @Override
+        public void push(long stackId, int subStackId, Context.Classname classname, FileEntry value) {
+            throw new UnsupportedOperationException();
         }
     }
 
-    private record JobServiceImpl(RemoteJobService remoteJobService) implements JobService {
+    private record JobServiceImpl(JobService JobService) implements JobService {
 
         @Override
         public Job getJob(long id) {
@@ -210,8 +223,13 @@ public class JobSyncExecutor {
         }
 
         @Override
+        public Job getTaskExecutionJob(long taskExecutionId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public Job create(JobParameters jobParameters, Workflow workflow) {
-            return remoteJobService.create(jobParameters, workflow);
+            return JobService.create(jobParameters, workflow);
         }
 
         @Override
@@ -224,6 +242,26 @@ public class JobSyncExecutor {
             String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId,
             List<String> workflowIds, Integer pageNumber) {
 
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Job resumeToStatusStarted(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Job setStatusToStarted(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Job setStatusToStopped(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Job update(Job job) {
             throw new UnsupportedOperationException();
         }
     }

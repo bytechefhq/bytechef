@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.coordinator;
 
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 
 import java.util.List;
@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractDispatcherPreSendProcessor {
 
-    private final RemoteProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
-    protected AbstractDispatcherPreSendProcessor(RemoteProjectInstanceWorkflowService projectInstanceWorkflowService) {
+    protected AbstractDispatcherPreSendProcessor(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
     }
 

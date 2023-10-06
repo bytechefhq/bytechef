@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.component.registry.facade.RemoteComponentDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,9 +34,9 @@ import java.util.List;
 @RequestMapping("/remote/component-definition-facade")
 public class RemoteComponentDefinitionFacadeController {
 
-    private final RemoteComponentDefinitionFacade componentDefinitionFacade;
+    private final ComponentDefinitionFacade componentDefinitionFacade;
 
-    public RemoteComponentDefinitionFacadeController(RemoteComponentDefinitionFacade componentDefinitionFacade) {
+    public RemoteComponentDefinitionFacadeController(ComponentDefinitionFacade componentDefinitionFacade) {
         this.componentDefinitionFacade = componentDefinitionFacade;
     }
 

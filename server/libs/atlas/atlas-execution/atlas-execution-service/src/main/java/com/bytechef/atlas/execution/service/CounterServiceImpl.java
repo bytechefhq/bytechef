@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Transactional
-public class CounterServiceImpl implements RemoteCounterService {
+public class CounterServiceImpl implements CounterService {
 
     private final CounterRepository counterRepository;
 

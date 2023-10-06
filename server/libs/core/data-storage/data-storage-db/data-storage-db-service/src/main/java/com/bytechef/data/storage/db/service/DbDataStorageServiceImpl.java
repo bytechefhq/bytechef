@@ -30,12 +30,12 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Transactional
-public class DbDataStorageService implements DataStorageService, RemoteDbDataStorageService {
+public class DbDataStorageServiceImpl implements DataStorageService, DbDataStorageService {
 
     private final DataStorageRepository dataStorageRepository;
 
     @SuppressFBWarnings("EI")
-    public DbDataStorageService(DataStorageRepository dataStorageRepository) {
+    public DbDataStorageServiceImpl(DataStorageRepository dataStorageRepository) {
         this.dataStorageRepository = dataStorageRepository;
     }
 

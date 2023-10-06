@@ -22,7 +22,7 @@ package com.bytechef.atlas.coordinator.event.listener;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -31,10 +31,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class TaskProgressedApplicationEventListener implements ApplicationEventListener {
 
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI2")
-    public TaskProgressedApplicationEventListener(RemoteTaskExecutionService taskExecutionService) {
+    public TaskProgressedApplicationEventListener(TaskExecutionService taskExecutionService) {
         this.taskExecutionService = taskExecutionService;
     }
 

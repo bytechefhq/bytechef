@@ -18,11 +18,11 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.component.registry.facade.RemoteActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
 import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
@@ -43,13 +43,13 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class ActionDefinitionController implements ActionDefinitionApi {
 
-    private final RemoteActionDefinitionFacade actionDefinitionFacade;
-    private final RemoteActionDefinitionService actionDefinitionService;
+    private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ActionDefinitionService actionDefinitionService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionController(
-        RemoteActionDefinitionFacade actionDefinitionFacade, RemoteActionDefinitionService actionDefinitionService,
+        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         ConversionService conversionService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;

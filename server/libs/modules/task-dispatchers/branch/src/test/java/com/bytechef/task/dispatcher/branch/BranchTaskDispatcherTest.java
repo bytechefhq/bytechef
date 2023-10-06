@@ -34,8 +34,8 @@ import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -57,9 +57,9 @@ import org.springframework.context.ApplicationEventPublisher;
 public class BranchTaskDispatcherTest {
 
     private final Base64FileStorageService base64FileStorageService = new Base64FileStorageService();
-    private final RemoteContextService contextService = mock(RemoteContextService.class);
+    private final ContextService contextService = mock(ContextService.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
-    private final RemoteTaskExecutionService taskExecutionService = mock(RemoteTaskExecutionService.class);
+    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
