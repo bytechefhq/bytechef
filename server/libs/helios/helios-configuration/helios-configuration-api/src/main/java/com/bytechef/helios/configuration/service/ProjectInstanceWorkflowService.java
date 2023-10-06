@@ -42,6 +42,8 @@ public interface ProjectInstanceWorkflowService {
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds);
 
+    ProjectInstanceWorkflow update(ProjectInstanceWorkflow projectInstanceWorkflow);
+
     List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
     void updateEnabled(Long id, boolean enable);

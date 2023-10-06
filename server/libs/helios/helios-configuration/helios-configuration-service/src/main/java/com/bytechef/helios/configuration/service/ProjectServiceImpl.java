@@ -113,17 +113,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId) {
+    public List<Project> getPublishedProjects(Long categoryId, List<Long> ids, Long tagId) {
         Iterable<Project> projectIterable;
 
         if (categoryId == null && tagId == null) {
-            projectIterable = projectRepository.findAll(Sort.by("name"));
+            projectIterable = projectRepository.findAllByPublishedDateNotNullOrderByName();
         } else if (categoryId != null && tagId == null) {
-            projectIterable = projectRepository.findAllByCategoryIdOrderByName(categoryId);
+            projectIterable = projectRepository.findAllByCategoryIdAndPublishedDateNotNullOrderByName(categoryId);
         } else if (categoryId == null) {
-            projectIterable = projectRepository.findAllByTagIdOrderByName(tagId);
+            projectIterable = projectRepository.findAllByTagIdAndPublishedDateNotNullOrderByName(tagId);
         } else {
-            projectIterable = projectRepository.findAllByCategoryIdAndTagIdOrderByName(categoryId, tagId);
+            projectIterable = projectRepository.findAllByCategoryIdAndTagIdAndPublishedDateNotNullOrderByName(
+                categoryId, tagId);
         }
 
         List<Project> projects = com.bytechef.commons.util.CollectionUtils.toList(projectIterable);

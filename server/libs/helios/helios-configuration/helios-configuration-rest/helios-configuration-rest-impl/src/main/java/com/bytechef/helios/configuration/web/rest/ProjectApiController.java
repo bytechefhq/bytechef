@@ -92,11 +92,9 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    public ResponseEntity<List<ProjectModel>> getProjects(
-        Long categoryId, Boolean projectInstances, Long tagId) {
-
+    public ResponseEntity<List<ProjectModel>> getProjects(Long categoryId, Boolean projectInstances, Long tagId) {
         return ResponseEntity.ok(
-            projectFacade.getProjects(categoryId, projectInstances != null, tagId)
+            projectFacade.getPublishedProjects(categoryId, projectInstances != null, tagId)
                 .stream()
                 .map(project -> conversionService.convert(project, ProjectModel.class))
                 .toList());

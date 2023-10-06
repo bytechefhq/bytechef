@@ -39,7 +39,7 @@ public class FilesystemFileStorageConfiguration {
     public FilesystemFileStorageConfiguration(FilesystemFileStorageProperties storageProperties) {
         if (logger.isInfoEnabled()) {
             logger.info(
-                "File storage provider type enabled: filesystem, directory %s".formatted(
+                "File storage provider type enabled: filesystem, directory: %s".formatted(
                     storageProperties.getBasedir()));
         }
     }

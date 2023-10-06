@@ -17,10 +17,12 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
+import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
@@ -117,5 +119,17 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
             projectInstanceFacade.updateProjectInstance(
                 conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
             ProjectInstanceModel.class));
+    }
+
+    @Override
+    public ResponseEntity<ProjectInstanceWorkflowModel> updateProjectInstanceWorkflow(
+        Long id, Long projectInstanceWorkflowId, ProjectInstanceWorkflowModel projectInstanceWorkflowModel) {
+
+        return ResponseEntity.ok(conversionService.convert(
+            projectInstanceFacade.updateProjectInstanceWorkflow(
+                conversionService.convert(
+                    projectInstanceWorkflowModel.id(projectInstanceWorkflowId).projectInstanceId(id),
+                    ProjectInstanceWorkflow.class)),
+            ProjectInstanceWorkflowModel.class));
     }
 }
