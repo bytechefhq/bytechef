@@ -111,11 +111,11 @@ const Select = ({
                 </Button>
             </Trigger>
 
-            <Portal className="z-50">
+            <Portal>
                 <Content
                     align="start"
                     className={twMerge(
-                        'flex max-h-select-content-available-height min-w-select-trigger-width',
+                        'flex max-h-select-content-available-height min-w-select-trigger-width z-50',
                         contentClassName
                     )}
                     position="popper"
