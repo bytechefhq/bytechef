@@ -1,4 +1,5 @@
 import {Switch} from '@/components/ui/switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ProjectInstanceModel,
     ProjectModel,
@@ -6,8 +7,10 @@ import {
 } from '@/middleware/helios/configuration';
 import {
     useDeleteProjectInstanceMutation,
+    useEnableProjectInstanceMutation,
     useUpdateProjectInstanceTagsMutation,
 } from '@/mutations/projects.mutations';
+import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/ProjectInstances';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
 import {AccordionTrigger} from '@radix-ui/react-accordion';
@@ -36,6 +39,9 @@ const ProjectInstanceListItem = ({
 }: ProjectItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const setEnabled = useProjectInstancesEnabledStore(
+        (state) => state.setEnabled
+    );
 
     const queryClient = useQueryClient();
 
@@ -69,10 +75,16 @@ const ProjectInstanceListItem = ({
         },
     ];
 
+    const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(ProjectKeys.projectInstances);
+        },
+    });
+
     return (
         <>
             <div className="flex items-center justify-between">
-                <AccordionTrigger className="group w-9/12">
+                <AccordionTrigger className="group w-10/12">
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
@@ -137,16 +149,26 @@ const ProjectInstanceListItem = ({
                         </div>
 
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                            {projectInstance.enabled ? (
+                            {projectInstance.lastExecutionDate ? (
                                 <>
-                                    <CalendarIcon
-                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
-                                        aria-hidden="true"
-                                    />
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex text-sm text-gray-500">
+                                                <CalendarIcon
+                                                    className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                                    aria-hidden="true"
+                                                />
 
-                                    <span>
-                                        {`${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
-                                    </span>
+                                                <span>
+                                                    {`${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
+                                                </span>
+                                            </div>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            Last Execution Date
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </>
                             ) : (
                                 '-'
@@ -155,8 +177,28 @@ const ProjectInstanceListItem = ({
                     </div>
                 </AccordionTrigger>
 
-                <div className="flex w-2/12 items-center justify-center">
-                    <Switch />
+                <div className="flex w-1/12 items-center justify-end">
+                    <Switch
+                        checked={projectInstance.enabled}
+                        onCheckedChange={(value) => {
+                            enableProjectInstanceMutation.mutate(
+                                {
+                                    enable: value,
+                                    id: projectInstance.id!,
+                                },
+                                {
+                                    onSuccess: () => {
+                                        setEnabled(
+                                            projectInstance.id!,
+                                            !projectInstance.enabled
+                                        );
+                                        projectInstance!.enabled =
+                                            !projectInstance.enabled;
+                                    },
+                                }
+                            );
+                        }}
+                    />
                 </div>
 
                 <div className="flex w-1/12 justify-end">

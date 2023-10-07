@@ -1,7 +1,9 @@
 import EmptyList from '@/components/EmptyList/EmptyList';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
+import {ProjectInstanceModel} from '@/middleware/helios/configuration';
 import {
     useGetProjectInstanceTagsQuery,
+    useGetProjectInstancesQuery,
     useGetProjectsQuery,
 } from '@/queries/projects.queries';
 import {TagIcon} from '@heroicons/react/20/solid';
@@ -9,6 +11,8 @@ import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+import {create} from 'zustand';
+import {devtools} from 'zustand/middleware';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
@@ -19,6 +23,32 @@ export enum Type {
     Project,
     Tag,
 }
+
+export interface ProjectInstancesEnabledState {
+    projectInstanceMap: Map<number, boolean>;
+    setEnabled: (projectInstanceId: number, enabled: boolean) => void;
+}
+
+export const useProjectInstancesEnabledStore =
+    create<ProjectInstancesEnabledState>()(
+        devtools(
+            (set) => ({
+                projectInstanceMap: new Map<number, boolean>(),
+                setEnabled: (projectInstanceId, enabled) =>
+                    set((state) => ({
+                        projectInstanceMap: new Map<number, boolean>(
+                            state.projectInstanceMap.set(
+                                projectInstanceId,
+                                enabled
+                            )
+                        ),
+                    })),
+            }),
+            {
+                name: 'project-instances-enabled',
+            }
+        )
+    );
 
 const ProjectInstances = () => {
     const [searchParams] = useSearchParams();
@@ -39,6 +69,44 @@ const ProjectInstances = () => {
     const {data: projects, isLoading: projectsLoading} = useGetProjectsQuery({
         projectInstances: true,
     });
+
+    const {data: projectInstances, isLoading: projectInstancesLoading} =
+        useGetProjectInstancesQuery({
+            projectId: searchParams.get('projectId')
+                ? parseInt(searchParams.get('projectId')!)
+                : undefined,
+            tagId: searchParams.get('tagId')
+                ? parseInt(searchParams.get('tagId')!)
+                : undefined,
+        });
+
+    const projectInstanceMap: Map<number, ProjectInstanceModel[]> = new Map<
+        number,
+        ProjectInstanceModel[]
+    >();
+
+    if (projectInstances) {
+        for (const projectInstance of projectInstances) {
+            let curProjectInstances: ProjectInstanceModel[];
+
+            if (projectInstance.project) {
+                if (projectInstanceMap.has(projectInstance.project.id!)) {
+                    curProjectInstances = projectInstanceMap.get(
+                        projectInstance.project.id!
+                    )!;
+                } else {
+                    curProjectInstances = [];
+                }
+
+                curProjectInstances.push(projectInstance);
+
+                projectInstanceMap.set(
+                    projectInstance.project.id!,
+                    curProjectInstances
+                );
+            }
+        }
+    }
 
     const {data: tags, isLoading: tagsLoading} =
         useGetProjectInstanceTagsQuery();
@@ -86,7 +154,7 @@ const ProjectInstances = () => {
                                 }}
                             />
 
-                            {!projectsLoading &&
+                            {projects &&
                                 projects?.map((item) => (
                                     <LeftSidebarNavItem
                                         key={item.name}
@@ -159,7 +227,9 @@ const ProjectInstances = () => {
                         'place-self-center px-2 2xl:mx-auto 2xl:w-4/5'
                 )}
             >
-                {!projectsLoading && !projects?.length ? (
+                {!projectInstancesLoading &&
+                !projectsLoading &&
+                (!projects?.length || !projectInstances?.length) ? (
                     <EmptyList
                         button={<ProjectInstanceDialog />}
                         icon={
@@ -169,12 +239,23 @@ const ProjectInstances = () => {
                         title="No instances of projects"
                     />
                 ) : (
-                    projects?.map((project) => (
-                        <ProjectInstanceList
-                            key={project.id}
-                            project={project}
-                        />
-                    ))
+                    Array.from(projectInstanceMap.keys())?.map(
+                        (projectId) =>
+                            projects && (
+                                <ProjectInstanceList
+                                    key={projectId}
+                                    project={
+                                        projects.find(
+                                            (curProject) =>
+                                                curProject.id === projectId
+                                        )!
+                                    }
+                                    projectInstances={
+                                        projectInstanceMap.get(projectId)!
+                                    }
+                                />
+                            )
+                    )
                 )}
             </div>
         </LayoutContainer>
