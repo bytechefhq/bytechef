@@ -231,7 +231,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
             {showWorkflowDialog && !!project.id && (
                 <WorkflowDialog
-                    id={project.id}
+                    parentId={project.id}
                     showTrigger={false}
                     visible
                     createWorkflowRequestMutation={

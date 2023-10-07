@@ -155,7 +155,7 @@ const Project = () => {
                                         createWorkflowRequestMutation={
                                             createWorkflowMutation
                                         }
-                                        id={projectId}
+                                        parentId={+projectId}
                                     />
                                 )}
                             </div>
