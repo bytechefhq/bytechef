@@ -77,7 +77,7 @@ const ConnectionListItem = ({
     return (
         <>
             <div className="flex items-center">
-                <div className="flex-1 pr-8">
+                <div className="w-10/12 flex-1">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
                             {componentDefinition?.icon && (
@@ -138,7 +138,7 @@ const ConnectionListItem = ({
                                     />
 
                                     <span>
-                                        {`Created ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
+                                        {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
                                     </span>
                                 </>
                             )}
@@ -146,9 +146,9 @@ const ConnectionListItem = ({
                     </div>
                 </div>
 
-                <div className="flex items-center"></div>
-
-                <DropdownMenu id={connection.id} menuItems={menuItems} />
+                <div className="flex w-2/12 justify-end">
+                    <DropdownMenu id={connection.id} menuItems={menuItems} />
+                </div>
             </div>
 
             {showDeleteDialog && (

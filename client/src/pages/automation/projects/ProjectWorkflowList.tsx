@@ -1,15 +1,16 @@
 import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
+import WorkflowDialog from '@/components/WorkflowDialog/WorkflowDialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
+import {CalendarIcon} from '@heroicons/react/24/outline';
+import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ProjectModel, WorkflowModel} from 'middleware/helios/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
-
-import ProjectInstanceEditWorkflowDialog from '../project-instances/ProjectInstanceEditWorkflowDialog';
 
 const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(project.id!);
@@ -34,7 +35,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
     return (
-        <div className="border-b border-b-gray-100 py-2">
+        <div className="border-b border-b-gray-100 py-3 pl-4">
             <div className="mb-1 flex items-center justify-between">
                 <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
                     Workflows
@@ -132,8 +133,23 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                         )}
                                     </div>
 
-                                    <div className="flex flex-1 justify-end text-sm">
-                                        {workflow.lastModifiedDate?.toLocaleDateString()}
+                                    <div className="flex flex-1 justify-end">
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <div className="flex text-sm text-gray-500">
+                                                    <CalendarIcon
+                                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+
+                                                    <span>{`${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}</span>
+                                                </div>
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>
+                                                Last Modified Date
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </div>
                                 </Link>
                             </div>
@@ -169,10 +185,10 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                             </div>
 
                             {showEditWorkflowDialog && (
-                                <ProjectInstanceEditWorkflowDialog
-                                    workflow={selectedWorkflow!}
+                                <WorkflowDialog
                                     showTrigger={false}
                                     visible
+                                    workflow={selectedWorkflow!}
                                     onClose={() =>
                                         setShowEditWorkflowDialog(false)
                                     }

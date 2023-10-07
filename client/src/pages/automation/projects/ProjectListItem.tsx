@@ -1,3 +1,4 @@
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ProjectModel,
     ProjectModelStatusEnum,
@@ -175,14 +176,24 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             {project.status ===
                             ProjectModelStatusEnum.Published ? (
                                 <>
-                                    <CalendarIcon
-                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
-                                        aria-hidden="true"
-                                    />
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex text-sm text-gray-500">
+                                                <CalendarIcon
+                                                    className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                                    aria-hidden="true"
+                                                />
 
-                                    <span>
-                                        {project.publishedDate?.toLocaleDateString()}
-                                    </span>
+                                                <span>
+                                                    {`${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
+                                                </span>
+                                            </div>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            Published Date
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </>
                             ) : (
                                 '-'
