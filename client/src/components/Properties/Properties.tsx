@@ -1,4 +1,3 @@
-import {TagModel} from '@/middleware/helios/configuration';
 import {ComponentDataType, DataPillType} from '@/types/types';
 import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
@@ -8,19 +7,6 @@ import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
 
-export interface PropertyFormProps {
-    authorizationName: string;
-    componentName: {
-        value: string;
-        label: string;
-    };
-    name: string;
-    parameters: {[key: string]: object};
-    tags: Array<TagModel | {label: string; value: string}>;
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    [key: string]: any;
-}
-
 interface PropertiesProps {
     actionName?: string;
     currentComponentData?: ComponentDataType;
@@ -29,8 +15,9 @@ interface PropertiesProps {
     formState?: FormState<FieldValues>;
     mention?: boolean;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+    path?: string;
     properties: Array<PropertyType>;
-    register?: UseFormRegister<PropertyFormProps>;
+    register?: UseFormRegister<any>;
 }
 
 const Properties = ({
@@ -41,6 +28,7 @@ const Properties = ({
     formState,
     mention,
     onChange,
+    path,
     properties,
     register,
 }: PropertiesProps) => (
@@ -60,6 +48,7 @@ const Properties = ({
                     key={`${property.name}_${index}`}
                     mention={mention}
                     onChange={onChange}
+                    path={path}
                     property={property}
                     register={register}
                 />

@@ -14,21 +14,19 @@ import Input from '../Input/Input';
 import ArrayProperty from './ArrayProperty';
 import InputProperty from './InputProperty';
 import ObjectProperty from './ObjectProperty';
-import {PropertyFormProps} from './Properties';
 
 const inputPropertyControlTypes = [
     'DATE',
     'DATE_TIME',
     'EMAIL',
     'INTEGER',
+    'NUMBER',
     'PASSWORD',
     'PHONE',
     'TEXT',
     'TIME',
     'URL',
 ];
-
-const inputPropertyTypes = ['NUMBER'];
 
 interface PropertyProps {
     actionName?: string;
@@ -40,7 +38,7 @@ interface PropertyProps {
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     property: PropertyType;
-    register?: UseFormRegister<PropertyFormProps>;
+    register?: UseFormRegister<any>;
 }
 
 const Property = ({
@@ -115,15 +113,16 @@ const Property = ({
                 </div>
             )}
 
-            {register && controlType === 'TEXT' && (
+            {register && inputPropertyControlTypes.includes(controlType!) && (
                 <Input
+                    defaultValue={defaultValue as string}
                     description={description}
-                    defaultValue={defaultValue}
                     error={hasError(name!)}
                     fieldsetClassName="flex-1 mb-0"
                     key={name}
                     label={label}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                    required={required}
                     type={hidden ? 'hidden' : 'text'}
                     {...register(`${path}.${name}`, {
                         required: required!,
@@ -131,28 +130,24 @@ const Property = ({
                 />
             )}
 
-            {!register &&
-                (inputPropertyControlTypes.includes(controlType!) ||
-                    inputPropertyTypes.includes(type!)) && (
-                    <InputProperty
-                        controlType={controlType}
-                        dataPills={dataPills}
-                        defaultValue={defaultValue}
-                        description={description}
-                        error={hasError(name!)}
-                        fieldsetClassName="flex-1 mb-0"
-                        key={name}
-                        label={label || name}
-                        leadingIcon={
-                            TYPE_ICONS[type as keyof typeof TYPE_ICONS]
-                        }
-                        mention={mention}
-                        name={name!}
-                        onChange={onChange}
-                        required={required}
-                        type={type}
-                    />
-                )}
+            {!register && inputPropertyControlTypes.includes(controlType!) && (
+                <InputProperty
+                    controlType={controlType}
+                    dataPills={dataPills}
+                    defaultValue={defaultValue}
+                    description={description}
+                    error={hasError(name!)}
+                    fieldsetClassName="flex-1 mb-0"
+                    key={name}
+                    label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                    mention={mention}
+                    name={name!}
+                    onChange={onChange}
+                    required={required}
+                    type={type}
+                />
+            )}
 
             {controlType === 'SELECT' && !!formattedOptions?.length && (
                 <Select
@@ -203,6 +198,22 @@ const Property = ({
 
             {(type === 'ARRAY' || controlType === 'MULTI_SELECT') && (
                 <ArrayProperty dataPills={dataPills} property={property} />
+            )}
+
+            {register && type === 'BOOLEAN' && (
+                <Select
+                    description={description}
+                    label={label}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                    options={[
+                        {label: 'True', value: 'true'},
+                        {label: 'False', value: 'false'},
+                    ]}
+                    triggerClassName="w-full border border-gray-300"
+                    {...register(`${path}.${name}`, {
+                        required: required!,
+                    })}
+                />
             )}
 
             {type === 'BOOLEAN' && (

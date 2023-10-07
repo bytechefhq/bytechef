@@ -11,7 +11,7 @@ import FilterableSelect from 'components/FilterableSelect/FilterableSelect';
 import Input from 'components/Input/Input';
 import Label from 'components/Label/Label';
 import NativeSelect from 'components/NativeSelect/NativeSelect';
-import Properties, {PropertyFormProps} from 'components/Properties/Properties';
+import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ConnectionModel, TagModel} from 'middleware/helios/connection';
 import {
@@ -52,6 +52,17 @@ interface ConnectionDialogProps {
     onClose?: () => void;
 }
 
+export interface ConnectionDialogFormProps {
+    authorizationName: string;
+    componentName: {
+        value: string;
+        label: string;
+    };
+    name: string;
+    parameters: {[key: string]: object};
+    tags: Array<TagModel | {label: string; value: string}>;
+}
+
 const ConnectionDialog = ({
     component,
     connection,
@@ -85,7 +96,7 @@ const ConnectionDialog = ({
         register,
         reset: formReset,
         setValue,
-    } = useForm<PropertyFormProps>({
+    } = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
             componentName: undefined,
