@@ -1,5 +1,5 @@
 import {
-    useGetProjectTagsQuery,
+    useGetProjectInstanceTagsQuery,
     useGetProjectsQuery,
 } from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
@@ -45,7 +45,7 @@ const ProjectInstanceDialogBasicStep = ({
         data: tags,
         error: tagsError,
         isLoading: tagsLoading,
-    } = useGetProjectTagsQuery();
+    } = useGetProjectInstanceTagsQuery();
 
     const tagNames = projectInstance?.tags?.map((tag) => tag.name);
 
@@ -63,40 +63,42 @@ const ProjectInstanceDialogBasicStep = ({
 
             {projects ? (
                 <>
-                    <Controller
-                        control={control}
-                        name="project"
-                        rules={{required: true}}
-                        render={({field}) => (
-                            <FilterableSelect
-                                autoFocus
-                                error={
-                                    touchedFields.projectId &&
-                                    !getValues('projectId')
-                                }
-                                field={field}
-                                label="Project"
-                                onChange={(selectedOption) => {
-                                    if (selectedOption) {
-                                        setValue(
-                                            'projectId',
-                                            parseInt(selectedOption.value)
-                                        );
-
-                                        setValue('project', selectedOption);
+                    {!projectInstance?.id && (
+                        <Controller
+                            control={control}
+                            name="project"
+                            rules={{required: true}}
+                            render={({field}) => (
+                                <FilterableSelect
+                                    autoFocus
+                                    error={
+                                        touchedFields.projectId &&
+                                        !getValues('projectId')
                                     }
-                                }}
-                                options={projects.map((project) => ({
-                                    label: project.name,
-                                    name: project.name,
-                                    value: project.id!.toString(),
-                                }))}
-                                placeholder="Select..."
-                                required
-                            />
-                        )}
-                        shouldUnregister={false}
-                    />
+                                    field={field}
+                                    label="Project"
+                                    onChange={(selectedOption) => {
+                                        if (selectedOption) {
+                                            setValue(
+                                                'projectId',
+                                                parseInt(selectedOption.value)
+                                            );
+
+                                            setValue('project', selectedOption);
+                                        }
+                                    }}
+                                    options={projects.map((project) => ({
+                                        label: project.name,
+                                        name: project.name,
+                                        value: project.id!.toString(),
+                                    }))}
+                                    placeholder="Select..."
+                                    required
+                                />
+                            )}
+                            shouldUnregister={false}
+                        />
+                    )}
 
                     <Input
                         error={touchedFields.name && !getValues('name')}

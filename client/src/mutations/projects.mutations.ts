@@ -7,6 +7,7 @@ import {
     ProjectInstanceApi,
     ProjectInstanceModel,
     ProjectInstanceTagApi,
+    ProjectInstanceWorkflowModel,
     ProjectModel,
     ProjectTagApi,
     UpdateProjectInstanceTagsRequest,
@@ -160,6 +161,31 @@ export const useUpdateProjectInstanceMutation = (
             return new ProjectInstanceApi().updateProjectInstance({
                 id: projectInstanceModel.id!,
                 projectInstanceModel,
+            });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type UpdateProjectInstanceWorkflowMutationProps = {
+    onSuccess?: (
+        result: ProjectInstanceWorkflowModel,
+        variables: ProjectInstanceWorkflowModel
+    ) => void;
+    onError?: (error: object, variables: ProjectInstanceWorkflowModel) => void;
+};
+
+export const useUpdateProjectInstanceWorkflowMutation = (
+    mutationProps?: UpdateProjectInstanceWorkflowMutationProps
+) =>
+    useMutation({
+        mutationFn: (
+            projectInstanceWorkflowModel: ProjectInstanceWorkflowModel
+        ) => {
+            return new ProjectInstanceApi().updateProjectInstanceWorkflow({
+                id: projectInstanceWorkflowModel.projectInstanceId!,
+                projectInstanceWorkflowId: projectInstanceWorkflowModel.id!,
+                projectInstanceWorkflowModel,
             });
         },
         onError: mutationProps?.onError,
