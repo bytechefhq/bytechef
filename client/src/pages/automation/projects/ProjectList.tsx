@@ -63,7 +63,7 @@ const ProjectList = () => {
                                     key={project.id}
                                     className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
                                 >
-                                    <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50">
+                                    <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
                                         <ProjectListItem
                                             key={project.id}
                                             project={project}

@@ -202,7 +202,7 @@ const IntegrationListItem = ({
 
             {showWorkflowDialog && !!integration.id && (
                 <WorkflowDialog
-                    id={integration.id}
+                    parentId={integration.id}
                     visible
                     createWorkflowRequestMutation={
                         createIntegrationWorkflowRequestMutation
