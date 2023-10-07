@@ -38,6 +38,7 @@ interface PropertyProps {
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     property: PropertyType;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
 }
 
