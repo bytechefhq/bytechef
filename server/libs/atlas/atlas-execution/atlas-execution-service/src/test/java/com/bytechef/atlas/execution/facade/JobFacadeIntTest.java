@@ -57,7 +57,7 @@ public class JobFacadeIntTest {
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            NullPointerException.class,
             () -> jobFacade.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
     }
 

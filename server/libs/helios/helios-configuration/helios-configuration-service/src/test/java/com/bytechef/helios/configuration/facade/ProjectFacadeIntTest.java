@@ -47,6 +47,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -204,6 +205,7 @@ public class ProjectFacadeIntTest {
 
         project.setCategory(category);
         project.setName("name");
+        project.setPublishedDate(LocalDateTime.now());
         project.setStatus(Project.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));

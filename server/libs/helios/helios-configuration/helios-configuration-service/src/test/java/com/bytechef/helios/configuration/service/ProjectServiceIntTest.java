@@ -26,6 +26,7 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -183,6 +184,7 @@ public class ProjectServiceIntTest {
             .description("description")
             .name("name")
             .projectVersion(1)
+            .publishedDate(LocalDateTime.now())
             .status(Project.Status.UNPUBLISHED)
             .workflowIds(List.of("workflow1"))
             .build();
