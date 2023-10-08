@@ -39,7 +39,7 @@ const ProjectInstanceDialogBasicStep = ({
         data: projects,
         error: projectsError,
         isLoading: projectsLoading,
-    } = useGetProjectsQuery();
+    } = useGetProjectsQuery({published: true});
 
     const {
         data: tags,

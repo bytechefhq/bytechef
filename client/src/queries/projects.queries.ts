@@ -91,6 +91,7 @@ export const useGetProjectsQuery = (filters?: {
     categoryId?: number;
     projectInstances?: boolean;
     tagId?: number;
+    published?: boolean;
 }) =>
     useQuery<ProjectModel[], Error>(ProjectKeys.projectList(filters), () =>
         new ProjectApi().getProjects(filters)
