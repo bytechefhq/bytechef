@@ -49,7 +49,7 @@ public interface ProjectFacade {
 
     List<Workflow> getProjectWorkflows(long id);
 
-    List<ProjectDTO> getPublishedProjects(Long categoryId, boolean projectInstances, Long tagId);
+    List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published);
 
     ProjectDTO updateProject(ProjectDTO projectDTO);
 

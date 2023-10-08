@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.repository.ProjectRepository;
@@ -111,21 +112,25 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> getPublishedProjects(Long categoryId, List<Long> ids, Long tagId) {
+    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Boolean published) {
         Iterable<Project> projectIterable;
 
         if (categoryId == null && tagId == null) {
-            projectIterable = projectRepository.findAllByPublishedDateNotNullOrderByName();
+            projectIterable = projectRepository.findAll(Sort.by("name"));
         } else if (categoryId != null && tagId == null) {
-            projectIterable = projectRepository.findAllByCategoryIdAndPublishedDateNotNullOrderByName(categoryId);
+            projectIterable = projectRepository.findAllByCategoryIdOrderByName(categoryId);
         } else if (categoryId == null) {
-            projectIterable = projectRepository.findAllByTagIdAndPublishedDateNotNullOrderByName(tagId);
+            projectIterable = projectRepository.findAllByTagIdOrderByName(tagId);
         } else {
-            projectIterable = projectRepository.findAllByCategoryIdAndTagIdAndPublishedDateNotNullOrderByName(
+            projectIterable = projectRepository.findAllByCategoryIdAndTagIdOrderByName(
                 categoryId, tagId);
         }
 
-        List<Project> projects = com.bytechef.commons.util.CollectionUtils.toList(projectIterable);
+        List<Project> projects = CollectionUtils.toList(projectIterable);
+
+        if (published != null && published) {
+            projects = CollectionUtils.filter(projects , project -> project.getPublishedDate() != null);
+        }
 
         if (ids != null) {
             projects = projects.stream()
