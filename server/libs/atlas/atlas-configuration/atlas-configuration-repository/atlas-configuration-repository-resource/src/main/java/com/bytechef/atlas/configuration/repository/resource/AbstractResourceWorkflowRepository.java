@@ -62,10 +62,10 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
     public List<Workflow> findAll(int type) {
         try {
             Resource[] resources = resourcePatternResolver.getResources(
-                "%s:%s%s".formatted(
-                    resourceWorkflowRepositoryProperties.urlPrefix(),
-                    resourceWorkflowRepositoryProperties.getBasePath(type),
-                    resourceWorkflowRepositoryProperties.locationPattern()));
+                String.format(
+                    "%s:%s",
+                    resourceWorkflowRepositoryProperties.protocol(),
+                    resourceWorkflowRepositoryProperties.getLocationPattern(type)));
 
             return Arrays.stream(resources)
                 .map(resource -> read(resource, type))

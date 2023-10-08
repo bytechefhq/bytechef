@@ -45,7 +45,6 @@ public class WorkflowConstants {
     public static final String POST = "post";
     public static final String PRE = "pre";
     public static final String REQUIRED = "required";
-    public static final String RESOURCE_WORKFLOW_LOCATION_PATTERN = "/**/*.{json|yml|yaml}";
     public static final String TASK_NUMBER = "taskNumber";
     public static final String TASKS = "tasks";
     public static final String TIMEOUT = "timeout";

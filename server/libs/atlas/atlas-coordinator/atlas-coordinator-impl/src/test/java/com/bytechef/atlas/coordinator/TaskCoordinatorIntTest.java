@@ -19,7 +19,6 @@
 
 package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.execution.domain.Job;
@@ -146,7 +145,7 @@ public class TaskCoordinatorIntTest {
 
             return new ClassPathResourceWorkflowRepository(
                 resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
-                    Map.of(0, "workflows"), "classpath", WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
+                    Map.of(0, "workflows/**/*.{json|yml|yaml}"), "classpath"));
         }
 
         @Bean
