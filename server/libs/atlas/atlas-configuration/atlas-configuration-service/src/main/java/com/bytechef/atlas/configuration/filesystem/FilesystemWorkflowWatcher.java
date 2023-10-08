@@ -17,7 +17,6 @@
 
 package com.bytechef.atlas.configuration.filesystem;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.EncodingUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,7 +54,7 @@ public class FilesystemWorkflowWatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(FilesystemWorkflowWatcher.class);
 
-    private final String basePath;
+    private final String locationPattern;
     private final List<String> dirNames = new ArrayList<>();
     private final WorkflowService workflowService;
     private final Map<WatchKey, Path> watchKeyPathMap = new HashMap<>();
@@ -64,9 +63,9 @@ public class FilesystemWorkflowWatcher {
 
     @SuppressFBWarnings("EI")
     public FilesystemWorkflowWatcher(
-        String basePath, TaskExecutor taskExecutor, WorkflowService workflowService) throws IOException {
+        String locationPattern, TaskExecutor taskExecutor, WorkflowService workflowService) throws IOException {
 
-        this.basePath = basePath;
+        this.locationPattern = locationPattern;
         this.taskExecutor = taskExecutor;
         this.workflowService = workflowService;
 
@@ -78,15 +77,14 @@ public class FilesystemWorkflowWatcher {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void onApplicationReadyEvent() throws IOException {
-        registerWatch(basePath);
+        registerWatch(locationPattern);
         taskExecutor.execute(this::run);
     }
 
-    private void registerWatch(String basePath) throws IOException {
+    private void registerWatch(String locationPattern) throws IOException {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-        Resource[] resources = resolver.getResources(
-            "file:" + basePath + WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN);
+        Resource[] resources = resolver.getResources("file:" + locationPattern);
 
         for (Resource resource : resources) {
             registerWatch(resource);

@@ -30,13 +30,13 @@ public class ProjectResourceWorkflowRepositoryConfiguration {
     @Bean
     ClasspathResourceWorkflowRepositoryPropertiesContributor
         projectClasspathResourceWorkflowRepositoryPropertiesContributor(
-            @Value("${bytechef.workflow.repository.classpath.projects.base-path:}") String basePath) {
+            @Value("${bytechef.workflow.repository.classpath.projects.location-pattern:}") String locationPattern) {
 
         return new ClasspathResourceWorkflowRepositoryPropertiesContributor() {
 
             @Override
-            public String getBasePath() {
-                return basePath;
+            public String getLocationPattern() {
+                return locationPattern;
             }
 
             @Override
@@ -49,13 +49,13 @@ public class ProjectResourceWorkflowRepositoryConfiguration {
     @Bean
     FilesystemResourceWorkflowRepositoryPropertiesContributor
         projectFilesystemResourceWorkflowRepositoryPropertiesContributor(
-            @Value("${bytechef.workflow.repository.filesystem.projects.base-path:}") String basePath) {
+            @Value("${bytechef.workflow.repository.filesystem.projects.location-pattern:}") String locationPattern) {
 
         return new FilesystemResourceWorkflowRepositoryPropertiesContributor() {
 
             @Override
-            public String getBasePath() {
-                return basePath;
+            public String getLocationPattern() {
+                return locationPattern;
             }
 
             @Override
