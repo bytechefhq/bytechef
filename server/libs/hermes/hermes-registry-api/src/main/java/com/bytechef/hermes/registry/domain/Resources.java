@@ -19,6 +19,7 @@ package com.bytechef.hermes.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class Resources {
     public Resources(com.bytechef.hermes.definition.Resources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
         this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
-        this.documentationUrl = Objects.requireNonNull(resources.getDocumentationUrl());
+        this.documentationUrl = Validate.notNull(resources.getDocumentationUrl(), "documentationUrl");
     }
 
     public Map<String, String> getAdditionalUrls() {

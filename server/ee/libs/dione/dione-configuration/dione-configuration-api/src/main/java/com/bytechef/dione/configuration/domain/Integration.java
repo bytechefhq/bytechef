@@ -27,6 +27,7 @@ import java.util.Set;
 
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -39,7 +40,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -232,11 +233,10 @@ public final class Integration implements Persistable<Long> {
             .ifPresent(integrationWorkflows::remove);
     }
 
-    @SuppressFBWarnings("NP")
     public void setCategory(Category category) {
         this.categoryId = category == null
             ? null
-            : category.getId() == null ? null : AggregateReference.to(category.getId());
+            : category.getId() == null ? null : AggregateReference.to(Validate.notNull(category.getId(), "id"));
     }
 
     public void setCategoryId(Long categoryId) {
@@ -279,7 +279,7 @@ public final class Integration implements Persistable<Long> {
 
     public void setTags(List<Tag> tags) {
         if (!CollectionUtils.isEmpty(tags)) {
-            setTagIds(com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+            setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
 

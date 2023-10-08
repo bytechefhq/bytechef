@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -50,11 +50,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job create(@NonNull JobParameters jobParameters, Workflow workflow) {
-        Assert.notNull(jobParameters, "'jobParameters' must not be null");
+        Validate.notNull(jobParameters, "'jobParameters' must not be null");
 
         String workflowId = jobParameters.getWorkflowId();
 
-        Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
+        Validate.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
 
         validate(jobParameters, workflow);
 
@@ -93,9 +93,9 @@ public class JobServiceImpl implements JobService {
     public Job resumeToStatusStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id));
 
-        Assert.notNull(job, String.format("Unknown job %s", id));
-        Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
-        Assert.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
+        Validate.notNull(job, String.format("Unknown job %s", id));
+        Validate.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
+        Validate.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STARTED);
 
@@ -131,7 +131,7 @@ public class JobServiceImpl implements JobService {
     public Job setStatusToStopped(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id));
 
-        Assert.isTrue(
+        Validate.isTrue(
             job.getStatus() == Job.Status.STARTED,
             "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
@@ -144,7 +144,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job update(@NonNull Job job) {
-        Assert.notNull(job, "'job' must not be null");
+        Validate.notNull(job, "'job' must not be null");
 
         return jobRepository.save(job);
     }
@@ -175,15 +175,15 @@ public class JobServiceImpl implements JobService {
 
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
-                Assert.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
+                Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
             }
         }
 
         // validate webhooks
 
         for (Job.Webhook webhook : jobParameters.getWebhooks()) {
-            Assert.notNull(webhook.type(), "must define 'type' on webhook");
-            Assert.notNull(webhook.url(), "must define 'url' on webhook");
+            Validate.notNull(webhook.type(), "must define 'type' on webhook");
+            Validate.notNull(webhook.url(), "must define 'url' on webhook");
         }
     }
 }

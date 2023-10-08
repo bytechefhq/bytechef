@@ -25,8 +25,8 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
 
 import java.util.Map;
 
@@ -57,7 +57,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
 
     @Override
     public Map<String, ?> readJobOutputs(@NonNull FileEntry fileEntry) {
-        Assert.notNull(fileEntry, "'fileEntry' must not be null");
+        Validate.notNull(fileEntry, "'fileEntry' must not be null");
 
         return JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOB_FILES_DIR, fileEntry)),
@@ -66,7 +66,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
 
     @Override
     public Object readTaskExecutionOutput(@NonNull FileEntry fileEntry) {
-        Assert.notNull(fileEntry, "'fileEntry' must not be null");
+        Validate.notNull(fileEntry, "'fileEntry' must not be null");
 
         return JsonUtils.read(
             CompressionUtils.decompressToString(
@@ -78,8 +78,8 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
     public FileEntry storeContextValue(
         long stackId, @NonNull Context.Classname classname, @NonNull Map<String, ?> value) {
 
-        Assert.notNull(classname, "'classname' must not be null");
-        Assert.notNull(value, "'value' must not be null");
+        Validate.notNull(classname, "'classname' must not be null");
+        Validate.notNull(value, "'value' must not be null");
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + ".json",
@@ -90,8 +90,8 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
     public FileEntry storeContextValue(
         long stackId, int subStackId, @NonNull Context.Classname classname, @NonNull Map<String, ?> value) {
 
-        Assert.notNull(classname, "'classname' must not be null");
-        Assert.notNull(value, "'value' must not be null");
+        Validate.notNull(classname, "'classname' must not be null");
+        Validate.notNull(value, "'value' must not be null");
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + "_" + subStackId + ".json",
@@ -100,7 +100,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
 
     @Override
     public FileEntry storeJobOutputs(long jobId, @NonNull Map<String, ?> outputs) {
-        Assert.notNull(outputs, "'outputs' must not be null");
+        Validate.notNull(outputs, "'outputs' must not be null");
 
         return fileStorageService.storeFileContent(
             JOB_FILES_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs, objectMapper)));
@@ -108,7 +108,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
 
     @Override
     public FileEntry storeTaskExecutionOutput(long taskExecutionId, @NonNull Object output) {
-        Assert.notNull(output, "'output' must not be null");
+        Validate.notNull(output, "'output' must not be null");
 
         return fileStorageService.storeFileContent(
             TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json",

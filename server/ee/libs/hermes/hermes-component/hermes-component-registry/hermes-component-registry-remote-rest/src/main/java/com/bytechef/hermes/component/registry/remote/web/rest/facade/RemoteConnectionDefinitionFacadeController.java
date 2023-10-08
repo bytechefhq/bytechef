@@ -25,14 +25,13 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -63,7 +62,7 @@ public class RemoteConnectionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             connectionDefinitionFacade.executeAuthorizationApply(
-                connectionRequest.componentName, Objects.requireNonNull(connectionRequest.connection)));
+                connectionRequest.componentName, Validate.notNull(connectionRequest.connection, "connection")));
     }
 
     @RequestMapping(

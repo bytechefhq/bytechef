@@ -30,13 +30,13 @@ import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -244,36 +244,35 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
             @Override
             public Executor configuration(Configuration.ConfigurationBuilder configurationBuilder) {
-                this.configuration = Objects.requireNonNull(configurationBuilder)
-                    .build();
+                this.configuration = configurationBuilder.build();
 
                 return this;
             }
 
             @Override
             public Executor header(String name, String value) {
-                headers.put(Objects.requireNonNull(name), List.of(Objects.requireNonNull(value)));
+                headers.put(Validate.notNull(name, "name"), List.of(Validate.notNull(value, "value")));
 
                 return this;
             }
 
             @Override
             public Executor headers(Map<String, List<String>> headers) {
-                this.headers = new HashMap<>(Objects.requireNonNull(headers));
+                this.headers = new HashMap<>(Validate.notNull(headers, "headers"));
 
                 return this;
             }
 
             @Override
             public Executor queryParameter(String name, String value) {
-                queryParameters.put(Objects.requireNonNull(name), List.of(Objects.requireNonNull(value)));
+                queryParameters.put(Validate.notNull(name, "name"), List.of(Validate.notNull(value, "value")));
 
                 return this;
             }
 
             @Override
             public Executor queryParameters(Map<String, List<String>> queryParameters) {
-                this.queryParameters = new HashMap<>(Objects.requireNonNull(queryParameters));
+                this.queryParameters = new HashMap<>(Validate.notNull(queryParameters, "queryParameters"));
 
                 return this;
             }

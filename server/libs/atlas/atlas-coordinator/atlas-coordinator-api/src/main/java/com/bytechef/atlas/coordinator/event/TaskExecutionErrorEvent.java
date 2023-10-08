@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica CardFic
@@ -37,7 +37,7 @@ public class TaskExecutionErrorEvent extends AbstractEvent implements ErrorEvent
     public TaskExecutionErrorEvent(TaskExecution taskExecution) {
         super(CoordinatorMessageRoute.ERROR_EVENTS);
 
-        Assert.notNull(taskExecution, "'taskExecution' must not be null");
+        Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
         this.taskExecution = taskExecution;
     }

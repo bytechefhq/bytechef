@@ -44,9 +44,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -76,7 +76,6 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -107,16 +106,16 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .build();
 
                 Map<String, ?> context = workflowFileStorageFacade.readContextValue(
-                    contextService.peek(Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION));
+                    contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
 
                 subTaskExecution.evaluate(context);
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
 
                 contextService.push(
-                    Objects.requireNonNull(subTaskExecution.getId()), Classname.TASK_EXECUTION,
+                    Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
                     workflowFileStorageFacade.storeContextValue(
-                        subTaskExecution.getId(), Classname.TASK_EXECUTION, context));
+                        Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
 
                 taskDispatcher.dispatch(subTaskExecution);
             }
@@ -129,7 +128,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             if (selectedCase.get("value") != null) {
                 taskExecution.setOutput(
                     workflowFileStorageFacade.storeTaskExecutionOutput(
-                        Objects.requireNonNull(taskExecution.getId()), selectedCase.get("value")));
+                        Validate.notNull(taskExecution.getId(), "id"), selectedCase.get("value")));
             }
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
@@ -150,7 +149,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         List<Map<String, Object>> cases = MapUtils.getList(
             taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
 
-        Assert.notNull(cases, "you must specify 'cases' in a branch statement");
+        Validate.notNull(cases, "you must specify 'cases' in a branch statement");
 
         for (Map<String, Object> oneCase : cases) {
             Object key = MapUtils.getRequired(oneCase, KEY);

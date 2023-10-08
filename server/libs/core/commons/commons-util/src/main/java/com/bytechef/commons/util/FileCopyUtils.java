@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.executor;
+package com.bytechef.commons.util;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.hermes.execution.dto.JobDTO;
+import org.springframework.lang.Nullable;
+
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobTestExecutor {
+public class FileCopyUtils {
 
-    JobDTO execute(JobParameters jobParameters);
+    public static String copyToString(@Nullable Reader in) throws IOException {
+        return org.springframework.util.FileCopyUtils.copyToString(in);
+    }
 }

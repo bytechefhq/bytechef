@@ -18,7 +18,7 @@
 package com.bytechef.hermes.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 
@@ -43,8 +43,8 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId of(int instanceType, long instanceId, String workflowId, String triggerName) {
-        Assert.hasText(workflowId, "'workflowId' must not be null");
-        Assert.hasText(triggerName, "'workflowTriggerName' must not be null");
+        Validate.notBlank(workflowId, "'workflowId' must not be null");
+        Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
         return new WorkflowExecutionId(instanceType, instanceId, workflowId, triggerName);
     }

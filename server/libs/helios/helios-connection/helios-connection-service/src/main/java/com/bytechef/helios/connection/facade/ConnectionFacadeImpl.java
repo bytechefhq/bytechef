@@ -38,10 +38,11 @@ import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import com.bytechef.commons.util.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,11 +82,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ConnectionDTO create(ConnectionDTO connectionDTO) {
         Connection connection = connectionDTO.toConnection();
 
-        if (StringUtils.hasText(connection.getAuthorizationName()) &&
+        if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
             connection.containsParameter(AuthorizationConstants.CODE)) {
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
@@ -118,7 +118,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         connection = connectionService.create(connection);
 
-        return new ConnectionDTO(isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, tags);
+        return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection, tags);
     }
 
     @Override
@@ -134,12 +134,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
     public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
 
         return new ConnectionDTO(
-            isConnectionUsed(Objects.requireNonNull(connection.getId())), connection,
+            isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection,
             tagService.getTags(connection.getTagIds()));
     }
 
@@ -179,14 +178,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ConnectionDTO update(Long id, List<Tag> tags) {
         tags = checkTags(tags);
 
-        Connection connection = connectionService.update(
-            id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+        Connection connection = connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
 
-        return new ConnectionDTO(isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, tags);
+        return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection, tags);
     }
 
     @Override
@@ -218,8 +215,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private boolean containsConnection(WorkflowConnection workflowConnection, long id) {
         return workflowConnection.getId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(workflowConnection.getOperationName(),
-                workflowConnection.getKey()) != null);
+            .orElseGet(() -> getConnection(workflowConnection.getOperationName(), workflowConnection.getKey()) != null);
     }
 
     private boolean containsConnection(WorkflowTask workflowTask, long id) {
@@ -252,13 +248,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private List<ConnectionDTO> getConnections(List<Connection> connections) {
         List<Tag> tags = tagService.getTags(connections.stream()
-            .flatMap(connection -> com.bytechef.commons.util.CollectionUtils.stream(connection.getTagIds()))
+            .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
             .filter(Objects::nonNull)
             .toList());
 
-        return connections.stream()
-            .map(connection -> new ConnectionDTO(
-                isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, filterTags(tags, connection)))
-            .toList();
+        return CollectionUtils.map(
+            connections,
+            connection -> new ConnectionDTO(
+                isConnectionUsed(
+                    Validate.notNull(connection.getId(), "id")),
+                connection, filterTags(tags, connection)));
     }
 }

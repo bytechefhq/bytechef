@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
 import com.bytechef.commons.util.MapUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -36,8 +36,8 @@ public class DataSourceFactory {
     public DataSource getDataSource(
         Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
 
-        Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
-        Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
+        Validate.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
+        Validate.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
         String url = "jdbc:" + databaseJdbcName + "://"
             + MapUtils.getString(connectionParameters, JdbcConstants.HOST)

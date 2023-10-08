@@ -22,8 +22,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public WorkflowTrigger(Map<String, ?> source) {
-        Assert.notNull(source, "'source' must not be null");
+        Validate.notNull(source, "'source' must not be null");
 
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.LABEL.equals(entry.getKey())) {
@@ -67,8 +67,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
             }
         }
 
-        Assert.notNull(name, "'name' must not be null");
-        Assert.notNull(type, "'type' must not be null");
+        Validate.notNull(name, "'name' must not be null");
+        Validate.notNull(type, "'type' must not be null");
     }
 
     public static WorkflowTrigger of(Map<String, Object> source) {

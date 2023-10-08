@@ -20,6 +20,7 @@ package com.bytechef.commons.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.apache.commons.lang3.Validate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,7 +41,6 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -171,7 +171,7 @@ public final class XmlUtils {
     }
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream, XmlMapper xmlMapper) {
-        Objects.requireNonNull(inputStream, "Non null stream reference expected");
+        Validate.notNull(inputStream, "Non null stream reference expected");
 
         try {
             return new XmlStreamReaderStream(inputStream, xmlMapper);

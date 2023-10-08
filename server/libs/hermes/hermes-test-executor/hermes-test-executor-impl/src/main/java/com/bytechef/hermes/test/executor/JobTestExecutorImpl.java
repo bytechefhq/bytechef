@@ -32,8 +32,7 @@ import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
@@ -60,7 +59,6 @@ public class JobTestExecutorImpl implements JobTestExecutor {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public JobDTO execute(JobParameters jobParameters) {
         Job job = jobSyncExecutor.execute(jobParameters);
 
@@ -68,12 +66,12 @@ public class JobTestExecutorImpl implements JobTestExecutor {
             job,
             workflowFileStorageFacade.readContextValue(job.getOutputs()),
             CollectionUtils.map(
-                taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(job.getId())),
+                taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
                 taskExecution -> new TaskExecutionDTO(
                     getComponentDefinition(taskExecution),
                     workflowFileStorageFacade.readContextValue(
                         contextService.peek(
-                            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)),
+                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                     taskExecution.getOutput() == null
                         ? null
                         : workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),

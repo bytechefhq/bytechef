@@ -37,6 +37,7 @@ import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,7 +82,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
@@ -96,7 +96,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstanceDTO.projectInstanceWorkflows(), projectInstance);
 
         return new ProjectInstanceDTO(
-            getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
+            getLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), projectInstance,
             projectInstanceWorkflows, projectService.getProject(projectInstance.getProjectId()), tags);
     }
 
@@ -179,13 +179,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
     public ProjectInstanceDTO getProjectInstance(long id) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
         return new ProjectInstanceDTO(
-            getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())),
+            getLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
             projectInstance, projectInstanceWorkflowService.getProjectInstanceWorkflows(id),
             projectService.getProject(projectInstance.getProjectId()), tagService.getTags(projectInstance.getTagIds()));
     }
@@ -215,7 +214,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return CollectionUtils.map(
             projectInstances,
             projectInstance -> new ProjectInstanceDTO(
-                getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
+                getLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), projectInstance,
                 projectInstanceWorkflows.stream()
                     .filter(projectInstanceWorkflow -> Objects.equals(
                         projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId()))
@@ -275,21 +274,17 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
-        return org.springframework.util.CollectionUtils.isEmpty(tags)
-            ? Collections.emptyList()
-            : tagService.save(tags);
+        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
     private static boolean containsTag(ProjectInstance projectInstance, Tag tag) {
-        List<Long> curTagIds = projectInstance.getTagIds();
+        List<Long> tagIds = projectInstance.getTagIds();
 
-        return curTagIds.contains(tag.getId());
+        return tagIds.contains(tag.getId());
     }
 
     private List<Tag> filterTags(List<Tag> tags, ProjectInstance projectInstance) {
-        return tags.stream()
-            .filter(tag -> containsTag(projectInstance, tag))
-            .toList();
+        return CollectionUtils.filter(tags, tag -> containsTag(projectInstance, tag));
     }
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {

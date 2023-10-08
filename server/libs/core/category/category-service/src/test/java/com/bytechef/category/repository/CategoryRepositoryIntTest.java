@@ -21,7 +21,7 @@ import com.bytechef.category.config.CategoryIntTestConfiguration;
 import com.bytechef.category.domain.Category;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,35 +46,32 @@ public class CategoryRepositoryIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testCreate() {
         Category category = categoryRepository.save(new Category("name"));
 
-        assertThat(category).isEqualTo(OptionalUtils.get(categoryRepository.findById(category.getId())));
+        assertThat(category).isEqualTo(
+            OptionalUtils.get(categoryRepository.findById(Validate.notNull(category.getId(), "id"))));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Category category = categoryRepository.save(new Category("name"));
 
-        assertThat(categoryRepository.findById(category.getId())).hasValue(category);
+        assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id"))).hasValue(category);
 
-        categoryRepository.deleteById(category.getId());
+        categoryRepository.deleteById(Validate.notNull(category.getId(), "id"));
 
-        assertThat(categoryRepository.findById(category.getId())).isEmpty();
+        assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id"))).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testFindById() {
         Category category = categoryRepository.save(new Category("name"));
 
-        assertThat(categoryRepository.findById(category.getId())).hasValue(category);
+        assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id"))).hasValue(category);
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Category category = categoryRepository.save(new Category("name"));
 

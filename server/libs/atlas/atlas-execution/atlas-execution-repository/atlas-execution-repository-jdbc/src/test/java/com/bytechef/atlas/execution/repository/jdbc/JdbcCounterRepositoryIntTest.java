@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepo
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,15 +64,14 @@ public class JdbcCounterRepositoryIntTest {
     }
 
     @BeforeEach
-    @SuppressFBWarnings("NP")
     public void beforeEach() {
         Job job = jobRepository.save(getJob());
 
-        TaskExecution taskExecution = getTaskExecution(job.getId());
+        TaskExecution taskExecution = getTaskExecution(Validate.notNull(job.getId(), "id"));
 
         taskExecution = taskExecutionRepository.save(taskExecution);
 
-        counter = getCounter(taskExecution.getId());
+        counter = getCounter(Validate.notNull(taskExecution.getId(), "id"));
 
         counter = counterRepository.save(counter);
     }

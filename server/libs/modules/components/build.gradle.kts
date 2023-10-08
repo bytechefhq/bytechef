@@ -6,6 +6,7 @@ subprojects {
     dependencies {
         annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
 
+        implementation("org.apache.commons:commons-lang3")
         implementation("org.slf4j:slf4j-api")
         implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
         implementation(project(":server:libs:hermes:hermes-component:hermes-component-api"))

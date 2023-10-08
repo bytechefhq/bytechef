@@ -18,12 +18,12 @@
 package com.bytechef.hermes.component.registry.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriBuilder;
 
 import java.net.URI;

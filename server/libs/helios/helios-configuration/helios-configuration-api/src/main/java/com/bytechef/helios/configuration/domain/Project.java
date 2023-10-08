@@ -26,6 +26,7 @@ import java.util.Set;
 
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -38,8 +39,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -217,9 +217,7 @@ public final class Project implements Persistable<Long> {
     }
 
     public List<String> getWorkflowIds() {
-        return projectWorkflows.stream()
-            .map(ProjectWorkflow::getWorkflowId)
-            .toList();
+        return CollectionUtils.map(projectWorkflows, ProjectWorkflow::getWorkflowId);
     }
 
     public int getVersion() {
@@ -245,11 +243,10 @@ public final class Project implements Persistable<Long> {
             .ifPresent(projectWorkflows::remove);
     }
 
-    @SuppressFBWarnings("NP")
     public void setCategory(Category category) {
         this.categoryId = category == null
             ? null
-            : category.getId() == null ? null : AggregateReference.to(category.getId());
+            : category.getId() == null ? null : AggregateReference.to(Validate.notNull(category.getId(), "id"));
     }
 
     public void setCategoryId(Long categoryId) {
@@ -277,7 +274,7 @@ public final class Project implements Persistable<Long> {
     }
 
     public void setStatus(Status status) {
-        Assert.notNull(status, "'status' must not be null");
+        Validate.notNull(status, "'status' must not be null");
 
         this.status = status.getId();
     }
@@ -294,7 +291,7 @@ public final class Project implements Persistable<Long> {
 
     public void setTags(List<Tag> tags) {
         if (!CollectionUtils.isEmpty(tags)) {
-            setTagIds(com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+            setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
 

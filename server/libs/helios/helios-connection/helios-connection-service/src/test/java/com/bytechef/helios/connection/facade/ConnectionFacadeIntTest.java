@@ -36,7 +36,7 @@ import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -78,7 +78,6 @@ public class ConnectionFacadeIntTest {
     private TagRepository tagRepository;
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
@@ -186,7 +185,6 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetConnectionTags() {
         Connection connection = new Connection();
 
@@ -210,7 +208,7 @@ public class ConnectionFacadeIntTest {
         connection.setComponentName("componentName");
         connection.setName("name2");
 
-        tag1 = OptionalUtils.get(tagRepository.findById(tag1.getId()));
+        tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
         connection.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
@@ -222,7 +220,7 @@ public class ConnectionFacadeIntTest {
             .collect(Collectors.toSet()))
             .contains("tag1", "tag2", "tag3");
 
-        connectionRepository.deleteById(connection.getId());
+        connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
 
         Assertions.assertThat(connectionFacade.getConnectionTags()
             .stream()

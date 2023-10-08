@@ -36,6 +36,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -74,7 +75,6 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
         WorkflowTask iteratee = MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
@@ -97,7 +97,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             Map<String, Object> newContext = new HashMap<>(
                 workflowFileStorageFacade.readContextValue(
                     contextService.peek(
-                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)));
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
@@ -114,11 +114,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
 
             contextService.push(
-                Objects.requireNonNull(
-                    subTaskExecution.getId()),
-                Context.Classname.TASK_EXECUTION,
+                Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext));
+                    Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, newContext));
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

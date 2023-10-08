@@ -17,11 +17,12 @@
 
 package com.bytechef.commons.util;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Array;
 import java.time.Duration;
@@ -35,7 +36,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Function;
@@ -62,8 +62,8 @@ public final class MapUtils {
     }
 
     public static <K> Map<K, ?> append(Map<K, ?> map, K key, Map<K, ?> values) {
-        Objects.requireNonNull(key, "'key' must not be null");
-        Objects.requireNonNull(values, "'values' must not be null");
+        Validate.notNull(key, "'key' must not be null");
+        Validate.notNull(values, "'values' must not be null");
 
         Map<K, Object> submap = new HashMap<>(getMap(map, key, Map.of()));
 
@@ -77,21 +77,25 @@ public final class MapUtils {
     }
 
     public static <K, V> Map<K, V> concat(Map<K, V> map1, Map<K, V> map2) {
-        Objects.requireNonNull(map1, "'map1' must not be null");
-        Objects.requireNonNull(map2, "'map2' must not be null");
+        Validate.notNull(map1, "'map1' must not be null");
+        Validate.notNull(map2, "'map2' must not be null");
 
         return Stream.concat(stream(map1), stream(map2))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
     public static <K> boolean containsKey(Map<K, ?> map, String key) {
-        Objects.requireNonNull(map, "'map' must not be null");
+        Validate.notNull(map, "'map' must not be null");
 
         return map.containsKey(key);
     }
 
+    public static boolean isEmpty(Map<String, ?> map) {
+        return CollectionUtils.isEmpty(map);
+    }
+
     public static <K> Object get(Map<K, ?> map, K key) {
-        Objects.requireNonNull(map, "'map' must not be null");
+        Validate.notNull(map, "'map' must not be null");
 
         return map.get(key);
     }
@@ -485,7 +489,7 @@ public final class MapUtils {
     public static <K> Object getRequired(Map<K, ?> map, K key) {
         Object value = get(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -493,7 +497,7 @@ public final class MapUtils {
     public static <K, T> T getRequired(Map<K, ?> map, K key, Class<T> returnType) {
         T value = get(map, key, returnType);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -501,7 +505,7 @@ public final class MapUtils {
     public static <K> Object[] getRequiredArray(Map<K, ?> map, K key) {
         Object[] value = getArray(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -509,7 +513,7 @@ public final class MapUtils {
     public static <K, T> T[] getRequiredArray(Map<K, ?> map, K key, Class<T> elementType) {
         T[] value = getArray(map, key, elementType);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -517,7 +521,7 @@ public final class MapUtils {
     public static <K> Boolean getRequiredBoolean(Map<K, ?> map, K key) {
         Boolean value = getBoolean(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -525,7 +529,7 @@ public final class MapUtils {
     public static <K> Date getRequiredDate(Map<K, ?> map, K key) {
         Date value = getDate(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -533,7 +537,7 @@ public final class MapUtils {
     public static <K> Double getRequiredDouble(Map<K, ?> map, K key) {
         Double value = getDouble(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -541,7 +545,7 @@ public final class MapUtils {
     public static <K> Float getRequiredFloat(Map<K, ?> map, K key) {
         Float value = getFloat(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -549,7 +553,7 @@ public final class MapUtils {
     public static <K> Integer getRequiredInteger(Map<K, ?> map, K key) {
         Integer value = getInteger(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -557,7 +561,7 @@ public final class MapUtils {
     public static <K> List<?> getRequiredList(Map<K, ?> map, K key) {
         List<?> value = getList(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -565,16 +569,17 @@ public final class MapUtils {
     public static <K, T> List<T> getRequiredList(Map<K, ?> map, K key, Class<T> elementType) {
         List<T> value = getList(map, key, elementType);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
 
     public static <K, T> List<T> getRequiredList(
         Map<K, ?> map, K key, ParameterizedTypeReference<T> elementType) {
+
         List<T> value = getList(map, key, elementType);
 
-        Assert.notNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -582,7 +587,7 @@ public final class MapUtils {
     public static <K> LocalDate getRequiredLocalDate(Map<K, ?> map, K key) {
         LocalDate value = getLocalDate(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -590,7 +595,7 @@ public final class MapUtils {
     public static <K> LocalTime getRequiredLocalTime(Map<K, ?> map, K key) {
         LocalTime value = getLocalTime(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -598,7 +603,7 @@ public final class MapUtils {
     public static <K> LocalDateTime getRequiredLocalDateTime(Map<K, ?> map, K key) {
         LocalDateTime value = getLocalDateTime(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -606,7 +611,7 @@ public final class MapUtils {
     public static <K1, K2, V> Map<K2, V> getRequiredMap(Map<K1, ?> map, K1 key, Class<V> valueType) {
         Map<K2, V> value = getMap(map, key, valueType);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -619,7 +624,7 @@ public final class MapUtils {
 
         Map<K2, V> value = getMap(map, key, (Class<V>) resolvableType.getRawClass());
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -627,7 +632,7 @@ public final class MapUtils {
     public static <K1, K2> Map<K2, ?> getRequiredMap(Map<K1, ?> map, K1 key) {
         Map<K2, ?> value = getMap(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -635,7 +640,7 @@ public final class MapUtils {
     public static long getRequiredLong(Map<String, ?> map, String key) {
         Long value = getLong(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -643,7 +648,7 @@ public final class MapUtils {
     public static <K> String getRequiredString(Map<K, ?> map, K key) {
         String value = getString(map, key);
 
-        Objects.requireNonNull(value, "Unknown value for : " + key);
+        Validate.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -659,13 +664,13 @@ public final class MapUtils {
     }
 
     public static int size(Map<?, ?> map) {
-        Objects.requireNonNull(map, "'map' must not be null");
+        Validate.notNull(map, "'map' must not be null");
 
         return map.size();
     }
 
     public static <K, V> Stream<Map.Entry<K, V>> stream(Map<K, V> map) {
-        Objects.requireNonNull(map, "'map' must not be null");
+        Validate.notNull(map, "'map' must not be null");
 
         Set<Map.Entry<K, V>> entry = map.entrySet();
 

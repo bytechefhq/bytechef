@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.springframework:spring-context")

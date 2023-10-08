@@ -29,7 +29,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -189,7 +189,7 @@ public class ProjectInstance implements Persistable<Long> {
 
     public void setTags(List<Tag> tags) {
         if (!CollectionUtils.isEmpty(tags)) {
-            setTagIds(com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+            setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
 

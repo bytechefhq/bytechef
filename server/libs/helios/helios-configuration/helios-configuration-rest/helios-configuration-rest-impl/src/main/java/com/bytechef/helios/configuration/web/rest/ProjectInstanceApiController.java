@@ -52,7 +52,6 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectInstanceModel> createProjectInstance(ProjectInstanceModel projectInstanceModel) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -95,7 +94,6 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectInstanceModel> getProjectInstance(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(projectInstanceFacade.getProjectInstance(id), ProjectInstanceModel.class));
@@ -111,7 +109,6 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectInstanceModel> updateProjectInstance(
         Long id, ProjectInstanceModel projectInstanceModel) {
 
@@ -128,7 +125,8 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
         return ResponseEntity.ok(conversionService.convert(
             projectInstanceFacade.updateProjectInstanceWorkflow(
                 conversionService.convert(
-                    projectInstanceWorkflowModel.id(projectInstanceWorkflowId).projectInstanceId(id),
+                    projectInstanceWorkflowModel.id(projectInstanceWorkflowId)
+                        .projectInstanceId(id),
                     ProjectInstanceWorkflow.class)),
             ProjectInstanceWorkflowModel.class));
     }

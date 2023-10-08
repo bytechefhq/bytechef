@@ -21,7 +21,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
@@ -37,7 +37,7 @@ public class TriggerExecutionErrorEvent extends AbstractEvent implements ErrorEv
     public TriggerExecutionErrorEvent(TriggerExecution triggerExecution) {
         super(CoordinatorMessageRoute.ERROR_EVENTS);
 
-        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         this.triggerExecution = triggerExecution;
     }

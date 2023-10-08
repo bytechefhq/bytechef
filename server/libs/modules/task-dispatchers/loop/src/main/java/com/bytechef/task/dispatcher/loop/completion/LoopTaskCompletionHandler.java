@@ -35,13 +35,13 @@ import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -83,14 +83,13 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(
-            Objects.requireNonNull(taskExecution.getParentId()));
+            Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
         Map<String, ?> iteratee = MapUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
@@ -108,7 +107,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, Object> newContext = new HashMap<>(
                 workflowFileStorageFacade.readContextValue(
                     contextService.peek(
-                        Objects.requireNonNull(loopTaskExecution.getId()), Classname.TASK_EXECUTION)));
+                        Validate.notNull(loopTaskExecution.getId(), "parentId"), Classname.TASK_EXECUTION)));
 
             WorkflowTask workflowTask = loopTaskExecution.getWorkflowTask();
 
@@ -125,9 +124,9 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
             subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
 
             contextService.push(
-                Objects.requireNonNull(subTaskExecution.getId()), Classname.TASK_EXECUTION,
+                Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    subTaskExecution.getId(), Classname.TASK_EXECUTION, newContext));
+                    Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, newContext));
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

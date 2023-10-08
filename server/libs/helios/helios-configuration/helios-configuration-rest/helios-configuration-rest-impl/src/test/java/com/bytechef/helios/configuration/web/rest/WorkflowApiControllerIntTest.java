@@ -29,8 +29,7 @@ import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import org.apache.commons.lang3.Validate;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -125,7 +124,6 @@ public class WorkflowApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPutWorkflow() throws JsonProcessingException {
         Workflow workflow = getWorkflow();
 
@@ -150,7 +148,7 @@ public class WorkflowApiControllerIntTest {
                 .jsonPath("$.format")
                 .isEqualTo(format.toString())
                 .jsonPath("$.id")
-                .isEqualTo(workflow.getId())
+                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo(workflow.getLabel())
                 .jsonPath("$.tasks")

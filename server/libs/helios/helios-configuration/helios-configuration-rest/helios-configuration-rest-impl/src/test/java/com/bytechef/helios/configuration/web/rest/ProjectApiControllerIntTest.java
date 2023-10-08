@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import org.apache.commons.lang3.Validate;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.category.domain.Category;
@@ -38,7 +38,6 @@ import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowReq
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,7 +109,6 @@ public class ProjectApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetProject() {
         try {
             ProjectDTO projectDTO = getProjectDTO();
@@ -125,7 +123,7 @@ public class ProjectApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(ProjectModel.class)
-                .isEqualTo(projectMapper.convert(projectDTO));
+                .isEqualTo(Validate.notNull(projectMapper.convert(projectDTO), "projectModel"));
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -250,7 +248,6 @@ public class ProjectApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPostProject() {
         ProjectDTO projectDTO = getProjectDTO();
         ProjectModel projectModel = new ProjectModel()
@@ -294,7 +291,6 @@ public class ProjectApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPostIntegrationWorkflows() {
         CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel = new CreateProjectWorkflowRequestModel()
             .label("workflowLabel")
@@ -319,7 +315,7 @@ public class ProjectApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(workflow.getId())
+                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {
@@ -337,7 +333,6 @@ public class ProjectApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPutIntegration() {
         ProjectDTO projectDTO = ProjectDTO.builder()
             .category(new Category(1L, "category"))
@@ -379,7 +374,6 @@ public class ProjectApiControllerIntTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings("NP")
     public void testPutIntegrationTags() {
         try {
             this.webTestClient

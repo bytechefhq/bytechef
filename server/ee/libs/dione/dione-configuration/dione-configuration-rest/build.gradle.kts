@@ -50,6 +50,7 @@ dependencies {
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
+    implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")

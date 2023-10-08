@@ -21,10 +21,10 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.dione.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.dione.configuration.domain.Integration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,43 +49,44 @@ public class IntegrationRepositoryIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testCreate() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
-        assertThat(integration).isEqualTo(OptionalUtils.get(integrationRepository.findById(integration.getId())));
+        assertThat(integration).isEqualTo(
+            OptionalUtils.get(integrationRepository.findById(Validate.notNull(integration.getId(), "id"))));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
-        Integration resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
+        Integration resultIntegration = OptionalUtils.get(
+            integrationRepository.findById(Validate.notNull(integration.getId(), "id")));
 
         assertThat(resultIntegration).isEqualTo(integration);
 
-        integrationRepository.deleteById(resultIntegration.getId());
+        integrationRepository.deleteById(Validate.notNull(resultIntegration.getId(), "id"));
 
         assertThat(integrationRepository.findById(integration.getId())).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testFindById() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
-        Integration resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
+        Integration resultIntegration = OptionalUtils.get(
+            integrationRepository.findById(Validate.notNull(integration.getId(), "id")));
 
         assertThat(resultIntegration).isEqualTo(integration);
 
-        integrationRepository.deleteById(integration.getId());
+        integrationRepository.deleteById(Validate.notNull(integration.getId(), "id"));
 
         integration = getIntegration(List.of("workflowId"));
 
         integration = integrationRepository.save(integration);
 
-        resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
+        resultIntegration = OptionalUtils.get(
+            integrationRepository.findById(Validate.notNull(integration.getId(), "id")));
 
         assertThat(resultIntegration.getWorkflowIds()).isEqualTo(integration.getWorkflowIds());
 
@@ -93,13 +94,13 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(resultIntegration);
 
-        resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
+        resultIntegration = OptionalUtils.get(
+            integrationRepository.findById(Validate.notNull(integration.getId(), "id")));
 
         assertThat(resultIntegration.getWorkflowIds()).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration(List.of("workflow1")));
 
@@ -108,7 +109,7 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(integration);
 
-        assertThat(integrationRepository.findById(integration.getId())).hasValue(integration);
+        assertThat(integrationRepository.findById(Validate.notNull(integration.getId(), "id"))).hasValue(integration);
     }
 
     private static Integration getIntegration(List<String> workflowIds) {

@@ -25,11 +25,11 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -47,7 +47,7 @@ public class WorkerHandlerConfiguration {
 
             return actionDefinitionFacade.executePerform(
                 componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName(), Objects.requireNonNull(taskExecution.getId()),
+                componentOperation.operationName(), Validate.notNull(taskExecution.getId(), "id"),
                 taskExecution.getParameters(),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         };

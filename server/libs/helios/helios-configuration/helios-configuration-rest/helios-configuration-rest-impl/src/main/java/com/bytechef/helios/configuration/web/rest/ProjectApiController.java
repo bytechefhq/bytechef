@@ -49,7 +49,6 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectModel> createProject(ProjectModel projectModel) {
 
         return ResponseEntity.ok(
@@ -59,7 +58,6 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> createProjectWorkflow(
         Long id, CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel) {
 
@@ -80,13 +78,11 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectModel> duplicateProject(Long id) {
         return ResponseEntity.ok(conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class));
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectModel> getProject(Long id) {
         return ResponseEntity.ok(conversionService.convert(projectFacade.getProject(id), ProjectModel.class));
     }
@@ -101,7 +97,6 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectModel> updateProject(Long id, ProjectModel projectModel) {
         return ResponseEntity.ok(conversionService.convert(
             projectFacade.updateProject(conversionService.convert(projectModel.id(id), ProjectDTO.class)),

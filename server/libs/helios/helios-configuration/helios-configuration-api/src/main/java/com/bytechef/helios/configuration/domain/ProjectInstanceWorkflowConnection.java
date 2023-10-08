@@ -18,7 +18,6 @@
 package com.bytechef.helios.configuration.domain;
 
 import com.bytechef.hermes.connection.domain.Connection;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -49,7 +48,6 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     }
 
     @Default
-    @SuppressFBWarnings("NP")
     public ProjectInstanceWorkflowConnection(Long connectionId, String key, String operationName) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
         this.key = key;

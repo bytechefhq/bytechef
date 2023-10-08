@@ -34,7 +34,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.message.event.MessageEvent;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -51,6 +50,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -98,7 +99,6 @@ public class TaskWorker {
      *
      * @param taskExecutionEvent The task event which contains task to execute.
      */
-    @SuppressFBWarnings("NP")
     public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
         logger.debug("Received task execution event: {}", taskExecutionEvent);
 
@@ -109,8 +109,8 @@ public class TaskWorker {
             try {
                 eventPublisher.publishEvent(
                     new TaskStartedApplicationEvent(
-                        Objects.requireNonNull(taskExecution.getJobId()),
-                        Objects.requireNonNull(taskExecution.getId())));
+                        Validate.notNull(taskExecution.getJobId(), "id"),
+                        Validate.notNull(taskExecution.getId(), "id")));
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
@@ -176,7 +176,6 @@ public class TaskWorker {
         return Collections.unmodifiableMap(taskExecutionFutureMap);
     }
 
-    @SuppressFBWarnings("NP")
     private TaskExecution doExecuteTask(TaskExecution taskExecution) throws Exception {
         Map<String, Object> context = new HashMap<>();
 
@@ -184,7 +183,7 @@ public class TaskWorker {
             long startTime = System.currentTimeMillis();
 
             // pre tasks
-            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getPre(), context);
+            executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getPre(), context);
 
             taskExecution.evaluate(context);
 
@@ -195,7 +194,7 @@ public class TaskWorker {
             if (output != null) {
                 taskExecution.setOutput(
                     workflowFileStorageFacade.storeTaskExecutionOutput(
-                        Objects.requireNonNull(taskExecution.getId()), output));
+                        Validate.notNull(taskExecution.getId(), "id"), output));
             }
 
             taskExecution.setEndDate(LocalDateTime.now());
@@ -209,11 +208,10 @@ public class TaskWorker {
             return taskExecution;
         } finally {
             // finalize tasks
-            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getFinalize(), context);
+            executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getFinalize(), context);
         }
     }
 
-    @SuppressFBWarnings("NP")
     private Object doExecuteSubTask(TaskExecution taskExecution) throws Exception {
         Map<String, Object> context = new HashMap<>();
 
@@ -221,7 +219,7 @@ public class TaskWorker {
             long startTime = System.currentTimeMillis();
 
             // pre tasks
-            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getPre(), context);
+            executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getPre(), context);
 
             taskExecution.evaluate(context);
 
@@ -240,7 +238,7 @@ public class TaskWorker {
             return output;
         } finally {
             // finalize tasks
-            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getFinalize(), context);
+            executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getFinalize(), context);
         }
     }
 
@@ -290,8 +288,8 @@ public class TaskWorker {
         private final TaskExecution taskExecution;
 
         TaskExecutionFuture(TaskExecution taskExecution, Future<T> future) {
-            this.taskExecution = Objects.requireNonNull(taskExecution);
-            this.future = Objects.requireNonNull(future);
+            this.taskExecution = Validate.notNull(taskExecution, "taskExecution");
+            this.future = Validate.notNull(future, "future");
         }
 
         @Override

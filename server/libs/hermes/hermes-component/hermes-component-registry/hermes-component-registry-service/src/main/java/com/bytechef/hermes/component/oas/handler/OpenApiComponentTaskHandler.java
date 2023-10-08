@@ -47,7 +47,6 @@ public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         try {
             return openApiComponentHandler.postExecute(actionName, (Response) super.handle(taskExecution));

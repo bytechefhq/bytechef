@@ -29,11 +29,12 @@ import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -95,7 +96,6 @@ public class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetConnection() {
         try {
             ConnectionDTO connectionDTO = getConnection();
@@ -110,7 +110,7 @@ public class ConnectionApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(ConnectionModel.class)
-                .isEqualTo(connectionMapper.convert(connectionDTO)
+                .isEqualTo(Validate.notNull(connectionMapper.convert(connectionDTO), "connectionModel")
                     .parameters(null));
         } catch (Exception exception) {
             Assertions.fail(exception);
@@ -143,7 +143,6 @@ public class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
@@ -157,7 +156,7 @@ public class ConnectionApiControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(ConnectionModel.class)
-            .contains(connectionMapper.convert(connectionDTO)
+            .contains(Validate.notNull(connectionMapper.convert(connectionDTO), "connectionMapper")
                 .parameters(null))
             .hasSize(1);
 
@@ -197,7 +196,6 @@ public class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPostConnection() {
         ConnectionDTO connectionDTO = getConnection();
         ConnectionModel connectionModel = new ConnectionModel().componentName("componentName")
@@ -241,7 +239,6 @@ public class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPutConnection() {
         ConnectionDTO connection = ConnectionDTO.builder()
             .componentName("componentName")
@@ -276,7 +273,6 @@ public class ConnectionApiControllerIntTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings("NP")
     public void testPutConnectionTags() {
         try {
             this.webTestClient

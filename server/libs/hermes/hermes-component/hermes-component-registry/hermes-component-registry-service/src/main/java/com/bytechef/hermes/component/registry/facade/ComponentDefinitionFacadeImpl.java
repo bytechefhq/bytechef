@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.registry.service.ComponentDefinitionService
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;

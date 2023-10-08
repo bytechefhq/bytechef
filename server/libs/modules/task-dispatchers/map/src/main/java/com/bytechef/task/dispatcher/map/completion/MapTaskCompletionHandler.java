@@ -27,10 +27,10 @@ import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -70,13 +70,12 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        long subtasksLeft = counterService.decrement(Objects.requireNonNull(taskExecution.getParentId()));
+        long subtasksLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (subtasksLeft == 0) {
             List<TaskExecution> childTaskExecutions = taskExecutionService
@@ -87,7 +86,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
             mapTaskExecution.setOutput(
                 workflowFileStorageFacade.storeTaskExecutionOutput(
-                    mapTaskExecution.getId(),
+                    Validate.notNull(mapTaskExecution.getId(), "id"),
                     childTaskExecutions.stream()
                         .map(output -> workflowFileStorageFacade.readTaskExecutionOutput(output.getOutput()))
                         .collect(Collectors.toList())));

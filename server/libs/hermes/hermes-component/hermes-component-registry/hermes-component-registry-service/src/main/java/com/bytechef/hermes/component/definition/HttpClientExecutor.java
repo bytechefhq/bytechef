@@ -39,6 +39,7 @@ import com.github.mizosoft.methanol.Methanol;
 import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
@@ -61,7 +62,6 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -205,7 +205,7 @@ public class HttpClientExecutor {
         httpRequestBuilder.uri(
             createURI(
                 getConnectionUrl(urlString, componentName, connection, context),
-                Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
+                queryParameters == null ? Collections.emptyMap() : queryParameters));
 
         return httpRequestBuilder.build();
     }
@@ -326,7 +326,7 @@ public class HttpClientExecutor {
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            Object value = Objects.requireNonNull(parameter.getValue());
+            Object value = Validate.notNull(parameter.getValue(), "value");
 
             builder.query((String) parameter.getKey(), value.toString());
         }

@@ -24,7 +24,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import java.util.Map;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -55,15 +55,16 @@ public class ConnectionRepositoryIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(connection, OptionalUtils.get(connectionRepository.findById(connection.getId())));
+        Assertions.assertEquals(
+            connection, OptionalUtils.get(connectionRepository.findById(Validate.notNull(connection.getId(), "id"))));
 
-        connectionRepository.deleteById(connection.getId());
+        connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
 
-        Assertions.assertFalse(OptionalUtils.isPresent(connectionRepository.findById(connection.getId())));
+        Assertions.assertFalse(
+            OptionalUtils.isPresent(connectionRepository.findById(Validate.notNull(connection.getId(), "id"))));
     }
 
     @Test
@@ -77,11 +78,11 @@ public class ConnectionRepositoryIntTest {
     public void testFindById() {
         Connection connection = connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(connection, OptionalUtils.get(connectionRepository.findById(connection.getId())));
+        Assertions.assertEquals(
+            connection, OptionalUtils.get(connectionRepository.findById(Validate.notNull(connection.getId(), "id"))));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Connection connection = connectionRepository.save(getConnection());
 
@@ -90,7 +91,8 @@ public class ConnectionRepositoryIntTest {
 
         connectionRepository.save(connection);
 
-        Connection updatedConnection = OptionalUtils.get(connectionRepository.findById(connection.getId()));
+        Connection updatedConnection = OptionalUtils.get(
+            connectionRepository.findById(Validate.notNull(connection.getId(), "id")));
 
         Assertions.assertEquals("name2", updatedConnection.getName());
         Assertions.assertEquals(Map.of("key2", "value2"), updatedConnection.getParameters());

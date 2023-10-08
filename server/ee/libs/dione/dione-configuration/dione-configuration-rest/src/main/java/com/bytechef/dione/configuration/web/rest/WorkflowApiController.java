@@ -23,6 +23,7 @@ import com.bytechef.dione.configuration.constant.IntegrationConstants;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,20 +71,20 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
-        return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
-            .definition(null));
+        return ResponseEntity.ok(
+            Validate.notNull(
+                conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class), "workflowModel")
+                .definition(null));
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
         for (Workflow workflow : workflowService.getWorkflows(IntegrationConstants.INTEGRATION_TYPE)) {
             workflowModels.add(
-                conversionService.convert(workflow, WorkflowModel.class)
+                Validate.notNull(conversionService.convert(workflow, WorkflowModel.class), "workflowModel")
                     .definition(null));
         }
 
@@ -91,7 +92,6 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
             conversionService.convert(workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class));
