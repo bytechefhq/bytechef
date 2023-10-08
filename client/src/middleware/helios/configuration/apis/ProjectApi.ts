@@ -53,6 +53,7 @@ export interface GetProjectsRequest {
     categoryId?: number;
     projectInstances?: boolean;
     tagId?: number;
+    published?: boolean;
 }
 
 export interface UpdateProjectRequest {
@@ -251,6 +252,10 @@ export class ProjectApi extends runtime.BaseAPI {
 
         if (requestParameters.tagId !== undefined) {
             queryParameters['tagId'] = requestParameters.tagId;
+        }
+
+        if (requestParameters.published !== undefined) {
+            queryParameters['published'] = requestParameters.published;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
