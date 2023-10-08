@@ -11,7 +11,8 @@ import {
     ProjectModel,
     ProjectTagApi,
     UpdateProjectInstanceTagsRequest,
-    UpdateProjectTagsRequest,
+    UpdateProjectTagsRequest, UpdateWorkflowRequest,
+    WorkflowApi,
     WorkflowModel,
 } from 'middleware/helios/configuration';
 
@@ -66,7 +67,7 @@ export const useCreateProjectWorkflowRequestMutation = (
     mutationProps?: CreateProjectWorkflowRequestMutationProps
 ) => {
     return useMutation({
-        mutationFn: async (request: CreateProjectWorkflowRequest) => {
+        mutationFn: (request: CreateProjectWorkflowRequest) => {
             return new ProjectApi().createProjectWorkflow(request);
         },
         onError: mutationProps?.onError,
@@ -121,6 +122,46 @@ export const useDuplicateProjectMutation = (
             return new ProjectApi().duplicateProject({
                 id: id,
             });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type EnableProjectInstanceMutationProps = {
+    onSuccess?: (result: void, variables: EnableProjectInstanceRequest) => void;
+    onError?: (error: object, variables: EnableProjectInstanceRequest) => void;
+};
+
+export const useEnableProjectInstanceMutation = (
+    mutationProps: EnableProjectInstanceMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: EnableProjectInstanceRequest) => {
+            return new ProjectInstanceApi().enableProjectInstance(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type EnableProjectInstanceWorkflowMutationProps = {
+    onSuccess?: (
+        result: void,
+        variables: EnableProjectInstanceWorkflowRequest
+    ) => void;
+    onError?: (
+        error: object,
+        variables: EnableProjectInstanceWorkflowRequest
+    ) => void;
+};
+
+export const useEnableProjectInstanceWorkflowMutation = (
+    mutationProps: EnableProjectInstanceWorkflowMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: EnableProjectInstanceWorkflowRequest) => {
+            return new ProjectInstanceApi().enableProjectInstanceWorkflow(
+                request
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -232,41 +273,20 @@ export const useUpdateProjectInstanceTagsMutation = (
         onSuccess: mutationProps?.onSuccess,
     });
 
-type EnableProjectInstanceMutationProps = {
-    onSuccess?: (result: void, variables: EnableProjectInstanceRequest) => void;
-    onError?: (error: object, variables: EnableProjectInstanceRequest) => void;
-};
-
-export const useEnableProjectInstanceMutation = (
-    mutationProps: EnableProjectInstanceMutationProps
-) =>
-    useMutation({
-        mutationFn: (request: EnableProjectInstanceRequest) => {
-            return new ProjectInstanceApi().enableProjectInstance(request);
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-type EnableProjectInstanceWorkflowMutationProps = {
+type UpdateWorkflowMutationProps = {
     onSuccess?: (
-        result: void,
-        variables: EnableProjectInstanceWorkflowRequest
+        result: WorkflowModel,
+        variables: UpdateWorkflowRequest
     ) => void;
-    onError?: (
-        error: object,
-        variables: EnableProjectInstanceWorkflowRequest
-    ) => void;
+    onError?: (error: object, variables: UpdateWorkflowRequest) => void;
 };
 
-export const useEnableProjectInstanceWorkflowMutation = (
-    mutationProps: EnableProjectInstanceWorkflowMutationProps
+export const useUpdateWorkflowMutation = (
+    mutationProps?: UpdateWorkflowMutationProps
 ) =>
     useMutation({
-        mutationFn: (request: EnableProjectInstanceWorkflowRequest) => {
-            return new ProjectInstanceApi().enableProjectInstanceWorkflow(
-                request
-            );
+        mutationFn: (request: UpdateWorkflowRequest) => {
+            return new WorkflowApi().updateWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
