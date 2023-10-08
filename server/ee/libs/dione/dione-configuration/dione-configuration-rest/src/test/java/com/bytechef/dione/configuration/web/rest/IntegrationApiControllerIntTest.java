@@ -36,8 +36,8 @@ import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -105,7 +105,6 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetIntegration() {
         try {
             IntegrationDTO integrationDTO = getIntegrationDTO();
@@ -120,7 +119,7 @@ public class IntegrationApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(IntegrationModel.class)
-                .isEqualTo(integrationMapper.convert(integrationDTO));
+                .isEqualTo(Validate.notNull(integrationMapper.convert(integrationDTO), "integrationModel"));
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -246,7 +245,6 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPostIntegration() {
         IntegrationDTO integrationDTO = getIntegrationDTO();
         IntegrationModel integrationModel = new IntegrationModel()
@@ -290,7 +288,6 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPostIntegrationWorkflows() throws Exception {
         CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel =
             new CreateIntegrationWorkflowRequestModel()
@@ -317,7 +314,7 @@ public class IntegrationApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(workflow.getId())
+                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {
@@ -335,7 +332,6 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testPutIntegration() {
         IntegrationDTO integrationDTO = IntegrationDTO.builder()
             .category(new Category(1L, "category"))
@@ -377,7 +373,6 @@ public class IntegrationApiControllerIntTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings("NP")
     public void testPutIntegrationTags() {
         try {
             this.webTestClient

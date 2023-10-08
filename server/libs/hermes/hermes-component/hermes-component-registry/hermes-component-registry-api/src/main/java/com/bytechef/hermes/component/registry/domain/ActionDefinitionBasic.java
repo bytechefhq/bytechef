@@ -21,6 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.registry.domain.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -46,10 +47,10 @@ public class ActionDefinitionBasic {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
         this.componentName = actionDefinition.getComponentName();
         this.componentVersion = actionDefinition.getComponentVersion();
-        this.description = Objects.requireNonNull(getDescription(actionDefinition));
+        this.description = Validate.notNull(getDescription(actionDefinition), "description");
         this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
-        this.name = Objects.requireNonNull(actionDefinition.getName());
-        this.title = Objects.requireNonNull(getTitle(actionDefinition));
+        this.name = Validate.notNull(actionDefinition.getName(), "name");
+        this.title = Validate.notNull(getTitle(actionDefinition), "title");
     }
 
     public String getComponentName() {

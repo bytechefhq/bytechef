@@ -36,6 +36,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
@@ -78,7 +79,6 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         WorkflowTask iteratee = MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
         List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
@@ -95,7 +95,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(Objects.requireNonNull(taskExecution.getId()), list.size());
+            counterService.set(Validate.notNull(taskExecution.getId(), "id"), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
@@ -109,7 +109,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 Map<String, Object> newContext = new HashMap<>(
                     workflowFileStorageFacade.readContextValue(
-                        contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
+                        contextService.peek(
+                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
@@ -118,9 +119,10 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution.evaluate(newContext));
 
                 contextService.push(
-                    Objects.requireNonNull(iterateeTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                    Validate.notNull(iterateeTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                     workflowFileStorageFacade.storeContextValue(
-                        iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext));
+                        Validate.notNull(iterateeTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                        newContext));
 
                 taskDispatcher.dispatch(iterateeTaskExecution);
             }

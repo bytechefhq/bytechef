@@ -20,8 +20,9 @@ package com.bytechef.discovery.redis.client;
 import com.bytechef.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.Validate;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.data.redis.core.ListOperations;
@@ -45,23 +46,19 @@ public class RedisDiscoveryClient implements DiscoveryClient {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public List<ServiceInstance> getInstances(String serviceId) {
         ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 
         List<RedisRegistration> redisRegistrations = listOperations.range("discovery/" + serviceId, 0, -1);
 
-        return Objects.requireNonNull(redisRegistrations)
+        return Validate.notNull(redisRegistrations, "redisRegistrations")
             .parallelStream()
             .collect(Collectors.toList());
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public List<String> getServices() {
-        // TODO move "*-app" to configuration
-
-        return Objects.requireNonNull(redisTemplate.keys("discovery/*"))
+        return Validate.notNull(redisTemplate.keys("discovery/*"), "keys")
             .stream()
             .map(key -> key.replace("discovery/", ""))
             .toList();

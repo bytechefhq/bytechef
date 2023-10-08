@@ -2,6 +2,7 @@ dependencies {
     api(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     api(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
 
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))

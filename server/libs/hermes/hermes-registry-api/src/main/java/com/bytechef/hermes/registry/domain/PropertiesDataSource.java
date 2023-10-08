@@ -18,6 +18,7 @@
 package com.bytechef.hermes.registry.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +32,8 @@ public class PropertiesDataSource {
     private final List<String> loadPropertiesDependsOn;
 
     public PropertiesDataSource(com.bytechef.hermes.definition.PropertiesDataSource propertiesDataSource) {
-        this.loadPropertiesDependsOn = Objects.requireNonNull(propertiesDataSource.getLoadPropertiesDependsOn());
+        this.loadPropertiesDependsOn = Validate.notNull(
+            propertiesDataSource.getLoadPropertiesDependsOn(), "loadPropertiesDependsOn");
     }
 
     public List<String> getLoadPropertiesDependsOn() {

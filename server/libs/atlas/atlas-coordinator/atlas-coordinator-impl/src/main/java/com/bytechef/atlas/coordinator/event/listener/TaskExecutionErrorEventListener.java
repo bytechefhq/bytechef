@@ -31,12 +31,11 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -64,16 +63,16 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void onErrorEvent(ErrorEvent errorEvent) {
         if (errorEvent instanceof TaskExecutionErrorEvent taskExecutionErrorEvent) {
             TaskExecution taskExecution = taskExecutionErrorEvent.getTaskExecution();
 
             ExecutionError error = taskExecution.getError();
 
-            Assert.notNull(error, "'error' must not be null");
+            Validate.notNull(error, "'error' must not be null");
 
-            logger.error("Task id={}: message={}\nstackTrace={}", taskExecution.getId(), error.getMessage(),
+            logger.error(
+                "Task id={}: message={}\nstackTrace={}", taskExecution.getId(), error.getMessage(),
                 error.getStackTrace());
 
             // set task status to FAILED and persist
@@ -104,9 +103,9 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                     taskExecution = taskExecutionService.update(taskExecution);
                 }
 
-                Job job = jobService.getTaskExecutionJob(Objects.requireNonNull(taskExecution.getId()));
+                Job job = jobService.getTaskExecutionJob(Validate.notNull(taskExecution.getId(), "id"));
 
-                Assert.notNull(job, String.format("No job found for task %s ", taskExecution.getId()));
+                Validate.notNull(job, "No job found for task %s", taskExecution.getId());
 
                 job.setStatus(Job.Status.FAILED);
                 job.setEndDate(LocalDateTime.now());
@@ -114,7 +113,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                 jobService.update(job);
 
                 eventPublisher
-                    .publishEvent(new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+                    .publishEvent(new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
             }
         }
     }

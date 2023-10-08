@@ -17,12 +17,13 @@
 
 package com.bytechef.commons.discovery.util;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,13 +75,11 @@ public class WorkerDiscoveryUtils {
         if (metadataMap.containsKey("components")) {
             String componentsString = metadataMap.get("components");
 
-            if (StringUtils.hasText(componentsString)) {
+            if (StringUtils.isNotBlank(componentsString)) {
                 List<Map<String, String>> components = JsonUtils.read(
                     componentsString, new TypeReference<>() {}, objectMapper);
 
-                return components.stream()
-                    .map(componentMap -> MapUtils.getString(componentMap, "name"))
-                    .toList();
+                return CollectionUtils.map(components, componentMap -> MapUtils.getString(componentMap, "name"));
             }
         }
 

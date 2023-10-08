@@ -79,7 +79,6 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public long getProjectInstanceWorkflowConnectionId(
         String workflowConnectionOperationName, String workflowConnectionKey) {
 

@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("io.projectreactor:reactor-core")
     implementation("org.springframework.boot:spring-boot-autoconfigure")

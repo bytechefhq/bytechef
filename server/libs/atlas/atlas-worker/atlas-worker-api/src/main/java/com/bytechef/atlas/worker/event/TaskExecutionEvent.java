@@ -23,7 +23,7 @@ import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
 
@@ -46,7 +46,7 @@ public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEven
 
     @SuppressFBWarnings("EI")
     public TaskExecutionEvent(WorkerMessageRoute route, TaskExecution taskExecution) {
-        Assert.notNull(taskExecution, "'taskExecution' must not be null");
+        Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
         this.createdDate = LocalDateTime.now();
         this.route = route;

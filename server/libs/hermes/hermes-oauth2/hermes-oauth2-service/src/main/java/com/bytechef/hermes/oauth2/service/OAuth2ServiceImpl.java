@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.oauth2.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     public Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> parameters) {
         Map<String, Object> newParameters = new HashMap<>(parameters);
 
-        if (!StringUtils.hasText(MapUtils.getString(parameters, AuthorizationConstants.CLIENT_ID))) {
+        if (StringUtils.isBlank(MapUtils.getString(parameters, AuthorizationConstants.CLIENT_ID))) {
             Map<String, OAuth2Properties.OAuth2App> oAuth2AppMap = oAuth2Properties.getPredefinedApps();
 
             if (oAuth2AppMap.containsKey(componentName)) {

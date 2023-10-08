@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 
 import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -39,7 +39,7 @@ public class KafkaMessageBroker implements MessageBroker {
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
-        Assert.notNull(messageRoute, "'queueName' key must not be null");
+        Validate.notNull(messageRoute, "'queueName' key must not be null");
 
         if (message instanceof Retryable retryable) {
             delay(retryable.getRetryDelayMillis());
@@ -57,6 +57,7 @@ public class KafkaMessageBroker implements MessageBroker {
         try {
             TimeUnit.MILLISECONDS.sleep(aValue);
         } catch (InterruptedException e) {
+            // ignore
         }
     }
 

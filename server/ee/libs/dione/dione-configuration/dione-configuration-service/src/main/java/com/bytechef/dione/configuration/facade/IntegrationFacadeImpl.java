@@ -32,7 +32,7 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -77,7 +77,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public IntegrationDTO create(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
 
@@ -153,11 +152,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public List<IntegrationDTO> getIntegrations(Long categoryId, Long tagId) {
         List<Integration> integrations = integrationService.getIntegrations(categoryId, tagId);
 
-        return com.bytechef.commons.util.CollectionUtils.map(
+        return CollectionUtils.map(
             integrations,
             integration -> new IntegrationDTO(
                 integration,
-                com.bytechef.commons.util.CollectionUtils.findFirstOrElse(
+                CollectionUtils.findFirstOrElse(
                     categoryService.getCategories(
                         integrations.stream()
                             .map(Integration::getCategoryId)
@@ -165,14 +164,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                             .toList()),
                     category -> Objects.equals(integration.getCategoryId(), category.getId()),
                     null),
-                com.bytechef.commons.util.CollectionUtils.filter(
+                CollectionUtils.filter(
                     tagService.getTags(
                         integrations.stream()
-                            .flatMap(curIntegration -> com.bytechef.commons.util.CollectionUtils.stream(
-                                curIntegration.getTagIds()))
+                            .flatMap(curIntegration -> CollectionUtils.stream(curIntegration.getTagIds()))
                             .filter(Objects::nonNull)
                             .toList()),
-                    tag -> com.bytechef.commons.util.CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
+                    tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
     }
 
     @Override
@@ -200,8 +198,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public IntegrationDTO update(long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
-        Integration integration = integrationService.update(
-            id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+        Integration integration = integrationService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         return new IntegrationDTO(
             integration,

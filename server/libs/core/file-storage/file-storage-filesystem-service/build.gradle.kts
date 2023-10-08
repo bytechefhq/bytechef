@@ -1,6 +1,7 @@
 dependencies {
     api(project(":server:libs:core:file-storage:file-storage-api"))
 
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.springframework:spring-context")

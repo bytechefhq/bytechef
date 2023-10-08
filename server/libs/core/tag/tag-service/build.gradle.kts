@@ -1,6 +1,7 @@
 dependencies {
     implementation(project(":server:libs:core:tag:tag-api"))
 
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation(project(":server:libs:core:commons:commons-util"))

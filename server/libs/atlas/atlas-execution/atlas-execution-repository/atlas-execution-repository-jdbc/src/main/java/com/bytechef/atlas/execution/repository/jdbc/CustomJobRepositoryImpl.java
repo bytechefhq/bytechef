@@ -23,8 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import com.bytechef.commons.util.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -84,13 +84,13 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
 
         List<Object> arguments = new ArrayList<>();
 
-        if (StringUtils.hasText(status) || startDate != null || endDate != null || StringUtils.hasText(workflowId) ||
-            !CollectionUtils.isEmpty(workflowIds)) {
+        if (StringUtils.isNotBlank(status) || startDate != null || endDate != null ||
+            StringUtils.isNotBlank(workflowId) || !CollectionUtils.isEmpty(workflowIds)) {
 
             query += "WHERE ";
         }
 
-        if (StringUtils.hasText(status)) {
+        if (StringUtils.isNotBlank(status)) {
             query += "status = ? ";
 
             Job.Status jobStatus = Job.Status.valueOf(status);
@@ -98,7 +98,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             arguments.add(jobStatus.getId());
         }
 
-        if (startDate != null && StringUtils.hasText(status)) {
+        if (startDate != null && StringUtils.isNotBlank(status)) {
             query += "AND ";
         }
 
@@ -108,7 +108,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             arguments.add(startDate);
         }
 
-        if (endDate != null && (StringUtils.hasText(status) || startDate != null)) {
+        if (endDate != null && (StringUtils.isNotBlank(status) || startDate != null)) {
             query += "AND ";
         }
 
@@ -118,18 +118,21 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             arguments.add(endDate);
         }
 
-        if (StringUtils.hasText(workflowId) && (StringUtils.hasText(status) || startDate != null || endDate != null)) {
+        if (StringUtils.isNotBlank(workflowId) && (StringUtils.isNotBlank(status) || startDate != null ||
+            endDate != null)) {
+
             query += "AND ";
         }
 
-        if (StringUtils.hasText(workflowId)) {
+        if (StringUtils.isNotBlank(workflowId)) {
             query += "workflow_id = ? ";
 
             arguments.add(workflowId);
         }
 
         if (!CollectionUtils.isEmpty(workflowIds) &&
-            (StringUtils.hasText(status) || startDate != null || endDate != null || StringUtils.hasText(workflowId))) {
+            (StringUtils.isNotBlank(status) || startDate != null || endDate != null ||
+                StringUtils.isNotBlank(workflowId))) {
 
             query += "AND ";
         }

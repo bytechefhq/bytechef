@@ -38,6 +38,7 @@ import com.bytechef.hermes.component.registry.service.ComponentDefinitionService
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -84,7 +85,6 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
@@ -92,16 +92,14 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             job, workflowFileStorageFacade.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
 
         return new WorkflowExecutionDTO(
-            Objects.requireNonNull(jobDTO.id()),
+            Validate.notNull(jobDTO.id(), "id"),
             OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(jobDTO.workflowId()), null),
-            jobDTO,
-            projectService.getWorkflowProject(jobDTO.workflowId()),
+            jobDTO, projectService.getWorkflowProject(jobDTO.workflowId()),
             workflowService.getWorkflow(jobDTO.workflowId()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
@@ -129,7 +127,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
         return jobsPage.map(job -> new WorkflowExecutionDTO(
-            Objects.requireNonNull(job.getId()),
+            Validate.notNull(job.getId(), "id"),
             OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(job.getWorkflowId()), null),
             new JobDTO(job, Map.of(), List.of()),
             CollectionUtils.getFirst(
@@ -137,7 +135,6 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))));
     }
 
-    @SuppressFBWarnings("NP")
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
         return taskExecutionService.getJobTaskExecutions(jobId)
             .stream()
@@ -145,7 +142,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                 getComponentDefinition(taskExecution),
                 workflowFileStorageFacade.readContextValue(
                     contextService.peek(
-                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)),
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                 taskExecution.getOutput() == null
                     ? null
                     : workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),

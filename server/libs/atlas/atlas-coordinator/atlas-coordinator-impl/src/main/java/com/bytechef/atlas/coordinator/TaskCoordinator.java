@@ -43,10 +43,10 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import com.bytechef.commons.util.ExceptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -125,7 +125,6 @@ public class TaskCoordinator {
      *
      * @param jobStartEvent The job start event
      */
-    @SuppressFBWarnings("NP")
 // TODO @Transactional
     public void onJobStartEvent(JobStartEvent jobStartEvent) {
         if (logger.isDebugEnabled()) {
@@ -137,7 +136,7 @@ public class TaskCoordinator {
         jobExecutor.execute(job);
 
         eventPublisher.publishEvent(
-            new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
     }
 
     /**
@@ -145,7 +144,6 @@ public class TaskCoordinator {
      *
      * @param jobStopEvent The job stop event
      */
-    @SuppressFBWarnings("NP")
 // TODO @Transactional
     public void onJobStopEvent(JobStopEvent jobStopEvent) {
         if (logger.isDebugEnabled()) {
@@ -155,7 +153,7 @@ public class TaskCoordinator {
         Job job = jobService.setStatusToStopped(jobStopEvent.getJobId());
 
         eventPublisher.publishEvent(
-            new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobStopEvent.getJobId());
 
@@ -169,8 +167,8 @@ public class TaskCoordinator {
 
             taskDispatcher.dispatch(
                 new CancelControlTask(
-                    Objects.requireNonNull(currentTaskExecution.getJobId()),
-                    Objects.requireNonNull(currentTaskExecution.getId())));
+                    Validate.notNull(currentTaskExecution.getJobId(), "jobId"),
+                    Validate.notNull(currentTaskExecution.getId(), "id")));
         }
     }
 

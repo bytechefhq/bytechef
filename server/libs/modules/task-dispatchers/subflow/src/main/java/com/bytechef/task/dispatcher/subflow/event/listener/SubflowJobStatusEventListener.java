@@ -32,11 +32,11 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * an {@link EventListener} which is used for listening to subflow job status events. When a sub-flow completes/fails or
@@ -66,7 +66,6 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (applicationEvent instanceof JobStatusApplicationEvent jobStatusApplicationEvent) {
             Job.Status status = jobStatusApplicationEvent.getStatus();
@@ -84,7 +83,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                         job.getParentTaskExecutionId());
 
                     eventPublisher.publishEvent(
-                        new JobStopEvent(Objects.requireNonNull(subflowTaskExecution.getJobId())));
+                        new JobStopEvent(Validate.notNull(subflowTaskExecution.getJobId(), "jobId")));
 
                 }
                 case FAILED -> {
@@ -104,7 +103,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                     if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(
                             workflowFileStorageFacade.storeTaskExecutionOutput(
-                                Objects.requireNonNull(completionTaskExecution.getId()), output));
+                                Validate.notNull(completionTaskExecution.getId(), "id"), output));
                     } else {
                         // TODO check, it seems wrong
                         completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)));

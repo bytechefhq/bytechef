@@ -17,6 +17,8 @@
 
 package com.bytechef.commons.util;
 
+import org.springframework.util.MimeType;
+
 import java.util.HashMap;
 
 /**
@@ -494,5 +496,9 @@ public class MimeTypeUtils {
             ext = "unknown";
         }
         return ext;
+    }
+
+    public static MimeType parseMimeType(String mimeType) {
+        return org.springframework.util.MimeTypeUtils.parseMimeType(mimeType);
     }
 }

@@ -29,11 +29,11 @@ import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -57,9 +57,8 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public TaskExecution process(TaskExecution taskExecution) {
-        Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
+        Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "id"));
 
         Map<String, Map<String, Map<String, Long>>> jobTaskConnectionMap = getJobTaskConnectionMap(job);
         Map<String, Long> connectionIdMap;
@@ -78,7 +77,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
 
-        projectInstanceService.fetchWorkflowProjectInstance(Objects.requireNonNull(job.getWorkflowId()))
+        projectInstanceService.fetchWorkflowProjectInstance(Validate.notNull(job.getWorkflowId(), "id"))
             .ifPresent(projectInstance -> taskExecution
                 .putMetadata(MetadataConstants.INSTANCE_ID, projectInstance.getId())
                 .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT_TYPE));

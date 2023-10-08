@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.util.Assert;
 
 /**
  * A {@link TaskDispatcher} implementation which implements the parallel construct. Providing a list of
@@ -76,12 +76,10 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = MapUtils.getList(
-            taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
-
-        Assert.notNull(workflowTasks, "'tasks' property can't be null");
+        List<WorkflowTask> workflowTasks = Validate.notNull(
+            MapUtils.getList(taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList()),
+            "'workflowTasks' property must not be null");
 
         if (workflowTasks.isEmpty()) {
             taskExecution.setStartDate(LocalDateTime.now());
@@ -90,7 +88,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(taskExecution.getId(), workflowTasks.size());
+            counterService.set(Validate.notNull(taskExecution.getId(), "id"), workflowTasks.size());
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 TaskExecution parallelTaskExecution = TaskExecution.builder()
@@ -104,12 +102,13 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 Map<String, ?> context = workflowFileStorageFacade.readContextValue(
                     contextService.peek(
-                        taskExecution.getId(), Context.Classname.TASK_EXECUTION));
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
                 contextService.push(
-                    Objects.requireNonNull(parallelTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                    Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                     workflowFileStorageFacade.storeContextValue(
-                        parallelTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
+                        Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                        context));
                 taskDispatcher.dispatch(parallelTaskExecution);
             }
         }

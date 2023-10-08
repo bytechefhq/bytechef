@@ -25,8 +25,6 @@ import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.configuration.task.Task;
 import org.springframework.context.ApplicationEventPublisher;
 
-import java.util.Objects;
-
 /**
  * @author Arik Cohen
  * @since Apr 11, 2017
@@ -36,7 +34,7 @@ public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
     private final ApplicationEventPublisher eventPublisher;
 
     public ControlTaskDispatcher(ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = Objects.requireNonNull(eventPublisher);
+        this.eventPublisher = eventPublisher;
     }
 
     @Override

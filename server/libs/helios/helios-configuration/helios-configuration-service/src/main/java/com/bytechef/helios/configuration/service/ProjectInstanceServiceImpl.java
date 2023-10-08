@@ -20,11 +20,10 @@ package com.bytechef.helios.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.repository.ProjectInstanceRepository;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +44,10 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     @Override
     public ProjectInstance create(ProjectInstance projectInstance) {
-        Assert.notNull(projectInstance, "'projectInstance' must not be notNull");
-
-        Assert.isNull(projectInstance.getId(), "'id' must be notNull");
-        Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be notNull");
-        Assert.notNull(projectInstance.getName(), "'projectId' must not be notNull");
+        Validate.notNull(projectInstance, "'projectInstance' must not be notNull");
+        Validate.isTrue(projectInstance.getId() == null, "'id' must be notNull");
+        Validate.notNull(projectInstance.getProjectId(), "'projectId' must not be notNull");
+        Validate.notNull(projectInstance.getName(), "'projectId' must not be notNull");
 
         projectInstance.setEnabled(false);
 
@@ -112,15 +110,12 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ProjectInstance update(ProjectInstance projectInstance) {
-        Assert.notNull(projectInstance, "'projectInstance' must not be notNull");
+        Validate.notNull(projectInstance, "'projectInstance' must not be notNull");
+        Validate.notNull(projectInstance.getProjectId(), "'projectId' must not be null");
+        Validate.notNull(projectInstance.getName(), "'projectId' must not be null");
 
-        Assert.notNull(projectInstance.getId(), "'id' must not be null");
-        Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be null");
-        Assert.notNull(projectInstance.getName(), "'projectId' must not be null");
-
-        ProjectInstance curProjectInstance = getProjectInstance(projectInstance.getId());
+        ProjectInstance curProjectInstance = getProjectInstance(Validate.notNull(projectInstance.getId(), "id"));
 
         curProjectInstance.setDescription(projectInstance.getDescription());
         curProjectInstance.setName(projectInstance.getName());

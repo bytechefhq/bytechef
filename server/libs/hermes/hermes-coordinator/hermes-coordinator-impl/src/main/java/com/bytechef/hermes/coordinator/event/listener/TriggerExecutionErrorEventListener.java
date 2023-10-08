@@ -21,11 +21,10 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
@@ -43,13 +42,10 @@ public class TriggerExecutionErrorEventListener {
         this.triggerExecutionService = triggerExecutionService;
     }
 
-    @SuppressFBWarnings("NP")
     public void onTriggerExecutionErrorEvent(TriggerExecutionErrorEvent triggerExecutionErrorEvent) {
         TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
 
-        ExecutionError error = triggerExecution.getError();
-
-        Assert.notNull(error, "'error' must not be null");
+        ExecutionError error = Validate.notNull(triggerExecution.getError(), "'error' must not be null");
 
         logger.error(
             "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),

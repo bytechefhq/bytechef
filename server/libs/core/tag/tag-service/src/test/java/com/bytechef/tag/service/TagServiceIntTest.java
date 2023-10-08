@@ -21,7 +21,7 @@ import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,29 +49,25 @@ class TagServiceIntTest {
     private TagService tagService;
 
     @BeforeEach
-    @SuppressFBWarnings("NP")
     public void beforeEach() {
         tag = tagRepository.save(new Tag("name"));
     }
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         tagRepository.deleteAll();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
-        tagService.delete(tag.getId());
+        tagService.delete(Validate.notNull(tag.getId(), "id"));
 
         assertThat(tagRepository.findById(tag.getId())).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetTags() {
-        assertThat(tagService.getTags(List.of(tag.getId()))).isEqualTo(List.of(tag));
+        assertThat(tagService.getTags(List.of(Validate.notNull(tag.getId(), "id")))).isEqualTo(List.of(tag));
     }
 
     @Test
@@ -80,8 +75,8 @@ class TagServiceIntTest {
         tag.setName("name1");
 
         assertThat(tagService.save(List.of(tag, new Tag("name2"), new Tag("name3")))).hasSize(3);
-        assertThat(StreamSupport.stream(tagRepository.findAll()
-            .spliterator(), false)
+        assertThat(tagRepository.findAll()
+            .stream()
             .map(Tag::getName)
             .toList()).contains("name1", "name2", "name3");
     }

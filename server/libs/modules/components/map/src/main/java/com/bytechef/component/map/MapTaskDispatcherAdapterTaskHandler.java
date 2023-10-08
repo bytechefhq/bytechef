@@ -46,12 +46,12 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -70,7 +70,6 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
@@ -95,12 +94,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                 errors.add(error);
             });
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
-            e -> {});
-
-        TaskWorker worker = new TaskWorker(
-            getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(), taskHandlerResolver,
-            workflowFileStorageFacade);
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskExecutionService taskExecutionService =
             new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
@@ -110,13 +104,18 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(
-            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION,
-            workflowFileStorageFacade.storeTaskExecutionOutput(taskExecution.getId(), Collections.emptyMap()));
+            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+            workflowFileStorageFacade.storeTaskExecutionOutput(
+                Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
+
+        TaskWorker taskWorker = new TaskWorker(
+            getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(), taskHandlerResolver,
+            workflowFileStorageFacade);
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             contextService, new CounterServiceImpl(new InMemoryCounterRepository()),
-            curTaskExecution -> worker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
+            curTaskExecution -> taskWorker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
             taskExecutionService, workflowFileStorageFacade);
 
         mapTaskDispatcher.dispatch(taskExecution);

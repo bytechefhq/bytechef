@@ -67,7 +67,6 @@ public class ActionDefinitionController implements ActionDefinitionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ActionDefinitionModel> getComponentActionDefinition(
         String componentName, Integer componentVersion, String actionName) {
 

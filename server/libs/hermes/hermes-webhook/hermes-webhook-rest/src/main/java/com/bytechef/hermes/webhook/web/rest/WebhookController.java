@@ -21,6 +21,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MimeTypeUtils;
+import com.bytechef.commons.util.StreamUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
@@ -44,9 +46,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -122,8 +122,7 @@ public class WebhookController {
                                 FileEntryConstants.FILES_DIR, part.getName(), part.getInputStream()));
                     } else {
                         multipartFormDataMap.put(
-                            part.getName(),
-                            StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
+                            part.getName(), StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
                     }
                 }
 
@@ -143,7 +142,7 @@ public class WebhookController {
                 body = new WebhookBodyImpl(
                     parameterMap, ContentType.FORM_URL_ENCODED, httpServletRequest.getContentType());
                 parameters = toMap(queryParams);
-            } else if (mediaType.startsWith(MimeTypeUtils.APPLICATION_JSON_VALUE)) {
+            } else if (mediaType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
                 Object content;
 
                 if (webhookTriggerFlags.webhookRawBody()) {
@@ -155,7 +154,7 @@ public class WebhookController {
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
-            } else if (mediaType.startsWith(MimeTypeUtils.APPLICATION_XML_VALUE)) {
+            } else if (mediaType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
                 Object content;
 
                 if (webhookTriggerFlags.webhookRawBody()) {

@@ -24,9 +24,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -43,9 +43,9 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     public TaskExecution create(TaskExecution taskExecution) {
-        Assert.notNull(taskExecution, "'taskExecution' must not be null");
-        Assert.isNull(taskExecution.getId(), "'taskExecution.id' must be null");
-        Assert.notNull(taskExecution.getWorkflowTask(), "'taskExecution.workflowTask' must not be null");
+        Validate.notNull(taskExecution, "'taskExecution' must not be null");
+        Validate.isTrue(taskExecution.getId() == null, "'taskExecution.id' must be null");
+        Validate.notNull(taskExecution.getWorkflowTask(), "'taskExecution.workflowTask' must not be null");
 
         return taskExecutionRepository.save(taskExecution);
     }
@@ -68,13 +68,11 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public TaskExecution update(@NonNull TaskExecution taskExecution) {
-        Assert.notNull(taskExecution, "'taskExecution' must not be null");
-        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
+        Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
         TaskExecution currentTaskExecution = OptionalUtils.get(
-            taskExecutionRepository.findByIdForUpdate(taskExecution.getId()));
+            taskExecutionRepository.findByIdForUpdate(Validate.notNull(taskExecution.getId(), "id")));
 
         TaskExecution.Status currentStatus = currentTaskExecution.getStatus();
         TaskExecution.Status status = taskExecution.getStatus();

@@ -20,12 +20,11 @@ package com.bytechef.category.service;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,8 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category create(Category category) {
-        Assert.notNull(category, "'category' must not be null");
-        Assert.isNull(category.getId(), "'category.id' must be null");
+        Validate.notNull(category, "'category' must not be null");
+        Validate.isTrue(category.getId() == null, "'category.id' must be null");
 
         return categoryRepository.save(category);
     }
@@ -76,7 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<Category> getCategories(List<Long> ids) {
-        Assert.notNull(ids, "'ids' must not be null");
+        Validate.notNull(ids, "'ids' must not be null");
 
         if (ids.isEmpty()) {
             return Collections.emptyList();
@@ -90,10 +89,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Category save(Category category) {
         if (category.isNew()) {
-            if (StringUtils.hasText(category.getName())) {
+            if (StringUtils.isNotBlank(category.getName())) {
                 Category finalCategory = category;
 
                 category = OptionalUtils.orElseGet(
@@ -101,7 +99,8 @@ public class CategoryServiceImpl implements CategoryService {
                     () -> categoryRepository.save(finalCategory));
             }
         } else {
-            Category curCategory = OptionalUtils.get(categoryRepository.findById(category.getId()));
+            Category curCategory = OptionalUtils.get(
+                categoryRepository.findById(Validate.notNull(category.getId(), "id")));
 
             if (!Objects.equals(category.getName(), curCategory.getName())) {
                 curCategory.setName(category.getName());
@@ -116,8 +115,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category update(Category category) {
-        Assert.notNull(category, "'category' must not be null");
-        Assert.notNull(category.getId(), "'category.id' must not be null");
+        Validate.notNull(category, "'category' must not be null");
+        Validate.notNull(category.getId(), "'category.id' must not be null");
 
         return categoryRepository.save(category);
     }

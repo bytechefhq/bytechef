@@ -27,6 +27,7 @@ import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +36,11 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -71,7 +71,6 @@ public class ProjectOrphanFilesystemWorkflowChecker {
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    @SuppressFBWarnings("NP")
     public void onApplicationReadyEvent() {
         List<Project> projects = projectService.getProjects();
         List<Workflow> workflows = workflowService.getFilesystemWorkflows(ProjectConstants.PROJECT_TYPE);
@@ -94,7 +93,7 @@ public class ProjectOrphanFilesystemWorkflowChecker {
 
                 path = path.replace("file:" + basePath + (basePath.endsWith(File.separator) ? "" : File.separator), "");
 
-                String[] items = Objects.requireNonNull(StringUtils.tokenizeToStringArray(path, File.separator));
+                String[] items = StringUtils.splitByWholeSeparator(path, File.separator);
 
                 if (items.length == 2) {
                     projectName = getProjectName(items[0]);
@@ -116,7 +115,7 @@ public class ProjectOrphanFilesystemWorkflowChecker {
                             .tagIds(getTagIds(workflow.getSourceType()))
                             .build()));
 
-                projectService.addWorkflow(Objects.requireNonNull(project.getId()), workflow.getId());
+                projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
             }
         }
     }

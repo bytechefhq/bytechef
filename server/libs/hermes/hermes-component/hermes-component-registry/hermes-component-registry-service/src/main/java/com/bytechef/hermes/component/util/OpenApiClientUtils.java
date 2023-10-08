@@ -31,7 +31,7 @@ import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.Type;
 import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,7 +142,7 @@ public class OpenApiClientUtils {
 
                 valuesMap.compute(property.getName(), (key, curValues) -> {
                     for (String value : values) {
-                        if (StringUtils.hasText(value)) {
+                        if (StringUtils.isNotBlank(value)) {
                             if (curValues == null) {
                                 curValues = new ArrayList<>();
                             }

@@ -28,7 +28,7 @@ import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,14 +104,13 @@ public class GitWorkflowRepository implements WorkflowRepository {
         return Workflow.SourceType.GIT;
     }
 
-    @SuppressFBWarnings("NP")
     private static Workflow readWorkflow(WorkflowResource resource, int type) {
         Workflow workflow = null;
 
         try {
             workflow = WorkflowReader.readWorkflow(resource, type);
 
-            workflow.setId(encode(Objects.requireNonNull(workflow.getId())));
+            workflow.setId(encode(Validate.notNull(workflow.getId(), "id")));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

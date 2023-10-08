@@ -26,8 +26,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 
 /**
  * A {@link TaskCompletionHandler} implementation which handles completions of parallel construct tasks.
@@ -72,13 +71,12 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        long tasksLeft = counterService.decrement(Objects.requireNonNull(taskExecution.getParentId()));
+        long tasksLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (tasksLeft == 0) {
             taskCompletionHandler.handle(taskExecutionService.getTaskExecution(taskExecution.getParentId()));

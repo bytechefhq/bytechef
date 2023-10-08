@@ -30,11 +30,10 @@ import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
-import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Arik Cohen
@@ -59,7 +58,6 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (applicationEvent instanceof TaskStartedApplicationEvent taskStartedApplicationEvent) {
             long taskExecutionId = taskStartedApplicationEvent.getTaskExecutionId();
@@ -67,7 +65,7 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
             if (logger.isDebugEnabled()) {
-                if (StringUtils.hasText(taskExecution.getName())) {
+                if (StringUtils.isNotBlank(taskExecution.getName())) {
                     logger.debug(
                         "Task id={}, name='{}', type='{}' started", taskExecution.getId(), taskExecution.getName(),
                         taskExecution.getType());
@@ -80,7 +78,7 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
 
             if (taskExecution.getStatus() == Status.CANCELLED || job.getStatus() != Job.Status.STARTED) {
                 taskDispatcher.dispatch(new CancelControlTask(
-                    Objects.requireNonNull(taskExecution.getJobId()), Objects.requireNonNull(taskExecution.getId())));
+                    Validate.notNull(taskExecution.getJobId(), "id"), Validate.notNull(taskExecution.getId(), "id")));
             } else {
                 if (taskExecution.getStartDate() == null && taskExecution.getStatus() != Status.STARTED) {
                     taskExecution.setStartDate(taskStartedApplicationEvent.getCreateDate());

@@ -25,10 +25,9 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -50,14 +49,13 @@ public class ComponentTaskHandler implements TaskHandler<Object> {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         Map<String, Long> connectIdMap = MapUtils.getMap(
             taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
         try {
             return actionDefinitionFacade.executePerform(
-                componentName, componentVersion, actionName, Objects.requireNonNull(taskExecution.getId()),
+                componentName, componentVersion, actionName, Validate.notNull(taskExecution.getId(), "id"),
                 taskExecution.getParameters(),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {

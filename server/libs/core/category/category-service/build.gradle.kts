@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation(project(":server:libs:core:category:category-api"))

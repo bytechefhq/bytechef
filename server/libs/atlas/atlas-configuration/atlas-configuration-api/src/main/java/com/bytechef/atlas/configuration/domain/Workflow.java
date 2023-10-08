@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -48,7 +49,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 /**
  * Workflows are the blueprints that describe the execution of a job.
@@ -74,7 +74,7 @@ public final class Workflow implements Persistable<String>, Serializable {
         }
 
         public static Format parse(String filename) {
-            Assert.notNull(filename, "Filename '%s' can not be null".formatted(filename));
+            Validate.notNull(filename, "Filename '%s' can not be null".formatted(filename));
 
             String extension = Optional.of(filename)
                 .filter(f -> f.contains("."))
@@ -175,11 +175,11 @@ public final class Workflow implements Persistable<String>, Serializable {
         String id, String definition, Format format, LocalDateTime lastModifiedDate, Map<String, ?> source,
         Map<String, Object> metadata, int type) {
 
-        Assert.notNull(definition, "'definition' must not be null");
-        Assert.notNull(format, "'format' must not be null");
-        Assert.notNull(id, "'id' must not be null");
-        Assert.notNull(source, "'source' must not be null");
-        Assert.notNull(metadata, "'metadata' must not be null");
+        Validate.notNull(definition, "'definition' must not be null");
+        Validate.notNull(format, "'format' must not be null");
+        Validate.notNull(id, "'id' must not be null");
+        Validate.notNull(source, "'source' must not be null");
+        Validate.notNull(metadata, "'metadata' must not be null");
 
         this.definition = definition;
         this.format = format.getId();

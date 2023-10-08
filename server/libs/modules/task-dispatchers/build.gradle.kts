@@ -4,6 +4,7 @@ subprojects {
     }
 
     dependencies {
+        implementation("org.apache.commons:commons-lang3")
         implementation("org.springframework:spring-context")
         implementation("org.springframework:spring-core")
         implementation("org.springframework.boot:spring-boot-autoconfigure")

@@ -17,6 +17,7 @@
 
 package com.bytechef.data.storage.db.domain;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -26,7 +27,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -160,7 +160,7 @@ public class DataEntry implements Persistable<Long> {
     }
 
     public void setValue(Object value) {
-        Assert.notNull(value, "'value' must not be null");
+        Validate.notNull(value, "'value' must not be null");
 
         this.value = new ValueWrapper(value, value.getClass());
     }

@@ -32,10 +32,10 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.message.event.MessageEvent;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.apache.commons.lang3.Validate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -73,7 +73,6 @@ public class TriggerWorker {
         this.triggerHandlerResolver = triggerHandlerResolver;
     }
 
-    @SuppressFBWarnings("NP")
     public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
         logger.debug("Received trigger execution event: {}", triggerExecutionEvent);
 
@@ -83,7 +82,7 @@ public class TriggerWorker {
         Future<?> future = triggerWorkerExecutor.submit(() -> {
             try {
                 eventPublisher.publishEvent(new TriggerStartedApplicationEvent(
-                    Objects.requireNonNull(triggerExecution.getId())));
+                    Validate.notNull(triggerExecution.getId(), "id")));
 
                 TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
@@ -186,8 +185,8 @@ public class TriggerWorker {
     private record TriggerExecutionFuture<T>(TriggerExecution triggerExecution, Future<T> future) implements Future<T> {
 
         private TriggerExecutionFuture(TriggerExecution triggerExecution, Future<T> future) {
-            this.triggerExecution = Objects.requireNonNull(triggerExecution);
-            this.future = Objects.requireNonNull(future);
+            this.triggerExecution = Validate.notNull(triggerExecution, "triggerExecution");
+            this.future = Validate.notNull(future, "future");
         }
 
         @Override

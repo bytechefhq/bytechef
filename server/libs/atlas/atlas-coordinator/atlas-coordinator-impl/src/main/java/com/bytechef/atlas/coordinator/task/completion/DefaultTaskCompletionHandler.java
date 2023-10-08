@@ -39,14 +39,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Arik Cohen
@@ -86,13 +85,12 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        Assert.notNull(taskExecution, "'taskExecution' must not be null");
-        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
+        Validate.notNull(taskExecution, "'taskExecution' must not be null");
+        Validate.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
         if (logger.isDebugEnabled()) {
-            if (!StringUtils.hasText(taskExecution.getName())) {
+            if (StringUtils.isBlank(taskExecution.getName())) {
                 logger.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
             } else {
                 logger.debug(
@@ -101,7 +99,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             }
         }
 
-        Job job = jobService.getTaskExecutionJob(taskExecution.getId());
+        Job job = jobService.getTaskExecutionJob(Validate.notNull(taskExecution.getId(), "id"));
 
         if (job == null) {
             logger.error("Unknown job id={}", taskExecution.getJobId());
@@ -113,15 +111,16 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
                 Map<String, Object> newContext = new HashMap<>(
                     workflowFileStorageFacade.readContextValue(
-                        contextService.peek(Objects.requireNonNull(job.getId()), Context.Classname.JOB)));
+                        contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB)));
 
                 newContext.put(
                     taskExecution.getName(),
                     workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
 
                 contextService.push(
-                    job.getId(), Context.Classname.JOB,
-                    workflowFileStorageFacade.storeContextValue(job.getId(), Context.Classname.JOB, newContext));
+                    Validate.notNull(job.getId(), "id"), Context.Classname.JOB,
+                    workflowFileStorageFacade.storeContextValue(
+                        Validate.notNull(job.getId(), "id"), Context.Classname.JOB, newContext));
             }
 
             if (hasMoreTasks(job)) {
@@ -136,12 +135,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
-    @SuppressFBWarnings("NP")
     private void complete(Job job) {
-        Assert.notNull(job.getId(), "'job.id' must not be null");
+        Validate.notNull(job, "'job' must not be null");
 
         Map<String, ?> context = workflowFileStorageFacade.readContextValue(
-            contextService.peek(job.getId(), Context.Classname.JOB));
+            contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Map<String, Object> source = MapUtils.toMap(
@@ -150,12 +148,14 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setCurrentTask(-1);
         job.setEndDate(LocalDateTime.now());
         job.setStatus(Job.Status.COMPLETED);
-        job.setOutputs(workflowFileStorageFacade.storeJobOutputs(job.getId(), Evaluator.evaluate(source, context)));
+        job.setOutputs(
+            workflowFileStorageFacade.storeJobOutputs(
+                Validate.notNull(job.getId(), "id"), Evaluator.evaluate(source, context)));
 
         job = jobService.update(job);
 
         eventPublisher
-            .publishEvent(new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+            .publishEvent(new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());

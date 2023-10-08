@@ -18,7 +18,7 @@
 package com.bytechef.helios.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.commons.util.MapUtils;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -30,7 +30,6 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -89,7 +88,6 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     public ProjectInstanceWorkflow() {
     }
 
-    @SuppressFBWarnings("NP")
     public ProjectInstanceWorkflow(
         List<ProjectInstanceWorkflowConnection> connections, Map<String, Object> inputs, String workflowId) {
 
@@ -186,7 +184,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     }
 
     public void setInputs(Map<String, ?> inputs) {
-        if (!CollectionUtils.isEmpty(inputs)) {
+        if (!MapUtils.isEmpty(inputs)) {
             this.inputs = new MapWrapper(inputs);
         }
     }

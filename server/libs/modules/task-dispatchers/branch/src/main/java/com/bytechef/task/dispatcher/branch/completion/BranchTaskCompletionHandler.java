@@ -41,10 +41,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Arik Cohen
@@ -88,19 +87,18 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution branchTaskExecution = taskExecutionService.getTaskExecution(
-            Objects.requireNonNull(taskExecution.getParentId()));
+            Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
                 workflowFileStorageFacade.readContextValue(
-                    contextService.peek(Objects.requireNonNull(branchTaskExecution.getId()),
+                    contextService.peek(Validate.notNull(branchTaskExecution.getId(), "id"),
                         Classname.TASK_EXECUTION)));
 
             newContext.put(
@@ -108,9 +106,9 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
 
             contextService.push(
-                branchTaskExecution.getId(), Classname.TASK_EXECUTION,
+                Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    branchTaskExecution.getId(), Classname.TASK_EXECUTION, newContext));
+                    Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, newContext));
         }
 
         List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution);
@@ -127,15 +125,16 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 .build();
 
             Map<String, ?> context = workflowFileStorageFacade.readContextValue(
-                contextService.peek(Objects.requireNonNull(branchTaskExecution.getId()), Classname.TASK_EXECUTION));
+                contextService.peek(Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             contextService.push(
-                Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION,
-                workflowFileStorageFacade.storeContextValue(taskExecution.getId(), Classname.TASK_EXECUTION, context));
+                Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                workflowFileStorageFacade.storeContextValue(
+                    Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         }
@@ -152,7 +151,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> caseWorkflowTasks = MapUtils.getList(
             taskExecution.getParameters(), CASES, WorkflowTask.class, Collections.emptyList());
 
-        Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
+        Validate.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
             Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);

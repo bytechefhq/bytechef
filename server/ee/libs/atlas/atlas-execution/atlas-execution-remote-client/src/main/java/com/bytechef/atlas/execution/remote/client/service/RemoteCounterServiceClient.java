@@ -48,7 +48,6 @@ public class RemoteCounterServiceClient implements CounterService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public long decrement(long id) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder

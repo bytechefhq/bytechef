@@ -29,13 +29,12 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -67,20 +66,21 @@ public class JobFacadeImpl implements JobFacade {
     // the job id is missing.
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    @SuppressFBWarnings("NP")
     public long createJob(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
-        logger.debug("Job id={}, label='{}' created", Objects.requireNonNull(job.getId()), job.getLabel());
+        logger.debug("Job id={}, label='{}' created", Validate.notNull(job.getId(), "id"), job.getLabel());
 
         contextService.push(
-            job.getId(), Context.Classname.JOB,
-            workflowFileStorageFacade.storeContextValue(job.getId(), Context.Classname.JOB, job.getInputs()));
+            Validate.notNull(job.getId(), "id"), Context.Classname.JOB,
+            workflowFileStorageFacade.storeContextValue(
+                Validate.notNull(job.getId(), "id"), Context.Classname.JOB, job.getInputs()));
 
-        eventPublisher.publishEvent(new JobStatusApplicationEvent(job.getId(), job.getStatus()));
-        eventPublisher.publishEvent(new JobStartEvent(job.getId()));
+        eventPublisher.publishEvent(
+            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+        eventPublisher.publishEvent(new JobStartEvent(Validate.notNull(job.getId(), "id")));
 
-        return job.getId();
+        return Validate.notNull(job.getId(), "id");
     }
 
     @Override

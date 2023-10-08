@@ -4,6 +4,7 @@ dependencies {
     api(project(":server:libs:core:file-storage:file-storage-api"))
     api(project(":server:libs:core:message:message-broker:message-broker-api"))
 
+    implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.data:spring-data-jdbc")
