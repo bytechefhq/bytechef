@@ -23,7 +23,8 @@ const DescriptionTab = ({
             ...otherComponentData,
             {
                 ...currentComponentData,
-                name: name,
+                action: currentComponentData!.action,
+                name,
                 title: event.target.value,
             },
         ]);
@@ -33,7 +34,8 @@ const DescriptionTab = ({
             ...otherComponentData,
             {
                 ...currentComponentData,
-                name: name,
+                action: currentComponentData!.action,
+                name,
                 notes: event.target.value,
             },
         ]);
