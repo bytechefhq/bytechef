@@ -2,13 +2,9 @@ package com.bytechef.helios.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -20,43 +16,44 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The request object that contains the array of tags.
+ * WorkflowRequestModel
  */
 
-@Schema(name = "UpdateTagsRequest", description = "The request object that contains the array of tags.")
-@JsonTypeName("UpdateTagsRequest")
+@JsonTypeName("WorkflowRequest")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-09T13:39:54.113168+02:00[Europe/Zagreb]")
-public class UpdateTagsRequestModel {
+public class WorkflowRequestModel {
 
-  @Valid
-  private List<@Valid TagModel> tags;
+  private String definition;
 
-  public UpdateTagsRequestModel tags(List<@Valid TagModel> tags) {
-    this.tags = tags;
-    return this;
+  public WorkflowRequestModel() {
+    super();
   }
 
-  public UpdateTagsRequestModel addTagsItem(TagModel tagsItem) {
-    if (this.tags == null) {
-      this.tags = new ArrayList<>();
-    }
-    this.tags.add(tagsItem);
+  /**
+   * Constructor with only required parameters
+   */
+  public WorkflowRequestModel(String definition) {
+    this.definition = definition;
+  }
+
+  public WorkflowRequestModel definition(String definition) {
+    this.definition = definition;
     return this;
   }
 
   /**
-   * Get tags
-   * @return tags
+   * The definition of a workflow.
+   * @return definition
   */
-  @Valid 
-  @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("tags")
-  public List<@Valid TagModel> getTags() {
-    return tags;
+  @NotNull 
+  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("definition")
+  public String getDefinition() {
+    return definition;
   }
 
-  public void setTags(List<@Valid TagModel> tags) {
-    this.tags = tags;
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
   @Override
@@ -67,20 +64,20 @@ public class UpdateTagsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateTagsRequestModel updateTagsRequest = (UpdateTagsRequestModel) o;
-    return Objects.equals(this.tags, updateTagsRequest.tags);
+    WorkflowRequestModel workflowRequest = (WorkflowRequestModel) o;
+    return Objects.equals(this.definition, workflowRequest.definition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tags);
+    return Objects.hash(definition);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateTagsRequestModel {\n");
-    sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("class WorkflowRequestModel {\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("}");
     return sb.toString();
   }

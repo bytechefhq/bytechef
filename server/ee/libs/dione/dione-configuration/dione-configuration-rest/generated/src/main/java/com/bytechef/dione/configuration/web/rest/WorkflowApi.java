@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T20:36:51.350361+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-09T13:39:53.714562+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow", description = "The Embedded Workflow API")
 public interface WorkflowApi {
@@ -195,7 +195,7 @@ public interface WorkflowApi {
      * Update an existing workflow.
      *
      * @param id The id of the workflow to update. (required)
-     * @param workflowModel The workflow object that needs to updated. (required)
+     * @param workflowModel  (required)
      * @return The updated workflow object. (status code 200)
      */
     @Operation(
@@ -217,7 +217,7 @@ public interface WorkflowApi {
     )
     default ResponseEntity<WorkflowModel> updateWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "WorkflowModel", description = "The workflow object that needs to updated.", required = true) @Valid @RequestBody WorkflowModel workflowModel
+        @Parameter(name = "WorkflowModel", description = "", required = true) @Valid @RequestBody WorkflowModel workflowModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
