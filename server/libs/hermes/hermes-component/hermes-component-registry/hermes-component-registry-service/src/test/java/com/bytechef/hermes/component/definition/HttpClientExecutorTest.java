@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
@@ -374,7 +375,7 @@ public class HttpClientExecutorTest {
     public void testHandleResponse() {
         Assertions.assertNull(
             httpClientExecutor.handleResponse(new TestHttpResponse(null), configuration)
-                .body());
+                .getBody());
 
         //
 
@@ -389,7 +390,7 @@ public class HttpClientExecutorTest {
                 new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
                 Http.responseType(Http.ResponseType.BINARY)
                     .build())
-                .body());
+                .getBody());
 
         //
 
@@ -404,7 +405,7 @@ public class HttpClientExecutorTest {
                         """),
                 Http.responseType(Http.ResponseType.JSON)
                     .build())
-                .body());
+                .getBody());
 
         //
 
@@ -414,7 +415,7 @@ public class HttpClientExecutorTest {
                 new TestHttpResponse("text"),
                 Http.responseType(Http.ResponseType.TEXT)
                     .build())
-                .body());
+                .getBody());
 
         //
 
@@ -432,16 +433,44 @@ public class HttpClientExecutorTest {
                         """),
                 Http.responseType(Http.ResponseType.XML)
                     .build())
-                .body());
+                .getBody());
 
         //
 
+        ConfigurationBuilder configurationBuilder = Http.responseType(Http.ResponseType.TEXT);
+
         Assertions.assertEquals(
-            new Http.Response(Map.of(), "text", 200),
-            httpClientExecutor.handleResponse(
-                new TestHttpResponse("text"),
-                Http.responseType(Http.ResponseType.TEXT)
-                    .build()));
+            new TestResponseImpl(Map.of(), "text", 200),
+            httpClientExecutor.handleResponse(new TestHttpResponse("text"), configurationBuilder.build()));
+    }
+
+    private static class TestResponseImpl implements Http.Response {
+
+        private final Map<String, List<String>> headers;
+        private final Object body;
+        private final int statusCode;
+
+        private TestResponseImpl(Map<String, List<String>> headers, Object body, int statusCode) {
+            this.headers = headers;
+            this.body = body;
+            this.statusCode = statusCode;
+        }
+
+        @Override
+        public Map<String, List<String>> getHeaders() {
+            return headers;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T getBody() {
+            return (T) body;
+        }
+
+        @Override
+        public int getStatusCode() {
+            return statusCode;
+        }
     }
 
     private static class TestHttpResponse implements HttpResponse<Object> {

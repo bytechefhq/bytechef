@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Option;
@@ -56,7 +57,7 @@ public class AirtableUtils {
         return (inputParameters, connectionParameters, searchText, context) -> {
             Map<String, List<Map<?, ?>>> response = context
                 .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
                 .getBody();
 
@@ -77,9 +78,9 @@ public class AirtableUtils {
 
             Map<String, List<AirtableTable>> tablesMap = context.json(json -> json.read(
                 (String) context.http(http -> http.get(url)
-                    .configuration(Http.responseType(Http.ResponseType.TEXT))
+                    .configuration(Http.responseType(ResponseType.TEXT))
                     .execute()
-                    .body()),
+                    .getBody()),
                 new Context.TypeReference<>() {}));
 
             if (logger.isDebugEnabled()) {
@@ -149,7 +150,7 @@ public class AirtableUtils {
                 inputParameters.getRequiredString(BASE_ID));
 
             Map<String, List<Map<?, ?>>> response = context.http(http -> http.get(url)
-                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
                 .getBody());
 
@@ -190,30 +191,13 @@ public class AirtableUtils {
     }
 
     private record AirtableChoice(String id, String name, String color) {
-//        AirtableChoice(Map<String, ?> map) {
-//
-//        }
     }
 
     private record AirtableField(
         String id, String name, String description, String type, AirtableOptions options) {
-
-//        AirtableField(Map<String, Object> map) {
-//            this(
-//                MapValueUtils.getString(map, "id"), MapValueUtils.getString(map, "name"),
-//                MapValueUtils.getString(map, "description"), MapValueUtils.getString(map, "type"),
-//                new AirtableOptions(MapValueUtils.getMap(map, "options")));
-//        }
     }
 
     private record AirtableOptions(List<AirtableChoice> choices) {
-//        AirtableOptions(Map<String, ?> map) {
-//            this(
-//                MapValueUtils.getList(map, "choices", Map.class)
-//                    .stream()
-//                    .map(AirtableChoice::new)
-//                    .toList());
-//        }
     }
 
     private record AirtableTable(
@@ -222,10 +206,5 @@ public class AirtableUtils {
     }
 
     private record AirtableTableView(String id, String name, String type) {
-//        AirtableTableView(Map<String, Object> map) {
-//            this(
-//                MapValueUtils.getString(map, "id"), MapValueUtils.getString(map, "name"),
-//                MapValueUtils.getString(map, "type"));
-//        }
     }
 }

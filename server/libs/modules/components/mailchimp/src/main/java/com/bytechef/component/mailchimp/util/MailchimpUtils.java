@@ -41,11 +41,11 @@ public class MailchimpUtils {
     private static final Logger logger = LoggerFactory.getLogger(MailchimpUtils.class);
 
     public static String getMailChimpServer(String accessToken, Context context) {
-        Map<?, ?> response = (Map<?, ?>) context.http(http -> http.get("https://login.mailchimp.com/oauth2/metadata")
+        Map<?, ?> response = context.http(http -> http.get("https://login.mailchimp.com/oauth2/metadata")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
-            .body());
+            .getBody());
 
         return (String) response.get("dc");
     }
