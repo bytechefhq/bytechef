@@ -22,6 +22,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
 import org.apache.commons.lang3.Validate;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
@@ -34,7 +36,6 @@ import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
-import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
@@ -292,13 +293,12 @@ public class ProjectApiControllerIntTest {
 
     @Test
     public void testPostIntegrationWorkflows() {
-        CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel = new CreateProjectWorkflowRequestModel()
-            .label("workflowLabel")
-            .description("workflowDescription");
-        Workflow workflow = new Workflow(
-            "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", Format.JSON, 0);
+        String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
-        when(projectFacade.addProjectWorkflow(anyLong(), any(), any(), any()))
+        WorkflowRequestModel workflowRequestModel = new WorkflowRequestModel().definition(definition);
+        Workflow workflow = new Workflow("id", definition, Format.JSON, 0);
+
+        when(projectFacade.addProjectWorkflow(anyLong(), any()))
             .thenReturn(workflow);
 
         try {
@@ -307,7 +307,7 @@ public class ProjectApiControllerIntTest {
                 .uri("/projects/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createProjectWorkflowRequestModel)
+                .bodyValue(workflowRequestModel)
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -326,7 +326,7 @@ public class ProjectApiControllerIntTest {
         ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
         verify(projectFacade).addProjectWorkflow(
-            anyLong(), nameArgumentCaptor.capture(), descriptionArgumentCaptor.capture(), isNull());
+            anyLong(), isNull());
 
         Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());
         Assertions.assertEquals("workflowDescription", descriptionArgumentCaptor.getValue());

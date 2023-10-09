@@ -84,10 +84,11 @@ public class IntegrationFacadeIntTest {
         integration = integrationRepository.save(integration);
 
         Workflow workflow = integrationFacade.addWorkflow(
-            Validate.notNull(integration.getId(), "id"), null);
+            Validate.notNull(integration.getId(), "id"),
+            "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
         assertThat(workflow.getDescription()).isEqualTo("Description");
-        assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
+        assertThat(workflow.getLabel()).isEqualTo("New Workflow");
     }
 
     @Test

@@ -33,6 +33,7 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,12 +69,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public Workflow addProjectWorkflow(long id, String label, String description, String definition) {
-        if (definition == null) {
-            definition = "{\"description\": \"%s\", \"label\": \"%s\", \"tasks\": []}"
-                .formatted(description, label);
-        }
-
+    public Workflow addProjectWorkflow(long id, @NonNull String definition) {
         Workflow workflow = workflowService.create(
             definition, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
 
@@ -83,7 +79,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO createProject(ProjectDTO projectDTO) {
+    public ProjectDTO createProject(@NonNull ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
         Category category = projectDTO.category();
@@ -96,7 +92,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
-                null, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
+                "{\"label\": \"New Workflow\", \"tasks\": []}", Format.JSON, SourceType.JDBC,
+                ProjectConstants.PROJECT_TYPE);
 
             project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
         }
@@ -126,7 +123,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(long id, String workflowId) {
+    public void deleteWorkflow(long id, @NonNull String workflowId) {
         projectService.removeWorkflow(id, workflowId);
 
         workflowService.delete(workflowId);
@@ -150,7 +147,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public Workflow duplicateWorkflow(long id, String workflowId) {
+    public Workflow duplicateWorkflow(long id, @NonNull String workflowId) {
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
 
         projectService.addWorkflow(id, workflow.getId());
@@ -234,7 +231,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO updateProject(ProjectDTO projectDTO) {
+    public ProjectDTO updateProject(@NonNull ProjectDTO projectDTO) {
         Category category = projectDTO.category() == null ? null : categoryService.save(projectDTO.category());
         List<Tag> tags = checkTags(projectDTO.tags());
 
@@ -246,7 +243,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void updateProjectTags(long id, List<Tag> tags) {
+    public void updateProjectTags(long id, @NonNull List<Tag> tags) {
         tags = checkTags(tags);
 
         Project project = projectService.update(id, CollectionUtils.map(tags, Tag::getId));

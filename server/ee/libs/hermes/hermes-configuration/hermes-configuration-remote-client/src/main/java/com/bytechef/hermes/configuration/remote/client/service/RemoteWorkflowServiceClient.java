@@ -44,7 +44,9 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public Workflow create(String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType, int type) {
+    public Workflow create(
+        @NonNull String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType,
+        int type) {
         throw new UnsupportedOperationException();
     }
 

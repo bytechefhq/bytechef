@@ -19,10 +19,11 @@ package com.bytechef.dione.configuration.web.rest;
 
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
-import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.dione.configuration.web.rest.model.WorkflowRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,27 +75,25 @@ public class IntegrationApiController implements IntegrationApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.create(
-                    conversionService.convert(integrationModel, IntegrationDTO.class)),
+                    Validate.notNull(
+                        conversionService.convert(integrationModel, IntegrationDTO.class), "integrationDTO")),
                 IntegrationModel.class));
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> createIntegrationWorkflow(
-        Long id, CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel) {
-
+    public ResponseEntity<WorkflowModel> createIntegrationWorkflow(Long id, WorkflowRequestModel workflowRequestModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                integrationFacade.addWorkflow(
-                    id,
-                    createIntegrationWorkflowRequestModel.getDefinition()),
-                WorkflowModel.class));
+                integrationFacade.addWorkflow(id, workflowRequestModel.getDefinition()), WorkflowModel.class));
     }
 
     @Override
     public ResponseEntity<IntegrationModel> updateIntegration(Long id, IntegrationModel integrationModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
+                integrationFacade.update(
+                    Validate.notNull(
+                        conversionService.convert(integrationModel.id(id), IntegrationDTO.class), "integrationDTO")),
                 IntegrationModel.class));
     }
 }
