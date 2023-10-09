@@ -15,17 +15,17 @@
 
 import * as runtime from '../runtime';
 import type {
-  CreateIntegrationWorkflowRequestModel,
   IntegrationModel,
   WorkflowModel,
+  WorkflowRequestModel,
 } from '../models/index';
 import {
-    CreateIntegrationWorkflowRequestModelFromJSON,
-    CreateIntegrationWorkflowRequestModelToJSON,
     IntegrationModelFromJSON,
     IntegrationModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
+    WorkflowRequestModelFromJSON,
+    WorkflowRequestModelToJSON,
 } from '../models/index';
 
 export interface CreateIntegrationRequest {
@@ -34,7 +34,7 @@ export interface CreateIntegrationRequest {
 
 export interface CreateIntegrationWorkflowRequest {
     id: number;
-    createIntegrationWorkflowRequestModel: CreateIntegrationWorkflowRequestModel;
+    workflowRequestModel: WorkflowRequestModel;
 }
 
 export interface DeleteIntegrationRequest {
@@ -104,8 +104,8 @@ export class IntegrationApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createIntegrationWorkflow.');
         }
 
-        if (requestParameters.createIntegrationWorkflowRequestModel === null || requestParameters.createIntegrationWorkflowRequestModel === undefined) {
-            throw new runtime.RequiredError('createIntegrationWorkflowRequestModel','Required parameter requestParameters.createIntegrationWorkflowRequestModel was null or undefined when calling createIntegrationWorkflow.');
+        if (requestParameters.workflowRequestModel === null || requestParameters.workflowRequestModel === undefined) {
+            throw new runtime.RequiredError('workflowRequestModel','Required parameter requestParameters.workflowRequestModel was null or undefined when calling createIntegrationWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -119,7 +119,7 @@ export class IntegrationApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateIntegrationWorkflowRequestModelToJSON(requestParameters.createIntegrationWorkflowRequestModel),
+            body: WorkflowRequestModelToJSON(requestParameters.workflowRequestModel),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));

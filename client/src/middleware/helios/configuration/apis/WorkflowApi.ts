@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   WorkflowModel,
+  WorkflowRequestModel,
 } from '../models/index';
 import {
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
+    WorkflowRequestModelFromJSON,
+    WorkflowRequestModelToJSON,
 } from '../models/index';
 
 export interface DeleteProjectWorkflowRequest {
@@ -42,7 +45,7 @@ export interface GetWorkflowRequest {
 
 export interface UpdateWorkflowRequest {
     id: string;
-    workflowModel: WorkflowModel;
+    workflowRequestModel: WorkflowRequestModel;
 }
 
 /**
@@ -222,8 +225,8 @@ export class WorkflowApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateWorkflow.');
         }
 
-        if (requestParameters.workflowModel === null || requestParameters.workflowModel === undefined) {
-            throw new runtime.RequiredError('workflowModel','Required parameter requestParameters.workflowModel was null or undefined when calling updateWorkflow.');
+        if (requestParameters.workflowRequestModel === null || requestParameters.workflowRequestModel === undefined) {
+            throw new runtime.RequiredError('workflowRequestModel','Required parameter requestParameters.workflowRequestModel was null or undefined when calling updateWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -237,7 +240,7 @@ export class WorkflowApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: WorkflowModelToJSON(requestParameters.workflowModel),
+            body: WorkflowRequestModelToJSON(requestParameters.workflowRequestModel),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
