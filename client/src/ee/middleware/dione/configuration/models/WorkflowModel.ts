@@ -67,7 +67,7 @@ export interface WorkflowModel {
      * @type {string}
      * @memberof WorkflowModel
      */
-    description?: string;
+    readonly description?: string;
     /**
      * 
      * @type {WorkflowFormatModel}
@@ -196,7 +196,6 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
     return {
         
         'definition': value.definition,
-        'description': value.description,
         'format': WorkflowFormatModelToJSON(value.format),
         'sourceType': value.sourceType,
         '__version': value.version,
