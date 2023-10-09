@@ -11,8 +11,6 @@ import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
@@ -23,32 +21,6 @@ export enum Type {
     Project,
     Tag,
 }
-
-export interface ProjectInstancesEnabledState {
-    projectInstanceMap: Map<number, boolean>;
-    setEnabled: (projectInstanceId: number, enabled: boolean) => void;
-}
-
-export const useProjectInstancesEnabledStore =
-    create<ProjectInstancesEnabledState>()(
-        devtools(
-            (set) => ({
-                projectInstanceMap: new Map<number, boolean>(),
-                setEnabled: (projectInstanceId, enabled) =>
-                    set((state) => ({
-                        projectInstanceMap: new Map<number, boolean>(
-                            state.projectInstanceMap.set(
-                                projectInstanceId,
-                                enabled
-                            )
-                        ),
-                    })),
-            }),
-            {
-                name: 'project-instances-enabled',
-            }
-        )
-    );
 
 const ProjectInstances = () => {
     const [searchParams] = useSearchParams();
@@ -87,22 +59,22 @@ const ProjectInstances = () => {
 
     if (projectInstances) {
         for (const projectInstance of projectInstances) {
-            let curProjectInstances: ProjectInstanceModel[];
+            let currentProjectInstances: ProjectInstanceModel[];
 
             if (projectInstance.project) {
                 if (projectInstanceMap.has(projectInstance.project.id!)) {
-                    curProjectInstances = projectInstanceMap.get(
+                    currentProjectInstances = projectInstanceMap.get(
                         projectInstance.project.id!
                     )!;
                 } else {
-                    curProjectInstances = [];
+                    currentProjectInstances = [];
                 }
 
-                curProjectInstances.push(projectInstance);
+                currentProjectInstances.push(projectInstance);
 
                 projectInstanceMap.set(
                     projectInstance.project.id!,
-                    curProjectInstances
+                    currentProjectInstances
                 );
             }
         }
@@ -246,8 +218,8 @@ const ProjectInstances = () => {
                                     key={projectId}
                                     project={
                                         projects.find(
-                                            (curProject) =>
-                                                curProject.id === projectId
+                                            (currentProject) =>
+                                                currentProject.id === projectId
                                         )!
                                     }
                                     projectInstances={

@@ -1,4 +1,4 @@
-import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/ProjectInstances';
+import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projects.queries';
 import {
     Accordion,
@@ -22,7 +22,7 @@ const ProjectInstanceList = ({
 }) => {
     const {data: tags} = useGetProjectInstanceTagsQuery();
     const projectInstanceMap = useProjectInstancesEnabledStore(
-        (state) => state.projectInstanceMap
+        ({projectInstanceMap}) => projectInstanceMap
     );
 
     return (

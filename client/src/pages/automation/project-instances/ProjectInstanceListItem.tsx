@@ -10,7 +10,7 @@ import {
     useEnableProjectInstanceMutation,
     useUpdateProjectInstanceTagsMutation,
 } from '@/mutations/projects.mutations';
-import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/ProjectInstances';
+import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
 import {AccordionTrigger} from '@radix-ui/react-accordion';
@@ -39,8 +39,8 @@ const ProjectInstanceListItem = ({
 }: ProjectItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const setEnabled = useProjectInstancesEnabledStore(
-        (state) => state.setEnabled
+    const setProjectInstanceEnabled = useProjectInstancesEnabledStore(
+        ({setProjectInstanceEnabled}) => setProjectInstanceEnabled
     );
 
     const queryClient = useQueryClient();
@@ -188,7 +188,7 @@ const ProjectInstanceListItem = ({
                                 },
                                 {
                                     onSuccess: () => {
-                                        setEnabled(
+                                        setProjectInstanceEnabled(
                                             projectInstance.id!,
                                             !projectInstance.enabled
                                         );
