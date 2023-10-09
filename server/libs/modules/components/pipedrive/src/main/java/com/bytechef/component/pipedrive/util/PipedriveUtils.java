@@ -41,7 +41,7 @@ public class PipedriveUtils {
     public static String subscribeWebhook(
         String eventObject, String eventAction, String webhookUrl, TriggerContext context) {
 
-        Map<?, ?> result = (Map<?, ?>) context
+        Map<?, ?> result = context
             .http(http -> http.post("/api/v1/webhooks"))
             .body(
                 Http.Body.of(
@@ -51,7 +51,7 @@ public class PipedriveUtils {
                         "subscription_url", webhookUrl)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .body();
+            .getBody();
 
         return (String) result.get("id");
     }

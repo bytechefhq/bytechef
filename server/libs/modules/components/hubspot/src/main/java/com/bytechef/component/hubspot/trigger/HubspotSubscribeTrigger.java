@@ -19,6 +19,7 @@ package com.bytechef.component.hubspot.trigger;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -166,26 +167,24 @@ public class HubspotSubscribeTrigger {
 
         context
             .http(http -> http.put("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
-            .body(Http.Body.of(
+            .body(Body.of(
                 Map.of(
                     "throttling", Map.of(
                         "period", "SECONDLY",
                         "maxConcurrentRequests", 10),
                     "targetUrl", webhookUrl)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .body();
+            .execute();
 
         context
             .http(http -> http.put("/webhooks/v3/%s/subscriptions".formatted(inputParameters.getString(APP_ID))))
-            .body(Http.Body.of(
+            .body(Body.of(
                 Map.of(
                     "eventType", inputParameters.getString(EVENT_TYPE),
                     "propertyName", inputParameters.getString(PROPERTY_NAME, ""),
                     "active", true)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .body();
+            .execute();
 
         return null;
     }

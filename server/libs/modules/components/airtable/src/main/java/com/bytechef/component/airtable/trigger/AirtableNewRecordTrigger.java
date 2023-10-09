@@ -69,8 +69,7 @@ public class AirtableNewRecordTrigger {
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();
 
-        @SuppressWarnings("unchecked")
-        List<Map<?, ?>> records = (List<Map<?, ?>>) context.http(http -> http.get(
+        List<Map<?, ?>> records = context.http(http -> http.get(
             "/{%s}/{%s}".formatted(
                 inputParameters.getRequiredString(TABLE_ID),
                 inputParameters.getRequiredString(BASE_ID))))
@@ -84,7 +83,7 @@ public class AirtableNewRecordTrigger {
                                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .body();
+            .getBody();
 
         return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }

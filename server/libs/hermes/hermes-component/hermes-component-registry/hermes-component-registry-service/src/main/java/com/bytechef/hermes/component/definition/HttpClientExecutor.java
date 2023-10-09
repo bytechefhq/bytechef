@@ -31,6 +31,7 @@ import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -217,7 +218,7 @@ public class HttpClientExecutor {
         Map<String, List<String>> headers = httpHeaders.map();
 
         if (configuration.getResponseType() == null) {
-            response = new Response(headers, null, httpResponse.statusCode());
+            response = new ResponseImpl(headers, null, httpResponse.statusCode());
         } else {
             Object httpResponseBody = httpResponse.body();
             ResponseType responseType = configuration.getResponseType();
@@ -236,7 +237,7 @@ public class HttpClientExecutor {
                     : com.bytechef.commons.util.XmlUtils.read(httpResponseBody.toString(), xmlMapper);
             }
 
-            response = new Response(headers, body, httpResponse.statusCode());
+            response = new ResponseImpl(headers, body, httpResponse.statusCode());
         }
 
         return response;
@@ -384,6 +385,34 @@ public class HttpClientExecutor {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofString(com.bytechef.commons.util.XmlUtils.write(body.getContent(), xmlMapper)),
             MediaType.APPLICATION_XML);
+    }
+
+    private class ResponseImpl implements Response {
+
+        private final Map<String, List<String>> headers;
+        private final Object body;
+        private final int statusCode;
+
+        private ResponseImpl(Map<String, List<String>> headers, Object body, int statusCode) {
+            this.headers = headers;
+            this.body = body;
+            this.statusCode = statusCode;
+        }
+
+        @Override
+        public Map<String, List<String>> getHeaders() {
+            return headers;
+        }
+
+        @Override
+        public <T> T getBody() {
+            return objectMapper.convertValue(body, new TypeReference<T>() {});
+        }
+
+        @Override
+        public int getStatusCode() {
+            return statusCode;
+        }
     }
 
     private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {

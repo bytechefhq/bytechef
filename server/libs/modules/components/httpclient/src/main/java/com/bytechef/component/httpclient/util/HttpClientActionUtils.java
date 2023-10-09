@@ -150,7 +150,7 @@ public class HttpClientActionUtils {
         if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
             return response;
         } else {
-            return response.body();
+            return response.getBody();
         }
     }
 
