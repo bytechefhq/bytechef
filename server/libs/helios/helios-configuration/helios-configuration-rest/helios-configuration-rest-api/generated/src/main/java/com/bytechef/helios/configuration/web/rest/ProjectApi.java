@@ -5,9 +5,9 @@
  */
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-08T22:26:46.976326+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-09T13:39:54.113168+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project", description = "The Project API")
 public interface ProjectApi {
@@ -89,7 +89,7 @@ public interface ProjectApi {
      * Create new workflow and adds it to an existing project.
      *
      * @param id The id of a project. (required)
-     * @param createProjectWorkflowRequestModel  (required)
+     * @param workflowRequestModel  (required)
      * @return The updated project object. (status code 200)
      */
     @Operation(
@@ -111,7 +111,7 @@ public interface ProjectApi {
     )
     default ResponseEntity<WorkflowModel> createProjectWorkflow(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "CreateProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel
+        @Parameter(name = "WorkflowRequestModel", description = "", required = true) @Valid @RequestBody WorkflowRequestModel workflowRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
