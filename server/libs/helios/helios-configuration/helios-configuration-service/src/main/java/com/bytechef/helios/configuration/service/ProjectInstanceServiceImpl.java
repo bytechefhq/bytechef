@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -57,11 +56,6 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     public void delete(long id) {
         projectInstanceRepository.delete(getProjectInstance(id));
-    }
-
-    @Override
-    public Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId) {
-        return projectInstanceRepository.findByWorkflowId(workflowId);
     }
 
     @Override

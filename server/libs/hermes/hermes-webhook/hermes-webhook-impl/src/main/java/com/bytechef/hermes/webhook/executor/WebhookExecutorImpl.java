@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
@@ -67,20 +68,25 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
         TriggerOutput triggerOutput = triggerSyncExecutor.execute(workflowExecutionId, webhookRequest);
 
-        Map<String, ?> inputs = getInputMap(workflowExecutionId);
+        Map<String, ?> inputMap = getInputMap(workflowExecutionId);
+        Map<String, ?> metadata = Map.of(
+            MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
+            MetadataConstants.INSTANCE_TYPE, workflowExecutionId.getInstanceType());
 
         if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> collectionOutput) {
             List<Map<String, ?>> outputsList = new ArrayList<>();
 
             for (Object outputItem : collectionOutput) {
-                Job job = jobSyncExecutor.execute(createJobParameters(workflowExecutionId, inputs, outputItem));
+                Job job = jobSyncExecutor.execute(
+                    createJobParameters(workflowExecutionId, inputMap, outputItem, metadata));
 
                 outputsList.add(workflowFileStorageFacade.readJobOutputs(job.getOutputs()));
             }
 
             return outputsList;
         } else {
-            Job job = jobSyncExecutor.execute(createJobParameters(workflowExecutionId, inputs, triggerOutput.value()));
+            Job job = jobSyncExecutor.execute(createJobParameters(
+                workflowExecutionId, inputMap, triggerOutput.value(), metadata));
 
             outputs = job.getOutputs() == null ? null : workflowFileStorageFacade.readJobOutputs(job.getOutputs());
         }
@@ -107,12 +113,12 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     @SuppressWarnings("unchecked")
     private static JobParameters createJobParameters(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> inputs, Object outputItem) {
+        WorkflowExecutionId workflowExecutionId, Map<String, ?> inputMap, Object outputItem, Map<String, ?> metadata) {
 
         return new JobParameters(
             workflowExecutionId.getWorkflowId(),
-            MapUtils.concat(
-                (Map<String, Object>) inputs, Map.of(workflowExecutionId.getTriggerName(), outputItem)));
+            MapUtils.concat((Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), outputItem)),
+            metadata);
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {

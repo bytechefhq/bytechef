@@ -33,7 +33,8 @@ import org.springframework.data.domain.Pageable;
  * @author Ivica Cardic
  */
 public interface JobRepository {
-    int DEFAULT_PAGE_SIZE = 20;
+
+    long count(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
 
     int countCompletedJobsToday();
 
@@ -47,8 +48,11 @@ public interface JobRepository {
 
     Page<Job> findAll(Pageable pageable);
 
+    List<Job> findAll(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
+
     Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
         Pageable pageable);
 
     Optional<Job> findById(Long id);

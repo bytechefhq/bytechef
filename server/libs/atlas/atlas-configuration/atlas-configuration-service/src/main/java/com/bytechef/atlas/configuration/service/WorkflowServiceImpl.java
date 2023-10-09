@@ -76,14 +76,15 @@ public class WorkflowServiceImpl implements WorkflowService {
             definition = "{\"label\": \"New Workflow\", \"tasks\": []}";
         }
 
-        Workflow workflow = new Workflow(definition, format);
+        final Workflow workflow = new Workflow(definition, format, type);
 
         workflow.setNew(true);
 
         Workflow savedWorkflow = CollectionUtils.getFirst(
             workflowCrudRepositories,
             workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
-            workflowCrudRepository -> save(workflow, workflowCrudRepository));
+            workflowCrudRepository -> workflowCrudRepository.save(workflow));
+
 
         return getWorkflow(Validate.notNull(savedWorkflow.getId(), "id"));
     }
@@ -99,7 +100,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow duplicateWorkflow(String id) {
+    public Workflow duplicateWorkflow(@NonNull String id) {
         Workflow workflow = getWorkflow(id);
 
         return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), workflow.getType());
@@ -170,7 +171,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Workflow> getWorkflows(List<String> workflowIds) {
+    public List<Workflow> getWorkflows(@NonNull List<String> workflowIds) {
         List<Workflow> workflows = new ArrayList<>();
 
         for (String workflowId : workflowIds) {
@@ -181,7 +182,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void refreshCache(String id) {
+    public void refreshCache(@NonNull String id) {
         Validate.notNull(id, "'id' must not be null");
 
         Workflow workflow = null;
@@ -281,28 +282,22 @@ public class WorkflowServiceImpl implements WorkflowService {
         Validate.notNull(id, "'id' must not be null");
         Validate.notNull(definition, "'definition' must not be null");
 
-        Workflow workflow = getWorkflow(id);
-
-        workflow.setDefinition(definition);
+        Workflow curWorkflow = getWorkflow(id);
 
         return CollectionUtils.getFirst(
             workflowCrudRepositories,
-            workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(workflow.getId())),
-            workflowCrudRepository -> save(workflow, workflowCrudRepository));
+            workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(curWorkflow.getId())),
+            workflowCrudRepository -> {
+                Workflow workflow  = new Workflow(
+                    curWorkflow.getId(), curWorkflow.getDefinition(), curWorkflow.getFormat(), curWorkflow.getType());
+
+                workflow.setVersion(curWorkflow.getVersion());
+
+                return workflowCrudRepository.save(workflow);
+            });
     }
 
-    private Workflow save(Workflow workflow, WorkflowCrudRepository workflowCrudRepository) {
-        if (workflow.isNew()) {
-            workflow = workflowCrudRepository.save(workflow);
-        } else {
-            Workflow curWorkflow = OptionalUtils.get(workflowCrudRepository.findById(workflow.getId()));
-
-            curWorkflow.setDefinition(workflow.getDefinition());
-            curWorkflow.setVersion(workflow.getVersion());
-
-            workflow = workflowCrudRepository.save(curWorkflow);
-        }
-
+    private Workflow updateCache(Workflow workflow, WorkflowCrudRepository workflowCrudRepository) {
         // Load definition into Workflow instance
 
         workflow = OptionalUtils.get(workflowCrudRepository.findById(workflow.getId()));

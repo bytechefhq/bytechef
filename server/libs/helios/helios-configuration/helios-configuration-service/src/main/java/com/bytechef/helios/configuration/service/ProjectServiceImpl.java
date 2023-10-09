@@ -83,6 +83,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project getProjectInstanceProject(long projectInstanceId) {
+        return projectRepository.findByProjectInstanceId(projectInstanceId);
+    }
+
+    @Override
     public Project getWorkflowProject(String workflowId) {
         return OptionalUtils.get(projectRepository.findByWorkflowId(workflowId));
     }
@@ -101,13 +106,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public List<Project> getProjects() {
-        return com.bytechef.commons.util.CollectionUtils.toList(projectRepository.findAll(Sort.by("name")));
+        return CollectionUtils.toList(projectRepository.findAll(Sort.by("name")));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Project> getProjects(List<Long> ids) {
-        return com.bytechef.commons.util.CollectionUtils.toList(projectRepository.findAllById(ids));
+        return CollectionUtils.toList(projectRepository.findAllById(ids));
     }
 
     @Override
@@ -128,8 +133,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         List<Project> projects = CollectionUtils.toList(projectIterable);
 
-        if (published != null && published) {
-            projects = CollectionUtils.filter(projects , project -> project.getPublishedDate() != null);
+        if (published != null) {
+            if (published) {
+                projects = CollectionUtils.filter(projects, project -> project.getPublishedDate() != null);
+            } else {
+                projects = CollectionUtils.filter(projects, project -> project.getPublishedDate() == null);
+            }
         }
 
         if (ids != null) {

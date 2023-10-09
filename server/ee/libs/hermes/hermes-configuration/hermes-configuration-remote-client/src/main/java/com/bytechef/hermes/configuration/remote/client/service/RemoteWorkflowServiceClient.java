@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,17 +44,17 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType, int type) {
+    public Workflow create(String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType, int type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(@NonNull String id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Workflow duplicateWorkflow(String id) {
+    public Workflow duplicateWorkflow(@NonNull String id) {
         throw new UnsupportedOperationException();
     }
 
@@ -63,7 +64,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public Workflow getWorkflow(String id) {
+    public Workflow getWorkflow(@NonNull String id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
@@ -83,7 +84,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public List<Workflow> getWorkflows(List<String> workflowIds) {
+    public List<Workflow> getWorkflows(@NonNull List<String> workflowIds) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
@@ -93,12 +94,12 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public void refreshCache(String id) {
+    public void refreshCache(@NonNull String id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Workflow update(String id, String definition) {
+    public Workflow update(@NonNull String id, @NonNull String definition) {
         throw new UnsupportedOperationException();
     }
 }

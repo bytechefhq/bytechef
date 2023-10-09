@@ -52,6 +52,13 @@ public interface ProjectRepository
         """)
     List<Project> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
+    @Query("""
+            SELECT project.* FROM project
+            JOIN project_instance ON project.id = project_instance.project_id
+            WHERE project_instance.id = :projectInstanceId
+        """)
+    Project findByProjectInstanceId(@Param("projectInstanceId") long projectInstanceId);
+
     Optional<Project> findByNameIgnoreCase(String name);
 
     @Query("""

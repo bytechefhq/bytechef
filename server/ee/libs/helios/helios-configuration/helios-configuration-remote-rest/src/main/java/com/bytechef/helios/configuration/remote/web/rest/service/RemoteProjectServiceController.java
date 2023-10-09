@@ -56,12 +56,12 @@ public class RemoteProjectServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-projects",
+        value = "/get-project-instance-project/{projectInstanceId}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<Project>> getProject() {
-        return ResponseEntity.ok(projectService.getProjects());
+    public ResponseEntity<Project> getProjectInstanceProject(@PathVariable long projectInstanceId) {
+        return ResponseEntity.ok(projectService.getProjectInstanceProject(projectInstanceId));
     }
 
     @RequestMapping(
@@ -70,7 +70,17 @@ public class RemoteProjectServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Project> getProject(@PathVariable String workflowId) {
+    public ResponseEntity<Project> getWorkflowProject(@PathVariable String workflowId) {
         return ResponseEntity.ok(projectService.getWorkflowProject(workflowId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-projects",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Project>> getProjects() {
+        return ResponseEntity.ok(projectService.getProjects());
     }
 }

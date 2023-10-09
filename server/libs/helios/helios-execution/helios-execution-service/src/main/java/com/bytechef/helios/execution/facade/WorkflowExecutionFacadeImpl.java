@@ -27,7 +27,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
@@ -35,20 +34,25 @@ import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -90,10 +94,11 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
         JobDTO jobDTO = new JobDTO(
             job, workflowFileStorageFacade.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
+        Long projectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
 
         return new WorkflowExecutionDTO(
             Validate.notNull(jobDTO.id(), "id"),
-            OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(jobDTO.workflowId()), null),
+            projectInstanceId == null ? null : projectInstanceService.getProjectInstance(projectInstanceId),
             jobDTO, projectService.getWorkflowProject(jobDTO.workflowId()),
             workflowService.getWorkflow(jobDTO.workflowId()));
     }
@@ -105,34 +110,62 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         String workflowId, Integer pageNumber) {
 
         List<Project> projects;
+        Set<String> workflowIds = new HashSet<>();
 
         if (projectId == null) {
             projects = projectService.getProjects();
         } else {
-            projects = List.of(projectService.getProject(projectId));
+            Project project = projectService.getProject(projectId);
+
+            workflowIds.addAll(project.getWorkflowIds());
+
+            projects = List.of(project);
         }
 
-        List<String> projectWorkflowIds = Collections.emptyList();
+        Page<Job> jobsPage;
 
-        if (projectId != null) {
-            Project project = projects.get(0);
+        if (projectInstanceId == null) {
+            jobsPage = jobService.getJobsPage(
+                jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds), pageNumber);
+        } else {
+            Project project = projectService.getProjectInstanceProject(projectInstanceId);
 
-            projectWorkflowIds = project.getWorkflowIds();
+            workflowIds.addAll(project.getWorkflowIds());
+
+            List<Job> jobs = jobService.getJobs(jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds));
+
+            jobs = CollectionUtils.filter(jobs, job -> {
+                Long curProjectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
+
+                return curProjectInstanceId == null || Objects.equals(curProjectInstanceId, projectInstanceId);
+            });
+
+            if (jobs.size() > JobService.DEFAULT_PAGE_SIZE * (pageNumber + 1)) {
+                jobs = jobs.subList(
+                    JobService.DEFAULT_PAGE_SIZE * pageNumber, JobService.DEFAULT_PAGE_SIZE * (pageNumber + 1));
+            }
+
+            long total = jobService.countJobs(jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds));
+
+            PageRequest pageRequest = PageRequest.of(pageNumber, JobService.DEFAULT_PAGE_SIZE);
+
+            jobsPage = new PageImpl<>(jobs, pageRequest, total);
         }
-
-        Page<Job> jobsPage = jobService.getJobs(
-            jobStatus, jobStartDate, jobEndDate, workflowId, projectWorkflowIds, pageNumber);
 
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-        return jobsPage.map(job -> new WorkflowExecutionDTO(
-            Validate.notNull(job.getId(), "id"),
-            OptionalUtils.orElse(projectInstanceService.fetchWorkflowProjectInstance(job.getWorkflowId()), null),
-            new JobDTO(job, Map.of(), List.of()),
-            CollectionUtils.getFirst(
-                projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
-            CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))));
+        return jobsPage.map(job -> {
+            Long jobProjectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
+
+            return new WorkflowExecutionDTO(
+                Validate.notNull(job.getId(), "id"),
+                jobProjectInstanceId == null ? null : projectInstanceService.getProjectInstance(jobProjectInstanceId),
+                new JobDTO(job, Map.of(), List.of()),
+                CollectionUtils.getFirst(
+                    projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
+                CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())));
+        });
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {

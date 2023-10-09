@@ -25,7 +25,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -54,11 +53,4 @@ public interface ProjectInstanceRepository
             WHERE project_instance_tag.tag_id = :tagId
         """)
     List<ProjectInstance> findAllByTagIdOrderByName(@Param("tagId") long tagId);
-
-    @Query("""
-            SELECT DISTINCT project_instance.* FROM project_instance
-            JOIN project_instance_workflow ON project_instance.id = project_instance_workflow.project_instance_id
-            WHERE project_instance_workflow.workflow_id = :workflowId
-        """)
-    Optional<ProjectInstance> findByWorkflowId(@Param("workflowId") String workflowId);
 }

@@ -20,6 +20,7 @@ package com.bytechef.hermes.coordinator.trigger.completion;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
@@ -73,22 +74,26 @@ public class TriggerCompletionHandler {
             instanceWorkflowAccessorRegistry.getInstanceWorkflowAccessor(
                 workflowExecutionId.getInstanceType());
 
-        Map<String, Object> inputs = (Map<String, Object>) instanceWorkflowAccessor.getInputMap(
+        Map<String, Object> inputMap = (Map<String, Object>) instanceWorkflowAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+        Map<String, ?> metadata = Map.of(
+            MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
+            MetadataConstants.INSTANCE_TYPE, workflowExecutionId.getInstanceType());
 
         if (!triggerExecution.isBatch() && triggerExecution.getOutput() instanceof Collection<?> collectionOutput) {
             for (Object outputItem : collectionOutput) {
                 createJob(
-                    workflowExecutionId, MapUtils.concat(inputs, Map.of(triggerExecution.getName(), outputItem)));
+                    workflowExecutionId, MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), outputItem)),
+                    metadata);
             }
         } else {
             createJob(
                 workflowExecutionId,
-                MapUtils.concat(inputs, Map.of(triggerExecution.getName(), triggerExecution.getOutput())));
+                MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerExecution.getOutput())), metadata);
         }
     }
 
-    private void createJob(WorkflowExecutionId workflowExecutionId, Map<String, ?> inputs) {
-        jobFacade.createJob(new JobParameters(workflowExecutionId.getWorkflowId(), inputs));
+    private void createJob(WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, Map<String, ?> metadata) {
+        jobFacade.createJob(new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap, metadata));
     }
 }

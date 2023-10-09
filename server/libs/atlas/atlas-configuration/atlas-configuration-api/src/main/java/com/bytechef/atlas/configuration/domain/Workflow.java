@@ -112,7 +112,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     private String description;
 
     @Transient
-    private Map<String, Object> extensions = new HashMap<>();
+    private final Map<String, Object> extensions = new HashMap<>();
 
     @Column
     private int format;
@@ -161,9 +161,10 @@ public final class Workflow implements Persistable<String>, Serializable {
     public Workflow() {
     }
 
-    public Workflow(String definition, Format format) {
+    public Workflow(String definition, Format format, int type) {
         this.definition = definition;
         this.format = format.getId();
+        this.type = type;
     }
 
     public Workflow(String id, String definition, Format format, int type) {
@@ -172,13 +173,13 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String id, String definition, Format format, LocalDateTime lastModifiedDate, Map<String, ?> source,
+        String id, String definition, Format format, LocalDateTime lastModifiedDate, Map<String, ?> sourceMap,
         Map<String, Object> metadata, int type) {
 
         Validate.notNull(definition, "'definition' must not be null");
         Validate.notNull(format, "'format' must not be null");
         Validate.notNull(id, "'id' must not be null");
-        Validate.notNull(source, "'source' must not be null");
+        Validate.notNull(sourceMap, "'sourceMap' must not be null");
         Validate.notNull(metadata, "'metadata' must not be null");
 
         this.definition = definition;
@@ -188,30 +189,30 @@ public final class Workflow implements Persistable<String>, Serializable {
         this.metadata = new HashMap<>(metadata);
         this.type = type;
 
-        for (Map.Entry<String, ?> entry : source.entrySet()) {
+        for (Map.Entry<String, ?> entry : sourceMap.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
-                this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
+                this.description = MapUtils.getString(sourceMap, WorkflowConstants.DESCRIPTION);
             } else if (WorkflowConstants.INPUTS.equals(entry.getKey())) {
                 this.inputs = CollectionUtils.map(
-                    MapUtils.getList(source, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
+                    MapUtils.getList(sourceMap, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
                     map -> new Input(
                         MapUtils.getRequiredString(map, WorkflowConstants.NAME),
                         MapUtils.getString(map, WorkflowConstants.LABEL),
                         MapUtils.getString(map, WorkflowConstants.TYPE, "string"),
                         MapUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
-                this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
+                this.label = MapUtils.getString(sourceMap, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.OUTPUTS.equals(entry.getKey())) {
                 this.outputs = CollectionUtils.map(
-                    MapUtils.getList(source, WorkflowConstants.OUTPUTS, Map.class, List.of()),
+                    MapUtils.getList(sourceMap, WorkflowConstants.OUTPUTS, Map.class, List.of()),
                     map -> new Output(
                         MapUtils.getRequiredString(map, WorkflowConstants.NAME),
                         MapUtils.getRequiredString(map, WorkflowConstants.VALUE)));
             } else if (WorkflowConstants.MAX_RETRIES.equals(entry.getKey())) {
-                this.maxRetries = MapUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
+                this.maxRetries = MapUtils.getInteger(sourceMap, WorkflowConstants.MAX_RETRIES, 0);
             } else if (WorkflowConstants.TASKS.equals(entry.getKey())) {
                 this.tasks = CollectionUtils.map(
-                    MapUtils.getList(source, WorkflowConstants.TASKS, Map.class, List.of()),
+                    MapUtils.getList(sourceMap, WorkflowConstants.TASKS, Map.class, List.of()),
                     WorkflowTask::of);
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
@@ -226,8 +227,9 @@ public final class Workflow implements Persistable<String>, Serializable {
     @PersistenceCreator
     public Workflow(String id, String definition, int format, LocalDateTime lastModifiedDate, int type)
         throws Exception {
+
         this(
-            id, definition, Format.valueOf(format), lastModifiedDate, readWorkflowMap(definition, id, format, type),
+            id, definition, Format.valueOf(format), lastModifiedDate, readWorkflowMap(definition, id, format),
             Map.of(), type);
     }
 
@@ -350,14 +352,6 @@ public final class Workflow implements Persistable<String>, Serializable {
         return isNew;
     }
 
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    public void setFormat(Format format) {
-        this.format = format.getId();
-    }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -368,10 +362,6 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     public void setSourceType(SourceType sourceType) {
         this.sourceType = sourceType;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public void setVersion(int version) {
@@ -404,11 +394,11 @@ public final class Workflow implements Persistable<String>, Serializable {
     public record Output(String name, Object value) implements Serializable {
     }
 
-    private static Map<String, ?> readWorkflowMap(String definition, String id, int format, int type) throws Exception {
+    private static Map<String, ?> readWorkflowMap(String definition, String id, int format) throws Exception {
         return WorkflowReader.readWorkflowMap(
             new WorkflowResource(
                 id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
-                Format.valueOf(format)),
-            type);
+                Format.valueOf(format))
+        );
     }
 }

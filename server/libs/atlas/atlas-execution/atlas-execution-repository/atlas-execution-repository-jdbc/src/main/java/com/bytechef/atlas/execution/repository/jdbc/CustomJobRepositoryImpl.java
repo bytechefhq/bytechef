@@ -19,6 +19,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -44,25 +45,37 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
     }
 
     @Override
+    public long count(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
+        Query query = buildQuery(status, startDate, endDate, workflowIds, null, true);
+
+        return Validate.notNull(jdbcTemplate.queryForObject(query.query, Long.class, query.arguments), "count");
+    }
+
+    @Override
+    public List<Job> findAll(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
+
+        Query query = buildQuery(status, startDate, endDate, workflowIds, null, false);
+
+        return jdbcTemplate.query(query.query, (rs, rowNum) -> new Job(rs), query.arguments);
+    }
+
+    @Override
     public Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
         Pageable pageable) {
 
         Page<Job> page;
-        Query query = buildQuery(status, startDate, endDate, workflowId, workflowIds, pageable, true);
+        Query query = buildQuery(status, startDate, endDate, workflowIds, pageable, true);
 
         Long total = jdbcTemplate.queryForObject(query.query, Long.class, query.arguments);
 
         if (total == null || total == 0) {
             page = Page.empty();
         } else {
-            query = buildQuery(status, startDate, endDate, workflowId, workflowIds, pageable, false);
+            query = buildQuery(status, startDate, endDate, workflowIds, pageable, false);
 
-            List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> {
-                Job job = new Job(rs);
-
-                return job;
-            }, query.arguments);
+            List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> new Job(rs), query.arguments);
 
             page = new PageImpl<>(jobs, pageable, total);
         }
@@ -71,8 +84,8 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
     }
 
     private Query buildQuery(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
-        Pageable pageable, boolean countQuery) {
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds, Pageable pageable,
+        boolean countQuery) {
 
         String query;
 
@@ -85,7 +98,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         List<Object> arguments = new ArrayList<>();
 
         if (StringUtils.isNotBlank(status) || startDate != null || endDate != null ||
-            StringUtils.isNotBlank(workflowId) || !CollectionUtils.isEmpty(workflowIds)) {
+            !CollectionUtils.isEmpty(workflowIds)) {
 
             query += "WHERE ";
         }
@@ -118,21 +131,8 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             arguments.add(endDate);
         }
 
-        if (StringUtils.isNotBlank(workflowId) && (StringUtils.isNotBlank(status) || startDate != null ||
-            endDate != null)) {
-
-            query += "AND ";
-        }
-
-        if (StringUtils.isNotBlank(workflowId)) {
-            query += "workflow_id = ? ";
-
-            arguments.add(workflowId);
-        }
-
         if (!CollectionUtils.isEmpty(workflowIds) &&
-            (StringUtils.isNotBlank(status) || startDate != null || endDate != null ||
-                StringUtils.isNotBlank(workflowId))) {
+            (StringUtils.isNotBlank(status) || startDate != null || endDate != null)) {
 
             query += "AND ";
         }
@@ -144,7 +144,11 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         }
 
         if (!countQuery) {
-            query += "ORDER BY id DESC LIMIT %s OFFSET %s".formatted(pageable.getPageSize(), pageable.getOffset());
+            query += "ORDER BY id DESC ";
+        }
+
+        if (!countQuery && pageable != null) {
+            query += "LIMIT %s OFFSET %s".formatted(pageable.getPageSize(), pageable.getOffset());
         }
 
         return new Query(query, arguments.toArray());
