@@ -548,19 +548,7 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
-              required:
-              - "label"
-              properties:
-                label:
-                  description: "The descriptive name for a workflow."
-                  type: "string"
-                description:
-                  description: "The workflow description."
-                  type: "string"
-                definition:
-                  description: "The workflow definition."
-                  type: "string"
+              $ref: '#/components/schemas/WorkflowRequest'
         required: true
       responses:
         "200":
@@ -672,11 +660,10 @@ paths:
         schema:
           type: "string"
       requestBody:
-        description: "The workflow object that needs to updated."
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Workflow"
+              $ref: '#/components/schemas/WorkflowRequest'
         required: true
       responses:
         "200":
@@ -1112,7 +1099,7 @@ components:
         description:
           description: "The description of a workflow."
           type: "string"
-          writeOnly: true
+          readOnly: true
         format:
           $ref: "#/components/schemas/WorkflowFormat"
         id:
@@ -1189,6 +1176,14 @@ components:
       enum:
       - "JSON"
       - "YAML"
+    WorkflowRequest:
+      type: "object"
+      required:
+        - "definition"
+      properties:
+        definition:
+          description: "The definition of a workflow."
+          type: "string"
     WorkflowTask:
       description: "Represents a definition of a workflow task."
       type: "object"
