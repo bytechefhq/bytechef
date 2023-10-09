@@ -10,7 +10,7 @@ import {
     IntegrationModel,
     IntegrationModelStatusEnum,
     TagModel,
-} from '@/ee/middleware/dione/configuration';
+} from '@/ee/middleware/athena/configuration';
 import {
     useCreateIntegrationWorkflowRequestMutation,
     useDeleteIntegrationMutation,

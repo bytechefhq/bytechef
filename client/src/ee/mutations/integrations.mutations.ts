@@ -7,7 +7,7 @@ import {
     IntegrationTagApi,
     UpdateIntegrationTagsRequest,
     WorkflowModel,
-} from 'ee/middleware/dione/configuration';
+} from 'ee/middleware/athena/configuration';
 
 type CreateIntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
