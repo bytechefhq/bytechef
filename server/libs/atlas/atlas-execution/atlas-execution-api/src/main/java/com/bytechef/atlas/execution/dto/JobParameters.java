@@ -51,6 +51,13 @@ public class JobParameters {
     }
 
     @SuppressFBWarnings("EI2")
+    public JobParameters(String workflowId, Map<String, ?> inputs, Map<String, ?> metadata) {
+        this.inputs = inputs;
+        this.workflowId = workflowId;
+        this.metadata = new HashMap<>(metadata);
+    }
+
+    @SuppressFBWarnings("EI2")
     public JobParameters(String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs) {
         this.inputs = inputs;
         this.parentTaskExecutionId = parentTaskExecutionId;
@@ -60,7 +67,7 @@ public class JobParameters {
     @Default
     public JobParameters(
         String workflowId, Long parentTaskExecutionId, Map<String, Object> inputs, String label, Integer priority,
-        List<Webhook> webhooks, Map<String, Object> metadata) {
+        List<Webhook> webhooks, Map<String, ?> metadata) {
 
         if (inputs != null) {
             this.inputs = new HashMap<>(inputs);

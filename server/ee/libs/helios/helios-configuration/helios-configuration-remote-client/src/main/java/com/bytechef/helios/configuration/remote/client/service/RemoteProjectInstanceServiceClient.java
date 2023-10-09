@@ -24,7 +24,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -34,6 +33,7 @@ public class RemoteProjectInstanceServiceClient implements ProjectInstanceServic
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_SERVICE = "/remote/project-instance-service";
+
     private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
@@ -52,19 +52,13 @@ public class RemoteProjectInstanceServiceClient implements ProjectInstanceServic
     }
 
     @Override
-    public Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId) {
-        return Optional.ofNullable(
-            loadBalancedWebClient.get(
-                uriBuilder -> uriBuilder
-                    .host(CONFIGURATION_APP)
-                    .path(PROJECT_INSTANCE_SERVICE + "/fetch-workflow-project-instance/{workflowId}")
-                    .build(workflowId),
-                ProjectInstance.class));
-    }
-
-    @Override
     public ProjectInstance getProjectInstance(long id) {
-        throw new UnsupportedOperationException();
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
+                .host(CONFIGURATION_APP)
+                .path(PROJECT_INSTANCE_SERVICE + "/get-project-instance/{id}")
+                .build(id),
+            ProjectInstance.class);
     }
 
     @Override

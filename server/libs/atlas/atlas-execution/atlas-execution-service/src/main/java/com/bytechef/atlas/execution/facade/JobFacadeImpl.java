@@ -69,18 +69,18 @@ public class JobFacadeImpl implements JobFacade {
     public long createJob(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
-        logger.debug("Job id={}, label='{}' created", Validate.notNull(job.getId(), "id"), job.getLabel());
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        logger.debug("Job id={}, label='{}' created", jobId, job.getLabel());
 
         contextService.push(
-            Validate.notNull(job.getId(), "id"), Context.Classname.JOB,
-            workflowFileStorageFacade.storeContextValue(
-                Validate.notNull(job.getId(), "id"), Context.Classname.JOB, job.getInputs()));
+            jobId, Context.Classname.JOB,
+            workflowFileStorageFacade.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
 
-        eventPublisher.publishEvent(
-            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
-        eventPublisher.publishEvent(new JobStartEvent(Validate.notNull(job.getId(), "id")));
+        eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
+        eventPublisher.publishEvent(new JobStartEvent(jobId));
 
-        return Validate.notNull(job.getId(), "id");
+        return jobId;
     }
 
     @Override

@@ -297,7 +297,7 @@ public class IntegrationApiControllerIntTest {
             "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
             Workflow.Format.JSON, 0);
 
-        when(integrationFacade.addWorkflow(anyLong(), any(), any(), any()))
+        when(integrationFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);
 
         try {
@@ -325,7 +325,7 @@ public class IntegrationApiControllerIntTest {
         ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
         verify(integrationFacade).addWorkflow(
-            anyLong(), nameArgumentCaptor.capture(), descriptionArgumentCaptor.capture(), isNull());
+            anyLong(), isNull());
 
         Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());
         Assertions.assertEquals("workflowDescription", descriptionArgumentCaptor.getValue());

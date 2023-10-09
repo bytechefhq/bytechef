@@ -97,10 +97,11 @@ public class ProjectFacadeIntTest {
         project = projectRepository.save(project);
 
         Workflow workflow = projectFacade.addProjectWorkflow(
-            Validate.notNull(project.getId(), "id"), "Workflow 1", "Description", null);
+            Validate.notNull(project.getId(), "id"),
+            "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
         assertThat(workflow.getDescription()).isEqualTo("Description");
-        assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
+        assertThat(workflow.getLabel()).isEqualTo("New Workflow");
     }
 
     @Test
@@ -271,7 +272,7 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testGetProjectWorkflows() {
-        Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
+        Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON, 0);
 
         workflow.setNew(true);
 

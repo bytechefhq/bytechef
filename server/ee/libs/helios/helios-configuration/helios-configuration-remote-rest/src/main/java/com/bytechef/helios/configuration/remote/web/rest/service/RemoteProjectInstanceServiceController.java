@@ -44,14 +44,11 @@ public class RemoteProjectInstanceServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-workflow-project-instance/{workflowId}",
+        value = "/get-project-instance/{id}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<ProjectInstance> fetchWorkflowProjectInstance(@PathVariable String workflowId) {
-        return projectInstanceService.fetchWorkflowProjectInstance(workflowId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.noContent()
-                .build());
+    public ResponseEntity<ProjectInstance> getProject(@PathVariable long id) {
+        return ResponseEntity.ok(projectInstanceService.getProjectInstance(id));
     }
 }

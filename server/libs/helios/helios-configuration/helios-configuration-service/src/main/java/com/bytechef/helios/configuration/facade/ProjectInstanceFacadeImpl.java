@@ -32,6 +32,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
@@ -46,6 +47,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -119,7 +121,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
 
-        return jobFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
+        return jobFacade.createJob(
+            new JobParameters(
+                workflowId, projectInstanceWorkflow.getInputs(),
+                Map.of(
+                    MetadataConstants.INSTANCE_ID, id, MetadataConstants.INSTANCE_TYPE,
+                    ProjectConstants.PROJECT_TYPE)));
     }
 
     @Override

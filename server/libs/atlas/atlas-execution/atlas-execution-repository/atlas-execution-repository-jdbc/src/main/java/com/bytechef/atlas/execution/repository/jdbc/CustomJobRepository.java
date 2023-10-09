@@ -29,7 +29,11 @@ import java.util.List;
  */
 public interface CustomJobRepository {
 
+    long count(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
+
+    List<Job> findAll(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
+
     Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
         Pageable pageable);
 }

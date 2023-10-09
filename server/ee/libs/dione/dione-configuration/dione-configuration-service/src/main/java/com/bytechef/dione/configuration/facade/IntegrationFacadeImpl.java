@@ -63,9 +63,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public Workflow addWorkflow(long id, String label, String description, String definition) {
+    public Workflow addWorkflow(long id, String definition) {
         if (definition == null) {
-            definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}".formatted(label, description);
+            definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}".formatted("dddd", "");
         }
 
         Workflow workflow = workflowService.create(

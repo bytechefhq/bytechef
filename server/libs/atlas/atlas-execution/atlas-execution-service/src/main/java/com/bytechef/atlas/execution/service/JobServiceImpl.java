@@ -49,6 +49,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public long countJobs(
+        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds) {
+
+        return jobRepository.count(jobStatus, jobStartDate, jobEndDate, projectWorkflowIds);
+    }
+
+    @Override
     public Job create(@NonNull JobParameters jobParameters, Workflow workflow) {
         Validate.notNull(jobParameters, "'jobParameters' must not be null");
 
@@ -79,8 +86,25 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Job> getJobs(int pageNumber) {
-        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
+    public Page<Job> getJobsPage(int pageNumber) {
+        return jobRepository.findAll(PageRequest.of(pageNumber, JobService.DEFAULT_PAGE_SIZE));
+    }
+
+    @Override
+    public List<Job> getJobs(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
+
+        return jobRepository.findAll(status, startDate, endDate, workflowIds);
+    }
+
+    @Override
+    public Page<Job> getJobsPage(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
+        Integer pageNumber) {
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, JobService.DEFAULT_PAGE_SIZE);
+
+        return jobRepository.findAll(status, startDate, endDate, workflowIds, pageRequest);
     }
 
     @Override
@@ -102,16 +126,6 @@ public class JobServiceImpl implements JobService {
         jobRepository.save(job);
 
         return job;
-    }
-
-    @Override
-    public Page<Job> getJobs(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
-        Integer pageNumber) {
-
-        return jobRepository.findAll(
-            status, startDate, endDate, workflowId, workflowIds,
-            PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
     }
 
     @Override
