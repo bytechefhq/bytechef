@@ -8,6 +8,7 @@ export type DataPillType = {
 };
 
 export type ComponentDataType = {
+    action: string;
     name: string;
     connection?: object;
     notes?: string;
