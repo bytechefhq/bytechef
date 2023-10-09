@@ -8,7 +8,7 @@ import {
     TagModel,
     WorkflowApi,
     WorkflowModel,
-} from 'ee/middleware/dione/configuration';
+} from 'ee/middleware/athena/configuration';
 
 export const IntegrationKeys = {
     integration: (id: number) => ['integration', id],
