@@ -42,11 +42,11 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-service"))
     implementation(project(":server:libs:hermes:hermes-swagger"))
 
+    implementation(project(":server:ee:libs:athena:athena-configuration:athena-configuration-rest"))
+    implementation(project(":server:ee:libs:athena:athena-configuration:athena-configuration-service"))
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-remote-client"))
-    implementation(project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest"))
-    implementation(project(":server:ee:libs:dione:dione-configuration:dione-configuration-service"))
     implementation(project(":server:ee:libs:helios:helios-configuration:helios-configuration-remote-rest"))
     implementation(project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-rest"))
     implementation(project(":server:ee:libs:hermes:hermes-connection:hermes-connection-remote-client"))

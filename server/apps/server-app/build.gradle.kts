@@ -67,9 +67,9 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-worker:hermes-worker-impl"))
     implementation(project(":server:libs:hermes:hermes-swagger"))
 
-    implementation(project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest"))
-    implementation(project(":server:ee:libs:dione:dione-configuration:dione-configuration-service"))
-    implementation(project(":server:ee:libs:dione:dione-swagger"))
+    implementation(project(":server:ee:libs:athena:athena-configuration:athena-configuration-rest"))
+    implementation(project(":server:ee:libs:athena:athena-configuration:athena-configuration-service"))
+    implementation(project(":server:ee:libs:athena:athena-swagger"))
 
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
