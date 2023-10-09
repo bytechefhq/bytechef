@@ -30,6 +30,7 @@ import com.bytechef.dione.configuration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.bytechef.commons.util.CollectionUtils;
@@ -63,11 +64,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public Workflow addWorkflow(long id, String definition) {
-        if (definition == null) {
-            definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}".formatted("dddd", "");
-        }
-
+    public Workflow addWorkflow(long id, @NonNull String definition) {
         Workflow workflow = workflowService.create(
             definition, Format.JSON, SourceType.JDBC, IntegrationConstants.INTEGRATION_TYPE);
 
@@ -77,7 +74,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationDTO create(IntegrationDTO integrationDTO) {
+    public IntegrationDTO create(@NonNull IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
 
         Category category = integrationDTO.category();
@@ -115,7 +112,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public void deleteWorkflow(long id, String workflowId) {
+    public void deleteWorkflow(long id, @NonNull String workflowId) {
         integrationService.removeWorkflow(id, workflowId);
 
         workflowService.delete(workflowId);
@@ -195,7 +192,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationDTO update(long id, List<Tag> tags) {
+    public IntegrationDTO update(long id, @NonNull List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         Integration integration = integrationService.update(id, CollectionUtils.map(tags, Tag::getId));
@@ -207,7 +204,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationDTO update(IntegrationDTO integrationDTO) {
+    public IntegrationDTO update(@NonNull IntegrationDTO integrationDTO) {
         Category category = integrationDTO.category() == null ? null : categoryService.save(integrationDTO.category());
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()
