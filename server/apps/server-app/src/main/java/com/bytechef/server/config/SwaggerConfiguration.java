@@ -39,6 +39,6 @@ public class SwaggerConfiguration {
 
     @Bean
     public GroupedOpenApi embeddedOpenApi() {
-        return com.bytechef.dione.swagger.util.SwaggerUtils.EMBEDDED_GROUP_API;
+        return com.bytechef.athena.swagger.util.SwaggerUtils.EMBEDDED_GROUP_API;
     }
 }
