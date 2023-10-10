@@ -1,3 +1,5 @@
+EE
+                
 package com.bytechef.athena.configuration.web.rest;
 
 import org.springframework.web.context.request.NativeWebRequest;
@@ -11,7 +13,8 @@ public class ApiUtil {
             HttpServletResponse res = req.getNativeResponse(HttpServletResponse.class);
             res.setCharacterEncoding("UTF-8");
             res.addHeader("Content-Type", contentType);
-            res.getWriter().print(example);
+            res.getWriter()
+                .print(example);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
