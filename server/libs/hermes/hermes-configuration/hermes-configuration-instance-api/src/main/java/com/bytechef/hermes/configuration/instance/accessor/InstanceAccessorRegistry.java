@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance;
+package com.bytechef.hermes.configuration.instance.accessor;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
@@ -28,19 +28,19 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 @Component
-public class InstanceWorkflowAccessorRegistry {
+public class InstanceAccessorRegistry {
 
-    private final Map<Integer, InstanceWorkflowAccessor> instanceAccessorMap;
+    private final Map<Integer, InstanceAccessor> instanceAccessorMap;
 
-    public InstanceWorkflowAccessorRegistry(List<InstanceWorkflowAccessor> instanceWorkflowAccessors) {
-        this.instanceAccessorMap = instanceWorkflowAccessors
+    public InstanceAccessorRegistry(List<InstanceAccessor> instanceAccessors) {
+        this.instanceAccessorMap = instanceAccessors
             .stream()
             .collect(
                 Collectors.toMap(
-                    InstanceWorkflowAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
+                    InstanceAccessor::getInstanceType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public InstanceWorkflowAccessor getInstanceWorkflowAccessor(int type) {
-        return Validate.notNull(instanceAccessorMap.get(type), "instanceWorkflowAccessor");
+    public InstanceAccessor getInstanceAccessor(int instanceType) {
+        return Validate.notNull(instanceAccessorMap.get(instanceType), "instanceAccessor");
     }
 }

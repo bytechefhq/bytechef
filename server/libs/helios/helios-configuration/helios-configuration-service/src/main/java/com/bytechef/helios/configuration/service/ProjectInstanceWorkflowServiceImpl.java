@@ -60,6 +60,13 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    public boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = getProjectInstanceWorkflow(projectInstanceId, workflowId);
+
+        return projectInstanceWorkflow.isEnabled();
+    }
+
+    @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
         String workflowConnectionOperationName, String workflowConnectionKey) {
 

@@ -52,6 +52,11 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
+    public boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder

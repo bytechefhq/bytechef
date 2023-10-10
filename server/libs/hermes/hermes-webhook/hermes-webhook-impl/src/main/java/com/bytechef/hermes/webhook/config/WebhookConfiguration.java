@@ -35,7 +35,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.webhook.executor.TriggerSyncExecutor;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.bytechef.hermes.webhook.executor.WebhookExecutorImpl;
@@ -77,7 +77,7 @@ public class WebhookConfiguration {
     @Bean
     WebhookExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
-        CounterService counterService, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
+        CounterService counterService, InstanceAccessorRegistry instanceAccessorRegistry,
         JobFacade jobFacade, JobService jobService, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         TriggerSyncExecutor triggerSyncExecutor,
@@ -87,7 +87,7 @@ public class WebhookConfiguration {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         return new WebhookExecutorImpl(
-            eventPublisher, instanceWorkflowAccessorRegistry,
+            eventPublisher, instanceAccessorRegistry,
             new JobSyncExecutor(
                 getApplicationEventListeners(
                     jobService, syncMessageBroker, taskExecutionService, workflowFileStorageFacade),
