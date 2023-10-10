@@ -86,6 +86,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     @Override
     public ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
+
+        long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
+
+        if (!projectService.isProjectEnabled(projectId)) {
+            throw new IllegalStateException("Project id=%s is not enabled".formatted(projectId));
+        }
+
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
 
         if (!tags.isEmpty()) {

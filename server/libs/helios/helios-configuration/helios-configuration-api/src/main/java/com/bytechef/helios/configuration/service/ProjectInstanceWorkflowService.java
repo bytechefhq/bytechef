@@ -31,6 +31,8 @@ public interface ProjectInstanceWorkflowService {
 
     void delete(Long id);
 
+    boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId);
+
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(

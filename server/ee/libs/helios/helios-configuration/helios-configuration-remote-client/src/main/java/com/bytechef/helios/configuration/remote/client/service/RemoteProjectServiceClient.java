@@ -69,6 +69,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public boolean isProjectEnabled(long projectId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Project getProjectInstanceProject(long projectInstanceId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder

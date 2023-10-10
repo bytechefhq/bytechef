@@ -37,6 +37,8 @@ public interface ProjectService {
 
     Optional<Project> fetchProject(String name);
 
+    boolean isProjectEnabled(long projectId);
+
     Project getProjectInstanceProject(long projectInstanceId);
 
     Project getProject(long id);

@@ -59,6 +59,13 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
+    public boolean isProjectInstanceEnabled(long projectInstanceId) {
+        ProjectInstance projectInstance = getProjectInstance(projectInstanceId);
+
+        return projectInstance.isEnabled();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectInstance getProjectInstance(long id) {
         return OptionalUtils.get(projectInstanceRepository.findById(id));
