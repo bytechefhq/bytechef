@@ -83,6 +83,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public boolean isProjectEnabled(long projectId) {
+        Project project = getProject(projectId);
+
+        return project.isNew();
+    }
+
+    @Override
     public Project getProjectInstanceProject(long projectInstanceId) {
         return projectRepository.findByProjectInstanceId(projectInstanceId);
     }
