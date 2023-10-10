@@ -45,8 +45,8 @@ public class RemoteDbDataStorageClientConfiguration {
     }
 
     @Bean
-    DataStorageService dataStorageService(DbDataStorageService DbDataStorageService) {
-        return new DataStorageServiceImpl(DbDataStorageService);
+    DataStorageService dataStorageService(DbDataStorageService dbDataStorageService) {
+        return new DataStorageServiceImpl(dbDataStorageService);
     }
 
     @Bean

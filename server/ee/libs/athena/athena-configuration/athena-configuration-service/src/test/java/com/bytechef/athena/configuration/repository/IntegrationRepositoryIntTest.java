@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +67,7 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.deleteById(Validate.notNull(resultIntegration.getId(), "id"));
 
-        Assertions.assertThat(integrationRepository.findById(integration.getId()))
+        assertThat(integrationRepository.findById(integration.getId()))
             .isEmpty();
     }
 
@@ -111,7 +110,7 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(integration);
 
-        Assertions.assertThat(integrationRepository.findById(Validate.notNull(integration.getId(), "id")))
+        assertThat(integrationRepository.findById(Validate.notNull(integration.getId(), "id")))
             .hasValue(integration);
     }
 

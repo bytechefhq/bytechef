@@ -138,9 +138,9 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
         schedule(jobDetail, trigger);
     }
 
-    private void deleteJob(String workflowExecutionId, String PollingTrigger) {
+    private void deleteJob(String workflowExecutionId, String pollingTrigger) {
         try {
-            scheduler.deleteJob(JobKey.jobKey(workflowExecutionId, PollingTrigger));
+            scheduler.deleteJob(JobKey.jobKey(workflowExecutionId, pollingTrigger));
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }

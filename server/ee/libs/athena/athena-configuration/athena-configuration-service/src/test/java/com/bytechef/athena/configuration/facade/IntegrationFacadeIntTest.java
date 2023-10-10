@@ -31,7 +31,6 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,7 +177,7 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        Assertions.assertThat(integrationFacade.getIntegration(Validate.notNull(integration.getId(), "id")))
+        assertThat(integrationFacade.getIntegration(Validate.notNull(integration.getId(), "id")))
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("id", integration.getId())
             .hasFieldOrPropertyWithValue("name", "name")
@@ -209,7 +208,7 @@ public class IntegrationFacadeIntTest {
 
         IntegrationDTO integrationDTO = integrationDTOs.get(0);
 
-        Assertions.assertThat(integrationFacade.getIntegration(integrationDTO.id()))
+        assertThat(integrationFacade.getIntegration(integrationDTO.id()))
             .isEqualTo(integrationDTO)
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));

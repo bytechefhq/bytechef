@@ -29,7 +29,6 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,8 +105,7 @@ public class IntegrationServiceIntTest {
 
         integrationService.delete(Validate.notNull(integration.getId(), "id"));
 
-        Assertions.assertThat(integrationRepository.findById(integration.getId()))
-            .isNotPresent();
+        assertThat(integrationRepository.findById(integration.getId())).isNotPresent();
     }
 
     @Test
@@ -122,8 +120,7 @@ public class IntegrationServiceIntTest {
     public void testGetIntegrations() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        Assertions.assertThat(integrationService.getIntegrations(null, null))
-            .hasSize(1);
+        assertThat(integrationService.getIntegrations(null, null)).hasSize(1);
 
         Category category = new Category("category1");
 
@@ -133,11 +130,9 @@ public class IntegrationServiceIntTest {
 
         integration = integrationRepository.save(integration);
 
-        Assertions.assertThat(integrationService.getIntegrations(category.getId(), null))
-            .hasSize(1);
+        assertThat(integrationService.getIntegrations(category.getId(), null)).hasSize(1);
 
-        Assertions.assertThat(integrationService.getIntegrations(Long.MAX_VALUE, null))
-            .hasSize(0);
+        assertThat(integrationService.getIntegrations(Long.MAX_VALUE, null)).hasSize(0);
 
         Tag tag = new Tag("tag1");
 
@@ -147,12 +142,9 @@ public class IntegrationServiceIntTest {
 
         integrationRepository.save(integration);
 
-        Assertions.assertThat(integrationService.getIntegrations(null, tag.getId()))
-            .hasSize(1);
-        Assertions.assertThat(integrationService.getIntegrations(null, Long.MAX_VALUE))
-            .hasSize(0);
-        Assertions.assertThat(integrationService.getIntegrations(Long.MAX_VALUE, Long.MAX_VALUE))
-            .hasSize(0);
+        assertThat(integrationService.getIntegrations(null, tag.getId())).hasSize(1);
+        assertThat(integrationService.getIntegrations(null, Long.MAX_VALUE)).hasSize(0);
+        assertThat(integrationService.getIntegrations(Long.MAX_VALUE, Long.MAX_VALUE)).hasSize(0);
     }
 
     @Test
