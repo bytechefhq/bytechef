@@ -27,7 +27,6 @@
     <suppress checks="RightCurly"/>
     <suppress checks="LineLength"/>
     <suppress checks="ParameterNumber"/>
-    <suppress checks="ParameterName"/>
     <suppress checks="AvoidNestedBlocks"/>
     <suppress message="Missing a Javadoc comment"/>
 
