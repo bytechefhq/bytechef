@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
+    implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-instance-api"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-api"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-api"))

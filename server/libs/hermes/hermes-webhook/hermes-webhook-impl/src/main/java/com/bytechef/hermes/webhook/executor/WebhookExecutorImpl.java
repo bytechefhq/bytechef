@@ -23,8 +23,8 @@ import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
@@ -43,7 +43,7 @@ import java.util.Map;
 public class WebhookExecutorImpl implements WebhookExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final JobSyncExecutor jobSyncExecutor;
     private final TriggerSyncExecutor triggerSyncExecutor;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
@@ -51,11 +51,11 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
         ApplicationEventPublisher eventPublisher,
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
+        InstanceAccessorRegistry instanceAccessorRegistry,
         JobSyncExecutor jobSyncExecutor, TriggerSyncExecutor triggerSyncExecutor,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
-        this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
         this.triggerSyncExecutor = triggerSyncExecutor;
@@ -122,10 +122,10 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceWorkflowAccessor instanceWorkflowAccessor = instanceWorkflowAccessorRegistry
-            .getInstanceWorkflowAccessor(workflowExecutionId.getInstanceType());
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry
+            .getInstanceAccessor(workflowExecutionId.getInstanceType());
 
-        return instanceWorkflowAccessor.getInputMap(
+        return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
     }
 }

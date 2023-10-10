@@ -15,16 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance;
+package com.bytechef.hermes.webhook.web.rest.exception;
 
-import java.util.Map;
+public class WorkflowNotEnabledException extends RuntimeException {
 
-/**
- * @author Ivica Cardic
- */
-public interface InstanceWorkflowAccessor {
-
-    Map<String, ?> getInputMap(long instanceId, String workflowId);
-
-    int getType();
+    public WorkflowNotEnabledException(String message) {
+        super(message);
+    }
 }

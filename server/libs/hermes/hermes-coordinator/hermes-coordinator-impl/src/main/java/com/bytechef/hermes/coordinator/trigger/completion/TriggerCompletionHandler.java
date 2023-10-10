@@ -21,8 +21,8 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -39,16 +39,16 @@ import java.util.Map;
 @Component
 public class TriggerCompletionHandler {
 
-    private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final JobFacade jobFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerStateService triggerStateService;
 
     public TriggerCompletionHandler(
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobFacade jobFacade,
+        InstanceAccessorRegistry instanceAccessorRegistry, JobFacade jobFacade,
         TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService) {
 
-        this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.jobFacade = jobFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerStateService = triggerStateService;
@@ -70,11 +70,11 @@ public class TriggerCompletionHandler {
             triggerStateService.save(workflowExecutionId, triggerExecution.getState());
         }
 
-        InstanceWorkflowAccessor instanceWorkflowAccessor =
-            instanceWorkflowAccessorRegistry.getInstanceWorkflowAccessor(
+        InstanceAccessor instanceAccessor =
+            instanceAccessorRegistry.getInstanceAccessor(
                 workflowExecutionId.getInstanceType());
 
-        Map<String, Object> inputMap = (Map<String, Object>) instanceWorkflowAccessor.getInputMap(
+        Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
         Map<String, ?> metadata = Map.of(
             MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
