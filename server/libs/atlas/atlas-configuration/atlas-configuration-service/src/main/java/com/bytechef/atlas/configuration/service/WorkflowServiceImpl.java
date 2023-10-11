@@ -27,6 +27,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -105,18 +106,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public List<Workflow> getFilesystemWorkflows(int type) {
-        WorkflowRepository workflowRepository = CollectionUtils.getFirst(
-            workflowRepositories,
-            curWorkflowRepository -> curWorkflowRepository.getSourceType() == SourceType.FILESYSTEM);
-
-        return workflowRepository.findAll(type)
-            .stream()
-            .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()))
-            .toList();
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Workflow getWorkflow(@NonNull String id) {
         Validate.notNull(id, "'id' must not be null");
@@ -158,9 +147,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     return workflow;
                 }
             } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("{}", e.getMessage());
-                }
+                logger.error(e.getMessage(), e);
             }
         }
 
@@ -168,23 +155,27 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows(int type) {
+        return getWorkflows(type, Arrays.asList(SourceType.values()));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Workflow> getWorkflows(int type, @NonNull List<SourceType> sourceTypes) {
         List<Workflow> workflows;
+
+        List<WorkflowRepository> filteredWorkflowRepositories = CollectionUtils.filter(
+            workflowRepositories, curWorkflowRepository -> sourceTypes.contains(curWorkflowRepository.getSourceType()));
 
         Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) == null) {
-            workflows = workflowRepositories.stream()
-                .flatMap(workflowRepository -> {
-                    List<Workflow> curWorkflows = workflowRepository.findAll(type);
-
-                    return curWorkflows
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()));
-                })
+            workflows = filteredWorkflowRepositories.stream()
+                .flatMap(workflowRepository -> workflowRepository.findAll(type)
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType())))
                 .sorted((a, b) -> {
                     if (a.getLabel() == null || b.getLabel() == null) {
                         return -1;
@@ -232,9 +223,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     workflow = workflowOptional.get();
                 }
             } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("{}", e.getMessage());
-                }
+                logger.error(e.getMessage(), e);
             }
         }
 

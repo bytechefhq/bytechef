@@ -20,6 +20,7 @@
 package com.bytechef.atlas.configuration.repository.git;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.git.config.GitWorkflowRepositoryProperties;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
@@ -100,15 +101,15 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     @Override
-    public Workflow.SourceType getSourceType() {
-        return Workflow.SourceType.GIT;
+    public SourceType getSourceType() {
+        return SourceType.GIT;
     }
 
-    private static Workflow readWorkflow(WorkflowResource resource, int type) {
+    private static Workflow readWorkflow(WorkflowResource workflowResource, int type) {
         Workflow workflow = null;
 
         try {
-            workflow = WorkflowReader.readWorkflow(resource, type);
+            workflow = WorkflowReader.readWorkflow(workflowResource, type);
 
             workflow.setId(encode(Validate.notNull(workflow.getId(), "id")));
         } catch (Exception e) {

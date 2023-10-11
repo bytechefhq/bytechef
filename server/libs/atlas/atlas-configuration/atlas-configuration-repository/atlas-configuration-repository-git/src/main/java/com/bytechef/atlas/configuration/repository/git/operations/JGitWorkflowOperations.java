@@ -98,13 +98,13 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         try (ObjectReader objectReader = repository.newObjectReader();
             RevWalk revWalk = new RevWalk(objectReader);
             TreeWalk treeWalk = new TreeWalk(repository, objectReader);) {
-            ObjectId id = repository.resolve(Constants.HEAD);
+            ObjectId objectId = repository.resolve(Constants.HEAD);
 
-            if (id == null) {
+            if (objectId == null) {
                 return List.of();
             }
 
-            RevCommit revCommit = revWalk.parseCommit(id);
+            RevCommit revCommit = revWalk.parseCommit(objectId);
 
             RevTree revTree = revCommit.getTree();
 
@@ -119,16 +119,19 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                     .map(f -> f.substring(path.lastIndexOf(".") + 1))
                     .orElse("");
 
-                if ((CollectionUtils.isEmpty(extensions) || extensions.contains(extension)) &&
-                    (CollectionUtils.isEmpty(searchPaths) || searchPaths.contains(path))) {
+                Optional<String> searchPathOptional = CollectionUtils.findFirst(searchPaths, path::startsWith);
 
-                    ObjectId objectId = treeWalk.getObjectId(0);
+                if ((CollectionUtils.isEmpty(extensions) || extensions.contains(extension)) &&
+                    (CollectionUtils.isEmpty(searchPaths) || searchPathOptional.isPresent())) {
+
+                    ObjectId firstObjectId = treeWalk.getObjectId(0);
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Loading {} [{}]", path, objectId.name());
+                        logger.debug("Loading {} [{}]", path, firstObjectId.name());
                     }
 
-                    workflowResources.add(readBlob(repository, path.substring(0, path.indexOf('.')), objectId.name()));
+                    workflowResources.add(
+                        readBlob(repository, path.substring(0, path.indexOf('.')), firstObjectId.name()));
                 }
             }
 
@@ -181,7 +184,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private WorkflowResource readBlob(Repository repository, String path, String blobId) throws Exception {
         WorkflowResource workflowResource = null;
 
-        try (ObjectReader reader = repository.newObjectReader()) {
+        try (ObjectReader objectReader = repository.newObjectReader()) {
             if (blobId.equals(LATEST)) {
                 List<WorkflowResource> headFiles = getHeadFiles(repository, extensions, List.of(path));
 
@@ -200,13 +203,20 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                         logger.debug("Could not find: " + path + ":" + blobId);
                     }
                 } else {
-                    ObjectLoader objectLoader = reader.open(objectId);
+                    ObjectLoader objectLoader = objectReader.open(objectId);
 
-                    AbbreviatedObjectId abbreviatedObjectId = reader.abbreviate(objectId);
+                    AbbreviatedObjectId abbreviatedObjectId = objectReader.abbreviate(objectId);
+
+                    // TODO check, it is maybe the right wat to get commit time
+
+                    RevWalk revWalk = new RevWalk(repository);
+
+                    RevCommit revCommit = revWalk.parseCommit(repository.resolve(Constants.HEAD));
 
                     workflowResource = new WorkflowResource(
-                        path + ":" + abbreviatedObjectId.name(), Map.of(WorkflowConstants.PATH, path),
-                        new ByteArrayResource(objectLoader.getBytes()), Workflow.Format.parse(path));
+                        path + ":" + abbreviatedObjectId.name(), revCommit.getCommitTime(),
+                        Map.of(WorkflowConstants.PATH, path), new ByteArrayResource(objectLoader.getBytes()),
+                        Workflow.Format.parse(path));
                 }
             }
 

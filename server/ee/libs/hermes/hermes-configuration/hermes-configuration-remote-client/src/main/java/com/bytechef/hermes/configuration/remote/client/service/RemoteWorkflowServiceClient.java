@@ -84,11 +84,6 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public List<Workflow> getFilesystemWorkflows(int type) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Workflow getWorkflow(@NonNull String id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -106,6 +101,11 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
                 .path(WORKFLOW_SERVICE + "/get-workflows/{type}")
                 .build(type),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<Workflow> getWorkflows(int type, @NonNull List<Workflow.SourceType> sourceTypes) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

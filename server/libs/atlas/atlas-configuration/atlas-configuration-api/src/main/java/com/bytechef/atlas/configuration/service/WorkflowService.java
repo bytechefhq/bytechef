@@ -35,11 +35,11 @@ public interface WorkflowService {
 
     Workflow duplicateWorkflow(@NonNull String id);
 
-    List<Workflow> getFilesystemWorkflows(int type);
-
     Workflow getWorkflow(@NonNull String id);
 
     List<Workflow> getWorkflows(int type);
+
+    List<Workflow> getWorkflows(int type, @NonNull List<SourceType> sourceTypes);
 
     List<Workflow> getWorkflows(@NonNull List<String> workflowIds);
 
