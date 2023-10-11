@@ -96,6 +96,7 @@ const ProjectInstances = () => {
         <LayoutContainer
             header={
                 <PageHeader
+                    centerTitle={true}
                     position="main"
                     right={<ProjectInstanceDialog />}
                     title={`${

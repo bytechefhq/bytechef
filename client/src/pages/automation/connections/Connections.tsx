@@ -51,6 +51,7 @@ const Connections = () => {
         <LayoutContainer
             header={
                 <PageHeader
+                    centerTitle={true}
                     position="main"
                     right={<ConnectionDialog />}
                     title={`${

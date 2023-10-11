@@ -132,6 +132,7 @@ export const WorkflowExecutions = () => {
                 }
                 header={
                     <PageHeader
+                        centerTitle={true}
                         position="main"
                         title="All Workflow Executions"
                     />
