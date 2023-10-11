@@ -51,7 +51,7 @@ public class WorkflowResource implements Resource {
     }
 
     public WorkflowResource(
-        String id, long lastModified, Map<String, Object> metadata, Resource resource,Workflow.Format workflowFormat) {
+        String id, long lastModified, Map<String, Object> metadata, Resource resource, Workflow.Format workflowFormat) {
 
         this.id = id;
         this.lastModified = lastModified;
@@ -110,7 +110,7 @@ public class WorkflowResource implements Resource {
 
     @Override
     public long lastModified() throws IOException {
-        if (lastModified == 0 ) {
+        if (lastModified == 0) {
             return resource.lastModified();
         }
 
