@@ -188,5 +188,6 @@ bytechef:
           password:
           # Folders within the git repo that are scanned for workflows
           search-paths:
+            - projects
       jdbc:
         enabled: true
