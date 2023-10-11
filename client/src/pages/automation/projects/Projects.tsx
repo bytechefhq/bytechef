@@ -54,6 +54,7 @@ const Projects = () => {
         <LayoutContainer
             header={
                 <PageHeader
+                    centerTitle={true}
                     position="main"
                     right={
                         <ProjectDialog
