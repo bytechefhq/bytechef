@@ -41,7 +41,7 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -126,7 +126,7 @@ public class TaskCoordinatorIntTest {
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, objectMapper, taskExecutionService, taskHandlerMap::get,
-            new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper), workflowService);
+            new TaskFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
     }

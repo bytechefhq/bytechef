@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-service"))
     implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-service"))
     implementation(project(":server:libs:core:data-storage:data-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
 }

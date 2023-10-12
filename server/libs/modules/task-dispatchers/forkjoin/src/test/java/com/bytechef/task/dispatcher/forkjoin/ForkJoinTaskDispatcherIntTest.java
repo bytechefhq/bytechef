@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.forkjoin;
 
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.EncodingUtils;
@@ -52,7 +52,7 @@ public class ForkJoinTaskDispatcherIntTest {
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @Autowired
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -67,12 +67,12 @@ public class ForkJoinTaskDispatcherIntTest {
                 counterService, taskExecutionService) -> List.of(
                     (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                         taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
-                        workflowFileStorageFacade)),
+                        taskFileStorageFacade)),
             (
                 messageBroker, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new ForkJoinTaskDispatcher(
                         messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
-                        workflowFileStorageFacade)),
+                        taskFileStorageFacade)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(85, testVarTaskHandler.get("sumVar1"));

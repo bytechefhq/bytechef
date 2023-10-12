@@ -22,7 +22,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -45,21 +45,21 @@ public class TaskDispatcherWorkflowTestSupport {
     private final JobService jobService;
     private final ObjectMapper objectMapper;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherWorkflowTestSupport(
         ContextService contextService, CounterService counterService, JobService jobService,
         ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+        TaskFileStorageFacade taskFileStorageFacade, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.jobService = jobService;
         this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
         this.workflowService = workflowService;
     }
 
@@ -87,7 +87,7 @@ public class TaskDispatcherWorkflowTestSupport {
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 contextService, counterService, taskExecutionService),
-            taskExecutionService, taskHandlerMapSupplier.get()::get, workflowFileStorageFacade, workflowService);
+            taskExecutionService, taskHandlerMapSupplier.get()::get, taskFileStorageFacade, workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }

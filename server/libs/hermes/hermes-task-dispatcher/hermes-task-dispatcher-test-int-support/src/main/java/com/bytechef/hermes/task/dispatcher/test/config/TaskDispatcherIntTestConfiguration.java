@@ -27,8 +27,8 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
@@ -95,11 +95,11 @@ public class TaskDispatcherIntTestConfiguration {
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
             ContextService contextService, CounterService counterService, JobService jobService,
             ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
-            WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+            TaskFileStorageFacade taskFileStorageFacade, WorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
                 contextService, counterService, jobService, objectMapper, taskExecutionService,
-                workflowFileStorageFacade, workflowService);
+                taskFileStorageFacade, workflowService);
         }
 
         @Bean
@@ -123,8 +123,8 @@ public class TaskDispatcherIntTestConfiguration {
     public static class WorkflowFileStorageConfiguration {
 
         @Bean
-        WorkflowFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
-            return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
+        TaskFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new TaskFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

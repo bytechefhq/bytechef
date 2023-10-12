@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.atlas.execution.repository.CounterRepository;
@@ -51,11 +51,11 @@ public class WorkflowExecutionConfiguration {
     @Bean
     JobFacadeImpl jobFacade(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade,
         WorkflowService workflowService) {
 
         return new JobFacadeImpl(
-            eventPublisher, contextService, jobService, workflowFileStorageFacade, workflowService);
+            eventPublisher, contextService, jobService, taskFileStorageFacade, workflowService);
     }
 
     @Bean

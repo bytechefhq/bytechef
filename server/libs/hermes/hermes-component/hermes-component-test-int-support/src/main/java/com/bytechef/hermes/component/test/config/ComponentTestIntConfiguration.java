@@ -28,8 +28,8 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
@@ -187,8 +187,8 @@ public class ComponentTestIntConfiguration {
     public static class WorkflowFileStorageConfiguration {
 
         @Bean
-        WorkflowFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
-            return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
+        TaskFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new TaskFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

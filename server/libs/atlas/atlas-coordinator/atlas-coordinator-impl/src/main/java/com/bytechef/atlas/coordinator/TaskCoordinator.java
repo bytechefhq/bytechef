@@ -93,12 +93,20 @@ public class TaskCoordinator {
      * @param applicationEvent
      */
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onApplicationEvent: applicationEvent={}", applicationEvent);
+        }
+
         for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
             applicationEventListener.onApplicationEvent(applicationEvent);
         }
     }
 
     public void onErrorEvent(ErrorEvent errorEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onErrorEvent: errorEvent={}", errorEvent);
+        }
+
         for (ErrorEventListener errorEventListener : errorEventListeners) {
             errorEventListener.onErrorEvent(errorEvent);
         }
@@ -112,12 +120,16 @@ public class TaskCoordinator {
 // TODO @Transactional
     public void onJobResumeEvent(JobResumeEvent jobResumeEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Resuming job id={}", jobResumeEvent.getJobId());
+            logger.debug("onJobResumeEvent: jobResumeEvent={}", jobResumeEvent);
         }
 
         Job job = jobService.resumeToStatusStarted(jobResumeEvent.getJobId());
 
         jobExecutor.execute(job);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={} resumed", jobResumeEvent.getJobId());
+        }
     }
 
     /**
@@ -128,7 +140,7 @@ public class TaskCoordinator {
 // TODO @Transactional
     public void onJobStartEvent(JobStartEvent jobStartEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Starting job id={}", jobStartEvent.getJobId());
+            logger.debug("onJobStartEvent: jobStartEvent={}", jobStartEvent);
         }
 
         Job job = jobService.setStatusToStarted(jobStartEvent.getJobId());
@@ -137,6 +149,10 @@ public class TaskCoordinator {
 
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={} started", jobStartEvent.getJobId());
+        }
     }
 
     /**
@@ -147,7 +163,7 @@ public class TaskCoordinator {
 // TODO @Transactional
     public void onJobStopEvent(JobStopEvent jobStopEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Stopping job id={}", jobStopEvent.getJobId());
+            logger.debug("onJobStopEvent: jobStopEvent={}", jobStopEvent);
         }
 
         Job job = jobService.setStatusToStopped(jobStopEvent.getJobId());
@@ -170,6 +186,10 @@ public class TaskCoordinator {
                     Validate.notNull(currentTaskExecution.getJobId(), "jobId"),
                     Validate.notNull(currentTaskExecution.getId(), "id")));
         }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={} stopped", jobStopEvent.getJobId());
+        }
     }
 
     /**
@@ -179,6 +199,10 @@ public class TaskCoordinator {
      */
 // TODO @Transactional
     public void onTaskExecutionCompleteEvent(TaskExecutionCompleteEvent taskExecutionCompleteEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onTaskExecutionCompleteEvent: taskExecutionCompleteEvent={}", taskExecutionCompleteEvent);
+        }
+
         TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();
 
         try {

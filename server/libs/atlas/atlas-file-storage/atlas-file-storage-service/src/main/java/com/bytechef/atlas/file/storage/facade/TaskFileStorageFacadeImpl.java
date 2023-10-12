@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade {
+public class TaskFileStorageFacadeImpl implements TaskFileStorageFacade {
 
     private static final String CONTEXT_FILES_DIR = "workflow_outputs_contexts";
     private static final String JOB_FILES_DIR = "workflow_outputs_jobs";
@@ -43,7 +43,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public WorkflowFileStorageFacadeImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
+    public TaskFileStorageFacadeImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
     }

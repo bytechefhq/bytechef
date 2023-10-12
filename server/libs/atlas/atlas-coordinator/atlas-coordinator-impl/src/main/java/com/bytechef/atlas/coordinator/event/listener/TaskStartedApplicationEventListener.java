@@ -65,13 +65,9 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
             if (logger.isDebugEnabled()) {
-                if (StringUtils.isNotBlank(taskExecution.getName())) {
-                    logger.debug(
-                        "Task id={}, name='{}', type='{}' started", taskExecution.getId(), taskExecution.getName(),
-                        taskExecution.getType());
-                } else {
-                    logger.debug("Task id={}, type='{}' started", taskExecution.getId(), taskExecution.getType());
-                }
+                logger.debug(
+                    "Task id={}, name='{}', type='{}' started", taskExecution.getId(), taskExecution.getName(),
+                    taskExecution.getType());
             }
 
             Job job = jobService.getTaskExecutionJob(taskExecutionId);

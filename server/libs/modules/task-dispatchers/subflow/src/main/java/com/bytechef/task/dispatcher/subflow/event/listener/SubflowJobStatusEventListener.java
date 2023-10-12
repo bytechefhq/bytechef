@@ -24,7 +24,7 @@ import com.bytechef.atlas.coordinator.event.JobStopEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
@@ -52,17 +52,17 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
     private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
         ApplicationEventPublisher eventPublisher, JobService jobService,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
                     if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(
-                            workflowFileStorageFacade.storeTaskExecutionOutput(
+                            taskFileStorageFacade.storeTaskExecutionOutput(
                                 Validate.notNull(completionTaskExecution.getId(), "id"), output));
                     } else {
                         // TODO check, it seems wrong

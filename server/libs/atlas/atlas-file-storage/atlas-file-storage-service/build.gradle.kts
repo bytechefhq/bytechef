@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     api("com.fasterxml.jackson.core:jackson-databind")
+    api(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")

@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-instance-impl"))
     implementation(project(":server:libs:helios:helios-coordinator"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-service"))
     implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-service"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))

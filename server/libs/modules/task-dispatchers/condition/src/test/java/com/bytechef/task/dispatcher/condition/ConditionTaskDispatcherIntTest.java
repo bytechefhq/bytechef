@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.condition;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -58,7 +58,7 @@ public class ConditionTaskDispatcherIntTest {
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @Autowired
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -144,7 +144,7 @@ public class ConditionTaskDispatcherIntTest {
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                workflowFileStorageFacade));
+                taskFileStorageFacade));
     }
 
     @SuppressWarnings("PMD")
@@ -155,7 +155,7 @@ public class ConditionTaskDispatcherIntTest {
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                workflowFileStorageFacade));
+                taskFileStorageFacade));
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {

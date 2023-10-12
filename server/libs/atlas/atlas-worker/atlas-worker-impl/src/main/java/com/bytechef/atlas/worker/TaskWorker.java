@@ -25,7 +25,7 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
@@ -81,17 +81,17 @@ public class TaskWorker {
     private final ExecutorService executorService;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutionFutureMap = new ConcurrentHashMap<>();
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     public TaskWorker(
         ApplicationEventPublisher eventPublisher, ExecutorService executorService,
         TaskHandlerResolver taskHandlerResolver,
-        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
         this.taskHandlerResolver = taskHandlerResolver;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     /**
@@ -100,7 +100,7 @@ public class TaskWorker {
      * @param taskExecutionEvent The task event which contains task to execute.
      */
     public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
-        logger.debug("Received task execution event: {}", taskExecutionEvent);
+        logger.debug("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
 
         TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
         CountDownLatch latch = new CountDownLatch(1);
@@ -156,7 +156,7 @@ public class TaskWorker {
         if (event instanceof CancelControlTaskEvent cancelControlTaskEvent) {
             CancelControlTask cancelControlTask = cancelControlTaskEvent.getControlTask();
 
-            logger.debug("Received cancel control task: {}", cancelControlTask);
+            logger.debug("onCancelControlTaskEvent: cancelControlTask={}", cancelControlTask);
 
             Long jobId = cancelControlTask.getJobId();
 
@@ -193,7 +193,7 @@ public class TaskWorker {
 
             if (output != null) {
                 taskExecution.setOutput(
-                    workflowFileStorageFacade.storeTaskExecutionOutput(
+                    taskFileStorageFacade.storeTaskExecutionOutput(
                         Validate.notNull(taskExecution.getId(), "id"), output));
             }
 

@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.EncodingUtils;
@@ -51,7 +51,7 @@ public class SequenceTaskDispatcherIntTest {
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @Autowired
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -65,10 +65,10 @@ public class SequenceTaskDispatcherIntTest {
             (counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
                     contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                    workflowFileStorageFacade)),
+                    taskFileStorageFacade)),
             (messageBroker, contextService, counterService, taskExecutionService) -> List.of(
                 (taskDispatcher) -> new SequenceTaskDispatcher(
-                    messageBroker, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade)),
+                    messageBroker, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(1, (Integer) testVarTaskHandler.get("value1"));

@@ -23,10 +23,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
 
 /**
  * @author Ivica Cardic
  */
+@ReadingConverter
 public class StringToFileEntryConverter implements Converter<String, FileEntry> {
 
     private final ObjectMapper objectMapper;

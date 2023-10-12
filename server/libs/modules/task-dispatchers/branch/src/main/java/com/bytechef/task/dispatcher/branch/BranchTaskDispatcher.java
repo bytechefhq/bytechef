@@ -29,7 +29,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -60,19 +60,19 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final ContextService contextService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskFileStorageFacade taskFileStorageFacade) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .workflowTask(subWorkflowTask)
                     .build();
 
-                Map<String, ?> context = workflowFileStorageFacade.readContextValue(
+                Map<String, ?> context = taskFileStorageFacade.readContextValue(
                     contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
 
                 subTaskExecution.evaluate(context);
@@ -114,7 +114,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
                 contextService.push(
                     Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                    workflowFileStorageFacade.storeContextValue(
+                    taskFileStorageFacade.storeContextValue(
                         Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
 
                 taskDispatcher.dispatch(subTaskExecution);
@@ -127,7 +127,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
             if (selectedCase.get("value") != null) {
                 taskExecution.setOutput(
-                    workflowFileStorageFacade.storeTaskExecutionOutput(
+                    taskFileStorageFacade.storeTaskExecutionOutput(
                         Validate.notNull(taskExecution.getId(), "id"), selectedCase.get("value")));
             }
 

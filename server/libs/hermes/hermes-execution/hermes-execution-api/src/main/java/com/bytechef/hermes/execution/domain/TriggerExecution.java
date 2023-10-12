@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.execution.domain;
 
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.hermes.configuration.trigger.Trigger;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -112,7 +112,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     private Map<String, Object> metadata = new HashMap<>();
 
     @Column
-    private MapWrapper output;
+    private FileEntry output;
 
     @Column
     private int priority;
@@ -252,16 +252,8 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
      *
      * @return Object the output of the task
      */
-    public Object getOutput() {
-        Object outputValue = null;
-
-        if (output != null) {
-            Map<String, Object> map = output.getMap();
-
-            outputValue = map.get("output");
-        }
-
-        return outputValue;
+    public FileEntry getOutput() {
+        return output;
     }
 
     @JsonIgnore
@@ -369,10 +361,8 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         }
     }
 
-    public void setOutput(Object output) {
-        if (output != null) {
-            this.output = new MapWrapper(Map.of("output", output));
-        }
+    public void setOutput(FileEntry output) {
+        this.output = output;
     }
 
     public void setPriority(int priority) {
@@ -429,7 +419,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         private ExecutionError error;
         private Long id;
         private Map<String, Object> metadata;
-        private Object output;
+        private FileEntry output;
         private int priority;
         private LocalDateTime startDate;
         private Status status = Status.CREATED;
@@ -463,7 +453,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             return this;
         }
 
-        public Builder output(Object output) {
+        public Builder output(FileEntry output) {
             this.output = output;
 
             return this;

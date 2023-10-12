@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.worker.config;
 
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
@@ -25,6 +26,7 @@ import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -57,9 +59,10 @@ public class TriggerWorkerConfiguration {
 
     @Bean
     TriggerWorker triggerWorker(
-        ApplicationEventPublisher eventPublisher, TriggerWorkerExecutor triggerWorkerExecutor,
-        TriggerHandlerResolver triggerHandlerResolver) {
+        ApplicationEventPublisher eventPublisher,
+        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        TriggerWorkerExecutor triggerWorkerExecutor, TriggerHandlerResolver triggerHandlerResolver) {
 
-        return new TriggerWorker(eventPublisher, triggerWorkerExecutor, triggerHandlerResolver);
+        return new TriggerWorker(eventPublisher, triggerFileStorageFacade, triggerWorkerExecutor, triggerHandlerResolver);
     }
 }

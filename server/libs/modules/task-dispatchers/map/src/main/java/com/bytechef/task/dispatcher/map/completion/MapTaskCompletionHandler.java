@@ -23,7 +23,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,17 +42,17 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final CounterService counterService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public MapTaskCompletionHandler(
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        CounterService counterService, TaskFileStorageFacade taskFileStorageFacade) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     @Override
@@ -85,10 +85,10 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             mapTaskExecution.setEndDate(LocalDateTime.now());
 
             mapTaskExecution.setOutput(
-                workflowFileStorageFacade.storeTaskExecutionOutput(
+                taskFileStorageFacade.storeTaskExecutionOutput(
                     Validate.notNull(mapTaskExecution.getId(), "id"),
                     childTaskExecutions.stream()
-                        .map(output -> workflowFileStorageFacade.readTaskExecutionOutput(output.getOutput()))
+                        .map(output -> taskFileStorageFacade.readTaskExecutionOutput(output.getOutput()))
                         .collect(Collectors.toList())));
 
             taskCompletionHandler.handle(mapTaskExecution);

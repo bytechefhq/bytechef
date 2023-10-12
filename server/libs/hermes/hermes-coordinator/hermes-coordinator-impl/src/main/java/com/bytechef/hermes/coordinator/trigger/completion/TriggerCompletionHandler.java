@@ -19,6 +19,7 @@ package com.bytechef.hermes.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
@@ -28,6 +29,10 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -39,23 +44,36 @@ import java.util.Map;
 @Component
 public class TriggerCompletionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(TriggerCompletionHandler.class);
+
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final JobFacade jobFacade;
     private final TriggerExecutionService triggerExecutionService;
+    private final TriggerFileStorageFacade triggerFileStorageFacade;
     private final TriggerStateService triggerStateService;
 
     public TriggerCompletionHandler(
         InstanceAccessorRegistry instanceAccessorRegistry, JobFacade jobFacade,
-        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService) {
+        TriggerExecutionService triggerExecutionService,
+        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        TriggerStateService triggerStateService) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.jobFacade = jobFacade;
         this.triggerExecutionService = triggerExecutionService;
+        this.triggerFileStorageFacade = triggerFileStorageFacade;
         this.triggerStateService = triggerStateService;
     }
 
     @SuppressWarnings("unchecked")
     public void handle(TriggerExecution triggerExecution) {
+        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Validate.notNull(triggerExecution.getId(), "'triggerExecution.id' must not be null");
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("handle: triggerExecution={}", triggerExecution);
+        }
+
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         triggerExecution.setStatus(Status.COMPLETED);
@@ -71,8 +89,7 @@ public class TriggerCompletionHandler {
         }
 
         InstanceAccessor instanceAccessor =
-            instanceAccessorRegistry.getInstanceAccessor(
-                workflowExecutionId.getInstanceType());
+            instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getInstanceType());
 
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
@@ -80,7 +97,9 @@ public class TriggerCompletionHandler {
             MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
             MetadataConstants.INSTANCE_TYPE, workflowExecutionId.getInstanceType());
 
-        if (!triggerExecution.isBatch() && triggerExecution.getOutput() instanceof Collection<?> collectionOutput) {
+        Object output = triggerFileStorageFacade.readTriggerExecutionOutput(triggerExecution.getOutput());
+
+        if (!triggerExecution.isBatch() && output instanceof Collection<?> collectionOutput) {
             for (Object outputItem : collectionOutput) {
                 createJob(
                     workflowExecutionId, MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), outputItem)),
@@ -89,7 +108,13 @@ public class TriggerCompletionHandler {
         } else {
             createJob(
                 workflowExecutionId,
-                MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerExecution.getOutput())), metadata);
+                MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)), metadata);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Task id={}, type='{}', name='{}' completed",
+                triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName());
         }
     }
 

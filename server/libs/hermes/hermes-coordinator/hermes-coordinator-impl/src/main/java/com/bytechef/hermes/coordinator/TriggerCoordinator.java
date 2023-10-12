@@ -19,6 +19,7 @@ package com.bytechef.hermes.coordinator;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -32,7 +33,6 @@ import com.bytechef.hermes.coordinator.event.TriggerPollEvent;
 import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.hermes.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.hermes.coordinator.event.listener.ErrorEventListener;
-import com.bytechef.hermes.coordinator.event.listener.TriggerExecutionErrorEventListener;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
@@ -44,8 +44,10 @@ import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -68,8 +70,8 @@ public class TriggerCoordinator {
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
-    private final TriggerExecutionErrorEventListener triggerExecutionErrorEventListener;
     private final TriggerExecutionService triggerExecutionService;
+    private final TriggerFileStorageFacade triggerFileStorageFacade;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
 
@@ -78,9 +80,9 @@ public class TriggerCoordinator {
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
         ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
-        TriggerExecutionErrorEventListener triggerExecutionErrorEventListener,
-        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService,
-        WorkflowService workflowService) {
+        TriggerExecutionService triggerExecutionService,
+        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
@@ -88,8 +90,8 @@ public class TriggerCoordinator {
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
-        this.triggerExecutionErrorEventListener = triggerExecutionErrorEventListener;
         this.triggerExecutionService = triggerExecutionService;
+        this.triggerFileStorageFacade = triggerFileStorageFacade;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
@@ -99,19 +101,23 @@ public class TriggerCoordinator {
      * @param applicationEvent
      */
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onApplicationEvent: applicationEvent={}", applicationEvent);
+        }
+
         for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
             applicationEventListener.onApplicationEvent(applicationEvent);
         }
     }
 
     public void onErrorEvent(ErrorEvent errorEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onErrorEvent: errorEvent={}", errorEvent);
+        }
+
         for (ErrorEventListener errorEventListener : errorEventListeners) {
             errorEventListener.onErrorEvent(errorEvent);
         }
-    }
-
-    public void onTriggerExecutionErrorEvent(TriggerExecutionErrorEvent triggerExecutionErrorEvent) {
-        triggerExecutionErrorEventListener.onTriggerExecutionErrorEvent(triggerExecutionErrorEvent);
     }
 
     /**
@@ -121,19 +127,31 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerExecutionCompleteEvent(TriggerExecutionCompleteEvent triggerExecutionCompleteEvent) {
-        TriggerExecution triggerExecution = triggerExecutionCompleteEvent.getTriggerExecution();
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "onTriggerExecutionCompleteEvent: triggerExecutionCompleteEvent={}", triggerExecutionCompleteEvent);
+        }
 
-        handleTriggerExecutionCompletion(triggerExecution);
+        handleTriggerExecutionCompletion(triggerExecutionCompleteEvent.getTriggerExecution());
     }
 
     // TODO @Transactional
     public void onTriggerListenerEvent(TriggerListenerEvent triggerListenerEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
+        }
+
         TriggerListenerEvent.ListenerParameters listenerParameters = triggerListenerEvent.getListenerParameters();
 
         TriggerExecution triggerExecution = TriggerExecution.builder()
-            .output(listenerParameters.output())
             .workflowExecutionId(listenerParameters.workflowExecutionId())
             .build();
+
+        triggerExecution = triggerExecutionService.create(triggerExecution);
+
+        triggerExecution.setOutput(
+            triggerFileStorageFacade.storeTriggerExecutionOutput(
+                Validate.notNull(triggerExecution.getId(), "id"), listenerParameters.output()));
 
         handleTriggerExecutionCompletion(triggerExecution);
     }
@@ -146,6 +164,10 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerPollEvent(TriggerPollEvent triggerPollEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onTriggerPollEvent: triggerPollEvent={}", triggerPollEvent);
+        }
+
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
 
         TriggerExecution triggerExecution = TriggerExecution.builder()
@@ -153,14 +175,14 @@ public class TriggerCoordinator {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
             .build();
 
+        dispatch(triggerExecution);
+
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "Handling poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
+                "Poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
                 triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
                 triggerExecution.getWorkflowExecutionId());
         }
-
-        dispatch(triggerExecution);
     }
 
     /**
@@ -169,6 +191,10 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerWebhookEvent(TriggerWebhookEvent triggerWebhookEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
+        }
+
         TriggerWebhookEvent.WebhookParameters webhookParameters = triggerWebhookEvent.getWebhookParameters();
 
         TriggerExecution triggerExecution = TriggerExecution.builder()
@@ -177,14 +203,14 @@ public class TriggerCoordinator {
             .workflowTrigger(getWorkflowTrigger(webhookParameters.workflowExecutionId()))
             .build();
 
+        dispatch(triggerExecution);
+
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "Dispatching webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
+                "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
                 triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
                 triggerExecution.getWorkflowExecutionId());
         }
-
-        dispatch(triggerExecution);
     }
 
     private void dispatch(TriggerExecution triggerExecution) {
