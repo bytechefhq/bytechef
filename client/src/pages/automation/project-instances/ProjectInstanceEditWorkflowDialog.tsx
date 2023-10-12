@@ -16,13 +16,15 @@ import {ProjectInstanceDialogWorkflowListItem} from './ProjectInstanceDialogWork
 
 interface ProjectInstanceEditWorkflowDialogProps {
     onClose?: () => void;
-    visible?: boolean;
+    projectInstanceEnabled: boolean;
     projectInstanceWorkflow: ProjectInstanceWorkflowModel;
+    visible?: boolean;
     workflow: WorkflowModel;
 }
 
 const ProjectInstanceEditWorkflowDialog = ({
     onClose,
+    projectInstanceEnabled,
     projectInstanceWorkflow,
     visible = false,
     workflow,
@@ -98,7 +100,7 @@ const ProjectInstanceEditWorkflowDialog = ({
                         </Close>
 
                         <Button
-                            disabled={projectInstanceWorkflow.enabled}
+                            disabled={projectInstanceEnabled}
                             label="Save"
                             onClick={handleSubmit(
                                 updateProjectInstanceWorkflow
