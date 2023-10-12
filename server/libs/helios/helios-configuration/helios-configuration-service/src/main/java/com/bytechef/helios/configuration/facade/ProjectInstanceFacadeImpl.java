@@ -90,7 +90,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
 
         if (!projectService.isProjectEnabled(projectId)) {
-            throw new IllegalStateException("Project id=%s is not enabled".formatted(projectId));
+            throw new IllegalStateException("Project id=%s is not published".formatted(projectId));
         }
 
         List<Tag> tags = checkTags(projectInstanceDTO.tags());

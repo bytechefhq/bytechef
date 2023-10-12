@@ -86,7 +86,7 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean isProjectEnabled(long projectId) {
         Project project = getProject(projectId);
 
-        return project.isNew();
+        return project.getPublishedDate() != null;
     }
 
     @Override
