@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -12,10 +11,8 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-
-import java.util.List;
-
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
@@ -26,6 +23,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @ComponentScan(

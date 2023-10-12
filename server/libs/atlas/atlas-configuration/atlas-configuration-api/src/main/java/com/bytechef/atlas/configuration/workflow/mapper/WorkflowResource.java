@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -20,7 +19,6 @@
 package com.bytechef.atlas.configuration.workflow.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +27,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.core.io.Resource;
 
 /**

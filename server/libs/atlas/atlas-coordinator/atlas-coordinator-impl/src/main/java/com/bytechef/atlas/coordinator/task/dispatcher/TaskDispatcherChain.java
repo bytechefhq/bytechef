@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -20,7 +19,6 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.configuration.task.Task;
-
 import java.util.ArrayList;
 import java.util.List;
 

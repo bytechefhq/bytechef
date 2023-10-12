@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,11 +17,10 @@
 package com.bytechef.category.repository;
 
 import com.bytechef.category.domain.Category;
+import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic

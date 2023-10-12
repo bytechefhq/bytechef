@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -12,13 +11,14 @@ import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Component

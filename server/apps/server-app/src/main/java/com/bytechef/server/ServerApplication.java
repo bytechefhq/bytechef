@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,13 +20,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Optional;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic

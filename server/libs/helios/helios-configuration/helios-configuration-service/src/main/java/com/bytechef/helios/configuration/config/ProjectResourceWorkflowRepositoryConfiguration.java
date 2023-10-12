@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,9 +16,9 @@
 
 package com.bytechef.helios.configuration.config;
 
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.atlas.configuration.repository.config.contributor.ClasspathResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.config.contributor.FilesystemResourceWorkflowRepositoryPropertiesContributor;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

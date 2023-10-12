@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,10 +16,6 @@
 
 package com.bytechef.commons.util;
 
-import org.apache.commons.lang3.Validate;
-import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +26,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.apache.commons.lang3.Validate;
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.hermes.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property;
-
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;

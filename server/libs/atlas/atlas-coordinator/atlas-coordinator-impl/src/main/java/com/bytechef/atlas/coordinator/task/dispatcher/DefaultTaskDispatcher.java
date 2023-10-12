@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,14 +18,12 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
-import com.bytechef.atlas.configuration.task.Task;
-
-import java.util.List;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;

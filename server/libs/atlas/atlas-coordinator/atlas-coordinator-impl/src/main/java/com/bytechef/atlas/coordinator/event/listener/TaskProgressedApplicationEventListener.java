@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -20,8 +19,8 @@
 package com.bytechef.atlas.coordinator.event.listener;
 
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
-import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

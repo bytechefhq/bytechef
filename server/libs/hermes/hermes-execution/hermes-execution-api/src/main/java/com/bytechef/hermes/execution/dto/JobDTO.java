@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -22,7 +21,6 @@ import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.atlas.execution.domain.Job.Webhook;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

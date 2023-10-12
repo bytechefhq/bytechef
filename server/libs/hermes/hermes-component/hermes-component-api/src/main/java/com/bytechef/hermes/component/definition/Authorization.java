@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,7 +20,6 @@ import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

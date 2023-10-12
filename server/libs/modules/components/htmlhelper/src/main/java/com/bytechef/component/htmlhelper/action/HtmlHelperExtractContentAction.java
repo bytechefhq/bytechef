@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,29 +16,27 @@
 
 package com.bytechef.component.htmlhelper.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.ATTRIBUTE;
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.CONTENT;
-import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.QUERY_SELECTOR;
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.EXTRACT_CONTENT;
+import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.QUERY_SELECTOR;
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.RETURN_ARRAY;
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.RETURN_VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * @author Ivica Cardic

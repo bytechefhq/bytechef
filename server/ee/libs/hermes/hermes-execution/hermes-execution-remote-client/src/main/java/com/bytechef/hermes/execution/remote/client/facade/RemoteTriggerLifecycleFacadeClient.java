@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -11,11 +10,12 @@ package com.bytechef.hermes.execution.remote.client.facade;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Component

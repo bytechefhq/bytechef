@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,13 +16,13 @@
 
 package com.bytechef.component.htmlhelper;
 
+import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.HTML_HELPER;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+
 import com.bytechef.component.htmlhelper.action.HtmlHelperExtractContentAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
-
-import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.HTML_HELPER;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 /**
  * @author Ivica Cardic

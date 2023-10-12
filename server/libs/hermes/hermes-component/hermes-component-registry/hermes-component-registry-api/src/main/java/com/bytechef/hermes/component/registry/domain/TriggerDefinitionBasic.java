@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -22,9 +21,8 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.registry.domain.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

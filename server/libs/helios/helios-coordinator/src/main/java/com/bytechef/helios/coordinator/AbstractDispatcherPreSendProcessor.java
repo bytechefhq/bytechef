@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,9 +16,8 @@
 
 package com.bytechef.helios.coordinator;
 
-import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
-
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

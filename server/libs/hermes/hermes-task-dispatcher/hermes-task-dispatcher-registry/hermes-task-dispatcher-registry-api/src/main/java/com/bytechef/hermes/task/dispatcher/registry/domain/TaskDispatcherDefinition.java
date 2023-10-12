@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,14 +17,13 @@
 package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.IconUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.registry.domain.Help;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.Resources;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

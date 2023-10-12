@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -15,6 +14,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Table("integration_workflow")

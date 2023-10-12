@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.atlas.configuration.workflow.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-
 import java.util.Map;
 
 /**

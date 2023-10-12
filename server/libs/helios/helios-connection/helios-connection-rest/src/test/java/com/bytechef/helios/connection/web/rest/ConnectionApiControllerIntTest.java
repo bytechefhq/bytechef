@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -22,18 +21,16 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.helios.connection.dto.ConnectionDTO;
+import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.helios.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
-import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.tag.domain.Tag;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

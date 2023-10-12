@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,18 @@
 
 package com.bytechef.helios.configuration.service;
 
-import com.bytechef.helios.configuration.domain.Project;
-import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
+import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.repository.ProjectRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic

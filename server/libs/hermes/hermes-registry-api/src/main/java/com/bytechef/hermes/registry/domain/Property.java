@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,7 +20,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property.Type;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import java.util.Objects;
 import java.util.Optional;
 

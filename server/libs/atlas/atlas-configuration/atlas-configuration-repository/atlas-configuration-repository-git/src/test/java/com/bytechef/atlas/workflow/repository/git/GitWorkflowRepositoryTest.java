@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -23,11 +22,9 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;

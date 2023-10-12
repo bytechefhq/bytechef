@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,15 +16,6 @@
 
 package com.bytechef.component.httpclient.constant;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
@@ -41,6 +31,13 @@ import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
+
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Ivica Cardic

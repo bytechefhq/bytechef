@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.scheduler;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,31 +16,43 @@
 
 package com.bytechef.hermes.component.oas.task.handler;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
+import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
-import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.component.definition.ContextFileEntryImpl;
-import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
-import com.bytechef.hermes.component.definition.Context.Http.Response;
-import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.hermes.component.definition.ContextFileEntryImpl;
+import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
+import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -54,6 +65,13 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
@@ -70,26 +88,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
-import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.delete;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 /**
  * @author Ivica Cardic

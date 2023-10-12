@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -22,7 +21,6 @@ import com.bytechef.hermes.component.util.CustomActionUtils;
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

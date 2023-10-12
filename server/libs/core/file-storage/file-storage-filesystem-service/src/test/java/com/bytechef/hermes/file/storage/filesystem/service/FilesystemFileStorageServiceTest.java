@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,13 +17,12 @@
 package com.bytechef.hermes.file.storage.filesystem.service;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;

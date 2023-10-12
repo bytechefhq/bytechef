@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,16 +18,14 @@
 
 package com.bytechef.message.broker.amqp.config;
 
-import com.bytechef.message.route.MessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
-
+import com.bytechef.message.route.MessageRoute;
+import com.bytechef.message.route.SystemMessageRoute;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.message.route.SystemMessageRoute;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.BindingBuilder;

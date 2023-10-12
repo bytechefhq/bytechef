@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,19 +16,17 @@
 
 package com.bytechef.component.delay.action;
 
+import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
+import static com.bytechef.component.delay.constant.DelayConstants.SLEEP;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-
-import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
-import static com.bytechef.component.delay.constant.DelayConstants.SLEEP;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 
 /**
  * @author Ivica Cardic

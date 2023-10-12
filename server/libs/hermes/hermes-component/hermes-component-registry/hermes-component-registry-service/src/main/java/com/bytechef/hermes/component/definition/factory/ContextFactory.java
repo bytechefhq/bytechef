@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -23,8 +22,8 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.HttpClientExecutor;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

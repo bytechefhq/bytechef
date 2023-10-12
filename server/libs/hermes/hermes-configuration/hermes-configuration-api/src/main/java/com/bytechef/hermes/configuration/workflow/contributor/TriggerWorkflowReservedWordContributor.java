@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.configuration.workflow.contributor;
 
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
-
 import java.util.List;
 
 /**

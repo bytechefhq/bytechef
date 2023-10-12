@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.helios.configuration.config;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
-
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;

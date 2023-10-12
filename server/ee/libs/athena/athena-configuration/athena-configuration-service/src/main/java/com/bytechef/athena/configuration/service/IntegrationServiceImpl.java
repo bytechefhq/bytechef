@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -11,15 +10,15 @@ package com.bytechef.athena.configuration.service;
 import com.bytechef.athena.configuration.domain.Integration;
 import com.bytechef.athena.configuration.repository.IntegrationRepository;
 import com.bytechef.commons.util.OptionalUtils;
-
 import java.util.List;
-
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Service

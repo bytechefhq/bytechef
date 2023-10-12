@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,20 @@
 
 package com.bytechef.helios.configuration.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.category.domain.Category;
+import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
-import com.bytechef.category.domain.Category;
-import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.repository.ProjectRepository;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
@@ -37,6 +38,9 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -46,12 +50,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,9 +17,9 @@
 package com.bytechef.helios.execution.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
+import com.bytechef.hermes.execution.dto.JobDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

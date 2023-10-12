@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,9 +19,6 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
-
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -34,6 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic

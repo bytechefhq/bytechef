@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,19 +16,17 @@
 
 package com.bytechef.component.pipedrive.util;
 
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.definition.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic

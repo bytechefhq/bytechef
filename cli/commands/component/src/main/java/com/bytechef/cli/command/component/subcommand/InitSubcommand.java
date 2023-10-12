@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,10 +16,9 @@
 
 package com.bytechef.cli.command.component.subcommand;
 
+import com.bytechef.cli.command.component.ComponentCommand;
 import java.io.File;
 import java.util.concurrent.Callable;
-
-import com.bytechef.cli.command.component.ComponentCommand;
 import picocli.CommandLine;
 
 /**

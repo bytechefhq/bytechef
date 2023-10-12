@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,9 +16,9 @@
 
 package com.bytechef.helios.connection.web.rest.mapper;
 
+import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

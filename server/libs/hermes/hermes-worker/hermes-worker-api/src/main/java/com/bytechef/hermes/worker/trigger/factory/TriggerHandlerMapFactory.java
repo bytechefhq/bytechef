@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.worker.trigger.factory;
 
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-
 import java.util.Map;
 
 /**

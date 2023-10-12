@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,12 +19,11 @@ package com.bytechef.hermes.file.storage;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import java.util.Collections;
 import java.util.Map;
-
-import com.bytechef.file.storage.domain.FileEntry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

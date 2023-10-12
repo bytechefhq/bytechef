@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,17 @@
 
 package com.bytechef.hermes.connection.domain;
 
+import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -38,7 +37,6 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import com.bytechef.commons.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic

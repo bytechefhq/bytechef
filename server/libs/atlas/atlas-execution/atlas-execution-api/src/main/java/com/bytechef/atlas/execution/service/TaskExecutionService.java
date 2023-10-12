@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-
 import java.util.List;
 
 /**

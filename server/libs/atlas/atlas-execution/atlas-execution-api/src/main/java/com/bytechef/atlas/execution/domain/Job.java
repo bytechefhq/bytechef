@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -20,13 +19,14 @@
 package com.bytechef.atlas.execution.domain;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.Prioritizable;
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -36,9 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;

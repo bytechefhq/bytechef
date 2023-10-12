@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -14,6 +13,8 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationP
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class RedisAutoServiceRegistration extends AbstractAutoServiceRegistration<RedisRegistration> {

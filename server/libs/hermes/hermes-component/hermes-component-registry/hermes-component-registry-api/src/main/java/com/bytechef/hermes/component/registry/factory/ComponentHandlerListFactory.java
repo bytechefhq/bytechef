@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.component.registry.factory;
 
 import com.bytechef.hermes.component.ComponentHandler;
-
 import java.util.List;
 
 /**

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,9 +18,8 @@ package com.bytechef.hermes.component.jdbc.handler.loader;
 
 import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
 import com.bytechef.hermes.component.handler.ComponentTaskHandler;
-import com.bytechef.hermes.component.jdbc.handler.JdbcComponentHandler;
 import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader;
-
+import com.bytechef.hermes.component.jdbc.handler.JdbcComponentHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;

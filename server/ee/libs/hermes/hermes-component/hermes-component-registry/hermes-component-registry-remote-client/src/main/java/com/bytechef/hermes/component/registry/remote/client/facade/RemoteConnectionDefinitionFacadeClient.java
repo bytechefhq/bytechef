@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -15,13 +14,14 @@ import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Component

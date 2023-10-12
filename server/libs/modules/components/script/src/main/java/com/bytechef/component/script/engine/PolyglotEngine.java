@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,10 +19,9 @@ package com.bytechef.component.script.engine;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 
+import com.bytechef.hermes.component.definition.ParameterMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import com.bytechef.hermes.component.definition.ParameterMap;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.TypeLiteral;

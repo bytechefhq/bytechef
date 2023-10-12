@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -26,7 +25,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;

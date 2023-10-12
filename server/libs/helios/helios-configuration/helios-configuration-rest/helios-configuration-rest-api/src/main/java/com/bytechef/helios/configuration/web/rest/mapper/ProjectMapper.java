@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,8 +16,8 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
+import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;

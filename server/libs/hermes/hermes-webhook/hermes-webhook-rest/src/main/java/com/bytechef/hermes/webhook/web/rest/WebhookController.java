@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,7 +18,6 @@ package com.bytechef.hermes.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.StreamUtils;
@@ -30,12 +28,12 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.bytechef.hermes.webhook.web.rest.exception.WorkflowNotEnabledException;
@@ -44,6 +42,15 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,19 +64,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Ivica Cardic
  */
 @RestController
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class WebhookController {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
 
     private final FileStorageService fileStorageService;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
@@ -198,6 +200,11 @@ public class WebhookController {
 
         WebhookRequest webhookRequest = new WebhookRequest(
             headers, parameters, body, WebhookMethod.valueOf(httpServletRequest.getMethod()));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "webhooks: id={}, webhookRequest={}, webhookTriggerFlags={}", id, webhookRequest, webhookTriggerFlags);
+        }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
             responseEntity = ResponseEntity.ok(webhookExecutor.execute(workflowExecutionId, webhookRequest));

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,27 +16,22 @@
 
 package com.bytechef.hermes.worker;
 
+import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
+import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
+import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
+import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
+import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
-import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
-import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.hermes.worker.trigger.event.TriggerExecutionEvent;
-import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
-import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
-import com.bytechef.commons.util.ExceptionUtils;
-import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.message.event.MessageEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
-import org.apache.commons.lang3.Validate;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -50,6 +44,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -9,15 +8,16 @@
 package com.bytechef.hermes.scheduler.remote.client;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Component

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -12,7 +11,6 @@ import com.bytechef.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.Validate;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -20,6 +18,8 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class RedisDiscoveryClient implements DiscoveryClient {

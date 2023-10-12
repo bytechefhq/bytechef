@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -25,14 +24,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.error.ExecutionError;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;

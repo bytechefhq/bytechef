@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -37,16 +36,15 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
+import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.UpdateJdbcOperation;
-import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
+import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.definition.Property;
-
 import java.util.List;
 import java.util.Map;
 

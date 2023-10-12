@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -21,14 +20,13 @@ package com.bytechef.atlas.execution.repository.memory;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
-import org.springframework.util.comparator.Comparators;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import org.springframework.util.comparator.Comparators;
 
 /**
  * @author Arik Cohen

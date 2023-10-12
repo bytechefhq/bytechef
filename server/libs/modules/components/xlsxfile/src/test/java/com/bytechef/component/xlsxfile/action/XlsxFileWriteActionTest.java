@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,13 +16,23 @@
 
 package com.bytechef.component.xlsxfile.action;
 
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FILENAME;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.ROWS;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.SHEET_NAME;
+
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsxfile.action.XlsxFileReadAction.ReadConfiguration;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-
 import com.bytechef.hermes.component.definition.ParameterMap;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
@@ -34,18 +43,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-
-import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FILENAME;
-import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.ROWS;
-import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.SHEET_NAME;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -23,9 +22,9 @@ import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

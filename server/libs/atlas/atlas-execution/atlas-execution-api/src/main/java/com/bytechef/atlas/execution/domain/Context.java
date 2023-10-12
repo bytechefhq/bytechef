@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,10 +18,9 @@
 
 package com.bytechef.atlas.execution.domain;
 
+import com.bytechef.file.storage.domain.FileEntry;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import com.bytechef.file.storage.domain.FileEntry;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;

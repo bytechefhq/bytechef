@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,18 +18,17 @@ package com.bytechef.hermes.scheduler.job;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.coordinator.event.TriggerListenerEvent;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Date;
+import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.util.Date;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic

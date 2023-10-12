@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,17 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
+import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
-import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * @author Ivica Cardic

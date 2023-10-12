@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,10 +20,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.registry.domain.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

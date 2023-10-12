@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,19 +16,6 @@
 
 package com.bytechef.component.xmlfile.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-
-import com.bytechef.hermes.component.definition.ParameterMap;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.IS_ARRAY;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_NUMBER;
@@ -40,10 +26,20 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic

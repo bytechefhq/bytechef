@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,11 +18,14 @@ package com.bytechef.hermes.coordinator;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.coordinator.event.ApplicationEvent;
 import com.bytechef.hermes.coordinator.event.ErrorEvent;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
@@ -33,28 +35,24 @@ import com.bytechef.hermes.coordinator.event.TriggerPollEvent;
 import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.hermes.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.hermes.coordinator.event.listener.ErrorEventListener;
-import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic

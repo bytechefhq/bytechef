@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,16 +16,15 @@
 
 package com.bytechef.component.objecthelper.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.ParameterMap;
-
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.PARSE;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
  * @author Ivica Cardic

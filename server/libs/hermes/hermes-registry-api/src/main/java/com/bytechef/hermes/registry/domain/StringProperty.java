@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,7 +20,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

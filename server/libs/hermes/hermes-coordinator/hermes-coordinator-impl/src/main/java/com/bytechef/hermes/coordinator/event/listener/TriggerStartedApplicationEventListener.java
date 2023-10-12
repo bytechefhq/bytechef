@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,13 +16,13 @@
 
 package com.bytechef.hermes.coordinator.event.listener;
 
+import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.coordinator.event.ApplicationEvent;
+import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
-import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
-import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
-import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
+import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

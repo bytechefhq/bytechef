@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.atlas.worker.message.route;
 
 import com.bytechef.message.route.MessageRoute;
-
 import java.util.Objects;
 
 /**

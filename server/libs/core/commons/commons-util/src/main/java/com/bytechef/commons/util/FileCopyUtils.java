@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,10 +16,9 @@
 
 package com.bytechef.commons.util;
 
-import org.springframework.lang.Nullable;
-
 import java.io.IOException;
 import java.io.Reader;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic

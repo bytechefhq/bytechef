@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -16,6 +15,9 @@
  */
 
 package com.bytechef.hermes.component.registry.service;
+
+import static com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CODE;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
@@ -35,20 +37,17 @@ import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.ParameterMapImpl;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.component.definition.ParameterMapImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -61,9 +60,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CODE;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Ivica Cardic

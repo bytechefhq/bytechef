@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,10 +16,10 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.data.storage.service.DataStorageService;
-import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
@@ -30,9 +29,6 @@ import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-import org.springframework.context.ApplicationEventPublisher;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +36,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.Validate;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic

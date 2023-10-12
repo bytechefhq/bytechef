@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,16 +19,15 @@ package com.bytechef.category.service;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic

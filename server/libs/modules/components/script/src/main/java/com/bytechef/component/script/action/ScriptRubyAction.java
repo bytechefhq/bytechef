@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,9 @@
 
 package com.bytechef.component.script.action;
 
-import com.bytechef.component.script.constant.ScriptConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.definition.Property;
-
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
@@ -38,6 +29,13 @@ import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
+
+import com.bytechef.component.script.constant.ScriptConstants;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.definition.Property;
 
 /**
  * @author Matija Petanjek

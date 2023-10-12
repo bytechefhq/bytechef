@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -25,10 +24,9 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
-
-import java.util.Map;
 
 /**
  * @author Ivica Cardic

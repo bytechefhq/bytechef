@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,20 +16,19 @@
 
 package com.bytechef.component.datamapper.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.ParameterMap;
-
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.FROM;
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.TO;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
  * @author Ivica Cardic

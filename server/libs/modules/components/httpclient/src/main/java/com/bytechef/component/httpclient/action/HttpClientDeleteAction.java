@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,15 +16,15 @@
 
 package com.bytechef.component.httpclient.action;
 
+import static com.bytechef.component.httpclient.constant.HttpClientConstants.DELETE;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
+
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-
-import static com.bytechef.component.httpclient.constant.HttpClientConstants.DELETE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 
 /**
  * @author Ivica Cardic

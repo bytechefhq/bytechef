@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,23 +16,6 @@
 
 package com.bytechef.component.odsfile.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
-import com.github.miachm.sods.Range;
-import com.github.miachm.sods.Sheet;
-import com.github.miachm.sods.SpreadSheet;
-import org.apache.commons.lang3.Validate;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.FILENAME;
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.ROWS;
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.SHEET_NAME;
@@ -41,7 +23,6 @@ import static com.bytechef.component.odsfile.constant.OdsFileConstants.WRITE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
@@ -51,6 +32,21 @@ import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
+
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.github.miachm.sods.Range;
+import com.github.miachm.sods.Sheet;
+import com.github.miachm.sods.SpreadSheet;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

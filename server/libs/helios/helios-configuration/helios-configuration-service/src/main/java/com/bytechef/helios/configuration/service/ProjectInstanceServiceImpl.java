@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,14 +17,13 @@
 package com.bytechef.helios.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.repository.ProjectInstanceRepository;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
+import com.bytechef.helios.configuration.repository.ProjectInstanceRepository;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * @author Ivica Cardic

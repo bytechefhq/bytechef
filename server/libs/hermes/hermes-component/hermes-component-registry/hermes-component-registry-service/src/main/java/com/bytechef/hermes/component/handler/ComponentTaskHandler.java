@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -25,9 +24,8 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import org.apache.commons.lang3.Validate;
-
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

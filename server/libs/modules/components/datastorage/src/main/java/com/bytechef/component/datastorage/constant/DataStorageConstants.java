@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,12 +16,11 @@
 
 package com.bytechef.component.datastorage.constant;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
+
 import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.List;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 /**
  * @author Ivica Cardic

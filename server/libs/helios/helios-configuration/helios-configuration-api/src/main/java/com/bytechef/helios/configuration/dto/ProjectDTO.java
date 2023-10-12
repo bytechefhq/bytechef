@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,7 +20,6 @@ import com.bytechef.category.domain.Category;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

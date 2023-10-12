@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,11 +18,10 @@ package com.bytechef.task.dispatcher.each;
 
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,9 +20,8 @@ import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import org.springframework.lang.NonNull;
-
 import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic

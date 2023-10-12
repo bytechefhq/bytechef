@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,9 +17,8 @@
 package com.bytechef.helios.configuration.repository;
 
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,16 +16,16 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinitionBasic;
-import com.bytechef.hermes.registry.domain.Help;
-import com.bytechef.hermes.registry.domain.Resources;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
 import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
+import com.bytechef.hermes.registry.domain.Help;
+import com.bytechef.hermes.registry.domain.Resources;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
-
 import java.util.List;
 import java.util.Optional;
 

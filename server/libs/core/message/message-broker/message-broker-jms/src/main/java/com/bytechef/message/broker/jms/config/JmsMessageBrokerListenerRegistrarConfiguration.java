@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,15 +18,14 @@
 
 package com.bytechef.message.broker.jms.config;
 
-import com.bytechef.message.route.MessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
-import java.util.List;
-
+import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

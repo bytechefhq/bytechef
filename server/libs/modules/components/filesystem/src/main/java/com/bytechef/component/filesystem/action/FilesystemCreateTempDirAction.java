@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,17 @@
 
 package com.bytechef.component.filesystem.action;
 
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 /**
  * @author Ivica Cardic

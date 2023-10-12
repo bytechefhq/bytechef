@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,6 @@
 
 package com.bytechef.component.rabbitmq.action;
 
-import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
-import com.rabbitmq.client.Channel;
-
-import java.nio.charset.StandardCharsets;
-
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.MESSAGE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWORD;
@@ -35,9 +23,17 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PORT;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.rabbitmq.client.Channel;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Ivica Cardic

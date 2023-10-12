@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -23,9 +22,8 @@ import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-
 import java.time.LocalDateTime;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica CardFic

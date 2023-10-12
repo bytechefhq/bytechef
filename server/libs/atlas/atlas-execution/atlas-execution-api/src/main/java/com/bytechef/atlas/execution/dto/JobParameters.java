@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.atlas.execution.dto;
 import com.bytechef.atlas.execution.domain.Job.Webhook;
 import com.bytechef.message.Prioritizable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

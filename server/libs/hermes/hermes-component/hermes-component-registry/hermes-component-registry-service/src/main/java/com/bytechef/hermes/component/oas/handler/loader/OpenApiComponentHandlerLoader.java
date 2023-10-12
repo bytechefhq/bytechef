@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -25,7 +24,6 @@ import com.bytechef.hermes.component.definition.ActionDefinitionWrapper;
 import com.bytechef.hermes.component.handler.loader.AbstractComponentHandlerLoader;
 import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.component.util.OpenApiClientUtils;
-
 import java.util.List;
 import java.util.function.Function;
 

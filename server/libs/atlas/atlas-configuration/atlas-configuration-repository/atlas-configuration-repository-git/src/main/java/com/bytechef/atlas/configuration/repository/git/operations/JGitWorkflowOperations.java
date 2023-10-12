@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -22,7 +21,9 @@ package com.bytechef.atlas.configuration.repository.git.operations;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
-
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.FileSystemUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,9 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import com.bytechef.commons.util.FileSystemUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
@@ -50,7 +48,6 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
-import com.bytechef.commons.util.CollectionUtils;
 
 /**
  * @author Arik Cohen

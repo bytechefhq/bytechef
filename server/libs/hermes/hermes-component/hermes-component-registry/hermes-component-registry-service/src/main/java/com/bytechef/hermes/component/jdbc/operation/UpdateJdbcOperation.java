@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,12 +17,11 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
