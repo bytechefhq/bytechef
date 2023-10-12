@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,28 +16,25 @@
 
 package com.bytechef.component.schedule.trigger;
 
+import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.INTERVAL;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.TIME_UNIT;
+import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
-
 import java.time.ZoneId;
 import java.util.Map;
-
-import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
-import static com.bytechef.component.schedule.constant.ScheduleConstants.INTERVAL;
-import static com.bytechef.component.schedule.constant.ScheduleConstants.TIME_UNIT;
-import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic

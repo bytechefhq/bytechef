@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,7 +18,6 @@ package com.bytechef.hermes.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.Objects;
 import java.util.Optional;
 

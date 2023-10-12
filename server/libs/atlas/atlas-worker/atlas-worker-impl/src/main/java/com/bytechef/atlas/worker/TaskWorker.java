@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,20 +18,20 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.domain.TaskExecution.Status;
-import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
-import com.bytechef.atlas.worker.event.TaskExecutionEvent;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.error.ExecutionError;
-import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.message.event.MessageEvent;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -50,7 +49,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

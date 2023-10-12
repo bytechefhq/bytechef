@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,10 +18,9 @@ package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
-import org.springframework.lang.NonNull;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic

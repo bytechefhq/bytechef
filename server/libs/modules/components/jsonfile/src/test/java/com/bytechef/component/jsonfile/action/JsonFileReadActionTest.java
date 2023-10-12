@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,22 +16,20 @@
 
 package com.bytechef.component.jsonfile.action;
 
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_ENTRY;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.IS_ARRAY;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_SIZE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PATH;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
 import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Files;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,14 +38,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_ENTRY;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.IS_ARRAY;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_SIZE;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PATH;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Files;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic

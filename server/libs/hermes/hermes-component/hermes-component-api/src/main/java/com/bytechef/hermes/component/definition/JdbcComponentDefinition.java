@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.definition.Resources;
-
 import java.util.Optional;
 
 /**

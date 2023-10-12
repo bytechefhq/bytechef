@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,7 +18,6 @@ package com.bytechef.helios.execution.web.rest.mapper.util;
 
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,13 +17,12 @@
 package com.bytechef.encryption;
 
 import com.bytechef.commons.util.EncodingUtils;
-import org.springframework.stereotype.Component;
-
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic

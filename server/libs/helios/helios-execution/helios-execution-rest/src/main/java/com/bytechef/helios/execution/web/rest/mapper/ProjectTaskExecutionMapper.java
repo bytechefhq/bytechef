@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,14 +18,13 @@ package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
-import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
+import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
+import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
-
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic

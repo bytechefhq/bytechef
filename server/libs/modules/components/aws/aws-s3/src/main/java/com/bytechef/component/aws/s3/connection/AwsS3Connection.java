@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,13 +16,13 @@
 
 package com.bytechef.component.aws.s3.connection;
 
-import com.bytechef.component.aws.s3.constant.AwsS3Constants;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.component.aws.s3.constant.AwsS3Constants;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 public class AwsS3Connection {
 

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,8 +16,8 @@
 
 package com.bytechef.hermes.scheduler.job;
 
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.coordinator.event.TriggerPollEvent;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

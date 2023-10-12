@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -23,23 +22,24 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
-import org.apache.commons.lang3.Validate;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.category.domain.Category;
+import com.bytechef.category.service.CategoryService;
+import com.bytechef.helios.configuration.dto.ProjectDTO;
+import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.helios.configuration.web.rest.mapper.ProjectMapper;
-import com.bytechef.helios.configuration.dto.ProjectDTO;
-import com.bytechef.helios.configuration.facade.ProjectFacade;
-import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
 import com.bytechef.tag.domain.Tag;
-
+import java.util.Iterator;
+import java.util.List;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -53,9 +53,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,16 @@
 
 package com.bytechef.component.filesystem.action;
 
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
+
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
+import java.io.File;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.io.File;
-import java.util.UUID;
-
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
 /**
  * @author Ivica Cardic

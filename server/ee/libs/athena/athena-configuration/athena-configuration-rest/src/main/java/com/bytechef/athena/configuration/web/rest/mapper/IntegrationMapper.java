@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -15,6 +14,8 @@ import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfiguration.class)

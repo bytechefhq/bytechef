@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,17 @@
 
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
+import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.apache.commons.lang3.Validate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.apache.commons.lang3.Validate;
-
-import java.util.List;
 
 /**
  * @author Ivica Cardic

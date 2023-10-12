@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -27,13 +26,12 @@ import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;

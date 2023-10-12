@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,12 +16,12 @@
 
 package com.bytechef.component.rabbitmq.connection;
 
-import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 
 /**
  * @author Ivica Cardic

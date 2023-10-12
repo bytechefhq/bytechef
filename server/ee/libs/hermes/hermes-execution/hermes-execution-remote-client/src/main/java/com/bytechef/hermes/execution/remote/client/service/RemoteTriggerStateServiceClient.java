@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -12,12 +11,13 @@ import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Component("triggerStorageService")

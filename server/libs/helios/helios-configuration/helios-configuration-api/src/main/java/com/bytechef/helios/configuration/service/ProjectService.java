@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.helios.configuration.service;
 
 import com.bytechef.helios.configuration.domain.Project;
-
 import java.util.List;
 import java.util.Optional;
 

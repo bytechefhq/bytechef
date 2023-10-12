@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,11 +16,6 @@
 
 package com.bytechef.component.datastorage.action;
 
-import com.bytechef.component.datastorage.constant.DataStorageConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
-
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.CREATE_VALUE_IF_MISSING;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
@@ -32,7 +26,6 @@ import static com.bytechef.component.datastorage.constant.DataStorageConstants.V
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
@@ -41,6 +34,11 @@ import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
+
+import com.bytechef.component.datastorage.constant.DataStorageConstants;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
  * @author Ivica Cardic

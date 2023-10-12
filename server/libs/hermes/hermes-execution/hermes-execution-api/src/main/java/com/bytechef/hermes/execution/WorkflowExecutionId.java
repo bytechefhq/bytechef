@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,9 +17,8 @@
 package com.bytechef.hermes.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
-import org.apache.commons.lang3.Validate;
-
 import java.io.Serializable;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

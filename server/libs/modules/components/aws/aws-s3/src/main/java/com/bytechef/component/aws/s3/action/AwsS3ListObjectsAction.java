@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,31 +16,28 @@
 
 package com.bytechef.component.aws.s3.action;
 
-import com.bytechef.component.aws.s3.util.AwsS3Utils;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-
-import com.bytechef.hermes.component.definition.ParameterMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
-import software.amazon.awssdk.services.s3.model.S3Object;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.LIST_OBJECTS;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PREFIX;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.component.aws.s3.util.AwsS3Utils;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * @author Ivica Cardic

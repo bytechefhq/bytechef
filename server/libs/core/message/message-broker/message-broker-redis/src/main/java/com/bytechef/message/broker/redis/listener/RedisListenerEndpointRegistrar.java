@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,24 +16,23 @@
 
 package com.bytechef.message.broker.redis.listener;
 
-import com.bytechef.message.route.MessageRoute;
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
+import com.bytechef.message.route.MessageRoute;
 import com.oblac.jrsmq.QueueMessage;
 import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.util.MethodInvoker;
-
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.util.MethodInvoker;
 
 /**
  * @author Ivica Cardic

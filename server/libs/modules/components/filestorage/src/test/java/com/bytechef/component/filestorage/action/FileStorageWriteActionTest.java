@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,22 +16,20 @@
 
 package com.bytechef.component.filestorage.action;
 
+import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
+import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.component.filestorage.FileStorageComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-
 import com.bytechef.hermes.component.definition.ParameterMap;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-
-import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
-import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,15 +16,16 @@
 
 package com.bytechef.atlas.execution.facade;
 
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.repository.JobRepository;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-
-import java.util.Collections;
 
 /**
  * Ivica Cardic

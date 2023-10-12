@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.helios.connection.dto;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,9 +16,8 @@
 
 package com.bytechef.commons.util;
 
-import org.springframework.util.MimeType;
-
 import java.util.HashMap;
+import org.springframework.util.MimeType;
 
 /**
  * Map file extensions to MIME types. Based on the Apache mime.types file. http://www.iana.org/assignments/media-types/

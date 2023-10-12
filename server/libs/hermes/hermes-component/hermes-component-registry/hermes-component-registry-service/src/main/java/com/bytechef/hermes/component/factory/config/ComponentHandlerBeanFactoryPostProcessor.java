@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,8 +16,8 @@
 
 package com.bytechef.hermes.component.factory.config;
 
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -27,17 +26,20 @@ import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.handler.ComponentTriggerHandler;
+import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
 import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader.ComponentTaskHandlerFunction;
-import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.hermes.component.handler.loader.ComponentHandlerLoader;
-import com.bytechef.hermes.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
 import com.bytechef.hermes.component.handler.loader.DefaultComponentHandlerLoader;
+import com.bytechef.hermes.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
+import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.factory.ComponentHandlerListFactory;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -46,10 +48,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic

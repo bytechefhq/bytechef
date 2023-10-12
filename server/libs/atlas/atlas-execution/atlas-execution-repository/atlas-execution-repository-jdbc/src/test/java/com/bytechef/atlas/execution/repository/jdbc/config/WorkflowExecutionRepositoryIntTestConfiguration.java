@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,6 +19,8 @@ package com.bytechef.atlas.execution.repository.jdbc.config;
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
@@ -27,19 +28,16 @@ import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Ivica Cardic

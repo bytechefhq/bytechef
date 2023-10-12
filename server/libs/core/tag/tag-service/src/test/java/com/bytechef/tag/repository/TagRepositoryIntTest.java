@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,8 @@
 
 package com.bytechef.tag.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
@@ -27,8 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic

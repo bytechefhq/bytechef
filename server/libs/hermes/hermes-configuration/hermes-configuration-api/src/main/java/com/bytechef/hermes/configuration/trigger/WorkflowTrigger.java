@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -22,15 +21,14 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.Validate;
-import org.springframework.core.convert.converter.Converter;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic

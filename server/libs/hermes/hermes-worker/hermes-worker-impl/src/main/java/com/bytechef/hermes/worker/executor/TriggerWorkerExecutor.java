@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,11 +16,10 @@
 
 package com.bytechef.hermes.worker.executor;
 
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic

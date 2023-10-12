@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,8 +17,8 @@
 package com.bytechef.atlas.configuration.repository.jdbc;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.repository.jdbc.config.WorkflowConfigurationRepositoryIntTestConfiguration;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.jdbc.config.WorkflowConfigurationRepositoryIntTestConfiguration;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;

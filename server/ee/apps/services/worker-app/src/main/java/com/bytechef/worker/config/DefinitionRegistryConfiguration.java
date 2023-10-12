@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,15 +16,19 @@ import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParamete
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.remote.client.facade.RemoteConnectionDefinitionFacadeClient;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
-import java.util.Optional;
-
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 @Configuration
 public class DefinitionRegistryConfiguration {
 

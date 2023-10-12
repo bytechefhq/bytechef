@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -27,15 +26,14 @@ import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic

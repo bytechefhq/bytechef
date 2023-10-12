@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,9 +18,8 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import org.springframework.core.convert.converter.Converter;
-
 import java.util.Map;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic

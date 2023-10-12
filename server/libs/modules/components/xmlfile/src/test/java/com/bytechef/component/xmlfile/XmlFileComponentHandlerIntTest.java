@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,9 @@
 
 package com.bytechef.component.xmlfile;
 
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTRY;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
+
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
@@ -24,20 +26,16 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTRY;
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
 
 /**
  * @author Ivica Cardic

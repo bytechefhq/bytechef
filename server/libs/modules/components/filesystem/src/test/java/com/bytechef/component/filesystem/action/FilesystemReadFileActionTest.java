@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,20 +16,18 @@
 
 package com.bytechef.component.filesystem.action;
 
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-
 import com.bytechef.hermes.component.definition.ParameterMap;
+import java.io.File;
+import java.io.InputStream;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-
-import java.io.File;
-import java.io.InputStream;
-
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic

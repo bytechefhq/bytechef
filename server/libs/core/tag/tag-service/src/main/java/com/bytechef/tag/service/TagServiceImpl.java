@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,14 +19,12 @@ package com.bytechef.tag.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
-
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;

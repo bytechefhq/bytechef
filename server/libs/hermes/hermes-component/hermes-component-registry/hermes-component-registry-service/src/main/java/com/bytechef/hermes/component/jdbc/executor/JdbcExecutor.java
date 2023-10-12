@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,11 +16,10 @@
 
 package com.bytechef.hermes.component.jdbc.executor;
 
+import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-
-import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

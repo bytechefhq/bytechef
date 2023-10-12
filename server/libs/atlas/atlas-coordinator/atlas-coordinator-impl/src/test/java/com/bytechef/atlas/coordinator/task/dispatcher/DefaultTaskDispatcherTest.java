@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -20,14 +19,12 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
-
+import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.message.event.MessageEvent;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.message.event.MessageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

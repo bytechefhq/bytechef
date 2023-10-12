@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.configuration.facade;
 
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-
 import java.util.Map;
 
 /**

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -13,14 +12,18 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.util.UriBuilder;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 public abstract class AbstractWorkerClient {
 
     protected static final String WORKER_APP = "worker-app";

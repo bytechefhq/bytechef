@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.hermes.worker.trigger.event;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
-
 import java.time.LocalDateTime;
 
 /**

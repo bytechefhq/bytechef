@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,10 +17,9 @@
 package com.bytechef.hermes.registry.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

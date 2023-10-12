@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,7 +20,6 @@ import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.time.LocalDateTime;
 
 /**

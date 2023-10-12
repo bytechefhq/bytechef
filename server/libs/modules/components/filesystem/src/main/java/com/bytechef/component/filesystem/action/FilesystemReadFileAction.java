@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,21 +16,19 @@
 
 package com.bytechef.component.filesystem.action;
 
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic

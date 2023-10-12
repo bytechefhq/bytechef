@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,24 +18,23 @@ package com.bytechef.hermes.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
+import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
+import java.util.Collection;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic

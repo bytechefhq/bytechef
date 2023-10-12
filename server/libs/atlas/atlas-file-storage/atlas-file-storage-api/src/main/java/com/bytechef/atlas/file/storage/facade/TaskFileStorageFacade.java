@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,9 +18,8 @@ package com.bytechef.atlas.file.storage.facade;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.file.storage.domain.FileEntry;
-import org.springframework.lang.NonNull;
-
 import java.util.Map;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic

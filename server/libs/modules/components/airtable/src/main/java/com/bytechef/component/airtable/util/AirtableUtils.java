@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,15 @@
 
 package com.bytechef.component.airtable.util;
 
+import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
@@ -27,22 +35,12 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property.ControlType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
-import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic

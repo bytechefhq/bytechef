@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,24 +16,22 @@
 
 package com.bytechef.component.xmlfile.action;
 
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
+
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-
 import com.bytechef.hermes.component.definition.ParameterMap;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,8 +16,15 @@
 
 package com.bytechef.hermes.task.dispatcher.test.config;
 
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -29,16 +35,12 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
-import com.bytechef.atlas.configuration.repository.WorkflowRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -48,10 +50,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic

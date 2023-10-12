@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,8 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Configuration

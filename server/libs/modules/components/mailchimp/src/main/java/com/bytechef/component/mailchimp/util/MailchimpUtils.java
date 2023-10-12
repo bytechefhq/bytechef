@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,21 +16,19 @@
 
 package com.bytechef.component.mailchimp.util;
 
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
-
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.definition.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.AUTHORIZATION;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
+
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.definition.Option;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic

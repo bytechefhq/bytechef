@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,26 +16,6 @@
 
 package com.bytechef.component.xlsxfile.action;
 
-import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-
-import com.bytechef.hermes.component.definition.Context.FileEntry;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.HEADER_ROW;
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
@@ -44,6 +23,24 @@ import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.PAGE_NU
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.PAGE_SIZE;
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.READ_AS_STRING;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+
+import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic

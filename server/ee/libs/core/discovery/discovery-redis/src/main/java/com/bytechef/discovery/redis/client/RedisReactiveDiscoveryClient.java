@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -15,6 +14,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import reactor.core.publisher.Flux;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class RedisReactiveDiscoveryClient implements ReactiveDiscoveryClient {

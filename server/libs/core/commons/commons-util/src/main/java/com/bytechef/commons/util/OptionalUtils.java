@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,13 +16,12 @@
 
 package com.bytechef.commons.util;
 
-import org.apache.commons.lang3.Validate;
-
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,9 @@
 
 package com.bytechef.component.airtable;
 
+import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
+
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
@@ -27,12 +29,8 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
 import com.google.auto.service.AutoService;
-
 import java.util.List;
 import java.util.Objects;
-
-import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
-import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 
 /**
  * @author Ivica Cardic

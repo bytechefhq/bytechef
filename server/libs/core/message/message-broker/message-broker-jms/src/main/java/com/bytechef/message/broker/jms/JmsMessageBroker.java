@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,12 +18,11 @@
 
 package com.bytechef.message.broker.jms;
 
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.Retryable;
-import java.util.concurrent.TimeUnit;
-
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.springframework.jms.core.JmsTemplate;
 

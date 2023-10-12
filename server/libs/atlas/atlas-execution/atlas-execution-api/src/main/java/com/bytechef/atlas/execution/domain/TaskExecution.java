@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,18 +18,19 @@
 
 package com.bytechef.atlas.execution.domain;
 
-import com.bytechef.evaluator.Evaluator;
-import com.bytechef.error.Errorable;
-import com.bytechef.error.ExecutionError;
-import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.message.Prioritizable;
 import com.bytechef.atlas.configuration.task.Progressable;
-import com.bytechef.message.Retryable;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.bytechef.error.Errorable;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.message.Prioritizable;
+import com.bytechef.message.Retryable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,14 +16,14 @@
 
 package com.bytechef.component.email;
 
+import static com.bytechef.component.email.constant.EmailConstants.EMAIL;
+
 import com.bytechef.component.email.action.EmailSendAction;
 import com.bytechef.component.email.connection.EmailConnection;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
-
-import static com.bytechef.component.email.constant.EmailConstants.EMAIL;
 
 /**
  * @author Ivica Cardic

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,22 +16,21 @@
 
 package com.bytechef.hermes.worker.config;
 
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -63,6 +61,7 @@ public class TriggerWorkerConfiguration {
         @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
         TriggerWorkerExecutor triggerWorkerExecutor, TriggerHandlerResolver triggerHandlerResolver) {
 
-        return new TriggerWorker(eventPublisher, triggerFileStorageFacade, triggerWorkerExecutor, triggerHandlerResolver);
+        return new TriggerWorker(eventPublisher, triggerFileStorageFacade, triggerWorkerExecutor,
+            triggerHandlerResolver);
     }
 }

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,12 +18,11 @@
 
 package com.bytechef.evaluator;
 
+import java.util.UUID;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
-
-import java.util.UUID;
 
 /**
  * @author Arik Cohen

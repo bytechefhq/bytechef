@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.task.dispatcher.condition;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.option;
@@ -31,10 +29,10 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.COMBINE_OPERATION;
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITIONS;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.DATE_TIME;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.EXPRESSION;
-import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.NUMBER;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.OPERATION;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.RAW_EXPRESSION;

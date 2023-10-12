@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,9 +19,8 @@ package com.bytechef.atlas.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
-import org.springframework.lang.NonNull;
-
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic

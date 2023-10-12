@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -8,15 +7,16 @@
 
 package com.bytechef.athena.configuration.facade;
 
+import com.bytechef.athena.configuration.dto.IntegrationDTO;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
-import com.bytechef.athena.configuration.dto.IntegrationDTO;
 import com.bytechef.tag.domain.Tag;
+import java.util.List;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public interface IntegrationFacade {

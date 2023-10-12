@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,15 @@
 
 package com.bytechef.component.delay.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
-import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 
 /**
  * @author Ivica Cardic

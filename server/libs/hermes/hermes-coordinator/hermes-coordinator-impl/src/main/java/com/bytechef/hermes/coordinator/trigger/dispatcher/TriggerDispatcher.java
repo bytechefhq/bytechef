@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -21,12 +20,11 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.event.TriggerExecutionEvent;
 import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @author Ivica Cardic

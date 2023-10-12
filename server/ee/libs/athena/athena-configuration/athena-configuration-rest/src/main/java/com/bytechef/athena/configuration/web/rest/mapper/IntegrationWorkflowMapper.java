@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -9,16 +8,17 @@
 package com.bytechef.athena.configuration.web.rest.mapper;
 
 import com.bytechef.athena.configuration.web.rest.mapper.config.IntegrationMapperSpringConfiguration;
+import com.bytechef.athena.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.athena.configuration.web.rest.model.WorkflowTaskModel;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.athena.configuration.web.rest.model.WorkflowModel;
+import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfiguration.class)

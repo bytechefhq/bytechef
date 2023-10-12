@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -9,10 +8,11 @@
 package com.bytechef.athena.configuration.service;
 
 import com.bytechef.athena.configuration.domain.Integration;
-
 import java.util.List;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public interface IntegrationService {

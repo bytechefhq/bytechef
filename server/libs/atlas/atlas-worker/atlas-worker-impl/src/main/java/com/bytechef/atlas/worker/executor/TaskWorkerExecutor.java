@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,10 +16,9 @@
 
 package com.bytechef.atlas.worker.executor;
 
-import org.springframework.scheduling.annotation.Async;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * @author Ivica Cardic

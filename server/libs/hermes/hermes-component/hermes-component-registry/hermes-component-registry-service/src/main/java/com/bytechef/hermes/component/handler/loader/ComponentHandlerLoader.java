@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,7 +19,6 @@ package com.bytechef.hermes.component.handler.loader;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.handler.ComponentTaskHandler;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-
 import java.util.List;
 
 /**

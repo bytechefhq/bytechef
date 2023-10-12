@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,16 +16,15 @@
 
 package com.bytechef.message.broker.redis;
 
+import com.bytechef.message.Retryable;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
-import com.bytechef.message.Retryable;
 import com.bytechef.message.route.MessageRoute;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import com.oblac.jrsmq.RedisSMQ;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic

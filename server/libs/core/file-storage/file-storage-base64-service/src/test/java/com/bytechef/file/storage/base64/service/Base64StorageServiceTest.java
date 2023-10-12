@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,13 +18,12 @@ package com.bytechef.file.storage.base64.service;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
