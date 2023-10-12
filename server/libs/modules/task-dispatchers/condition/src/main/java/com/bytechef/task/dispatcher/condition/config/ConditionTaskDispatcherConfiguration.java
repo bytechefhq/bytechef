@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.condition.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -46,18 +46,18 @@ public class ConditionTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
-    @Qualifier("workflowAsyncFileStorageFacade")
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    @Qualifier("workflowAsyncTaskFileStorageFacade")
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @Bean("conditionTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory conditionTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade);
     }
 
     @Bean("conditionTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory conditionTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ConditionTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
     }
 }

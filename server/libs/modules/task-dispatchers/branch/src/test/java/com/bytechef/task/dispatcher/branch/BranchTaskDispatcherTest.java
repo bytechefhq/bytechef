@@ -30,8 +30,8 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -62,7 +62,7 @@ public class BranchTaskDispatcherTest {
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
-    private final WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
+    private final TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
         base64FileStorageService, new ObjectMapper());
 
     @Test
@@ -72,7 +72,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -121,7 +121,7 @@ public class BranchTaskDispatcherTest {
             base64FileStorageService.storeFileContent("", "", "{}"));
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -150,11 +150,11 @@ public class BranchTaskDispatcherTest {
     @Test
     public void test3() {
         when(contextService.peek(anyLong(), any())).thenReturn(
-            workflowFileStorageFacade.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+            taskFileStorageFacade.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -201,7 +201,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -236,6 +236,6 @@ public class BranchTaskDispatcherTest {
 
         taskExecution = taskExecutionCompleteEvent.getTaskExecution();
 
-        Assertions.assertEquals("1234", workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
+        Assertions.assertEquals("1234", taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
     }
 }

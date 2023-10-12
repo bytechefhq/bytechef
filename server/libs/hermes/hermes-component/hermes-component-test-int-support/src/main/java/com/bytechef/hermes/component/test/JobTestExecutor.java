@@ -29,7 +29,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 
 import java.util.Map;
 
@@ -67,7 +67,7 @@ public class JobTestExecutor {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, objectMapper, taskExecutionService,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
-            new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
+            new TaskFileStorageFacadeImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }

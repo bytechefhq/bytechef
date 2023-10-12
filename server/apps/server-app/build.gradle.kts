@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-service"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-service"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-service"))
     implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-service"))
     implementation(project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl"))
     implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-service"))

@@ -194,8 +194,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             workflowExecutionId,
             output -> eventPublisher.publishEvent(
                 new TriggerListenerEvent(
-                    new TriggerListenerEvent.ListenerParameters(WorkflowExecutionId.parse(workflowExecutionId),
-                        output))),
+                    new TriggerListenerEvent.ListenerParameters(
+                        WorkflowExecutionId.parse(workflowExecutionId), output))),
             context);
     }
 

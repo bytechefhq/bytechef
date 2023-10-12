@@ -22,8 +22,8 @@ import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -59,8 +59,8 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
     }
 
     @Bean
-    WorkflowFileStorageFacade workflowFileStorage(ObjectMapper objectMapper) {
-        return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
+    TaskFileStorageFacade workflowFileStorage(ObjectMapper objectMapper) {
+        return new TaskFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")

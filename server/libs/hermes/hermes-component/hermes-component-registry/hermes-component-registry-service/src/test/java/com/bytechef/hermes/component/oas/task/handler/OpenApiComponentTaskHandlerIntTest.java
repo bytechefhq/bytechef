@@ -20,8 +20,8 @@ package com.bytechef.hermes.component.oas.task.handler;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
@@ -868,8 +868,8 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @Bean
-        WorkflowFileStorageFacade workflowFileStorage(ObjectMapper objectMapper) {
-            return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
+        TaskFileStorageFacade workflowFileStorage(ObjectMapper objectMapper) {
+            return new TaskFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
         }
 
         @TestConfiguration

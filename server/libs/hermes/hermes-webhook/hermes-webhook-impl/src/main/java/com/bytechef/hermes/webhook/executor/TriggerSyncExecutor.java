@@ -19,6 +19,7 @@ package com.bytechef.hermes.webhook.executor;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -36,6 +37,7 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -52,6 +54,7 @@ public class TriggerSyncExecutor {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
+    private final TriggerFileStorageFacade triggerFileStorageFacade;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
 
@@ -60,12 +63,14 @@ public class TriggerSyncExecutor {
         InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
+        @Qualifier("workflowSyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
+        this.triggerFileStorageFacade = triggerFileStorageFacade;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
@@ -96,7 +101,8 @@ public class TriggerSyncExecutor {
             OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
 
         triggerExecution.setBatch(triggerOutput.batch());
-        triggerExecution.setOutput(triggerOutput.value());
+        triggerExecution.setOutput(
+            triggerFileStorageFacade.storeTriggerExecutionOutput(triggerExecution.getId(), triggerOutput.value()));
         triggerExecution.setState(triggerOutput.state());
         triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
 

@@ -17,7 +17,9 @@
 
 package com.bytechef.hermes.coordinator.event.listener;
 
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.hermes.coordinator.event.ErrorEvent;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
@@ -32,7 +34,7 @@ import java.time.LocalDateTime;
  * @author Ivica Cardic
  */
 @Component
-public class TriggerExecutionErrorEventListener {
+public class TriggerExecutionErrorEventListener implements ErrorEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerExecutionErrorEventListener.class);
 
@@ -42,20 +44,21 @@ public class TriggerExecutionErrorEventListener {
         this.triggerExecutionService = triggerExecutionService;
     }
 
-    public void onTriggerExecutionErrorEvent(TriggerExecutionErrorEvent triggerExecutionErrorEvent) {
-        TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
+    public void onErrorEvent(ErrorEvent errorEvent) {
+        if (errorEvent instanceof TriggerExecutionErrorEvent triggerExecutionErrorEvent) {
+            TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
+            ExecutionError error = Validate.notNull(errorEvent.getError(), "'error' must not be null");
 
-        ExecutionError error = Validate.notNull(triggerExecution.getError(), "'error' must not be null");
+            logger.error(
+                "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),
+                error.getStackTrace());
 
-        logger.error(
-            "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),
-            error.getStackTrace());
+            // set task status to FAILED and persist
 
-        // set task status to FAILED and persist
+            triggerExecution.setEndDate(LocalDateTime.now());
+            triggerExecution.setStatus(TriggerExecution.Status.FAILED);
 
-        triggerExecution.setEndDate(LocalDateTime.now());
-        triggerExecution.setStatus(TriggerExecution.Status.FAILED);
-
-        triggerExecutionService.update(triggerExecution);
+            triggerExecutionService.update(triggerExecution);
+        }
     }
 }

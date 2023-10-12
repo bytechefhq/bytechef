@@ -335,6 +335,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private void enableWorkflowTrigger(ProjectInstanceWorkflow projectInstanceWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
+        validate(projectInstanceWorkflow.getInputs(), workflow);
+
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
@@ -364,5 +366,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 workflowConnectionOperationName, workflowConnectionKey);
 
         return projectInstanceWorkflowConnection.getConnectionId();
+    }
+
+    private static void validate(Map<String, ?> inputs, Workflow workflow) {
+        // validate inputs
+
+        for (Workflow.Input input : workflow.getInputs()) {
+            if (input.required()) {
+                Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
+            }
+        }
     }
 }

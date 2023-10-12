@@ -20,7 +20,7 @@ package com.bytechef.component.script;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
@@ -50,7 +50,7 @@ public class ScriptComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @Disabled
     @Test
@@ -66,7 +66,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }
@@ -79,7 +79,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }
@@ -93,7 +93,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }
@@ -106,7 +106,7 @@ public class ScriptComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals(6000, outputs.get("result"));
     }

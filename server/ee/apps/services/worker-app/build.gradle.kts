@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-service"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-service"))
     implementation(project(":server:libs:hermes:hermes-worker:hermes-worker-impl"))
 
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))

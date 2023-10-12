@@ -1,7 +1,6 @@
 dependencies {
     api("org.springframework:spring-context")
     api(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
-    api(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
@@ -10,6 +9,7 @@ dependencies {
     implementation("org.springframework:spring-expression")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.retry:spring-retry")
+    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator"))

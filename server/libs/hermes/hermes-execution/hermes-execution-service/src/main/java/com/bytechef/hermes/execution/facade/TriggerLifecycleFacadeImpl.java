@@ -26,6 +26,8 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -35,6 +37,8 @@ import java.util.Map;
  */
 @Service
 public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(TriggerLifecycleFacadeImpl.class);
 
     private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -85,6 +89,12 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             default -> {
             }
         }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Trigger workflowExecutionId={}, type='{}', name='{}' disabled",
+                workflowExecutionId, workflowTriggerType, workflowTriggerName);
+        }
     }
 
     @Override
@@ -125,6 +135,12 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             case POLLING -> triggerScheduler.schedulePollingTrigger(workflowExecutionId);
             default -> {
             }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Trigger workflowExecutionId={}, type='{}', name='{}' enabled",
+                workflowExecutionId, workflowTriggerType, workflowTriggerName);
         }
     }
 }

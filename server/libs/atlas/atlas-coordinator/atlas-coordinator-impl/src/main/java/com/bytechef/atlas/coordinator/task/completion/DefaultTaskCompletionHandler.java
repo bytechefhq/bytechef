@@ -26,7 +26,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.service.JobService;
@@ -45,7 +45,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Arik Cohen
@@ -61,21 +60,21 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final JobExecutor jobExecutor;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
         ContextService contextService, ApplicationEventPublisher eventPublisher,
         JobExecutor jobExecutor, JobService jobService, TaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+        TaskFileStorageFacade taskFileStorageFacade, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
         this.workflowService = workflowService;
     }
 
@@ -90,13 +89,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         Validate.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
         if (logger.isDebugEnabled()) {
-            if (StringUtils.isBlank(taskExecution.getName())) {
-                logger.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
-            } else {
-                logger.debug(
-                    "Task id={}, type='{}', name='{}' completed",
-                    taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
-            }
+            logger.debug("handle: taskExecution={}", taskExecution);
         }
 
         Job job = jobService.getTaskExecutionJob(Validate.notNull(taskExecution.getId(), "id"));
@@ -110,18 +103,21 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
                 Map<String, Object> newContext = new HashMap<>(
-                    workflowFileStorageFacade.readContextValue(
+                    taskFileStorageFacade.readContextValue(
                         contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB)));
 
                 newContext.put(
-                    taskExecution.getName(),
-                    workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
+                    taskExecution.getName(), taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
 
                 contextService.push(
                     Validate.notNull(job.getId(), "id"), Context.Classname.JOB,
-                    workflowFileStorageFacade.storeContextValue(
+                    taskFileStorageFacade.storeContextValue(
                         Validate.notNull(job.getId(), "id"), Context.Classname.JOB, newContext));
             }
+
+            logger.debug(
+                "Task id={}, type='{}', name='{}' completed",
+                taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
 
             if (hasMoreTasks(job)) {
                 job.setCurrentTask(job.getCurrentTask() + 1);
@@ -138,7 +134,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private void complete(Job job) {
         Validate.notNull(job, "'job' must not be null");
 
-        Map<String, ?> context = workflowFileStorageFacade.readContextValue(
+        if (logger.isDebugEnabled()) {
+            logger.debug("complete: job={}", job);
+        }
+
+        Map<String, ?> context = taskFileStorageFacade.readContextValue(
             contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
@@ -149,7 +149,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setEndDate(LocalDateTime.now());
         job.setStatus(Job.Status.COMPLETED);
         job.setOutputs(
-            workflowFileStorageFacade.storeJobOutputs(
+            taskFileStorageFacade.storeJobOutputs(
                 Validate.notNull(job.getId(), "id"), Evaluator.evaluate(source, context)));
 
         job = jobService.update(job);
