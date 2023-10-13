@@ -92,11 +92,11 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
         JobDTO jobDTO = new JobDTO(
             job, taskFileStorageFacade.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
-        Long projectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
+        Number projectInstanceId = ((Number) job.getMetadata(MetadataConstants.INSTANCE_ID));
 
         return new WorkflowExecutionDTO(
             Validate.notNull(jobDTO.id(), "id"),
-            projectInstanceId == null ? null : projectInstanceService.getProjectInstance(projectInstanceId),
+            projectInstanceId == null ? null : projectInstanceService.getProjectInstance(projectInstanceId.longValue()),
             jobDTO, projectService.getWorkflowProject(jobDTO.workflowId()),
             workflowService.getWorkflow(jobDTO.workflowId()));
     }
@@ -133,7 +133,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             List<Job> jobs = jobService.getJobs(jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds));
 
             jobs = CollectionUtils.filter(jobs, job -> {
-                Long curProjectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
+                Number curProjectInstanceId = (Number) job.getMetadata(MetadataConstants.INSTANCE_ID);
 
                 return curProjectInstanceId == null || Objects.equals(curProjectInstanceId, projectInstanceId);
             });
@@ -154,11 +154,12 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
         return jobsPage.map(job -> {
-            Long jobProjectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
+            Number jobProjectInstanceId = (Number) job.getMetadata(MetadataConstants.INSTANCE_ID);
 
             return new WorkflowExecutionDTO(
                 Validate.notNull(job.getId(), "id"),
-                jobProjectInstanceId == null ? null : projectInstanceService.getProjectInstance(jobProjectInstanceId),
+                jobProjectInstanceId == null
+                    ? null : projectInstanceService.getProjectInstance(jobProjectInstanceId.longValue()),
                 new JobDTO(job, Map.of(), List.of()),
                 CollectionUtils.getFirst(
                     projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
