@@ -39,6 +39,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -100,7 +101,8 @@ public class TriggerSyncExecutor {
 
         triggerExecution.setBatch(triggerOutput.batch());
         triggerExecution.setOutput(
-            triggerFileStorageFacade.storeTriggerExecutionOutput(triggerExecution.getId(), triggerOutput.value()));
+            triggerFileStorageFacade.storeTriggerExecutionOutput(
+                Validate.notNull(triggerExecution.getId(), "id"), triggerOutput.value()));
         triggerExecution.setState(triggerOutput.state());
         triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
 
