@@ -48,13 +48,13 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -129,24 +129,30 @@ public class WebhookController {
             componentOperation.componentName(), componentOperation.componentVersion(),
             componentOperation.operationName());
 
-        if (mediaType != null && !mediaType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
+        if (mediaType != null) {
             if (mediaType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
-                Map<String, Object> multipartFormDataMap = new HashMap<>();
+                MultiValueMap<String, Object> multipartFormDataMap = new LinkedMultiValueMap<>();
 
                 for (Part part : httpServletRequest.getParts()) {
-                    if (isBinaryPart(part)) {
-                        multipartFormDataMap.put(
-                            part.getName(),
-                            fileStorageService.storeFileContent(
-                                FileEntryConstants.FILES_DIR, part.getName(), part.getInputStream()));
+                    List<Object> value = multipartFormDataMap.getOrDefault(part.getName(), new ArrayList<>());
+
+                    if (part.getContentType() == null) {
+                        value.add(StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
                     } else {
-                        multipartFormDataMap.put(
-                            part.getName(), StreamUtils.copyToString(part.getInputStream(), StandardCharsets.UTF_8));
+                        value.add(
+                            fileStorageService.storeFileContent(
+                                FileEntryConstants.FILES_DIR, part.getSubmittedFileName(), part.getInputStream()));
                     }
+
+                    multipartFormDataMap.put(part.getName(), value);
                 }
 
                 body = new WebhookBodyImpl(
                     multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType());
+
+                UriComponents uriComponents = getUriComponents(httpServletRequest);
+
+                parameters = toMap(uriComponents.getQueryParams());
             } else if (mediaType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
                 Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
 
@@ -259,12 +265,6 @@ public class WebhookController {
         return UriComponentsBuilder
             .fromHttpRequest(new ServletServerHttpRequest(httpServletRequest))
             .build();
-    }
-
-    private static boolean isBinaryPart(Part part) {
-        String contentType = part.getContentType();
-
-        return contentType != null && contentType.equals(MediaType.APPLICATION_OCTET_STREAM_VALUE);
     }
 
     private static String[] toArray(Enumeration<String> enumeration) {

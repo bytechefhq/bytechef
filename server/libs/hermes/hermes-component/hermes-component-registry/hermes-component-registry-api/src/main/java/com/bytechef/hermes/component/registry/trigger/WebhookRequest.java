@@ -16,12 +16,14 @@
 
 package com.bytechef.hermes.component.registry.trigger;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
@@ -39,21 +41,22 @@ public record WebhookRequest(
 
         private static final String BODY = "body";
         private static final String CONTENT = "content";
+        private static final String MIME_TYPE = "mimeType";
 
         @Override
         public WebhookRequest convert(Map<String, Object> source) {
             WebhookRequest.WebhookBodyImpl webhookBody = null;
 
             if (MapUtils.containsKey(source, BODY)) {
+                Object content;
                 Map<String, ?> bodyMap = MapUtils.getRequiredMap(source, BODY);
 
-                Object content;
                 ContentType contentType = ContentType.valueOf(MapUtils.getString(bodyMap, "contentType"));
 
                 if (contentType == ContentType.BINARY) {
                     content = MapUtils.get(bodyMap, CONTENT, FileEntry.class);
                 } else if (contentType == ContentType.FORM_DATA) {
-                    content = checkContent(bodyMap);
+                    content = checkFormDataWebhookBodyContent(MapUtils.getRequiredMap(bodyMap, CONTENT));
                 } else if (contentType == ContentType.FORM_URL_ENCODED || contentType == ContentType.JSON ||
                     contentType == ContentType.XML) {
 
@@ -63,7 +66,7 @@ public record WebhookRequest(
                 }
 
                 webhookBody =
-                    new WebhookRequest.WebhookBodyImpl(content, contentType, MapUtils.getString(bodyMap, "mimeType"));
+                    new WebhookRequest.WebhookBodyImpl(content, contentType, MapUtils.getString(bodyMap, MIME_TYPE));
             }
 
             return new WebhookRequest(
@@ -72,21 +75,40 @@ public record WebhookRequest(
                 webhookBody, WebhookMethod.valueOf(MapUtils.getString(source, "method")));
         }
 
-        private static Map<String, Object> checkContent(Map<String, ?> bodyMap) {
-            Map<String, ?> content = MapUtils.getRequiredMap(bodyMap, CONTENT);
-
+        private static Map<String, Object> checkFormDataWebhookBodyContent(Map<String, ?> content) {
             return MapUtils.toMap(
                 content,
                 Map.Entry::getKey,
                 entry -> {
                     if (entry.getValue() instanceof String) {
-                        return MapUtils.getRequiredString(bodyMap, entry.getKey());
+                        return entry.getValue();
+                    } else if (entry.getValue() instanceof List<?> list) {
+                        return CollectionUtils.map(
+                            list,
+                            item -> {
+                                if (item instanceof Map<?, ?> map) {
+                                    return new FileEntry(
+                                        (String) map.get("name"), (String) map.get("extension"),
+                                        (String) map.get(MIME_TYPE), (String) map.get("url"));
+                                } else {
+                                    return item;
+                                }
+                            });
                     } else {
-                        return MapUtils.getRequiredMap(bodyMap, entry.getKey(), FileEntry.class);
+                        return MapUtils.getRequiredMap(content, entry.getKey(), FileEntry.class);
                     }
                 });
         }
+    }
 
+    @Override
+    public String toString() {
+        return "WebhookRequest{" +
+            "headers=" + MapUtils.toString(headers) +
+            ", parameters=" + MapUtils.toString(parameters) +
+            ", body=" + body +
+            ", method=" + method +
+            '}';
     }
 
     public record WebhookBodyImpl(

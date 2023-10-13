@@ -54,6 +54,16 @@ public class FileEntry {
         this.url = url;
     }
 
+    public FileEntry(String name, String extension, String mimeType, String url) {
+        Validate.notNull(name, "'name' must not be null");
+        Validate.notNull(url, "'url' must not be null");
+
+        this.name = name;
+        this.extension = extension;
+        this.mimeType = mimeType;
+        this.url = url;
+    }
+
     public boolean equals(Object o) {
         if (this == o) {
             return true;
