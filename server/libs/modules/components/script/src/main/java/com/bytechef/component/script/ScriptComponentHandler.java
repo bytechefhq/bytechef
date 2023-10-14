@@ -44,7 +44,7 @@ public class ScriptComponentHandler implements ComponentHandler {
             ScriptJavaAction.ACTION_DEFINITION,
             ScriptJavaScriptAction.ACTION_DEFINITION,
             ScriptPythonAction.ACTION_DEFINITION,
-            ScriptRAction.ACTION_DEFINITION,
+//            ScriptRAction.ACTION_DEFINITION,
             ScriptRubyAction.ACTION_DEFINITION);
 
     @Override
