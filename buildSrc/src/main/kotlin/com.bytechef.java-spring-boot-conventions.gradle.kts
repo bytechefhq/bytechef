@@ -13,9 +13,10 @@ plugins {
 
 //https://melix.github.io/blog/2021/03/version-catalogs-faq.html#_can_i_use_the_version_catalog_in_buildsrc
 val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+var profiles = ""
 
 if (project.hasProperty("prod")) {
-    var profiles = "prod"
+    profiles = "prod"
 
     if (project.hasProperty("api-docs")) {
         profiles += ",api-docs"
@@ -24,44 +25,12 @@ if (project.hasProperty("prod")) {
     configure<org.springframework.boot.gradle.dsl.SpringBootExtension> {
         buildInfo()
     }
-
-    tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun::class) {
-        args = listOf("--spring.profiles.active=$profiles")
-    }
-
-    val processResources by tasks.existing(ProcessResources::class) {
-        inputs.property("version", version)
-        inputs.property("springProfiles", profiles)
-
-        filesMatching("**/application.yml") {
-            filter {
-                it.replace("#project.version#", version.toString())
-            }
-            filter {
-                it.replace("#spring.profiles.active#", profiles)
-            }
-        }
-    }
-
-    val bootJar by tasks.existing {
-        dependsOn(processResources)
-    }
-
-    val compileJava by tasks.existing {
-        dependsOn(processResources)
-    }
-
-    val bootBuildInfo by tasks.existing
-
-    tasks.processResources {
-        dependsOn(bootBuildInfo)
-    }
 } else {
     dependencies {
         "developmentOnly"("org.springframework.boot:spring-boot-devtools:${libs.findVersion("spring-boot").get()}")
     }
 
-    val profiles = "dev"
+    profiles = "dev"
 
     configure<org.springframework.boot.gradle.dsl.SpringBootExtension> {
         buildInfo {
@@ -70,38 +39,38 @@ if (project.hasProperty("prod")) {
             }
         }
     }
+}
 
-    tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun::class) {
-        args = listOf("--spring.profiles.active=$profiles")
-    }
+tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun::class) {
+    args = listOf("--spring.profiles.active=$profiles")
+}
 
-    val processResources by tasks.existing(ProcessResources::class) {
-        inputs.property("version", version)
-        inputs.property("springProfiles", profiles)
+val processResources by tasks.existing(ProcessResources::class) {
+    inputs.property("version", version)
+    inputs.property("springProfiles", profiles)
 
-        filesMatching("**/application.yml") {
-            filter {
-                it.replace("#project.version#", version.toString())
-            }
-            filter {
-                it.replace("#spring.profiles.active#", profiles)
-            }
+    filesMatching("**/application.yml") {
+        filter {
+            it.replace("#project.version#", version.toString())
+        }
+        filter {
+            it.replace("#spring.profiles.active#", profiles)
         }
     }
+}
 
-    val bootJar by tasks.existing {
-        dependsOn(processResources)
-    }
+val bootJar by tasks.existing {
+    dependsOn(processResources)
+}
 
-    val compileJava by tasks.existing {
-        dependsOn(processResources)
-    }
+val compileJava by tasks.existing {
+    dependsOn(processResources)
+}
 
-    val bootBuildInfo by tasks.existing
+val bootBuildInfo by tasks.existing
 
-    tasks.processResources {
-        dependsOn(bootBuildInfo)
-    }
+tasks.processResources {
+    dependsOn(bootBuildInfo)
 }
 
 if (project.hasProperty("native")) {
