@@ -92,7 +92,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
         JobDTO jobDTO = new JobDTO(
             job, taskFileStorageFacade.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
-        Number projectInstanceId = ((Number) job.getMetadata(MetadataConstants.INSTANCE_ID));
+        Number projectInstanceId = (Number) job.getMetadata(MetadataConstants.INSTANCE_ID);
 
         return new WorkflowExecutionDTO(
             Validate.notNull(jobDTO.id(), "id"),
