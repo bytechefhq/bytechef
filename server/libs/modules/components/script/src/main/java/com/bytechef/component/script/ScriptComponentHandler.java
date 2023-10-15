@@ -22,7 +22,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import com.bytechef.component.script.action.ScriptJavaAction;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
-import com.bytechef.component.script.action.ScriptRAction;
 import com.bytechef.component.script.action.ScriptRubyAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
