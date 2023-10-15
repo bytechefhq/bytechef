@@ -42,9 +42,6 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-service"))
     implementation(project(":server:libs:hermes:hermes-swagger"))
 
-    implementation(project(":server:ee:libs:athena:athena-configuration:athena-configuration-rest"))
-    implementation(project(":server:ee:libs:athena:athena-configuration:athena-configuration-service"))
-    implementation(project(":server:ee:libs:athena:athena-swagger"))
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:helios:helios-configuration:helios-configuration-remote-rest"))
