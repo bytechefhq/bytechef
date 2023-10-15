@@ -15,7 +15,7 @@ tags:
 - name: "project-tag"
   description: "The Automation Project Tag API"
 - name: "project"
-  description: "The Project API"
+  description: "The Automation Project API"
 - name: "workflow"
   description: "The Automation Workflow API"
 paths:
