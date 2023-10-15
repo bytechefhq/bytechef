@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.helios.swagger.config;
 
-import com.bytechef.hermes.swagger.util.SwaggerUtils;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-@Configuration
+/**
+ * @author Ivica Cardic
+ */
+@Configuration("automationSwaggerConfiguration")
 @Profile("api-docs")
 public class SwaggerConfiguration {
 
     @Bean
     public GroupedOpenApi automationOpenApi() {
-        return com.bytechef.helios.swagger.util.SwaggerUtils.AUTOMATION_GROUP_API;
-    }
-
-    @Bean
-    public GroupedOpenApi coreOpenApi() {
-        return SwaggerUtils.CORE_GROUP_API;
-    }
-
-    @Bean
-    public GroupedOpenApi embeddedOpenApi() {
-        return com.bytechef.athena.swagger.util.SwaggerUtils.EMBEDDED_GROUP_API;
+        return GroupedOpenApi.builder()
+            .group("automation")
+            .displayName("Automation API")
+            .pathsToMatch(new String[] {
+                "/api/automation/**"
+            })
+            .build();
     }
 }
