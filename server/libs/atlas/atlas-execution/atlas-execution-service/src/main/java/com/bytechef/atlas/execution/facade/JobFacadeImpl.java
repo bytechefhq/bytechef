@@ -26,7 +26,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -45,18 +45,18 @@ public class JobFacadeImpl implements JobFacade {
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final JobService jobService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        TaskFileStorageFacade taskFileStorageFacade, WorkflowService workflowService) {
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.jobService = jobService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -74,7 +74,7 @@ public class JobFacadeImpl implements JobFacade {
 
         contextService.push(
             jobId, Context.Classname.JOB,
-            taskFileStorageFacade.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
+            taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
 
         eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
         eventPublisher.publishEvent(new JobStartEvent(jobId));

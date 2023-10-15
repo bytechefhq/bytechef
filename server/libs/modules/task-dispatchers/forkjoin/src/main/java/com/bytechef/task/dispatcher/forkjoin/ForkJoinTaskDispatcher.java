@@ -33,7 +33,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -90,20 +90,20 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final CounterService counterService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public ForkJoinTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         CounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -149,7 +149,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                                 branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, i))))
                     .build();
 
-                Map<String, ?> context = taskFileStorageFacade.readContextValue(
+                Map<String, ?> context = taskFileStorage.readContextValue(
                     contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
 
                 branchTaskExecution.evaluate(context);
@@ -158,12 +158,12 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 contextService.push(
                     Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                    taskFileStorageFacade.storeContextValue(
+                    taskFileStorage.storeContextValue(
                         Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
                         context));
                 contextService.push(
                     Validate.notNull(taskExecution.getId(), "id"), i, Classname.TASK_EXECUTION,
-                    taskFileStorageFacade.storeContextValue(Validate.notNull(taskExecution.getId(), "id"), i,
+                    taskFileStorage.storeContextValue(Validate.notNull(taskExecution.getId(), "id"), i,
                         Classname.TASK_EXECUTION,
                         context));
 

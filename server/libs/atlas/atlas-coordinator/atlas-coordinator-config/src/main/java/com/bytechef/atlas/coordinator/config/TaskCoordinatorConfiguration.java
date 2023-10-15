@@ -44,7 +44,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -89,7 +89,7 @@ public class TaskCoordinatorConfiguration {
 
     @Autowired
     @Qualifier("workflowAsyncTaskFileStorageFacade")
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Autowired
     private WorkflowService workflowService;
@@ -103,7 +103,7 @@ public class TaskCoordinatorConfiguration {
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
             contextService, eventPublisher, jobExecutor(), jobService, taskExecutionService,
-            taskFileStorageFacade, workflowService);
+            taskFileStorage, workflowService);
     }
 
     @Bean
@@ -114,7 +114,7 @@ public class TaskCoordinatorConfiguration {
     @Bean
     JobExecutor jobExecutor() {
         return new JobExecutor(
-            contextService, taskDispatcher(), taskExecutionService, taskFileStorageFacade, workflowService);
+            contextService, taskDispatcher(), taskExecutionService, taskFileStorage, workflowService);
     }
 
     @Bean

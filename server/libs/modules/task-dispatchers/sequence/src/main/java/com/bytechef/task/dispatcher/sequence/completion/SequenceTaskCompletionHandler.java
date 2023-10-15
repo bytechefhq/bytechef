@@ -27,7 +27,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -47,19 +47,19 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public SequenceTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        TaskFileStorageFacade taskFileStorageFacade) {
+        TaskFileStorage taskFileStorage) {
 
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -88,17 +88,17 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
-                taskFileStorageFacade.readContextValue(
+                taskFileStorage.readContextValue(
                     contextService.peek(
                         Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
             newContext.put(
                 taskExecution.getName(),
-                taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
+                taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
 
             contextService.push(
                 Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorageFacade.storeContextValue(
+                taskFileStorage.storeContextValue(
                     Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                     newContext));
         }
@@ -117,7 +117,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            Map<String, ?> context = taskFileStorageFacade.readContextValue(
+            Map<String, ?> context = taskFileStorage.readContextValue(
                 contextService.peek(
                     Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
@@ -127,7 +127,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(
                 Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorageFacade.storeContextValue(
+                taskFileStorage.storeContextValue(
                     Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);

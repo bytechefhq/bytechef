@@ -32,7 +32,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -57,19 +57,19 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final ContextService contextService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public LoopTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade) {
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
-                taskFileStorageFacade.readContextValue(
+                taskFileStorage.readContextValue(
                     contextService.peek(
                         Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
@@ -113,7 +113,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             contextService.push(
                 Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorageFacade.storeContextValue(
+                taskFileStorage.storeContextValue(
                     Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, newContext));
 
             taskDispatcher.dispatch(subTaskExecution);

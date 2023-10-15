@@ -20,8 +20,8 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacadeImpl;
+import com.bytechef.hermes.file.storage.TriggerFileStorage;
+import com.bytechef.hermes.file.storage.TriggerFileStorageImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class TriggerFileStorageConfiguration {
 
     @Bean
     @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
-    TriggerFileStorageFacade workflowAsyncTriggerFileStorageFacade(
+    TriggerFileStorage workflowAsyncTriggerFileStorageFacade(
         ObjectMapper objectMapper,
         @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
 
@@ -60,13 +60,13 @@ public class TriggerFileStorageConfiguration {
                     workflowAsyncOutputStorageProvider));
         }
 
-        return new TriggerFileStorageFacadeImpl(
+        return new TriggerFileStorageImpl(
             getFileStorageService(workflowAsyncOutputStorageProvider), objectMapper);
     }
 
     @Bean
     @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
-    TriggerFileStorageFacade workflowSyncTriggerFileStorageFacade(
+    TriggerFileStorage workflowSyncTriggerFileStorageFacade(
         ObjectMapper objectMapper,
         @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
 
@@ -76,7 +76,7 @@ public class TriggerFileStorageConfiguration {
                     workflowSyncOutputStorageProvider));
         }
 
-        return new TriggerFileStorageFacadeImpl(
+        return new TriggerFileStorageImpl(
             getFileStorageService(workflowSyncOutputStorageProvider), objectMapper);
     }
 

@@ -20,7 +20,7 @@ import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FILE_EN
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
@@ -55,7 +55,7 @@ public class XlsxFileComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Test
     public void testRead() throws IOException, JSONException {
@@ -72,7 +72,7 @@ public class XlsxFileComponentHandlerIntTest {
             Assertions.assertThat(job.getStatus())
                 .isEqualTo(Job.Status.COMPLETED);
 
-            Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+            Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -92,7 +92,7 @@ public class XlsxFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertThat(((Map) outputs.get("writeXlsxFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.xlsx");
@@ -107,7 +107,7 @@ public class XlsxFileComponentHandlerIntTest {
                     fileStorageService.storeFileContent(
                         FileEntryConstants.FILES_DIR, sampleFile.getName(), fileInputStream)));
 
-            outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+            outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),

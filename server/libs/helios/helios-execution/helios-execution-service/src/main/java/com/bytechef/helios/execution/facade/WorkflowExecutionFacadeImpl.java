@@ -24,7 +24,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
@@ -64,7 +64,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectService projectService;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -72,7 +72,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
         JobService jobService, ProjectInstanceService projectInstanceService, ProjectService projectService,
         TaskExecutionService taskExecutionService,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade,
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
@@ -81,7 +81,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -91,7 +91,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         Job job = jobService.getJob(id);
 
         JobDTO jobDTO = new JobDTO(
-            job, taskFileStorageFacade.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
+            job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
         Number projectInstanceId = (Number) job.getMetadata(MetadataConstants.INSTANCE_ID);
 
         return new WorkflowExecutionDTO(
@@ -172,12 +172,12 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             .stream()
             .map(taskExecution -> new TaskExecutionDTO(
                 getComponentDefinition(taskExecution),
-                taskFileStorageFacade.readContextValue(
+                taskFileStorage.readContextValue(
                     contextService.peek(
                         Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                 taskExecution.getOutput() == null
                     ? null
-                    : taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
+                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()),
                 taskExecutionService.getTaskExecution(taskExecution.getId())))
             .toList();
     }

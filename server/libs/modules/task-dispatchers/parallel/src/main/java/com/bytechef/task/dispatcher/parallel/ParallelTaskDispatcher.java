@@ -31,7 +31,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -57,20 +57,20 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final CounterService counterService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public ParallelTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         CounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -98,13 +98,13 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
-                Map<String, ?> context = taskFileStorageFacade.readContextValue(
+                Map<String, ?> context = taskFileStorage.readContextValue(
                     contextService.peek(
                         Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
                 contextService.push(
                     Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    taskFileStorageFacade.storeContextValue(
+                    taskFileStorage.storeContextValue(
                         Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                         context));
                 taskDispatcher.dispatch(parallelTaskExecution);

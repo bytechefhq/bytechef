@@ -25,7 +25,7 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -79,17 +79,17 @@ public class TaskWorker {
     private final ExecutorService executorService;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutionFutureMap = new ConcurrentHashMap<>();
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     public TaskWorker(
         ApplicationEventPublisher eventPublisher, ExecutorService executorService,
         TaskHandlerResolver taskHandlerResolver,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade) {
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
         this.taskHandlerResolver = taskHandlerResolver;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     /**
@@ -191,7 +191,7 @@ public class TaskWorker {
 
             if (output != null) {
                 taskExecution.setOutput(
-                    taskFileStorageFacade.storeTaskExecutionOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
                         Validate.notNull(taskExecution.getId(), "id"), output));
             }
 

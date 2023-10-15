@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
@@ -56,7 +56,7 @@ public class ConditionTaskDispatcherIntTest {
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @BeforeEach
     void beforeEach() {
@@ -142,7 +142,7 @@ public class ConditionTaskDispatcherIntTest {
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade));
+                taskFileStorage));
     }
 
     @SuppressWarnings("PMD")
@@ -153,7 +153,7 @@ public class ConditionTaskDispatcherIntTest {
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade));
+                taskFileStorage));
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {

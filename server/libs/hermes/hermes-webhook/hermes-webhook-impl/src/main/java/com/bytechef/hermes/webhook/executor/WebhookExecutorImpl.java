@@ -18,7 +18,7 @@ package com.bytechef.hermes.webhook.executor;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
@@ -44,20 +44,20 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final JobSyncExecutor jobSyncExecutor;
     private final TriggerSyncExecutor triggerSyncExecutor;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
         ApplicationEventPublisher eventPublisher,
         InstanceAccessorRegistry instanceAccessorRegistry,
         JobSyncExecutor jobSyncExecutor, TriggerSyncExecutor triggerSyncExecutor,
-        TaskFileStorageFacade taskFileStorageFacade) {
+        TaskFileStorage taskFileStorage) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
         this.triggerSyncExecutor = triggerSyncExecutor;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, inputMap, outputItem, metadata));
 
-                outputsList.add(taskFileStorageFacade.readJobOutputs(job.getOutputs()));
+                outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
 
             return outputsList;
@@ -86,7 +86,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
             Job job = jobSyncExecutor.execute(createJobParameters(
                 workflowExecutionId, inputMap, triggerOutput.value(), metadata));
 
-            outputs = job.getOutputs() == null ? null : taskFileStorageFacade.readJobOutputs(job.getOutputs());
+            outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
 
         return outputs;

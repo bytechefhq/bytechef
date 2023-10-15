@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.file.storage.facade;
+package com.bytechef.atlas.file.storage;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -24,7 +24,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface TaskFileStorageFacade {
+public interface TaskFileStorage {
 
     Map<String, ?> readContextValue(@NonNull FileEntry fileEntry);
 

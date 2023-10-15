@@ -34,7 +34,7 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
+import com.bytechef.hermes.file.storage.TriggerFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class TriggerSyncExecutor {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
-    private final TriggerFileStorageFacade triggerFileStorageFacade;
+    private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
 
@@ -62,14 +62,14 @@ public class TriggerSyncExecutor {
         InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
-        @Qualifier("workflowSyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        @Qualifier("workflowSyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
-        this.triggerFileStorageFacade = triggerFileStorageFacade;
+        this.triggerFileStorage = triggerFileStorage;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
@@ -101,7 +101,7 @@ public class TriggerSyncExecutor {
 
         triggerExecution.setBatch(triggerOutput.batch());
         triggerExecution.setOutput(
-            triggerFileStorageFacade.storeTriggerExecutionOutput(
+            triggerFileStorage.storeTriggerExecutionOutput(
                 Validate.notNull(triggerExecution.getId(), "id"), triggerOutput.value()));
         triggerExecution.setState(triggerOutput.state());
         triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);

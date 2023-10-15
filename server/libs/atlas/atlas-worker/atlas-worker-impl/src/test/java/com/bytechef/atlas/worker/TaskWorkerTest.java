@@ -31,8 +31,8 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
@@ -69,7 +69,7 @@ public class TaskWorkerTest {
             registerModule(new Jdk8Module());
         }
     };
-    private final TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService(), objectMapper);
 
     @Test
@@ -79,7 +79,7 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(
             CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
-                "done", taskFileStorageFacade.readTaskExecutionOutput(
+                "done", taskFileStorage.readTaskExecutionOutput(
                     ((TaskExecutionCompleteEvent) t).getTaskExecution()
                         .getOutput())));
         syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
@@ -89,7 +89,7 @@ public class TaskWorkerTest {
             new TaskWorker(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 Executors.newSingleThreadExecutor(),
-                task -> taskExecution -> "done", taskFileStorageFacade);
+                task -> taskExecution -> "done", taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -118,7 +118,7 @@ public class TaskWorkerTest {
             Executors.newSingleThreadExecutor(),
             task -> taskExecution -> {
                 throw new IllegalArgumentException("bad input");
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -137,7 +137,7 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(
             CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
-                "done", taskFileStorageFacade.readTaskExecutionOutput(
+                "done", taskFileStorage.readTaskExecutionOutput(
                     ((TaskExecutionCompleteEvent) t).getTaskExecution()
                         .getOutput())));
         syncMessageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
@@ -159,7 +159,7 @@ public class TaskWorkerTest {
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -217,7 +217,7 @@ public class TaskWorkerTest {
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -280,7 +280,7 @@ public class TaskWorkerTest {
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -324,7 +324,7 @@ public class TaskWorkerTest {
                 }
 
                 return null;
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -370,7 +370,7 @@ public class TaskWorkerTest {
                 }
 
                 return null;
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
@@ -426,7 +426,7 @@ public class TaskWorkerTest {
                 }
 
                 return null;
-            }, taskFileStorageFacade);
+            }, taskFileStorage);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))

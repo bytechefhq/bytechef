@@ -28,7 +28,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -50,17 +50,17 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
     private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
         ApplicationEventPublisher eventPublisher, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
                     if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(
-                            taskFileStorageFacade.storeTaskExecutionOutput(
+                            taskFileStorage.storeTaskExecutionOutput(
                                 Validate.notNull(completionTaskExecution.getId(), "id"), output));
                     } else {
                         // TODO check, it seems wrong

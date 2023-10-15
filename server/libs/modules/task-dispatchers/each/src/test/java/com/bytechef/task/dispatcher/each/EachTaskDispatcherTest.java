@@ -35,8 +35,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
@@ -57,7 +57,7 @@ public class EachTaskDispatcherTest {
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private final TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService(), new ObjectMapper());
 
     @Test
@@ -65,7 +65,7 @@ public class EachTaskDispatcherTest {
         Assertions.assertThrows(NullPointerException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade);
+                taskFileStorage);
 
             dispatcher.dispatch(TaskExecution.builder()
                 .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
@@ -76,12 +76,12 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch2() {
         when(contextService.peek(anyLong(), any())).thenReturn(
-            taskFileStorageFacade.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+            taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-            taskFileStorageFacade);
+            taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -108,7 +108,7 @@ public class EachTaskDispatcherTest {
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-            taskFileStorageFacade);
+            taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(
                 1L)

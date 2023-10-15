@@ -35,7 +35,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -57,20 +57,20 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     private final TaskExecutionService taskExecutionService;
     private final ContextService contextService;
     private final CounterService counterService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public MapTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         CounterService counterService, TaskDispatcher<? super TaskExecution> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.counterService = counterService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
-                    taskFileStorageFacade.readContextValue(
+                    taskFileStorage.readContextValue(
                         contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION)));
 
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
@@ -115,7 +115,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 contextService.push(
                     Validate.notNull(iterateeTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                    taskFileStorageFacade.storeTaskExecutionOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
                         Validate.notNull(iterateeTaskExecution.getId(), "id"), newContext));
 
                 taskDispatcher.dispatch(iterateeTaskExecution);
