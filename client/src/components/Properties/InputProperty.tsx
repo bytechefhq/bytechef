@@ -88,7 +88,6 @@ const InputProperty = ({
             {!mentionInput && (
                 <Input
                     className="py-2"
-                    defaultValue={defaultValue}
                     description={description}
                     error={error}
                     fieldsetClassName="flex-1 mb-0"
@@ -114,17 +113,24 @@ const InputProperty = ({
                     required={required}
                     title={type}
                     type={hidden ? 'hidden' : getInputType()}
-                    value={isNumericalInput ? integerValue : undefined}
+                    value={
+                        isNumericalInput
+                            ? integerValue || defaultValue
+                            : defaultValue
+                    }
                 />
             )}
 
             {mentionInput && !!dataPills?.length && !!name && (
                 <MentionsInput
                     controlType={controlType || getInputType()}
+                    defaultValue={defaultValue}
                     description={description}
                     data={dataPills}
                     label={label}
                     leadingIcon={leadingIcon}
+                    name={name}
+                    onChange={onChange}
                     onKeyPress={(event: KeyboardEvent) => {
                         if (isNumericalInput) {
                             event.key !== '{' && event.preventDefault();

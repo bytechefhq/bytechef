@@ -26,7 +26,7 @@ const Workflow = ({components, flowControls}: WorkflowEditorProps) => {
                 flowControls={flowControls}
             />
 
-            {componentDefinitions && currentNode && (
+            {componentDefinitions && currentNode.name && (
                 <NodeDetailsDialog
                     componentDefinitions={componentDefinitions}
                 />
