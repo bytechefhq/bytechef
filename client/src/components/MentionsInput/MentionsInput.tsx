@@ -2,7 +2,15 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/utils/getRandomId';
 
 import 'quill-mention';
-import {ReactNode, memo, useEffect, useMemo, useRef, useState} from 'react';
+import {
+    ChangeEvent,
+    ReactNode,
+    memo,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -22,7 +30,7 @@ const MentionInputListItem = (item: DataPillType) => {
 
     div.innerHTML = `
         <div>
-            <span>${item.icon}</span>
+            <span>${item.componentIcon}</span>
 
             <span>${item.value}</span>
         </div>
@@ -34,10 +42,13 @@ const MentionInputListItem = (item: DataPillType) => {
 type MentionsInputProps = {
     controlType?: string;
     data: Array<DataPillType>;
+    defaultValue?: string;
     description?: string;
     fieldsetClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
+    name?: string;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     placeholder?: string;
 };
@@ -45,10 +56,13 @@ type MentionsInputProps = {
 const MentionsInput = ({
     controlType,
     data,
+    defaultValue,
     description,
     fieldsetClassName,
     label,
     leadingIcon,
+    name,
+    onChange,
     onKeyPress,
     placeholder = "Mention datapills using '{'",
 }: MentionsInputProps) => {
@@ -64,7 +78,7 @@ const MentionsInput = ({
     const modules = {
         mention: {
             blotName: 'bytechef-mention',
-            dataAttributes: ['component'],
+            dataAttributes: ['componentIcon'],
             fixMentionsToQuill: true,
             mentionDenotationChars: ['{'],
             onOpen: () => {
@@ -94,12 +108,9 @@ const MentionsInput = ({
                     overriddenOptions: object
                 ) => void
             ) => {
-                const component = JSON.parse(item.component as string);
-
                 insertItem(
                     {
-                        component,
-                        icon: component.icon,
+                        componentIcon: item.componentIcon,
                         id: item.id,
                         value: item.value,
                     },
@@ -116,8 +127,9 @@ const MentionsInput = ({
                 renderList: (arg1: Array<object>, arg2: string) => void
             ) => {
                 const formattedData = data.map((datum) => ({
-                    ...datum,
-                    icon: JSON.parse(datum.component as string).icon,
+                    componentIcon: JSON.parse(datum.component as string).icon,
+                    id: datum.id,
+                    value: datum.value,
                 }));
 
                 if (searchTerm.length === 0) {
@@ -197,12 +209,25 @@ const MentionsInput = ({
                         'h-full w-full bg-white rounded-md',
                         leadingIcon && 'border-0 pl-10'
                     )}
+                    defaultValue={defaultValue}
                     formats={['bytechef-mention', 'mention']}
                     id={elementId}
                     key={elementId}
                     // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                     modules={useMemo(() => modules, [])}
-                    onChange={setValue}
+                    onChange={(value) => {
+                        const formattedEvent = {
+                            target: {name, value},
+                        };
+
+                        if (onChange) {
+                            onChange(
+                                formattedEvent as ChangeEvent<HTMLInputElement>
+                            );
+                        }
+
+                        setValue(value);
+                    }}
                     onFocus={() => {
                         if (editorRef.current) {
                             setFocusedInput(editorRef.current);
@@ -213,7 +238,7 @@ const MentionsInput = ({
                     onKeyPress={onKeyPress}
                     placeholder={placeholder}
                     ref={editorRef}
-                    value={value}
+                    value={defaultValue || value}
                 />
             </div>
         </fieldset>
