@@ -7,12 +7,16 @@ export default class MentionBlot extends Embed {
     static tagName = 'div';
     static className = 'bytechef-mention';
 
-    static create(data: {denotationChar: string; value: string; icon: string}) {
+    static create(data: {
+        denotationChar: string;
+        value: string;
+        componentIcon: string;
+    }) {
         const node = super.create();
         const iconNode = document.createElement('span');
         const contentNode = document.createElement('span');
 
-        iconNode.innerHTML = data.icon;
+        iconNode.innerHTML = data.componentIcon;
         contentNode.innerHTML = data.value;
 
         node.appendChild(iconNode);
@@ -27,8 +31,8 @@ export default class MentionBlot extends Embed {
         Object.keys(data).forEach((key) => {
             domNode.dataset[key] = data[key];
 
-            if (key === 'component') {
-                domNode.dataset[key] = JSON.stringify(data[key]);
+            if (key === 'componentIcon') {
+                domNode.dataset[key] = data[key];
             }
         });
 
