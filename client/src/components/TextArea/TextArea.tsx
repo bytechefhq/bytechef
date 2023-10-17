@@ -44,7 +44,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                         {label}
                     </label>
 
-                    {required && <span className="pr-1 text-red-500">*</span>}
+                    {required && (
+                        <span className="px-1 leading-3 text-red-500">*</span>
+                    )}
 
                     {description && (
                         <Tooltip>
