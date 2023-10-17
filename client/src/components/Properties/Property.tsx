@@ -1,18 +1,21 @@
+import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import getInputType from '@/pages/automation/project/utils/getInputType';
 import {PropertyType} from '@/types/projectTypes';
 import {DataPillType} from '@/types/types';
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
-import {ChangeEvent} from 'react';
+import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
+import {ChangeEvent, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 
 import Input from '../Input/Input';
+import MentionsInput from '../MentionsInput/MentionsInput';
 import ArrayProperty from './ArrayProperty';
-import InputProperty from './InputProperty';
 import ObjectProperty from './ObjectProperty';
 
 const inputPropertyControlTypes = [
@@ -54,6 +57,9 @@ const Property = ({
     property,
     register,
 }: PropertyProps) => {
+    const [mentionInput, setMentionInput] = useState(mention);
+    const [integerValue, setIntegerValue] = useState('');
+
     const {
         controlType,
         description,
@@ -83,6 +89,19 @@ const Property = ({
         inputPropertyControlTypes.includes(controlType!) ||
         inputPropertyControlTypes.includes(type!);
 
+    const isNumericalInput =
+        getInputType(controlType) === 'number' ||
+        type === 'INTEGER' ||
+        type === 'NUMBER';
+
+    const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+
+    const showMentionInput =
+        type !== 'OBJECT' &&
+        type !== 'ARRAY' &&
+        mentionInput &&
+        !!dataPills?.length;
+
     if (!name) {
         return <></>;
     }
@@ -98,157 +117,240 @@ const Property = ({
                 customClassName
             )}
         >
-            {(type === 'OBJECT' || type === 'ARRAY') && label && (
-                <div className="flex items-center py-2">
-                    <span className="pr-2" title={type}>
-                        {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    </span>
-
-                    <span className="text-sm font-medium">{label}</span>
-
-                    {description && (
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <QuestionMarkCircledIcon className="ml-1" />
-                            </TooltipTrigger>
-
-                            <TooltipContent>{description}</TooltipContent>
-                        </Tooltip>
+            <div className="relative w-full">
+                {type !== 'OBJECT' &&
+                    type !== 'ARRAY' &&
+                    !!dataPills?.length &&
+                    !!name && (
+                        <Button
+                            className="absolute right-0 top-0 h-auto w-auto p-0.5"
+                            onClick={() => setMentionInput(!mentionInput)}
+                            size="icon"
+                            variant="ghost"
+                            title="Switch input type"
+                        >
+                            {mentionInput ? (
+                                <FormInputIcon className="h-5 w-5 text-gray-800" />
+                            ) : (
+                                <FunctionSquareIcon className="h-5 w-5 text-gray-800" />
+                            )}
+                        </Button>
                     )}
-                </div>
-            )}
 
-            {register && isValidPropertyType && (
-                <Input
-                    defaultValue={defaultValue as string}
-                    description={description}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1 mb-0"
-                    key={name}
-                    label={label}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    required={required}
-                    type={hidden ? 'hidden' : 'text'}
-                    {...register(`${path}.${name}`, {
-                        required: required!,
-                    })}
-                />
-            )}
-
-            {!register && isValidPropertyType && (
-                <InputProperty
-                    controlType={controlType}
-                    dataPills={dataPills}
-                    defaultValue={defaultValue}
-                    description={description}
-                    error={hasError(name!)}
-                    fieldsetClassName="flex-1 mb-0"
-                    key={name}
-                    label={label || name}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    mention={mention}
-                    name={name!}
-                    onChange={onChange}
-                    required={required}
-                    type={type}
-                />
-            )}
-
-            {controlType === 'SELECT' && !!formattedOptions?.length && (
-                <Select
-                    description={description}
-                    label={label}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    options={formattedOptions}
-                    triggerClassName="w-full border border-gray-300"
-                />
-            )}
-
-            {controlType === 'CODE_EDITOR' && (
-                <div className="h-full w-full border-2">
-                    <Editor
-                        defaultValue="// Add your custom code here..."
-                        language={actionName}
-                        options={{
-                            extraEditorClassName: 'code-editor',
-                            folding: false,
-                            glyphMargin: false,
-                            lineDecorationsWidth: 0,
-                            lineNumbers: 'off',
-                            lineNumbersMinChars: 0,
-                            minimap: {
-                                enabled: false,
-                            },
-                            scrollBeyondLastLine: false,
-                            scrollbar: {
-                                horizontalScrollbarSize: 4,
-                                verticalScrollbarSize: 4,
-                            },
-                            tabSize: 2,
+                {showMentionInput && (
+                    <MentionsInput
+                        controlType={controlType || getInputType(controlType)}
+                        defaultValue={defaultValue}
+                        description={description}
+                        data={dataPills}
+                        label={label}
+                        leadingIcon={typeIcon}
+                        name={name}
+                        onChange={onChange}
+                        onKeyPress={(event: KeyboardEvent) => {
+                            if (isNumericalInput) {
+                                event.key !== '{' && event.preventDefault();
+                            }
                         }}
                     />
-                </div>
-            )}
+                )}
 
-            {controlType === 'TEXT_AREA' && (
-                <TextArea
-                    description={description}
-                    fieldsetClassName="w-full"
-                    key={name}
-                    required={required}
-                    label={label}
-                    name={name!}
-                />
-            )}
+                {!showMentionInput && (
+                    <>
+                        {(type === 'OBJECT' || type === 'ARRAY') && label && (
+                            <div className="flex items-center py-2">
+                                <span className="pr-2" title={type}>
+                                    {typeIcon}
+                                </span>
 
-            {(type === 'ARRAY' || controlType === 'MULTI_SELECT') && (
-                <ArrayProperty dataPills={dataPills} property={property} />
-            )}
+                                <span className="text-sm font-medium">
+                                    {label}
+                                </span>
 
-            {register && type === 'BOOLEAN' && (
-                <Select
-                    description={description}
-                    label={label}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    options={[
-                        {label: 'True', value: 'true'},
-                        {label: 'False', value: 'false'},
-                    ]}
-                    triggerClassName="w-full border border-gray-300"
-                    {...register(`${path}.${name}`, {
-                        required: required!,
-                    })}
-                />
-            )}
+                                {description && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <QuestionMarkCircledIcon className="ml-1" />
+                                        </TooltipTrigger>
 
-            {type === 'BOOLEAN' && (
-                <Select
-                    description={description}
-                    label={label}
-                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
-                    options={[
-                        {label: 'True', value: 'true'},
-                        {label: 'False', value: 'false'},
-                    ]}
-                    triggerClassName="w-full border border-gray-300"
-                />
-            )}
+                                        <TooltipContent>
+                                            {description}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        )}
 
-            {type === 'OBJECT' && (
-                <ObjectProperty dataPills={dataPills} property={property} />
-            )}
+                        {(type === 'ARRAY' ||
+                            controlType === 'MULTI_SELECT') && (
+                            <ArrayProperty
+                                dataPills={dataPills}
+                                property={property}
+                            />
+                        )}
 
-            {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
+                        {type === 'OBJECT' && (
+                            <ObjectProperty
+                                dataPills={dataPills}
+                                property={property}
+                            />
+                        )}
 
-            {!controlType && type === 'ANY' && (
-                <span>
-                    {controlType} - {type}
-                </span>
-            )}
+                        {register && isValidPropertyType && (
+                            <Input
+                                defaultValue={defaultValue as string}
+                                description={description}
+                                error={hasError(name!)}
+                                fieldsetClassName="flex-1 mb-0"
+                                key={name}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                required={required}
+                                type={hidden ? 'hidden' : 'text'}
+                                {...register(`${path}.${name}`, {
+                                    required: required!,
+                                })}
+                            />
+                        )}
 
-            {type === 'NULL' && <span>NULL</span>}
+                        {!register && isValidPropertyType && (
+                            <Input
+                                description={description}
+                                error={hasError(name!)}
+                                fieldsetClassName="flex-1 mb-0"
+                                key={name}
+                                label={label || name}
+                                leadingIcon={typeIcon}
+                                name={name!}
+                                onChange={(event) => {
+                                    if (onChange) {
+                                        onChange(event);
+                                    }
 
-            {type === 'DYNAMIC_PROPERTIES' && <span>Dynamic properties</span>}
+                                    if (isNumericalInput) {
+                                        const {value} = event.target;
+
+                                        const integerOnlyRegex = /^[0-9\b]+$/;
+
+                                        if (
+                                            value === '' ||
+                                            integerOnlyRegex.test(value)
+                                        ) {
+                                            setIntegerValue(value);
+                                        }
+                                    }
+                                }}
+                                required={required}
+                                title={type}
+                                type={
+                                    hidden
+                                        ? 'hidden'
+                                        : getInputType(controlType)
+                                }
+                                value={
+                                    isNumericalInput
+                                        ? integerValue || defaultValue
+                                        : defaultValue
+                                }
+                            />
+                        )}
+
+                        {controlType === 'SELECT' &&
+                            !!formattedOptions?.length && (
+                                <Select
+                                    description={description}
+                                    label={label}
+                                    leadingIcon={typeIcon}
+                                    options={formattedOptions}
+                                    triggerClassName="w-full border border-gray-300"
+                                />
+                            )}
+
+                        {controlType === 'CODE_EDITOR' && (
+                            <div className="h-full w-full border-2">
+                                <Editor
+                                    defaultValue="// Add your custom code here..."
+                                    language={actionName}
+                                    options={{
+                                        extraEditorClassName: 'code-editor',
+                                        folding: false,
+                                        glyphMargin: false,
+                                        lineDecorationsWidth: 0,
+                                        lineNumbers: 'off',
+                                        lineNumbersMinChars: 0,
+                                        minimap: {
+                                            enabled: false,
+                                        },
+                                        scrollBeyondLastLine: false,
+                                        scrollbar: {
+                                            horizontalScrollbarSize: 4,
+                                            verticalScrollbarSize: 4,
+                                        },
+                                        tabSize: 2,
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        {controlType === 'TEXT_AREA' && (
+                            <TextArea
+                                description={description}
+                                fieldsetClassName="w-full"
+                                key={name}
+                                required={required}
+                                label={label}
+                                name={name!}
+                            />
+                        )}
+
+                        {register && type === 'BOOLEAN' && (
+                            <Select
+                                description={description}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                options={[
+                                    {label: 'True', value: 'true'},
+                                    {label: 'False', value: 'false'},
+                                ]}
+                                triggerClassName="w-full border border-gray-300"
+                                {...register(`${path}.${name}`, {
+                                    required: required!,
+                                })}
+                            />
+                        )}
+
+                        {type === 'BOOLEAN' && (
+                            <Select
+                                description={description}
+                                fieldsetClassName="mt-2"
+                                label={label}
+                                leadingIcon={typeIcon}
+                                options={[
+                                    {label: 'True', value: 'true'},
+                                    {label: 'False', value: 'false'},
+                                ]}
+                                triggerClassName="w-full border border-gray-300"
+                            />
+                        )}
+
+                        {controlType === 'SCHEMA_DESIGNER' && (
+                            <span>Schema designer</span>
+                        )}
+
+                        {!controlType && type === 'ANY' && (
+                            <span>
+                                {controlType} - {type}
+                            </span>
+                        )}
+
+                        {type === 'NULL' && <span>NULL</span>}
+
+                        {type === 'DYNAMIC_PROPERTIES' && (
+                            <span>Dynamic properties</span>
+                        )}
+                    </>
+                )}
+            </div>
         </li>
     );
 };
