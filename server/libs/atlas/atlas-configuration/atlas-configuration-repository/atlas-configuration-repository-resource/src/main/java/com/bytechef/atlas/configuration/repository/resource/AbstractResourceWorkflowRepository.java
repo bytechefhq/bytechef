@@ -66,6 +66,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
             return Arrays.stream(resources)
                 .map(resource -> read(resource, type))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -107,7 +108,9 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             return WorkflowReader.readWorkflow(workflowResource, type);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage());
+            }
         }
 
         return null;
