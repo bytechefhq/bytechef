@@ -79,6 +79,10 @@ const Property = ({
             }) as ISelectOption
     );
 
+    const isValidPropertyType =
+        inputPropertyControlTypes.includes(controlType!) ||
+        inputPropertyControlTypes.includes(type!);
+
     if (!name) {
         return <></>;
     }
@@ -114,7 +118,7 @@ const Property = ({
                 </div>
             )}
 
-            {register && inputPropertyControlTypes.includes(controlType!) && (
+            {register && isValidPropertyType && (
                 <Input
                     defaultValue={defaultValue as string}
                     description={description}
@@ -131,7 +135,7 @@ const Property = ({
                 />
             )}
 
-            {!register && inputPropertyControlTypes.includes(controlType!) && (
+            {!register && isValidPropertyType && (
                 <InputProperty
                     controlType={controlType}
                     dataPills={dataPills}
