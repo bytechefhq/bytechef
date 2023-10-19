@@ -2,7 +2,6 @@
 /* eslint-disable */
 export * from './ActionDefinitionBasicModel';
 export * from './ActionDefinitionModel';
-export * from './AnyPropertyModel';
 export * from './ArrayPropertyModel';
 export * from './AuthorizationModel';
 export * from './AuthorizationTypeModel';
@@ -33,6 +32,7 @@ export * from './ResourcesModel';
 export * from './StringPropertyModel';
 export * from './TaskDispatcherDefinitionBasicModel';
 export * from './TaskDispatcherDefinitionModel';
+export * from './TaskDispatcherOperationRequestModel';
 export * from './TimePropertyModel';
 export * from './TriggerDefinitionBasicModel';
 export * from './TriggerDefinitionModel';
