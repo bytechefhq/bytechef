@@ -1,27 +1,16 @@
-
-/*
- * Copyright 2023-present ByteChef Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.bytechef.helios.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 
 import java.util.*;
 import jakarta.annotation.Generated;
@@ -32,129 +21,114 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular task.")
 @JsonTypeName("ProjectInstanceWorkflowConnection")
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-10-09T13:39:54.113168+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-19T19:33:27.276007+02:00[Europe/Berlin]")
 public class ProjectInstanceWorkflowConnectionModel {
 
-    private Long connectionId;
+  private Long connectionId;
 
-    private String key;
+  private String key;
 
-    private String operationName;
+  private String operationName;
 
-    public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
-        this.connectionId = connectionId;
-        return this;
+  public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
+    this.connectionId = connectionId;
+    return this;
+  }
+
+  /**
+   * The connection id
+   * @return connectionId
+  */
+  
+  @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionId")
+  public Long getConnectionId() {
+    return connectionId;
+  }
+
+  public void setConnectionId(Long connectionId) {
+    this.connectionId = connectionId;
+  }
+
+  public ProjectInstanceWorkflowConnectionModel key(String key) {
+    this.key = key;
+    return this;
+  }
+
+  /**
+   * The connection key under which a connection is defined in a workflow definition.
+   * @return key
+  */
+  
+  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("key")
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public ProjectInstanceWorkflowConnectionModel operationName(String operationName) {
+    this.operationName = operationName;
+    return this;
+  }
+
+  /**
+   * The action/trigger name to which a connection belongs.
+   * @return operationName
+  */
+  
+  @Schema(name = "operationName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("operationName")
+  public String getOperationName() {
+    return operationName;
+  }
+
+  public void setOperationName(String operationName) {
+    this.operationName = operationName;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    /**
-     * The connection id
-     * 
-     * @return connectionId
-     */
-
-    @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("connectionId")
-    public Long getConnectionId() {
-        return connectionId;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    ProjectInstanceWorkflowConnectionModel projectInstanceWorkflowConnection = (ProjectInstanceWorkflowConnectionModel) o;
+    return Objects.equals(this.connectionId, projectInstanceWorkflowConnection.connectionId) &&
+        Objects.equals(this.key, projectInstanceWorkflowConnection.key) &&
+        Objects.equals(this.operationName, projectInstanceWorkflowConnection.operationName);
+  }
 
-    public void setConnectionId(Long connectionId) {
-        this.connectionId = connectionId;
+  @Override
+  public int hashCode() {
+    return Objects.hash(connectionId, key, operationName);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class ProjectInstanceWorkflowConnectionModel {\n");
+    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+    sb.append("    key: ").append(toIndentedString(key)).append("\n");
+    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
     }
-
-    public ProjectInstanceWorkflowConnectionModel key(String key) {
-        this.key = key;
-        return this;
-    }
-
-    /**
-     * The connection key under which a connection is defined in a workflow definition.
-     * 
-     * @return key
-     */
-
-    @Schema(
-        name = "key", description = "The connection key under which a connection is defined in a workflow definition.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("key")
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public ProjectInstanceWorkflowConnectionModel operationName(String operationName) {
-        this.operationName = operationName;
-        return this;
-    }
-
-    /**
-     * The action/trigger name to which a connection belongs.
-     * 
-     * @return operationName
-     */
-
-    @Schema(
-        name = "operationName", description = "The action/trigger name to which a connection belongs.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("operationName")
-    public String getOperationName() {
-        return operationName;
-    }
-
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProjectInstanceWorkflowConnectionModel projectInstanceWorkflowConnection =
-            (ProjectInstanceWorkflowConnectionModel) o;
-        return Objects.equals(this.connectionId, projectInstanceWorkflowConnection.connectionId) &&
-            Objects.equals(this.key, projectInstanceWorkflowConnection.key) &&
-            Objects.equals(this.operationName, projectInstanceWorkflowConnection.operationName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(connectionId, key, operationName);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class ProjectInstanceWorkflowConnectionModel {\n");
-        sb.append("    connectionId: ")
-            .append(toIndentedString(connectionId))
-            .append("\n");
-        sb.append("    key: ")
-            .append(toIndentedString(key))
-            .append("\n");
-        sb.append("    operationName: ")
-            .append(toIndentedString(operationName))
-            .append("\n");
-        sb.append("}");
-        return sb.toString();
-    }
-
-    /**
-     * Convert the given object to string with each line indented by 4 spaces (except the first line).
-     */
-    private String toIndentedString(Object o) {
-        if (o == null) {
-            return "null";
-        }
-        return o.toString()
-            .replace("\n", "\n    ");
-    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+
