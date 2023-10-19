@@ -1,3 +1,4 @@
+import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
@@ -14,6 +15,7 @@ import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export type WorkflowEditorProps = {
     components: ComponentDefinitionBasicModel[];
@@ -21,6 +23,7 @@ export type WorkflowEditorProps = {
 };
 
 const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
+    const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
@@ -41,7 +44,52 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
         []
     );
 
-    const {getEdge, getNode, setViewport} = useReactFlow();
+    const {data: workflowComponent} = useGetComponentDefinitionQuery(
+        {
+            componentName: nodeNames[nodeNames.length - 1],
+        },
+        !!nodeNames.length
+    );
+
+    const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
+
+    const nodes = getNodes();
+
+    useEffect(() => {
+        const workflowNodes = nodes.filter((node) => node.data.originNodeName);
+
+        setNodeNames(workflowNodes.map((node) => node.data.originNodeName));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nodes.length]);
+
+    const {componentActions, setComponentActions} = useWorkflowDataStore();
+
+    useEffect(() => {
+        if (workflowComponent?.actions) {
+            let workflowAlias = workflowComponent.name;
+            let index = 1;
+
+            while (
+                componentActions.some(
+                    (action) => action.componentName === workflowAlias
+                )
+            ) {
+                workflowAlias = `${workflowComponent.name}-${index}`;
+
+                index++;
+            }
+
+            setComponentActions([
+                ...componentActions,
+                {
+                    actionName: workflowComponent.actions[0].name,
+                    componentName: workflowComponent.name,
+                    workflowAlias,
+                },
+            ]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowComponent?.name]);
 
     const {width} = useStore((store) => ({
         height: store.height,
