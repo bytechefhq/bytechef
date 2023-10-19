@@ -1,5 +1,4 @@
 import {
-    AnyPropertyModel,
     ArrayPropertyModel,
     BooleanPropertyModel,
     DatePropertyModel,
@@ -13,8 +12,7 @@ import {
     TimePropertyModel,
 } from 'middleware/hermes/configuration';
 
-export type PropertyType = AnyPropertyModel &
-    ArrayPropertyModel &
+export type PropertyType = ArrayPropertyModel &
     BooleanPropertyModel &
     DatePropertyModel &
     DateTimePropertyModel &
