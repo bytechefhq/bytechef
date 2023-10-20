@@ -91,7 +91,11 @@ const ConnectionDialog = ({
             authorizationName: '',
             componentName: undefined,
             name: connection?.name || '',
-            tags: [],
+            tags:
+                connection?.tags?.map((tag) => ({
+                    ...tag,
+                    label: tag.name,
+                })) || [],
         },
     });
 
@@ -247,6 +251,10 @@ const ConnectionDialog = ({
                 : undefined
         );
     }, [authorizationsExists, authorizationOptions, componentDefinition]);
+
+    const tagNames = connection?.tags?.map((tag) => tag.name);
+
+    const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
     function closeDialog() {
         setIsOpen(false);
@@ -558,18 +566,20 @@ const ConnectionDialog = ({
                                             field={field}
                                             isMulti={true}
                                             label="Tags"
-                                            options={tags!.map(
-                                                (tag: TagModel) => ({
-                                                    label: `${tag.name
-                                                        .charAt(0)
-                                                        .toUpperCase()}${tag.name.slice(
-                                                        1
-                                                    )}`,
-                                                    value: tag.name
-                                                        .toLowerCase()
-                                                        .replace(/\W/g, ''),
-                                                    ...tag,
-                                                })
+                                            options={remainingTags!.map(
+                                                (tag: TagModel) => {
+                                                    return {
+                                                        label: `${tag.name
+                                                            .charAt(0)
+                                                            .toUpperCase()}${tag.name.slice(
+                                                            1
+                                                        )}`,
+                                                        value: tag.name
+                                                            .toLowerCase()
+                                                            .replace(/\W/g, ''),
+                                                        ...tag,
+                                                    };
+                                                }
                                             )}
                                             onCreateOption={(
                                                 inputValue: string
