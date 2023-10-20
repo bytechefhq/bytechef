@@ -97,8 +97,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextService.push(
-                taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION, newContext);
+            contextService.push(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION, newContext);
         }
 
         TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
@@ -123,13 +122,9 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             branchWorkflowTask.put(BRANCH, branch);
 
-            TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask);
-
-            branchTaskExecution.setJobId(taskExecution.getJobId());
-            branchTaskExecution.setParentId(taskExecution.getParentId());
-            branchTaskExecution.setPriority(taskExecution.getPriority());
-            branchTaskExecution.setStatus(TaskStatus.CREATED);
-            branchTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
+            TaskExecution branchTaskExecution = TaskExecution.of(
+                taskExecution.getJobId(), taskExecution.getParentId(), taskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, branchWorkflowTask);
 
             Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);

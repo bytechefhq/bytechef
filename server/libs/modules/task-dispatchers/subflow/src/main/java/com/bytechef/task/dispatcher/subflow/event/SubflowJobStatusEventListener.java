@@ -32,11 +32,10 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * an {@link EventListener} which is used for listening to subflow job status events. When a sub-flow completes/fails or
- * stops its parent job and its parent task needs to be informed so as to resume its execution.
+ * stops its parent job and its parent task needs to be informed to resume its execution.
  *
  * @author Arik Cohen
  * @author Ivica Cardic
@@ -52,14 +51,13 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-        JobService jobService,
-        TaskExecutionService taskExecutionService,
-        CoordinatorManager coordinatorManager,
+        JobService jobService, TaskExecutionService taskExecutionService, CoordinatorManager coordinatorManager,
         TaskEvaluator taskEvaluator) {
-        this.jobService = Objects.requireNonNull(jobService);
-        this.taskExecutionService = Objects.requireNonNull(taskExecutionService);
-        this.coordinatorManager = Objects.requireNonNull(coordinatorManager);
-        this.taskEvaluator = Objects.requireNonNull(taskEvaluator);
+
+        this.jobService = jobService;
+        this.taskExecutionService = taskExecutionService;
+        this.coordinatorManager = coordinatorManager;
+        this.taskEvaluator = taskEvaluator;
     }
 
     @Override

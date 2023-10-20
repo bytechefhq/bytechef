@@ -64,13 +64,10 @@ public class Coordinator {
     private final TaskExecutionService taskExecutionService;
 
     public Coordinator(
-        ErrorHandler<? super Errorable> errorHandler,
-        EventPublisher eventPublisher,
-        JobExecutor jobExecutor,
-        JobFacade jobFacade, JobService jobService,
-        TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService) {
+        ErrorHandler<? super Errorable> errorHandler, EventPublisher eventPublisher, JobExecutor jobExecutor,
+        JobFacade jobFacade, JobService jobService, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+
         this.errorHandler = errorHandler;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
@@ -149,8 +146,7 @@ public class Coordinator {
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {
-            taskExecution.setError(
-                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
             handleError(taskExecution);
         }

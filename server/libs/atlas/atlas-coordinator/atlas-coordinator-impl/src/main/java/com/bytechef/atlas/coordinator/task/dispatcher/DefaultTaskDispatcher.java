@@ -42,7 +42,8 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     public DefaultTaskDispatcher(
         MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
         this.messageBroker = Objects.requireNonNull(messageBroker);
-        this.taskDispatcherPreSendProcessors = taskDispatcherPreSendProcessors == null ? List.of()
+        this.taskDispatcherPreSendProcessors = taskDispatcherPreSendProcessors == null
+            ? List.of()
             : taskDispatcherPreSendProcessors;
     }
 
