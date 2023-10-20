@@ -47,6 +47,18 @@ public class ComponentDefinitionTest {
     };
 
     @Test
+    public void testActionDefinition() throws JSONException, JsonProcessingException {
+        ActionDefinition action = ComponentDSL.action("name")
+            .display(display("label").description("description"));
+
+        jsonAssertEquals(
+            """
+                {"display":{"description":"description","label":"label"},"name":"name"}
+                """,
+            action);
+    }
+
+    @Test
     public void testAnyProperty() throws JSONException, JsonProcessingException {
         Property<Property.OneOfProperty> property = ComponentDSL.oneOf("name")
             .description("description")
@@ -249,18 +261,6 @@ public class ComponentDefinitionTest {
                 }
                 """,
             property);
-    }
-
-    @Test
-    public void testTaskOperation() throws JSONException, JsonProcessingException {
-        ActionDefinition action = ComponentDSL.action("name")
-            .display(display("label").description("description"));
-
-        jsonAssertEquals(
-            """
-                {"display":{"description":"description","label":"label"},"name":"name"}
-                """,
-            action);
     }
 
     @Test

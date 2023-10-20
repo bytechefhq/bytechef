@@ -66,7 +66,7 @@ public class HttpClientUtilsTest {
         //
 
         bodyHandler = httpClient.createBodyHandler(HttpClientUtils.Configuration.builder()
-            .responseFormat(HttpClientUtils.ResponseFormat.FILE)
+            .responseFormat(HttpClientUtils.ResponseFormat.BINARY)
             .build());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
@@ -443,7 +443,7 @@ public class HttpClientUtilsTest {
                 context,
                 new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
                 HttpClientUtils.Configuration.builder()
-                    .responseFormat(HttpClientUtils.ResponseFormat.FILE)
+                    .responseFormat(HttpClientUtils.ResponseFormat.BINARY)
                     .build()));
 
         //

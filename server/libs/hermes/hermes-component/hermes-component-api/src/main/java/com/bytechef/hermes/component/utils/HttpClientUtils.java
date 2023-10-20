@@ -37,6 +37,7 @@ import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
@@ -61,8 +62,6 @@ import org.apache.tika.mime.MimeTypes;
  */
 public class HttpClientUtils {
 
-    private static final HttpClientUtils HTTP_CLIENT_UTILS = new HttpClientUtils();
-
     public enum BodyContentType {
         BINARY,
         FORM_DATA,
@@ -73,7 +72,7 @@ public class HttpClientUtils {
     }
 
     public enum ResponseFormat {
-        FILE,
+        BINARY,
         JSON,
         TEXT,
         XML,
@@ -95,7 +94,7 @@ public class HttpClientUtils {
         return new Executor();
     }
 
-    protected Object execute(
+    protected static Object execute(
         Context context,
         String urlString,
         Map<String, List<String>> headers,
@@ -107,22 +106,22 @@ public class HttpClientUtils {
 
         HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
 
-        HttpRequest httpRequest = createHTTPRequest(context, urlString, requestMethod, headers, queryParameters,
-            payload);
+        HttpRequest httpRequest = createHTTPRequest(
+            context, urlString, requestMethod, headers, queryParameters, payload);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
         return handleResponse(context, httpResponse, configuration);
     }
 
-    protected HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
+    protected static HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
         HttpResponse.BodyHandler<?> bodyHandler;
         ResponseFormat responseFormat = configuration.getResponseFormat();
 
         if (responseFormat == null) {
             bodyHandler = HttpResponse.BodyHandlers.discarding();
         } else {
-            if (responseFormat == ResponseFormat.FILE) {
+            if (responseFormat == ResponseFormat.BINARY) {
                 bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
             } else {
                 bodyHandler = HttpResponse.BodyHandlers.ofString();
@@ -132,7 +131,7 @@ public class HttpClientUtils {
         return bodyHandler;
     }
 
-    protected HttpRequest.BodyPublisher createBodyPublisher(Context context, Payload payload) {
+    protected static HttpRequest.BodyPublisher createBodyPublisher(Context context, Payload payload) {
         HttpRequest.BodyPublisher bodyPublisher;
 
         if (payload == null) {
@@ -141,7 +140,7 @@ public class HttpClientUtils {
             if (payload.bodyContentType == BodyContentType.BINARY && payload.value instanceof FileEntry fileEntry) {
                 bodyPublisher = MoreBodyPublishers.ofMediaType(
                     HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
-                    MediaType.parse(fileEntry.getMimeType()));
+                    MediaType.parse(payload.mimeType == null ? fileEntry.getMimeType() : payload.mimeType));
             } else if (payload.bodyContentType == BodyContentType.FORM_DATA) {
                 Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
 
@@ -179,14 +178,14 @@ public class HttpClientUtils {
             } else {
                 bodyPublisher = MoreBodyPublishers.ofMediaType(
                     HttpRequest.BodyPublishers.ofString(payload.value.toString()),
-                    MediaType.parse(payload.rawContentMimeType));
+                    MediaType.parse(payload.mimeType));
             }
         }
 
         return bodyPublisher;
     }
 
-    protected HttpClient createHttpClient(
+    protected static HttpClient createHttpClient(
         Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
         Configuration configuration) {
 
@@ -230,7 +229,7 @@ public class HttpClientUtils {
         return builder.build();
     }
 
-    protected HttpRequest createHTTPRequest(
+    protected static HttpRequest createHTTPRequest(
         Context context, String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         Map<String, List<String>> queryParameters, Payload payload) {
 
@@ -251,23 +250,24 @@ public class HttpClientUtils {
         return httpRequestBuilder.build();
     }
 
-    protected Object handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
+    protected static Object handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
         throws Exception {
+
         Object body = null;
+        HttpHeaders httpHeaders = httpResponse.headers();
+
+        Map<String, List<String>> headersMap = httpHeaders.map();
 
         if (configuration.getResponseFormat() != null) {
+            Object httpResponseBody = httpResponse.body();
             ResponseFormat responseFormat = configuration.getResponseFormat();
 
-            if (responseFormat == ResponseFormat.FILE) {
+            if (!ObjectUtils.isEmpty(httpResponseBody) && responseFormat == ResponseFormat.BINARY) {
                 String filename = configuration.getFilename();
 
                 if (filename == null || filename.length() == 0) {
-                    Map<String, List<String>> headersMap = httpResponse.headers()
-                        .map();
-
                     if (headersMap.containsKey("Content-Type")) {
                         MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
-
                         List<String> values = headersMap.get("Content-Type");
 
                         MimeType mimeType = mimeTypes.forName(values.get(0));
@@ -278,22 +278,20 @@ public class HttpClientUtils {
                     }
                 }
 
-                body = context.storeFileContent(filename, (InputStream) httpResponse.body());
+                body = context.storeFileContent(filename, (InputStream) httpResponseBody);
             } else if (responseFormat == ResponseFormat.JSON) {
-                body = JsonUtils.read(httpResponse.body()
-                    .toString());
+                body = ObjectUtils.isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
             } else if (responseFormat == ResponseFormat.TEXT) {
-                body = httpResponse.body()
-                    .toString();
+                body = ObjectUtils.isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
             } else {
-                body = XmlUtils.read(httpResponse.body()
-                    .toString());
+                body = ObjectUtils.isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());
             }
 
             if (configuration.isFullResponse()) {
-                body = new HttpResponseEntry(body, httpResponse.headers()
-                    .map(), httpResponse.statusCode());
+                body = new HttpResponseEntry(body, headersMap, httpResponse.statusCode());
             }
+        } else if (configuration.isFullResponse()) {
+            body = new HttpResponseEntry(null, headersMap, httpResponse.statusCode());
         }
 
         return body;
@@ -591,7 +589,7 @@ public class HttpClientUtils {
 
         public Object execute(Context context) {
             try {
-                return HTTP_CLIENT_UTILS.execute(
+                return HttpClientUtils.execute(
                     Objects.requireNonNull(context),
                     url,
                     headers,
@@ -608,7 +606,7 @@ public class HttpClientUtils {
     public static class Payload {
 
         private final BodyContentType bodyContentType;
-        private String rawContentMimeType;
+        private String mimeType;
         private final Object value;
 
         private Payload(Object value, BodyContentType bodyContentType) {
@@ -616,16 +614,33 @@ public class HttpClientUtils {
             this.bodyContentType = bodyContentType;
         }
 
-        private Payload(Object value, BodyContentType bodyContentType, String rawContentMimeType) {
+        private Payload(Object value, BodyContentType bodyContentType, String mimeType) {
             this.value = value;
             this.bodyContentType = bodyContentType;
-            this.rawContentMimeType = rawContentMimeType;
+            this.mimeType = mimeType;
         }
 
         public static Payload of(FileEntry fileEntry) {
+            return new Payload(fileEntry, BodyContentType.BINARY);
+        }
+
+        public static Payload of(FileEntry fileEntry, String mimeType) {
             Objects.requireNonNull(fileEntry);
 
-            return new Payload(fileEntry, BodyContentType.BINARY);
+            return new Payload(fileEntry, BodyContentType.BINARY, mimeType);
+        }
+
+        public static Payload of(List<?> list) {
+            Objects.requireNonNull(list);
+
+            return new Payload(list, BodyContentType.JSON);
+        }
+
+        public static Payload of(List<?> list, BodyContentType bodyContentType) {
+            Objects.requireNonNull(list);
+            Objects.requireNonNull(bodyContentType);
+
+            return new Payload(list, bodyContentType);
         }
 
         public static Payload of(Map<String, Object> map) {
