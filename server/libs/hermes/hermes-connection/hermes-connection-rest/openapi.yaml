@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Core Connection API"
+  title: "Core Connection OAuth2 API"
   version: "1"
 servers:
 - url: "http://localhost:5173/api/core"
@@ -9,7 +9,7 @@ tags:
 - name: "connection-oauth2"
   description: "The Core Connection OAuth2 API"
 paths:
-  /connection-oauth2-properties:
+  /oauth2-properties:
     get:
       description: "Get OAuth2 properties."
       summary: "Get OAuth2 properties"
