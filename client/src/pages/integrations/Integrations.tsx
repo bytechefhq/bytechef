@@ -1,6 +1,6 @@
 import { MainLayout } from '../../components/Layouts/MainLayout'
 import { IntegrationList } from './IntegrationList'
-import { Button } from '../../components/Button'
+import { Button } from '../../components/Button/Button'
 
 export const Integrations = () => {
   return (
