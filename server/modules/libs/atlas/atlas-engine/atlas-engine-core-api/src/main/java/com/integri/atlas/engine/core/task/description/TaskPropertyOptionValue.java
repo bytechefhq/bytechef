@@ -28,11 +28,11 @@ import java.io.IOException;
  * @author Ivica Cardic
  */
 public interface TaskPropertyOptionValue {
-    static TaskPropertyOptionValue propertyOptionValue(int value) {
+    static TaskPropertyOptionValue optionValue(int value) {
         return new TaskPropertyOptionValueNumber(value);
     }
 
-    static TaskPropertyOptionValue propertyOptionValue(String value) {
+    static TaskPropertyOptionValue optionValue(String value) {
         return new TaskPropertyOptionValueString(value);
     }
 

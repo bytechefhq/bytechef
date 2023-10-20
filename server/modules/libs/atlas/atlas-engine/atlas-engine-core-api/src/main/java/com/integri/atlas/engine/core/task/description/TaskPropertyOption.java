@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.core.task.description;
 
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.propertyOptionValue;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 
 import java.util.List;
 
@@ -27,24 +27,24 @@ import java.util.List;
  */
 public sealed interface TaskPropertyOption
     permits TaskProperty, TaskPropertyOption.TaskPropertyOptionItem, TaskPropertyOption.TaskPropertyGroup {
-    static TaskPropertyOption propertyGroup(String name, String displayName, List<TaskProperty> properties) {
+    static TaskPropertyOption group(String name, String displayName, List<TaskProperty> properties) {
         return new TaskPropertyGroup(name, displayName, properties);
     }
 
-    static TaskPropertyOption propertyOption(String name, int value) {
-        return new TaskPropertyOptionItem(name, propertyOptionValue(value), null);
+    static TaskPropertyOption option(String name, int value) {
+        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), null);
     }
 
-    static TaskPropertyOption propertyOption(String name, String value) {
-        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.propertyOptionValue(value), null);
+    static TaskPropertyOption option(String name, String value) {
+        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), null);
     }
 
-    static TaskPropertyOption propertyOption(String name, int value, String description) {
-        return new TaskPropertyOptionItem(name, propertyOptionValue(value), description);
+    static TaskPropertyOption option(String name, int value, String description) {
+        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), description);
     }
 
-    static TaskPropertyOption propertyOption(String name, String value, String description) {
-        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.propertyOptionValue(value), description);
+    static TaskPropertyOption option(String name, String value, String description) {
+        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), description);
     }
 
     record TaskPropertyGroup(String name, String displayName, List<TaskProperty> properties)
