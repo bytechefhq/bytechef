@@ -51,6 +51,12 @@ import {
  */
 export interface ProjectExecutionModel {
     /**
+     * The id of a project execution.
+     * @type {number}
+     * @memberof ProjectExecutionModel
+     */
+    readonly id?: number;
+    /**
      * 
      * @type {ProjectInstanceModel}
      * @memberof ProjectExecutionModel
@@ -101,6 +107,7 @@ export function ProjectExecutionModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'id': !exists(json, 'id') ? undefined : json['id'],
         'instance': !exists(json, 'instance') ? undefined : ProjectInstanceModelFromJSON(json['instance']),
         'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
