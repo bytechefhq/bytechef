@@ -32,12 +32,6 @@ export interface JobParametersModel {
      */
     label?: string;
     /**
-     * The outputs expected by the workflow.
-     * @type {{ [key: string]: object; }}
-     * @memberof JobParametersModel
-     */
-    outputs?: { [key: string]: object; };
-    /**
      * The id of the parent task that created this job. Used for sub-flows.
      * @type {string}
      * @memberof JobParametersModel
@@ -85,7 +79,6 @@ export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'label': !exists(json, 'label') ? undefined : json['label'],
-        'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
         'priority': !exists(json, 'priority') ? undefined : json['priority'],
         'workflowId': json['workflowId'],
@@ -104,7 +97,6 @@ export function JobParametersModelToJSON(value?: JobParametersModel | null): any
         
         'inputs': value.inputs,
         'label': value.label,
-        'outputs': value.outputs,
         'parentTaskExecutionId': value.parentTaskExecutionId,
         'priority': value.priority,
         'workflowId': value.workflowId,
