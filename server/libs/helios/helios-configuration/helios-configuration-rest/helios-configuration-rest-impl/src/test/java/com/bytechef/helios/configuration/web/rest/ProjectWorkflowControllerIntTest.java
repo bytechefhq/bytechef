@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
+import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.hermes.configuration.facade.WorkflowFacade;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,9 +50,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
-@WebMvcTest(WorkflowController.class)
-public class WorkflowControllerIntTest {
+@ContextConfiguration(classes = ProjectConfigurationRestTestConfiguration.class)
+@WebMvcTest(ProjectWorkflowController.class)
+public class ProjectWorkflowControllerIntTest {
 
     public static final String DEFINITION = """
         {
@@ -138,49 +137,6 @@ public class WorkflowControllerIntTest {
                 .isOk()
                 .expectBodyList(WorkflowModel.class)
                 .hasSize(1);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    @SuppressFBWarnings("NP")
-    public void testPostWorkflow() throws JsonProcessingException {
-        Workflow workflow = getWorkflow();
-
-        WorkflowModel workflowModel = new WorkflowModel()
-            .definition(DEFINITION)
-            .sourceType(WorkflowModel.SourceTypeEnum.JDBC)
-            .format(WorkflowFormatModel.JSON);
-
-        when(workflowFacade.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC))
-            .thenReturn(new WorkflowDTO(Collections.emptyList(), workflow));
-
-        try {
-            Workflow.Format format = workflow.getFormat();
-
-            this.webTestClient
-                .post()
-                .uri("/core/workflows")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(workflowModel)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.format")
-                .isEqualTo(format.toString())
-                .jsonPath("$.id")
-                .isEqualTo(workflow.getId())
-                .jsonPath("$.label")
-                .isEqualTo(workflow.getLabel())
-                .jsonPath("$.tasks")
-                .isArray()
-                .jsonPath("$.tasks[0].name")
-                .isEqualTo("name")
-                .jsonPath("$.tasks[0].type")
-                .isEqualTo("type");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.hermes.configuration.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.hermes.configuration.facade.WorkflowFacade;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -35,20 +31,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Arik Cohen
  * @author Ivica Cardic
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
-public class WorkflowController implements WorkflowsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+public class ProjectWorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowController(
+    public ProjectWorkflowController(
         ConversionService conversionService, WorkflowFacade workflowFacade, WorkflowService workflowService) {
 
         this.conversionService = conversionService;
@@ -84,21 +79,6 @@ public class WorkflowController implements WorkflowsApi {
         }
 
         return ResponseEntity.ok(workflowModels);
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public ResponseEntity<WorkflowModel> createWorkflow(WorkflowModel workflowModel) {
-        WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
-        WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
-
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workflowFacade.create(
-                    workflowModel.getDefinition(),
-                    Workflow.Format.valueOf(workflowFormatModel.name()),
-                    Workflow.SourceType.valueOf(sourceTypeEnum.name())),
-                WorkflowModel.class));
     }
 
     @Override

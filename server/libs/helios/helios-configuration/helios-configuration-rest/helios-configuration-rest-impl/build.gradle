@@ -15,17 +15,7 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelPackage = "com.bytechef.helios.configuration.web.rest.model"
     outputDir = "$projectDir/../helios-configuration-rest-api/generated".toString()
     schemaMappings = [
-        Connection: "com.bytechef.connection.web.rest.model.ConnectionModel",
-        ExecutionError: "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
-        Input: "com.bytechef.hermes.configuration.web.rest.model.InputModel",
-        Job: "com.bytechef.hermes.execution.web.rest.model.JobModel",
-        Output: "com.bytechef.hermes.configuration.web.rest.model.OutputModel",
         Page: "org.springframework.data.domain.Page",
-        TaskExecution: "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel",
-        Workflow: "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel",
-        WorkflowConnection: "com.bytechef.hermes.configuration.web.rest.model.WorkflowConnectionModel",
-        WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
-        WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
     ]
 }
 
