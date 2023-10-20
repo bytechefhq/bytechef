@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.coordinator.completion;
 
-import com.bytechef.hermes.coordinator.instance.InstanceJobFactoryAccessor;
+import com.bytechef.hermes.coordinator.job.InstanceJobFactoryAccessor;
 import com.bytechef.hermes.domain.TriggerExecution.Status;
-import com.bytechef.hermes.job.InstanceJobFactory;
 import com.bytechef.hermes.domain.TriggerExecution;
+import com.bytechef.hermes.job.InstanceJobFactory;
 import com.bytechef.hermes.service.TriggerExecutionService;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import org.springframework.stereotype.Component;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.facade;
+package com.bytechef.hermes.workflow.facade;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

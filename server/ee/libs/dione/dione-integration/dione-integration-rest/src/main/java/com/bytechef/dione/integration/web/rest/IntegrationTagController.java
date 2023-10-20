@@ -17,7 +17,6 @@
 
 package com.bytechef.dione.integration.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -20,6 +20,7 @@ package com.bytechef.hermes.connection.facade;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -248,6 +249,9 @@ public class ConnectionFacadeIntTest {
         ConnectionDefinitionService connectionDefinitionService;
 
         @MockBean
+        private InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
+
+        @MockBean
         WorkflowService workflowService;
 
         @Bean
@@ -256,7 +260,8 @@ public class ConnectionFacadeIntTest {
             OAuth2Properties oAuth2Properties, TagService tagService, WorkflowService workflowService) {
 
             return new ConnectionFacadeImpl(
-                connectionDefinitionService, connectionService, oAuth2Properties, tagService, workflowService);
+                connectionDefinitionService, connectionService, instanceConnectionFetcherAccessor, oAuth2Properties,
+                tagService, workflowService);
         }
 
         @Bean

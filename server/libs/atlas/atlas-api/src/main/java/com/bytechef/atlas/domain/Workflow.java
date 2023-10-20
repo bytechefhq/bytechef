@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -119,7 +118,6 @@ public final class Workflow implements Errorable, Persistable<String> {
     @Transient
     private ExecutionError error;
 
-    @JsonAnySetter
     @Transient
     private Map<String, Object> extensions = new HashMap<>();
 
@@ -177,29 +175,41 @@ public final class Workflow implements Errorable, Persistable<String> {
 
         this.definition = definition;
         this.format = format.getId();
-        this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
         this.id = id;
-        this.inputs = CollectionUtils.map(
-            MapValueUtils.getList(
-                source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
-                Collections.emptyList()),
-            map -> new Input(
-                MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
-                MapValueUtils.getString(map, WorkflowConstants.LABEL),
-                MapValueUtils.getString(map, WorkflowConstants.TYPE, "string"),
-                MapValueUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
-        this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
-        this.outputs = CollectionUtils.map(
-            MapValueUtils.getList(
-                source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
-                Collections.emptyList()),
-            map -> new Output(
-                MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
-                MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
-        this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
-        this.tasks = CollectionUtils.map(
-            MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList()),
-            WorkflowTask::of);
+
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
+                this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
+            } else if (WorkflowConstants.INPUTS.equals(entry.getKey())) {
+                this.inputs = CollectionUtils.map(
+                    MapValueUtils.getList(
+                        source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
+                        Collections.emptyList()),
+                    map -> new Input(
+                        MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
+                        MapValueUtils.getString(map, WorkflowConstants.LABEL),
+                        MapValueUtils.getString(map, WorkflowConstants.TYPE, "string"),
+                        MapValueUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
+            } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
+                this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+            } else if (WorkflowConstants.OUTPUTS.equals(entry.getKey())) {
+                this.outputs = CollectionUtils.map(
+                    MapValueUtils.getList(
+                        source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
+                        Collections.emptyList()),
+                    map -> new Output(
+                        MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
+                        MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
+            } else if (WorkflowConstants.MAX_RETRIES.equals(entry.getKey())) {
+                this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
+            } else if (WorkflowConstants.TASKS.equals(entry.getKey())) {
+                this.tasks = CollectionUtils.map(
+                    MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList()),
+                    WorkflowTask::of);
+            } else {
+                extensions.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public Workflow(String definition, Format format) {
@@ -238,12 +248,12 @@ public final class Workflow implements Errorable, Persistable<String> {
         return Objects.equals(id, workflow.id);
     }
 
-    public <T> T getExtension(String name, Class<T> extensionClass) {
-        return MapValueUtils.get(extensions, name, extensionClass);
+    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType, T defaultValue) {
+        return MapValueUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType) {
-        return MapValueUtils.get(extensions, name, elementType);
+    public <T> List<T> getExtensions(String name, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+        return MapValueUtils.getList(extensions, name, elementType, defaultValue);
     }
 
     @Override

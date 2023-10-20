@@ -18,6 +18,7 @@
 package com.bytechef.helios.project.service;
 
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 
 import java.util.List;
 
@@ -31,6 +32,8 @@ public interface ProjectInstanceWorkflowService {
     List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long id);
+
+    ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName);
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(String workflowId, long projectInstanceId);
 

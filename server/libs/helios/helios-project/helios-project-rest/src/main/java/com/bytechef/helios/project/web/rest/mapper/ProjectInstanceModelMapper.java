@@ -18,9 +18,11 @@
 package com.bytechef.helios.project.web.rest.mapper;
 
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.web.rest.mapper.config.ProjectMapperSpringConfig;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowConnectionModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -37,4 +39,6 @@ public interface ProjectInstanceModelMapper extends Converter<ProjectInstanceMod
     ProjectInstanceDTO convert(ProjectInstanceModel projectInstanceModel);
 
     ProjectInstanceWorkflow map(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+
+    ProjectInstanceWorkflowConnection map(ProjectInstanceWorkflowConnectionModel value);
 }

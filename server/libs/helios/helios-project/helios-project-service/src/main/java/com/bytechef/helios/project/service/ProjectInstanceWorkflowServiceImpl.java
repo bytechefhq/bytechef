@@ -19,7 +19,9 @@ package com.bytechef.helios.project.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflowJob;
+import com.bytechef.helios.project.repository.ProjectInstanceWorkflowConnectionRepository;
 import com.bytechef.helios.project.repository.ProjectInstanceWorkflowJobRepository;
 import com.bytechef.helios.project.repository.ProjectInstanceWorkflowRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -37,14 +39,17 @@ import java.util.List;
 @Transactional
 public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkflowService {
 
+    private final ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository;
     private final ProjectInstanceWorkflowJobRepository projectInstanceWorkflowJobRepository;
     private final ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowServiceImpl(
+        ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository,
         ProjectInstanceWorkflowJobRepository projectInstanceWorkflowJobRepository,
         ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository) {
 
+        this.projectInstanceWorkflowConnectionRepository = projectInstanceWorkflowConnectionRepository;
         this.projectInstanceWorkflowJobRepository = projectInstanceWorkflowJobRepository;
         this.projectInstanceWorkflowRepository = projectInstanceWorkflowRepository;
     }
@@ -65,6 +70,11 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long id) {
         return OptionalUtils.get(projectInstanceWorkflowRepository.findById(id));
+    }
+
+    @Override
+    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName) {
+        return OptionalUtils.get(projectInstanceWorkflowConnectionRepository.findByKeyAndTaskName(key, taskName));
     }
 
     @Override
@@ -93,7 +103,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
             ProjectInstanceWorkflow curProjectInstanceWorkflow = OptionalUtils.get(
                 projectInstanceWorkflowRepository.findById(projectInstanceWorkflow.getId()));
 
-            curProjectInstanceWorkflow.setConnectionIds(projectInstanceWorkflow.getConnectionIds());
+            curProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
             curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
             curProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
             curProjectInstanceWorkflow.setVersion(projectInstanceWorkflow.getVersion());

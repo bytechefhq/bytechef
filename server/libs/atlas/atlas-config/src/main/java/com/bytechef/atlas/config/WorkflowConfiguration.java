@@ -18,8 +18,6 @@
 package com.bytechef.atlas.config;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.facade.TaskExecutionFacade;
-import com.bytechef.atlas.facade.TaskExecutionFacadeImpl;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.message.broker.MessageBroker;
@@ -72,11 +70,6 @@ public class WorkflowConfiguration {
     @Bean
     JobService jobService(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
         return new JobServiceImpl(jobRepository, workflowRepositories);
-    }
-
-    @Bean
-    TaskExecutionFacade taskExecutionFacade(ContextService contextService, TaskExecutionService taskExecutionService) {
-        return new TaskExecutionFacadeImpl(contextService, taskExecutionService);
     }
 
     @Bean

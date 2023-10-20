@@ -37,26 +37,37 @@ public class WorkflowConnection {
     private static final String CONNECTIONS = "connections";
 
     private final String componentName;
-    private final int connectionVersion;
+    private final Long connectionId;
+    private final Integer connectionVersion;
+    private final String key;
     private final String name;
-    private final String title;
+    private final String taskName;
 
-    private WorkflowConnection(String componentName, int connectionVersion, String name, String title) {
+    private WorkflowConnection(
+        String componentName, Long connectionId, Integer connectionVersion, String key, String name, String taskName) {
+
         this.componentName = componentName;
+        this.connectionId = connectionId;
         this.connectionVersion = connectionVersion;
+        this.key = key;
         this.name = name;
-        this.title = title;
+        this.taskName = taskName;
     }
 
     public static Map<String, WorkflowConnection> of(WorkflowTask workflowTask) {
-        return toMap(workflowTask.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}));
+        return toMap(
+            workflowTask.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of()),
+            workflowTask.getName());
     }
 
     public static Optional<WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
-        return toMap(workflowTrigger.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}))
-            .values()
-            .stream()
-            .findFirst();
+        return toMap(
+            workflowTrigger.getExtension(
+                CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of()),
+            workflowTrigger.getName())
+                .values()
+                .stream()
+                .findFirst();
     }
 
     public static List<WorkflowConnection> of(Workflow workflow) {
@@ -75,30 +86,51 @@ public class WorkflowConnection {
         return workflowConnections;
     }
 
-    public String getComponentName() {
-        return componentName;
+    public Optional<String> getComponentName() {
+        return Optional.ofNullable(componentName);
     }
 
-    public int getConnectionVersion() {
-        return connectionVersion;
+    public Optional<Long> getConnectionId() {
+        return Optional.ofNullable(connectionId);
+    }
+
+    public Optional<Integer> getConnectionVersion() {
+        return Optional.ofNullable(connectionVersion);
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getTitle() {
-        return title;
+    public Optional<String> getTaskName() {
+        return Optional.ofNullable(taskName);
     }
 
-    private static Map<String, WorkflowConnection> toMap(Map<String, Map<String, Object>> source) {
+    private static Map<String, WorkflowConnection> toMap(Map<String, Map<String, Object>> source, String taskName) {
         return source.entrySet()
             .stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> new WorkflowConnection(
-                    MapValueUtils.getRequiredString(entry.getValue(), "componentName"),
-                    MapValueUtils.getRequiredInteger(entry.getValue(), "connectionVersion"),
-                    entry.getKey(), MapValueUtils.getString(entry.getValue(), "title"))));
+                    MapValueUtils.getString(entry.getValue(), "componentName"),
+                    MapValueUtils.getLong(entry.getValue(), "id"),
+                    MapValueUtils.getInteger(entry.getValue(), "connectionVersion"),
+                    entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), taskName)));
+    }
+
+    @Override
+    public String toString() {
+        return "WorkflowConnection{" +
+            "componentName='" + componentName + '\'' +
+            ", connectionId=" + connectionId +
+            ", connectionVersion=" + connectionVersion +
+            ", key='" + key + '\'' +
+            ", name='" + name + '\'' +
+            ", taskName='" + taskName + '\'' +
+            '}';
     }
 }

@@ -102,6 +102,7 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
                 .addConstructorArgReference("dataStorageService")
                 .addConstructorArgReference("eventPublisher")
                 .addConstructorArgReference("fileStorageService")
+                .addConstructorArgReference("instanceConnectionFetcherAccessor")
                 .addConstructorArgValue(triggerDefinition)
                 .getBeanDefinition();
         }

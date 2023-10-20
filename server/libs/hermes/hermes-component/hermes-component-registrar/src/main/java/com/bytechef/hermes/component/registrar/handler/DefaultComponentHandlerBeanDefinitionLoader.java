@@ -38,11 +38,12 @@ public class DefaultComponentHandlerBeanDefinitionLoader
 
         return BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
-            .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgValue(componentHandler)
+            .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgReference("connectionService")
             .addConstructorArgReference("eventPublisher")
             .addConstructorArgReference("fileStorageService")
+            .addConstructorArgReference("instanceConnectionFetcherAccessor")
             .getBeanDefinition();
     }
 }

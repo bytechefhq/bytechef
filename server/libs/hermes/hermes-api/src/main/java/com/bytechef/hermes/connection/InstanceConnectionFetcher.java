@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.facade;
+package com.bytechef.hermes.connection;
 
-import com.bytechef.atlas.dto.TaskExecutionDTO;
-
-import java.util.List;
+import com.bytechef.hermes.connection.domain.Connection;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskExecutionFacade {
+public interface InstanceConnectionFetcher {
 
-    TaskExecutionDTO getTaskExecution(long id);
+    Connection getConnection(String key, String taskName);
 
-    List<TaskExecutionDTO> getJobTaskExecutions(long jobId);
+    String getType();
 }

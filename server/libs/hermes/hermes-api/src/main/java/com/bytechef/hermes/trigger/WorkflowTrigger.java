@@ -20,7 +20,6 @@ package com.bytechef.hermes.trigger;
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.commons.util.MapValueUtils;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
@@ -46,9 +45,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private String componentName;
     private int componentVersion;
 
-    @JsonAnySetter
     private Map<String, Object> extensions = new HashMap<>();
-
     private String name;
     private String label;
     private Map<String, Object> parameters;
@@ -60,29 +57,27 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     private WorkflowTrigger(Map<String, Object> source) {
-        if (source.containsKey(WorkflowConstants.LABEL)) {
-            this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            if (WorkflowConstants.LABEL.equals(entry.getKey())) {
+                this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+            } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
+                this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
+            } else if (WorkflowConstants.PARAMETERS.equals(entry.getKey())) {
+                this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
+            } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
+                this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
+            } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
+                this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
+
+                String[] typeItems = type.split("/");
+
+                this.componentName = typeItems[0];
+                this.componentVersion = Integer.parseInt(typeItems[1].replace("v", ""));
+                this.triggerName = typeItems[2];
+            } else {
+                extensions.put(entry.getKey(), entry.getValue());
+            }
         }
-
-        if (source.containsKey(WorkflowConstants.NAME)) {
-            this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
-        }
-
-        if (source.containsKey(WorkflowConstants.PARAMETERS)) {
-            this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
-        }
-
-        if (source.containsKey(WorkflowConstants.TIMEOUT)) {
-            this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
-        }
-
-        this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
-
-        String[] typeItems = type.split("/");
-
-        this.componentName = typeItems[0];
-        this.componentVersion = Integer.parseInt(typeItems[1].replace("v", ""));
-        this.triggerName = typeItems[2];
     }
 
     public static WorkflowTrigger of(Map<String, Object> source) {
@@ -92,7 +87,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
-        return workflow.getExtension("triggers", new ParameterizedTypeReference<List<Map<String, Object>>>() {})
+        return workflow.getExtensions("triggers", new ParameterizedTypeReference<Map<String, Object>>() {}, List.of())
             .stream()
             .map(WorkflowTrigger::new)
             .toList();
@@ -117,12 +112,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
             && Objects.equals(type, that.type);
     }
 
-    public <T> T getExtension(String name, Class<T> extensionClass) {
-        return MapValueUtils.get(extensions, name, extensionClass);
+    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType, T defaultValue) {
+        return MapValueUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType) {
-        return MapValueUtils.get(extensions, name, elementType);
+    public <T> List<T> getExtensions(String name, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+        return MapValueUtils.getList(extensions, name, elementType, defaultValue);
     }
 
     @Override

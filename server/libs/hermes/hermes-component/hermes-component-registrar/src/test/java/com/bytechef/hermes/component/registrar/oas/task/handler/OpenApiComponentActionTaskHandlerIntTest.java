@@ -22,7 +22,6 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
@@ -31,10 +30,10 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.registrar.oas.handler.OpenApiComponentActionTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -75,8 +74,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
@@ -114,6 +111,9 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     @Autowired
     private ConnectionService connectionService;
+
+    @MockBean
+    private InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
 
     @MockBean
     private TagService tagService;
@@ -803,7 +803,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     private OpenApiComponentActionTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentActionTaskHandler(
             getActionDefinition(actionName), connectionDefinitionService, connectionService,
-            null, FILE_STORAGE_SERVICE, PETSTORE_COMPONENT_HANDLER);
+            null, FILE_STORAGE_SERVICE, instanceConnectionFetcherAccessor, PETSTORE_COMPONENT_HANDLER);
     }
 
     private ActionDefinition getActionDefinition(String actionName) {
@@ -822,17 +822,12 @@ public class OpenApiComponentActionTaskHandlerIntTest {
         return TaskExecution.builder()
             .workflowTask(
                 connection.getId() == null
-                    ? new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type"))
-                    : new WorkflowTask(
+                    ? WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type", WorkflowConstants.PARAMETERS, parameters))
+                    : WorkflowTask.of(
                         Map.of(
                             WorkflowConstants.TYPE, "type",
-                            WorkflowConstants.PARAMETERS,
-                            Stream
-                                .concat(
-                                    CollectionUtils
-                                        .stream(Map.of(ConnectionDefinition.CONNECTION_ID, connection.getId())),
-                                    CollectionUtils.stream(parameters.entrySet()))
-                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))))
+                            WorkflowConstants.PARAMETERS, parameters,
+                            "connections", Map.of("petstore", Map.of("id", connection.getId())))))
             .build();
     }
 

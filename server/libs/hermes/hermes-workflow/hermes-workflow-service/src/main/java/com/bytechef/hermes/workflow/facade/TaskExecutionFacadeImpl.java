@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.facade;
+package com.bytechef.hermes.workflow.facade;
 
 import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.dto.TaskExecutionDTO;
+import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 
+@Service
 @Transactional(readOnly = true)
 public class TaskExecutionFacadeImpl implements TaskExecutionFacade {
 

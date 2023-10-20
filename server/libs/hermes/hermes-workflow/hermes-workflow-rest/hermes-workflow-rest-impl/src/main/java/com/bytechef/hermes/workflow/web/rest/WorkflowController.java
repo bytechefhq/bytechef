@@ -21,7 +21,7 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.hermes.workflow.WorkflowDTO;
+import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
 import com.bytechef.hermes.workflow.facade.WorkflowFacade;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;

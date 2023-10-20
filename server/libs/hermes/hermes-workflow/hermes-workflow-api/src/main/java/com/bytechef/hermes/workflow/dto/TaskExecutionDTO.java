@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.dto;
+package com.bytechef.hermes.workflow.dto;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;

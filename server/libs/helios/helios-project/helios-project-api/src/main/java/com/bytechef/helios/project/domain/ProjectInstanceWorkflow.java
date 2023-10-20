@@ -33,6 +33,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -114,10 +115,8 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         return getClass().hashCode();
     }
 
-    public List<Long> getConnectionIds() {
-        return projectInstanceWorkflowConnections.stream()
-            .map(ProjectInstanceWorkflowConnection::getConnectionId)
-            .toList();
+    public List<ProjectInstanceWorkflowConnection> getConnections() {
+        return new ArrayList<>(projectInstanceWorkflowConnections);
     }
 
     public String getCreatedBy() {
@@ -170,14 +169,8 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         return id == null;
     }
 
-    public void setConnectionIds(List<Long> connectionIds) {
-        projectInstanceWorkflowConnections = new HashSet<>();
-
-        if (connectionIds != null) {
-            for (Long connectionId : connectionIds) {
-                projectInstanceWorkflowConnections.add(new ProjectInstanceWorkflowConnection(connectionId));
-            }
-        }
+    public void setConnections(List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections) {
+        this.projectInstanceWorkflowConnections = new HashSet<>(projectInstanceWorkflowConnections);
     }
 
     public void setEnabled(boolean enabled) {

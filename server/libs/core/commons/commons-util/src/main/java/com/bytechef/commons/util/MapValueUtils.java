@@ -94,6 +94,15 @@ public final class MapValueUtils {
         return get(map, key, (Class<T>) resolvableType.getRawClass());
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T get(
+        Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, T defaultValue) {
+
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        return get(map, key, (Class<T>) resolvableType.getRawClass(), defaultValue);
+    }
+
     public static <T> T get(Map<String, Object> map, String key, Class<T> returnType, T defaultValue) {
         T value = get(map, key, returnType);
 
