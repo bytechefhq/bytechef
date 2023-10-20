@@ -26,8 +26,8 @@ import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
@@ -48,7 +48,7 @@ import java.util.Objects;
 @Component
 public class TriggerSyncExecutor {
 
-    private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
@@ -57,12 +57,12 @@ public class TriggerSyncExecutor {
 
     @SuppressFBWarnings("EI")
     public TriggerSyncExecutor(
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
+        InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
 
-        this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
@@ -139,10 +139,10 @@ public class TriggerSyncExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceWorkflowAccessor instanceWorkflowAccessor = instanceWorkflowAccessorRegistry
-            .getInstanceWorkflowAccessor(workflowExecutionId.getInstanceType());
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry
+            .getInstanceAccessor(workflowExecutionId.getInstanceType());
 
-        return instanceWorkflowAccessor.getInputMap(
+        return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
     }
 

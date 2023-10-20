@@ -33,8 +33,8 @@ import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.hermes.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.hermes.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.hermes.coordinator.event.listener.TriggerExecutionErrorEventListener;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
@@ -65,7 +65,7 @@ public class TriggerCoordinator {
     private final List<ApplicationEventListener> applicationEventListeners;
     private final List<ErrorEventListener> errorEventListeners;
     private final ApplicationEventPublisher eventPublisher;
-    private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionErrorEventListener triggerExecutionErrorEventListener;
@@ -76,7 +76,7 @@ public class TriggerCoordinator {
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
-        ApplicationEventPublisher eventPublisher, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
+        ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionErrorEventListener triggerExecutionErrorEventListener,
         TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService,
@@ -85,7 +85,7 @@ public class TriggerCoordinator {
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
         this.eventPublisher = eventPublisher;
-        this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
         this.triggerExecutionErrorEventListener = triggerExecutionErrorEventListener;
@@ -190,12 +190,12 @@ public class TriggerCoordinator {
     private void dispatch(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        InstanceWorkflowAccessor instanceWorkflowAccessor = instanceWorkflowAccessorRegistry
-            .getInstanceWorkflowAccessor(workflowExecutionId.getInstanceType());
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry
+            .getInstanceAccessor(workflowExecutionId.getInstanceType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
-                instanceWorkflowAccessor.getInputMap(
+                instanceAccessor.getInputMap(
                     workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.coordinator.processor.instance.manager;
+package com.bytechef.helios.instance.accessor;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ProjectInstanceWorkflowAccessorTest {
+public class ProjectInstanceAccessorTest {
 
     @Disabled
     @Test

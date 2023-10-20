@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":server:libs:helios:helios-connection:helios-connection-rest"))
     implementation(project(":server:libs:helios:helios-connection:helios-connection-service"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
+    implementation(project(":server:libs:helios:helios-configuration:helios-configuration-instance-impl"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-impl"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-service"))
     implementation(project(":server:libs:helios:helios-coordinator"))

@@ -23,8 +23,8 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
+    implementation(project(":server:libs:helios:helios-configuration:helios-configuration-instance-impl"))
     implementation(project(":server:libs:helios:helios-coordinator"))
-//    implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-impl"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-rest"))
 

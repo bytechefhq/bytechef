@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:jackson-config"))
     implementation(project(":server:libs:core:rest:rest-impl"))
+    implementation(project(":server:libs:helios:helios-configuration:helios-configuration-instance-impl"))
     implementation(project(":server:libs:helios:helios-coordinator"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl"))
     implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-service"))

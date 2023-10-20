@@ -31,11 +31,14 @@ import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest.WebhookBodyImpl;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
+import com.bytechef.hermes.webhook.web.rest.exception.WorkflowNotEnabledException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -69,6 +72,7 @@ import java.util.Map;
 public class WebhookController {
 
     private final FileStorageService fileStorageService;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final ObjectMapper objectMapper;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
@@ -77,11 +81,13 @@ public class WebhookController {
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        FileStorageService fileStorageService, ObjectMapper objectMapper,
+        FileStorageService fileStorageService, InstanceAccessorRegistry instanceAccessorRegistry,
+        ObjectMapper objectMapper,
         TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
         WorkflowService workflowService, XmlMapper xmlMapper) {
 
         this.fileStorageService = fileStorageService;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.objectMapper = objectMapper;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
@@ -97,12 +103,23 @@ public class WebhookController {
     public ResponseEntity<?> webhooks(@PathVariable String id, HttpServletRequest httpServletRequest)
         throws Exception {
 
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
+            workflowExecutionId.getInstanceType());
+
+        if (!instanceAccessor.isWorkflowEnabled(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())) {
+
+            throw new WorkflowNotEnabledException(
+                "Workflow id=%s is not enabled".formatted(workflowExecutionId.getWorkflowId()));
+        }
+
         WebhookBodyImpl body = null;
         String mediaType = httpServletRequest.getContentType();
         Map<String, String[]> headers = getHeaderMap(httpServletRequest);
         Map<String, String[]> parameters = httpServletRequest.getParameterMap();
         ResponseEntity<?> responseEntity;
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
 

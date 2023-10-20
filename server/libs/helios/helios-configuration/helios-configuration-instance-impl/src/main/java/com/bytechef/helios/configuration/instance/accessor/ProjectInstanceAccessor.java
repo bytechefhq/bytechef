@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.coordinator.instance;
+package com.bytechef.helios.configuration.instance.accessor;
 
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +31,30 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor {
+public class ProjectInstanceAccessor implements InstanceAccessor {
 
+    private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceWorkflowAccessor(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+    public ProjectInstanceAccessor(
+        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+
+        this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+    }
+
+    @Override
+    public boolean isWorkflowEnabled(long instanceId, String workflowId) {
+        boolean workflowEnabled = false;
+
+        if (projectInstanceService.isProjectInstanceEnabled(instanceId) &&
+            projectInstanceWorkflowService.isProjectInstanceWorkflowEnabled(instanceId, workflowId)) {
+
+            workflowEnabled = true;
+        }
+
+        return workflowEnabled;
     }
 
     @Override
@@ -48,7 +66,7 @@ public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor
     }
 
     @Override
-    public int getType() {
+    public int getInstanceType() {
         return ProjectConstants.PROJECT_TYPE;
     }
 }
