@@ -24088,7 +24088,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Activity",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -25649,7 +25649,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Deal",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -26763,7 +26763,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Organization",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -28121,7 +28121,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Person",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -29682,7 +29682,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "Updated Deal",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -30796,7 +30796,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "Updated Organization",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -32154,7 +32154,7 @@
     "properties": null,
     "staticWebhookRequest": null,
     "title": "Updated Person",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null

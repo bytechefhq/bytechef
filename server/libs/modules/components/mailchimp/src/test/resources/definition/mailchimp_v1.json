@@ -1888,7 +1888,7 @@
     } ],
     "staticWebhookRequest": null,
     "title": "Subscribe",
-    "type": "DYNAMIC_WEBHOOK",
+    "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null

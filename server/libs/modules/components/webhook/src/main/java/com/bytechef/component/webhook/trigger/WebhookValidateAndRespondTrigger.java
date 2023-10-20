@@ -51,7 +51,7 @@ public class WebhookValidateAndRespondTrigger {
         .title("Validate and respond")
         .description(
             "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.")
-        .type(TriggerDefinition.TriggerType.STATIC_WEBHOOK)
+        .type(TriggerDefinition.TriggerType.WEBHOOK_STATIC)
         .properties(
             string(CSRF_TOKEN)
                 .label("CSRF Token")

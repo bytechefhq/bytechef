@@ -44,7 +44,7 @@ public class PipedriveNewDealTrigger {
     public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("newDeal")
         .title("New Deal")
         .description("Trigger off whenever a new deal is added.")
-        .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerDefinition.TriggerType.WEBHOOK_DYNAMIC)
         .outputSchema(
             object()
                 .properties(

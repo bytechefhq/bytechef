@@ -52,7 +52,7 @@ public class MailchimpSubscribeTrigger {
     public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(SUBSCRIBE)
         .title("Subscribe")
         .description("Triggers when an Audience subscriber is added to the list.")
-        .type(TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerType.WEBHOOK_DYNAMIC)
         .properties(
             string(LIST_ID)
 // TODO

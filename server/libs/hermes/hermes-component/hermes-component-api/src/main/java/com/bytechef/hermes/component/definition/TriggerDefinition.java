@@ -36,11 +36,12 @@ import java.util.Optional;
 public interface TriggerDefinition {
 
     enum TriggerType {
-        DYNAMIC_WEBHOOK,
-        HYBRID,
+        HYBRID_DYNAMIC,
+        HYBRID_STATIC,
         LISTENER,
         POLLING,
-        STATIC_WEBHOOK
+        WEBHOOK_DYNAMIC,
+        WEBHOOK_STATIC
     }
 
     enum WebhookMethod {
@@ -230,10 +231,11 @@ public interface TriggerDefinition {
      * @param connection
      * @param inputParameters
      * @param dynamicWebhookEnableOutput
+     * @param workflowExecutionId
      */
     record DynamicWebhookDisableContext(
-        Connection connection, InputParameters inputParameters,
-        DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
+        Connection connection, InputParameters inputParameters, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
+        String workflowExecutionId) {
     }
 
     /**
