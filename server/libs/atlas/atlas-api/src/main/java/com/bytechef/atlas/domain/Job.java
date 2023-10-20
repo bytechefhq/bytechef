@@ -20,9 +20,9 @@
 package com.bytechef.atlas.domain;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.error.Errorable;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.priority.Prioritizable;
+import com.bytechef.error.Errorable;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.message.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
 import java.util.Collections;

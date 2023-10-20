@@ -22,13 +22,13 @@ package com.bytechef.atlas.coordinator.event;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
-import com.bytechef.atlas.event.WorkflowEvent;
+import com.bytechef.event.listener.EventListener;
+import com.bytechef.event.WorkflowEvent;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,12 +69,12 @@ public class TaskStartedEventListener implements EventListener {
 
             Job job = jobService.getTaskExecutionJob(taskId);
 
-            if (taskExecution.getStatus() == TaskStatus.CANCELLED || job.getStatus() != Job.Status.STARTED) {
+            if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED || job.getStatus() != Job.Status.STARTED) {
                 taskDispatcher.dispatch(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId()));
             } else {
-                if (taskExecution.getStartDate() == null && taskExecution.getStatus() != TaskStatus.STARTED) {
+                if (taskExecution.getStartDate() == null && taskExecution.getStatus() != TaskExecution.Status.STARTED) {
                     taskExecution.setStartDate(workflowEvent.getCreatedDate());
-                    taskExecution.setStatus(TaskStatus.STARTED);
+                    taskExecution.setStatus(TaskExecution.Status.STARTED);
 
                     taskExecution = taskExecutionService.update(taskExecution);
                 }

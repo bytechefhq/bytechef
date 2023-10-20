@@ -19,9 +19,9 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.message.broker.WorkflowExchange;
-import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.task.ControlTask;
+import com.bytechef.message.broker.ExchangeType;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.task.Task;
 
 import java.util.Objects;
@@ -40,7 +40,7 @@ public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
 
     @Override
     public void dispatch(ControlTask controlTask) {
-        messageBroker.send(WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL, controlTask);
+        messageBroker.send(ExchangeType.CONTROL + "/" + ExchangeType.CONTROL, controlTask);
     }
 
     @Override

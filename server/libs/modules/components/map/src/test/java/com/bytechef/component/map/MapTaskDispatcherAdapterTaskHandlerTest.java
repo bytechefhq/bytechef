@@ -22,10 +22,11 @@ package com.bytechef.component.map;
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.MapValueUtils;
 import java.util.Arrays;
@@ -92,13 +93,13 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             Assertions.assertNull(taskExecution.getOutput());
         });
 
-        messageBroker.receive(TaskQueues.TASKS_ERRORS, t -> {
+        messageBroker.receive(Queues.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
 
-        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 
@@ -118,7 +119,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             }
         };
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(taskHandlerResolver)
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})

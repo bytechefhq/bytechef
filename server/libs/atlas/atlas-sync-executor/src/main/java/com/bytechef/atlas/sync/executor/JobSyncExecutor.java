@@ -17,8 +17,7 @@
 
 package com.bytechef.atlas.sync.executor;
 
-import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.coordinator.error.TaskExecutionErrorHandler;
+import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain;
@@ -29,19 +28,19 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.error.ErrorHandler;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
-import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -76,7 +75,7 @@ public class JobSyncExecutor {
             syncMessageBroker = new SyncMessageBroker();
         }
 
-        syncMessageBroker.receive(TaskQueues.TASKS_ERRORS, message -> {
+        syncMessageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -92,7 +91,7 @@ public class JobSyncExecutor {
                     builder.taskDispatcherAdapterFactories, taskHandlerResolverChain, builder.taskEvaluator),
                 new DefaultTaskHandlerResolver(builder.taskHandlerAccessor)));
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(taskHandlerResolverChain)
             .messageBroker(syncMessageBroker)
             .eventPublisher(builder.eventPublisher)
@@ -132,9 +131,7 @@ public class JobSyncExecutor {
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
-        Coordinator coordinator = Coordinator.builder()
-            .errorHandler((ErrorHandler) new TaskExecutionErrorHandler(
-                builder.eventPublisher, jobService, taskDispatcherChain, builder.taskExecutionService))
+        TaskCoordinator coordinator = TaskCoordinator.builder()
             .eventPublisher(builder.eventPublisher)
             .jobExecutor(jobExecutor)
             .jobFactory(jobFactory)

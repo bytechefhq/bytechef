@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.task.handler;
 
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.task.handler.DefaultComponentActionTaskHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;

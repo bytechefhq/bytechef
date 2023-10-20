@@ -17,9 +17,9 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.atlas.worker.Worker;
+import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -32,31 +32,31 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnWorker
-public class WorkerMessageBrokerConfiguration {
+public class TaskWorkerMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;
-    private final WorkerProperties workerProperties;
+    private final TaskWorkerProperties taskWorkerProperties;
 
-    @SuppressFBWarnings("EI2")
-    public WorkerMessageBrokerConfiguration(
-        ApplicationContext applicationContext, WorkerProperties workerProperties) {
+    @SuppressFBWarnings("EI")
+    public TaskWorkerMessageBrokerConfiguration(
+        ApplicationContext applicationContext, TaskWorkerProperties taskWorkerProperties) {
 
         this.applicationContext = applicationContext;
-        this.workerProperties = workerProperties;
+        this.taskWorkerProperties = taskWorkerProperties;
     }
 
     @Bean
-    MessageBrokerConfigurer<?> workerMessageBrokerConfigurer() {
+    MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer() {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            Worker worker = applicationContext.getBean(Worker.class);
+            TaskWorker worker = applicationContext.getBean(TaskWorker.class);
 
-            Map<String, Object> subscriptions = workerProperties.getSubscriptions();
+            Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
             subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TaskQueues.TASKS_CONTROL, 1, worker, "handle");
+                listenerEndpointRegistrar, Queues.TASKS_CONTROL, 1, worker, "handle");
         };
     }
 }

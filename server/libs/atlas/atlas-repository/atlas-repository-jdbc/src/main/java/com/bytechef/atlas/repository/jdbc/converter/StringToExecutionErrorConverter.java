@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.repository.jdbc.converter;
 
-import com.bytechef.atlas.error.ExecutionError;
+import com.bytechef.error.ExecutionError;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

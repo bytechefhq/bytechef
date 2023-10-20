@@ -31,7 +31,7 @@ public final class ComponentContextSupplier {
     public static <T, E extends Exception> T get(
         Context context, ComponentDefinition componentDefinition, Supplier<T, E> supplier) throws E {
 
-        Objects.requireNonNull(context, "'triggerContext' must not be null");
+        Objects.requireNonNull(context, "'context' must not be null");
         Objects.requireNonNull(componentDefinition, "'componentDefinition' must not be null");
         Objects.requireNonNull(supplier, "'supplier' must not be null");
 

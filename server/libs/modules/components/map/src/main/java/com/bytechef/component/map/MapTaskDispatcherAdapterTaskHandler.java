@@ -21,9 +21,11 @@ package com.bytechef.component.map;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
@@ -33,7 +35,6 @@ import com.bytechef.atlas.service.ContextServiceImpl;
 import com.bytechef.atlas.service.CounterServiceImpl;
 import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
@@ -74,7 +75,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
-        messageBroker.receive(TaskQueues.TASKS_ERRORS, message -> {
+        messageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -82,7 +83,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             errors.add(error);
         });
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(taskHandlerResolver)
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})

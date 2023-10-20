@@ -19,14 +19,13 @@
 
 package com.bytechef.atlas.domain;
 
-import com.bytechef.atlas.error.Errorable;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.priority.Prioritizable;
+import com.bytechef.error.Errorable;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.message.Prioritizable;
 import com.bytechef.atlas.task.Progressable;
-import com.bytechef.atlas.task.Retryable;
+import com.bytechef.message.Retryable;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -74,6 +73,27 @@ public final class TaskExecution
     implements Errorable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
 
     private static final int DEFAULT_TASK_NUMBER = -1;
+
+    /**
+     * Defines the various states that a {@link TaskExecution} can be in at any give moment in time.
+     */
+    public enum Status {
+        CREATED(false),
+        STARTED(false),
+        FAILED(true),
+        CANCELLED(true),
+        COMPLETED(true);
+
+        private final boolean terminated;
+
+        Status(boolean terminated) {
+            this.terminated = terminated;
+        }
+
+        public boolean isTerminated() {
+            return terminated;
+        }
+    }
 
     @CreatedBy
     @Column("created_by")
@@ -137,7 +157,7 @@ public final class TaskExecution
     private LocalDateTime startDate;
 
     @Column
-    private TaskStatus status;
+    private Status status;
 
     @Column("task_number")
     private int taskNumber;
@@ -369,7 +389,7 @@ public final class TaskExecution
      *
      * @return The status of the task.
      */
-    public TaskStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -474,7 +494,7 @@ public final class TaskExecution
         this.startDate = startDate;
     }
 
-    public void setStatus(TaskStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -527,7 +547,7 @@ public final class TaskExecution
         private String retryDelay = "1s";
         private int retryDelayFactor = 2;
         private LocalDateTime startDate;
-        private TaskStatus status = TaskStatus.CREATED;
+        private Status status = Status.CREATED;
         private int taskNumber = DEFAULT_TASK_NUMBER;
         private WorkflowTask workflowTask;
 
@@ -599,7 +619,7 @@ public final class TaskExecution
             return this;
         }
 
-        public Builder status(TaskStatus status) {
+        public Builder status(Status status) {
             this.status = status;
             return this;
         }

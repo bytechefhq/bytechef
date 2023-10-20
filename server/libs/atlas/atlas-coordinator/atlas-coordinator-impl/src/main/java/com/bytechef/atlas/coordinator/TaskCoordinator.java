@@ -24,10 +24,10 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.error.ErrorHandler;
-import com.bytechef.atlas.error.Errorable;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.JobService;
@@ -35,7 +35,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.execution.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -53,25 +52,25 @@ import org.slf4j.LoggerFactory;
  * @author Ivica Cardic
  * @since Jun 12, 2016
  */
-public class Coordinator {
+public class TaskCoordinator {
 
-    private static final Logger log = LoggerFactory.getLogger(Coordinator.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskCoordinator.class);
 
-    private final ErrorHandler<? super Errorable> errorHandler;
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
     private final JobFactory jobFactory;
     private final JobService jobService;
+    private final MessageBroker messageBroker;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
-    private Coordinator(Builder builder) {
-        this.errorHandler = builder.errorHandler;
+    private TaskCoordinator(Builder builder) {
         this.eventPublisher = builder.eventPublisher;
         this.jobExecutor = builder.jobExecutor;
         this.jobFactory = builder.jobFactory;
         this.jobService = builder.jobService;
+        this.messageBroker = builder.messageBroker;
         this.taskCompletionHandler = builder.taskCompletionHandler;
         this.taskDispatcher = builder.taskDispatcher;
         this.taskExecutionService = builder.taskExecutionService;
@@ -125,7 +124,7 @@ public class Coordinator {
             TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
 
             currentTaskExecution.setEndDate(LocalDateTime.now());
-            currentTaskExecution.setStatus(TaskStatus.CANCELLED);
+            currentTaskExecution.setStatus(TaskExecution.Status.CANCELLED);
 
             taskExecutionService.update(currentTaskExecution);
 
@@ -134,7 +133,7 @@ public class Coordinator {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Job id={}, label='{}' stoped", job.getId(), job.getLabel());
+            log.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
         }
 
         return job;
@@ -169,36 +168,22 @@ public class Coordinator {
         } catch (Exception e) {
             taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            handleError(taskExecution);
+            messageBroker.send(Queues.ERRORS, taskExecution);
         }
-    }
-
-    /**
-     * Handle an application error.
-     *
-     * @param errorable The erring message.
-     */
-    public void handleError(Errorable errorable) {
-        errorHandler.handle(errorable);
     }
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
-        private ErrorHandler<? super Errorable> errorHandler;
         private EventPublisher eventPublisher;
         private JobExecutor jobExecutor;
         private JobFactory jobFactory;
         private JobService jobService;
+        private MessageBroker messageBroker;
         private TaskCompletionHandler taskCompletionHandler;
         private TaskDispatcher<? super Task> taskDispatcher;
         private TaskExecutionService taskExecutionService;
 
         private Builder() {
-        }
-
-        public Builder errorHandler(ErrorHandler<? super Errorable> errorHandler) {
-            this.errorHandler = errorHandler;
-            return this;
         }
 
         public Builder eventPublisher(EventPublisher eventPublisher) {
@@ -221,6 +206,11 @@ public class Coordinator {
             return this;
         }
 
+        public Builder messageBroker(MessageBroker messageBroker) {
+            this.messageBroker = messageBroker;
+            return this;
+        }
+
         public Builder taskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
             this.taskCompletionHandler = taskCompletionHandler;
             return this;
@@ -236,8 +226,8 @@ public class Coordinator {
             return this;
         }
 
-        public Coordinator build() {
-            return new Coordinator(this);
+        public TaskCoordinator build() {
+            return new TaskCoordinator(this);
         }
     }
 }

@@ -21,7 +21,8 @@ package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
-import com.bytechef.atlas.event.WorkflowEvent;
+import com.bytechef.event.listener.EventListener;
+import com.bytechef.event.WorkflowEvent;
 import com.bytechef.atlas.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;

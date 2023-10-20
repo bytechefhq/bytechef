@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.component.test.config;
 
-import com.bytechef.atlas.coordinator.event.EventListener;
-import com.bytechef.atlas.coordinator.event.EventListenerChain;
-import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.event.listener.EventListener;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.event.listener.EventListenerChain;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;

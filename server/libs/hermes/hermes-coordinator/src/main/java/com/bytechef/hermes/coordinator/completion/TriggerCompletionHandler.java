@@ -17,21 +17,34 @@
 
 package com.bytechef.hermes.coordinator.completion;
 
-import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.error.ErrorHandler;
+import com.bytechef.error.Errorable;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.hermes.trigger.TriggerExecution;
+
+import java.util.Arrays;
 
 /**
  * @author Ivica Cardic
  */
-public class TriggerCompletionHandler implements TaskCompletionHandler {
+public class TriggerCompletionHandler {
 
-    @Override
-    public void handle(TaskExecution taskExecution) {
+    private final ErrorHandler<? super Errorable> errorHandler;
 
+    public TriggerCompletionHandler(ErrorHandler<? super Errorable> errorHandler) {
+        this.errorHandler = errorHandler;
     }
 
-    @Override
-    public boolean canHandle(TaskExecution taskExecution) {
-        return false;
+    public void handle(TriggerExecution triggerExecution) {
+        try {
+            // TODO
+            System.out.println(triggerExecution);
+        } catch (Exception e) {
+            triggerExecution.setError(
+                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
+            errorHandler.handle(triggerExecution);
+        }
     }
 }

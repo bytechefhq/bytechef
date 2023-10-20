@@ -18,7 +18,7 @@
 package com.bytechef.atlas.job;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.priority.Prioritizable;
+import com.bytechef.message.Prioritizable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;

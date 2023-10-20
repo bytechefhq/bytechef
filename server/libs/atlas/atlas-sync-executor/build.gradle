@@ -4,8 +4,7 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.slf4j:slf4j-api"
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-    implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":server:libs:core:message-broker:message-broker-sync")
     implementation project(":server:libs:atlas:atlas-service")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     implementation project(":server:libs:core:commons:commons-util")

@@ -20,7 +20,8 @@ package com.bytechef.atlas.worker;
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -37,7 +38,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
 
-public class WorkerTest {
+public class TaskWorkerTest {
 
     @Test
     public void test1() {
@@ -46,9 +47,9 @@ public class WorkerTest {
         messageBroker.receive(
             TaskQueues.TASKS_COMPLETIONS,
             t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(jt -> t -> "done")
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
@@ -68,12 +69,12 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskQueues.TASKS_ERRORS,
+            Queues.ERRORS,
             t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
                 .getMessage()));
-        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(jt -> t -> {
                 throw new IllegalArgumentException("bad input");
             })
@@ -95,14 +96,14 @@ public class WorkerTest {
 
         messageBroker.receive(
             TaskQueues.TASKS_COMPLETIONS, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(TaskQueues.TASKS_ERRORS, t -> {
+        messageBroker.receive(Queues.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
-        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
@@ -139,9 +140,9 @@ public class WorkerTest {
         messageBroker.receive(TaskQueues.TASKS_COMPLETIONS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
@@ -182,11 +183,11 @@ public class WorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(TaskQueues.TASKS_ERRORS, t -> {
+        messageBroker.receive(Queues.ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
-        Worker worker = Worker.builder()
+        messageBroker.receive(Queues.EVENTS, t -> {});
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
@@ -225,7 +226,7 @@ public class WorkerTest {
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -267,7 +268,7 @@ public class WorkerTest {
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -317,7 +318,7 @@ public class WorkerTest {
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        Worker worker = Worker.builder()
+        TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);

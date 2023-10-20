@@ -20,8 +20,8 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.task.Task;
 
 import java.util.List;
@@ -61,8 +61,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
         if (log.isDebugEnabled()) {
             log.debug(
-                "Task id={}, type='{}' sent to queueName='{}'", taskExecution.getId(), taskExecution.getType(),
-                queueName);
+                "Task id={}, type='{}' sent to queue='{}'", taskExecution.getId(), taskExecution.getType(), queueName);
         }
 
         messageBroker.send(queueName, taskExecution);

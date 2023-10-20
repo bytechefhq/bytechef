@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.workflow.config;
 
-import com.bytechef.atlas.coordinator.event.EventListener;
+import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;

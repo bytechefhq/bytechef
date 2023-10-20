@@ -25,7 +25,7 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -33,7 +33,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.task.execution.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -101,7 +100,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         if (job == null) {
             log.error("Unknown job id={}", taskExecution.getJobId());
         } else {
-            taskExecution.setStatus(TaskStatus.COMPLETED);
+            taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
             taskExecution = taskExecutionService.update(taskExecution);
 

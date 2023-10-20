@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.task.handler;
 
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.ContextImpl;

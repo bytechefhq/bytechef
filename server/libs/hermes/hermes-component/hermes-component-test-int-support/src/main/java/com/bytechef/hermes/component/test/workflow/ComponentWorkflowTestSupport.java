@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.test.workflow;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;

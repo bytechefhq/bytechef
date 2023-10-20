@@ -17,6 +17,13 @@
 
 package com.bytechef.hermes.coordinator.config;
 
+import com.bytechef.error.ErrorHandler;
+import com.bytechef.error.Errorable;
+import com.bytechef.hermes.coordinator.TriggerCoordinator;
+import com.bytechef.hermes.coordinator.completion.TriggerCompletionHandler;
+import com.bytechef.hermes.coordinator.error.TriggerExecutionErrorHandler;
+import com.bytechef.message.broker.MessageBroker;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -24,4 +31,21 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class TriggerCoordinatorConfiguration {
+
+    @Bean
+    TriggerCompletionHandler triggerCompletionHandler(ErrorHandler<? super Errorable> errorHandle) {
+        return new TriggerCompletionHandler(errorHandle);
+    }
+
+    @Bean
+    TriggerCoordinator triggerCoordinator(
+        MessageBroker messageBroker, TriggerCompletionHandler triggerCompletionHandler) {
+
+        return new TriggerCoordinator(messageBroker, triggerCompletionHandler);
+    }
+
+    @Bean
+    TriggerExecutionErrorHandler triggerExecutionErrorHandler() {
+        return new TriggerExecutionErrorHandler();
+    }
 }

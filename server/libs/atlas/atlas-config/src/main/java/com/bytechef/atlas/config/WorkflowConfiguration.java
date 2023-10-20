@@ -17,12 +17,12 @@
 
 package com.bytechef.atlas.config;
 
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.atlas.facade.TaskExecutionFacadeImpl;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.ContextRepository;
 import com.bytechef.atlas.repository.CounterRepository;
 import com.bytechef.atlas.repository.JobRepository;

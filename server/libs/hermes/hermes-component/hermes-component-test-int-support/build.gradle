@@ -7,15 +7,15 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-test"
     implementation project(":server:libs:atlas:atlas-api")
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-    implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-memory")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:atlas:atlas-service")
     implementation project(":server:libs:atlas:atlas-sync-executor")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
-    implementation project(":server:libs:core:encryption:encryption-api")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:core:encryption:encryption-api")
+    implementation project(":server:libs:core:event:event-listener:event-listener-impl")
+    implementation project(":server:libs:core:message-broker:message-broker-sync")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
 }

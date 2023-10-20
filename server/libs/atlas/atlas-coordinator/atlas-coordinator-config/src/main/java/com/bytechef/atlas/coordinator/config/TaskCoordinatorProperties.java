@@ -19,32 +19,31 @@
 
 package com.bytechef.atlas.coordinator.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Arik Cohen
  */
-@ConfigurationProperties(prefix = "bytechef.coordinator")
-public class CoordinatorProperties {
+@ConfigurationProperties(prefix = "bytechef.coordinator.task")
+@SuppressFBWarnings("EI")
+public class TaskCoordinatorProperties {
 
-    private CoordinatorSubscriptions subscriptions = new CoordinatorSubscriptions();
+    private TaskCoordinatorSubscriptions subscriptions = new TaskCoordinatorSubscriptions();
 
-    public CoordinatorSubscriptions getSubscriptions() {
+    public TaskCoordinatorSubscriptions getSubscriptions() {
         return subscriptions;
     }
 
-    public void setSubscriptions(CoordinatorSubscriptions subscriptions) {
+    public void setSubscriptions(TaskCoordinatorSubscriptions subscriptions) {
         this.subscriptions = subscriptions;
     }
 
-    public static class CoordinatorSubscriptions {
+    public static class TaskCoordinatorSubscriptions {
 
         private int completions = 1;
-        private int errors = 1;
-        private int events = 1;
         private int jobs = 1;
         private int subflows = 1;
-        private int requests = 1;
 
         public int getCompletions() {
             return completions;
@@ -52,22 +51,6 @@ public class CoordinatorProperties {
 
         public void setCompletions(int completions) {
             this.completions = completions;
-        }
-
-        public int getErrors() {
-            return errors;
-        }
-
-        public void setErrors(int errors) {
-            this.errors = errors;
-        }
-
-        public int getEvents() {
-            return events;
-        }
-
-        public void setEvents(int events) {
-            this.events = events;
         }
 
         public int getJobs() {
@@ -84,14 +67,6 @@ public class CoordinatorProperties {
 
         public void setSubflows(int subflows) {
             this.subflows = subflows;
-        }
-
-        public int getRequests() {
-            return requests;
-        }
-
-        public void setRequests(int requests) {
-            this.requests = requests;
         }
     }
 }

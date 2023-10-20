@@ -21,15 +21,14 @@ package com.bytechef.atlas.coordinator.error;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.error.ErrorHandler;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.error.ErrorHandler;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 
@@ -74,13 +73,13 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         // set task status to FAILED and persist
 
         taskExecution.setEndDate(LocalDateTime.now());
-        taskExecution.setStatus(TaskStatus.FAILED);
+        taskExecution.setStatus(TaskExecution.Status.FAILED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         // if the task is retryable, then retry it
         if (taskExecution.getRetryAttempts() < taskExecution.getMaxRetries()) {
-            taskExecution.setStatus(TaskStatus.CREATED);
+            taskExecution.setStatus(TaskExecution.Status.CREATED);
             taskExecution.setError(null);
             taskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
 
@@ -94,7 +93,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
                 taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
                 taskExecution.setEndDate(LocalDateTime.now());
-                taskExecution.setStatus(TaskStatus.FAILED);
+                taskExecution.setStatus(TaskExecution.Status.FAILED);
 
                 taskExecution = taskExecutionService.update(taskExecution);
             }

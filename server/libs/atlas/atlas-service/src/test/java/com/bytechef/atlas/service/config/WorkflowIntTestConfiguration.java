@@ -18,8 +18,8 @@
 package com.bytechef.atlas.service.config;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
-import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringBootConfiguration;

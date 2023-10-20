@@ -16,10 +16,6 @@ dependencies {
     implementation "org.springframework.kafka:spring-kafka"
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config")
-    implementation project(":server:libs:atlas:atlas-event:atlas-event-impl")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-redis")
     implementation project(":server:libs:atlas:atlas-config")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-git")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
@@ -27,7 +23,13 @@ dependencies {
     implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
+    implementation project(":server:libs:core:error:error-impl")
+    implementation project(":server:libs:core:event:event-impl")
+    implementation project(":server:libs:core:event:event-listener:event-listener-impl")
     implementation project(":server:libs:core:commons:commons-data")
+    implementation project(":server:libs:core:message-broker:message-broker-amqp")
+    implementation project(":server:libs:core:message-broker:message-broker-kafka")
+    implementation project(":server:libs:core:message-broker:message-broker-redis")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:helios:helios-project:helios-project-service")
     implementation project(":server:libs:hermes:hermes-coordinator")
@@ -46,6 +48,6 @@ dependencies {
 
     testImplementation "org.apache.activemq:artemis-jakarta-server"
     testImplementation "org.springframework.boot:spring-boot-starter-artemis"
-    testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
+    testImplementation project(":server:libs:core:message-broker:message-broker-jms")
     testImplementation project(":server:libs:test:test-int-support")
 }

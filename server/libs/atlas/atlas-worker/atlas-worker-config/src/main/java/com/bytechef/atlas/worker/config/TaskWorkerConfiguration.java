@@ -19,10 +19,10 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
+import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -47,8 +47,8 @@ import org.springframework.context.annotation.Primary;
  */
 @Configuration
 @ConditionalOnWorker
-@EnableConfigurationProperties(WorkerProperties.class)
-public class WorkerConfiguration {
+@EnableConfigurationProperties(TaskWorkerProperties.class)
+public class TaskWorkerConfiguration {
 
     @Autowired(required = false)
     private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
@@ -86,8 +86,10 @@ public class WorkerConfiguration {
     }
 
     @Bean
-    Worker worker(TaskHandlerResolver taskHandlerResolver, MessageBroker messageBroker, EventPublisher eventPublisher) {
-        return Worker.builder()
+    TaskWorker taskWorker(
+        EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver) {
+
+        return TaskWorker.builder()
             .taskHandlerResolver(taskHandlerResolver)
             .messageBroker(messageBroker)
             .eventPublisher(eventPublisher)

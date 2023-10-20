@@ -23,7 +23,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.jdbc.JdbcContextRepository;
@@ -83,7 +83,7 @@ import java.util.Map;
         "bytechef.persistence.provider=jdbc",
         "bytechef.workflow-repository.classpath.enabled=true"
     })
-public class CoordinatorIntTest {
+public class TaskCoordinatorIntTest {
 
     @Autowired
     private ContextService contextService;
@@ -117,7 +117,7 @@ public class CoordinatorIntTest {
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Coordinator coordinator = Coordinator.builder()
+            TaskCoordinator coordinator = TaskCoordinator.builder()
                 .jobFactory(jobFactory)
                 .jobService(jobService)
                 .taskExecutionService(taskExecutionService)

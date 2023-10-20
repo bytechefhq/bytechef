@@ -28,8 +28,8 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -38,7 +38,6 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -87,7 +86,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
         taskExecution.setStartDate(LocalDateTime.now());
-        taskExecution.setStatus(TaskStatus.STARTED);
+        taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
