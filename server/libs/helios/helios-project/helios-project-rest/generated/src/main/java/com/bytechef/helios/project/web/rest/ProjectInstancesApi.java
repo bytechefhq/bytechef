@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T07:30:32.347559+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:37:23.076362+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-instances", description = "the project-instances API")
+@Tag(name = "project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
 
     /**
@@ -151,6 +151,74 @@ public interface ProjectInstancesApi {
     )
     default Mono<ResponseEntity<Void>> deleteProjectInstance(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /project-instances/{id}/enable/{enable} : Enable/disable a project instance.
+     * Enable/disable a project instance.
+     *
+     * @param id The id of a project instance. (required)
+     * @param enable Enable/disable the project instance. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "enableProjectInstance",
+        summary = "Enable/disable a project instance.",
+        description = "Enable/disable a project instance.",
+        tags = { "project-instances" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/project-instances/{id}/enable/{enable}"
+    )
+    default Mono<ResponseEntity<Void>> enableProjectInstance(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "enable", description = "Enable/disable the project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /project-instances/{id}/workflows/{workflowId}/enable/{enable} : Enable/disable a workflow of a project instance.
+     * Enable/disable a workflow of a project instance.
+     *
+     * @param id The id of a project instance. (required)
+     * @param workflowId The id of a project workflow. (required)
+     * @param enable Enable/disable the workflow of a project instance. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "enableProjectInstanceWorkflow",
+        summary = "Enable/disable a workflow of a project instance.",
+        description = "Enable/disable a workflow of a project instance.",
+        tags = { "project-instances" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/project-instances/{id}/workflows/{workflowId}/enable/{enable}"
+    )
+    default Mono<ResponseEntity<Void>> enableProjectInstanceWorkflow(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowId", description = "The id of a project workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "enable", description = "Enable/disable the workflow of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
