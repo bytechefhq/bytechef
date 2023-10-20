@@ -37,6 +37,12 @@ public final class OptionalUtils {
         return optional.orElseThrow(IllegalArgumentException::new);
     }
 
+    public static <T> T get(Optional<T> optional, String exceptionMessage) {
+        Objects.requireNonNull(optional, "'optional' must not be null");
+
+        return optional.orElseThrow(() -> new IllegalArgumentException(exceptionMessage));
+    }
+
     public static <T> void ifPresent(Optional<T> optional, Consumer<? super T> action) {
         Objects.requireNonNull(optional, "'optional' must not be null");
 
