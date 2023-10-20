@@ -55,6 +55,7 @@ dependencyResolutionManagement {
             library("mapstruct-spring-annotations", "org.mapstruct.extensions.spring:mapstruct-spring-annotations:0.1.2")
             library("mapstruct-spring-extensions", "org.mapstruct.extensions.spring:mapstruct-spring-extensions:0.1.2")
             library("methanol", "com.github.mizosoft.methanol:methanol:1.7.0")
+            library("javapoet", "com.squareup:javapoet:1.13.0")
             library("jupiter-engine", "org.junit.jupiter:junit-jupiter-engine:5.9.1")
             library("problem-spring-webflux", "org.zalando:problem-spring-webflux:0.28.0-RC.0")
             library("picocli", "info.picocli:picocli:4.7.0")
