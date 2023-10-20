@@ -1,5 +1,9 @@
 import {useState} from 'react';
-import {LinkIcon, Square3Stack3DIcon} from '@heroicons/react/24/outline';
+import {
+    LightBulbIcon,
+    LinkIcon,
+    Square3Stack3DIcon,
+} from '@heroicons/react/24/outline';
 import {DesktopSidebar} from './components/Sidebar/DesktopSidebar';
 import {MobileTopNavigation} from './components/Sidebar/MobileTopNavigation';
 import {MobileSidebar} from './components/Sidebar/MobileSidebar';
@@ -21,6 +25,7 @@ const navigation: {
         href: '/automation/integrations',
         icon: Square3Stack3DIcon,
     },
+    {name: 'Instances', href: '/automation/instances', icon: LightBulbIcon},
     {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
 ];
 
