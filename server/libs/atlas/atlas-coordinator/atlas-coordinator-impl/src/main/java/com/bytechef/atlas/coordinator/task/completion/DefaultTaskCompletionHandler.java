@@ -43,6 +43,8 @@ import java.util.Map;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Arik Cohen
@@ -82,18 +84,27 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        log.debug("{}/'{}'/'{}' TASK DONE", taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
+        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null.");
+
+        if (!StringUtils.hasText(taskExecution.getName())) {
+            log.debug("Task {}: '{}' completed.", taskExecution.getId(), taskExecution.getType());
+        } else {
+            log.debug(
+                "Task {}: '{}/{}' completed.", taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
+        }
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
         if (job == null) {
-            log.error("Unknown job: {}", taskExecution.getJobId());
+            log.error("Unknown job: {}.", taskExecution.getJobId());
         } else {
             taskExecution.setStatus(TaskStatus.COMPLETED);
 
             taskExecution = taskExecutionService.update(taskExecution);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+                Assert.notNull(job.getId(), "'job.id' must not be null.");
+
                 Map<String, Object> newContext = new HashMap<>(contextService.peek(job.getId(), Context.Classname.JOB));
 
                 newContext.put(taskExecution.getName(), taskExecution.getOutput());
@@ -115,6 +126,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("NP")
     private void complete(Job job) {
+        Assert.notNull(job.getId(), "'job.id' must not be null.");
+
         Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
@@ -139,7 +152,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        log.debug("Job '{}' with id {} completed successfully", job.getLabel(), job.getId());
+        log.debug("Job '{}: {}' completed.", job.getId(), job.getLabel());
     }
 
     private boolean hasMoreTasks(Job job) {

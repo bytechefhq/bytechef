@@ -30,6 +30,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,8 @@ public class JobExecutor {
 
     @SuppressFBWarnings("NP")
     private void executeNextTask(Job job, Workflow workflow) {
+        Assert.notNull(job.getId(), "'job.id' must not be null.");
+
         Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
@@ -80,6 +83,7 @@ public class JobExecutor {
 
         nextTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
+        Assert.notNull(nextTaskExecution.getId(), "'nextTaskExecution.id' must not be null.");
 
         contextService.push(nextTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
@@ -97,6 +101,8 @@ public class JobExecutor {
         List<WorkflowTask> workflowTasks = workflow.getTasks();
 
         WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
+
+        Assert.notNull(job.getId(), "'job.id' must not be null.");
 
         TaskExecution taskExecution = TaskExecution.of(job.getId(), job.getPriority(), workflowTask);
 

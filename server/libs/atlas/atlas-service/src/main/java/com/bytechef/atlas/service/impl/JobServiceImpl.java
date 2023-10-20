@@ -123,7 +123,7 @@ public class JobServiceImpl implements JobService {
 
         job = jobRepository.save(job);
 
-        log.debug("Job '{}' with id {} created", job.getLabel(), job.getId());
+        log.debug("Job {}: '{}' created.", job.getId(), job.getLabel());
 
         return job;
     }

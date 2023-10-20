@@ -94,7 +94,7 @@ public class Coordinator {
 
         jobExecutor.execute(job);
 
-        log.debug("Job '{}' with id {} started", job.getLabel(), job.getId());
+        log.debug("Job {}: '{}' started.", job.getId(), job.getLabel());
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
     }
