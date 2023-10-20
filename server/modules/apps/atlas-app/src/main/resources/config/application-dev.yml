@@ -23,7 +23,6 @@ spring:
     password: postgres
     hikari:
       poolName: Hikari
-#      auto-commit: false
   h2:
     console:
       enabled: false
