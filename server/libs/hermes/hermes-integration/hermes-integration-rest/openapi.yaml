@@ -18,9 +18,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                description: The response object that contains the array of tags.
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
   /integrations:
     get:
       description: Get integrations.
@@ -142,6 +146,7 @@ paths:
           application/json:
             schema:
               type: object
+              description: The request object that contains the array of tags.
               properties:
                 tags:
                   type: array
