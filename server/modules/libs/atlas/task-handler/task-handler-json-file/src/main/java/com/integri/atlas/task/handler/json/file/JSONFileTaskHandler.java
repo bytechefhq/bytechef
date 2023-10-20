@@ -98,8 +98,8 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                     }
                 }
 
-                Integer pageSize = taskExecution.get(PROPERTY_PAGE_SIZE);
-                Integer pageNumber = taskExecution.get(PROPERTY_PAGE_NUMBER);
+                Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
+                Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
