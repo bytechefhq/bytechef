@@ -62,8 +62,7 @@ CREATE TABLE IF NOT EXISTS task_execution (
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
     last_modified_date       TIMESTAMP    NOT NULL,
-    last_modified_by         VARCHAR(256) NOT NULL,
-    version                  BIGINT       NOT NULL
+    last_modified_by         VARCHAR(256) NOT NULL
     );
 
 CREATE TABLE IF NOT EXISTS workflow (
