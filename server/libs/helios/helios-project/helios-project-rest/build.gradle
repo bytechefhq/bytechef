@@ -3,7 +3,7 @@ plugins {
 }
 
 task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    apiPackage = "com.bytechef.hermes.project.web.rest"
+    apiPackage = "com.bytechef.helios.project.web.rest"
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
@@ -13,7 +13,7 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     generatorName = "spring"
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    modelPackage = "com.bytechef.hermes.project.web.rest.model"
+    modelPackage = "com.bytechef.helios.project.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         Category: "com.bytechef.category.web.rest.model.CategoryModel",

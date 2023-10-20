@@ -15,30 +15,36 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service;
+package com.bytechef.helios.project.service;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.helios.project.domain.Project;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface ConnectionService {
+public interface ProjectService {
 
-    Connection create(Connection connection);
+    Project addWorkflow(long id, String workflowId);
+
+    Project create(Project project);
 
     void delete(long id);
 
-    Connection getConnection(long id);
+    Optional<Project> fetchProject(String name);
 
-    List<Connection> getConnections();
+    Project getProject(long id);
 
-    List<Connection> getConnections(List<Long> ids);
+    List<Project> getProjects();
 
-    List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
+    List<Project> getProjects(List<Long> ids);
 
-    Connection update(long id, List<Long> tagIds);
+    List<Project> searchProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds);
 
-    Connection update(long id, String name, List<Long> tagIds, int version);
+    Project update(long id, List<Long> tagIds);
+
+    Project update(
+        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds);
 }

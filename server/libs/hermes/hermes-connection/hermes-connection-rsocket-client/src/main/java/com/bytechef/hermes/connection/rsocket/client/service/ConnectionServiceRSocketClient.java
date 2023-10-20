@@ -67,6 +67,11 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     }
 
     @Override
+    public List<Connection> getConnections(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Connection> getConnections() {
         return getConnections(null, null);
     }

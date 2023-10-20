@@ -15,30 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service;
+package com.bytechef.helios.project.web.rest.mapper;
 
-import com.bytechef.hermes.connection.domain.Connection;
-
-import java.util.List;
+import com.bytechef.helios.project.web.rest.mapper.config.ProjectMapperSpringConfig;
+import com.bytechef.helios.project.dto.ProjectDTO;
+import com.bytechef.helios.project.web.rest.model.ProjectModel;
+import org.mapstruct.Mapper;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-public interface ConnectionService {
+@Mapper(config = ProjectMapperSpringConfig.class)
+public interface ProjectMapper extends Converter<ProjectDTO, ProjectModel> {
 
-    Connection create(Connection connection);
-
-    void delete(long id);
-
-    Connection getConnection(long id);
-
-    List<Connection> getConnections();
-
-    List<Connection> getConnections(List<Long> ids);
-
-    List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
-
-    Connection update(long id, List<Long> tagIds);
-
-    Connection update(long id, String name, List<Long> tagIds, int version);
+    @Override
+    ProjectModel convert(ProjectDTO projectDTO);
 }

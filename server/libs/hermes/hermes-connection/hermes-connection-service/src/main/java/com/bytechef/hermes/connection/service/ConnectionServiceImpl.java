@@ -70,7 +70,12 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections() {
-        return getConnections(null, null);
+        return com.bytechef.commons.util.CollectionUtils.toList(connectionRepository.findAll(Sort.by("name")));
+    }
+
+    @Override
+    public List<Connection> getConnections(List<Long> ids) {
+        return com.bytechef.commons.util.CollectionUtils.toList(connectionRepository.findAllById(ids));
     }
 
     @Override
