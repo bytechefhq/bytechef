@@ -34,6 +34,7 @@ services:
     depends_on:
       - postgres
 #      - rabbitmq
+      - redis
     environment:
       - SERVER_PORT=9555
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
@@ -41,7 +42,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
 #      - SPRING_RABBITMQ_HOST=rabbitmq
 #      - SPRING_RABBITMQ_PORT=5672
-#      - SPRING_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_HOST=redis
 #      - WORKFLOW_MESSAGE_BROKER_PROVIDER=amqp
     ports:
       - '9555:9555'
