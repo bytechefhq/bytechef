@@ -31,6 +31,7 @@ pluginManagement {
 
 rootProject.name = "server"
 
+include("cli")
 include("modules:apps:atlas-app")
 include("modules:libs:atlas:encryption:encryption-api")
 include("modules:libs:atlas:encryption:encryption-filesystem")
