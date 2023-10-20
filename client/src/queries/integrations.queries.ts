@@ -1,8 +1,5 @@
-import {
-  Integration,
-  IntegrationControllerApi
-} from '../_generated/data-access/integration'
 import { useQuery } from '@tanstack/react-query'
+import { Integration, IntegrationsApi } from 'data-access/integration'
 
 export enum ServerStateKeysEnum {
   Integrations = 'integrations'
@@ -10,5 +7,5 @@ export enum ServerStateKeysEnum {
 
 export const useGetIntegrations = () =>
   useQuery<Integration[], Error>([ServerStateKeysEnum.Integrations], () =>
-    new IntegrationControllerApi().getIntegrations()
+    new IntegrationsApi().getIntegrations()
   )
