@@ -1,7 +1,6 @@
 import {Component1Icon} from '@radix-ui/react-icons';
 import {
     ComponentDefinitionBasicModel,
-    DisplayModel,
     TaskDispatcherDefinitionModel,
 } from 'middleware/definition-registry';
 import React, {HTMLAttributes} from 'react';
@@ -10,9 +9,7 @@ interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
 }
 
-interface WorkflowNodesListItemProps
-    extends HTMLAttributes<HTMLLIElement>,
-        DisplayModel {
+interface WorkflowNodesListItemProps extends HTMLAttributes<HTMLLIElement> {
     handleClick?: () => void;
     node: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
 }
@@ -31,7 +28,7 @@ const WorkflowNodesListItem = ({
         <li
             className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable={draggable}
-            id={node.display?.title}
+            id={node?.title}
             onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
         >
@@ -39,11 +36,11 @@ const WorkflowNodesListItem = ({
 
             <div className="flex flex-col">
                 <p className="text-sm font-medium text-gray-900">
-                    {node.display?.title}
+                    {node?.title}
                 </p>
 
                 <p className="line-clamp-2 text-left text-xs text-gray-500">
-                    {node.display?.description}
+                    {node?.description}
                 </p>
             </div>
         </li>

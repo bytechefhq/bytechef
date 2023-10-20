@@ -38,13 +38,12 @@ export default function useHandleDrop(): [
     ) {
         const newWorkflowNode = {
             ...targetNode,
-            display: droppedNode.display,
             name: droppedNode.name,
             data: {
-                icon: droppedNode.display?.icon || (
+                icon: droppedNode?.icon || (
                     <PlayIcon className="h-8 w-8 text-gray-700" />
                 ),
-                label: droppedNode.display?.title,
+                label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
                 originNodeName: droppedNode.name,
             },
@@ -120,12 +119,11 @@ export default function useHandleDrop(): [
         );
 
         const draggedNode = {
-            display: droppedNode.display,
             data: {
-                icon: droppedNode.display?.icon || (
+                icon: droppedNode?.icon || (
                     <PlayIcon className="h-8 w-8 text-gray-700" />
                 ),
-                label: droppedNode.display?.title,
+                label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
                 originNodeName: droppedNode.name,
             },

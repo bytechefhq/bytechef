@@ -113,12 +113,9 @@ const NodeDetailsDialog = () => {
                                     ({currentNode.name})
                                 </span>
 
-                                {currentComponent?.display.description && (
+                                {currentComponent?.description && (
                                     <Tooltip
-                                        text={
-                                            currentComponent?.display
-                                                .description
-                                        }
+                                        text={currentComponent?.description}
                                     >
                                         <InfoCircledIcon className="h-4 w-4" />
                                     </Tooltip>
@@ -150,16 +147,12 @@ const NodeDetailsDialog = () => {
 
                                                 <div className="overflow-hidden rounded-md bg-gray-100 px-4 py-2">
                                                     <span className="inline-flex text-sm font-medium">
-                                                        {
-                                                            firstAction.display
-                                                                .title
-                                                        }
+                                                        {firstAction.title}
                                                     </span>
 
                                                     <p className="mt-1 line-clamp-2 w-full overflow-hidden text-xs text-gray-500">
                                                         {
-                                                            firstAction.display
-                                                                .description
+                                                            firstAction.description
                                                         }
                                                     </p>
                                                 </div>
@@ -171,17 +164,13 @@ const NodeDetailsDialog = () => {
                                                     <div className="flex flex-col">
                                                         <span className="inline-flex text-sm font-medium">
                                                             {
-                                                                currentAction
-                                                                    ?.display
-                                                                    .title
+                                                                currentAction?.title
                                                             }
                                                         </span>
 
                                                         <p className="mt-1 line-clamp-2 w-full text-left text-xs text-gray-500">
                                                             {
-                                                                currentAction
-                                                                    ?.display
-                                                                    .description
+                                                                currentAction?.description
                                                             }
                                                         </p>
                                                     </div>
@@ -189,12 +178,10 @@ const NodeDetailsDialog = () => {
                                                 label="Actions"
                                                 options={currentComponent.actions.map(
                                                     (action) => ({
-                                                        label: action.display
-                                                            .title!,
+                                                        label: action.title!,
                                                         value: action.name,
                                                         description:
-                                                            action.display
-                                                                .description,
+                                                            action.description,
                                                     })
                                                 )}
                                                 triggerClassName="w-full bg-gray-100"
