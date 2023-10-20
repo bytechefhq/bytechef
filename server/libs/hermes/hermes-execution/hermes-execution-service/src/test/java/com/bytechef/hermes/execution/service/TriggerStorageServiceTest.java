@@ -17,16 +17,29 @@
 
 package com.bytechef.hermes.execution.service;
 
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-
-import java.util.Optional;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface TriggerLifecycleService {
+public class TriggerStorageServiceTest {
 
-    <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId);
+    @Disabled
+    @Test
+    public void testFetchValue() {
+        // TODO
+    }
 
-    void save(WorkflowExecutionId workflowExecutionId, Object value);
+    @Disabled
+    @Test
+    public void testGetTriggerLifecycle() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testSave() {
+        // TODO
+    }
 }

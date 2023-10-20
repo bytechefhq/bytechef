@@ -28,10 +28,10 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConve
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
-import com.bytechef.hermes.execution.converter.StringToTriggerLifecycleValueConverter;
+import com.bytechef.hermes.execution.converter.StringToTriggerStorageValueConverter;
 import com.bytechef.hermes.execution.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.hermes.execution.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.hermes.execution.converter.TriggerLifecycleValueToStringConverter;
+import com.bytechef.hermes.execution.converter.TriggerStorageValueToStringConverter;
 import com.bytechef.hermes.execution.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.hermes.execution.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.hermes.data.storage.db.converter.DataStorageValueToStringConverter;
@@ -93,8 +93,8 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),
             new StringToWorkflowTriggerConverter(objectMapper),
-            new StringToTriggerLifecycleValueConverter(objectMapper),
-            new TriggerLifecycleValueToStringConverter(objectMapper),
+            new StringToTriggerStorageValueConverter(objectMapper),
+            new TriggerStorageValueToStringConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
             new WorkflowExecutionIdToStringConverter(),
             new WorkflowTaskToStringConverter(objectMapper),
