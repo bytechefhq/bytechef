@@ -4,7 +4,7 @@ tasks:
   - type: httpClient
     requestMethod: GET
     authenticationType: BASIC_AUTH
-    uri: http://localhost:8080/test
+    uri: http://localhost:8081/test
     responseFormat: JSON
     name: testResponse
     credentials:
