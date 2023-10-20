@@ -23,5 +23,6 @@ import com.bytechef.hermes.execution.dto.JobDTO;
  * @author Ivica Cardic
  */
 public interface JobFacade {
+
     JobDTO getJob(long id);
 }

@@ -1228,9 +1228,7 @@ public abstract class DefinitionDSL {
             public ControlType getControlType() {
                 if (objectType != null && !objectType.isEmpty()) {
                     return ControlType.EXPRESSION;
-                }
-
-                if ((options == null || options.isEmpty()) && optionsFunction == null) {
+                } else if ((options == null || options.isEmpty()) && optionsFunction == null) {
                     return ControlType.OBJECT_BUILDER;
                 } else {
                     return ControlType.SELECT;
