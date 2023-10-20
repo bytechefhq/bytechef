@@ -9,12 +9,14 @@ import {
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
-import {MouseEvent} from 'react';
+import {useEffect} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import DataPill from './DataPill';
+
+type dataPillType = {display: string; id: string};
 
 const DataPillPanelBody = ({
     containerHeight,
@@ -23,10 +25,10 @@ const DataPillPanelBody = ({
     containerHeight: number;
     dataPillFilterQuery: string;
 }) => {
-    const {componentActions, componentNames, dataPills, setDataPills} =
+    const {componentActions, componentNames, setDataPills} =
         useWorkflowDefinitionStore();
 
-    const {currentNode, focusedInput} = useNodeDetailsDialogStore();
+    const {currentNode} = useNodeDetailsDialogStore();
 
     const taskTypes = componentActions?.map(
         (componentAction) =>
@@ -52,90 +54,6 @@ const DataPillPanelBody = ({
         !!componentActions?.length
     );
 
-    const getMatchingSubProperty = (
-        properties: PropertyType[],
-        name: string
-    ): PropertyType | undefined => {
-        const matchingProperties = properties.map((subProperty) => {
-            if (subProperty.label === name || subProperty.name === name) {
-                return subProperty;
-            } else if (subProperty.properties) {
-                return getMatchingSubProperty(subProperty.properties, name);
-            } else if (subProperty.items) {
-                return getMatchingSubProperty(subProperty.items, name);
-            }
-        });
-
-        if (matchingProperties) {
-            return matchingProperties.filter(
-                (property) => property !== undefined
-            )[0];
-        } else {
-            return undefined;
-        }
-    };
-
-    const handleDataPillClick = (
-        event: MouseEvent<HTMLDivElement>,
-        componentName: string,
-        property: PropertyType
-    ) => {
-        let dataPillData = property.label || property.name;
-
-        if (!(event.target instanceof HTMLDivElement)) {
-            return;
-        }
-
-        const eventData = event.currentTarget.dataset.name;
-
-        if (!eventData) {
-            return;
-        }
-
-        const subProperties = property.properties || property.items;
-
-        if (property.name !== eventData && subProperties?.length) {
-            const matchingProperty = getMatchingSubProperty(
-                subProperties,
-                eventData
-            );
-
-            if (matchingProperty) {
-                dataPillData = `${componentName}/${property.name}/${
-                    matchingProperty.label || matchingProperty.name
-                }`;
-            }
-        }
-
-        if (focusedInput && dataPillData) {
-            const existingDataPill = dataPills.find(
-                (pill) => pill.name === focusedInput.name
-            );
-
-            if (existingDataPill) {
-                const remainingDataPills = dataPills.filter(
-                    (pill) => pill.name !== focusedInput.name
-                );
-
-                setDataPills([
-                    ...remainingDataPills,
-                    {
-                        name: focusedInput.name,
-                        value: [...existingDataPill.value, dataPillData],
-                    },
-                ]);
-            } else {
-                setDataPills([
-                    ...dataPills,
-                    {
-                        name: focusedInput.name,
-                        value: [dataPillData],
-                    },
-                ]);
-            }
-        }
-    };
-
     const getFilteredProperties = (
         properties: PropertyType[],
         filterQuery: string
@@ -157,6 +75,114 @@ const DataPillPanelBody = ({
 
             return previousValue;
         }, []);
+
+    const getSubProperties = (
+        properties: PropertyType[],
+        propertyName: string,
+        componentTitle: string
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): any =>
+        properties.map((subProperty: PropertyType) => {
+            if (subProperty.properties?.length) {
+                return getSubProperties(
+                    subProperty.properties,
+                    propertyName,
+                    componentTitle
+                );
+            } else if (subProperty.items?.length) {
+                return getSubProperties(
+                    subProperty.items,
+                    propertyName,
+                    componentTitle
+                );
+            }
+
+            return {
+                display: `${componentTitle}/${propertyName}/${
+                    subProperty.label || subProperty.name
+                }`,
+                id: `${componentTitle}/${propertyName}/${subProperty.name}`,
+            };
+        });
+
+    const componentProperties = previousComponents?.map((component, index) => {
+        if (!actionData?.length) {
+            return;
+        }
+
+        const outputSchema: PropertyType | undefined =
+            actionData[index]?.outputSchema;
+
+        const properties = outputSchema?.properties?.length
+            ? outputSchema.properties
+            : outputSchema?.items;
+
+        return {
+            componentName: component.title,
+            properties,
+        };
+    });
+
+    const getExistingProperties = (
+        properties: PropertyType[]
+    ): PropertyType[] =>
+        properties.filter((property) => {
+            if (property.properties) {
+                return getExistingProperties(property.properties);
+            } else if (property.items) {
+                return getExistingProperties(property.items);
+            }
+
+            return !!property.name;
+        });
+
+    const availableDataPills: dataPillType[] = [];
+
+    componentProperties?.forEach((componentProperty) => {
+        if (!componentProperty) {
+            return;
+        }
+
+        const existingProperties = getExistingProperties(
+            componentProperty.properties!
+        );
+
+        const formattedProperties: dataPillType[] = existingProperties.map(
+            (property: PropertyType) => {
+                if (property.properties) {
+                    return getSubProperties(
+                        property.properties,
+                        property.name!,
+                        componentProperty.componentName!
+                    );
+                } else if (property.items) {
+                    return getSubProperties(
+                        property.items,
+                        property.name!,
+                        componentProperty.componentName!
+                    );
+                }
+
+                return {
+                    display: `${componentProperty.componentName}/${
+                        property.label || property.name
+                    }`,
+                    id: property.name,
+                };
+            }
+        );
+
+        if (existingProperties.length && formattedProperties.length) {
+            availableDataPills.push(...formattedProperties);
+        }
+    });
+
+    useEffect(() => {
+        if (availableDataPills) {
+            setDataPills(availableDataPills.flat(Infinity));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [availableDataPills.length]);
 
     return (
         <Accordion className="h-full" collapsible type="single">
@@ -224,14 +250,8 @@ const DataPillPanelBody = ({
                                                 (property: PropertyType) => (
                                                     <DataPill
                                                         key={property.name}
-                                                        onClick={(
-                                                            event: MouseEvent<HTMLDivElement>
-                                                        ) =>
-                                                            handleDataPillClick(
-                                                                event,
-                                                                title || name,
-                                                                property
-                                                            )
+                                                        onClick={() =>
+                                                            console.log('TODO')
                                                         }
                                                         property={property}
                                                     />
