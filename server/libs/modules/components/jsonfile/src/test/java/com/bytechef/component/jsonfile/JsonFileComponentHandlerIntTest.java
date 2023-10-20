@@ -17,10 +17,10 @@
 
 package com.bytechef.component.jsonfile;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -36,11 +36,15 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
+
 /**
  * @author Ivica Cardic
  */
 @ComponentIntTest
 public class JsonFileComponentHandlerIntTest {
+
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -53,8 +57,7 @@ public class JsonFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_array.json");
 
         Job job = componentWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
@@ -77,10 +80,9 @@ public class JsonFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws JSONException {
         Job job = componentWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("jsonfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("jsonfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                "source",
+                SOURCE,
                 new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)).toList()));
 
         Assertions.assertThat(job.getStatus())
@@ -88,26 +90,18 @@ public class JsonFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        Assertions.assertThat(((Map) outputs.get("writeJSONFile")).get(WorkflowConstants.NAME))
+        Map<?, ?> fileEntryMap = ((Map<?, ?>) outputs.get("writeJSONFile"));
+
+        Assertions.assertThat(fileEntryMap.get("name"))
             .isEqualTo("file.json");
 
-        File sampleFile = getFile("sample_array.json");
-
-        job = componentWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
-            Map.of(
-                "fileEntry",
-                fileStorageService
-                    .storeFileContent(
-                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                    .toMap()));
-
-        outputs = job.getOutputs();
-
         JSONAssert.assertEquals(
-            new JSONArray(Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) outputs.get("readJSONFile")),
+            new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
+            new JSONArray(
+                fileStorageService.readFileToString(
+                    new FileEntry(
+                        (String) fileEntryMap.get("name"), (String) fileEntryMap.get("extension"),
+                        (String) fileEntryMap.get("mimeType"), (String) fileEntryMap.get("url")))),
             true);
     }
 
