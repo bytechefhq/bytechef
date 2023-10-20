@@ -2,7 +2,7 @@ import {Squares2X2Icon} from '@heroicons/react/24/outline';
 import React from 'react';
 import {CategoryModel} from '../../data-access/integration';
 
-export const Category: React.FC<{category?: CategoryModel}> = ({category}) => {
+export const Category: React.FC<{category: CategoryModel}> = ({category}) => {
     return (
         <div className="mt-2 flex items-center text-sm text-gray-500">
             <Squares2X2Icon
@@ -10,7 +10,7 @@ export const Category: React.FC<{category?: CategoryModel}> = ({category}) => {
                 aria-hidden="true"
             />
 
-            {category?.name}
+            {category.name}
         </div>
     );
 };

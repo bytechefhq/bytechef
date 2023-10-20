@@ -5,13 +5,13 @@ import {Name} from './Name';
 import {Status} from './Status';
 
 const Header: React.FC<{
-    id?: number;
     name: string;
     status: boolean;
     description?: string;
+    id?: number;
 }> = ({id, name, status, description}) => {
     return (
-        <div className="flex table-auto justify-between">
+        <div className="flex justify-between">
             <div className="list-inside">
                 <Name name={name} />
 
