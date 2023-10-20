@@ -24,6 +24,7 @@ dependencies {
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
+    implementation project(":server:libs:core:tag:tag-service")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-rest")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-service:hermes-component-service-local")
