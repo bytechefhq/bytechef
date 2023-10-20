@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable sort-keys */
 /** @type {import('tailwindcss').Config} */
 
 const plugin = require('tailwindcss/plugin');
