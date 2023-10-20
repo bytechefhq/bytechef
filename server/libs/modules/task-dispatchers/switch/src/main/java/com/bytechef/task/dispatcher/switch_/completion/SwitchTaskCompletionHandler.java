@@ -128,7 +128,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the switch
         else {
-            switchTaskExecution.setEndTime(LocalDateTime.now());
+            switchTaskExecution.setEndDate(LocalDateTime.now());
 
             taskCompletionHandler.handle(switchTaskExecution);
         }

@@ -72,7 +72,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
@@ -109,8 +109,8 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
-            taskExecution.setStartTime(LocalDateTime.now());
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setStartDate(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);

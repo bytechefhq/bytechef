@@ -18,6 +18,7 @@
 package com.bytechef.atlas.repository.jdbc;
 
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +31,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,37 +47,40 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
 
     @Override
     public Page<Job> findAll(
-        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Pageable pageable) {
 
         Page<Job> page;
-        Query query = buildQuery(status, startTime, endTime, workflowId, workflowIds, pageable, true);
+        Query query = buildQuery(status, startDate, endDate, workflowId, workflowIds, pageable, true);
 
         Long total = jdbcTemplate.queryForObject(query.query, Long.class, query.arguments);
 
         if (total == null || total == 0) {
             page = Page.empty();
         } else {
-            query = buildQuery(status, startTime, endTime, workflowId, workflowIds, pageable, false);
+            query = buildQuery(status, startDate, endDate, workflowId, workflowIds, pageable, false);
 
             List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> {
                 Job job = new Job();
 
                 job.setCurrentTask(rs.getInt("current_task"));
 
-                Timestamp endTimeTimestamp = rs.getTimestamp("end_time");
+                Timestamp endDateTimestamp = rs.getTimestamp("end_date");
 
-                if (endTimeTimestamp != null) {
-                    job.setEndTime(new Date(endTimeTimestamp.getTime()));
+                if (endDateTimestamp != null) {
+                    job.setEndDate(LocalDateTimeUtils.getLocalDateTime(endDateTimestamp));
                 }
 
                 job.setLabel(rs.getString("label"));
                 job.setId(rs.getLong("id"));
                 job.setPriority(rs.getInt("priority"));
 
-                Timestamp startTimeTimestamp = rs.getTimestamp("start_time");
+                Timestamp startDateTimestamp = rs.getTimestamp("start_date");
 
-                job.setStartTime(new Date(startTimeTimestamp.getTime()));
+                if (startDateTimestamp != null) {
+                    job.setEndDate(LocalDateTimeUtils.getLocalDateTime(startDateTimestamp));
+                }
+
                 job.setStatus(Job.Status.valueOf(rs.getString("status")));
                 job.setWorkflowId(rs.getString("workflow_id"));
 
@@ -91,7 +94,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
     }
 
     private Query buildQuery(
-        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Pageable pageable, boolean countQuery) {
 
         String query;
@@ -104,7 +107,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
 
         List<Object> arguments = new ArrayList<>();
 
-        if (StringUtils.hasText(status) || startTime != null || endTime != null || StringUtils.hasText(workflowId) ||
+        if (StringUtils.hasText(status) || startDate != null || endDate != null || StringUtils.hasText(workflowId) ||
             !CollectionUtils.isEmpty(workflowIds)) {
 
             query += "WHERE ";
@@ -116,27 +119,27 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             arguments.add(status);
         }
 
-        if (startTime != null && StringUtils.hasText(status)) {
+        if (startDate != null && StringUtils.hasText(status)) {
             query += "AND ";
         }
 
-        if (startTime != null) {
-            query += "start_time >= ? ";
+        if (startDate != null) {
+            query += "start_date >= ? ";
 
-            arguments.add(startTime);
+            arguments.add(startDate);
         }
 
-        if (endTime != null && (StringUtils.hasText(status) || startTime != null)) {
+        if (endDate != null && (StringUtils.hasText(status) || startDate != null)) {
             query += "AND ";
         }
 
-        if (endTime != null) {
-            query += "end_time <= ? ";
+        if (endDate != null) {
+            query += "end_date <= ? ";
 
-            arguments.add(endTime);
+            arguments.add(endDate);
         }
 
-        if (StringUtils.hasText(workflowId) && (StringUtils.hasText(status) || startTime != null || endTime != null)) {
+        if (StringUtils.hasText(workflowId) && (StringUtils.hasText(status) || startDate != null || endDate != null)) {
             query += "AND ";
         }
 
@@ -147,7 +150,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         }
 
         if (!CollectionUtils.isEmpty(workflowIds) &&
-            (StringUtils.hasText(status) || startTime != null || endTime != null || StringUtils.hasText(workflowId))) {
+            (StringUtils.hasText(status) || startDate != null || endDate != null || StringUtils.hasText(workflowId))) {
 
             query += "AND ";
         }

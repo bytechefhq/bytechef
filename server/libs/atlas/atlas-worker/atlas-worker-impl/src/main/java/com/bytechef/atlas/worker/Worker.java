@@ -183,7 +183,7 @@ public class Worker {
                 taskExecution.setOutput(output);
             }
 
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
             taskExecution.setStatus(TaskStatus.COMPLETED);

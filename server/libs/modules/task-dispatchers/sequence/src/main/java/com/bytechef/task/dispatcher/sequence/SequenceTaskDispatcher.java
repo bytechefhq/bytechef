@@ -70,7 +70,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
@@ -79,8 +79,8 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         if (subWorkflowTasks.isEmpty()) {
-            taskExecution.setStartTime(LocalDateTime.now());
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setStartDate(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);

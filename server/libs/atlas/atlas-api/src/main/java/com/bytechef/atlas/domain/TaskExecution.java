@@ -80,8 +80,8 @@ public final class TaskExecution
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @Column("end_time")
-    private LocalDateTime endTime;
+    @Column("end_date")
+    private LocalDateTime endDate;
 
     @Column("error")
     private ExecutionError error;
@@ -127,8 +127,8 @@ public final class TaskExecution
     @Column("retry_delay_factor")
     private int retryDelayFactor = 2;
 
-    @Column("start_time")
-    private LocalDateTime startTime;
+    @Column("start_date")
+    private LocalDateTime startDate;
 
     @Column
     private TaskStatus status;
@@ -237,8 +237,8 @@ public final class TaskExecution
      *
      * @return Date
      */
-    public LocalDateTime getEndTime() {
-        return endTime;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
     @Override
@@ -386,8 +386,8 @@ public final class TaskExecution
      *
      * @return Date
      */
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
     /**
@@ -429,11 +429,11 @@ public final class TaskExecution
         return id == null;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
 
-        if (endTime != null && startTime != null) {
-            this.executionTime = LocalDateTimeUtils.getTime(endTime) - LocalDateTimeUtils.getTime(startTime);
+        if (endDate != null && startDate != null) {
+            this.executionTime = LocalDateTimeUtils.getTime(endDate) - LocalDateTimeUtils.getTime(startDate);
         }
     }
 
@@ -491,8 +491,8 @@ public final class TaskExecution
         this.retryDelayFactor = retryDelayFactor;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
     public void setStatus(TaskStatus status) {
@@ -513,9 +513,9 @@ public final class TaskExecution
             + id + ", jobId="
             + getJobId() + ", parentId="
             + getParentId() + ", status="
-            + status + ", startTime="
-            + startTime + ", endTime="
-            + endTime + ", executionTime="
+            + status + ", startDate="
+            + startDate + ", endDate="
+            + endDate + ", executionTime="
             + executionTime + ", output="
             + output + ", error="
             + error + ", priority="

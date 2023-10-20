@@ -123,7 +123,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
-            sequenceTaskExecution.setEndTime(LocalDateTime.now());
+            sequenceTaskExecution.setEndDate(LocalDateTime.now());
 
             taskCompletionHandler.handle(sequenceTaskExecution);
         }

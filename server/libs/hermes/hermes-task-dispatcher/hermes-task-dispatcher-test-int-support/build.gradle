@@ -1,6 +1,7 @@
 dependencies {
     api project(":server:libs:atlas:atlas-sync-executor")
 
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot-test"
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")

@@ -118,14 +118,14 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))
             .toList();
 
-        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         if (branchesWorkflowTasks.isEmpty()) {
-            taskExecution.setStartTime(LocalDateTime.now());
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setStartDate(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);

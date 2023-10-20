@@ -26,7 +26,8 @@ import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestCo
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,7 @@ public class JdbcJobRepositoryIntTest {
 
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 
-        job.setEndTime(Date.from(Instant.now()
+        job.setEndDate(LocalDateTime.from(Instant.now()
             .minus(1, DAYS)));
 
         jobRepository.save(job);
@@ -100,7 +101,7 @@ public class JdbcJobRepositoryIntTest {
         for (int i = 0; i < 5; i++) {
             Job completedJobToday = jobRepository.save(getJob(Job.Status.COMPLETED));
 
-            completedJobToday.setEndTime(new Date());
+            completedJobToday.setEndDate(LocalDateTime.now());
 
             jobRepository.save(completedJobToday);
         }
@@ -126,7 +127,7 @@ public class JdbcJobRepositoryIntTest {
         for (int i = 0; i < 5; i++) {
             Job completedJobYesterday = jobRepository.save(getJob(Job.Status.COMPLETED));
 
-            completedJobYesterday.setEndTime(Date.from(Instant.now()
+            completedJobYesterday.setEndDate(LocalDateTime.from(Instant.now()
                 .minus(1, DAYS)));
 
             jobRepository.save(completedJobYesterday);
@@ -144,7 +145,7 @@ public class JdbcJobRepositoryIntTest {
 
         completedJobToday = jobRepository.save(completedJobToday);
 
-        completedJobToday.setEndTime(new Date());
+        completedJobToday.setEndDate(LocalDateTime.now());
         completedJobToday.setId(null);
 
         jobRepository.save(completedJobToday);

@@ -30,6 +30,6 @@ import java.util.List;
 public interface CustomJobRepository {
 
     Page<Job> findAll(
-        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Pageable pageable);
 }

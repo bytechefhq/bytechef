@@ -85,11 +85,11 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         TaskStatus taskStatus = taskExecution.getStatus();
 
         if (currentTaskStatus.isTerminated() && taskStatus == TaskStatus.STARTED) {
-            currentTaskExecution.setStartTime(taskExecution.getStartTime());
+            currentTaskExecution.setStartDate(taskExecution.getStartDate());
 
             taskExecution = currentTaskExecution;
         } else if (taskStatus.isTerminated() && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
-            taskExecution.setStartTime(currentTaskExecution.getStartTime());
+            taskExecution.setStartDate(currentTaskExecution.getStartDate());
         }
 
         // Do not override initial workflow task definition
