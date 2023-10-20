@@ -8,7 +8,7 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-job:engine-job-service")
     implementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-api")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-api")
-    implementation project(":modules:libs:atlas:task-definition")
+    implementation project(":modules:libs:atlas:task-definition:task-definition-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-web"
 }

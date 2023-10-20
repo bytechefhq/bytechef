@@ -113,8 +113,8 @@ public class DSL {
         return new TaskProperty.StringTaskProperty(name);
     }
 
-    public static TaskAction OPERATION(String name) {
-        return new TaskAction(name);
+    public static TaskOperation OPERATION(String name) {
+        return new TaskOperation(name);
     }
 
     public static TaskDefinition create(String name) {

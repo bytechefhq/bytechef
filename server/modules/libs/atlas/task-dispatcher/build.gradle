@@ -8,14 +8,14 @@ subprojects {
         compileOnly project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-api")
         compileOnly project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-api")
         compileOnly project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")
-        compileOnly project(":modules:libs:atlas:task-definition")
+        compileOnly project(":modules:libs:atlas:task-definition:task-definition-api")
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
         testImplementation "com.fasterxml.jackson.core:jackson-databind"
         testImplementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-job:engine-job-api")
-        testImplementation project(":modules:libs:atlas:task-definition")
+        testImplementation project(":modules:libs:atlas:task-definition:task-definition-api")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
         testImplementation project(":modules:libs:atlas:test-commons")
         testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")

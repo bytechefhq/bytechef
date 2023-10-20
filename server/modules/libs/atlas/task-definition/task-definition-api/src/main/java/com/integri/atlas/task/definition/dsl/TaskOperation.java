@@ -21,37 +21,37 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class TaskAction {
+public class TaskOperation {
 
     private String description;
-    private String name;
+    private final String name;
     private List<TaskProperty<?>> inputs;
     private List<TaskProperty<?>> outputs;
     private String displayName;
 
-    TaskAction(String name) {
+    TaskOperation(String name) {
         this.name = name;
     }
 
-    public TaskAction description(String description) {
+    public TaskOperation description(String description) {
         this.description = description;
 
         return this;
     }
 
-    public TaskAction displayName(String displayName) {
+    public TaskOperation displayName(String displayName) {
         this.displayName = displayName;
 
         return this;
     }
 
-    public TaskAction inputs(TaskProperty<?>... inputs) {
+    public TaskOperation inputs(TaskProperty<?>... inputs) {
         this.inputs = List.of(inputs);
 
         return this;
     }
 
-    public TaskAction outputs(TaskProperty<?>... outputs) {
+    public TaskOperation outputs(TaskProperty<?>... outputs) {
         this.outputs = List.of(outputs);
 
         return this;
