@@ -22,24 +22,45 @@ import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.commons.xml.XmlHelper;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_XML_HELPERS + "/stringify")
-public class XmlHelpersStringifyTaskHandler implements TaskHandler<String> {
+public class XmlHelpersTaskHandler {
 
-    private final XmlHelper xmlHelper;
+    @Component(TASK_XML_HELPERS + "/parse")
+    public static class XmlHelpersParseTaskHandler implements TaskHandler<Map<String, ?>> {
 
-    public XmlHelpersStringifyTaskHandler(XmlHelper xmlHelper) {
-        this.xmlHelper = xmlHelper;
+        private final XmlHelper xmlHelper;
+
+        public XmlHelpersParseTaskHandler(XmlHelper xmlHelper) {
+            this.xmlHelper = xmlHelper;
+        }
+
+        @Override
+        public Map<String, ?> handle(TaskExecution taskExecution) {
+            String input = taskExecution.getRequiredString(PROPERTY_SOURCE);
+
+            return xmlHelper.read(input);
+        }
     }
 
-    @Override
-    public String handle(TaskExecution taskExecution) {
-        Object input = taskExecution.getRequired(PROPERTY_SOURCE);
+    @Component(TASK_XML_HELPERS + "/stringify")
+    public static class XmlHelpersStringifyTaskHandler implements TaskHandler<String> {
 
-        return xmlHelper.write(input);
+        private final XmlHelper xmlHelper;
+
+        public XmlHelpersStringifyTaskHandler(XmlHelper xmlHelper) {
+            this.xmlHelper = xmlHelper;
+        }
+
+        @Override
+        public String handle(TaskExecution taskExecution) {
+            Object input = taskExecution.getRequired(PROPERTY_SOURCE);
+
+            return xmlHelper.write(input);
+        }
     }
 }

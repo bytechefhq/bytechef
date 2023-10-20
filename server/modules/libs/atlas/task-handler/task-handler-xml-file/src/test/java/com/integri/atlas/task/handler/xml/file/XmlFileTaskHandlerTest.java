@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.xml.file;
 
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;

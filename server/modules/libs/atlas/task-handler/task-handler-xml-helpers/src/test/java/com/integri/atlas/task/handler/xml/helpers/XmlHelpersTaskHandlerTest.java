@@ -16,11 +16,10 @@
 
 package com.integri.atlas.task.handler.xml.helpers;
 
+import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
-import com.integri.atlas.task.commons.json.JsonHelper;
 import com.integri.atlas.task.commons.xml.XmlHelper;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class XmlHelpersTaskHandlerTest {
 
-    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
     private static final XmlHelper xmlHelper = new XmlHelper();
     private static final XmlHelpersParseTaskHandler xmlHelpersParseTaskHandler = new XmlHelpersParseTaskHandler(
         xmlHelper

@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.json.file;
 
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 

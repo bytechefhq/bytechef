@@ -27,19 +27,39 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_OBJECT_HELPERS + "/parse")
-public class ObjectHelpersParseTaskHandler implements TaskHandler<Object> {
+public class ObjectHelpersTaskHandler {
 
-    private final JsonHelper jsonHelper;
+    @Component(TASK_OBJECT_HELPERS + "/parse")
+    public static class ObjectHelpersParseTaskHandler implements TaskHandler<Object> {
 
-    public ObjectHelpersParseTaskHandler(JsonHelper jsonHelper) {
-        this.jsonHelper = jsonHelper;
+        private final JsonHelper jsonHelper;
+
+        public ObjectHelpersParseTaskHandler(JsonHelper jsonHelper) {
+            this.jsonHelper = jsonHelper;
+        }
+
+        @Override
+        public Object handle(TaskExecution taskExecution) {
+            Object input = taskExecution.getRequired("input");
+
+            return jsonHelper.read((String) input, new TypeReference<>() {});
+        }
     }
 
-    @Override
-    public Object handle(TaskExecution taskExecution) {
-        Object input = taskExecution.getRequired("input");
+    @Component(TASK_OBJECT_HELPERS + "/stringify")
+    public static class ObjectHelpersStringifyTaskHandler implements TaskHandler<String> {
 
-        return jsonHelper.read((String) input, new TypeReference<>() {});
+        private final JsonHelper jsonHelper;
+
+        public ObjectHelpersStringifyTaskHandler(JsonHelper jsonHelper) {
+            this.jsonHelper = jsonHelper;
+        }
+
+        @Override
+        public String handle(TaskExecution taskExecution) {
+            Object input = taskExecution.getRequired("input");
+
+            return jsonHelper.write(input);
+        }
     }
 }

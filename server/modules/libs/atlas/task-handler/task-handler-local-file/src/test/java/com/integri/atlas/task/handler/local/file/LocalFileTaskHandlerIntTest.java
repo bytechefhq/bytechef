@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.local.file;
 
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.integri.atlas.engine.Accessor;
