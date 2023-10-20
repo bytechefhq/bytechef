@@ -5,6 +5,7 @@ import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
 
+import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '@/pages/automation/project/stores/useNodeDetailsDialogStore';
 import {DataPillType} from '@/types/types';
 import {twMerge} from 'tailwind-merge';
@@ -34,6 +35,7 @@ const MentionsInput = ({data, label, placeholder}: MentionsInputProps) => {
     const editorRef = useRef<ReactQuill>(null);
 
     const {focusedInput, setFocusedInput} = useNodeDetailsDialogStore();
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
 
     const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
 
@@ -128,6 +130,8 @@ const MentionsInput = ({data, label, placeholder}: MentionsInputProps) => {
                 onFocus={() => {
                     if (editorRef.current) {
                         setFocusedInput(editorRef.current);
+
+                        setDataPillPanelOpen(true);
                     }
                 }}
                 placeholder={placeholder}

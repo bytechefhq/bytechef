@@ -33,7 +33,7 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
                                 'last-of-type:pb-0',
                                 label && 'mb-0 pb-4 pl-2'
                             )}
-                            key={`${subProperty.name}_${index}`}
+                            key={`${property.name}_${subProperty.name}_${index}`}
                             property={subProperty}
                         />
                     );

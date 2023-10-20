@@ -4,13 +4,13 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {ComponentDefinitionModel} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
 import {DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import Properties from 'components/Properties/Properties';
-import {PanelRightClose, PanelRightOpen} from 'lucide-react';
 import {
     useGetActionDefinitionQuery,
     useGetActionDefinitionsQuery,
@@ -23,7 +23,6 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
-import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import getSubProperties from '../utils/getSubProperties';
@@ -51,6 +50,12 @@ const tabs = [
     },
 ];
 
+type CurrentComponentType =
+    | ({
+          workflowAlias?: string;
+      } & ComponentDefinitionModel)
+    | undefined;
+
 const NodeDetailsDialog = () => {
     const [activeTab, setActiveTab] = useState('description');
     const [currentActionName, setCurrentActionName] = useState('');
@@ -61,19 +66,26 @@ const NodeDetailsDialog = () => {
     const {
         componentActions,
         componentNames,
+        dataPills,
         setComponentActions,
         setDataPills,
     } = useWorkflowDefinitionStore();
-
-    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
     });
 
-    const {data: currentComponent} = useGetComponentDefinitionQuery({
+    let currentComponent: CurrentComponentType;
+
+    const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.originNodeName || currentNode.name,
     });
+
+    if (currentComponentDefinition) {
+        currentComponent = currentComponentDefinition;
+
+        currentComponent.workflowAlias = currentNode.name;
+    }
 
     const getActionName = (): string => {
         const currentComponentActionNames = currentComponent?.actions?.map(
@@ -111,11 +123,18 @@ const NodeDetailsDialog = () => {
             ? componentNames.slice(0, currentNodeIndex)
             : [];
 
+    const normalizedPreviousComponentNames = previousComponentNames.map(
+        (name) =>
+            name.match(new RegExp(/-\d$/))
+                ? name.slice(0, name.length - 2)
+                : name
+    );
+
     const {data: previousComponents} = useGetComponentDefinitionsQuery(
         {
-            include: previousComponentNames,
+            include: normalizedPreviousComponentNames,
         },
-        !!previousComponentNames.length
+        !!normalizedPreviousComponentNames.length
     );
 
     const {data: actionData} = useGetActionDefinitionsQuery(
@@ -230,16 +249,34 @@ const NodeDetailsDialog = () => {
             setCurrentActionName(currentAction.name);
 
             if (componentActions && currentComponent) {
-                setComponentActions([
-                    ...componentActions.filter(
-                        (action) =>
-                            action.componentName !== currentComponent.name
-                    ),
-                    {
+                const index = componentActions.findIndex(
+                    (action) =>
+                        action.workflowAlias?.match(new RegExp(/-\d$/)) &&
+                        action.workflowAlias === currentComponent?.workflowAlias
+                );
+
+                if (index !== -1) {
+                    componentActions.splice(index, 1, {
                         actionName: currentAction.name,
                         componentName: currentComponent.name,
-                    },
-                ]);
+                        workflowAlias: currentComponent.workflowAlias,
+                    });
+
+                    setComponentActions(componentActions);
+                } else {
+                    setComponentActions([
+                        ...componentActions.filter(
+                            (action) =>
+                                action.workflowAlias !==
+                                currentComponent?.workflowAlias
+                        ),
+                        {
+                            actionName: currentAction.name,
+                            componentName: currentComponent.name,
+                            workflowAlias: currentComponent.workflowAlias,
+                        },
+                    ]);
+                }
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -279,30 +316,6 @@ const NodeDetailsDialog = () => {
                     {currentComponent ? (
                         <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
                             <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
-                                {!!previousComponentNames.length && (
-                                    <Button
-                                        aria-label={
-                                            dataPillPanelOpen
-                                                ? 'Close the data pill panel'
-                                                : 'Open the data pill panel'
-                                        }
-                                        className="mr-auto p-0"
-                                        displayType="icon"
-                                        icon={
-                                            dataPillPanelOpen ? (
-                                                <PanelRightOpen className="h-6 w-6 cursor-pointer text-gray-900" />
-                                            ) : (
-                                                <PanelRightClose className="h-6 w-6 cursor-pointer text-gray-900" />
-                                            )
-                                        }
-                                        onClick={() =>
-                                            setDataPillPanelOpen(
-                                                !dataPillPanelOpen
-                                            )
-                                        }
-                                    />
-                                )}
-
                                 {currentNode.label}
 
                                 <span className="mx-2 text-sm text-gray-500">
@@ -385,6 +398,7 @@ const NodeDetailsDialog = () => {
                                                         currentActionName
                                                     }
                                                     customClassName="p-4 overflow-y-auto"
+                                                    dataPills={dataPills}
                                                     properties={
                                                         currentAction.properties
                                                     }

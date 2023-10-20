@@ -5,6 +5,7 @@ import {create} from 'zustand';
 type ComponentActionsType = Array<{
     componentName: string;
     actionName: string;
+    workflowAlias?: string;
 }>;
 
 interface WorkflowDefinitionState {
