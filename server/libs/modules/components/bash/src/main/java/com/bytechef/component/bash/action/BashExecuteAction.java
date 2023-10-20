@@ -18,9 +18,9 @@
 package com.bytechef.component.bash.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 import java.io.BufferedWriter;
@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 
 import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
@@ -55,11 +56,11 @@ public class BashExecuteAction {
         .outputSchema(string())
         .execute(BashExecuteAction::execute);
 
-    protected static String execute(Context context, InputParameters inputParameters) {
+    protected static String execute(Context context, Map<String, ?> inputParameters) {
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
 
-            writeStringToFile(scriptFile, inputParameters.getRequiredString(SCRIPT));
+            writeStringToFile(scriptFile, MapValueUtils.getRequiredString(inputParameters, SCRIPT));
 
             try {
                 Runtime runtime = Runtime.getRuntime();

@@ -46,7 +46,7 @@ import java.util.stream.Stream;
  * @author Ivica Cardic
  */
 @Component
-public class XmlMapper implements XmlUtils.XmlMapper {
+final class XmlMapper implements XmlUtils.XmlMapper {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();

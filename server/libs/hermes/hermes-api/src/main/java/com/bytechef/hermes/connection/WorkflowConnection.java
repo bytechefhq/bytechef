@@ -22,7 +22,6 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,25 +55,24 @@ public class WorkflowConnection {
         this.taskName = taskName;
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Map<String, WorkflowConnection>> of(Job job) {
-        return MapValueUtils.get(
-            job.getMetadata(), CONNECTIONS,
-            new ParameterizedTypeReference<Map<String, Map<String, Map<String, Object>>>>() {}, Map.of())
-            .entrySet()
+        Map<String, Map<String, Map<String, Object>>> connectionMap = MapValueUtils.get(
+            job.getMetadata(), CONNECTIONS, Map.class, Map.of());
+
+        return connectionMap.entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> toMap(entry.getValue(), entry.getKey())));
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, WorkflowConnection> of(WorkflowTask workflowTask) {
-        return toMap(
-            workflowTask.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of()),
-            workflowTask.getName());
+        return toMap(workflowTask.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTask.getName());
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
-        return toMap(
-            workflowTrigger.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of()),
-            workflowTrigger.getName());
+        return toMap(workflowTrigger.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTrigger.getName());
     }
 
     public static List<WorkflowConnection> of(Workflow workflow) {
@@ -125,8 +123,8 @@ public class WorkflowConnection {
                 entry -> new WorkflowConnection(
                     MapValueUtils.getString(entry.getValue(), "componentName"),
                     MapValueUtils.getLong(entry.getValue(), ID),
-                    MapValueUtils.getInteger(entry.getValue(), "componentVersion"),
-                    entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), taskName)));
+                    MapValueUtils.getInteger(entry.getValue(), "componentVersion"), entry.getKey(),
+                    MapValueUtils.getString(entry.getValue(), "name"), taskName)));
     }
 
     @Override

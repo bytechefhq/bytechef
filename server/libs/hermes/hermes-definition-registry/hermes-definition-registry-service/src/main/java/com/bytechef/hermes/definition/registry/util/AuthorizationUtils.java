@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.util;
 
-import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
@@ -37,71 +37,78 @@ public class AuthorizationUtils {
     public static Authorization.ApplyConsumer getDefaultApply(Authorization.AuthorizationType type) {
         return switch (type) {
             case API_KEY -> ((
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext) -> {
+                Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {
 
-                String addTo = connectionInputParameters.getString(
-                    Authorization.ADD_TO, Authorization.ApiTokenLocation.HEADER.name());
+                String addTo = MapValueUtils.getString(
+                    connectionInputParameters, Authorization.ADD_TO, Authorization.ApiTokenLocation.HEADER.name());
 
                 if (Authorization.ApiTokenLocation
                     .valueOf(addTo.toUpperCase()) == Authorization.ApiTokenLocation.HEADER) {
 
                     authorizationContext.setHeaders(
                         Map.of(
-                            connectionInputParameters.getString(Authorization.KEY, Authorization.API_TOKEN),
-                            List.of(connectionInputParameters.getString(Authorization.VALUE, ""))));
+                            MapValueUtils.getString(
+                                connectionInputParameters, Authorization.KEY, Authorization.API_TOKEN),
+                            List.of(
+                                MapValueUtils.getString(connectionInputParameters, Authorization.VALUE, ""))));
                 } else {
                     authorizationContext.setQueryParameters(
                         Map.of(
-                            connectionInputParameters.getString(Authorization.KEY, Authorization.API_TOKEN),
-                            List.of(connectionInputParameters.getString(Authorization.VALUE, ""))));
+                            MapValueUtils.getString(
+                                connectionInputParameters, Authorization.KEY, Authorization.API_TOKEN),
+                            List.of(
+                                MapValueUtils.getString(connectionInputParameters, Authorization.VALUE, ""))));
                 }
             });
             case BASIC_AUTH, DIGEST_AUTH -> ((
-                InputParameters connectionInputParameters,
+                Map<String, Object> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext
                     .setUsernamePassword(
-                        connectionInputParameters.getString(Authorization.USERNAME),
-                        connectionInputParameters.getString(Authorization.PASSWORD)));
+                        MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME),
+                        MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD)));
             case BEARER_TOKEN -> ((
-                InputParameters connectionInputParameters,
+                Map<String, Object> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext
                     .setHeaders(
                         Map.of(
                             Authorization.AUTHORIZATION,
-                            List.of(Authorization.BEARER + " " + connectionInputParameters.getString(
-                                Authorization.TOKEN)))));
+                            List.of(
+                                Authorization.BEARER + " " +
+                                    MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN)))));
             case CUSTOM -> ((
-                InputParameters connectionInputParameters, AuthorizationContext authorizationContext) -> {});
+                Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {});
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> ((
-                    InputParameters connectionInputParameters,
+                    Map<String, Object> connectionInputParameters,
                     AuthorizationContext authorizationContext) -> authorizationContext
                         .setHeaders(
                             Map.of(
                                 Authorization.AUTHORIZATION,
                                 List.of(
-                                    connectionInputParameters.getString(
-                                        Authorization.HEADER_PREFIX, Authorization.BEARER) + " " +
-                                        connectionInputParameters.getString(Authorization.ACCESS_TOKEN)))));
+                                    MapValueUtils.getString(
+                                        connectionInputParameters, Authorization.HEADER_PREFIX, Authorization.BEARER) +
+                                        " " +
+                                        MapValueUtils.getString(
+                                            connectionInputParameters, Authorization.ACCESS_TOKEN)))));
         };
     }
 
-    public static String getDefaultAuthorizationUrl(InputParameters connectionInputParameters) {
-        return connectionInputParameters.getString(Authorization.AUTHORIZATION_URL);
+    public static String getDefaultAuthorizationUrl(Map<String, Object> connectionInputParameters) {
+        return MapValueUtils.getString(connectionInputParameters, Authorization.AUTHORIZATION_URL);
     }
 
-    public static String getDefaultBaseUri(InputParameters connectionInputParameters) {
+    public static String getDefaultBaseUri(Map<String, Object> connectionInputParameters) {
         return connectionInputParameters.containsKey(ConnectionDefinition.BASE_URI)
-            ? connectionInputParameters.getString(ConnectionDefinition.BASE_URI)
+            ? MapValueUtils.getString(connectionInputParameters, ConnectionDefinition.BASE_URI)
             : null;
     }
 
-    public static String getDefaultClientId(InputParameters connectionInputParameters) {
-        return connectionInputParameters.getString(Authorization.CLIENT_ID);
+    public static String getDefaultClientId(Map<String, Object> connectionInputParameters) {
+        return MapValueUtils.getString(connectionInputParameters, Authorization.CLIENT_ID);
     }
 
-    public static String getDefaultClientSecret(InputParameters connectionInputParameters) {
-        return connectionInputParameters.getString(Authorization.CLIENT_SECRET);
+    public static String getDefaultClientSecret(Map<String, Object> connectionInputParameters) {
+        return MapValueUtils.getString(connectionInputParameters, Authorization.CLIENT_SECRET);
     }
 
     public static Authorization.PkceFunction getDefaultPkce() {
@@ -109,8 +116,8 @@ public class AuthorizationUtils {
     }
 
     public static String
-        getDefaultRefreshUrl(InputParameters connectionInputParameters, TokenUrlFunction tokeUrlFunction) {
-        String refreshUrl = connectionInputParameters.getString(Authorization.REFRESH_URL);
+        getDefaultRefreshUrl(Map<String, Object> connectionInputParameters, TokenUrlFunction tokeUrlFunction) {
+        String refreshUrl = MapValueUtils.getString(connectionInputParameters, Authorization.REFRESH_URL);
 
         if (refreshUrl == null) {
             refreshUrl = tokeUrlFunction.apply(connectionInputParameters);
@@ -120,8 +127,8 @@ public class AuthorizationUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<String> getDefaultScopes(InputParameters connectionInputParameters) {
-        Object scopes = connectionInputParameters.getString(Authorization.SCOPES);
+    public static List<String> getDefaultScopes(Map<String, Object> connectionInputParameters) {
+        Object scopes = MapValueUtils.getString(connectionInputParameters, Authorization.SCOPES);
 
         if (scopes == null) {
             return Collections.emptyList();
@@ -136,7 +143,7 @@ public class AuthorizationUtils {
         }
     }
 
-    public static String getDefaultTokenUrl(InputParameters connectionInputParameters) {
-        return connectionInputParameters.getString(Authorization.TOKEN_URL);
+    public static String getDefaultTokenUrl(Map<String, Object> connectionInputParameters) {
+        return MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN_URL);
     }
 }

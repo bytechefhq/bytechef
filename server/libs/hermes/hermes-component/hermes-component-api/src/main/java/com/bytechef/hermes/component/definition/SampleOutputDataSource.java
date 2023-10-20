@@ -18,7 +18,8 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -44,6 +45,6 @@ public interface SampleOutputDataSource {
          * @param inputParameters
          * @return
          */
-        Object apply(Connection connection, InputParameters inputParameters);
+        Object apply(Connection connection, Map<String, ?> inputParameters);
     }
 }

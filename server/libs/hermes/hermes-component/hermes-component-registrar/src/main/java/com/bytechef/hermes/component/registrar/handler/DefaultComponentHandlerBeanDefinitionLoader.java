@@ -40,7 +40,6 @@ public class DefaultComponentHandlerBeanDefinitionLoader
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgValue(componentHandler)
             .addConstructorArgReference("contextFactory")
-            .addConstructorArgReference("inputParametersFactory")
             .getBeanDefinition();
     }
 }

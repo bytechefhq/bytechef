@@ -24,7 +24,6 @@ import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstant
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.operation.config.JdbcActionIntTestConfiguration;
@@ -81,16 +80,11 @@ public class InsertJdbcActionIntTest {
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getList(COLUMNS, String.class, List.of()))
-            .thenReturn(List.of("id", "name"));
-        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")));
-        Mockito.when(inputParameters.getString(SCHEMA, "public"))
-            .thenReturn("public");
-        Mockito.when(inputParameters.getRequiredString(TABLE))
-            .thenReturn("test");
+        Map<String, ?> inputParameters = Map.of(
+            COLUMNS, List.of("id", "name"),
+            ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
+            SCHEMA, "public",
+            TABLE, "test");
 
         Map<String, Integer> result = insertJdbcOperation.execute(context, inputParameters);
 

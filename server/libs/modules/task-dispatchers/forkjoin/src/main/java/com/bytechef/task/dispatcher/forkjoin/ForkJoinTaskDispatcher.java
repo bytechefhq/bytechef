@@ -104,10 +104,11 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
-            taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+        List<List<Map<String, Object>>> branches = (List)MapValueUtils.getRequiredList(
+            taskExecution.getParameters(), BRANCHES, List.class);
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(source -> CollectionUtils.map(source, WorkflowTask::of))

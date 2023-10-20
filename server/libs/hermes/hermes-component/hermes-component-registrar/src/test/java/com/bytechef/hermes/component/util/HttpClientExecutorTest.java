@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
@@ -43,15 +42,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import javax.net.ssl.SSLSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -366,7 +361,7 @@ public class HttpClientExecutorTest {
     public void testHandleResponse() throws Exception {
         Assertions.assertNull(
             HTTP_CLIENT_EXECUTOR.handleResponse(context, new TestHttpResponse(null), Configuration.configuration())
-                .getBody());
+                .body());
 
         //
 
@@ -380,7 +375,7 @@ public class HttpClientExecutorTest {
             HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY))
-                .getBody());
+                .body());
 
         //
 
@@ -395,7 +390,7 @@ public class HttpClientExecutorTest {
                         }
                         """),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.JSON))
-                .getBody());
+                .body());
 
         //
 
@@ -404,7 +399,7 @@ public class HttpClientExecutorTest {
             HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse("text"),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT))
-                .getBody());
+                .body());
 
         //
 
@@ -422,7 +417,7 @@ public class HttpClientExecutorTest {
 
                         """),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML))
-                .getBody());
+                .body());
 
         //
 
@@ -503,7 +498,7 @@ public class HttpClientExecutorTest {
             // TODO mock ConnectionDefinitionService
             Authorization.ApplyConsumer applyConsumer = AuthorizationUtils.getDefaultApply(authorization.getType());
 
-            applyConsumer.accept(new MockInputParameters(parameters), authorizationContext);
+            applyConsumer.accept(parameters, authorizationContext);
         }
 
         @Override
@@ -517,217 +512,7 @@ public class HttpClientExecutorTest {
         }
 
         @Override
-        public boolean containsKey(String key) {
-            return false;
-        }
-
-        @Override
-        public Object get(String key) {
-            return null;
-        }
-
-        @Override
-        public <T> T get(String key, Class<T> returnType) {
-            return null;
-        }
-
-        @Override
-        public <T> T get(String key, Class<T> returnType, T defaultValue) {
-            return null;
-        }
-
-        @Override
-        public <T> T[] getArray(String key, Class<T> elementType) {
-            return null;
-        }
-
-        @Override
-        public Boolean getBoolean(String key) {
-            return null;
-        }
-
-        @Override
-        public boolean getBoolean(String key, boolean defaultValue) {
-            return false;
-        }
-
-        @Override
-        public Date getDate(String key) {
-            return null;
-        }
-
-        @Override
-        public Date getDate(String key, Date defaultValue) {
-            return null;
-        }
-
-        @Override
-        public Double getDouble(String key) {
-            return null;
-        }
-
-        @Override
-        public double getDouble(String key, double defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public Duration getDuration(String key) {
-            return null;
-        }
-
-        @Override
-        public Duration getDuration(String key, Duration defaultDuration) {
-            return null;
-        }
-
-        @Override
-        public Float getFloat(String key) {
-            return null;
-        }
-
-        @Override
-        public float getFloat(String key, float defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public Integer getInteger(String key) {
-            return null;
-        }
-
-        @Override
-        public int getInteger(String key, int defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public Set<String> getKeys() {
-            return null;
-        }
-
-        @Override
-        public <T> List<T> getList(String key, Class<T> elementType) {
-            return null;
-        }
-
-        @Override
-        public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public List<Object> getList(String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public LocalDate getLocalDate(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDate getLocalDate(String key, LocalDate defaultValue) {
-            return null;
-        }
-
-        @Override
-        public LocalDateTime getLocalDateTime(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
-            return null;
-        }
-
-        @Override
-        public Long getLong(String key) {
-            return null;
-        }
-
-        @Override
-        public long getLong(String key, long defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public <V> Map<String, V> getMap(String key) {
-            return null;
-        }
-
-        @Override
-        public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public <T> T getRequired(String key) {
-            return null;
-        }
-
-        @Override
-        public <T> T getRequired(String key, Class<T> returnType) {
-            return null;
-        }
-
-        @Override
-        public Boolean getRequiredBoolean(String key) {
-            return null;
-        }
-
-        @Override
-        public Date getRequiredDate(String key) {
-            return null;
-        }
-
-        @Override
-        public Double getRequiredDouble(String key) {
-            return null;
-        }
-
-        @Override
-        public Float getRequiredFloat(String key) {
-            return null;
-        }
-
-        @Override
-        public Integer getRequiredInteger(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDate getRequiredLocalDate(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDateTime getRequiredLocalDateTime(String key) {
-            return null;
-        }
-
-        @Override
-        public <V> Map<String, V> getRequiredMap(String key) {
-            return null;
-        }
-
-        @Override
-        public String getRequiredString(String key) {
-            return null;
-        }
-
-        @Override
-        public String getString(String key) {
-            return null;
-        }
-
-        @Override
-        public String getString(String key, String defaultValue) {
+        public Map<String, Object> getParameters() {
             return null;
         }
 
@@ -737,230 +522,5 @@ public class HttpClientExecutorTest {
             return this;
         }
 
-    }
-
-    @SuppressFBWarnings("NP")
-    private static class MockInputParameters implements InputParameters {
-
-        private final Map<String, Object> parameters;
-
-        private MockInputParameters(Map<String, Object> parameters) {
-            this.parameters = parameters;
-        }
-
-        @Override
-        public boolean containsKey(String key) {
-            return false;
-        }
-
-        @Override
-        public Object get(String key) {
-            return null;
-        }
-
-        @Override
-        public <T> T get(String key, Class<T> returnType) {
-            return null;
-        }
-
-        @Override
-        public <T> T get(String key, Class<T> returnType, T defaultValue) {
-            return null;
-        }
-
-        @Override
-        public <T> T[] getArray(String key, Class<T> elementType) {
-            return null;
-        }
-
-        @Override
-        public Boolean getBoolean(String key) {
-            return null;
-        }
-
-        @Override
-        public boolean getBoolean(String key, boolean defaultValue) {
-            return false;
-        }
-
-        @Override
-        public Date getDate(String key) {
-            return null;
-        }
-
-        @Override
-        public Date getDate(String key, Date defaultValue) {
-            return null;
-        }
-
-        @Override
-        public Double getDouble(String key) {
-            return null;
-        }
-
-        @Override
-        public double getDouble(String key, double defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public Duration getDuration(String key) {
-            return null;
-        }
-
-        @Override
-        public Duration getDuration(String key, Duration defaultDuration) {
-            return null;
-        }
-
-        @Override
-        public Float getFloat(String key) {
-            return null;
-        }
-
-        @Override
-        public float getFloat(String key, float defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public Integer getInteger(String key) {
-            return null;
-        }
-
-        @Override
-        public int getInteger(String key, int defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public Set<String> getKeys() {
-            return null;
-        }
-
-        @Override
-        public <T> List<T> getList(String key, Class<T> elementType) {
-            return null;
-        }
-
-        @Override
-        public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public List<Object> getList(String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public LocalDate getLocalDate(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDate getLocalDate(String key, LocalDate defaultValue) {
-            return null;
-        }
-
-        @Override
-        public LocalDateTime getLocalDateTime(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
-            return null;
-        }
-
-        @Override
-        public Long getLong(String key) {
-            return null;
-        }
-
-        @Override
-        public long getLong(String key, long defaultValue) {
-            return 0;
-        }
-
-        @Override
-        public <V> Map<String, V> getMap(String key) {
-            return null;
-        }
-
-        @Override
-        public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
-            return null;
-        }
-
-        @Override
-        public <T> T getRequired(String key) {
-            return null;
-        }
-
-        @Override
-        public <T> T getRequired(String key, Class<T> returnType) {
-            return null;
-        }
-
-        @Override
-        public Boolean getRequiredBoolean(String key) {
-            return null;
-        }
-
-        @Override
-        public Date getRequiredDate(String key) {
-            return null;
-        }
-
-        @Override
-        public Double getRequiredDouble(String key) {
-            return null;
-        }
-
-        @Override
-        public Float getRequiredFloat(String key) {
-            return null;
-        }
-
-        @Override
-        public Integer getRequiredInteger(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDate getRequiredLocalDate(String key) {
-            return null;
-        }
-
-        @Override
-        public LocalDateTime getRequiredLocalDateTime(String key) {
-            return null;
-        }
-
-        @Override
-        public <V> Map<String, V> getRequiredMap(String key) {
-            return null;
-        }
-
-        @Override
-        public String getRequiredString(String key) {
-            return null;
-        }
-
-        @Override
-        public String getString(String key) {
-            return (String) parameters.get(key);
-        }
-
-        @Override
-        public String getString(String key, String defaultValue) {
-            return (String) parameters.getOrDefault(key, defaultValue);
-        }
     }
 }

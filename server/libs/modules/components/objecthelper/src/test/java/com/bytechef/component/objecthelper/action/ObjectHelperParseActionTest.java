@@ -18,14 +18,10 @@
 package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.util.JsonMapper;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -42,15 +38,13 @@ public class ObjectHelperParseActionTest {
 
     @BeforeAll
     public static void beforeAll() {
-        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
+//        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
     }
 
     @Test
     public void testExecuteParse() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn("""
+        Map<String, ?> inputParameters = Map.of(
+            SOURCE, """
                 {
                     "key": 3
                 }
@@ -59,17 +53,14 @@ public class ObjectHelperParseActionTest {
         assertThat(ObjectHelperParseAction.executeParse(context, inputParameters))
             .isEqualTo(Map.of("key", 3));
 
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(
-                """
-                    [
-                        {
-                            "key": 3
-                        }
-                    ]
-                    """);
+        inputParameters = Map.of(
+            SOURCE, """
+                [
+                    {
+                        "key": 3
+                    }
+                ]
+                """);
 
         assertThat(ObjectHelperParseAction.executeParse(context, inputParameters))
             .isEqualTo(List.of(Map.of("key", 3)));

@@ -19,9 +19,11 @@ package com.bytechef.component.randomhelper.action;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
+
+import java.util.Map;
 
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.END_INCLUSIVE;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_INT;
@@ -52,9 +54,9 @@ public class RandomHelperRandomIntAction {
     /**
      * Generates a random integer.
      */
-    public static int executeNextInt(Context context, InputParameters inputParameters) {
-        int startInclusive = inputParameters.getInteger("startInclusive", 0);
-        int endInclusive = inputParameters.getInteger("endInclusive", 100);
+    public static int executeNextInt(Context context, Map<String, ?> inputParameters) {
+        int startInclusive = MapValueUtils.getInteger(inputParameters, START_INCLUSIVE, 0);
+        int endInclusive = MapValueUtils.getInteger(inputParameters, END_INCLUSIVE, 100);
 
         return nextInt(startInclusive, endInclusive);
     }

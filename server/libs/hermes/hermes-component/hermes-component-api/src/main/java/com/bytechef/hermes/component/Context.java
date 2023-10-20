@@ -20,6 +20,7 @@ package com.bytechef.hermes.component;
 import com.bytechef.hermes.component.definition.Authorization;
 
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -78,13 +79,15 @@ public interface Context {
 
     FileEntry storeFileContent(String fileName, InputStream inputStream);
 
-    interface Connection extends InputParameters {
+    interface Connection {
 
         void applyAuthorization(Authorization.AuthorizationContext authorizationContext);
 
         Optional<String> fetchBaseUri();
 
         String getBaseUri();
+
+        Map<String, Object> getParameters();
     }
 
     interface FileEntry {

@@ -20,6 +20,8 @@ package com.bytechef.hermes.component;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
+import java.util.Map;
+
 /**
  * Default component handler.
  *
@@ -37,7 +39,7 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
      * @return the result of execution
      * @throws ComponentExecutionException
      */
-    default Object handleAction(ActionDefinition actionDefinition, Context context, InputParameters inputParameters)
+    default Object handleAction(ActionDefinition actionDefinition, Context context, Map<String, ?> inputParameters)
         throws ComponentExecutionException {
 
         return null;

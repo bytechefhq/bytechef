@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -41,13 +42,15 @@ public class DataSourceFactory {
         Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
+        Map<String, Object> connectionInputParameters = connection.getParameters();
+
         String url = "jdbc:" + databaseJdbcName + "://"
-            + connection.getString(JdbcConstants.HOST)
+            + MapValueUtils.getString(connectionInputParameters, JdbcConstants.HOST)
             + ":"
-            + connection.getString(JdbcConstants.PORT)
+            + MapValueUtils.getString(connectionInputParameters, JdbcConstants.PORT)
             + "/"
-            + connection.getString(JdbcConstants.DATABASE);
-        String username = connection.getString(JdbcConstants.USERNAME);
+            + MapValueUtils.getString(connectionInputParameters, JdbcConstants.DATABASE);
+        String username = MapValueUtils.getString(connectionInputParameters, JdbcConstants.USERNAME);
 
         return dataSourceMap.computeIfAbsent(url + username, key -> {
             DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
@@ -55,7 +58,7 @@ public class DataSourceFactory {
             dataSourceBuilder.driverClassName(jdbcDriverClassName);
             dataSourceBuilder.url(url);
             dataSourceBuilder.username(username);
-            dataSourceBuilder.password(connection.getString(JdbcConstants.PASSWORD));
+            dataSourceBuilder.password(MapValueUtils.getString(connectionInputParameters, JdbcConstants.PASSWORD));
 
             return dataSourceBuilder.build();
         });

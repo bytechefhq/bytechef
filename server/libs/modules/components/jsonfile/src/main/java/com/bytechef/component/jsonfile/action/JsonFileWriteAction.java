@@ -20,10 +20,10 @@ package com.bytechef.component.jsonfile.action;
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -80,10 +80,10 @@ public class JsonFileWriteAction {
         .execute(JsonFileWriteAction::executeWrite);
 
     @SuppressWarnings("unchecked")
-    protected static FileEntry executeWrite(Context context, InputParameters inputParameters)
+    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters)
         throws ComponentExecutionException {
         JsonFileTaskConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
-        Object source = inputParameters.getRequired(SOURCE);
+        Object source = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -101,7 +101,7 @@ public class JsonFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                getDefaultFileName(fileType, inputParameters.getString(FILENAME)), inputStream);
+                getDefaultFileName(fileType, MapValueUtils.getString(inputParameters, FILENAME)), inputStream);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create json file", ioException);
         }

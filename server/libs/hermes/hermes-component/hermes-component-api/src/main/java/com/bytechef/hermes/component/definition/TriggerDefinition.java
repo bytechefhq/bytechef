@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Property;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -249,8 +248,8 @@ public interface TriggerDefinition {
      * @param workflowExecutionId
      */
     record DynamicWebhookDisableContext(
-        Connection connection, InputParameters inputParameters, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
-        String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters,
+        DynamicWebhookEnableOutput dynamicWebhookEnableOutput, String workflowExecutionId) {
     }
 
     /**
@@ -261,7 +260,7 @@ public interface TriggerDefinition {
      * @param workflowExecutionId
      */
     record DynamicWebhookEnableContext(
-        Connection connection, InputParameters inputParameters, String webhookUrl, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId) {
     }
 
     /**
@@ -311,7 +310,7 @@ public interface TriggerDefinition {
      * @param dynamicWebhookEnableOutput
      */
     record DynamicWebhookRequestContext(
-        TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
+        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
         WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method,
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
     }
@@ -342,7 +341,7 @@ public interface TriggerDefinition {
          * @param inputParameters
          * @param workflowExecutionId
          */
-        void accept(Connection connection, InputParameters inputParameters, String workflowExecutionId);
+        void accept(Connection connection, Map<String, ?> inputParameters, String workflowExecutionId);
     }
 
     /**
@@ -356,7 +355,7 @@ public interface TriggerDefinition {
          * @param connection
          * @param inputParameters
          */
-        void accept(Connection connection, InputParameters inputParameters, String workflowExecutionId);
+        void accept(Connection connection, Map<String, ?> inputParameters, String workflowExecutionId);
     }
 
     /**
@@ -367,7 +366,7 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record PollContext(
-        TriggerContext triggerContext, InputParameters inputParameters, Map<String, Object> closureParameters) {
+        TriggerContext triggerContext, Map<String, ?> inputParameters, Map<String, Object> closureParameters) {
     }
 
     /**
@@ -413,7 +412,7 @@ public interface TriggerDefinition {
      * @param method
      */
     record StaticWebhookRequestContext(
-        TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
+        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
         WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
     }
 
@@ -612,7 +611,7 @@ public interface TriggerDefinition {
      * @param method
      */
     record WebhookValidateContext(
-        TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
+        TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
         WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
     }
 

@@ -39,14 +39,10 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTrigger implements Serializable, Trigger {
 
-    static {
-        MapValueUtils.addConverter(new WorkflowTriggerConverter());
-    }
-
     private String componentName;
     private int componentVersion;
 
-    private Map<String, Object> extensions = new HashMap<>();
+    private final Map<String, Object> extensions = new HashMap<>();
     private String name;
     private String label;
     private Map<String, Object> parameters;
@@ -113,11 +109,11 @@ public class WorkflowTrigger implements Serializable, Trigger {
             && Objects.equals(type, that.type);
     }
 
-    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType, T defaultValue) {
+    public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
         return MapValueUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public <T> List<T> getExtensions(String name, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+    public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapValueUtils.getList(extensions, name, elementType, defaultValue);
     }
 
@@ -188,14 +184,5 @@ public class WorkflowTrigger implements Serializable, Trigger {
             + timeout + '\'' + ", type='"
             + type + '\'' + ", parameters='"
             + parameters + '\'' + '}';
-    }
-
-    private static class WorkflowTriggerConverter implements Converter<Map, WorkflowTrigger> {
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public WorkflowTrigger convert(Map source) {
-            return new WorkflowTrigger(source);
-        }
     }
 }

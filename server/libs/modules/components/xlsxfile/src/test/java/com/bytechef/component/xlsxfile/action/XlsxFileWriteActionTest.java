@@ -20,7 +20,6 @@ package com.bytechef.component.xlsxfile.action;
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -53,7 +52,7 @@ public class XlsxFileWriteActionTest {
     public void testExecuteWriteXLSX() throws IOException, JSONException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        InputParameters inputParameters = getWriteParameters(new JSONArray(jsonContent).toList());
+        Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList());
 
         XlsxFileWriteAction.executeWrite(context, inputParameters);
 
@@ -80,17 +79,11 @@ public class XlsxFileWriteActionTest {
     }
 
     @SuppressWarnings("raw")
-    private InputParameters getWriteParameters(List items) {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILENAME, "file.xlsx"))
-            .thenReturn("file.xlsx");
-        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(items);
-        Mockito.when(inputParameters.getString(SHEET_NAME, "Sheet"))
-            .thenReturn("Sheet");
-
-        return inputParameters;
+    private Map<String, ?> getWriteParameters(List<?> items) {
+        return Map.of(
+            FILENAME, "file.xlsx",
+            ROWS, items,
+            SHEET_NAME, "Sheet");
     }
 
     private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {

@@ -166,6 +166,7 @@ public final class Workflow implements Persistable<String> {
         this(definition, Format.valueOf(format), id, readWorkflowMap(definition, id, format), Map.of());
     }
 
+    @SuppressWarnings("unchecked")
     public Workflow(
         String definition, Format format, String id, Map<String, Object> source, Map<String, Object> metadata) {
 
@@ -185,9 +186,7 @@ public final class Workflow implements Persistable<String> {
                 this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
             } else if (WorkflowConstants.INPUTS.equals(entry.getKey())) {
                 this.inputs = CollectionUtils.map(
-                    MapValueUtils.getList(
-                        source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
-                        Collections.emptyList()),
+                    MapValueUtils.getList(source, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
                     map -> new Input(
                         MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
                         MapValueUtils.getString(map, WorkflowConstants.LABEL),
@@ -197,9 +196,7 @@ public final class Workflow implements Persistable<String> {
                 this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.OUTPUTS.equals(entry.getKey())) {
                 this.outputs = CollectionUtils.map(
-                    MapValueUtils.getList(
-                        source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
-                        Collections.emptyList()),
+                    MapValueUtils.getList(source, WorkflowConstants.OUTPUTS, Map.class, List.of()),
                     map -> new Output(
                         MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
                         MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
@@ -207,7 +204,7 @@ public final class Workflow implements Persistable<String> {
                 this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
             } else if (WorkflowConstants.TASKS.equals(entry.getKey())) {
                 this.tasks = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList()),
+                    MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, List.of()),
                     WorkflowTask::of);
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
@@ -246,11 +243,11 @@ public final class Workflow implements Persistable<String> {
         return Objects.equals(id, workflow.id);
     }
 
-    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType, T defaultValue) {
+    public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
         return MapValueUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public <T> List<T> getExtensions(String name, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+    public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapValueUtils.getList(extensions, name, elementType, defaultValue);
     }
 

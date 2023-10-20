@@ -19,7 +19,6 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
@@ -36,7 +35,6 @@ import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
@@ -81,7 +79,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerDefinition.DynamicWebhookDisableContext context = new TriggerDefinition.DynamicWebhookDisableContext(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters), output, workflowExecutionId);
+            triggerParameters, output, workflowExecutionId);
 
         dynamicWebhookDisableConsumer.accept(context);
     }
@@ -101,7 +99,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerDefinition.DynamicWebhookEnableContext context = new TriggerDefinition.DynamicWebhookEnableContext(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters), webhookUrl, workflowExecutionId);
+            triggerParameters, webhookUrl, workflowExecutionId);
 
         return dynamicWebhookEnableFunction.apply(context);
     }
@@ -135,7 +133,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters));
+            triggerParameters);
     }
 
     @Override
@@ -152,13 +150,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         EditorDescriptionFunction editorDescriptionFunction = OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (Context.Connection connection, InputParameters inputParameters) -> componentDefinition.getTitle() + ": "
-                + triggerDefinition.getTitle());
+            (Context.Connection connection, Map<String, ?> inputParameters) -> componentDefinition.getTitle() +
+                ": " + triggerDefinition.getTitle());
 
         return editorDescriptionFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters));
+            triggerParameters);
     }
 
     @Override
@@ -174,7 +172,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         listenerDisableConsumer.accept(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters), workflowExecutionId);
+            triggerParameters, workflowExecutionId);
     }
 
     @Override
@@ -190,7 +188,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         listenerEnableConsumer.accept(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters), workflowExecutionId);
+            triggerParameters, workflowExecutionId);
     }
 
     @Override
@@ -208,7 +206,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters));
+            triggerParameters);
     }
 
     @Override
@@ -227,7 +225,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return outputSchemaFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters));
+            triggerParameters);
     }
 
     @Override
@@ -246,7 +244,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return sampleOutputFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters));
+            triggerParameters);
     }
 
     @Override

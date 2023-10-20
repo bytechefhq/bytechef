@@ -20,13 +20,14 @@ package com.bytechef.component.rabbitmq.action;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.rabbitmq.client.Channel;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.MESSAGE;
@@ -56,17 +57,19 @@ public class RabbitMqSendMessageAction {
                 .required(true))
         .execute(RabbitMqSendMessageAction::execute);
 
-    protected static Object execute(ActionContext context, InputParameters inputParameters) {
+    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
         Connection connection = context.getConnection();
 
         try (com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
-            connection.getString(HOSTNAME), connection.getInteger(PORT, 5672), connection.getString(USERNAME),
-            connection.getString(PASSWORD))) {
+            MapValueUtils.getString(connection.getParameters(), HOSTNAME),
+            MapValueUtils.getInteger(connection.getParameters(), PORT, 5672),
+            MapValueUtils.getString(connection.getParameters(), USERNAME),
+            MapValueUtils.getString(connection.getParameters(), PASSWORD))) {
 
             Channel channel = rabbitMqConnection.createChannel();
 
-            String queueName = inputParameters.getRequiredString(QUEUE);
-            String message = JsonUtils.write(inputParameters.getRequired(MESSAGE));
+            String queueName = MapValueUtils.getRequiredString(inputParameters, QUEUE);
+            String message = JsonUtils.write(MapValueUtils.getRequired(inputParameters, MESSAGE));
 
             channel.queueDeclare(queueName, true, false, false, null);
             channel.basicPublish("", queueName, null, message.getBytes(StandardCharsets.UTF_8));

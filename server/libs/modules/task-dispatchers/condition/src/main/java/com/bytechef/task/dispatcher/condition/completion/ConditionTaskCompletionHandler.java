@@ -133,7 +133,6 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
 
     private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution conditionTaskExecution, String caseTrue) {
         return MapValueUtils.getList(
-            conditionTaskExecution.getParameters(), caseTrue, new ParameterizedTypeReference<>() {},
-            Collections.emptyList());
+            conditionTaskExecution.getParameters(), caseTrue, WorkflowTask.class, Collections.emptyList());
     }
 }

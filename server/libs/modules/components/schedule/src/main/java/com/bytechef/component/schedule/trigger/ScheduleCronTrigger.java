@@ -20,9 +20,9 @@ package com.bytechef.component.schedule.trigger;
 import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
@@ -75,10 +75,11 @@ public class ScheduleCronTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         CronSchedule cronSchedule = new CronSchedule(
-            "0 " + inputParameters.getString(EXPRESSION), ZoneId.of(inputParameters.getString(TIMEZONE)));
+            "0 " + MapValueUtils.getString(inputParameters, EXPRESSION),
+            ZoneId.of(MapValueUtils.getString(inputParameters, TIMEZONE)));
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
@@ -86,14 +87,14 @@ public class ScheduleCronTrigger {
                 new WorkflowScheduleAndData(
                     cronSchedule,
                     Map.of(
-                        EXPRESSION, inputParameters.getString(EXPRESSION),
-                        TIMEZONE, inputParameters.getString(TIMEZONE)),
+                        EXPRESSION, MapValueUtils.getString(inputParameters, EXPRESSION),
+                        TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
                     workflowExecutionId)),
             cronSchedule.getInitialExecutionTime(Instant.now()));
     }
 
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }

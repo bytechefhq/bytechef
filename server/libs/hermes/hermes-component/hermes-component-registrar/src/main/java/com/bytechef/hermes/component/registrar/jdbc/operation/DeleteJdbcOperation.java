@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -40,15 +41,15 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, InputParameters inputParameters) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
         Map<String, Integer> result;
 
-        String deleteKey = inputParameters.getString(JdbcConstants.DELETE_KEY, "id");
-        @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) inputParameters.getList(JdbcConstants.ROWS, Map.class,
-            Collections.emptyList());
-        String schema = inputParameters.getString(JdbcConstants.SCHEMA, "public");
-        String table = inputParameters.getRequiredString(JdbcConstants.TABLE);
+        String deleteKey = MapValueUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
+        List<Map<String, ?>> rows = (List)MapValueUtils.getList(
+            inputParameters, JdbcConstants.ROWS, Map.class, Collections.emptyList());
+        String schema = MapValueUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
+        String table = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 
         if (rows.isEmpty()) {
             result = Map.of("rows", 0);

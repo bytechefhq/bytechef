@@ -19,8 +19,6 @@ package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.util.XmlMapper;
 import com.bytechef.hermes.component.util.XmlUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
@@ -29,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -54,7 +51,7 @@ public class XmlFileWriteActionTest {
 
     @BeforeAll
     public static void beforeAll() {
-        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
+//        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
     }
 
     @BeforeEach
@@ -66,10 +63,8 @@ public class XmlFileWriteActionTest {
     public void testExecuteWrite() {
         File file = getFile(SAMPLE_XML);
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8)));
+        Map<String, ?> inputParameters = Map.of(
+            SOURCE, XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8)));
 
         XmlFileWriteAction.executeWrite(context, inputParameters);
 
@@ -87,12 +82,9 @@ public class XmlFileWriteActionTest {
 
         Mockito.reset(context);
 
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getString(FILENAME))
-            .thenReturn(TEST_XML);
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8)));
+        inputParameters = Map.of(
+            FILENAME, TEST_XML,
+            SOURCE, XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8)));
 
         XmlFileWriteAction.executeWrite(context, inputParameters);
 
@@ -109,10 +101,8 @@ public class XmlFileWriteActionTest {
     public void testExecuteWriteArray() {
         File file = getFile(SAMPLE_ARRAY_XML);
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(XmlUtils.readList(Files.contentOf(file, StandardCharsets.UTF_8)));
+        Map<String, ?> inputParameters = Map.of(
+            SOURCE, XmlUtils.readList(Files.contentOf(file, StandardCharsets.UTF_8)));
 
         XmlFileWriteAction.executeWrite(context, inputParameters);
 
@@ -131,12 +121,9 @@ public class XmlFileWriteActionTest {
 
         Mockito.reset(context);
 
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(SOURCE))
-            .thenReturn(XmlUtils.readList(Files.contentOf(file, StandardCharsets.UTF_8)));
-        Mockito.when(inputParameters.getString(FILENAME))
-            .thenReturn(TEST_XML);
+        inputParameters = Map.of(
+            SOURCE, XmlUtils.readList(Files.contentOf(file, StandardCharsets.UTF_8)),
+            FILENAME, TEST_XML);
 
         XmlFileWriteAction.executeWrite(context, inputParameters);
 

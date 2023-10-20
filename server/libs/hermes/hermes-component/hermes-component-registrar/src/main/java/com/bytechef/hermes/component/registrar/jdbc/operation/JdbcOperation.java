@@ -18,7 +18,8 @@
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -27,5 +28,5 @@ import com.bytechef.hermes.component.InputParameters;
  */
 public interface JdbcOperation<T> {
 
-    T execute(Context context, InputParameters inputParameters);
+    T execute(Context context, Map<String, ?> inputParameters);
 }

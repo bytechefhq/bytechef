@@ -40,7 +40,7 @@ import java.util.stream.Stream;
  * @author Ivica Cardic
  */
 @Component
-public class JsonMapper implements JsonUtils.JsonMapper {
+final class JsonMapper implements JsonUtils.JsonMapper {
 
     static {
         com.jayway.jsonpath.Configuration.setDefaults(new com.jayway.jsonpath.Configuration.Defaults() {

@@ -18,13 +18,9 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.util.XmlMapper;
-import com.bytechef.hermes.component.util.XmlUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -39,36 +35,34 @@ public class XmlHelperParseActionTest {
 
     @BeforeAll
     public static void beforeAll() {
-        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
+//        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
     }
 
     @Test
     public void testExecuteParse() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequiredString(SOURCE))
-            .thenReturn(
-                """
-                    <Flower id="45">
-                        <name>Poppy</name>
-                    </Flower>
-                    """);
+        Map<String, ?> inputParameters = Map.of(
+            SOURCE,
+            """
+                <Flower id="45">
+                    <name>Poppy</name>
+                </Flower>
+                """);
 
         assertThat((Map<String, ?>) XmlHelperParseAction.executeParse(Mockito.mock(Context.class), inputParameters))
             .isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
-        Mockito.when(inputParameters.getRequiredString(SOURCE))
-            .thenReturn(
-                """
-                    <Flowers>
-                        <Flower id="45">
-                            <name>Poppy</name>
-                        </Flower>
-                        <Flower id="50">
-                            <name>Rose</name>
-                        </Flower>
-                    </Flowers>
-                    """);
+        inputParameters = Map.of(
+            SOURCE,
+            """
+                <Flowers>
+                    <Flower id="45">
+                        <name>Poppy</name>
+                    </Flower>
+                    <Flower id="50">
+                        <name>Rose</name>
+                    </Flower>
+                </Flowers>
+                """);
 
         assertThat(XmlHelperParseAction.executeParse(Mockito.mock(Context.class), inputParameters))
             .isEqualTo(

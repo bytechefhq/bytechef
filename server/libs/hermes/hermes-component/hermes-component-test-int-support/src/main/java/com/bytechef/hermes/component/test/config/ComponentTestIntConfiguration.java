@@ -23,8 +23,6 @@ import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
@@ -97,11 +95,6 @@ public class ComponentTestIntConfiguration {
 
         return new ContextFactoryImpl(
             connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
-    }
-
-    @Bean
-    InputParametersFactory inputParametersFactory() {
-        return new InputParametersFactoryImpl();
     }
 
     @MockBean

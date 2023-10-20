@@ -59,12 +59,11 @@ public class WorkflowTask implements Task {
     private WorkflowTask() {
     }
 
-    private WorkflowTask(Map<String, Object> source) {
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
+    private WorkflowTask(Map<String, ?> source) {
+        for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
-                this.finalize = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()),
-                    WorkflowTask::new);
+                this.finalize =  MapValueUtils.getList(
+                    source, WorkflowConstants.FINALIZE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
@@ -76,13 +75,11 @@ public class WorkflowTask implements Task {
             } else if (WorkflowConstants.PARAMETERS.equals(entry.getKey())) {
                 this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
             } else if (WorkflowConstants.POST.equals(entry.getKey())) {
-                this.post = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList()),
-                    WorkflowTask::new);
+                this.post = MapValueUtils.getList(
+                    source, WorkflowConstants.POST, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.PRE.equals(entry.getKey())) {
-                this.pre = CollectionUtils.map(
-                    MapValueUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList()),
-                    WorkflowTask::new);
+                this.pre = MapValueUtils.getList(
+                    source, WorkflowConstants.PRE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
                 this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
@@ -93,7 +90,7 @@ public class WorkflowTask implements Task {
         }
     }
 
-    public static WorkflowTask of(Map<String, Object> source) {
+    public static WorkflowTask of(Map<String, ?> source) {
         Assert.notNull(source, "'source' must not be null");
 
         return new WorkflowTask(source);
@@ -122,11 +119,11 @@ public class WorkflowTask implements Task {
             && Objects.equals(type, that.type);
     }
 
-    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType, T defaultValue) {
+    public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
         return MapValueUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public <T> List<T> getExtensions(String name, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+    public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapValueUtils.getList(extensions, name, elementType, defaultValue);
     }
 

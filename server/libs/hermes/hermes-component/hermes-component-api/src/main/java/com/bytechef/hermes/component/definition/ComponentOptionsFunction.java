@@ -18,11 +18,11 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -35,5 +35,5 @@ public interface ComponentOptionsFunction extends OptionsDataSource.OptionsFunct
      * @param inputParameters
      * @return
      */
-    List<Option<?>> apply(Context.Connection connection, InputParameters inputParameters);
+    List<Option<?>> apply(Context.Connection connection, Map<String, ?> inputParameters);
 }

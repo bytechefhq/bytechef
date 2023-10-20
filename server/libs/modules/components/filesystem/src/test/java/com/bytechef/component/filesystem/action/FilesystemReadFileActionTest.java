@@ -19,13 +19,13 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,11 +37,9 @@ public class FilesystemReadFileActionTest {
 
     @Test
     public void testExecuteReadFile() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getSampleFile();
 
-        Mockito.when(inputParameters.getRequiredString(FILENAME))
-            .thenReturn(file.getAbsolutePath());
+        Map<String, ?> inputParameters = Map.of(FILENAME, file.getAbsolutePath());
 
         Context context = Mockito.mock(Context.class);
 

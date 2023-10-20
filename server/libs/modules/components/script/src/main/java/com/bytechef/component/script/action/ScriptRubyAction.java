@@ -19,9 +19,10 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
+
+import java.util.Map;
 
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
@@ -48,11 +49,12 @@ public class ScriptRubyAction {
             string(SCRIPT)
                 .label("Ruby code")
                 .description("Add your Ruby custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR))
+                .controlType(Property.ControlType.CODE_EDITOR)
+                .required(true))
         .outputSchema(oneOf())
         .execute(ScriptRubyAction::executeRuby);
 
-    protected static Object executeRuby(Context context, InputParameters inputParameters) {
+    protected static Object executeRuby(Context context, Map<String, ?> inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters);
     }
 }

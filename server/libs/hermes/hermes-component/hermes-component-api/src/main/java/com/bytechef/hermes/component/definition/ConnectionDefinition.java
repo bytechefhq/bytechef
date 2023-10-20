@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -95,7 +95,7 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
          * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionInputParameters);
+        String apply(Map<String, Object> connectionInputParameters);
     }
 
     /**
@@ -108,6 +108,6 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
          *
          * @param connectionInputParameters
          */
-        void accept(InputParameters connectionInputParameters);
+        void accept(Map<String, Object> connectionInputParameters);
     }
 }

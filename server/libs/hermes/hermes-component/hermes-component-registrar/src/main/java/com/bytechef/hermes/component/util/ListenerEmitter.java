@@ -25,7 +25,7 @@ import com.bytechef.message.broker.MessageBroker;
 /**
  * @author Ivica Cardic
  */
-public class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitter {
+final class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitter {
 
     private final MessageBroker messageBroker;
 

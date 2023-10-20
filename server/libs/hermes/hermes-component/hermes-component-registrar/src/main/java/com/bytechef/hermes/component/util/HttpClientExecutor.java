@@ -19,10 +19,12 @@ package com.bytechef.hermes.component.util;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
+import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
@@ -50,6 +52,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
@@ -114,23 +117,21 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         return bodyHandler;
     }
 
-    HttpRequest.BodyPublisher createBodyPublisher(Context context, Body body) {
-        HttpRequest.BodyPublisher bodyPublisher;
+    BodyPublisher createBodyPublisher(Context context, Body body) {
+        BodyPublisher bodyPublisher;
 
         if (body == null) {
             bodyPublisher = HttpRequest.BodyPublishers.noBody();
         } else {
-            if (body.getContentType() == HttpClientUtils.BodyContentType.BINARY &&
-                body.getContent() instanceof Context.FileEntry fileEntry) {
-
+            if (body.getContentType() == BodyContentType.BINARY && body.getContent() instanceof FileEntry fileEntry) {
                 bodyPublisher = getBinaryBodyPublisher(context, body, fileEntry);
-            } else if (body.getContentType() == HttpClientUtils.BodyContentType.FORM_DATA) {
+            } else if (body.getContentType() == BodyContentType.FORM_DATA) {
                 bodyPublisher = getFormDataBodyPublisher(context, body);
-            } else if (body.getContentType() == HttpClientUtils.BodyContentType.FORM_URL_ENCODED) {
+            } else if (body.getContentType() == BodyContentType.FORM_URL_ENCODED) {
                 bodyPublisher = getFormUrlEncodedBodyPublisher(body);
-            } else if (body.getContentType() == HttpClientUtils.BodyContentType.JSON) {
+            } else if (body.getContentType() == BodyContentType.JSON) {
                 bodyPublisher = getJsonBodyPublisher(body);
-            } else if (body.getContentType() == HttpClientUtils.BodyContentType.XML) {
+            } else if (body.getContentType() == BodyContentType.XML) {
                 bodyPublisher = getXmlBodyPublisher(body);
             } else {
                 bodyPublisher = getStringBodyPublisher(body);
@@ -239,7 +240,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
     }
 
     private static void addFileEntry(
-        Context context, MultipartBodyPublisher.Builder builder, String name, Context.FileEntry fileEntry) {
+        Context context, MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
 
         Objects.requireNonNull(context, "'context' must not be null");
 
@@ -310,9 +311,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
             .orElse(uriString);
     }
 
-    private static HttpRequest.BodyPublisher getBinaryBodyPublisher(
-        Context context, Body body, Context.FileEntry fileEntry) {
-
+    private static BodyPublisher getBinaryBodyPublisher(Context context, Body body, FileEntry fileEntry) {
         Objects.requireNonNull(context, "'context' must not be null");
 
         return MoreBodyPublishers.ofMediaType(
@@ -320,13 +319,13 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
-    private static HttpRequest.BodyPublisher getFormDataBodyPublisher(Context context, Body body) {
+    private static BodyPublisher getFormDataBodyPublisher(Context context, Body body) {
         Map<?, ?> bodyParameters = (Map<?, ?>) body.getContent();
 
         MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            if (parameter.getValue() instanceof Context.FileEntry fileEntry) {
+            if (parameter.getValue() instanceof FileEntry fileEntry) {
                 addFileEntry(context, builder, (String) parameter.getKey(), fileEntry);
             } else {
                 builder.textPart((String) parameter.getKey(), parameter.getValue());
@@ -336,7 +335,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         return builder.build();
     }
 
-    private static HttpRequest.BodyPublisher getFormUrlEncodedBodyPublisher(Body body) {
+    private static BodyPublisher getFormUrlEncodedBodyPublisher(Body body) {
         Map<?, ?> bodyParameters = (Map<?, ?>) body.getContent();
 
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
@@ -350,7 +349,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         return builder.build();
     }
 
-    private static HttpRequest.BodyPublisher getStringBodyPublisher(Body body) {
+    private static BodyPublisher getStringBodyPublisher(Body body) {
         Object content = body.getContent();
 
         return MoreBodyPublishers.ofMediaType(
@@ -370,7 +369,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         return false;
     }
 
-    private static Context.FileEntry storeBinaryResponseBody(
+    private static FileEntry storeBinaryResponseBody(
         Context context, Configuration configuration, Map<String, List<String>> headers,
         InputStream httpResponseBody) throws MimeTypeException {
 
@@ -394,13 +393,13 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         return context.storeFileContent(filename, httpResponseBody);
     }
 
-    private HttpRequest.BodyPublisher getJsonBodyPublisher(Body body) {
+    private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
             HttpRequest.BodyPublishers.ofString(jsonMapper.write(body.getContent())),
             MediaType.APPLICATION_JSON);
     }
 
-    private HttpRequest.BodyPublisher getXmlBodyPublisher(Body body) {
+    private BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
             HttpRequest.BodyPublishers.ofString(xmlMapper.write(body.getContent())),
             MediaType.APPLICATION_XML);

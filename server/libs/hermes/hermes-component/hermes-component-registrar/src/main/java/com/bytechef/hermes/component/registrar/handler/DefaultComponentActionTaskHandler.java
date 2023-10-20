@@ -27,7 +27,6 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
-import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -39,17 +38,14 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
 
     private final ActionDefinition actionDefinition;
     private final ContextFactory contextFactory;
-    private final InputParametersFactory inputParametersFactory;
 
     @SuppressFBWarnings("EI2")
     public DefaultComponentActionTaskHandler(
-        ActionDefinition actionDefinition, ComponentHandler componentHandler, ContextFactory contextFactory,
-        InputParametersFactory inputParametersFactory) {
+        ActionDefinition actionDefinition, ComponentHandler componentHandler, ContextFactory contextFactory) {
 
         this.actionDefinition = actionDefinition;
         this.componentHandler = componentHandler;
         this.contextFactory = contextFactory;
-        this.inputParametersFactory = inputParametersFactory;
     }
 
     @Override
@@ -62,11 +58,9 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
             () -> {
                 try {
                     return actionDefinition.getExecute()
-                        .map(executeFunction -> executeFunction.apply(
-                            context, inputParametersFactory.createInputParameters(taskExecution.getParameters())))
+                        .map(executeFunction -> executeFunction.apply(context, taskExecution.getParameters()))
                         .orElseGet(() -> componentHandler.handleAction(
-                            actionDefinition, context,
-                            inputParametersFactory.createInputParameters(taskExecution.getParameters())));
+                            actionDefinition, context, taskExecution.getParameters()));
                 } catch (Exception e) {
                     throw new TaskExecutionException(e.getMessage(), e);
                 }

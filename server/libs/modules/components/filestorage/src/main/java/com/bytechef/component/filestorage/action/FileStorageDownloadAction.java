@@ -20,9 +20,9 @@ package com.bytechef.component.filestorage.action;
 import com.bytechef.component.filestorage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.DOWNLOAD;
@@ -67,9 +68,9 @@ public class FileStorageDownloadAction {
     /**
      * executes the download of a file (given its URL).
      */
-    protected static FileEntry executeDownload(Context context, InputParameters inputParameters) {
+    protected static FileEntry executeDownload(Context context, Map<String, ?> inputParameters) {
         try {
-            URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
+            URL url = new URL(MapValueUtils.getRequiredString(inputParameters, FileStorageConstants.URL));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.connect();
@@ -85,7 +86,8 @@ public class FileStorageDownloadAction {
                 }
 
                 try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
-                    return context.storeFileContent(inputParameters.getRequiredString(FILENAME), fileInputStream);
+                    return context.storeFileContent(
+                        MapValueUtils.getRequiredString(inputParameters, FILENAME), fileInputStream);
                 }
             }
 

@@ -18,9 +18,9 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,12 +60,12 @@ public class FilesystemWriteFileAction {
         .outputSchema(object().properties(integer("bytes")))
         .execute(FilesystemWriteFileAction::executeWriteFile);
 
-    protected static Map<String, Long> executeWriteFile(Context context, InputParameters inputParameters) {
-        String fileName = inputParameters.getRequiredString(FILENAME);
+    protected static Map<String, Long> executeWriteFile(Context context, Map<String, ?> inputParameters) {
+        String fileName = MapValueUtils.getRequiredString(inputParameters, FILENAME);
 
-        try (
-            InputStream inputStream = context
-                .getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+        try (InputStream inputStream = context.getFileStream(
+            MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY))) {
+
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create file " + inputParameters, ioException);

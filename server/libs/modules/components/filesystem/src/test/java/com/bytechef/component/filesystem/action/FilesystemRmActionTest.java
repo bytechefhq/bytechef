@@ -18,13 +18,13 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -38,10 +38,7 @@ public class FilesystemRmActionTest {
 
         Assertions.assertTrue(tempDir.exists());
 
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequiredString("path"))
-            .thenReturn(tempDir.getAbsolutePath());
+        Map<String, ?> inputParameters = Map.of("path", tempDir.getAbsolutePath());
 
         FilesystemRmAction.executeRm(Mockito.mock(Context.class), inputParameters);
 

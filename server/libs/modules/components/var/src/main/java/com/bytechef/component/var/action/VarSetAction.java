@@ -19,9 +19,12 @@ package com.bytechef.component.var.action;
 
 import com.bytechef.component.var.constant.VarConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
+import java.util.Map;
+
+import static com.bytechef.component.var.constant.VarConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
@@ -33,13 +36,13 @@ public class VarSetAction {
     public static final ActionDefinition ACTION_DEFINITION = action(VarConstants.SET)
         .title("Set value")
         .description("Assign value to a variable that can be used in the following steps.")
-        .properties(oneOf(VarConstants.VALUE)
+        .properties(oneOf(VALUE)
             .label("Value")
             .description("Value of any type to set.")
             .required(true))
         .execute(VarSetAction::executeSetValue);
 
-    protected static Object executeSetValue(Context context, InputParameters inputParameters) {
-        return inputParameters.get(VarConstants.VALUE);
+    protected static Object executeSetValue(Context context, Map<String, ?> inputParameters) {
+        return MapValueUtils.getRequired(inputParameters, VALUE);
     }
 }

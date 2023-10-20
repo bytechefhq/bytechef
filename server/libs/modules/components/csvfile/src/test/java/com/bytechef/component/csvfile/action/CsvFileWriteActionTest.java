@@ -19,7 +19,6 @@ package com.bytechef.component.csvfile.action;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -70,13 +69,8 @@ public class CsvFileWriteActionTest {
     }
 
     @SuppressWarnings("raw")
-    private InputParameters getWriteParameters(List<Map> items) {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(items);
-
-        return inputParameters;
+    private Map<String, Object> getWriteParameters(List<Map<?, ?>> items) {
+        return Map.of(ROWS, items);
     }
 
     private List<Map<String, Object>> read(InputStream inputStream) throws IOException {

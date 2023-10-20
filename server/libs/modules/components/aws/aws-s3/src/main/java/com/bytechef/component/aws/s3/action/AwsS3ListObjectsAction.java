@@ -20,8 +20,8 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -59,18 +60,23 @@ public class AwsS3ListObjectsAction {
         .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
         .execute(AwsS3ListObjectsAction::executeListObjects);
 
-    protected static List<S3ObjectDescription> executeListObjects(Context context, InputParameters inputParameters) {
+    protected static List<S3ObjectDescription> executeListObjects(
+        Context context, Map<String, ?> inputParameters) {
+
         Connection connection = context.getConnection();
+
+        Map<String, Object> connectionInputParameters = connection.getParameters();
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(inputParameters.getRequiredString(BUCKET_NAME))
-                .prefix(inputParameters.getRequiredString(PREFIX))
+                .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                .prefix(MapValueUtils.getRequiredString(inputParameters, PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
-                .map(o -> new S3ObjectDescription(inputParameters.getRequiredString(BUCKET_NAME), o))
+                .map(o -> new S3ObjectDescription(
+                    MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }

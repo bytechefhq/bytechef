@@ -19,9 +19,10 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
+
+import java.util.Map;
 
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.PYTHON;
@@ -49,11 +50,12 @@ public class ScriptPythonAction {
             string(SCRIPT)
                 .label("Python code")
                 .description("Add your Python custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR))
+                .controlType(Property.ControlType.CODE_EDITOR)
+                .required(true))
         .outputSchema(oneOf())
         .execute(ScriptPythonAction::executePython);
 
-    protected static Object executePython(Context context, InputParameters inputParameters) {
+    protected static Object executePython(Context context, Map<String, ?> inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("python", inputParameters);
     }
 }

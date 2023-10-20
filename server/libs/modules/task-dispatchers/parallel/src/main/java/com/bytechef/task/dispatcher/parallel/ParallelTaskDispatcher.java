@@ -77,7 +77,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         List<WorkflowTask> workflowTasks = MapValueUtils.getList(
-            taskExecution.getParameters(), TASKS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 

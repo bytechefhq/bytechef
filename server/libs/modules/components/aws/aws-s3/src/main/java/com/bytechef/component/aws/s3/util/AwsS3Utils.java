@@ -18,6 +18,7 @@
 package com.bytechef.component.aws.s3.util;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -36,25 +37,23 @@ public class AwsS3Utils {
 
     public static S3Client buildS3Client(Context.Connection connection) {
         S3ClientBuilder builder = S3Client.builder()
-            .credentialsProvider(
-                getCredentialsProvider(connection))
-            .region(Region.of(connection.getRequiredString(REGION)));
+            .credentialsProvider(getCredentialsProvider(connection))
+            .region(Region.of(MapValueUtils.getRequiredString(connection.getParameters(), REGION)));
 
         return builder.build();
     }
 
     public static S3Presigner buildS3Presigner(Context.Connection connection) {
         S3Presigner.Builder builder = S3Presigner.builder()
-            .credentialsProvider(
-                getCredentialsProvider(connection))
-            .region(Region.of(connection.getRequiredString(REGION)));
+            .credentialsProvider(getCredentialsProvider(connection))
+            .region(Region.of(MapValueUtils.getRequiredString(connection.getParameters(), REGION)));
 
         return builder.build();
     }
 
     private static StaticCredentialsProvider getCredentialsProvider(Context.Connection connection) {
         return StaticCredentialsProvider.create(AwsBasicCredentials.create(
-            connection.getRequiredString(ACCESS_KEY_ID),
-            connection.getRequiredString(SECRET_ACCESS_KEY)));
+            MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_KEY_ID),
+            MapValueUtils.getRequiredString(connection.getParameters(), SECRET_ACCESS_KEY)));
     }
 }

@@ -18,9 +18,11 @@
 package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.JsonUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
+
+import java.util.Map;
 
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.PARSE;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
@@ -44,8 +46,8 @@ public class ObjectHelperParseAction {
         .outputSchema(oneOf())
         .execute(ObjectHelperParseAction::executeParse);
 
-    protected static Object executeParse(Context context, InputParameters inputParameters) {
-        Object input = inputParameters.getRequired(SOURCE);
+    protected static Object executeParse(Context context, Map<String, ?> inputParameters) {
+        Object input = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         return JsonUtils.read((String) input);
     }

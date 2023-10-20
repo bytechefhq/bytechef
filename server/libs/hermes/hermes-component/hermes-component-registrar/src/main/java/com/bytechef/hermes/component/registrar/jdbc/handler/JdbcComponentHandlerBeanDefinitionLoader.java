@@ -71,7 +71,6 @@ public class JdbcComponentHandlerBeanDefinitionLoader implements ComponentHandle
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgReference("contextFactory")
             .addConstructorArgReference("dataSourceFactory")
-            .addConstructorArgReference("inputParametersFactory")
             .addConstructorArgValue(jdbcComponentHandler)
             .getBeanDefinition();
     }

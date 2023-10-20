@@ -19,7 +19,6 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
@@ -36,7 +35,6 @@ import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
@@ -80,7 +78,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
+            actionParameters);
     }
 
     @Override
@@ -97,15 +95,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         EditorDescriptionFunction editorDescriptionFunction = OptionalUtils.mapOrElse(
             actionDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (
-                Context.Connection connection,
-                InputParameters inputParameters) -> ComponentDefinitionDTO.getTitle(componentDefinition) + ": " +
-                    ActionDefinitionDTO.getTitle(actionDefinition));
+            (Context.Connection connection, Map<String, ?> inputParameters) -> ComponentDefinitionDTO.getTitle(
+                componentDefinition) + ": " + ActionDefinitionDTO.getTitle(actionDefinition));
 
         return editorDescriptionFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
+            actionParameters);
     }
 
     @Override
@@ -123,7 +119,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
+            actionParameters);
     }
 
     @Override
@@ -141,7 +137,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return outputSchemaFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
+            actionParameters);
     }
 
     @Override
@@ -160,7 +156,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return sampleOutputFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
+            actionParameters);
     }
 
     @Override

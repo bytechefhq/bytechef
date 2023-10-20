@@ -19,6 +19,7 @@ package com.bytechef.component.mailchimp.util;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.Option;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class MailchimpUtils {
             .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
             .headers(Map.of(AUTHORIZATION, List.of("OAuth " + accessToken)))
             .execute()
-            .getBody();
+            .body();
 
         return (String) response.get("dc");
     }
@@ -50,14 +51,14 @@ public class MailchimpUtils {
         return (connection, inputParameters) -> {
             Map<?, ?> response = ((Map<?, ?>) HttpClientUtils
                 .get("https://%s.api.mailchimp.com/3.0/lists".formatted(
-                    getMailChimpServer(connection.getRequiredString(ACCESS_TOKEN))))
+                    getMailChimpServer(MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN))))
                 .queryParameters(
                     Map.of(
                         "fields", List.of("lists.id,lists.name,total_items"),
                         "count", List.of("1000")))
                 .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
                 .execute()
-                .getBody());
+                .body());
 
             List<Option<?>> options = new ArrayList<>();
 

@@ -19,14 +19,15 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
@@ -49,8 +50,8 @@ public class FilesystemReadFileAction {
         .outputSchema(ComponentDSL.fileEntry())
         .execute(FilesystemReadFileAction::executeReadFile);
 
-    protected static FileEntry executeReadFile(Context context, InputParameters inputParameters) {
-        String filename = inputParameters.getRequiredString(FILENAME);
+    protected static FileEntry executeReadFile(Context context, Map<String, ?> inputParameters) {
+        String filename = MapValueUtils.getRequiredString(inputParameters, FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
             return context.storeFileContent(filename, inputStream);

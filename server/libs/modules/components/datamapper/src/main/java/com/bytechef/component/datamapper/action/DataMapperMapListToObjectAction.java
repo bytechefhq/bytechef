@@ -18,9 +18,10 @@
 package com.bytechef.component.datamapper.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+
+import java.util.Map;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
@@ -53,7 +54,7 @@ public class DataMapperMapListToObjectAction {
                 .required(true))
         .execute(DataMapperMapListToObjectAction::execute);
 
-    protected static Object execute(ActionContext context, InputParameters inputParameters) {
+    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
         return null;
     }
 }

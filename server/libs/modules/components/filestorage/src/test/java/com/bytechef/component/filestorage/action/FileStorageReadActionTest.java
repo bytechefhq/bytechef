@@ -18,10 +18,11 @@
 package com.bytechef.component.filestorage.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+
+import java.util.Map;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,14 +36,9 @@ public class FileStorageReadActionTest {
 
     @Test
     public void testExecuteRead() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
         Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
-            .thenReturn(fileEntry);
-
-        FileStorageReadAction.executeRead(context, inputParameters);
+        FileStorageReadAction.executeRead(context, Map.of(FILE_ENTRY, Mockito.mock(Context.FileEntry.class)));
 
         ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(Context.FileEntry.class);
 
