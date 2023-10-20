@@ -22,7 +22,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,9 +49,6 @@ public class XlsxFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
@@ -67,8 +63,8 @@ public class XlsxFileComponentHandlerIntTest {
                 ENCODER.encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
-                    fileStorageService
-                        .storeFileContent("data", sampleFile.getAbsolutePath(), fileInputStream)
+                    workflowFileStorage
+                        .storeFileContent(sampleFile.getAbsolutePath(), fileInputStream)
                         .toMap()));
 
             Assertions.assertThat(job.getStatus())
@@ -106,8 +102,8 @@ public class XlsxFileComponentHandlerIntTest {
                 ENCODER.encodeToString("xlsxfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
-                    fileStorageService
-                        .storeFileContent("data", sampleFile.getName(), fileInputStream)
+                    workflowFileStorage
+                        .storeFileContent(sampleFile.getName(), fileInputStream)
                         .toMap()));
 
             outputs = workflowFileStorage.readJobOutputs(job.getOutputs());

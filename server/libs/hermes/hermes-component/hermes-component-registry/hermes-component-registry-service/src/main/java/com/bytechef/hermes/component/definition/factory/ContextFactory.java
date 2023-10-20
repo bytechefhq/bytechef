@@ -18,12 +18,12 @@
 package com.bytechef.hermes.component.definition.factory;
 
 import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -45,8 +45,7 @@ public class ContextFactory {
     @SuppressFBWarnings("EI")
     public ContextFactory(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        DataStorageService dataStorageService, EventPublisher eventPublisher,
-        WorkflowFileStorage workflowFileStorage) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, WorkflowFileStorage workflowFileStorage) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
@@ -69,7 +68,8 @@ public class ContextFactory {
 
     private ContextImpl createContextImpl(Map<String, Long> connectionIdMap, Long taskExecutionId) {
         return new ContextImpl(
-            connectionIdMap, connectionDefinitionService, connectionService, eventPublisher, dataStorageService,
-            workflowFileStorage, taskExecutionId);
+            connectionIdMap, connectionDefinitionService, connectionService, dataStorageService, eventPublisher,
+            taskExecutionId,
+            workflowFileStorage);
     }
 }

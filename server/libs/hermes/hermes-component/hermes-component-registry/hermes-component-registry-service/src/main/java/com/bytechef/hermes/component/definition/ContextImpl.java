@@ -18,11 +18,11 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.TaskProgressedEvent;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -48,8 +48,8 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
     @SuppressFBWarnings("EI")
     public ContextImpl(
         Map<String, Long> connectionIdMap, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, EventPublisher eventPublisher, DataStorageService dataStorageService,
-        WorkflowFileStorage workflowFileStorage, Long taskExecutionId) {
+        ConnectionService connectionService, DataStorageService dataStorageService, EventPublisher eventPublisher,
+        Long taskExecutionId, WorkflowFileStorage workflowFileStorage) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionIdMap = connectionIdMap;
@@ -79,8 +79,8 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
     }
 
     @Override
-    public <T> Optional<T> fetchValue(String key, DataStorageScope scope, long scopeId) {
-        return dataStorageService.fetchValue(scope, scopeId, key);
+    public <T> Optional<T> fetchData(String context, int scope, long scopeId, String key) {
+        return dataStorageService.fetchData(context, scope, scopeId, key);
     }
 
     @Override
@@ -103,8 +103,7 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
 
     @Override
     public InputStream getFileStream(Context.FileEntry fileEntry) {
-        return workflowFileStorage.getFileStream(new com.bytechef.file.storage.domain.FileEntry(
-            fileEntry.getName(), fileEntry.getUrl()));
+        return workflowFileStorage.getFileStream(fileEntry.getName(), fileEntry.getUrl());
     }
 
     @Override
@@ -114,13 +113,12 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
 
     @Override
     public String readFileToString(Context.FileEntry fileEntry) {
-        return workflowFileStorage.readFileToString(new com.bytechef.file.storage.domain.FileEntry(
-            fileEntry.getName(), fileEntry.getUrl()));
+        return workflowFileStorage.readFileToString(fileEntry.getName(), fileEntry.getUrl());
     }
 
     @Override
-    public void saveValue(String key, Object value, DataStorageScope scope, long scopeId) {
-        dataStorageService.save(scope, scopeId, key, value);
+    public void saveData(String context, int scope, long scopeId, String key, Object data) {
+        dataStorageService.save(context, scope, scopeId, key, data);
     }
 
     @Override

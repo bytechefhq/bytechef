@@ -4,9 +4,12 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="202308070817" author="Ivica Cardic">
-            <createTable tableName="data_storage">
+            <createTable tableName="data_entry">
                 <column name="id" type="BIGINT" autoIncrement="true">
                     <constraints primaryKey="true" nullable="false"/>
+                </column>
+                <column name="context" type="VARCHAR(256)">
+                    <constraints nullable="false"/>
                 </column>
                 <column name="scope" type="INT">
                     <constraints nullable="false"/>
@@ -17,7 +20,7 @@
                 <column name="key" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>
-                <column name="value" type="TEXT">
+                <column name="data" type="TEXT">
                     <constraints nullable="false"/>
                 </column>
                 <column name="created_date" type="TIMESTAMP">
@@ -37,6 +40,6 @@
                 </column>
             </createTable>
 
-            <addUniqueConstraint constraintName="uk_data_storage_key" tableName="data_storage" columnNames="key, scope" />
+            <addUniqueConstraint constraintName="uk_data_entry_key" tableName="data_entry" columnNames="key, scope" />
         </changeSet>
 </databaseChangeLog>

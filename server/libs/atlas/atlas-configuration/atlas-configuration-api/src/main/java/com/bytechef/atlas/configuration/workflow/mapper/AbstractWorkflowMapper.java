@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.configuration.workflow.mapper;
 
-import com.bytechef.atlas.configuration.WorkflowReservedWordContributor;
+import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
@@ -57,7 +57,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
                 WorkflowReservedWordContributor.class);
 
             for (WorkflowReservedWordContributor workflowReservedWordContributor : serviceLoader) {
-                additionalWorkflowReservedWords.addAll(workflowReservedWordContributor.getReservedWord());
+                additionalWorkflowReservedWords.addAll(workflowReservedWordContributor.getReservedWords());
             }
         } catch (ServiceConfigurationError e) {
             if (logger.isDebugEnabled()) {

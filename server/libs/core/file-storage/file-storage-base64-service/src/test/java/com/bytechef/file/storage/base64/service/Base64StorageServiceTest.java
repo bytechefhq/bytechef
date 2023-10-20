@@ -33,34 +33,36 @@ import java.nio.charset.StandardCharsets;
  */
 public class Base64StorageServiceTest {
 
-    private static final String string = "test string";
+    private static final String DATA = "data";
+    private static final String STRING = "test string";
 
     private static final Base64FileStorageService base64StorageService = new Base64FileStorageService();
 
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.getFileStream(
-            "data",
-            new FileEntry("file.text", EncodingUtils.encodeBase64ToString(CompressionUtils.compress(string))));
+            DATA,
+            new FileEntry(DATA, "file.text", EncodingUtils.encodeBase64ToString(CompressionUtils.compress(STRING))));
 
         Assertions.assertThat(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
-            .isEqualTo(string);
+            .isEqualTo(STRING);
     }
 
     @Test
     public void testRead() {
         Assertions.assertThat(base64StorageService.readFileToString(
-            "data",
-            new FileEntry("file.text", EncodingUtils.encodeBase64ToString(CompressionUtils.compress(string)))))
-            .isEqualTo(string);
+            DATA,
+            new FileEntry(
+                DATA, "file.text", EncodingUtils.encodeBase64ToString(CompressionUtils.compress(STRING)))))
+            .isEqualTo(STRING);
     }
 
     @Test
     public void testWrite() {
         FileEntry fileEntry = base64StorageService.storeFileContent(
-            "data", "fileEntry", new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
+            DATA, "fileEntry", new ByteArrayInputStream(STRING.getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertThat(fileEntry.getUrl())
-            .isEqualTo("base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(string)));
+            .isEqualTo("base64:" + EncodingUtils.encodeBase64ToString(CompressionUtils.compress(STRING)));
     }
 }

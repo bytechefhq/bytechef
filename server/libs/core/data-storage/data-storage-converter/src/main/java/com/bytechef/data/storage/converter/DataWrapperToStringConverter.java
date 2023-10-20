@@ -17,7 +17,7 @@
 
 package com.bytechef.data.storage.converter;
 
-import com.bytechef.data.storage.domain.DataStorage.DataStorageValue;
+import com.bytechef.data.storage.domain.DataEntry.DataWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
@@ -27,17 +27,17 @@ import org.springframework.data.convert.WritingConverter;
  * @author Ivica Cardic
  */
 @WritingConverter
-public class DataStorageValueToStringConverter implements Converter<DataStorageValue, String> {
+public class DataWrapperToStringConverter implements Converter<DataWrapper, String> {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public DataStorageValueToStringConverter(ObjectMapper objectMapper) {
+    public DataWrapperToStringConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convert(DataStorageValue workflowTask) {
+    public String convert(DataWrapper workflowTask) {
         return write(objectMapper, workflowTask);
     }
 

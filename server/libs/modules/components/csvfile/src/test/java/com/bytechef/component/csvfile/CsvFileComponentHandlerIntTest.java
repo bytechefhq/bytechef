@@ -25,7 +25,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -46,9 +45,6 @@ public class CsvFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
@@ -62,10 +58,8 @@ public class CsvFileComponentHandlerIntTest {
             ENCODER.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                fileStorageService
-                    .storeFileContent(
-                        "data", sampleFile.getAbsolutePath(),
-                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                workflowFileStorage
+                    .storeFileContent(sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -101,9 +95,8 @@ public class CsvFileComponentHandlerIntTest {
                 .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                fileStorageService
-                    .storeFileContent(
-                        "data", sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                workflowFileStorage
+                    .storeFileContent(sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
         outputs = workflowFileStorage.readJobOutputs(job.getOutputs());

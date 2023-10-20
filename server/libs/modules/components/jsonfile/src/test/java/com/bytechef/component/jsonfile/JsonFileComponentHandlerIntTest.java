@@ -21,8 +21,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -48,9 +47,6 @@ public class JsonFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
@@ -64,10 +60,8 @@ public class JsonFileComponentHandlerIntTest {
             ENCODER.encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
-                fileStorageService
-                    .storeFileContent(
-                        "data", sampleFile.getAbsolutePath(),
-                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                workflowFileStorage
+                    .storeFileContent(sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
         Assertions.assertThat(job.getStatus())
@@ -102,9 +96,8 @@ public class JsonFileComponentHandlerIntTest {
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
             new JSONArray(
-                fileStorageService.readFileToString(
-                    "data",
-                    new FileEntry((String) fileEntryMap.get("name"), (String) fileEntryMap.get("url")))),
+                workflowFileStorage.readFileToString(
+                    (String) fileEntryMap.get("name"), (String) fileEntryMap.get("url"))),
             true);
     }
 

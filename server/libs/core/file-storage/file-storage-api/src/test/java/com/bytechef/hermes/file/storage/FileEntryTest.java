@@ -36,7 +36,7 @@ public class FileEntryTest {
 
     @Test
     public void testOf1() {
-        Assertions.assertThat(new FileEntry("fileName.txt", "/tmp/fileName.txt"))
+        Assertions.assertThat(new FileEntry("context", "fileName.txt", "/tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "fileName.txt")
@@ -45,7 +45,7 @@ public class FileEntryTest {
 
     @Test
     public void testOf2() {
-        Assertions.assertThat(new FileEntry("name.txt", "/tmp/fileName.txt"))
+        Assertions.assertThat(new FileEntry("context", "name.txt", "/tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "name.txt")
@@ -56,7 +56,7 @@ public class FileEntryTest {
     public void testSpelEvaluation() {
         Map<String, Object> map = Evaluator.evaluate(
             Map.of(WorkflowConstants.TYPE, "type", "result", "${fileEntry.name} ${fileEntry.url}"),
-            Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt")));
+            Collections.singletonMap("fileEntry", new FileEntry("context", "sample.txt", "/tmp/fileName.txt")));
 
         assertEquals(
             "sample.txt /tmp/fileName.txt", MapUtils.getString(map, "result"));

@@ -94,16 +94,18 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String context, String fileName, byte[] data) throws FileStorageException {
-        Objects.requireNonNull(fileName, "Filename is required");
-        Objects.requireNonNull(data, "Content is required");
+        Objects.requireNonNull(context, "context is required");
+        Objects.requireNonNull(fileName, "fileName is required");
+        Objects.requireNonNull(data, "data is required");
 
         return storeFileContent(context, fileName, new ByteArrayInputStream(data));
     }
 
     @Override
     public FileEntry storeFileContent(String context, String fileName, String data) throws FileStorageException {
-        Objects.requireNonNull(fileName, "Filename is required");
-        Objects.requireNonNull(data, "Content is required");
+        Objects.requireNonNull(context, "context is required");
+        Objects.requireNonNull(fileName, "fileName is required");
+        Objects.requireNonNull(data, "data is required");
 
         return storeFileContent(context, fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
     }
@@ -112,9 +114,17 @@ public class FilesystemFileStorageService implements FileStorageService {
     public FileEntry storeFileContent(String context, String fileName, InputStream inputStream)
         throws FileStorageException {
 
+        Objects.requireNonNull(context, "context is required");
+        Objects.requireNonNull(fileName, "fileName is required");
+        Objects.requireNonNull(inputStream, "inputStream is required");
+
+        return doStoreFileContent(context, fileName, inputStream);
+    }
+
+    private FileEntry doStoreFileContent(String context, String fileName, InputStream inputStream) {
         Path path = resolveDirectory(context);
 
-        path = path.resolve(generate());
+        path = path.resolve(generateUuid());
 
         try {
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
@@ -128,7 +138,7 @@ public class FilesystemFileStorageService implements FileStorageService {
             throw new FileStorageException("Failed to store empty file " + fileName);
         }
 
-        return new FileEntry(fileName, "file:" + path);
+        return new FileEntry(context, fileName, "file:" + path);
     }
 
     private Path resolveDirectory(String context) {
@@ -139,7 +149,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         }
     }
 
-    private String generate() {
+    private String generateUuid() {
         UUID uuid = UUID.randomUUID();
 
         return uuid.toString();
