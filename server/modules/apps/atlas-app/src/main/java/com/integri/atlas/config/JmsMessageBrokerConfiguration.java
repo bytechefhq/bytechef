@@ -34,13 +34,15 @@ import javax.jms.Message;
 import javax.jms.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListenerConfigurer;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
@@ -55,17 +57,9 @@ import org.springframework.jms.support.converter.MessageType;
 @Configuration
 @EnableConfigurationProperties(AtlasProperties.class)
 @ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "jms")
-public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
+public class JmsMessageBrokerConfiguration implements ApplicationContextAware, JmsListenerConfigurer {
 
-    @Autowired(required = false)
-    private Worker worker;
-
-    @Lazy
-    @Autowired(required = false)
-    private Coordinator coordinator;
-
-    @Autowired
-    private EventListener eventListener;
+    private ApplicationContext applicationContext;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -109,6 +103,8 @@ public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
         CoordinatorProperties coordinatorProperties = properties.getCoordinator();
         WorkerProperties workerProperties = properties.getWorker();
         if (coordinatorProperties.isEnabled()) {
+            Coordinator coordinator = applicationContext.getBean(Coordinator.class);
+
             registerListenerEndpoint(
                 aRegistrar,
                 Queues.COMPLETIONS,
@@ -127,7 +123,7 @@ public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
                 aRegistrar,
                 Queues.EVENTS,
                 coordinatorProperties.getSubscriptions().getEvents(),
-                eventListener,
+                applicationContext.getBean(EventListener.class),
                 "onApplicationEvent"
             );
             registerListenerEndpoint(
@@ -146,6 +142,8 @@ public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
             );
         }
         if (workerProperties.isEnabled()) {
+            Worker worker = applicationContext.getBean(Worker.class);
+
             Map<String, Object> subscriptions = workerProperties.getSubscriptions();
             subscriptions.forEach((k, v) ->
                 registerListenerEndpoint(aRegistrar, k, Integer.valueOf((String) v), worker, "handle")
@@ -180,6 +178,11 @@ public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
         factory.setConcurrency(String.valueOf(aConcurrency));
         factory.setConnectionFactory(connectionFactory);
         return factory;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     private static class NoReplyMessageListenerAdapter extends MessageListenerAdapter {

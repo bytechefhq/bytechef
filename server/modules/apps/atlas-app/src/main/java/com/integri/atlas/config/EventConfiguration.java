@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Lazy;
 class EventConfiguration {
 
     @Bean
-    DistributedEventPublisher defaultEventPublisher(@Lazy MessageBroker aMessageBroker) {
+    DistributedEventPublisher defaultEventPublisher(MessageBroker aMessageBroker) {
         return new DistributedEventPublisher(aMessageBroker);
     }
 }

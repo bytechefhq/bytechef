@@ -46,10 +46,13 @@ import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -57,17 +60,9 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 @EnableConfigurationProperties(AtlasProperties.class)
 @ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "amqp")
-public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer {
+public class AmqpMessageBrokerConfiguration implements ApplicationContextAware, RabbitListenerConfigurer {
 
-    @Autowired(required = false)
-    private Worker worker;
-
-    @Lazy
-    @Autowired(required = false)
-    private Coordinator coordinator;
-
-    @Autowired
-    private EventListener eventListener;
+    private ApplicationContext applicationContext;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -125,6 +120,8 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
         CoordinatorProperties coordinatorProperties = properties.getCoordinator();
         WorkerProperties workerProperties = properties.getWorker();
         if (coordinatorProperties.isEnabled()) {
+            Coordinator coordinator = applicationContext.getBean(Coordinator.class);
+
             registerListenerEndpoint(
                 aRegistrar,
                 Queues.COMPLETIONS,
@@ -143,7 +140,7 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
                 aRegistrar,
                 Queues.EVENTS,
                 coordinatorProperties.getSubscriptions().getEvents(),
-                eventListener,
+                applicationContext.getBean(EventListener.class),
                 "onApplicationEvent"
             );
             registerListenerEndpoint(
@@ -162,6 +159,8 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
             );
         }
         if (workerProperties.isEnabled()) {
+            Worker worker = applicationContext.getBean(Worker.class);
+
             Map<String, Object> subscriptions = workerProperties.getSubscriptions();
             subscriptions.forEach((k, v) ->
                 registerListenerEndpoint(aRegistrar, k, Integer.valueOf((String) v), worker, "handle")
@@ -220,5 +219,10 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
         factory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
         factory.setPrefetchCount(rabbit.getListener().getDirect().getPrefetch());
         return factory;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

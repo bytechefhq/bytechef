@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * @author Arik Cohen
@@ -45,7 +44,7 @@ public class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
     private final TaskHandlerResolver taskHandlerResolver;
     private final TaskEvaluator taskEvaluator;
 
-    public MapTaskHandlerAdapter(@Lazy TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
+    public MapTaskHandlerAdapter(TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
         taskHandlerResolver = Objects.requireNonNull(aResolver);
         taskEvaluator = Objects.requireNonNull(aTaskEvaluator);
     }
