@@ -43,7 +43,7 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 
 import java.util.Collections;
@@ -88,7 +88,7 @@ public class JobSyncExecutor {
             List.of(
                 new TaskDispatcherAdapterTaskHandlerResolver(
                     builder.taskDispatcherAdapterFactories, taskHandlerResolverChain),
-                new DefaultTaskHandlerResolver(builder.taskHandlerAccessor)));
+                new DefaultTaskHandlerResolver(builder.taskHandlerRegistry)));
 
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(taskHandlerResolverChain)
@@ -159,7 +159,7 @@ public class JobSyncExecutor {
         private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories = Collections.emptyList();
         private List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories = Collections.emptyList();
         private TaskExecutionService taskExecutionService;
-        private TaskHandlerAccessor taskHandlerAccessor;
+        private TaskHandlerRegistry taskHandlerRegistry;
         private WorkflowService workflowService;
 
         private Builder() {
@@ -202,8 +202,8 @@ public class JobSyncExecutor {
             return this;
         }
 
-        public Builder taskHandlerAccessor(TaskHandlerAccessor taskHandlerAccessor) {
-            this.taskHandlerAccessor = taskHandlerAccessor;
+        public Builder taskHandlerAccessor(TaskHandlerRegistry taskHandlerRegistry) {
+            this.taskHandlerRegistry = taskHandlerRegistry;
             return this;
         }
 

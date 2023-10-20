@@ -24,13 +24,13 @@ import com.bytechef.hermes.trigger.Trigger;
  */
 public class TriggerHandlerResolver {
 
-    private final TriggerHandlerAccessor triggerHandlerAccessor;
+    private final TriggerHandlerRegistry triggerHandlerRegistry;
 
-    public TriggerHandlerResolver(TriggerHandlerAccessor triggerHandlerAccessor) {
-        this.triggerHandlerAccessor = triggerHandlerAccessor;
+    public TriggerHandlerResolver(TriggerHandlerRegistry triggerHandlerRegistry) {
+        this.triggerHandlerRegistry = triggerHandlerRegistry;
     }
 
     public TriggerHandler<?> resolve(Trigger trigger) {
-        return triggerHandlerAccessor.getTriggerHandler(trigger.getType());
+        return triggerHandlerRegistry.getTriggerHandler(trigger.getType());
     }
 }

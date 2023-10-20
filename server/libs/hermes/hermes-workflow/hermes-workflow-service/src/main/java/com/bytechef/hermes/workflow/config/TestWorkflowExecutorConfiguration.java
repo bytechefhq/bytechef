@@ -43,7 +43,7 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
@@ -86,7 +86,7 @@ public class TestWorkflowExecutorConfiguration {
     @Bean
     WorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
-        TaskHandlerAccessor taskHandlerAccessor, List<WorkflowRepository> workflowRepositories) {
+        TaskHandlerRegistry taskHandlerRegistry, List<WorkflowRepository> workflowRepositories) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
@@ -122,7 +122,7 @@ public class TestWorkflowExecutorConfiguration {
                     getTaskDispatcherResolverFactories(
                         contextService, counterService, jobFactory, syncMessageBroker, taskExecutionService))
                 .taskExecutionService(taskExecutionService)
-                .taskHandlerAccessor(taskHandlerAccessor)
+                .taskHandlerAccessor(taskHandlerRegistry)
                 .workflowService(workflowService)
                 .build(),
             taskExecutionService);

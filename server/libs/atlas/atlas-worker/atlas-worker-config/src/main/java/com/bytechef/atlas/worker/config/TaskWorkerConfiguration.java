@@ -26,7 +26,7 @@ import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import java.util.Collections;
@@ -52,13 +52,13 @@ public class TaskWorkerConfiguration {
     private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
 
     @Bean
-    TaskHandlerAccessor taskHandlerAccessor(Map<String, TaskHandler<?>> taskHandlerMap) {
+    TaskHandlerRegistry taskHandlerAccessor(Map<String, TaskHandler<?>> taskHandlerMap) {
         return taskHandlerMap::get;
     }
 
     @Bean
-    TaskHandlerResolver defaultTaskHandlerResolver(TaskHandlerAccessor taskHandlerAccessor) {
-        return new DefaultTaskHandlerResolver(taskHandlerAccessor);
+    TaskHandlerResolver defaultTaskHandlerResolver(TaskHandlerRegistry taskHandlerRegistry) {
+        return new DefaultTaskHandlerResolver(taskHandlerRegistry);
     }
 
     @Bean
