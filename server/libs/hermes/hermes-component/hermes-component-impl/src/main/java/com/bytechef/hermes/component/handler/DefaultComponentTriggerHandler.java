@@ -62,7 +62,6 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private static final String HEADERS = "headers";
     private static final String METHOD = "method";
     private static final String PARAMETERS = "parameters";
-    private static final String PATH = "path";
 
     private final ComponentDefinitionFactory componentDefinitionFactory;
     private final ContextFactory contextFactory;
@@ -112,7 +111,6 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-                    MapValueUtils.getRequiredString(triggerExecution.getParameters(), PATH),
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
                     OptionalUtils.orElse(
                         datStorageService.fetchValue(
@@ -131,7 +129,6 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-                    MapValueUtils.getRequiredString(triggerExecution.getParameters(), PATH),
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class)));
 
             output = webhookOutput.getValue();
@@ -180,7 +177,6 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
             MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
             MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-            MapValueUtils.getRequiredString(triggerExecution.getParameters(), PATH),
             MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class));
 
         return triggerDefinition.getWebhookValidate()
