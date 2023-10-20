@@ -79,7 +79,7 @@ public class ProjectConnectionApiControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/connections/1")
+                .uri("/project-connections/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -104,7 +104,7 @@ public class ProjectConnectionApiControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/connections/1")
+                .uri("/project-connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -151,7 +151,7 @@ public class ProjectConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections")
+            .uri("/project-connections")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -165,7 +165,7 @@ public class ProjectConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections?componentNames=component1")
+            .uri("/project-connections?componentNames=component1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -177,7 +177,7 @@ public class ProjectConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections?tagIds=1")
+            .uri("/project-connections?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -189,7 +189,7 @@ public class ProjectConnectionApiControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/connections?componentNames=component1&tagIds=1")
+            .uri("/project-connections?componentNames=component1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -210,7 +210,7 @@ public class ProjectConnectionApiControllerIntTest {
             assert connectionDTO.id() != null;
             this.webTestClient
                 .post()
-                .uri("/connections")
+                .uri("/project-connections")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(connectionModel)
@@ -257,7 +257,7 @@ public class ProjectConnectionApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/connections/1")
+                .uri("/project-connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(connectionModel)
@@ -281,7 +281,7 @@ public class ProjectConnectionApiControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/connections/1/tags")
+                .uri("/project-connections/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))

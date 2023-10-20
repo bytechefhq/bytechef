@@ -106,5 +106,11 @@ bytechef:
     provider: filesystem
   discovery-service:
     provider: redis
+  oauth2:
+    #    predefinedApps:
+    #      mailchimp:
+    #        clientId: 123456789
+    #        clientSecret: 123456789
+    redirectUri: ${bytechef.publicUrl}/callback
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ

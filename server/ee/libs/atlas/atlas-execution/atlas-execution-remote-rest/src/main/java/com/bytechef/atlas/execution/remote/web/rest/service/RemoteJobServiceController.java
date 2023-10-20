@@ -118,6 +118,7 @@ public class RemoteJobServiceController {
         return ResponseEntity.ok(jobService.update(job));
     }
 
+    @SuppressFBWarnings("EI")
     public record JobCreateRequest(JobParameters jobParameters, Workflow workflow) {
     }
 }

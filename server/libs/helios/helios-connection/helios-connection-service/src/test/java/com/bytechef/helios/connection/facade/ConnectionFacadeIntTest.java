@@ -25,13 +25,13 @@ import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConne
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
 import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
-import com.bytechef.hermes.configuration.service.RemoteOAuth2Service;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -68,7 +68,7 @@ public class ConnectionFacadeIntTest {
     private ConnectionRepository connectionRepository;
 
     @MockBean
-    private RemoteOAuth2Service oAuth2Service;
+    private OAuth2Service oAuth2Service;
 
     @Autowired
     private TagRepository tagRepository;
