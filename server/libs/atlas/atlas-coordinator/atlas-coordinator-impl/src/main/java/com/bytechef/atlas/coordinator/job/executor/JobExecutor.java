@@ -104,7 +104,11 @@ public class JobExecutor {
 
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        TaskExecution taskExecution = TaskExecution.of(job.getId(), job.getPriority(), workflowTask);
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(job.getId())
+            .priority(job.getPriority())
+            .workflowTask(workflowTask)
+            .build();
 
         if (workflow.getRetry() > 0 && taskExecution.getRetry() < 1) {
             taskExecution.setRetry(workflow.getRetry());

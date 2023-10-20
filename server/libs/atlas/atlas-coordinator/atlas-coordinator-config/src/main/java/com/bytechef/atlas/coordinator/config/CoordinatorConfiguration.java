@@ -20,8 +20,6 @@
 package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.coordinator.CoordinatorManager;
-import com.bytechef.atlas.coordinator.CoordinatorManagerImpl;
 import com.bytechef.atlas.coordinator.error.ErrorHandlerChain;
 import com.bytechef.atlas.coordinator.error.TaskExecutionErrorHandler;
 import com.bytechef.atlas.coordinator.event.EventListener;
@@ -113,14 +111,16 @@ public class CoordinatorConfiguration {
 
     @Bean
     Coordinator coordinator() {
-        return new Coordinator(
-            errorHandler(), eventPublisher, jobExecutor(), jobFactory, jobService, taskCompletionHandler(),
-            taskDispatcher(), taskExecutionService);
-    }
-
-    @Bean
-    CoordinatorManager coordinatorManager(Coordinator coordinator) {
-        return new CoordinatorManagerImpl(coordinator);
+        return Coordinator.builder()
+            .errorHandler(errorHandler())
+            .eventPublisher(eventPublisher)
+            .jobExecutor(jobExecutor())
+            .jobFactory(jobFactory)
+            .jobService(jobService)
+            .taskCompletionHandler(taskCompletionHandler())
+            .taskDispatcher(taskDispatcher())
+            .taskExecutionService(taskExecutionService)
+            .build();
     }
 
     @Bean

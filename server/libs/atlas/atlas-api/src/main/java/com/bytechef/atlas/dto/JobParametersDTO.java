@@ -43,10 +43,6 @@ public class JobParametersDTO {
     private JobParametersDTO() {
     }
 
-    public JobParametersDTO(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
     @SuppressFBWarnings("EI2")
     public JobParametersDTO(Map<String, Object> inputs, Long parentTaskExecutionId, String workflowId) {
         this.inputs = inputs;

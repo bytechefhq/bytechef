@@ -13,10 +13,11 @@ dependencies {
     implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
-    testImplementation project(":server:libs:atlas:atlas-config")
+    testImplementation project(":server:libs:atlas:atlas-service")
     testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
+    testImplementation project(":server:libs:atlas:atlas-sync-executor")
     testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     testImplementation project(":server:libs:core:commons:commons-data")
     testImplementation project(":server:libs:db-migration")

@@ -83,11 +83,11 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         });
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(taskHandlerResolver)
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withExecutorService(new CurrentThreadExecutorService())
-            .withTaskEvaluator(taskEvaluator)
+            .taskHandlerResolver(taskHandlerResolver)
+            .messageBroker(messageBroker)
+            .eventPublisher(e -> {})
+            .executorService(new CurrentThreadExecutorService())
+            .taskEvaluator(taskEvaluator)
             .build();
 
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());

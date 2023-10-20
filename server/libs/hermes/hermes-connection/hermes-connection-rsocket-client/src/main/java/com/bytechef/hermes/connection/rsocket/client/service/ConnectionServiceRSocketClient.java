@@ -103,7 +103,13 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     public Connection update(long id, String name, List<Long> tagIds, int version) {
         return rSocketRequester
             .route("updateConnection")
-            .data(new Connection(id, name, tagIds, version))
+            .data(
+                Connection.builder()
+                    .id(id)
+                    .name(name)
+                    .tagIds(tagIds)
+                    .version(version)
+                    .build())
             .retrieveMono(Connection.class)
             .block();
     }

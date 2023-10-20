@@ -25,13 +25,13 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -112,7 +112,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private int version;
 
     @Column
-    private List<Webhook> webhooks = Collections.emptyList();
+    private Webhooks webhooks;
 
     @Column("workflow_id")
     private String workflowId;
@@ -257,12 +257,12 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     }
 
     /**
-     * Get the list of webhooks configured for this job.
+     * Get the list of list configured for this job.
      *
      * @return {@link List}
      */
     public List<Webhook> getWebhooks() {
-        return Collections.unmodifiableList(webhooks);
+        return webhooks == null ? null : webhooks.list;
     }
 
     /**
@@ -326,7 +326,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     }
 
     public void setWebhooks(List<Webhook> webhooks) {
-        this.webhooks = new ArrayList<>(webhooks);
+        this.webhooks = new Webhooks(webhooks);
     }
 
     public void setWorkflowId(String workflowId) {
@@ -343,7 +343,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             + startDate + ", endDate="
             + endDate + ", inputs="
             + inputs + ", outputs="
-            + outputs + ", webhooks="
+            + outputs + ", list="
             + webhooks + ", error="
             + error + ", parentTaskExecutionId="
             + getParentTaskExecutionId() + ", priority="
@@ -355,6 +355,9 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             + lastModifiedDate + '}';
     }
 
+    public record Retry(Integer initialInterval, Integer maxInterval, Integer maxAttempts, Integer multiplier) {
+    }
+
     public record Webhook(String type, String url, Retry retry) {
         public Map<String, Object> toMap() {
             Map<String, Object> map = new HashMap<>();
@@ -364,15 +367,16 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             map.put(
                 WorkflowConstants.RETRY,
                 Map.of(
-                    "initialInterval", retry.initialInterval,
-                    "maxInterval", retry.maxInterval,
-                    "maxAttempts", retry.maxAttempts,
-                    "multiplier", retry.multiplier));
+                    "initialInterval", retry.initialInterval(),
+                    "maxInterval", retry.maxInterval(),
+                    "maxAttempts", retry.maxAttempts(),
+                    "multiplier", retry.multiplier()));
 
             return map;
         }
     }
 
-    public record Retry(Integer initialInterval, Integer maxInterval, Integer maxAttempts, Integer multiplier) {
+    @SuppressFBWarnings("EI")
+    public record Webhooks(List<Webhook> list) {
     }
 }

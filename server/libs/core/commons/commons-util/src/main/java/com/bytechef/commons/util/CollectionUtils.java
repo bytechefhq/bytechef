@@ -173,6 +173,20 @@ public final class CollectionUtils {
                 .findFirst());
     }
 
+    public static <T, U> U getFirstFlat(
+        Collection<T> list, Function<? super T, ? extends Stream<? extends U>> mapper, Predicate<? super U> filter) {
+
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
+        return OptionalUtils.get(
+            list.stream()
+                .flatMap(mapper)
+                .filter(filter)
+                .findFirst());
+    }
+
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
         Assert.notNull(list, "'list' must not be null");
         Assert.notNull(mapper, "'mapper' must not be null");

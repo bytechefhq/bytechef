@@ -143,9 +143,13 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
-                TaskExecution branchTaskExecution = TaskExecution.of(
-                    taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
-                    branchWorkflowTask.putParameter(BRANCH, i));
+                TaskExecution branchTaskExecution = TaskExecution.builder()
+                    .jobId(taskExecution.getJobId())
+                    .parentId(taskExecution.getId())
+                    .priority(taskExecution.getPriority())
+                    .taskNumber(1)
+                    .workflowTask(branchWorkflowTask.putParameter(BRANCH, i))
+                    .build();
 
                 Map<String, Object> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);

@@ -121,9 +121,13 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
-            TaskExecution branchTaskExecution = TaskExecution.of(
-                taskExecution.getJobId(), taskExecution.getParentId(), taskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1, branchWorkflowTask.putParameter(BRANCH, branch));
+            TaskExecution branchTaskExecution = TaskExecution.builder()
+                .jobId(taskExecution.getJobId())
+                .parentId(taskExecution.getId())
+                .priority(taskExecution.getPriority())
+                .taskNumber(taskExecution.getTaskNumber() + 1)
+                .workflowTask(branchWorkflowTask.putParameter(BRANCH, branch))
+                .build();
 
             Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);

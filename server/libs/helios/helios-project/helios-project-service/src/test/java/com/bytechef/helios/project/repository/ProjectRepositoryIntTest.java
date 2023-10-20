@@ -113,7 +113,7 @@ public class ProjectRepositoryIntTest {
     }
 
     private static Project getProject(List<String> workflowIds) {
-        return Project.Builder.builder()
+        return Project.builder()
             .description("description")
             .name("name")
             .projectVersion(1)

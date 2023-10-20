@@ -47,13 +47,13 @@ public class SequenceTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
-    @Bean
+    @Bean("sequenceTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory sequenceTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
             contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 
-    @Bean
+    @Bean("sequenceTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory sequenceTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SequenceTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);

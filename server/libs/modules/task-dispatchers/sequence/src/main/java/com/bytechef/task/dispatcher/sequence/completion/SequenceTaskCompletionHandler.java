@@ -33,7 +33,6 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -45,7 +44,6 @@ import java.util.Map;
  * @author Ivica Cardic
  * @author Matija Petanjek
  */
-@Configuration
 public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     private final TaskExecutionService taskExecutionService;
@@ -108,9 +106,13 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                sequenceTaskExecution.getJobId(), sequenceTaskExecution.getId(), sequenceTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1, subWorkflowTask);
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(sequenceTaskExecution.getJobId())
+                .parentId(sequenceTaskExecution.getId())
+                .priority(sequenceTaskExecution.getPriority())
+                .taskNumber(taskExecution.getTaskNumber() + 1)
+                .workflowTask(subWorkflowTask)
+                .build();
 
             Map<String, Object> context = contextService.peek(
                 sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION);

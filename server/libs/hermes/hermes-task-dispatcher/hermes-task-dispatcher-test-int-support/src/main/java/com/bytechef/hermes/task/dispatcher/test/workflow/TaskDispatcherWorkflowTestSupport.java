@@ -74,16 +74,26 @@ public class TaskDispatcherWorkflowTestSupport {
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
-        SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
 
-        WorkflowSyncExecutor workflowSyncExecutor = new WorkflowSyncExecutor(
-            contextService, jobService, eventPublisher,
-            taskCompletionHandlerFactoriesFunction.apply(
-                counterService, taskEvaluator, taskExecutionService),
-            taskDispatcherResolverFactoriesFunction
-                .apply(contextService, counterService, coordinatorMessageBroker, taskEvaluator, taskExecutionService),
-            taskExecutionService, taskHandlerMapSupplier.get(), workflowService);
+        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+            .contextService(contextService)
+            .eventPublisher(eventPublisher)
+            .jobService(jobService)
+            .syncMessageBroker(syncMessageBroker)
+            .taskCompletionHandlerFactories(
+                taskCompletionHandlerFactoriesFunction.apply(
+                    counterService, taskEvaluator, taskExecutionService))
+            .taskDispatcherResolverFactories(
+                taskDispatcherResolverFactoriesFunction
+                    .apply(
+                        contextService, counterService, syncMessageBroker, taskEvaluator,
+                        taskExecutionService))
+            .taskExecutionService(taskExecutionService)
+            .taskHandlerAccessor(taskHandlerMapSupplier.get()::get)
+            .workflowService(workflowService)
+            .build();
 
         return workflowSyncExecutor.execute(workflowId, inputs);
     }

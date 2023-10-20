@@ -65,19 +65,19 @@ public class Coordinator {
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
-    public Coordinator(
-        ErrorHandler<? super Errorable> errorHandler, EventPublisher eventPublisher, JobExecutor jobExecutor,
-        JobFactory jobFactory, JobService jobService, TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+    private Coordinator(Builder builder) {
+        this.errorHandler = builder.errorHandler;
+        this.eventPublisher = builder.eventPublisher;
+        this.jobExecutor = builder.jobExecutor;
+        this.jobFactory = builder.jobFactory;
+        this.jobService = builder.jobService;
+        this.taskCompletionHandler = builder.taskCompletionHandler;
+        this.taskDispatcher = builder.taskDispatcher;
+        this.taskExecutionService = builder.taskExecutionService;
+    }
 
-        this.errorHandler = errorHandler;
-        this.eventPublisher = eventPublisher;
-        this.jobExecutor = jobExecutor;
-        this.jobFactory = jobFactory;
-        this.jobService = jobService;
-        this.taskCompletionHandler = taskCompletionHandler;
-        this.taskDispatcher = taskDispatcher;
-        this.taskExecutionService = taskExecutionService;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -96,7 +96,9 @@ public class Coordinator {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
+        }
     }
 
     /**
@@ -124,7 +126,9 @@ public class Coordinator {
                 new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
         }
 
-        logger.debug("Job id={} stopped", job.getId());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={} stopped", job.getId());
+        }
 
         return job;
     }
@@ -140,7 +144,9 @@ public class Coordinator {
 
         jobExecutor.execute(job);
 
-        logger.debug("Job id={} resumed", job.getId());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={} resumed", job.getId());
+        }
 
         return job;
     }
@@ -167,5 +173,63 @@ public class Coordinator {
      */
     public void handleError(Errorable errorable) {
         errorHandler.handle(errorable);
+    }
+
+    public static final class Builder {
+        private ErrorHandler<? super Errorable> errorHandler;
+        private EventPublisher eventPublisher;
+        private JobExecutor jobExecutor;
+        private JobFactory jobFactory;
+        private JobService jobService;
+        private TaskCompletionHandler taskCompletionHandler;
+        private TaskDispatcher<? super Task> taskDispatcher;
+        private TaskExecutionService taskExecutionService;
+
+        private Builder() {
+        }
+
+        public Builder errorHandler(ErrorHandler<? super Errorable> errorHandler) {
+            this.errorHandler = errorHandler;
+            return this;
+        }
+
+        public Builder eventPublisher(EventPublisher eventPublisher) {
+            this.eventPublisher = eventPublisher;
+            return this;
+        }
+
+        public Builder jobExecutor(JobExecutor jobExecutor) {
+            this.jobExecutor = jobExecutor;
+            return this;
+        }
+
+        public Builder jobFactory(JobFactory jobFactory) {
+            this.jobFactory = jobFactory;
+            return this;
+        }
+
+        public Builder jobService(JobService jobService) {
+            this.jobService = jobService;
+            return this;
+        }
+
+        public Builder taskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
+            this.taskCompletionHandler = taskCompletionHandler;
+            return this;
+        }
+
+        public Builder taskDispatcher(TaskDispatcher<? super Task> taskDispatcher) {
+            this.taskDispatcher = taskDispatcher;
+            return this;
+        }
+
+        public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
+            this.taskExecutionService = taskExecutionService;
+            return this;
+        }
+
+        public Coordinator build() {
+            return new Coordinator(this);
+        }
     }
 }

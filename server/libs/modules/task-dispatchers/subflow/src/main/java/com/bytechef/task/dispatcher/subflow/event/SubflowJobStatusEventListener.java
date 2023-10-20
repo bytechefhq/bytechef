@@ -19,13 +19,14 @@
 
 package com.bytechef.task.dispatcher.subflow.event;
 
-import com.bytechef.atlas.coordinator.CoordinatorManager;
 import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
+import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -45,18 +46,18 @@ import java.util.Map;
 public class SubflowJobStatusEventListener implements EventListener {
 
     private final JobService jobService;
+    private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
-    private final CoordinatorManager coordinatorManager;
     private final TaskEvaluator taskEvaluator;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-        JobService jobService, TaskExecutionService taskExecutionService, CoordinatorManager coordinatorManager,
+        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
         TaskEvaluator taskEvaluator) {
 
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
-        this.coordinatorManager = coordinatorManager;
+        this.messageBroker = messageBroker;
         this.taskEvaluator = taskEvaluator;
     }
 
@@ -80,7 +81,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     TaskExecution subflowTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
-                    coordinatorManager.stop(subflowTaskExecution.getJobId());
+                    messageBroker.send(Queues.STOPS, subflowTaskExecution.getJobId());
 
                     break;
                 }
@@ -90,7 +91,7 @@ public class SubflowJobStatusEventListener implements EventListener {
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
-                    coordinatorManager.handleError(erroredTaskExecution);
+                    messageBroker.send(Queues.ERRORS, erroredTaskExecution);
 
                     break;
                 }
@@ -107,7 +108,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                             completionTaskExecution, Map.of("execution", Map.of("output", output)));
                     }
 
-                    coordinatorManager.complete(completionTaskExecution);
+                    messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
 
                     break;
                 }

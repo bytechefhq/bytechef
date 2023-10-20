@@ -342,9 +342,9 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             '}';
     }
 
-    public record Input(String name, String label, String type, boolean required) {
+    public record Input(String name, String label, String type, boolean required) implements Serializable {
     }
 
-    public record Output(String name, Object value) {
+    public record Output(String name, Object value) implements Serializable {
     }
 }

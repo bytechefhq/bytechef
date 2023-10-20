@@ -155,6 +155,7 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar2"));
     }
 
+    @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
 
@@ -167,6 +168,7 @@ public class LoopTaskDispatcherIntTest {
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
+    @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
         TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {

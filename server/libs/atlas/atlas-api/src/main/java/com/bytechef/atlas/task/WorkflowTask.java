@@ -57,7 +57,7 @@ public class WorkflowTask implements Serializable {
     private WorkflowTask() {
     }
 
-    public WorkflowTask(Map<String, Object> source) {
+    private WorkflowTask(Map<String, Object> source) {
         Assert.notNull(source, "'source' must not be null");
 
         putAll(source);

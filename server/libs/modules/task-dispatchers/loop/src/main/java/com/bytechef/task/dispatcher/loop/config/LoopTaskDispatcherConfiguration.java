@@ -49,18 +49,18 @@ public class LoopTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Bean
-    TaskCompletionHandlerFactory loopTaskCompletionHandler() {
+    TaskCompletionHandlerFactory loopTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
             contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 
-    @Bean("loopBreakTaskDispatcherFactory_v1")
-    TaskDispatcherResolverFactory loopBreakTaskDispatcherFactory() {
+    @Bean("loopBreakTaskDispatcherResolverFactory_v1")
+    TaskDispatcherResolverFactory loopBreakTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService);
     }
 
-    @Bean("loopTaskDispatcherFactory_v1")
-    TaskDispatcherResolverFactory loopTaskDispatcherFactory() {
+    @Bean("loopTaskDispatcherResolverFactory_v1")
+    TaskDispatcherResolverFactory loopTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new LoopTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }

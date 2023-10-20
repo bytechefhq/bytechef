@@ -15,20 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.coordinator;
-
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.error.Errorable;
+package com.bytechef.atlas.worker.task.handler;
 
 /**
  * @author Ivica Cardic
  */
-public interface CoordinatorManager {
+public interface TaskHandlerAccessor {
 
-    void complete(TaskExecution taskExecution);
-
-    void handleError(Errorable errorable);
-
-    Job stop(Long jobId);
+    TaskHandler<?> getTaskHandler(String type);
 }

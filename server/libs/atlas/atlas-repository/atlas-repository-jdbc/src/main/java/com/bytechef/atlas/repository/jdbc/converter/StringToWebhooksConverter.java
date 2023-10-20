@@ -18,33 +18,35 @@
 package com.bytechef.atlas.repository.jdbc.converter;
 
 import com.bytechef.atlas.domain.Job;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.convert.ReadingConverter;
 
 /**
  * @author Ivica Cardic
  */
-@WritingConverter
-public class WebhookToStringConverter implements Converter<Job.Webhook, String> {
+@ReadingConverter
+public class StringToWebhooksConverter implements Converter<String, Job.Webhooks> {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public WebhookToStringConverter(ObjectMapper objectMapper) {
+    public StringToWebhooksConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convert(Job.Webhook webhook) {
-        return write(objectMapper, webhook);
+    public Job.Webhooks convert(String source) {
+        return source == null ? null : read(objectMapper, source);
     }
 
-    private String write(ObjectMapper objectMapper, Object object) {
+    private Job.Webhooks read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }

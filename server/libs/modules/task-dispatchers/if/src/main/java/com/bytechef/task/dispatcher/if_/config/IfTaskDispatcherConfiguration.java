@@ -53,8 +53,8 @@ public class IfTaskDispatcherConfiguration {
             contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 
-    @Bean("ifTaskDispatcherFactory_v1")
-    TaskDispatcherResolverFactory ifTaskDispatcherFactory() {
+    @Bean("ifTaskDispatcherResolverFactory_v1")
+    TaskDispatcherResolverFactory ifTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new IfTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }

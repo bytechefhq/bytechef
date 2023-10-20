@@ -87,8 +87,13 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         } else {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1, subWorkflowTask);
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(taskExecution.getJobId())
+                .parentId(taskExecution.getId())
+                .priority(taskExecution.getPriority())
+                .taskNumber(1)
+                .workflowTask(subWorkflowTask)
+                .build();
 
             Map<String, Object> context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 

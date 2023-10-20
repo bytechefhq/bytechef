@@ -43,9 +43,12 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
+import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -61,55 +64,20 @@ import org.slf4j.LoggerFactory;
 public class WorkflowSyncExecutor {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowSyncExecutor.class);
 
-    private final ContextService contextService;
-    private SyncMessageBroker coordinatorMessageBroker;
+    private final JobFactory jobFactory;
     private final JobService jobService;
-    private final EventPublisher eventPublisher;
-    private final List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories;
-    private final List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories;
-    private final TaskExecutionService taskExecutionService;
-    private final Map<String, TaskHandler<?>> taskHandlerMap;
-    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowSyncExecutor(
-        ContextService contextService, JobService jobService, EventPublisher eventPublisher,
-        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
-        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
-        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-        WorkflowService workflowService) {
+    private WorkflowSyncExecutor(Builder builder) {
+        this.jobService = builder.jobService;
 
-        this(
-            contextService, null, jobService, eventPublisher, taskCompletionHandlerFactories,
-            taskDispatcherResolverFactories, taskExecutionService, taskHandlerMap, workflowService);
-    }
+        SyncMessageBroker syncMessageBroker = builder.syncMessageBroker;
 
-    @SuppressFBWarnings("EI")
-    public WorkflowSyncExecutor(
-        ContextService contextService, SyncMessageBroker coordinatorMessageBroker, JobService jobService,
-        EventPublisher eventPublisher, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
-        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
-        Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
+        if (syncMessageBroker == null) {
+            syncMessageBroker = new SyncMessageBroker();
+        }
 
-        this.contextService = contextService;
-        this.coordinatorMessageBroker = coordinatorMessageBroker;
-        this.jobService = jobService;
-        this.eventPublisher = eventPublisher;
-        this.taskCompletionHandlerFactories = taskCompletionHandlerFactories;
-        this.taskDispatcherResolverFactories = taskDispatcherResolverFactories;
-        this.taskExecutionService = taskExecutionService;
-        this.taskHandlerMap = taskHandlerMap;
-        this.workflowService = workflowService;
-    }
-
-    public Job execute(String workflowId) {
-        return execute(workflowId, Map.of());
-    }
-
-    public Job execute(String workflowId, Map<String, Object> inputs) {
-        SyncMessageBroker workerMessageBroker = new SyncMessageBroker();
-
-        workerMessageBroker.receive(Queues.ERRORS, message -> {
+        syncMessageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -117,69 +85,158 @@ public class WorkflowSyncExecutor {
             logger.error(error.getMessage());
         });
 
+        TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
-        taskHandlerResolverChain.setTaskHandlerResolvers(List.of(new DefaultTaskHandlerResolver(taskHandlerMap)));
-
-        TaskEvaluator taskEvaluator = TaskEvaluator.create();
+        taskHandlerResolverChain.setTaskHandlerResolvers(
+            List.of(
+                new TaskDispatcherAdapterTaskHandlerResolver(
+                    builder.taskDispatcherAdapterFactories, taskHandlerResolverChain, taskEvaluator),
+                new DefaultTaskHandlerResolver(builder.taskHandlerAccessor)));
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(taskHandlerResolverChain)
-            .withMessageBroker(workerMessageBroker)
-            .withEventPublisher(eventPublisher)
-            .withTaskEvaluator(taskEvaluator)
+            .taskHandlerResolver(taskHandlerResolverChain)
+            .messageBroker(syncMessageBroker)
+            .eventPublisher(builder.eventPublisher)
+            .taskEvaluator(taskEvaluator)
             .build();
 
-        SyncMessageBroker coordinatorMessageBroker;
-
-        if (this.coordinatorMessageBroker == null) {
-            coordinatorMessageBroker = new SyncMessageBroker();
-        } else {
-            coordinatorMessageBroker = this.coordinatorMessageBroker;
-        }
-
-        coordinatorMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
+        syncMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
-                taskDispatcherResolverFactories.stream()
+                builder.taskDispatcherResolverFactories.stream()
                     .map(taskDispatcherFactory -> taskDispatcherFactory
                         .createTaskDispatcherResolver(taskDispatcherChain)),
-                Stream.of(new DefaultTaskDispatcher(coordinatorMessageBroker, List.of()))));
+                Stream.of(new DefaultTaskDispatcher(syncMessageBroker, List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
-            contextService, taskDispatcherChain, taskExecutionService, taskEvaluator, workflowService);
+            builder.contextService, taskDispatcherChain, builder.taskExecutionService, taskEvaluator,
+            builder.workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, e -> {}, jobExecutor, jobService, taskEvaluator, taskExecutionService, workflowService);
+            builder.contextService, builder.eventPublisher, jobExecutor, jobService, taskEvaluator,
+            builder.taskExecutionService, builder.workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
         taskCompletionHandlerChain.setTaskCompletionHandlers(
             CollectionUtils.concat(
-                taskCompletionHandlerFactories.stream()
+                builder.taskCompletionHandlerFactories.stream()
                     .map(taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
                         taskCompletionHandlerChain, taskDispatcherChain)),
                 Stream.of(defaultTaskCompletionHandler)));
 
-        JobFactory jobFactory = new JobFactoryImpl(contextService, eventPublisher, jobService, workerMessageBroker);
+        jobFactory = new JobFactoryImpl(builder.contextService, builder.eventPublisher, jobService, syncMessageBroker);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
-        Coordinator coordinator = new Coordinator(
-            (ErrorHandler) new TaskExecutionErrorHandler(
-                eventPublisher, jobService, taskDispatcherChain, taskExecutionService),
-            eventPublisher, jobExecutor, jobFactory, jobService, taskCompletionHandlerChain, taskDispatcherChain,
-            taskExecutionService);
+        Coordinator coordinator = Coordinator.builder()
+            .errorHandler((ErrorHandler) new TaskExecutionErrorHandler(
+                builder.eventPublisher, jobService, taskDispatcherChain, builder.taskExecutionService))
+            .eventPublisher(builder.eventPublisher)
+            .jobExecutor(jobExecutor)
+            .jobFactory(jobFactory)
+            .jobService(jobService)
+            .taskCompletionHandler(taskCompletionHandlerChain)
+            .taskDispatcher(taskDispatcherChain)
+            .taskExecutionService(builder.taskExecutionService)
+            .build();
 
-        workerMessageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        workerMessageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
+        syncMessageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
+        syncMessageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
+    }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public Job execute(String workflowId) {
+        return execute(workflowId, Map.of());
+    }
+
+    public Job execute(String workflowId, Map<String, Object> inputs) {
         long jobId = jobFactory.create(new JobParametersDTO(inputs, workflowId));
 
         return jobService.getJob(jobId);
+    }
+
+    @SuppressFBWarnings("EI")
+    public static final class Builder {
+
+        private ContextService contextService;
+        private EventPublisher eventPublisher;
+        private JobService jobService;
+        private SyncMessageBroker syncMessageBroker;
+        private List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = Collections.emptyList();
+        public List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories = Collections.emptyList();
+        private List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories = Collections.emptyList();
+        private TaskExecutionService taskExecutionService;
+        private TaskHandlerAccessor taskHandlerAccessor;
+        private WorkflowService workflowService;
+
+        private Builder() {
+        }
+
+        public Builder contextService(ContextService contextService) {
+            this.contextService = contextService;
+            return this;
+        }
+
+        public Builder eventPublisher(EventPublisher eventPublisher) {
+            this.eventPublisher = eventPublisher;
+            return this;
+        }
+
+        public Builder jobService(JobService jobService) {
+            this.jobService = jobService;
+            return this;
+        }
+
+        public Builder syncMessageBroker(SyncMessageBroker syncMessageBroker) {
+            this.syncMessageBroker = syncMessageBroker;
+            return this;
+        }
+
+        public Builder taskDispatcherAdapterFactories(
+            List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories) {
+            this.taskDispatcherAdapterFactories = taskDispatcherAdapterFactories;
+            return this;
+        }
+
+        public Builder taskCompletionHandlerFactories(
+            List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories) {
+            this.taskCompletionHandlerFactories = taskCompletionHandlerFactories;
+            return this;
+        }
+
+        public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
+            this.taskExecutionService = taskExecutionService;
+            return this;
+        }
+
+        public Builder taskHandlerAccessor(TaskHandlerAccessor taskHandlerAccessor) {
+            this.taskHandlerAccessor = taskHandlerAccessor;
+            return this;
+        }
+
+        public Builder taskDispatcherResolverFactories(
+            List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories) {
+            this.taskDispatcherResolverFactories = taskDispatcherResolverFactories;
+
+            return this;
+        }
+
+        public Builder workflowService(WorkflowService workflowService) {
+            this.workflowService = workflowService;
+            return this;
+        }
+
+        public WorkflowSyncExecutor build() {
+            return new WorkflowSyncExecutor(this);
+        }
     }
 }

@@ -49,10 +49,10 @@ public class WorkerTest {
         messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(jt -> t -> "done")
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .taskHandlerResolver(jt -> t -> "done")
+            .messageBroker(messageBroker)
+            .eventPublisher(e -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
@@ -74,12 +74,12 @@ public class WorkerTest {
         messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(jt -> t -> {
+            .taskHandlerResolver(jt -> t -> {
                 throw new IllegalArgumentException("bad input");
             })
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .messageBroker(messageBroker)
+            .eventPublisher(e -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
 
@@ -103,7 +103,7 @@ public class WorkerTest {
         messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(t1 -> {
+            .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
                     return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
@@ -111,9 +111,9 @@ public class WorkerTest {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
             })
-            .withMessageBroker(messageBroker)
-            .withTaskEvaluator(TaskEvaluator.create())
-            .withEventPublisher(e -> {})
+            .messageBroker(messageBroker)
+            .taskEvaluator(TaskEvaluator.create())
+            .eventPublisher(e -> {})
             .build();
 
         TaskExecution task = new TaskExecution(WorkflowTask.of(Map.of(
@@ -142,7 +142,7 @@ public class WorkerTest {
         messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(t1 -> {
+            .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
                     return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
@@ -158,9 +158,9 @@ public class WorkerTest {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
             })
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .messageBroker(messageBroker)
+            .eventPublisher(e -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
@@ -187,7 +187,7 @@ public class WorkerTest {
         });
         messageBroker.receive(Queues.EVENTS, t -> {});
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(t1 -> {
+            .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
                     return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
@@ -205,9 +205,9 @@ public class WorkerTest {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
             })
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .messageBroker(messageBroker)
+            .eventPublisher(e -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
@@ -226,7 +226,7 @@ public class WorkerTest {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(task -> taskExecution -> {
+            .taskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException interruptedException) {
@@ -235,9 +235,9 @@ public class WorkerTest {
 
                 return null;
             })
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(event -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .messageBroker(messageBroker)
+            .eventPublisher(event -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
@@ -268,7 +268,7 @@ public class WorkerTest {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(task -> taskExecution -> {
+            .taskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException interruptedException) {
@@ -277,9 +277,9 @@ public class WorkerTest {
 
                 return null;
             })
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(event -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .messageBroker(messageBroker)
+            .eventPublisher(event -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution taskExecution1 = new TaskExecution(WorkflowTask.of("type"));
@@ -318,7 +318,7 @@ public class WorkerTest {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(task -> taskExecution -> {
+            .taskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException interruptedException) {
@@ -327,9 +327,9 @@ public class WorkerTest {
 
                 return null;
             })
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(event -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .messageBroker(messageBroker)
+            .eventPublisher(event -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution taskExecution1 = new TaskExecution(WorkflowTask.of("type"));

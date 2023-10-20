@@ -75,7 +75,7 @@ public class DemoProjectConfiguration implements InitializingBean {
                     }
                 },
                     () -> projectService.create(
-                        Project.Builder.builder()
+                        Project.builder()
                             .name(DEFAULT)
                             .status(Project.Status.PUBLISHED)
                             .workflowIds(orphanWorkflowIds)

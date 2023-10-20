@@ -186,7 +186,7 @@ public class IntegrationServiceIntTest {
     }
 
     private Integration getIntegration() {
-        return Integration.Builder.builder()
+        return Integration.builder()
             .categoryId(category.getId())
             .description("description")
             .integrationVersion(1)

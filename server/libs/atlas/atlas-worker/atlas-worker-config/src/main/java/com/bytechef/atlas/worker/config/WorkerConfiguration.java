@@ -27,6 +27,7 @@ import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
@@ -56,8 +57,13 @@ public class WorkerConfiguration {
     private TaskEvaluator taskEvaluator;
 
     @Bean
-    TaskHandlerResolver defaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlerMap) {
-        return new DefaultTaskHandlerResolver(taskHandlerMap == null ? Map.of() : taskHandlerMap);
+    TaskHandlerAccessor taskHandlerAccessor(Map<String, TaskHandler<?>> taskHandlerMap) {
+        return taskHandlerMap::get;
+    }
+
+    @Bean
+    TaskHandlerResolver defaultTaskHandlerResolver(TaskHandlerAccessor taskHandlerAccessor) {
+        return new DefaultTaskHandlerResolver(taskHandlerAccessor);
     }
 
     @Bean
@@ -74,7 +80,7 @@ public class WorkerConfiguration {
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlerMap)));
+                defaultTaskHandlerResolver(taskHandlerAccessor(taskHandlerMap == null ? Map.of() : taskHandlerMap))));
 
         return taskHandlerResolverChain;
     }
@@ -82,10 +88,10 @@ public class WorkerConfiguration {
     @Bean
     Worker worker(TaskHandlerResolver taskHandlerResolver, MessageBroker messageBroker, EventPublisher eventPublisher) {
         return Worker.builder()
-            .withTaskHandlerResolver(taskHandlerResolver)
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(eventPublisher)
-            .withTaskEvaluator(taskEvaluator)
+            .taskHandlerResolver(taskHandlerResolver)
+            .messageBroker(messageBroker)
+            .eventPublisher(eventPublisher)
+            .taskEvaluator(taskEvaluator)
             .build();
     }
 }
