@@ -108,7 +108,7 @@ public class CsvFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("csvFile", new CsvFileTaskHandler(jsonHelper, fileStorageService));
+        return Map.of("csvFile", new CsvFileTaskHandler(fileStorageService));
     }
 
     private File getFile(String fileName) throws IOException {

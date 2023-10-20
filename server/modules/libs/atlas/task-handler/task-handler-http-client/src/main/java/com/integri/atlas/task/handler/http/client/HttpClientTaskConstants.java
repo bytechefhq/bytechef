@@ -21,13 +21,10 @@ package com.integri.atlas.task.handler.http.client;
  */
 public class HttpClientTaskConstants {
 
-    public static final String PROPERTY_AUTHENTICATION_TYPE = "authenticationType";
-    public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
     public static final String PROPERTY_PROPERTY_URI = "uri";
     public static final String PROPERTY_ALLOW_UNAUTHORIZED_CERTS = "allowUnauthorizedCerts";
     public static final String PROPERTY_RESPONSE_FORMAT = "responseFormat";
     public static final String PROPERTY_RESPONSE_FILE_NAME = "responseFileName";
-    public static final String PROPERTY_RAW_PARAMETERS = "rawParameters";
     public static final String PROPERTY_BODY_CONTENT_TYPE = "bodyContentType";
     public static final String PROPERTY_MIME_TYPE = "mimeType";
     public static final String PROPERTY_FULL_RESPONSE = "fullResponse";
@@ -38,16 +35,11 @@ public class HttpClientTaskConstants {
     public static final String PROPERTY_TIMEOUT = "timeout";
     public static final String PROPERTY_HEADER_PARAMETERS = "headerParameters";
     public static final String PROPERTY_PARAMETER = "parameter";
-    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_KEY = "key";
     public static final String PROPERTY_VALUE = "value";
     public static final String PROPERTY_QUERY_PARAMETERS = "queryParameters";
     public static final String PROPERTY_BODY_PARAMETERS = "bodyParameters";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
-    public static final String PROPERTY_HTTP_BASIC_AUTH = "httpBasicAuth";
-    public static final String PROPERTY_HTTP_DIGEST_AUTH = "httpDigestAuth";
-    public static final String PROPERTY_HTTP_BEARER_TOKEN = "httpBearerToken";
-    public static final String PROPERTY_HTTP_API_KEY = "httpApiKey";
-    public static final String PROPERTY_OAUTH2 = "oAuth2";
     public static final String TASK_HTTP_CLIENT = "httpClient";
 
     public enum AuthenticationType {

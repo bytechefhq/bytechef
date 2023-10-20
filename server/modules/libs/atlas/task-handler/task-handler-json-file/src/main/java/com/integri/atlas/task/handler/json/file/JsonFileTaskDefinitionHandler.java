@@ -29,7 +29,7 @@ import static com.integri.atlas.task.definition.dsl.DSL.option;
 import static com.integri.atlas.task.definition.dsl.DSL.showWhen;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.FileType.JSON;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.FileType.JSONL;
-import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.Action;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_TYPE;
@@ -55,8 +55,8 @@ public class JsonFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_JSON_FILE)
         .displayName("JSON File")
         .description("Reads and writes data from a JSON file.")
-        .actions(
-            OPERATION(Action.READ.name())
+        .operations(
+            OPERATION(Operation.READ.name())
                 .displayName("Read from file")
                 .description("Reads data from a JSON file.")
                 .inputs(
@@ -95,7 +95,7 @@ public class JsonFileTaskDefinitionHandler implements TaskDefinitionHandler {
                         )
                 )
                 .outputs(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
-            OPERATION(Action.WRITE.name())
+            OPERATION(Operation.WRITE.name())
                 .displayName("Write to file")
                 .description("Writes the data to a JSON file.")
                 .inputs(

@@ -19,7 +19,6 @@ package com.integri.atlas.task.handler.object_.helpers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskDefinition;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -37,64 +36,62 @@ public class ObjectHelpersTaskDefinitionTest {
     };
 
     @Test
-    public void testFileTaskSpecification() throws JsonProcessingException {
+    public void testFileTaskDefinition() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Converts between JSON string and object/array.",
-                "displayName":"Object Helpers",
-                "name":"objectHelpers",
-                "properties":[
+              "description": "Converts between JSON string and object/array.",
+              "displayName": "Object Helpers",
+              "name": "objectHelpers",
+              "operations": [
+                {
+                  "description": "Converts the JSON string to object/array.",
+                  "name": "JSON_PARSE",
+                  "inputs": [
                     {
-                        "defaultValue":"JSON_PARSE",
-                        "description":"The operation to perform.",
-                        "displayName":"Operation",
-                        "name":"operation",
-                        "required":true,
-                        "type":"SELECT",
-                        "options":[
-                            {
-                                "name":"Convert from JSON string",
-                                "value":"JSON_PARSE",
-                                "description": "Converts the JSON string to object/array."
-                            },
-                            {
-                                "name":"Convert to JSON string",
-                                "value":"JSON_STRINGIFY",
-                                 "description": "Writes the object/array to a JSON string."
-                            }
-                        ]
+                      "description": "The JSON string to convert to the data.",
+                      "displayName": "Source",
+                      "name": "source",
+                      "required": true,
+                      "type": "STRING"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "ARRAY"
                     },
                     {
-                        "description":"The JSON string to convert to the data.",
-                        "displayName":"Source",
-                        "displayOption":{
-                            "show":{
-                                "operation":["JSON_PARSE"]
-                            }
-                        },
-                        "name":"source",
-                        "required":true,
-                        "type":"STRING"
-                    },
-                        {
-                        "description":"The data to convert to JSON string.",
-                        "displayName":"Source",
-                        "displayOption":{
-                            "show":{
-                                "operation":["JSON_STRINGIFY"]
-                            }
-                        },
-                        "name":"source",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                ],
-                "version":1.0
+                      "type": "OBJECT"
+                    }
+                  ],
+                  "displayName": "Convert from JSON string"
+                },
+                {
+                  "description": "Writes the object/array to a JSON string.",
+                  "name": "JSON_STRINGIFY",
+                  "inputs": [
+                    {
+                      "description": "The data to convert to JSON string.",
+                      "displayName": "Source",
+                      "name": "source",
+                      "required": true,
+                      "type": "OBJECT",
+                      "additionalProperties": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "STRING"
+                    }
+                  ],
+                  "displayName": "Convert to JSON string"
+                }
+              ],
+              "version": 1
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(ObjectHelpersTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(new ObjectHelpersTaskDefinitionHandler().getTaskDefinition())
             ),
             true
         );

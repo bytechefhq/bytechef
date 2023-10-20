@@ -43,7 +43,7 @@ public class JsonFileTaskDefinitionTest {
               "description": "Reads and writes data from a JSON file.",
               "displayName": "JSON File",
               "name": "jsonFile",
-              "actions": [
+              "operations": [
                 {
                   "description": "Reads data from a JSON file.",
                   "name": "READ",

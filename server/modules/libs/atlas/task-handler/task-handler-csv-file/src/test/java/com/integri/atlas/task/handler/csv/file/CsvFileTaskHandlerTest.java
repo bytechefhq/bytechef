@@ -19,12 +19,10 @@ package com.integri.atlas.task.handler.csv.file;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.test.json.JSONArrayUtil;
 import com.integri.atlas.test.json.JSONObjectUtil;
 import java.io.File;
@@ -45,8 +43,7 @@ import org.springframework.core.io.ClassPathResource;
 public class CsvFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
-    private static final CsvFileTaskHandler csvFileTaskHandler = new CsvFileTaskHandler(jsonHelper, fileStorageService);
+    private static final CsvFileTaskHandler csvFileTaskHandler = new CsvFileTaskHandler(fileStorageService);
 
     @Test
     public void testReadCSV() throws Exception {

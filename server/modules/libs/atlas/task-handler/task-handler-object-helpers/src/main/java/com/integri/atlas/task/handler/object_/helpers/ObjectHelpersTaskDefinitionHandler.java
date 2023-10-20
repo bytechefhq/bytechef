@@ -39,7 +39,7 @@ public class ObjectHelpersTaskDefinitionHandler implements TaskDefinitionHandler
         .create(TASK_OBJECT_HELPERS)
         .displayName("Object Helpers")
         .description("Converts between JSON string and object/array.")
-        .actions(
+        .operations(
             OPERATION(Operation.JSON_PARSE.name())
                 .displayName("Convert from JSON string")
                 .description("Converts the JSON string to object/array.")

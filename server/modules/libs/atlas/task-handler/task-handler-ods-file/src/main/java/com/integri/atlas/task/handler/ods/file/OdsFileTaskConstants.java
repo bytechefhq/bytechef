@@ -21,7 +21,6 @@ package com.integri.atlas.task.handler.ods.file;
  */
 public class OdsFileTaskConstants {
 
-    public static final String PROPERTY_OPERATION = "operation";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_ROWS = "rows";
     public static final String PROPERTY_FILE_NAME = "fileName";

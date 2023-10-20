@@ -51,7 +51,7 @@ public class XmlFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_XML_FILE)
         .displayName("XML File")
         .description("Reads and writes data from a XML file.")
-        .actions(
+        .operations(
             OPERATION(Operation.READ.name())
                 .displayName("Read from file")
                 .description("Reads data from a XML file.")

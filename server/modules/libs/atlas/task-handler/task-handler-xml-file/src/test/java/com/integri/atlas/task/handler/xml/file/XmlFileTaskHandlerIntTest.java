@@ -105,7 +105,7 @@ public class XmlFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("xmlFile", new XmlFileTaskHandler(jsonHelper, fileStorageService, new XmlHelper()));
+        return Map.of("xmlFile", new XmlFileTaskHandler(fileStorageService, new XmlHelper()));
     }
 
     private File getFile(String fileName) throws IOException {

@@ -33,7 +33,7 @@ public class XmlHelpersTaskHandlerTest {
 
     private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
     private static final XmlHelper xmlHelper = new XmlHelper();
-    private static final XmlHelpersTaskHandler xmlHelpersTaskHandler = new XmlHelpersTaskHandler(jsonHelper, xmlHelper);
+    private static final XmlHelpersTaskHandler xmlHelpersTaskHandler = new XmlHelpersTaskHandler(xmlHelper);
 
     @Test
     public void testJSONToObject() {

@@ -37,7 +37,7 @@ public class SequenceTaskDefinitionTest {
     };
 
     @Test
-    public void testIfTaskSpecification() throws JsonProcessingException, JSONException {
+    public void testSequenceTaskDefinition() throws JsonProcessingException, JSONException {
         JSONAssert.assertEquals(
             """
             {
@@ -48,7 +48,7 @@ public class SequenceTaskDefinitionTest {
             }
                 """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(SequenceTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(new SequenceTaskDefinitionHandler().getTaskDefinition())
             ),
             true
         );

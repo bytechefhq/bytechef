@@ -38,7 +38,7 @@ public class LocalFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_LOCAL_FILE)
         .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
-        .actions(
+        .operations(
             OPERATION(Operation.READ.name())
                 .displayName("Read to file")
                 .inputs(

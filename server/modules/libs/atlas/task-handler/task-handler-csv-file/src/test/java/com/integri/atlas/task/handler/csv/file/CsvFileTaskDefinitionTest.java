@@ -36,154 +36,181 @@ public class CsvFileTaskDefinitionTest {
     };
 
     @Test
-    public void testCsvFileTaskSpecification() throws JsonProcessingException {
+    public void testCsvFileTaskDefinition() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads and writes data from a csv file.",
-                "displayName":"CSV File",
-                "name":"csvFile",
-                "properties":[
+              "description": "Reads and writes data from a csv file.",
+              "displayName": "CSV File",
+              "name": "csvFile",
+              "operations": [
+                {
+                  "description": "Reads data from a csv file.",
+                  "name": "READ",
+                  "inputs": [
                     {
-                        "defaultValue":"READ",
-                        "description":"The operation to perform.",
-                        "displayName":"Operation",
-                        "name":"operation",
-                        "required":true,
-                        "type":"SELECT",
-                        "options":[
-                            {
-                                "name":"Read from file",
-                                "value":"READ",
-                                "description": "Reads data from a csv file."
-                            },
-                            {
-                                "name":"Write to file",
-                                "value":"WRITE",
-                                 "description": "Writes the data to a csv file."
-                            }
-                        ]
-                    },
-                    {
-                        "description":"The object property which contains a reference to the csv file to read from.",
-                        "displayName":"File",
-                        "displayOption":{
-                            "show":{
-                                "operation":["READ"]
-                            }
-                        },
-                        "name":"fileEntry",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                    {
-                        "description":"The array of objects to write to the file.",
-                        "displayName":"Rows",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
-                        },
-                        "name":"rows",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                    {
-                        "displayName":"Options",
-                        "name":"options",
-                        "type":"COLLECTION",
-                        "options":[
+                      "description": "The object property which contains a reference to the csv file to read from.",
+                      "displayName": "File",
+                      "name": "fileEntry",
+                      "required": true,
+                      "type": "OBJECT",
+                      "properties": [
                         {
-                                "defaultValue":",",
-                                "description":"Delimiter to use when reading a csv file.",
-                                "displayName":"Delimiter",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"delimiter",
-                                "type":"STRING"
-                            },
-                            {
-                                "defaultValue":"",
-                                "description":"File name to set for binary data. By default, \\"file.csv\\" will be used.",
-                                "displayName":"File Name",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["WRITE"]
-                                    }
-                                },
-                                "name":"fileName",
-                                "type":"STRING"
-                            },
-                            {
-                                "defaultValue":true,
-                                "description":"The first row of the file contains the header names.",
-                                "displayName":"Header Row",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"headerRow",
-                                "type":"BOOLEAN"
-                            },
-                            {
-                                "defaultValue":false,
-                                "description":"When reading from file the empty cells will be filled with an empty string.",
-                                "displayName":"Include Empty Cells",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"includeEmptyCells",
-                                "type":"BOOLEAN"
-                            },
-                            {
-                                "description":"The amount of child elements to return in a page.",
-                                "displayName":"Page Size",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"pageSize",
-                                "type":"INTEGER"
-                            },
-                            {
-                                "description":"The page number to get.",
-                                "displayName":"Page Number",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"pageNumber",
-                                "type":"INTEGER"
-                            },
-                            {
-                                "defaultValue":false,
-                                "description":"In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
-                                "displayName":"Read As String",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"readAsString",
-                                "type":"BOOLEAN"
-                            }
-                        ],
-                        "placeholder":"Add Option"
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
+                    },
+                    {
+                      "displayName": "Options",
+                      "placeholder": "Add Option",
+                      "options": [
+                        {
+                          "description": "Delimiter to use when reading a csv file.",
+                          "displayName": "Delimiter",
+                          "name": "delimiter",
+                          "defaultValue": ",",
+                          "type": "STRING"
+                        },
+                        {
+                          "description": "The first row of the file contains the header names.",
+                          "displayName": "Header Row",
+                          "name": "headerRow",
+                          "defaultValue": true,
+                          "type": "BOOLEAN"
+                        },
+                        {
+                          "description": "When reading from file the empty cells will be filled with an empty string.",
+                          "displayName": "Include Empty Cells",
+                          "name": "includeEmptyCells",
+                          "defaultValue": false,
+                          "type": "BOOLEAN"
+                        },
+                        {
+                          "description": "The amount of child elements to return in a page.",
+                          "displayName": "Page Size",
+                          "name": "pageSize",
+                          "type": "INTEGER"
+                        },
+                        {
+                          "description": "The page number to get.",
+                          "displayName": "Page Number",
+                          "name": "pageNumber",
+                          "type": "INTEGER"
+                        },
+                        {
+                          "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
+                          "displayName": "Read As String",
+                          "name": "readAsString",
+                          "defaultValue": false,
+                          "type": "BOOLEAN"
+                        }
+                      ]
                     }
-                ],
-                "version":1.0
+                  ],
+                  "outputs": [
+                    {
+                      "type": "ARRAY"
+                    }
+                  ],
+                  "displayName": "Read from file"
+                },
+                {
+                  "description": "Writes the data to a csv file.",
+                  "name": "WRITE",
+                  "inputs": [
+                    {
+                      "description": "The array of objects to write to the file.",
+                      "displayName": "Rows",
+                      "name": "rows",
+                      "required": true,
+                      "type": "ARRAY",
+                      "items": [
+                        {
+                          "type": "OBJECT",
+                          "additionalProperties": true,
+                          "properties": [
+                            {
+                              "type": "BOOLEAN"
+                            },
+                            {
+                              "type": "DATE_TIME"
+                            },
+                            {
+                              "type": "NUMBER"
+                            },
+                            {
+                              "type": "STRING"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "displayName": "Options",
+                      "placeholder": "Add Option",
+                      "options": [
+                        {
+                          "description": "File name to set for binary data. By default, \\"file.csv\\" will be used.",
+                          "displayName": "File Name",
+                          "name": "fileName",
+                          "defaultValue": "",
+                          "type": "STRING"
+                        }
+                      ]
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
+                    }
+                  ],
+                  "displayName": "Write to file"
+                }
+              ],
+              "version": 1
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(CsvFileTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(new CsvFileTaskDefinitionHandler().getTaskDefinition())
             ),
             true
         );

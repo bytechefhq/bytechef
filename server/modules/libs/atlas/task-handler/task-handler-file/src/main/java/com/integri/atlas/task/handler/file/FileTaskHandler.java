@@ -19,7 +19,6 @@ package com.integri.atlas.task.handler.file;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_CONTENT;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_NAME;
-import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.TASK_FILE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
@@ -46,7 +45,7 @@ public class FileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
