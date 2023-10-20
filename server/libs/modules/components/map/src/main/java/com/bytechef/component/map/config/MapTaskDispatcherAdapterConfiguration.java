@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.map.config;
+package com.bytechef.component.map.config;
 
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.task.handler.map.MapTaskDispatcherAdapterTaskHandler;
+import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
+import com.bytechef.component.map.constants.MapConstants;
+import com.bytechef.hermes.component.constants.Versions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MapTaskDispatcherAdapterTaskHandlerConfiguration {
+public class MapTaskDispatcherAdapterConfiguration {
 
     @Bean
     TaskDispatcherAdapterFactory taskDispatcherAdapterFactory() {
         return new TaskDispatcherAdapterFactory() {
 
             @Override
-            public TaskHandler<?> create(
-                    TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator, Worker.Builder builder) {
-                return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, taskEvaluator, builder);
+            public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator) {
+                return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, taskEvaluator);
             }
 
             @Override
             public String getName() {
-                return "map";
+                return MapConstants.MAP + "/v" + Versions.VERSION_1;
             }
         };
     }
