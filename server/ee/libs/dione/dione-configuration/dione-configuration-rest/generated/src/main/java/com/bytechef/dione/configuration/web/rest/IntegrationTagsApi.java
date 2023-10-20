@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.363670+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:04.509639+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "integration-tags", description = "The Embedded Integration Tags API")
+@Tag(name = "embedded-integration-tags", description = "The Embedded Integration Tags API")
 public interface IntegrationTagsApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -51,7 +51,7 @@ public interface IntegrationTagsApi {
         operationId = "getIntegrationTags",
         summary = "Get integration tags",
         description = "Get integration tags.",
-        tags = { "integration-tags" },
+        tags = { "embedded-integration-tags" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of integration tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))

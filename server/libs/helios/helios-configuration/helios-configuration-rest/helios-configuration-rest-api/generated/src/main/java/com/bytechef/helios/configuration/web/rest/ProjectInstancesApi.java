@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.741985+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:00:51.254016+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-instances", description = "The Automation Project Instances API")
+@Tag(name = "automation-project-instances", description = "The Automation Project Instances API")
 public interface ProjectInstancesApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -54,7 +54,7 @@ public interface ProjectInstancesApi {
         operationId = "createProjectInstance",
         summary = "Create a new project instance",
         description = "Create a new project instance.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project instance object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
@@ -96,7 +96,7 @@ public interface ProjectInstancesApi {
         operationId = "createProjectInstanceWorkflowJob",
         summary = "Create a request for running a new job",
         description = "Create a request for running a new job.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CreateProjectInstanceWorkflowJob200ResponseModel.class))
@@ -137,7 +137,7 @@ public interface ProjectInstancesApi {
         operationId = "deleteProjectInstance",
         summary = "Delete a project instance",
         description = "Delete a project instance.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -166,7 +166,7 @@ public interface ProjectInstancesApi {
         operationId = "enableProjectInstance",
         summary = "Enable/disable a project instance",
         description = "Enable/disable a project instance.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -197,7 +197,7 @@ public interface ProjectInstancesApi {
         operationId = "enableProjectInstanceWorkflow",
         summary = "Enable/disable a workflow of a project instance",
         description = "Enable/disable a workflow of a project instance.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -227,7 +227,7 @@ public interface ProjectInstancesApi {
         operationId = "getProjectInstance",
         summary = "Get a project instance by id",
         description = "Get a project instance by id.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
@@ -268,7 +268,7 @@ public interface ProjectInstancesApi {
         operationId = "getProjectInstances",
         summary = "Get project instances",
         description = "Get project instances.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of project instances.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProjectInstanceModel.class)))
@@ -310,7 +310,7 @@ public interface ProjectInstancesApi {
         operationId = "updateProjectInstance",
         summary = "Update an existing project instance",
         description = "Update an existing project instance.",
-        tags = { "project-instances" },
+        tags = { "automation-project-instances" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project instnce object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
@@ -353,7 +353,7 @@ public interface ProjectInstancesApi {
         operationId = "updateProjectInstanceTags",
         summary = "Updates tags of an existing project instance",
         description = "Updates tags of an existing project instance.",
-        tags = { "project-instance-tags" },
+        tags = { "automation-project-instance-tags" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }

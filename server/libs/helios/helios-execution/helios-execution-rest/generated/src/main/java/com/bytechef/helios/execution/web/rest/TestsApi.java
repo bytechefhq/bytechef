@@ -6,7 +6,7 @@
 package com.bytechef.helios.execution.web.rest;
 
 import com.bytechef.helios.execution.web.rest.model.JobModel;
-import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
+import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:41:06.109085+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:03.230135+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-tests", description = "The Automation Project Tests API")
-public interface ProjectTestsApi {
+@Tag(name = "automation-tests", description = "The Automation Tests API")
+public interface TestsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -46,14 +46,14 @@ public interface ProjectTestsApi {
      * POST /tests : Execute a workflow synchronously for testing purpose
      * Execute a workflow synchronously for testing purposes.
      *
-     * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
+     * @param testParametersModel Parameters required to test a workflow, for example &#39;{\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
      * @return The output expected by the workflow. (status code 200)
      */
     @Operation(
-        operationId = "test",
+        operationId = "testWorkflow",
         summary = "Execute a workflow synchronously for testing purpose",
         description = "Execute a workflow synchronously for testing purposes.",
-        tags = { "project-tests" },
+        tags = { "automation-tests" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output expected by the workflow.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
@@ -66,8 +66,8 @@ public interface ProjectTestsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<JobModel> test(
-        @Parameter(name = "JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody JobParametersModel jobParametersModel
+    default ResponseEntity<JobModel> testWorkflow(
+        @Parameter(name = "TestParametersModel", description = "Parameters required to test a workflow, for example '{\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody TestParametersModel testParametersModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

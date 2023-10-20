@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:23:54.741985+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:00:51.254016+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-categories", description = "The Automation Project Categories API")
+@Tag(name = "automation-project-categories", description = "The Automation Project Categories API")
 public interface ProjectCategoriesApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -51,7 +51,7 @@ public interface ProjectCategoriesApi {
         operationId = "getProjectCategories",
         summary = "Get categories",
         description = "Get categories.",
-        tags = { "project-categories" },
+        tags = { "automation-project-categories" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))

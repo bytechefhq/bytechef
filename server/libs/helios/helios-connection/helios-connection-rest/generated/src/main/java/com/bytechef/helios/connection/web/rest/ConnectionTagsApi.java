@@ -6,7 +6,6 @@
 package com.bytechef.helios.connection.web.rest;
 
 import com.bytechef.helios.connection.web.rest.model.TagModel;
-import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-21T07:35:07.212008+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:01.750310+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "connection-tags", description = "The Automation Connection Tags API")
+@Tag(name = "automation-connection-tags", description = "The Automation Connection Tags API")
 public interface ConnectionTagsApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -52,7 +51,7 @@ public interface ConnectionTagsApi {
         operationId = "getConnectionTags",
         summary = "Get connection tags",
         description = "Get connection tags.",
-        tags = { "connection-tags" },
+        tags = { "automation-connection-tags" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connection tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
@@ -76,37 +75,6 @@ public interface ConnectionTagsApi {
                 }
             }
         });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /connections/{id}/connection-tags : Updates tags of an existing connection
-     * Updates tags of an existing connection.
-     *
-     * @param id The id of the connection. (required)
-     * @param updateTagsRequestModel  (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "updateConnectionTags",
-        summary = "Updates tags of an existing connection",
-        description = "Updates tags of an existing connection.",
-        tags = { "connection-tags" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/connections/{id}/connection-tags",
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<Void> updateConnectionTags(
-        @Parameter(name = "id", description = "The id of the connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
-    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

@@ -34,10 +34,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T08:41:06.109085+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:03.230135+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-jobs", description = "The Automation Project Jobs API")
-public interface ProjectJobsApi {
+@Tag(name = "automation-jobs", description = "The Automation Jobs API")
+public interface JobsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -54,7 +54,7 @@ public interface ProjectJobsApi {
         operationId = "createJob",
         summary = "Create a request for running a new job",
         description = "Create a request for running a new job.",
-        tags = { "project-jobs" },
+        tags = { "automation-jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CreateJob200ResponseModel.class))
@@ -95,7 +95,7 @@ public interface ProjectJobsApi {
         operationId = "getJob",
         summary = "Get a job by id",
         description = "Get a job by id.",
-        tags = { "project-jobs" },
+        tags = { "automation-jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The job object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
@@ -135,7 +135,7 @@ public interface ProjectJobsApi {
         operationId = "getJobs",
         summary = "Get a page of jobs",
         description = "Get a page of jobs.",
-        tags = { "project-jobs" },
+        tags = { "automation-jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The page of jobs.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = org.springframework.data.domain.Page.class))
@@ -174,7 +174,7 @@ public interface ProjectJobsApi {
         operationId = "getLatestJob",
         summary = "Get the latest job",
         description = "Get the latest job.",
-        tags = { "project-jobs" },
+        tags = { "automation-jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The latest job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
@@ -214,7 +214,7 @@ public interface ProjectJobsApi {
         operationId = "restartJob",
         summary = "Restart a job",
         description = "Restart a job.",
-        tags = { "project-jobs" },
+        tags = { "automation-jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -242,7 +242,7 @@ public interface ProjectJobsApi {
         operationId = "stopJob",
         summary = "Stop a job",
         description = "Stop a job.",
-        tags = { "project-jobs" },
+        tags = { "automation-jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
