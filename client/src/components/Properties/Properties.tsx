@@ -19,7 +19,6 @@ import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
-import {TagModel} from '../../middleware/automation/configuration';
 import Input from '../Input/Input';
 import ArrayProperty from './ArrayProperty';
 import InputProperty from './InputProperty';
