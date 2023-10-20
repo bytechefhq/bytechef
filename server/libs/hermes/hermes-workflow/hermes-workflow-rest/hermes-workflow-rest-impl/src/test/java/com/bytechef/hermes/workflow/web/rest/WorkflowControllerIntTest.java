@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
 import com.bytechef.hermes.workflow.web.rest.config.WorkflowRestTestConfiguration;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -61,10 +63,13 @@ public class WorkflowControllerIntTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
-    private WorkflowService workflowService;
+    private WebTestClient webTestClient;
 
     @Autowired
-    private WebTestClient webTestClient;
+    private WorkflowService workflowService;
+
+    @MockBean
+    private WorkflowTestExecutor workflowTestExecutor;
 
     @Test
     public void testDeleteWorkflow() {
