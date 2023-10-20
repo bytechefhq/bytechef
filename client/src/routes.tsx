@@ -35,13 +35,15 @@ export const router = createBrowserRouter([
                     {
                         loader: async ({params}) =>
                             queryClient.ensureQueryData(
-                                ProjectKeys.project(+params.projectId!),
+                                ProjectKeys.project(
+                                    parseInt(params.projectId!)
+                                ),
                                 () =>
                                     new ProjectsApi().getProject({
-                                        id: +params.projectId!,
+                                        id: parseInt(params.projectId!),
                                     })
                             ),
-                        path: 'projects/:projectId',
+                        path: 'projects/:projectId/workflow/:workflowId',
                         element: <Project />,
                     },
                     {
@@ -60,11 +62,11 @@ export const router = createBrowserRouter([
                         path: 'executions',
                         element: <Executions />,
                     },
-                    {
-                        path: 'settings',
-                        element: <Settings />,
-                    },
                 ],
+            },
+            {
+                path: 'settings',
+                element: <Settings />,
             },
             {
                 path: 'embedded',
