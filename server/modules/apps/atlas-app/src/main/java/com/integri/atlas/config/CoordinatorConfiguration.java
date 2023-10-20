@@ -23,6 +23,8 @@ import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.coordinator.error.ErrorHandlerChain;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
+import com.integri.atlas.engine.coordinator.event.ContextJobStatusEventListener;
+import com.integri.atlas.engine.coordinator.event.ContextService;
 import com.integri.atlas.engine.coordinator.event.JobStatusWebhookEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskProgressedEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskStartedEventListener;
@@ -264,6 +266,16 @@ public class CoordinatorConfiguration {
         taskDispatcher.setResolvers(resolvers);
 
         return taskDispatcher;
+    }
+
+    @Bean
+    ContextJobStatusEventListener contextJobStatusEventHandler(ContextService contextService) {
+        return new ContextJobStatusEventListener(contextService, jobRepository);
+    }
+
+    @Bean
+    ContextService contextService() {
+        return new ContextService(contextRepository, taskExecutionRepository);
     }
 
     @Bean
