@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.message.broker.redis.config;
+package com.bytechef.atlas.message.broker.redis.serializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.Assert;
 
@@ -30,47 +28,45 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-class RedisMessageRedisSerializer implements RedisSerializer<RedisMessage> {
+public class RedisMessageSerializer {
 
-    private final Jackson2JsonRedisSerializer<ListItem> jackson2JsonRedisSerializer;
     private final ObjectMapper objectMapper;
 
-    RedisMessageRedisSerializer(ObjectMapper objectMapper) {
-        this.jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(objectMapper, ListItem.class);
+    @SuppressFBWarnings("EI2")
+    public RedisMessageSerializer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    @Override
-    public byte[] serialize(RedisMessage redisMessage) throws SerializationException {
-        Assert.notNull(redisMessage, "'object' must not be null.");
+    public String serialize(Object object) throws SerializationException {
+        Assert.notNull(object, "'object' must not be null");
 
         try {
-            return jackson2JsonRedisSerializer.serialize(
-                new ListItem(objectMapper.writeValueAsString(redisMessage.payload()), redisMessage.payloadClassName()));
+            Class<?> messageClass = object.getClass();
+
+            return objectMapper.writeValueAsString(
+                new RedisMessage(objectMapper.writeValueAsString(object), messageClass.getName()));
         } catch (JsonProcessingException e) {
             throw new SerializationException(e.getMessage());
         }
     }
 
-    @Override
     @SuppressFBWarnings("NP")
-    public RedisMessage deserialize(byte[] bytes) throws SerializationException {
-        RedisMessage redisMessage = null;
+    public Object deserialize(String string) throws SerializationException {
+        Object object = null;
 
-        if (bytes != null) {
-            ListItem listItem = Objects.requireNonNull(jackson2JsonRedisSerializer.deserialize(bytes));
-
+        if (string != null) {
             try {
-                redisMessage = new RedisMessage(
-                    objectMapper.readValue(listItem.payload(), Class.forName(listItem.type())));
+                RedisMessage redisMessage = Objects.requireNonNull(objectMapper.readValue(string, RedisMessage.class));
+
+                object = objectMapper.readValue(redisMessage.payload(), Class.forName(redisMessage.type()));
             } catch (Exception e) {
                 throw new SerializationException(e.getMessage());
             }
         }
 
-        return redisMessage;
+        return object;
     }
 
-    record ListItem(String payload, String type) {
+    record RedisMessage(String payload, String type) {
     }
 }
