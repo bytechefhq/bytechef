@@ -18,7 +18,6 @@
 package com.bytechef.helios.configuration.web.rest;
 
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -37,7 +36,6 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -88,26 +86,6 @@ public class WorkflowApiControllerIntTest {
         this.webTestClient = MockMvcWebTestClient
             .bindTo(mockMvc)
             .build();
-    }
-
-    @Test
-    public void testDeleteWorkflow() {
-        try {
-            this.webTestClient
-                .delete()
-                .uri("/workflows/1")
-                .exchange()
-                .expectStatus()
-                .isEqualTo(204);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-
-        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-
-        verify(workflowService).delete(argument.capture());
-
-        Assertions.assertEquals("1", argument.getValue());
     }
 
     @Test
@@ -188,6 +166,6 @@ public class WorkflowApiControllerIntTest {
 
     private Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            "1", DEFINITION, Workflow.Format.JSON, objectMapper.readValue(DEFINITION, new TypeReference<>() {}));
+            "1", DEFINITION, Workflow.Format.JSON, objectMapper.readValue(DEFINITION, new TypeReference<>() {}), 0);
     }
 }

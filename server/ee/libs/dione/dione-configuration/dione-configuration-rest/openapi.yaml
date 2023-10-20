@@ -252,6 +252,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /integrations/{id}/workflows/{workflowId}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+        - "workflow"
+      operationId: "deleteIntegrationWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of an integration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
   /workflows:
     get:
       description: "Get integration workflow definitions."
@@ -269,22 +293,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/Workflow"
   /workflows/{id}:
-    delete:
-      description: "Delete a workflow."
-      summary: "Delete a workflow"
-      tags:
-      - "workflow"
-      operationId: "deleteWorkflow"
-      parameters:
-      - name: "id"
-        description: "The id of the workflow to delete."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
     get:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
