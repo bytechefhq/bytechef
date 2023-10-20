@@ -1,14 +1,14 @@
 import {
-    AutomationConnectionApi,
-    AutomationConnectionTagApi,
     ConnectionModel,
     GetConnectionsRequest,
+    ProjectConnectionApi,
+    ProjectConnectionTagApi,
     TagModel,
 } from '@/middleware/helios/connection';
 import {
-    ConnectionDefinitionApi,
     GetOAuth2AuthorizationParametersRequestModel,
     OAuth2AuthorizationParametersModel,
+    Oauth2Api,
 } from '@/middleware/hermes/configuration';
 import {useQuery} from '@tanstack/react-query';
 
@@ -31,13 +31,13 @@ export const useGetConnectionsQuery = (
 ) =>
     useQuery<ConnectionModel[], Error>(
         ConnectionKeys.connectionList(filters),
-        () => new AutomationConnectionApi().getConnections(filters),
+        () => new ProjectConnectionApi().getConnections(filters),
         {enabled: false || enabledCondition}
     );
 
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>(ConnectionKeys.connectionTags, () =>
-        new AutomationConnectionTagApi().getConnectionTags()
+        new ProjectConnectionTagApi().getConnectionTags()
     );
 
 export const useGetOAuth2AuthorizationParametersQuery = (
@@ -47,7 +47,7 @@ export const useGetOAuth2AuthorizationParametersQuery = (
     useQuery<OAuth2AuthorizationParametersModel, Error>(
         ConnectionKeys.connectionOAuth2AuthorizationParameters(request),
         () =>
-            new ConnectionDefinitionApi().getOAuth2AuthorizationParameters({
+            new Oauth2Api().getOAuth2AuthorizationParameters({
                 getOAuth2AuthorizationParametersRequestModel: request,
             }),
         {
