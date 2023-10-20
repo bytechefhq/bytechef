@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -51,12 +52,10 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -165,8 +164,6 @@ public class OpenApiComponentGenerator {
                 componentHandlerSourcePath, getPackageName(), getComponentHandlerClassName(componentName), version);
             writeComponentHandlerTest(sourceTestJavaDirPath);
         }
-
-        writeComponentHandlerServiceFile();
     }
 
     private JavaFile.Builder addStaticImport(JavaFile.Builder builder) {
@@ -1574,22 +1571,6 @@ public class OpenApiComponentGenerator {
         javaFile.writeTo(componentHandlerDirPath);
     }
 
-    private void writeComponentHandlerServiceFile() throws IOException {
-        String servicesDirPathname = getAbsolutePathname(
-            "src" + File.separator + "main" + File.separator + "resources" + File.separator + "META-INF" +
-                File.separator + "services");
-
-        Files.createDirectories(Paths.get(servicesDirPathname));
-
-        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".OpenApiComponentHandler";
-
-        try (PrintWriter printWriter = new PrintWriter(
-            servicesDirPathname + File.separator + serviceName, StandardCharsets.UTF_8)) {
-
-            printWriter.println(getPackageName() + "." + getComponentHandlerClassName(componentName));
-        }
-    }
-
     private void writeComponentHandlerSource(Path sourceDirPath) throws IOException {
         String packageName = getPackageName();
 
@@ -1604,6 +1585,11 @@ public class OpenApiComponentGenerator {
                 getPackageName(),
                 TypeSpec.classBuilder(getComponentHandlerClassName(componentName))
                     .addJavadoc("@generated")
+                    .addAnnotation(
+                        AnnotationSpec.builder(ClassName.get("com.google.auto.service", "AutoService"))
+                            .addMember("value", "$T.class",
+                                ClassName.get("com.bytechef.hermes.component", "OpenApiComponentHandler"))
+                            .build())
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(ClassName.get(
                         getPackageName(),
