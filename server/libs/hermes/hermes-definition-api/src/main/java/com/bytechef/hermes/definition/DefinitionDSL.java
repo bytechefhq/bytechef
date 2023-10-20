@@ -17,18 +17,20 @@
 
 package com.bytechef.hermes.definition;
 
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableAnyProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableArrayProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNullProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNumberProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableTimeProperty;
 import com.bytechef.hermes.definition.OptionsDataSource.OptionsFunction;
 import com.bytechef.hermes.definition.PropertiesDataSource.PropertiesFunction;
+import com.bytechef.hermes.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDate;
@@ -43,6 +45,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class DefinitionDSL {
+
+    public static ModifiableAnyProperty any() {
+        return new ModifiableAnyProperty();
+    }
+
+    public static ModifiableAnyProperty any(String name) {
+        return new ModifiableAnyProperty(name);
+    }
 
     public static ModifiableArrayProperty array() {
         return new ModifiableArrayProperty();
@@ -92,12 +102,12 @@ public class DefinitionDSL {
         return new ModifiableNullProperty(name);
     }
 
-    public static ModifiableProperty.ModifiableNumberProperty number() {
-        return new ModifiableProperty.ModifiableNumberProperty();
+    public static ModifiableNumberProperty number() {
+        return new ModifiableNumberProperty();
     }
 
-    public static ModifiableProperty.ModifiableNumberProperty number(String name) {
-        return new ModifiableProperty.ModifiableNumberProperty(name);
+    public static ModifiableNumberProperty number(String name) {
+        return new ModifiableNumberProperty(name);
     }
 
     public static ModifiableObjectProperty object() {
@@ -106,14 +116,6 @@ public class DefinitionDSL {
 
     public static ModifiableObjectProperty object(String name) {
         return new ModifiableObjectProperty(name);
-    }
-
-    public static ModifiableOneOfProperty oneOf() {
-        return new ModifiableOneOfProperty();
-    }
-
-    public static ModifiableOneOfProperty oneOf(String name) {
-        return new ModifiableOneOfProperty(name);
     }
 
     public static ModifiableOption<Boolean> option(String name, boolean value) {
@@ -195,19 +197,46 @@ public class DefinitionDSL {
             .objectType(objectType);
     }
 
-    protected static ModifiableObjectProperty buildObject(
-        String name, String description, String objectType, Property<?>... properties) {
+    @SafeVarargs
+    protected static <P extends ValueProperty<?>> ModifiableObjectProperty buildObject(
+        String name, String description, String objectType, P... properties) {
         return new ModifiableObjectProperty(name)
             .description(description)
             .objectType(objectType)
             .properties(properties);
     }
 
+    protected static <P extends ValueProperty<?>> List<? extends P> checkPropertyNames(List<? extends P> properties) {
+        if (properties != null && properties.size() > 0) {
+            Property firstProperty = properties.get(0);
+
+            String firstName = firstProperty.getName();
+
+            boolean emptyName = firstName == null || firstName.isEmpty();
+
+            for (Property property : properties) {
+                String name = property.getName();
+
+                if (emptyName && !(name == null || name.isEmpty()) ||
+                    !emptyName && (name == null || name.isEmpty())) {
+
+                    throw new IllegalArgumentException(
+                        "Defined items either have to have all names defined or no defined names.");
+                }
+            }
+
+            return properties.stream()
+                .distinct()
+                .toList();
+        }
+
+        return null;
+    }
+
     // CHECKSTYLE:OFF
-    public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
-        implements Property<P>
-        permits ModifiableProperty.ModifiableDynamicPropertiesProperty, ModifiableNullProperty,
-        ModifiableOneOfProperty, ModifiableProperty.ModifiableValueProperty {
+    public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property>
+        implements Property permits ModifiableProperty.ModifiableDynamicPropertiesProperty,
+        ModifiableProperty.ModifiableValueProperty {
 
         private Boolean advancedOption;
         private String description;
@@ -302,6 +331,27 @@ public class DefinitionDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ModifiableProperty<?, ?> that = (ModifiableProperty<?, ?>) o;
+
+            return Objects.equals(displayCondition, that.displayCondition) && Objects.equals(name, that.name)
+                && type == that.type;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(displayCondition, name, type);
+        }
+
+        @Override
         public Optional<Boolean> getAdvancedOption() {
             return Optional.ofNullable(advancedOption);
         }
@@ -356,11 +406,29 @@ public class DefinitionDSL {
             return type;
         }
 
+        public static final class ModifiableAnyProperty
+            extends ModifiableValueProperty<Object, ModifiableAnyProperty, AnyProperty>
+            implements Property.AnyProperty {
+
+            private ModifiableAnyProperty() {
+                this(null);
+            }
+
+            public ModifiableAnyProperty(String name) {
+                super(name, Type.ANY);
+            }
+
+            @Override
+            public ControlType getControlType() {
+                return null;
+            }
+        }
+
         public static final class ModifiableArrayProperty
             extends ModifiableValueProperty<Object[], ModifiableArrayProperty, ArrayProperty>
             implements Property.ArrayProperty {
 
-            private List<? extends Property<?>> items;
+            private List<? extends ValueProperty<?>> items;
             private Boolean multipleValues;
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -410,7 +478,8 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableArrayProperty exampleValue(Map<String, ?>... exampleValue) {
+            @SafeVarargs
+            public final ModifiableArrayProperty exampleValue(Map<String, ?>... exampleValue) {
                 this.exampleValue = exampleValue;
 
                 return this;
@@ -452,35 +521,20 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableArrayProperty defaultValue(Map<String, ?>... defaultValue) {
+            @SafeVarargs
+            public final ModifiableArrayProperty defaultValue(Map<String, ?>... defaultValue) {
                 this.defaultValue = defaultValue;
 
                 return this;
             }
 
-            public ModifiableArrayProperty items(Property<?>... items) {
-                if (items != null) {
-                    items(List.of(items));
-                }
-
-                return this;
+            @SafeVarargs
+            public final <P extends ValueProperty<?>> ModifiableArrayProperty items(P... properties) {
+                return items(properties == null ? List.of() : List.of(properties));
             }
 
-            public ModifiableArrayProperty items(List<Property<?>> items) {
-                if (items != null && items.size() > 0) {
-                    for (Property<?> property : items) {
-                        String name = property.getName();
-
-                        if (name != null && !name.isEmpty()) {
-                            throw new IllegalArgumentException(
-                                "Defined properties under items cannot have defined names.");
-                        }
-                    }
-
-                    this.items = items.stream()
-                        .map(property -> (Property<?>) property)
-                        .toList();
-                }
+            public <P extends ValueProperty<?>> ModifiableArrayProperty items(List<P> properties) {
+                this.items = checkPropertyNames(properties);
 
                 return this;
             }
@@ -499,8 +553,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableArrayProperty options(Option<Object>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableArrayProperty options(Option<Object>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -521,7 +578,7 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends Property<?>>> getItems() {
+            public Optional<List<? extends ValueProperty<?>>> getItems() {
                 return Optional.ofNullable(items);
             }
 
@@ -618,8 +675,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableDateProperty options(Option<LocalDate>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableDateProperty options(Option<LocalDate>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -689,8 +749,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableDateTimeProperty options(Option<LocalDateTime>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableDateTimeProperty options(Option<LocalDateTime>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -805,8 +868,19 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableIntegerProperty options(Option<Integer>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableIntegerProperty options(Option<Integer>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
+
+                return this;
+            }
+
+            public ModifiableIntegerProperty options(List<Option<Integer>> options) {
+                if (options != null) {
+                    this.options = Collections.unmodifiableList(options);
+                }
 
                 return this;
             }
@@ -851,7 +925,7 @@ public class DefinitionDSL {
         }
 
         public static final class ModifiableNullProperty
-            extends ModifiableProperty<ModifiableNullProperty, NullProperty>
+            extends ModifiableValueProperty<Void, ModifiableNullProperty, NullProperty>
             implements Property.NullProperty {
 
             private ModifiableNullProperty() {
@@ -860,6 +934,11 @@ public class DefinitionDSL {
 
             public ModifiableNullProperty(String name) {
                 super(name, Type.NULL);
+            }
+
+            @Override
+            public ControlType getControlType() {
+                return null;
             }
         }
 
@@ -956,8 +1035,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableNumberProperty options(Option<? extends Number>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableNumberProperty options(Option<? extends Number>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -1010,13 +1092,13 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object, ModifiableObjectProperty, ObjectProperty>
             implements Property.ObjectProperty {
 
-            private List<? extends Property<?>> additionalProperties;
+            private List<? extends ValueProperty<?>> additionalProperties;
             private List<String> loadOptionsDependsOn;
             private Boolean multipleValues;
             private String objectType;
             private List<Option<?>> options;
             private OptionsFunction optionsFunction;
-            private List<? extends Property<?>> properties;
+            private List<? extends ValueProperty<?>> properties;
 
             private ModifiableObjectProperty() {
                 this(null);
@@ -1038,39 +1120,17 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableObjectProperty additionalProperties(Property<?>... additionalProperties) {
-                if (additionalProperties != null) {
-                    additionalProperties(List.of(additionalProperties));
-                }
+            @SafeVarargs
+            public final <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
+                P... properties) {
 
-                return this;
+                return additionalProperties(properties == null ? List.of() : List.of(properties));
             }
 
-            @SuppressWarnings("rawtypes")
-            public ModifiableObjectProperty additionalProperties(List<Property> additionalProperties) {
-                if (additionalProperties != null && additionalProperties.size() > 0) {
-                    Property<?> firstProperty = additionalProperties.get(0);
+            public <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
+                List<? extends P> properties) {
 
-                    String firstName = firstProperty.getName();
-
-                    boolean emptyName = firstName == null || firstName.isEmpty();
-
-                    for (Property<?> property : additionalProperties) {
-                        String name = property.getName();
-
-                        if (emptyName && !(name == null || name.isEmpty()) ||
-                            !emptyName && (name == null || name.isEmpty())) {
-
-                            throw new IllegalArgumentException(
-                                "Defined additional properties either have to have all names defined or no " +
-                                    "defined names.");
-                        }
-                    }
-
-                    this.additionalProperties = additionalProperties.stream()
-                        .map(property -> (Property<?>) property)
-                        .toList();
-                }
+                this.additionalProperties = checkPropertyNames(properties);
 
                 return this;
             }
@@ -1095,8 +1155,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableObjectProperty options(Option<Object>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableObjectProperty options(Option<Object>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -1107,18 +1170,14 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableObjectProperty properties(Property<?>... properties) {
-                if (properties != null) {
-                    this.properties = List.of(properties);
-                }
-
-                return this;
+            @SafeVarargs
+            public final <P extends ValueProperty<?>> ModifiableObjectProperty properties(P... properties) {
+                return properties(List.of(properties));
             }
 
-            @SuppressWarnings("rawtypes")
-            public ModifiableObjectProperty properties(List<Property> properties) {
+            public <P extends ValueProperty<?>> ModifiableObjectProperty properties(List<P> properties) {
                 if (properties != null) {
-                    for (Property<?> property : properties) {
+                    for (Property property : properties) {
                         String name = property.getName();
 
                         if (name == null || name.isEmpty()) {
@@ -1127,7 +1186,7 @@ public class DefinitionDSL {
                     }
 
                     this.properties = properties.stream()
-                        .map(property -> (Property<?>) property)
+                        .distinct()
                         .toList();
                 }
 
@@ -1135,7 +1194,7 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends Property<?>>> getAdditionalProperties() {
+            public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
                 return Optional.ofNullable(
                     additionalProperties == null ? null : new ArrayList<>(additionalProperties));
             }
@@ -1176,34 +1235,8 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends Property<?>>> getProperties() {
+            public Optional<List<? extends ValueProperty<?>>> getProperties() {
                 return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
-            }
-        }
-
-        public static final class ModifiableOneOfProperty
-            extends ModifiableProperty<ModifiableOneOfProperty, OneOfProperty> implements Property.OneOfProperty {
-
-            private List<? extends Property<?>> types;
-
-            private ModifiableOneOfProperty() {
-                super(null, Type.ONE_OF);
-            }
-
-            private ModifiableOneOfProperty(String name) {
-                super(name, Type.ONE_OF);
-            }
-
-            public ModifiableOneOfProperty types(Property<?>... types) {
-                if (types != null && types.length > 0) {
-                    this.types = List.of(types);
-                }
-
-                return this;
-            }
-
-            public Optional<List<? extends Property<?>>> getTypes() {
-                return Optional.ofNullable(types);
             }
         }
 
@@ -1251,8 +1284,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableStringProperty options(Option<String>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableStringProperty options(Option<String>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -1343,8 +1379,11 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableTimeProperty options(Option<LocalTime>... options) {
-                this.options = List.of(options);
+            @SafeVarargs
+            public final ModifiableTimeProperty options(Option<LocalTime>... options) {
+                if (options != null) {
+                    this.options = List.of(options);
+                }
 
                 return this;
             }
@@ -1374,12 +1413,12 @@ public class DefinitionDSL {
             }
         }
 
-        public abstract static sealed class ModifiableValueProperty<V, M extends ModifiableValueProperty<V, M, P>, P extends ValueProperty<V, P>>
+        public abstract static sealed class ModifiableValueProperty<V, M extends ModifiableValueProperty<V, M, P>, P extends ValueProperty<V>>
             extends ModifiableProperty<M, P>
             implements
-            Property.ValueProperty<V, P> permits ModifiableArrayProperty, ModifiableBooleanProperty,
-            ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNumberProperty,
-            ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
+            ValueProperty<V> permits ModifiableAnyProperty, ModifiableArrayProperty, ModifiableBooleanProperty,
+            ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNullProperty,
+            ModifiableNumberProperty, ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
 
             protected V defaultValue;
             protected V exampleValue;
