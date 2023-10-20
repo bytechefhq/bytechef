@@ -322,15 +322,6 @@ const NodeDetailsDialog = ({
                 ]);
             }
 
-            setComponentActions([
-                ...componentActions,
-                {
-                    actionName: currentAction.name,
-                    componentName: currentComponent.name,
-                    workflowAlias: currentComponent.workflowAlias,
-                },
-            ]);
-
             if (componentActions && currentComponent) {
                 const duplicateComponentActionIndex =
                     componentActions.findIndex(
