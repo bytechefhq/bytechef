@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class JiraCreatedIssueProperties {
-    public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
         .description("The ID of the created issue or subtask.")
         .required(false),
         string("key").label("Key")

@@ -30,7 +30,7 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueTransitionProperties {
-    public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
         .description("The ID of the issue transition. Required when specifying a transition to undertake.")
         .required(false),
         string("name").label("Name")
@@ -57,7 +57,7 @@ public class JiraIssueTransitionProperties {
             .description("Whether the issue has to meet criteria before the issue transition is applied.")
             .required(false),
         object("fields").additionalProperties(object().properties(JiraFieldMetadataProperties.PROPERTIES))
-            .placeholder("Add")
+            .placeholder("Add to Fields")
             .label("Fields")
             .description(
                 "Details of the fields associated with the issue transition screen. Use this information to populate `fields` and `update` in a transition request.")

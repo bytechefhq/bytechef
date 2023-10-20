@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class JiraHistoryMetadataProperties {
-    public static final List<Property> PROPERTIES = List.of(string("type").label("Type")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("type").label("Type")
         .description("The type of the history record.")
         .required(false),
         string("description").label("Description")
@@ -63,7 +63,7 @@ public class JiraHistoryMetadataProperties {
             .description("Details of user or system associated with a issue history metadata item.")
             .required(false),
         object("extraData").additionalProperties(string())
-            .placeholder("Add")
+            .placeholder("Add to Extra Data")
             .label("Extra Data")
             .description("Additional arbitrary information about the history record.")
             .required(false));

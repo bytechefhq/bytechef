@@ -31,7 +31,7 @@ import java.util.List;
  * @generated
  */
 public class JiraLinkGroupProperties {
-    public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
         .required(false),
         string("styleClass").label("Style Class")
             .required(false),
@@ -43,7 +43,7 @@ public class JiraLinkGroupProperties {
             .required(false),
         array("links").items(object().properties(JiraSimpleLinkProperties.PROPERTIES)
             .description("Details about the operations available in this version."))
-            .placeholder("Add")
+            .placeholder("Add to Links")
             .label("Links")
             .required(false));
 }

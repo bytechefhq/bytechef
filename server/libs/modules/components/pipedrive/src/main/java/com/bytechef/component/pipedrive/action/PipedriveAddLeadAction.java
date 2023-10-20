@@ -59,7 +59,7 @@ public class PipedriveAddLeadAction {
                 .required(false),
             array("label_ids")
                 .items(string().description("The IDs of the lead labels which will be associated with the lead"))
-                .placeholder("Add")
+                .placeholder("Add to Label Ids")
                 .label("Label Ids")
                 .description("The IDs of the lead labels which will be associated with the lead")
                 .required(false),
@@ -90,76 +90,57 @@ public class PipedriveAddLeadAction {
             bool("was_seen").label("Was Seen")
                 .description("A flag indicating whether the lead was seen by someone in the Pipedrive UI")
                 .required(false))
+            .label("Item")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object().properties(bool("success").label("Success")
-            .required(false),
-            object("data").properties(string("id").label("Id")
-                .description("The unique ID of the lead in the UUID format")
-                .required(false),
-                string("title").label("Title")
-                    .description("The title of the lead")
+        .outputSchema(object()
+            .properties(bool("success").required(false), object("data").properties(
+                string("id").description("The unique ID of the lead in the UUID format")
                     .required(false),
-                integer("owner_id").label("Owner Id")
-                    .description("The ID of the user who owns the lead")
+                string("title").description("The title of the lead")
                     .required(false),
-                integer("creator_id").label("Creator Id")
-                    .description("The ID of the user who created the lead")
+                integer("owner_id").description("The ID of the user who owns the lead")
+                    .required(false),
+                integer("creator_id").description("The ID of the user who created the lead")
                     .required(false),
                 array("label_ids")
                     .items(string().description("The IDs of the lead labels which are associated with the lead"))
-                    .placeholder("Add")
-                    .label("Label Ids")
                     .description("The IDs of the lead labels which are associated with the lead")
                     .required(false),
-                integer("person_id").label("Person Id")
-                    .description("The ID of a person which this lead is linked to")
+                integer("person_id").description("The ID of a person which this lead is linked to")
                     .required(false),
-                integer("organization_id").label("Organization Id")
-                    .description("The ID of an organization which this lead is linked to")
+                integer("organization_id").description("The ID of an organization which this lead is linked to")
                     .required(false),
-                string("source_name").label("Source Name")
-                    .description(
-                        "Defines where the lead comes from. Will be `API` if the lead was created through the Public API and will be `Manually created` if the lead was created manually through the UI.\n")
+                string("source_name").description(
+                    "Defines where the lead comes from. Will be `API` if the lead was created through the Public API and will be `Manually created` if the lead was created manually through the UI.\n")
                     .required(false),
-                bool("is_archived").label("Is Archived")
-                    .description("A flag indicating whether the lead is archived or not")
+                bool("is_archived").description("A flag indicating whether the lead is archived or not")
                     .required(false),
-                bool("was_seen").label("Was Seen")
+                bool("was_seen")
                     .description("A flag indicating whether the lead was seen by someone in the Pipedrive UI")
                     .required(false),
-                object("value").properties(number("amount").label("Amount")
-                    .required(true),
-                    string("currency").label("Currency")
-                        .required(true))
-                    .label("Value")
+                object("value").properties(number("amount").required(true), string("currency").required(true))
                     .description("The potential value of the lead")
                     .required(false),
-                date("expected_close_date").label("Expected Close Date")
-                    .description(
-                        "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
+                date("expected_close_date").description(
+                    "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
                     .required(false),
-                integer("next_activity_id").label("Next Activity Id")
-                    .description("The ID of the next activity associated with the lead")
+                integer("next_activity_id").description("The ID of the next activity associated with the lead")
                     .required(false),
-                dateTime("add_time").label("Add Time")
+                dateTime("add_time")
                     .description(
                         "The date and time of when the lead was created. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
                     .required(false),
-                dateTime("update_time").label("Update Time")
-                    .description(
-                        "The date and time of when the lead was last updated. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
+                dateTime("update_time").description(
+                    "The date and time of when the lead was last updated. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
                     .required(false),
-                string("visible_to").label("Visible To")
-                    .description(
-                        "The visibility of the lead. If omitted, the visibility will be set to the default visibility setting of this item type for the authorized user.<table><tr><th>Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner &amp; followers (private)</td></tr><tr><td>`3`</td><td>Entire company (shared)</td></tr></table>")
+                string("visible_to").description(
+                    "The visibility of the lead. If omitted, the visibility will be set to the default visibility setting of this item type for the authorized user.<table><tr><th>Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner &amp; followers (private)</td></tr><tr><td>`3`</td><td>Entire company (shared)</td></tr></table>")
                     .options(option("1", "1"), option("3", "3"), option("5", "5"), option("7", "7"))
                     .required(false),
-                string("cc_email").label("Cc Email")
-                    .description("The BCC email of the lead")
+                string("cc_email").description("The BCC email of the lead")
                     .required(false))
-                .label("Data")
                 .required(false))
             .metadata(
                 Map.of(

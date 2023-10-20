@@ -97,7 +97,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                     Map.of(
                         "type", PropertyType.QUERY)),
             array("fields").items(string())
-                .placeholder("Add")
+                .placeholder("Add to Fields")
                 .label("Fields")
                 .description(
                     "A list of fields to return for each issue, use it to retrieve a subset of fields. This parameter accepts a comma-separated list. Expand options include:\n"
@@ -136,7 +136,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                     Map.of(
                         "type", PropertyType.QUERY)),
             array("properties").items(string())
-                .placeholder("Add")
+                .placeholder("Add to Properties")
                 .label("Properties")
                 .description(
                     "A list of issue property keys for issue properties to include in the results. This parameter accepts a comma-separated list. Multiple properties can also be provided using an ampersand separated list. For example, `properties=prop1,prop2&properties=prop3`. A maximum of 5 issue property keys can be specified.")

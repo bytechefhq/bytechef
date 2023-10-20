@@ -48,11 +48,8 @@ public class PipedriveDeleteLeadAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(bool("success").label("Success")
-            .required(false),
-            object("data").properties(string("id").label("Id")
-                .required(false))
-                .label("Data")
+        .outputSchema(object()
+            .properties(bool("success").required(false), object("data").properties(string("id").required(false))
                 .required(false))
             .metadata(
                 Map.of(

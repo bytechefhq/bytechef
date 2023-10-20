@@ -28,7 +28,7 @@ import java.util.List;
  * @generated
  */
 public class JiraHistoryMetadataParticipantProperties {
-    public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
         .description("The ID of the user or system associated with a history record.")
         .required(false),
         string("displayName").label("Display Name")

@@ -65,7 +65,7 @@ public class PipedriveAddPersonAction {
                     .required(false))
                 .description(
                     "A phone number supplied as a string or an array of phone objects related to the person. The structure of the array is as follows: `[{ \"value\": \"12345\", \"primary\": \"true\", \"label\": \"mobile\" }]`. Please note that only `value` is required."))
-                .placeholder("Add")
+                .placeholder("Add to Phone")
                 .label("Phone")
                 .description(
                     "A phone number supplied as a string or an array of phone objects related to the person. The structure of the array is as follows: `[{ \"value\": \"12345\", \"primary\": \"true\", \"label\": \"mobile\" }]`. Please note that only `value` is required.")
@@ -101,257 +101,197 @@ public class PipedriveAddPersonAction {
                     .required(false))
                 .description(
                     "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" }]`. Please note that only `value` is required."))
-                .placeholder("Add")
+                .placeholder("Add to Email")
                 .label("Email")
                 .description(
                     "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" }]`. Please note that only `value` is required.")
                 .required(false))
+            .label("Item")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object().properties(integer("related_closed_deals_count").label("Related Closed Deals Count")
-            .description("The count of related closed deals related with the item")
-            .required(false),
-            integer("email_messages_count").label("Email Messages Count")
-                .description("The count of email messages related to the person")
-                .required(false),
-            string("cc_email").label("Cc Email")
-                .description("The BCC email associated with the person")
-                .required(false),
-            string("name").label("Name")
-                .description("The name of the user")
-                .required(false),
-            integer("has_pic").label("Has Pic")
-                .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
-                .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the user is active or not")
-                .required(false),
-            integer("id").label("Id")
-                .description("The ID of the user")
-                .required(false),
-            integer("value").label("Value")
-                .description("The ID of the owner")
-                .required(false),
-            string("email").label("Email")
-                .description("The email of the user")
-                .required(false),
-            string("pic_hash").label("Pic Hash")
-                .description("The user picture hash")
-                .required(false),
-            integer("open_deals_count").label("Open Deals Count")
-                .description("The count of open deals related with the item")
-                .required(false),
-            string("last_outgoing_mail_time").label("Last Outgoing Mail Time")
-                .description("The date and time of the last outgoing email associated with the person")
-                .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the person is active or not")
-                .required(false),
-            string("update_time").label("Update Time")
-                .description("The update time of the picture")
-                .required(false),
-            integer("added_by_user_id").label("Added By User Id")
-                .description("The ID of the user who added the picture")
-                .required(false),
-            integer("item_id").label("Item Id")
-                .description("The ID of related item")
-                .required(false),
-            string("item_type").label("Item Type")
-                .description("The type of item the picture is related to")
-                .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the associated picture is active or not")
-                .required(false),
-            integer("id").label("Id")
-                .description("The ID of the picture associated with the item")
-                .required(false),
-            string("add_time").label("Add Time")
-                .description("The add time of the picture")
-                .required(false),
-            object("pictures").properties(string("128").label("128")
-                .description("The URL of the 128*128 picture")
-                .required(false),
-                string("512").label("512")
-                    .description("The URL of the 512*512 picture")
-                    .required(false))
-                .label("Pictures")
-                .required(false),
-            integer("last_activity_id").label("Last Activity Id")
-                .description("The ID of the last activity associated with the deal")
-                .required(false),
-            string("next_activity_date").label("Next Activity Date")
-                .description("The date of the next activity associated with the deal")
-                .required(false),
-            string("update_time").label("Update Time")
-                .description("The last updated date and time of the person. Format: YYYY-MM-DD HH:MM:SS")
-                .required(false),
-            integer("activities_count").label("Activities Count")
-                .description("The count of activities related to the person")
-                .required(false),
-            integer("id").label("Id")
-                .description("The ID of the person")
-                .required(false),
-            string("org_name").label("Org Name")
-                .description("The name of the organization associated with the person")
-                .required(false),
-            string("first_name").label("First Name")
-                .description("The first name of the person")
-                .required(false),
-            array("email").items(object().properties(string("value").label("Value")
-                .description("Email")
-                .required(false),
-                bool("primary").label("Primary")
-                    .description("Boolean that indicates if email is primary for the person or not")
-                    .required(false),
-                string("label").label("Label")
-                    .description(
-                        "The label that indicates the type of the email. (Possible values - work, home or other)")
-                    .required(false))
-                .description(
-                    "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" } ]`. Please note that only `value` is required."))
-                .placeholder("Add")
-                .label("Email")
-                .description(
-                    "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" } ]`. Please note that only `value` is required.")
-                .required(false),
-            integer("won_deals_count").label("Won Deals Count")
-                .description("The count of won deals related with the item")
-                .required(false),
-            string("owner_name").label("Owner Name")
-                .description("The name of the owner associated with the person")
-                .required(false),
-            integer("files_count").label("Files Count")
-                .description("The count of files related to the person")
-                .required(false),
-            integer("company_id").label("Company Id")
-                .description("The ID of the company related to the person")
-                .required(false),
-            integer("related_won_deals_count").label("Related Won Deals Count")
-                .description("The count of related won deals related with the item")
-                .required(false),
-            string("last_incoming_mail_time").label("Last Incoming Mail Time")
-                .description("The date and time of the last incoming email associated with the person")
-                .required(false),
-            string("first_char").label("First Char")
-                .description("The first letter of the name of the person")
-                .required(false),
-            integer("undone_activities_count").label("Undone Activities Count")
-                .description("The count of undone activities related to the person")
-                .required(false),
-            integer("closed_deals_count").label("Closed Deals Count")
-                .description("The count of closed deals related with the item")
-                .required(false),
-            string("last_name").label("Last Name")
-                .description("The last name of the person")
-                .required(false),
-            string("last_activity_date").label("Last Activity Date")
-                .description("The date of the last activity associated with the deal")
-                .required(false),
-            integer("label").label("Label")
-                .description("The label assigned to the person")
-                .required(false),
-            integer("related_open_deals_count").label("Related Open Deals Count")
-                .description("The count of related open deals related with the item")
-                .required(false),
-            integer("related_lost_deals_count").label("Related Lost Deals Count")
-                .description("The count of related lost deals related with the item")
-                .required(false),
-            integer("next_activity_id").label("Next Activity Id")
-                .description("The ID of the next activity associated with the deal")
-                .required(false),
-            array("phone").items(object().properties(string("value").label("Value")
-                .description("The phone number")
-                .required(false),
-                bool("primary").label("Primary")
-                    .description("Boolean that indicates if phone number is primary for the person or not")
-                    .required(false),
-                string("label").label("Label")
-                    .description(
-                        "The label that indicates the type of the phone number. (Possible values - work, home, mobile or other)")
-                    .required(false))
-                .description(
-                    "A phone number supplied as a string or an array of phone objects related to the person. The structure of the array is as follows: `[{ \"value\": \"12345\", \"primary\": \"true\", \"label\": \"mobile\" }]`. Please note that only `value` is required."))
-                .placeholder("Add")
-                .label("Phone")
-                .description(
-                    "A phone number supplied as a string or an array of phone objects related to the person. The structure of the array is as follows: `[{ \"value\": \"12345\", \"primary\": \"true\", \"label\": \"mobile\" }]`. Please note that only `value` is required.")
-                .required(false),
-            string("visible_to").label("Visible To")
-                .description("The visibility group ID of who can see the person")
-                .required(false),
-            string("address").label("Address")
-                .description("The address of the organization")
-                .required(false),
-            integer("owner_id").label("Owner Id")
-                .description("The ID of the owner of the organization that is associated with the item")
-                .required(false),
-            string("cc_email").label("Cc Email")
-                .description("The BCC email of the organization associated with the item")
-                .required(false),
-            string("name").label("Name")
-                .description("The name of the organization associated with the item")
-                .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the associated organization is active or not")
-                .required(false),
-            integer("people_count").label("People Count")
-                .description("The number of people connected with the organization that is associated with the item")
-                .required(false),
-            integer("value").label("Value")
-                .description("The ID of the organization")
-                .required(false),
-            integer("notes_count").label("Notes Count")
-                .description("The count of notes related to the person")
-                .required(false),
-            integer("followers_count").label("Followers Count")
-                .description("The count of followers related to the person")
-                .required(false),
-            string("name").label("Name")
-                .description("The name of the person")
-                .required(false),
-            integer("lost_deals_count").label("Lost Deals Count")
-                .description("The count of lost deals related with the item")
-                .required(false),
-            string("next_activity_time").label("Next Activity Time")
-                .description("The time of the next activity associated with the deal")
-                .required(false),
-            string("add_time").label("Add Time")
-                .description("The date and time when the person was added/created. Format: YYYY-MM-DD HH:MM:SS")
-                .required(false),
-            integer("done_activities_count").label("Done Activities Count")
-                .description("The count of done activities related to the person")
-                .required(false),
-            object("related_objects").properties(object("user").properties(string("name").label("Name")
-                .description("The name of the user")
-                .required(false),
-                object("USER_ID").label("USER ID")
-                    .required(false),
-                integer("has_pic").label("Has Pic")
-                    .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
-                    .required(false),
-                bool("active_flag").label("Active Flag")
-                    .description("Whether the user is active or not")
-                    .required(false),
-                integer("id").label("Id")
-                    .description("The ID of the user")
-                    .required(false),
-                string("email").label("Email")
-                    .description("The email of the user")
-                    .required(false),
-                string("pic_hash").label("Pic Hash")
-                    .description("The user picture hash")
-                    .required(false))
-                .label("User")
-                .required(false))
-                .label("Related Objects")
-                .required(false),
-            bool("success").label("Success")
-                .description("If the response is successful or not")
-                .required(false))
-            .metadata(
-                Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+        .outputSchema(
+            object()
+                .properties(
+                    integer("related_closed_deals_count")
+                        .description("The count of related closed deals related with the item")
+                        .required(false),
+                    integer("email_messages_count").description("The count of email messages related to the person")
+                        .required(false),
+                    string("cc_email").description("The BCC email associated with the person")
+                        .required(false),
+                    string("name").description("The name of the user")
+                        .required(false),
+                    integer("has_pic")
+                        .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
+                        .required(false),
+                    bool("active_flag").description("Whether the user is active or not")
+                        .required(false),
+                    integer("id").description("The ID of the user")
+                        .required(false),
+                    integer("value").description("The ID of the owner")
+                        .required(false),
+                    string("email").description("The email of the user")
+                        .required(false),
+                    string("pic_hash").description("The user picture hash")
+                        .required(false),
+                    integer("open_deals_count").description("The count of open deals related with the item")
+                        .required(false),
+                    string("last_outgoing_mail_time")
+                        .description("The date and time of the last outgoing email associated with the person")
+                        .required(false),
+                    bool("active_flag").description("Whether the person is active or not")
+                        .required(false),
+                    string("update_time").description("The update time of the picture")
+                        .required(false),
+                    integer("added_by_user_id").description("The ID of the user who added the picture")
+                        .required(false),
+                    integer("item_id").description("The ID of related item")
+                        .required(false),
+                    string("item_type").description("The type of item the picture is related to")
+                        .required(false),
+                    bool("active_flag").description("Whether the associated picture is active or not")
+                        .required(false),
+                    integer("id").description("The ID of the picture associated with the item")
+                        .required(false),
+                    string("add_time").description("The add time of the picture")
+                        .required(false),
+                    object("pictures").properties(string("128").description("The URL of the 128*128 picture")
+                        .required(false),
+                        string("512").description("The URL of the 512*512 picture")
+                            .required(false))
+                        .required(false),
+                    integer("last_activity_id").description("The ID of the last activity associated with the deal")
+                        .required(false),
+                    string("next_activity_date").description("The date of the next activity associated with the deal")
+                        .required(false),
+                    string("update_time")
+                        .description("The last updated date and time of the person. Format: YYYY-MM-DD HH:MM:SS")
+                        .required(false),
+                    integer("activities_count").description("The count of activities related to the person")
+                        .required(false),
+                    integer("id").description("The ID of the person")
+                        .required(false),
+                    string("org_name").description("The name of the organization associated with the person")
+                        .required(false),
+                    string("first_name").description("The first name of the person")
+                        .required(false),
+                    array("email").items(object().properties(string("value").description("Email")
+                        .required(false),
+                        bool("primary").description("Boolean that indicates if email is primary for the person or not")
+                            .required(false),
+                        string(
+                            "label").description(
+                                "The label that indicates the type of the email. (Possible values - work, home or other)")
+                                .required(false))
+                        .description(
+                            "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" } ]`. Please note that only `value` is required."))
+                        .description(
+                            "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" } ]`. Please note that only `value` is required.")
+                        .required(false),
+                    integer("won_deals_count").description("The count of won deals related with the item")
+                        .required(false),
+                    string("owner_name").description("The name of the owner associated with the person")
+                        .required(false),
+                    integer("files_count").description("The count of files related to the person")
+                        .required(false),
+                    integer("company_id").description("The ID of the company related to the person")
+                        .required(false),
+                    integer("related_won_deals_count")
+                        .description("The count of related won deals related with the item")
+                        .required(false),
+                    string("last_incoming_mail_time")
+                        .description("The date and time of the last incoming email associated with the person")
+                        .required(false),
+                    string("first_char").description("The first letter of the name of the person")
+                        .required(false),
+                    integer("undone_activities_count")
+                        .description("The count of undone activities related to the person")
+                        .required(false),
+                    integer("closed_deals_count").description("The count of closed deals related with the item")
+                        .required(false),
+                    string("last_name").description("The last name of the person")
+                        .required(false),
+                    string("last_activity_date").description("The date of the last activity associated with the deal")
+                        .required(false),
+                    integer("label").description("The label assigned to the person")
+                        .required(false),
+                    integer("related_open_deals_count")
+                        .description("The count of related open deals related with the item")
+                        .required(false),
+                    integer("related_lost_deals_count")
+                        .description("The count of related lost deals related with the item")
+                        .required(false),
+                    integer("next_activity_id").description("The ID of the next activity associated with the deal")
+                        .required(false),
+                    array("phone").items(object().properties(string("value").description("The phone number")
+                        .required(false),
+                        bool("primary")
+                            .description("Boolean that indicates if phone number is primary for the person or not")
+                            .required(false),
+                        string("label").description(
+                            "The label that indicates the type of the phone number. (Possible values - work, home, mobile or other)")
+                            .required(false))
+                        .description(
+                            "A phone number supplied as a string or an array of phone objects related to the person. The structure of the array is as follows: `[{ \"value\": \"12345\", \"primary\": \"true\", \"label\": \"mobile\" }]`. Please note that only `value` is required."))
+                        .description(
+                            "A phone number supplied as a string or an array of phone objects related to the person. The structure of the array is as follows: `[{ \"value\": \"12345\", \"primary\": \"true\", \"label\": \"mobile\" }]`. Please note that only `value` is required.")
+                        .required(false),
+                    string("visible_to").description("The visibility group ID of who can see the person")
+                        .required(false),
+                    string("address").description("The address of the organization")
+                        .required(false),
+                    integer("owner_id")
+                        .description("The ID of the owner of the organization that is associated with the item")
+                        .required(false),
+                    string("cc_email").description("The BCC email of the organization associated with the item")
+                        .required(false),
+                    string("name").description("The name of the organization associated with the item")
+                        .required(false),
+                    bool("active_flag").description("Whether the associated organization is active or not")
+                        .required(false),
+                    integer("people_count")
+                        .description(
+                            "The number of people connected with the organization that is associated with the item")
+                        .required(false),
+                    integer("value").description("The ID of the organization")
+                        .required(false),
+                    integer("notes_count").description("The count of notes related to the person")
+                        .required(false),
+                    integer("followers_count").description("The count of followers related to the person")
+                        .required(false),
+                    string("name").description("The name of the person")
+                        .required(false),
+                    integer("lost_deals_count").description("The count of lost deals related with the item")
+                        .required(false),
+                    string("next_activity_time").description("The time of the next activity associated with the deal")
+                        .required(false),
+                    string("add_time")
+                        .description("The date and time when the person was added/created. Format: YYYY-MM-DD HH:MM:SS")
+                        .required(false),
+                    integer("done_activities_count").description("The count of done activities related to the person")
+                        .required(false),
+                    object("related_objects")
+                        .properties(object("user").properties(string("name").description("The name of the user")
+                            .required(false), object("USER_ID").required(false),
+                            integer("has_pic")
+                                .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
+                                .required(false),
+                            bool("active_flag").description("Whether the user is active or not")
+                                .required(false),
+                            integer("id").description("The ID of the user")
+                                .required(false),
+                            string("email").description("The email of the user")
+                                .required(false),
+                            string("pic_hash").description("The user picture hash")
+                                .required(false))
+                            .required(false))
+                        .required(false),
+                    bool("success").description("If the response is successful or not")
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseFormat", ResponseFormat.JSON)))
         .sampleOutput(
             "{\"success\":true,\"data\":{\"id\":1,\"company_id\":12,\"owner_id\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":123},\"org_id\":{\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":1234},\"name\":\"Will Smith\",\"first_name\":\"Will\",\"last_name\":\"Smith\",\"open_deals_count\":2,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":3,\"participant_open_deals_count\":1,\"participant_closed_deals_count\":1,\"email_messages_count\":1,\"activities_count\":1,\"done_activities_count\":1,\"undone_activities_count\":2,\"files_count\":2,\"notes_count\":2,\"followers_count\":3,\"won_deals_count\":3,\"related_won_deals_count\":3,\"lost_deals_count\":1,\"related_lost_deals_count\":1,\"active_flag\":true,\"phone\":[{\"value\":\"12345\",\"primary\":true,\"label\":\"work\"}],\"email\":[{\"value\":\"12345@email.com\",\"primary\":true,\"label\":\"work\"}],\"primary_email\":\"12345@email.com\",\"first_char\":\"w\",\"update_time\":\"2020-05-08 05:30:20\",\"add_time\":\"2017-10-18 13:23:07\",\"visible_to\":\"3\",\"marketing_status\":\"no_consent\",\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"},\"value\":4},\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":1,\"org_name\":\"Organization name\",\"owner_name\":\"Jane Doe\",\"cc_email\":\"org@pipedrivemail.com\"},\"related_objects\":{\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}}}}");
 }

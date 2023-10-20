@@ -52,303 +52,221 @@ public class PipedriveGetOrganizationAction {
                     "type", PropertyType.PATH)))
         .outputSchema(
             object()
-                .properties(object("additional_data").properties(object("followers")
-                    .properties(string("name").label("Name")
-                        .description("The name of the follower")
+                .properties(
+                    object("additional_data")
+                        .properties(
+                            object("followers").properties(string("name").description("The name of the follower")
+                                .required(false),
+                                integer("id").description("The ID of the follower associated with the item")
+                                    .required(false),
+                                integer("user_id").description("The user ID of the follower")
+                                    .required(false),
+                                string("email").description("The email of the follower")
+                                    .required(false),
+                                string("pic_hash").description("The follower picture hash")
+                                    .required(false))
+                                .description("The follower that is associated with the item")
+                                .required(false),
+                            string("dropbox_email").description("Dropbox email for the organization")
+                                .required(false))
                         .required(false),
-                        integer("id").label("Id")
-                            .description("The ID of the follower associated with the item")
-                            .required(false),
-                        integer("user_id").label("User Id")
-                            .description("The user ID of the follower")
-                            .required(false),
-                        string("email").label("Email")
-                            .description("The email of the follower")
-                            .required(false),
-                        string("pic_hash").label("Pic Hash")
-                            .description("The follower picture hash")
-                            .required(false))
-                    .label("Followers")
-                    .description("The follower that is associated with the item")
-                    .required(false),
-                    string("dropbox_email").label("Dropbox Email")
-                        .description("Dropbox email for the organization")
-                        .required(false))
-                    .label("Additional Data")
-                    .required(false),
-                    string("address_route").label("Address Route")
-                        .description("The route of the organization location")
+                    string("address_route").description("The route of the organization location")
                         .required(false),
-                    integer("related_closed_deals_count").label("Related Closed Deals Count")
+                    integer("related_closed_deals_count")
                         .description("The count of related closed deals related with the item")
                         .required(false),
-                    integer("email_messages_count").label("Email Messages Count")
+                    integer("email_messages_count")
                         .description("The count of email messages related to the organization")
                         .required(false),
-                    string("name").label("Name")
-                        .description("The name of the user")
+                    string("name").description("The name of the user")
                         .required(false),
-                    integer("has_pic").label("Has Pic")
+                    integer("has_pic")
                         .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
                         .required(false),
-                    bool("active_flag").label("Active Flag")
-                        .description("Whether the user is active or not")
+                    bool("active_flag").description("Whether the user is active or not")
                         .required(false),
-                    integer("id").label("Id")
-                        .description("The ID of the user")
+                    integer("id").description("The ID of the user")
                         .required(false),
-                    integer("value").label("Value")
-                        .description("The ID of the owner")
+                    integer("value").description("The ID of the owner")
                         .required(false),
-                    string("email").label("Email")
-                        .description("The email of the user")
+                    string("email").description("The email of the user")
                         .required(false),
-                    string("pic_hash").label("Pic Hash")
-                        .description("The user picture hash")
+                    string("pic_hash").description("The user picture hash")
                         .required(false),
-                    string("cc_email").label("Cc Email")
-                        .description("The BCC email of the organization")
+                    string("cc_email").description("The BCC email of the organization")
                         .required(false),
-                    integer("open_deals_count").label("Open Deals Count")
-                        .description("The count of open deals related with the item")
+                    integer("open_deals_count").description("The count of open deals related with the item")
                         .required(false),
-                    integer("people_count").label("People Count")
-                        .description("The count of persons related to the organization")
+                    integer("people_count").description("The count of persons related to the organization")
                         .required(false),
-                    string("next_activity_date").label("Next Activity Date")
-                        .description("The date of the next activity associated with the deal")
+                    string("next_activity_date").description("The date of the next activity associated with the deal")
                         .required(false),
-                    integer("id").label("Id")
-                        .description("The ID of the organization")
+                    integer("id").description("The ID of the organization")
                         .required(false),
-                    string("address_admin_area_level_2").label("Address Admin Area Level 2")
+                    string("address_admin_area_level_2")
                         .description("The level 2 admin area of the organization location")
                         .required(false),
-                    string("address_admin_area_level_1").label("Address Admin Area Level 1")
+                    string("address_admin_area_level_1")
                         .description("The level 1 admin area of the organization location")
                         .required(false),
-                    string("owner_name").label("Owner Name")
-                        .description("The name of the organization owner")
+                    string("owner_name").description("The name of the organization owner")
                         .required(false),
-                    string("address_formatted_address").label("Address Formatted Address")
-                        .description("The formatted organization location")
+                    string("address_formatted_address").description("The formatted organization location")
                         .required(false),
-                    integer("related_won_deals_count").label("Related Won Deals Count")
+                    integer("related_won_deals_count")
                         .description("The count of related won deals related with the item")
                         .required(false),
-                    integer("undone_activities_count").label("Undone Activities Count")
+                    integer("undone_activities_count")
                         .description("The count of undone activities related to the organization")
                         .required(false),
-                    string("address_subpremise").label("Address Subpremise")
-                        .description("The sub-premise of the organization location")
+                    string("address_subpremise").description("The sub-premise of the organization location")
                         .required(false),
-                    string("last_activity_date").label("Last Activity Date")
-                        .description("The date of the last activity associated with the deal")
+                    string("last_activity_date").description("The date of the last activity associated with the deal")
                         .required(false),
-                    integer("next_activity_id").label("Next Activity Id")
-                        .description("The ID of the next activity associated with the deal")
+                    integer("next_activity_id").description("The ID of the next activity associated with the deal")
                         .required(false),
-                    string("country_code").label("Country Code")
-                        .description("The country code of the organization")
+                    string("country_code").description("The country code of the organization")
                         .required(false),
-                    string("visible_to").label("Visible To")
-                        .description("The visibility group ID of who can see the organization")
+                    string("visible_to").description("The visibility group ID of who can see the organization")
                         .required(false),
-                    integer("notes_count").label("Notes Count")
-                        .description("The count of notes related to the organization")
+                    integer("notes_count").description("The count of notes related to the organization")
                         .required(false),
-                    string("name").label("Name")
-                        .description("The name of the organization")
+                    string("name").description("The name of the organization")
                         .required(false),
-                    string("address_locality").label("Address Locality")
-                        .description("The locality of the organization location")
+                    string("address_locality").description("The locality of the organization location")
                         .required(false),
-                    integer("lost_deals_count").label("Lost Deals Count")
-                        .description("The count of lost deals related with the item")
+                    integer("lost_deals_count").description("The count of lost deals related with the item")
                         .required(false),
-                    string("next_activity_time").label("Next Activity Time")
-                        .description("The time of the next activity associated with the deal")
+                    string("next_activity_time").description("The time of the next activity associated with the deal")
                         .required(false),
-                    bool("active_flag").label("Active Flag")
-                        .description("Whether the organization is active or not")
+                    bool("active_flag").description("Whether the organization is active or not")
                         .required(false),
-                    string("update_time").label("Update Time")
-                        .description("The update time of the picture")
+                    string("update_time").description("The update time of the picture")
                         .required(false),
-                    integer("added_by_user_id").label("Added By User Id")
-                        .description("The ID of the user who added the picture")
+                    integer("added_by_user_id").description("The ID of the user who added the picture")
                         .required(false),
-                    integer("item_id").label("Item Id")
-                        .description("The ID of related item")
+                    integer("item_id").description("The ID of related item")
                         .required(false),
-                    string("item_type").label("Item Type")
-                        .description("The type of item the picture is related to")
+                    string("item_type").description("The type of item the picture is related to")
                         .required(false),
-                    bool("active_flag").label("Active Flag")
-                        .description("Whether the associated picture is active or not")
+                    bool("active_flag").description("Whether the associated picture is active or not")
                         .required(false),
-                    integer("value").label("Value")
-                        .description("The ID of the picture associated with the item")
+                    integer("value").description("The ID of the picture associated with the item")
                         .required(false),
-                    string("add_time").label("Add Time")
-                        .description("The add time of the picture")
+                    string("add_time").description("The add time of the picture")
                         .required(false),
-                    object("pictures").properties(string("128").label("128")
-                        .description("The URL of the 128*128 picture")
+                    object("pictures").properties(string("128").description("The URL of the 128*128 picture")
                         .required(false),
-                        string("512").label("512")
-                            .description("The URL of the 512*512 picture")
+                        string("512").description("The URL of the 512*512 picture")
                             .required(false))
-                        .label("Pictures")
                         .required(false),
-                    integer("last_activity_id").label("Last Activity Id")
-                        .description("The ID of the last activity associated with the deal")
+                    integer("last_activity_id").description("The ID of the last activity associated with the deal")
                         .required(false),
-                    string("update_time").label("Update Time")
-                        .description("The last updated date and time of the organization")
+                    string("update_time").description("The last updated date and time of the organization")
                         .required(false),
-                    object("last_activity").label("Last Activity")
-                        .description(
-                            "Please refer to response schema of <a href=\"https://developers.pipedrive.com/docs/api/v1/Activities#getActivity\">Activity</a>")
+                    object("last_activity").description(
+                        "Please refer to response schema of <a href=\"https://developers.pipedrive.com/docs/api/v1/Activities#getActivity\">Activity</a>")
                         .required(false),
-                    object("next_activity").label("Next Activity")
-                        .description(
-                            "Please refer to response schema of <a href=\"https://developers.pipedrive.com/docs/api/v1/Activities#getActivity\">Activity</a>")
+                    object("next_activity").description(
+                        "Please refer to response schema of <a href=\"https://developers.pipedrive.com/docs/api/v1/Activities#getActivity\">Activity</a>")
                         .required(false),
-                    integer("activities_count").label("Activities Count")
-                        .description("The count of activities related to the organization")
+                    integer("activities_count").description("The count of activities related to the organization")
                         .required(false),
-                    integer("won_deals_count").label("Won Deals Count")
-                        .description("The count of won deals related with the item")
+                    integer("won_deals_count").description("The count of won deals related with the item")
                         .required(false),
-                    string("address_street_number").label("Address Street Number")
-                        .description("The street number of the organization location")
+                    string("address_street_number").description("The street number of the organization location")
                         .required(false),
-                    integer("files_count").label("Files Count")
-                        .description("The count of files related to the organization")
+                    integer("files_count").description("The count of files related to the organization")
                         .required(false),
-                    string("address").label("Address")
-                        .description("The full address of the organization")
+                    string("address").description("The full address of the organization")
                         .required(false),
-                    bool("edit_name").label("Edit Name")
+                    bool("edit_name")
                         .description(
                             "If the company ID of the organization and company ID of the request is same or not")
                         .required(false),
-                    integer("company_id").label("Company Id")
-                        .description("The ID of the company related to the organization")
+                    integer("company_id").description("The ID of the company related to the organization")
                         .required(false),
-                    string("address_postal_code").label("Address Postal Code")
-                        .description("The postal code of the organization location")
+                    string("address_postal_code").description("The postal code of the organization location")
                         .required(false),
-                    string("address_country").label("Address Country")
-                        .description("The country of the organization location")
+                    string("address_country").description("The country of the organization location")
                         .required(false),
-                    string("first_char").label("First Char")
-                        .description("The first character of the organization name")
+                    string("first_char").description("The first character of the organization name")
                         .required(false),
-                    integer("closed_deals_count").label("Closed Deals Count")
-                        .description("The count of closed deals related with the item")
+                    integer("closed_deals_count").description("The count of closed deals related with the item")
                         .required(false),
-                    integer("label").label("Label")
-                        .description("The ID of the label")
+                    integer("label").description("The ID of the label")
                         .required(false),
-                    integer("related_open_deals_count").label("Related Open Deals Count")
+                    integer("related_open_deals_count")
                         .description("The count of related open deals related with the item")
                         .required(false),
-                    integer("related_lost_deals_count").label("Related Lost Deals Count")
+                    integer("related_lost_deals_count")
                         .description("The count of related lost deals related with the item")
                         .required(false),
-                    integer("followers_count").label("Followers Count")
-                        .description("The count of followers related to the organization")
+                    integer("followers_count").description("The count of followers related to the organization")
                         .required(false),
-                    string("address_sublocality").label("Address Sublocality")
-                        .description("The sub-locality of the organization location")
+                    string("address_sublocality").description("The sub-locality of the organization location")
                         .required(false),
-                    string("add_time").label("Add Time")
-                        .description("The creation date and time of the organization")
+                    string("add_time").description("The creation date and time of the organization")
                         .required(false),
-                    integer("done_activities_count").label("Done Activities Count")
+                    integer("done_activities_count")
                         .description("The count of done activities related to the organization")
                         .required(false),
-                    object("related_objects").properties(object("organization").properties(string("name").label("Name")
-                        .description("The name of the organization associated with the item")
-                        .required(false),
-                        integer("id").label("Id")
-                            .description("The ID of the organization associated with the item")
+                    object("related_objects")
+                        .properties(object("organization").properties(string("name").description(
+                            "The name of the organization associated with the item")
                             .required(false),
-                        string("address").label("Address")
-                            .description("The address of the organization")
-                            .required(false),
-                        integer("people_count").label("People Count")
-                            .description(
+                            integer("id").description("The ID of the organization associated with the item")
+                                .required(false),
+                            string("address").description("The address of the organization")
+                                .required(false),
+                            integer("people_count").description(
                                 "The number of people connected with the organization that is associated with the item")
-                            .required(false),
-                        integer("owner_id").label("Owner Id")
-                            .description("The ID of the owner of the organization that is associated with the item")
-                            .required(false),
-                        string("cc_email").label("Cc Email")
-                            .description("The BCC email of the organization associated with the item")
-                            .required(false))
-                        .label("Organization")
-                        .required(false),
-                        object("user").properties(string("name").label("Name")
-                            .description("The name of the user")
-                            .required(false),
-                            object("USER_ID").label("USER ID")
                                 .required(false),
-                            integer("has_pic").label("Has Pic")
-                                .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
+                            integer("owner_id").description(
+                                "The ID of the owner of the organization that is associated with the item")
                                 .required(false),
-                            bool("active_flag").label("Active Flag")
-                                .description("Whether the user is active or not")
-                                .required(false),
-                            integer("id").label("Id")
-                                .description("The ID of the user")
-                                .required(false),
-                            string("email").label("Email")
-                                .description("The email of the user")
-                                .required(false),
-                            string("pic_hash").label("Pic Hash")
-                                .description("The user picture hash")
+                            string("cc_email").description("The BCC email of the organization associated with the item")
                                 .required(false))
-                            .label("User")
                             .required(false),
-                        object("picture").properties(string("update_time").label("Update Time")
-                            .description("The update time of the picture")
-                            .required(false),
-                            integer("added_by_user_id").label("Added By User Id")
-                                .description("The ID of the user who added the picture")
-                                .required(false),
-                            integer("item_id").label("Item Id")
-                                .description("The ID of related item")
-                                .required(false),
-                            string("item_type").label("Item Type")
-                                .description("The type of item the picture is related to")
-                                .required(false),
-                            bool("active_flag").label("Active Flag")
-                                .description("Whether the associated picture is active or not")
-                                .required(false),
-                            integer("id").label("Id")
-                                .description("The ID of the picture associated with the item")
-                                .required(false),
-                            string("add_time").label("Add Time")
-                                .description("The add time of the picture")
-                                .required(false),
-                            object("pictures").properties(string("128").label("128")
-                                .description("The URL of the 128*128 picture")
-                                .required(false),
-                                string("512").label("512")
-                                    .description("The URL of the 512*512 picture")
+                            object("user").properties(string("name").description("The name of the user")
+                                .required(false), object("USER_ID").required(false),
+                                integer("has_pic").description(
+                                    "Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
+                                    .required(false),
+                                bool("active_flag").description("Whether the user is active or not")
+                                    .required(false),
+                                integer("id").description("The ID of the user")
+                                    .required(false),
+                                string("email").description("The email of the user")
+                                    .required(false),
+                                string("pic_hash").description("The user picture hash")
                                     .required(false))
-                                .label("Pictures")
+                                .required(false),
+                            object("picture")
+                                .properties(string("update_time").description("The update time of the picture")
+                                    .required(false),
+                                    integer("added_by_user_id").description("The ID of the user who added the picture")
+                                        .required(false),
+                                    integer("item_id").description("The ID of related item")
+                                        .required(false),
+                                    string("item_type").description("The type of item the picture is related to")
+                                        .required(false),
+                                    bool("active_flag").description("Whether the associated picture is active or not")
+                                        .required(false),
+                                    integer("id").description("The ID of the picture associated with the item")
+                                        .required(false),
+                                    string("add_time").description("The add time of the picture")
+                                        .required(false),
+                                    object("pictures")
+                                        .properties(string("128").description("The URL of the 128*128 picture")
+                                            .required(false),
+                                            string("512").description("The URL of the 512*512 picture")
+                                                .required(false))
+                                        .required(false))
+                                .description("The picture that is associated with the item")
                                 .required(false))
-                            .label("Picture")
-                            .description("The picture that is associated with the item")
-                            .required(false))
-                        .label("Related Objects")
                         .required(false),
-                    bool("success").label("Success")
-                        .description("If the response is successful or not")
+                    bool("success").description("If the response is successful or not")
                         .required(false))
                 .metadata(
                     Map.of(

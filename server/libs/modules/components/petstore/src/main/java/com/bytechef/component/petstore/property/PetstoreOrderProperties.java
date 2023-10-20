@@ -32,7 +32,7 @@ import java.util.List;
  * @generated
  */
 public class PetstoreOrderProperties {
-    public static final List<Property> PROPERTIES = List.of(integer("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(integer("id").label("Id")
         .required(false)
         .exampleValue(10),
         integer("petId").label("Pet Id")

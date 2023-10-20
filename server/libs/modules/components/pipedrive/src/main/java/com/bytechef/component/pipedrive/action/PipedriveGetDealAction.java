@@ -53,433 +53,307 @@ public class PipedriveGetDealAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(bool("success").label("Success")
-            .description("If the response is successful or not")
+        .outputSchema(object().properties(bool("success").description("If the response is successful or not")
             .required(false),
-            integer("email_messages_count").label("Email Messages Count")
-                .description("The number of emails associated with the deal")
+            integer("email_messages_count").description("The number of emails associated with the deal")
                 .required(false),
-            string("cc_email").label("Cc Email")
-                .description("The BCC email of the deal")
+            string("cc_email").description("The BCC email of the deal")
                 .required(false),
-            object("stay_in_pipeline_stages").properties(object("times_in_stages").label("Times In Stages")
-                .description("The number of seconds a deal has been in each stage of the pipeline")
-                .required(false),
-                array("order_of_stages")
-                    .items(integer(null).description("The order of the deal progression through the pipeline stages"))
-                    .placeholder("Add")
-                    .label("Order Of Stages")
-                    .description("The order of the deal progression through the pipeline stages")
-                    .required(false))
-                .label("Stay In Pipeline Stages")
+            object("stay_in_pipeline_stages")
+                .properties(
+                    object("times_in_stages")
+                        .description("The number of seconds a deal has been in each stage of the pipeline")
+                        .required(false),
+                    array("order_of_stages")
+                        .items(
+                            integer(null).description("The order of the deal progression through the pipeline stages"))
+                        .description("The order of the deal progression through the pipeline stages")
+                        .required(false))
                 .description("The details of the duration of the deal being in each stage of the pipeline")
                 .required(false),
-            integer("products_count").label("Products Count")
-                .description("The number of products associated with the deal")
+            integer("products_count").description("The number of products associated with the deal")
                 .required(false),
-            string("next_activity_date").label("Next Activity Date")
-                .description("The date of the next activity associated with the deal")
+            string("next_activity_date").description("The date of the next activity associated with the deal")
                 .required(false),
-            string("next_activity_type").label("Next Activity Type")
-                .description("The type of the next activity associated with the deal")
+            string("next_activity_type").description("The type of the next activity associated with the deal")
                 .required(false),
-            string("next_activity_duration").label("Next Activity Duration")
-                .description("The duration of the next activity associated with the deal")
+            string("next_activity_duration").description("The duration of the next activity associated with the deal")
                 .required(false),
-            integer("id").label("Id")
-                .description("The ID of the deal")
+            integer("id").description("The ID of the deal")
                 .required(false),
-            string("name").label("Name")
-                .description("The name of the person associated with the deal")
+            string("name").description("The name of the person associated with the deal")
                 .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the associated person is active or not")
+            bool("active_flag").description("Whether the associated person is active or not")
                 .required(false),
-            array("phone").items(object().properties(string("label").label("Label")
-                .description("The type of the phone number")
+            array("phone").items(object().properties(string("label").description("The type of the phone number")
                 .required(false),
-                string("value").label("Value")
-                    .description("The phone number of the person associated with the deal")
+                string("value").description("The phone number of the person associated with the deal")
                     .required(false),
-                bool("primary").label("Primary")
-                    .description("If this is the primary phone number or not")
+                bool("primary").description("If this is the primary phone number or not")
                     .required(false))
                 .description("The phone numbers of the person associated with the deal"))
-                .placeholder("Add")
-                .label("Phone")
                 .description("The phone numbers of the person associated with the deal")
                 .required(false),
-            integer("value").label("Value")
-                .description("The ID of the person associated with the deal")
+            integer("value").description("The ID of the person associated with the deal")
                 .required(false),
-            array("email").items(object().properties(string("label").label("Label")
-                .description("The type of the email")
+            array("email").items(object().properties(string("label").description("The type of the email")
                 .required(false),
-                string("value").label("Value")
-                    .description("The email of the associated person")
+                string("value").description("The email of the associated person")
                     .required(false),
-                bool("primary").label("Primary")
-                    .description("If this is the primary email or not")
+                bool("primary").description("If this is the primary email or not")
                     .required(false))
                 .description("The emails of the person associated with the deal"))
-                .placeholder("Add")
-                .label("Email")
                 .description("The emails of the person associated with the deal")
                 .required(false),
-            integer("owner_id").label("Owner Id")
-                .description("The ID of the owner of the person that is associated with the deal")
+            integer("owner_id").description("The ID of the owner of the person that is associated with the deal")
                 .required(false),
-            object("creator_user_id").properties(integer("id").label("Id")
-                .description("The ID of the deal creator")
+            object("creator_user_id").properties(integer("id").description("The ID of the deal creator")
                 .required(false),
-                string("name").label("Name")
-                    .description("The name of the deal creator")
+                string("name").description("The name of the deal creator")
                     .required(false),
-                string("email").label("Email")
-                    .description("The email of the deal creator")
+                string("email").description("The email of the deal creator")
                     .required(false),
-                bool("has_pic").label("Has Pic")
-                    .description("If the creator has a picture or not")
+                bool("has_pic").description("If the creator has a picture or not")
                     .required(false),
-                string("pic_hash").label("Pic Hash")
-                    .description("The creator picture hash")
+                string("pic_hash").description("The creator picture hash")
                     .required(false),
-                bool("active_flag").label("Active Flag")
-                    .description("Whether the creator is active or not")
+                bool("active_flag").description("Whether the creator is active or not")
                     .required(false),
-                integer("value").label("Value")
-                    .description("The ID of the deal creator")
+                integer("value").description("The ID of the deal creator")
                     .required(false))
-                .label("Creator User Id")
                 .description("The creator of the deal")
                 .required(false),
-            date("expected_close_date").label("Expected Close Date")
-                .description("The expected close date of the deal")
+            date("expected_close_date").description("The expected close date of the deal")
                 .required(false),
-            integer("participants_count").label("Participants Count")
-                .description("The number of participants associated with the deal")
+            integer("participants_count").description("The number of participants associated with the deal")
                 .required(false),
-            string("owner_name").label("Owner Name")
-                .description("The name of the deal owner")
+            string("owner_name").description("The name of the deal owner")
                 .required(false),
-            integer("stage_id").label("Stage Id")
-                .description("The ID of the deal stage")
+            integer("stage_id").description("The ID of the deal stage")
                 .required(false),
-            number("probability").label("Probability")
-                .description("The success probability percentage of the deal")
+            number("probability").description("The success probability percentage of the deal")
                 .required(false),
-            integer("undone_activities_count").label("Undone Activities Count")
+            integer("undone_activities_count")
                 .description("The number of incomplete activities associated with the deal")
                 .required(false),
-            bool("active").label("Active")
-                .description("Whether the deal is active or not")
+            bool("active").description("Whether the deal is active or not")
                 .required(false),
-            string("last_activity_date").label("Last Activity Date")
-                .description("The date of the last activity associated with the deal")
+            string("last_activity_date").description("The date of the last activity associated with the deal")
                 .required(false),
-            string("person_name").label("Person Name")
-                .description("The name of the person associated with the deal")
+            string("person_name").description("The name of the person associated with the deal")
                 .required(false),
-            string("close_time").label("Close Time")
-                .description("The date and time of closing the deal")
+            string("close_time").description("The date and time of closing the deal")
                 .required(false),
-            integer("next_activity_id").label("Next Activity Id")
-                .description("The ID of the next activity associated with the deal")
+            integer("next_activity_id").description("The ID of the next activity associated with the deal")
                 .required(false),
-            string("weighted_value_currency").label("Weighted Value Currency")
-                .description("The currency associated with the deal")
+            string("weighted_value_currency").description("The currency associated with the deal")
                 .required(false),
-            bool("org_hidden").label("Org Hidden")
-                .description("If the organization that is associated with the deal is hidden or not")
+            bool("org_hidden").description("If the organization that is associated with the deal is hidden or not")
                 .required(false),
-            integer("stage_order_nr").label("Stage Order Nr")
-                .description("The order number of the deal stage associated with the deal")
+            integer("stage_order_nr").description("The order number of the deal stage associated with the deal")
                 .required(false),
-            string("next_activity_subject").label("Next Activity Subject")
-                .description("The subject of the next activity associated with the deal")
+            string("next_activity_subject").description("The subject of the next activity associated with the deal")
                 .required(false),
-            string("rotten_time").label("Rotten Time")
-                .description("The date and time of changing the deal status as rotten")
+            string("rotten_time").description("The date and time of changing the deal status as rotten")
                 .required(false),
-            string("name").label("Name")
-                .description("The name of the user")
+            string("name").description("The name of the user")
                 .required(false),
-            bool("has_pic").label("Has Pic")
-                .description("If the user has a picture or not")
+            bool("has_pic").description("If the user has a picture or not")
                 .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the user is active or not")
+            bool("active_flag").description("Whether the user is active or not")
                 .required(false),
-            integer("id").label("Id")
-                .description("The ID of the user")
+            integer("id").description("The ID of the user")
                 .required(false),
-            integer("value").label("Value")
-                .description("The ID of the user")
+            integer("value").description("The ID of the user")
                 .required(false),
-            string("email").label("Email")
-                .description("The email of the user")
+            string("email").description("The email of the user")
                 .required(false),
-            string("pic_hash").label("Pic Hash")
-                .description("The user picture hash")
+            string("pic_hash").description("The user picture hash")
                 .required(false),
-            string("visible_to").label("Visible To")
-                .description("The visibility of the deal")
+            string("visible_to").description("The visibility of the deal")
                 .required(false),
-            number("average_stage_progress").label("Average Stage Progress")
-                .description("The average of the deal stage progression")
+            number("average_stage_progress").description("The average of the deal stage progression")
                 .required(false),
-            string("address").label("Address")
-                .description("The address of the organization that is associated with the deal")
+            string("address").description("The address of the organization that is associated with the deal")
                 .required(false),
-            integer("owner_id").label("Owner Id")
-                .description("The ID of the owner of the organization that is associated with the deal")
+            integer("owner_id").description("The ID of the owner of the organization that is associated with the deal")
                 .required(false),
-            string("cc_email").label("Cc Email")
-                .description("The BCC email of the organization associated with the deal")
+            string("cc_email").description("The BCC email of the organization associated with the deal")
                 .required(false),
-            string("name").label("Name")
-                .description("The name of the organization associated with the deal")
+            string("name").description("The name of the organization associated with the deal")
                 .required(false),
-            bool("active_flag").label("Active Flag")
-                .description("Whether the associated organization is active or not")
+            bool("active_flag").description("Whether the associated organization is active or not")
                 .required(false),
-            integer("people_count").label("People Count")
+            integer("people_count")
                 .description("The number of people connected with the organization that is associated with the deal")
                 .required(false),
-            integer("value").label("Value")
-                .description("The ID of the organization associated with the deal")
+            integer("value").description("The ID of the organization associated with the deal")
                 .required(false),
-            integer("notes_count").label("Notes Count")
-                .description("The number of notes associated with the deal")
+            integer("notes_count").description("The number of notes associated with the deal")
                 .required(false),
-            string("next_activity_time").label("Next Activity Time")
-                .description("The time of the next activity associated with the deal")
+            string("next_activity_time").description("The time of the next activity associated with the deal")
                 .required(false),
-            string("formatted_value").label("Formatted Value")
-                .description("The deal value formatted with selected currency. E.g. US$500")
+            string("formatted_value").description("The deal value formatted with selected currency. E.g. US$500")
                 .required(false),
-            string("status").label("Status")
-                .description("The status of the deal")
+            string("status").description("The status of the deal")
                 .required(false),
-            string("formatted_weighted_value").label("Formatted Weighted Value")
+            string("formatted_weighted_value")
                 .description("The weighted_value formatted with selected currency. E.g. US$500")
                 .required(false),
-            string("first_won_time").label("First Won Time")
-                .description("The date and time of the first time changing the deal status as won")
+            string("first_won_time").description("The date and time of the first time changing the deal status as won")
                 .required(false),
-            string("last_outgoing_mail_time").label("Last Outgoing Mail Time")
+            string("last_outgoing_mail_time")
                 .description("The date and time of the last outgoing email associated with the deal")
                 .required(false),
-            object("average_time_to_won").properties(integer("y").label("Y")
-                .description("Years")
+            object("average_time_to_won").properties(integer("y").description("Years")
                 .required(false),
-                integer("m").label("M")
-                    .description("Months")
+                integer("m").description("Months")
                     .required(false),
-                integer("d").label("D")
-                    .description("Days")
+                integer("d").description("Days")
                     .required(false),
-                integer("h").label("H")
-                    .description("Hours")
+                integer("h").description("Hours")
                     .required(false),
-                integer("i").label("I")
-                    .description("Minutes")
+                integer("i").description("Minutes")
                     .required(false),
-                integer("s").label("S")
-                    .description("Seconds")
+                integer("s").description("Seconds")
                     .required(false),
-                integer("total_seconds").label("Total Seconds")
-                    .description("The total time in seconds")
+                integer("total_seconds").description("The total time in seconds")
                     .required(false))
-                .label("Average Time To Won")
                 .description("The average time to win the deal")
                 .required(false),
-            string("title").label("Title")
-                .description("The title of the deal")
+            string("title").description("The title of the deal")
                 .required(false),
-            integer("last_activity_id").label("Last Activity Id")
-                .description("The ID of the last activity associated with the deal")
+            integer("last_activity_id").description("The ID of the last activity associated with the deal")
                 .required(false),
-            string("update_time").label("Update Time")
-                .description("The last updated date and time of the deal")
+            string("update_time").description("The last updated date and time of the deal")
                 .required(false),
-            object("last_activity").label("Last Activity")
-                .description("The details of the last activity associated with the deal")
+            object("last_activity").description("The details of the last activity associated with the deal")
                 .required(false),
-            object("next_activity").label("Next Activity")
-                .description("The details of the next activity associated with the deal")
+            object("next_activity").description("The details of the next activity associated with the deal")
                 .required(false),
-            integer("activities_count").label("Activities Count")
-                .description("The number of activities associated with the deal")
+            integer("activities_count").description("The number of activities associated with the deal")
                 .required(false),
-            integer("pipeline_id").label("Pipeline Id")
-                .description("The ID of pipeline associated with the deal")
+            integer("pipeline_id").description("The ID of pipeline associated with the deal")
                 .required(false),
-            string("lost_time").label("Lost Time")
-                .description("The date and time of changing the deal status as lost")
+            string("lost_time").description("The date and time of changing the deal status as lost")
                 .required(false),
-            string("currency").label("Currency")
-                .description("The currency associated with the deal")
+            string("currency").description("The currency associated with the deal")
                 .required(false),
-            number("weighted_value").label("Weighted Value")
-                .description(
-                    "Probability times deal value. Probability can either be deal probability or if not set, then stage probability.")
+            number("weighted_value").description(
+                "Probability times deal value. Probability can either be deal probability or if not set, then stage probability.")
                 .required(false),
-            string("org_name").label("Org Name")
-                .description("The name of the organization associated with the deal")
+            string("org_name").description("The name of the organization associated with the deal")
                 .required(false),
-            number("value").label("Value")
-                .description("The value of the deal")
+            number("value").description("The value of the deal")
                 .required(false),
-            string("next_activity_note").label("Next Activity Note")
-                .description("The note of the next activity associated with the deal")
+            string("next_activity_note").description("The note of the next activity associated with the deal")
                 .required(false),
-            bool("person_hidden").label("Person Hidden")
-                .description("If the person that is associated with the deal is hidden or not")
+            bool("person_hidden").description("If the person that is associated with the deal is hidden or not")
                 .required(false),
-            integer("files_count").label("Files Count")
-                .description("The number of files associated with the deal")
+            integer("files_count").description("The number of files associated with the deal")
                 .required(false),
-            string("last_incoming_mail_time").label("Last Incoming Mail Time")
+            string("last_incoming_mail_time")
                 .description("The date and time of the last incoming email associated with the deal")
                 .required(false),
-            integer("label").label("Label")
-                .description("The label assigned to the deal")
+            integer("label").description("The label assigned to the deal")
                 .required(false),
-            string("lost_reason").label("Lost Reason")
-                .description("The reason for losing the deal")
+            string("lost_reason").description("The reason for losing the deal")
                 .required(false),
-            bool("deleted").label("Deleted")
-                .description("Whether the deal is deleted or not")
+            bool("deleted").description("Whether the deal is deleted or not")
                 .required(false),
-            string("won_time").label("Won Time")
-                .description("The date and time of changing the deal status as won")
+            string("won_time").description("The date and time of changing the deal status as won")
                 .required(false),
-            integer("followers_count").label("Followers Count")
-                .description("The number of followers associated with the deal")
+            integer("followers_count").description("The number of followers associated with the deal")
                 .required(false),
-            string("stage_change_time").label("Stage Change Time")
-                .description("The last updated date and time of the deal stage")
+            string("stage_change_time").description("The last updated date and time of the deal stage")
                 .required(false),
-            string("add_time").label("Add Time")
-                .description("The creation date and time of the deal")
+            string("add_time").description("The creation date and time of the deal")
                 .required(false),
-            integer("done_activities_count").label("Done Activities Count")
-                .description("The number of completed activities associated with the deal")
+            integer("done_activities_count").description("The number of completed activities associated with the deal")
                 .required(false),
-            object("age").properties(integer("y").label("Y")
-                .description("Years")
+            object("age").properties(integer("y").description("Years")
                 .required(false),
-                integer("m").label("M")
-                    .description("Months")
+                integer("m").description("Months")
                     .required(false),
-                integer("d").label("D")
-                    .description("Days")
+                integer("d").description("Days")
                     .required(false),
-                integer("h").label("H")
-                    .description("Hours")
+                integer("h").description("Hours")
                     .required(false),
-                integer("i").label("I")
-                    .description("Minutes")
+                integer("i").description("Minutes")
                     .required(false),
-                integer("s").label("S")
-                    .description("Seconds")
+                integer("s").description("Seconds")
                     .required(false),
-                integer("total_seconds").label("Total Seconds")
-                    .description("The total time in seconds")
+                integer("total_seconds").description("The total time in seconds")
                     .required(false))
-                .label("Age")
                 .description("The lifetime of the deal")
                 .required(false),
-            object("additional_data").properties(string("dropbox_email").label("Dropbox Email")
-                .description("The BCC email of the deal")
+            object("additional_data").properties(string("dropbox_email").description("The BCC email of the deal")
                 .required(false))
-                .label("Additional Data")
                 .required(false),
-            object("related_objects").properties(object("user").properties(integer("id").label("Id")
-                .description("The ID of the user")
-                .required(false),
-                string("name").label("Name")
-                    .description("The name of the user")
+            object("related_objects")
+                .properties(object("user").properties(integer("id").description("The ID of the user")
                     .required(false),
-                string("email").label("Email")
-                    .description("The email of the user")
-                    .required(false),
-                bool("has_pic").label("Has Pic")
-                    .description("If the user has a picture or not")
-                    .required(false),
-                string("pic_hash").label("Pic Hash")
-                    .description("The user picture hash")
-                    .required(false),
-                bool("active_flag").label("Active Flag")
-                    .description("Whether the user is active or not")
-                    .required(false))
-                .label("User")
-                .description("The user who is associated with the deal")
-                .required(false),
-                object("organization").properties(string("name").label("Name")
-                    .description("The name of the organization associated with the deal")
-                    .required(false),
-                    integer("people_count").label("People Count")
-                        .description(
-                            "The number of people connected with the organization that is associated with the deal")
+                    string("name").description("The name of the user")
                         .required(false),
-                    integer("owner_id").label("Owner Id")
-                        .description("The ID of the owner of the organization that is associated with the deal")
+                    string("email").description("The email of the user")
                         .required(false),
-                    string("address").label("Address")
-                        .description("The address of the organization that is associated with the deal")
+                    bool("has_pic").description("If the user has a picture or not")
                         .required(false),
-                    bool("active_flag").label("Active Flag")
-                        .description("Whether the associated organization is active or not")
+                    string("pic_hash").description("The user picture hash")
                         .required(false),
-                    string("cc_email").label("Cc Email")
-                        .description("The BCC email of the organization associated with the deal")
+                    bool("active_flag").description("Whether the user is active or not")
                         .required(false))
-                    .label("Organization")
-                    .description("The organization which is associated with the deal")
+                    .description("The user who is associated with the deal")
                     .required(false),
-                object("person").properties(bool("active_flag").label("Active Flag")
-                    .description("Whether the associated person is active or not")
-                    .required(false),
-                    string("name").label("Name")
-                        .description("The name of the person associated with the deal")
+                    object("organization").properties(string("name").description(
+                        "The name of the organization associated with the deal")
                         .required(false),
-                    array("email").items(object().properties(string("label").label("Label")
-                        .description("The type of the email")
-                        .required(false),
-                        string("value").label("Value")
-                            .description("The email of the associated person")
+                        integer("people_count")
+                            .description(
+                                "The number of people connected with the organization that is associated with the deal")
                             .required(false),
-                        bool("primary").label("Primary")
-                            .description("If this is the primary email or not")
-                            .required(false))
-                        .description("The emails of the person associated with the deal"))
-                        .placeholder("Add")
-                        .label("Email")
-                        .description("The emails of the person associated with the deal")
-                        .required(false),
-                    array("phone").items(object().properties(string("label").label("Label")
-                        .description("The type of the phone number")
-                        .required(false),
-                        string("value").label("Value")
-                            .description("The phone number of the person associated with the deal")
+                        integer("owner_id").description(
+                            "The ID of the owner of the organization that is associated with the deal")
                             .required(false),
-                        bool("primary").label("Primary")
-                            .description("If this is the primary phone number or not")
+                        string("address").description(
+                            "The address of the organization that is associated with the deal")
+                            .required(false),
+                        bool("active_flag").description("Whether the associated organization is active or not")
+                            .required(false),
+                        string("cc_email").description("The BCC email of the organization associated with the deal")
                             .required(false))
-                        .description("The phone numbers of the person associated with the deal"))
-                        .placeholder("Add")
-                        .label("Phone")
-                        .description("The phone numbers of the person associated with the deal")
+                        .description("The organization which is associated with the deal")
                         .required(false),
-                    integer("owner_id").label("Owner Id")
-                        .description("The ID of the owner of the person that is associated with the deal")
+                    object("person")
+                        .properties(bool("active_flag").description("Whether the associated person is active or not")
+                            .required(false),
+                            string("name").description("The name of the person associated with the deal")
+                                .required(false),
+                            array("email")
+                                .items(object().properties(string("label").description("The type of the email")
+                                    .required(false),
+                                    string("value").description("The email of the associated person")
+                                        .required(false),
+                                    bool("primary").description("If this is the primary email or not")
+                                        .required(false))
+                                    .description("The emails of the person associated with the deal"))
+                                .description("The emails of the person associated with the deal")
+                                .required(false),
+                            array("phone").items(object().properties(
+                                string("label").description("The type of the phone number")
+                                    .required(false),
+                                string("value").description("The phone number of the person associated with the deal")
+                                    .required(false),
+                                bool("primary").description("If this is the primary phone number or not")
+                                    .required(false))
+                                .description("The phone numbers of the person associated with the deal"))
+                                .description("The phone numbers of the person associated with the deal")
+                                .required(false),
+                            integer("owner_id")
+                                .description("The ID of the owner of the person that is associated with the deal")
+                                .required(false))
+                        .description("The person who is associated with the deal")
                         .required(false))
-                    .label("Person")
-                    .description("The person who is associated with the deal")
-                    .required(false))
-                .label("Related Objects")
                 .required(false))
             .metadata(
                 Map.of(

@@ -32,7 +32,7 @@ import java.util.List;
  * @generated
  */
 public class PetstorePetProperties {
-    public static final List<Property> PROPERTIES = List.of(integer("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(integer("id").label("Id")
         .required(false)
         .exampleValue(10),
         string("name").label("Name")
@@ -42,11 +42,11 @@ public class PetstorePetProperties {
             .label("Category")
             .required(false),
         array("photoUrls").items(string())
-            .placeholder("Add")
+            .placeholder("Add to Photo Urls")
             .label("Photo Urls")
             .required(true),
         array("tags").items(object().properties(PetstoreTagProperties.PROPERTIES))
-            .placeholder("Add")
+            .placeholder("Add to Tags")
             .label("Tags")
             .required(false),
         string("status").label("Status")

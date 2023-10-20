@@ -30,7 +30,7 @@ import java.util.List;
  * @generated
  */
 public class JiraJsonTypeBeanProperties {
-    public static final List<Property> PROPERTIES = List.of(string("type").label("Type")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("type").label("Type")
         .description("The data type of the field.")
         .required(true),
         string("items").label("Items")
@@ -46,7 +46,7 @@ public class JiraJsonTypeBeanProperties {
             .description("If the field is a custom field, the custom ID of the field.")
             .required(false),
         object("configuration").additionalProperties(object())
-            .placeholder("Add")
+            .placeholder("Add to Configuration")
             .label("Configuration")
             .description("If the field is a custom field, the configuration of the field.")
             .required(false));

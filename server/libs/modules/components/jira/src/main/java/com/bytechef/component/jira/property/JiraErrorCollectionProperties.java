@@ -31,15 +31,16 @@ import java.util.List;
  * @generated
  */
 public class JiraErrorCollectionProperties {
-    public static final List<Property> PROPERTIES = List.of(array("errorMessages").items(string().description(
-        "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\""))
-        .placeholder("Add")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(array("errorMessages")
+        .items(string().description(
+            "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\""))
+        .placeholder("Add to Error Messages")
         .label("Error Messages")
         .description(
             "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"")
         .required(false),
         object("errors").additionalProperties(string())
-            .placeholder("Add")
+            .placeholder("Add to Errors")
             .label("Errors")
             .description(
                 "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"")

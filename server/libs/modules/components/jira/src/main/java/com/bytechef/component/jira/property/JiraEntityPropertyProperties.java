@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class JiraEntityPropertyProperties {
-    public static final List<Property> PROPERTIES = List.of(string("key").label("Key")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("key").label("Key")
         .description("The key of the property. Required on create and update.")
         .required(false),
         object("value").label("Value")

@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class JiraStatusDetailsProperties {
-    public static final List<Property> PROPERTIES = List.of(string("self").label("Self")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("self").label("Self")
         .description("The URL of the status.")
         .required(false),
         string("description").label("Description")

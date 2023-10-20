@@ -44,7 +44,7 @@ public class PetstoreFindPetsByTagsAction {
 
             ))
         .properties(array("tags").items(string())
-            .placeholder("Add")
+            .placeholder("Add to Tags")
             .label("Tags")
             .description("Tags to filter by")
             .required(false)

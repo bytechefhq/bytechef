@@ -30,7 +30,7 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueBeanProperties {
-    public static final List<Property> PROPERTIES = List.of(string("expand").label("Expand")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("expand").label("Expand")
         .description("Expand options that include additional issue details in the response.")
         .required(false),
         string("id").label("Id")
@@ -43,28 +43,28 @@ public class JiraIssueBeanProperties {
             .description("The key of the issue.")
             .required(false),
         object("renderedFields").additionalProperties(object())
-            .placeholder("Add")
+            .placeholder("Add to Rendered Fields")
             .label("Rendered Fields")
             .description("The rendered value of each field present on the issue.")
             .required(false),
         object("properties").additionalProperties(object())
-            .placeholder("Add")
+            .placeholder("Add to Properties")
             .label("Properties")
             .description("Details of the issue properties identified in the request.")
             .required(false),
         object("names").additionalProperties(string())
-            .placeholder("Add")
+            .placeholder("Add to Names")
             .label("Names")
             .description("The ID and name of each field present on the issue.")
             .required(false),
         object("schema").additionalProperties(object().properties(JiraJsonTypeBeanProperties.PROPERTIES))
-            .placeholder("Add")
+            .placeholder("Add to Schema")
             .label("Schema")
             .description("The schema describing each field present on the issue.")
             .required(false),
         array("transitions").items(object().properties(JiraIssueTransitionProperties.PROPERTIES)
             .description("Details of an issue transition."))
-            .placeholder("Add")
+            .placeholder("Add to Transitions")
             .label("Transitions")
             .description("The transitions that can be performed on the issue.")
             .required(false),
@@ -81,7 +81,7 @@ public class JiraIssueBeanProperties {
             .description("A page of changelogs.")
             .required(false),
         object("versionedRepresentations").additionalProperties(object())
-            .placeholder("Add")
+            .placeholder("Add to Versioned Representations")
             .label("Versioned Representations")
             .description("The versions of each field on the issue.")
             .required(false),
@@ -89,7 +89,7 @@ public class JiraIssueBeanProperties {
             .label("Fields To Include")
             .required(false),
         object("fields").additionalProperties(object())
-            .placeholder("Add")
+            .placeholder("Add to Fields")
             .label("Fields")
             .required(false));
 }

@@ -31,7 +31,7 @@ import java.util.List;
  * @generated
  */
 public class JiraChangelogProperties {
-    public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
         .description("The ID of the changelog.")
         .required(false),
         object("author").properties(JiraUserDetailsProperties.PROPERTIES)
@@ -48,7 +48,7 @@ public class JiraChangelogProperties {
             .required(false),
         array("items").items(object().properties(JiraChangeDetailsProperties.PROPERTIES)
             .description("A change item."))
-            .placeholder("Add")
+            .placeholder("Add to Items")
             .label("Items")
             .description("The list of items changed.")
             .required(false),

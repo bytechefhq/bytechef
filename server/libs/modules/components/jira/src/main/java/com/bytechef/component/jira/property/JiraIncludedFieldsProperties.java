@@ -29,16 +29,16 @@ import java.util.List;
  * @generated
  */
 public class JiraIncludedFieldsProperties {
-    public static final List<Property> PROPERTIES = List.of(array("actuallyIncluded").items(string())
-        .placeholder("Add")
+    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(array("actuallyIncluded").items(string())
+        .placeholder("Add to Actually Included")
         .label("Actually Included")
         .required(false),
         array("excluded").items(string())
-            .placeholder("Add")
+            .placeholder("Add to Excluded")
             .label("Excluded")
             .required(false),
         array("included").items(string())
-            .placeholder("Add")
+            .placeholder("Add to Included")
             .label("Included")
             .required(false));
 }
