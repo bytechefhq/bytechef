@@ -38,7 +38,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,7 +81,6 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name1");
-        connection.setParameters(Collections.emptyMap());
         connection.setTags(List.of(new Tag("tag1")));
 
         connection = connectionFacade.create(connection);
@@ -98,7 +96,6 @@ public class ConnectionFacadeIntTest {
 
         connection1.setComponentName("componentName");
         connection1.setName("name1");
-        connection1.setParameters(Collections.emptyMap());
         connection1.setTags(List.of(new Tag("tag1")));
 
         connection1 = connectionFacade.create(connection1);
@@ -107,7 +104,6 @@ public class ConnectionFacadeIntTest {
 
         connection2.setComponentName("componentName");
         connection2.setName("name2");
-        connection2.setParameters(Collections.emptyMap());
         connection2.setTags(List.of(new Tag("tag1")));
 
         connection2 = connectionFacade.create(connection2);
@@ -130,7 +126,6 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setParameters(Collections.emptyMap());
         connection.setName("name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -150,7 +145,6 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setParameters(Collections.emptyMap());
         connection.setName("name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -180,7 +174,6 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
-        connection.setParameters(Collections.emptyMap());
         connection.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
         connectionRepository.save(connection);
@@ -193,7 +186,6 @@ public class ConnectionFacadeIntTest {
         connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setParameters(Collections.emptyMap());
         connection.setName("name2");
 
         tag1 = tagRepository.findById(tag1.getId())
@@ -221,7 +213,6 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setParameters(Collections.emptyMap());
         connection.setName("name");
 
         Tag tag1 = new Tag("tag1");

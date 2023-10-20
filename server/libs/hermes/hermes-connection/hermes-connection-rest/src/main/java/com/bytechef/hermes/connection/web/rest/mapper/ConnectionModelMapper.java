@@ -30,6 +30,8 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = ConnectionMapperSpringConfig.class)
 public interface ConnectionModelMapper extends Converter<ConnectionModel, Connection> {
 
+    @Mapping(target = "parameters", source = "parameters")
+    @Mapping(target = "update", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
     Connection convert(ConnectionModel connectionModel);
 }
