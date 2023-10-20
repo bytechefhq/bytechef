@@ -6,18 +6,24 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(project.id!);
 
     return (
-        <ul className="pb-4 pl-2 pr-4">
-            {workflows?.map((workflow) => (
-                <li key={workflow.id} className="mb-2">
-                    <Link
-                        className="text-base text-gray-900"
-                        to={`/automation/projects/${project.id}/workflow/${workflow.id}`}
-                    >
-                        {workflow.label}
-                    </Link>
-                </li>
-            ))}
-        </ul>
+        <div className="rounded-b-md border bg-gray-100 p-4">
+            <h3 className="mb-2 text-sm font-bold uppercase text-gray-500">
+                Workflows
+            </h3>
+
+            <ul className="space-y-2">
+                {workflows?.map((workflow) => (
+                    <li key={workflow.id}>
+                        <Link
+                            className="text-sm"
+                            to={`/automation/projects/${project.id}/workflow/${workflow.id}`}
+                        >
+                            {workflow.label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </div>
     );
 };
 
