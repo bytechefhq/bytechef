@@ -18,7 +18,6 @@
 package com.bytechef.hermes.integration.domain;
 
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -79,7 +78,6 @@ public final class Integration implements Persistable<Long> {
     private LocalDateTime lastModifiedDate;
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     public Integration() {
@@ -167,6 +165,10 @@ public final class Integration implements Persistable<Long> {
             .stream()
             .map(IntegrationTag::getTagId)
             .collect(Collectors.toSet());
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     @Override

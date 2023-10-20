@@ -24,7 +24,6 @@ import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.utils.MapUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -126,7 +125,6 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private List<WorkflowTask> tasks = Collections.emptyList();
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     public Workflow() {

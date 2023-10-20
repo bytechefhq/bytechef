@@ -31,7 +31,6 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -141,7 +140,6 @@ public final class TaskExecution
     private int taskNumber = DEFAULT_TASK_NUMBER;
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     @Column("workflow_task")

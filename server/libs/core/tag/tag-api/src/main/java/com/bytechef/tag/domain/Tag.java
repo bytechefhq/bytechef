@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -61,7 +60,6 @@ public class Tag implements Persistable<Long>, Serializable {
     private String name;
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     public Tag() {
@@ -93,6 +91,10 @@ public class Tag implements Persistable<Long>, Serializable {
 
     public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     @Override
