@@ -1,0 +1,18 @@
+server:
+  port: 9999
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: platform-connections-endpoint
+          uri: lb://platform-service-app/
+          predicates:
+            - Path=/connections/**
+
+springdoc:
+  api-docs:
+    enabled: true

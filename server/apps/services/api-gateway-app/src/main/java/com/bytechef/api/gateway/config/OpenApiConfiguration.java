@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class OpenAPIConfiguration {
+public class OpenApiConfiguration {
 
     @Bean
     @SuppressWarnings("PMD.NP")

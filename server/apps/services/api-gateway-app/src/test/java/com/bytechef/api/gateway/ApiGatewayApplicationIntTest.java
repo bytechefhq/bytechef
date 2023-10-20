@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef;
+package com.bytechef.api.gateway;
 
+import com.bytechef.test.extension.RedisTestContainerExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(RedisTestContainerExtension.class)
 @SpringBootTest
 public class ApiGatewayApplicationIntTest {
 
