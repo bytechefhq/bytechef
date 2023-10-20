@@ -5,6 +5,40 @@ info:
 servers:
   - url: http://localhost:5173/api
 paths:
+  /integration-categories:
+    get:
+      description: Get categories.
+      summary: Get categories.
+      tags:
+        - integration-categories
+      operationId: getIntegrationCategories
+      responses:
+        "200":
+          description: The list of categories.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of categories.
+                type: array
+                items:
+                  $ref: '../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+  /integration-tags:
+    get:
+      description: Get integration tags.
+      summary: Get integration tags.
+      tags:
+        - integration-tags
+      operationId: getIntegrationTags
+      responses:
+        "200":
+          description: The list of integration tags.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of tags.
+                type: array
+                items:
+                  $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
   /integrations:
     get:
       description: Get integrations.
@@ -59,40 +93,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
-  /integrations/categories:
-    get:
-      description: Get categories.
-      summary: Get categories.
-      tags:
-        - integrations
-      operationId: getIntegrationCategories
-      responses:
-        "200":
-          description: The list of categories.
-          content:
-            application/json:
-              schema:
-                description: The response object that contains the array of categories.
-                type: array
-                items:
-                  $ref: '../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
-  /integrations/tags:
-    get:
-      description: Get integration tags.
-      summary: Get integration tags.
-      tags:
-        - integrations
-      operationId: getIntegrationTags
-      responses:
-        "200":
-          description: The list of integration tags.
-          content:
-            application/json:
-              schema:
-                description: The response object that contains the array of tags.
-                type: array
-                items:
-                  $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
   /integrations/{id}:
     delete:
       description: Delete an integration.
