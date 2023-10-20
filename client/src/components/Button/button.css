@@ -2,11 +2,11 @@
 
 @layer components {
     .btn {
-        @apply px-4 py-2 leading-4 rounded-md border border-solid border-transparent text-sm font-medium text-white inline-flex items-center hover:cursor-pointer;
+        @apply px-4 py-2 rounded-md border border-transparent text-sm font-medium inline-flex items-center hover:cursor-pointer;
     }
 
     .btn-primary {
-        @apply bg-gray-900 font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-sky-500 dark:hover:bg-sky-400;
+        @apply bg-gray-900 font-medium text-white shadow-sm text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-sky-500 dark:hover:bg-sky-400;
     }
 
     .btn-secondary {
@@ -14,15 +14,15 @@
     }
 
     .btn-light {
-        @apply border-white bg-white hover:bg-gray-50  hover:border-gray-50 text-gray-900 dark:bg-sky-500 dark:hover:bg-sky-400;
+        @apply border-solid border-white bg-white hover:bg-gray-50  hover:border-gray-50 text-gray-900 dark:bg-sky-500 dark:hover:bg-sky-400;
     }
 
     .btn-light-border {
-        @apply border-gray-100 bg-white hover:bg-gray-100  hover:border-gray-100 text-gray-900 dark:bg-sky-500 dark:hover:bg-sky-400;
+        @apply border-solid border-gray-100 bg-white hover:bg-gray-100  hover:border-gray-100 text-gray-900 dark:bg-sky-500 dark:hover:bg-sky-400;
     }
 
     .btn-danger {
-        @apply bg-rose-500 hover:bg-rose-800 hover:text-white;
+        @apply bg-rose-500 hover:bg-rose-800 text-white hover:text-white;
     }
 
     .btn-unstyled {
