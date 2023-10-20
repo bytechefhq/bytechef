@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * A type of property.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.955206+02:00[Europe/Zagreb]")
 public enum PropertyTypeModel {
   
   ARRAY("ARRAY"),

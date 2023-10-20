@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.955206+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "the action-definitions API")
 public interface ComponentDefinitionsApi {
@@ -101,7 +101,7 @@ public interface ComponentDefinitionsApi {
         operationId = "getComponentConnectionDefinition",
         summary = "Get connection definition for a component.",
         description = "Get connection definition for a component.",
-        tags = { "connection-definitions" },
+        tags = { "component-definitions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionDefinitionModel.class))
@@ -144,7 +144,7 @@ public interface ComponentDefinitionsApi {
         operationId = "getComponentConnectionDefinitions",
         summary = "Get all compatible connection definitions for a component.",
         description = "Get all compatible connection definitions for a component.",
-        tags = { "connection-definitions" },
+        tags = { "component-definitions" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectionDefinitionBasicModel.class)))
@@ -179,8 +179,8 @@ public interface ComponentDefinitionsApi {
      * GET /component-definitions/{componentName}/{componentVersion} : Get a component definition.
      * Get a component definition.
      *
-     * @param componentName The name of the component to get. (required)
-     * @param componentVersion The version of the component to get. (required)
+     * @param componentName The name of a component to get. (required)
+     * @param componentVersion The version of a component to get. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -200,8 +200,8 @@ public interface ComponentDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<ComponentDefinitionWithBasicActionsModel>> getComponentDefinition(
-        @Parameter(name = "componentName", description = "The name of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -222,7 +222,7 @@ public interface ComponentDefinitionsApi {
      * GET /component-definitions/{componentName} : Get all component definition versions of a component definition.
      * Get all component definition versions of a component definition.
      *
-     * @param componentName The name of the component to get. (required)
+     * @param componentName The name of a component to get. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -242,7 +242,7 @@ public interface ComponentDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<ComponentDefinitionBasicModel>>> getComponentDefinitionVersions(
-        @Parameter(name = "componentName", description = "The name of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();

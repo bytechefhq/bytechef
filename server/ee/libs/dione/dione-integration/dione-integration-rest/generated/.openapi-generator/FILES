@@ -4,4 +4,4 @@ src/main/java/com/bytechef/dione/integration/web/rest/IntegrationTagsApi.java
 src/main/java/com/bytechef/dione/integration/web/rest/IntegrationsApi.java
 src/main/java/com/bytechef/dione/integration/web/rest/model/CreateIntegrationWorkflowRequestModel.java
 src/main/java/com/bytechef/dione/integration/web/rest/model/IntegrationModel.java
-src/main/java/com/bytechef/dione/integration/web/rest/model/UpdateIntegrationTagsRequestModel.java
+src/main/java/com/bytechef/dione/integration/web/rest/model/UpdateTagsRequestModel.java

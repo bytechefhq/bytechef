@@ -35,10 +35,94 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.955206+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-dispatcher-definitions", description = "the task-dispatcher-definitions API")
 public interface TaskDispatcherDefinitionsApi {
+
+    /**
+     * GET /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion} : Get a task dispatcher definition.
+     * Get a task dispatcher definition.
+     *
+     * @param taskDispatcherName The name of a task dispatcher to get. (required)
+     * @param taskDispatcherVersion The version of a task dispatcher to get. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getTaskDispatcherDefinition",
+        summary = "Get a task dispatcher definition.",
+        description = "Get a task dispatcher definition.",
+        tags = { "task-dispatcher-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDispatcherDefinitionModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}",
+        produces = { "application/json" }
+    )
+    default Mono<ResponseEntity<TaskDispatcherDefinitionModel>> getTaskDispatcherDefinition(
+        @Parameter(name = "taskDispatcherName", description = "The name of a task dispatcher to get.", required = true, in = ParameterIn.PATH) @PathVariable("taskDispatcherName") String taskDispatcherName,
+        @Parameter(name = "taskDispatcherVersion", description = "The version of a task dispatcher to get.", required = true, in = ParameterIn.PATH) @PathVariable("taskDispatcherVersion") Integer taskDispatcherVersion,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"taskProperties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"version\" : 0, \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(Mono.empty());
+
+    }
+
+
+    /**
+     * GET /task-dispatcher-definitions/{taskDispatcherName} : Get all task dispatcher definition versions of a component definition.
+     * Get all task dispatcher definition versions of a task dispatcher definition.
+     *
+     * @param taskDispatcherName The name of a task dispatcher to get. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getTaskDispatcherDefinitionVersions",
+        summary = "Get all task dispatcher definition versions of a component definition.",
+        description = "Get all task dispatcher definition versions of a task dispatcher definition.",
+        tags = { "task-dispatcher-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TaskDispatcherDefinitionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/task-dispatcher-definitions/{taskDispatcherName}",
+        produces = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitionVersions(
+        @Parameter(name = "taskDispatcherName", description = "The name of a task dispatcher to get.", required = true, in = ParameterIn.PATH) @PathVariable("taskDispatcherName") String taskDispatcherName,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"taskProperties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"version\" : 0, \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, { \"taskProperties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"version\" : 0, \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(Mono.empty());
+
+    }
+
 
     /**
      * GET /task-dispatcher-definitions : Get all task dispatcher definitions.

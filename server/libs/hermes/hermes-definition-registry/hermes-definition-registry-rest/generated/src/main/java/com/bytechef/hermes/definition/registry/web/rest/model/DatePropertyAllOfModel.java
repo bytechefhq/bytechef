@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DateProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.955206+02:00[Europe/Zagreb]")
 public class DatePropertyAllOfModel {
 
   @JsonProperty("options")
@@ -48,11 +48,11 @@ public class DatePropertyAllOfModel {
   }
 
   /**
-   * A list of valid property options.
+   * The list of valid property options.
    * @return options
   */
   @Valid 
-  @Schema(name = "options", description = "A list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<OptionModel> getOptions() {
     return options;
   }

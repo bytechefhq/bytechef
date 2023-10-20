@@ -46,6 +46,8 @@ public interface ProjectFacade {
 
     List<Category> getProjectCategories();
 
+    List<Tag> getProjectInstanceTags();
+
     List<Tag> getProjectTags();
 
     List<Workflow> getProjectWorkflows(Long id);

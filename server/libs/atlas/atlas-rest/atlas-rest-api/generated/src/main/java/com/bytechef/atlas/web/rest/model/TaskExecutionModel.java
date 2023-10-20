@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.067916+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   @JsonProperty("createdBy")
@@ -36,9 +36,9 @@ public class TaskExecutionModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("endTime")
+  @JsonProperty("endDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime endTime;
+  private LocalDateTime endDate;
 
   @JsonProperty("error")
   private ExecutionErrorModel error;
@@ -83,9 +83,9 @@ public class TaskExecutionModel {
   @JsonProperty("retryDelayFactor")
   private Integer retryDelayFactor;
 
-  @JsonProperty("startTime")
+  @JsonProperty("startDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime startTime;
+  private LocalDateTime startDate;
 
   /**
    * The current status of this task.
@@ -181,23 +181,23 @@ public class TaskExecutionModel {
     this.createdDate = createdDate;
   }
 
-  public TaskExecutionModel endTime(LocalDateTime endTime) {
-    this.endTime = endTime;
+  public TaskExecutionModel endDate(LocalDateTime endDate) {
+    this.endDate = endDate;
     return this;
   }
 
   /**
    * The time when this task instance ended (CANCELLED, FAILED, COMPLETED).
-   * @return endTime
+   * @return endDate
   */
   @Valid 
-  @Schema(name = "endTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when this task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public LocalDateTime getEndTime() {
-    return endTime;
+  @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when this task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public LocalDateTime getEndDate() {
+    return endDate;
   }
 
-  public void setEndTime(LocalDateTime endTime) {
-    this.endTime = endTime;
+  public void setEndDate(LocalDateTime endDate) {
+    this.endDate = endDate;
   }
 
   public TaskExecutionModel error(ExecutionErrorModel error) {
@@ -466,23 +466,23 @@ public class TaskExecutionModel {
     this.retryDelayFactor = retryDelayFactor;
   }
 
-  public TaskExecutionModel startTime(LocalDateTime startTime) {
-    this.startTime = startTime;
+  public TaskExecutionModel startDate(LocalDateTime startDate) {
+    this.startDate = startDate;
     return this;
   }
 
   /**
    * The time when this task instance was started.
-   * @return startTime
+   * @return startDate
   */
   @Valid 
-  @Schema(name = "startTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when this task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
-  public LocalDateTime getStartTime() {
-    return startTime;
+  @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when this task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
+  public LocalDateTime getStartDate() {
+    return startDate;
   }
 
-  public void setStartTime(LocalDateTime startTime) {
-    this.startTime = startTime;
+  public void setStartDate(LocalDateTime startDate) {
+    this.startDate = startDate;
   }
 
   public TaskExecutionModel status(StatusEnum status) {
@@ -591,7 +591,7 @@ public class TaskExecutionModel {
     TaskExecutionModel taskExecution = (TaskExecutionModel) o;
     return Objects.equals(this.createdBy, taskExecution.createdBy) &&
         Objects.equals(this.createdDate, taskExecution.createdDate) &&
-        Objects.equals(this.endTime, taskExecution.endTime) &&
+        Objects.equals(this.endDate, taskExecution.endDate) &&
         Objects.equals(this.error, taskExecution.error) &&
         Objects.equals(this.executionTime, taskExecution.executionTime) &&
         Objects.equals(this.id, taskExecution.id) &&
@@ -606,7 +606,7 @@ public class TaskExecutionModel {
         Objects.equals(this.retryAttempts, taskExecution.retryAttempts) &&
         Objects.equals(this.retryDelay, taskExecution.retryDelay) &&
         Objects.equals(this.retryDelayFactor, taskExecution.retryDelayFactor) &&
-        Objects.equals(this.startTime, taskExecution.startTime) &&
+        Objects.equals(this.startDate, taskExecution.startDate) &&
         Objects.equals(this.status, taskExecution.status) &&
         Objects.equals(this.taskNumber, taskExecution.taskNumber) &&
         Objects.equals(this.retryDelayMillis, taskExecution.retryDelayMillis) &&
@@ -616,7 +616,7 @@ public class TaskExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endTime, error, executionTime, id, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startTime, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, id, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
   }
 
   @Override
@@ -625,7 +625,7 @@ public class TaskExecutionModel {
     sb.append("class TaskExecutionModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
-    sb.append("    endTime: ").append(toIndentedString(endTime)).append("\n");
+    sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    executionTime: ").append(toIndentedString(executionTime)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
@@ -640,7 +640,7 @@ public class TaskExecutionModel {
     sb.append("    retryAttempts: ").append(toIndentedString(retryAttempts)).append("\n");
     sb.append("    retryDelay: ").append(toIndentedString(retryDelay)).append("\n");
     sb.append("    retryDelayFactor: ").append(toIndentedString(retryDelayFactor)).append("\n");
-    sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
+    sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    taskNumber: ").append(toIndentedString(taskNumber)).append("\n");
     sb.append("    retryDelayMillis: ").append(toIndentedString(retryDelayMillis)).append("\n");
