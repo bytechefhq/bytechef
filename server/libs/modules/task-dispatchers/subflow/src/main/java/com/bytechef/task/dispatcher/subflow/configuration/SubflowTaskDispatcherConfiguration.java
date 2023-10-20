@@ -33,7 +33,7 @@ public class SubflowTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Bean
-    TaskDispatcherResolverFactory subflowTaskDispatcherFactory() {
+    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker);
     }
 }
