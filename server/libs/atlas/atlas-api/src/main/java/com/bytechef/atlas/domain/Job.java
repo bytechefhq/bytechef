@@ -318,7 +318,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public void setParentTaskExecutionId(Long parentTaskExecutionId) {
         if (parentTaskExecutionId != null) {
-            this.parentTaskExecutionRef = new AggregateReference.IdOnlyAggregateReference<>(parentTaskExecutionId);
+            this.parentTaskExecutionRef = AggregateReference.to(parentTaskExecutionId);
         }
     }
 

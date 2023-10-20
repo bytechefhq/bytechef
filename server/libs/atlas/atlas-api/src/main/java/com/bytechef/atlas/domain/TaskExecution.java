@@ -160,10 +160,10 @@ public final class TaskExecution
     }
 
     private TaskExecution(Long jobId, Long parentId, int priority, int taskNumber, WorkflowTask workflowTask) {
-        this.jobRef = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+        this.jobRef = AggregateReference.to(jobId);
 
         if (parentId != null) {
-            this.parentRef = new AggregateReference.IdOnlyAggregateReference<>(parentId);
+            this.parentRef = AggregateReference.to(parentId);
         }
 
         this.priority = priority;
@@ -463,7 +463,7 @@ public final class TaskExecution
 
     public void setJobId(Long jobId) {
         if (jobId != null) {
-            this.jobRef = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+            this.jobRef = AggregateReference.to(jobId);
         }
     }
 
@@ -479,7 +479,7 @@ public final class TaskExecution
 
     public void setParentId(Long parentId) {
         if (parentId != null) {
-            this.parentRef = new AggregateReference.IdOnlyAggregateReference<>(parentId);
+            this.parentRef = AggregateReference.to(parentId);
         }
     }
 
