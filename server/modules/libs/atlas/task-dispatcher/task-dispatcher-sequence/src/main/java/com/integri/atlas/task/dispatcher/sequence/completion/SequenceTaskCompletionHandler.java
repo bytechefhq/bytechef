@@ -116,39 +116,11 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             taskExecutionRepository.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
-        }
-        // no more tasks to execute -- complete the sequence
-        else {
-            Context parentContext;
-
-            // If is root level, get the job's context
-            if (sequenceTaskExecution.getParentId() == null) {
-                parentContext = contextRepository.peek(sequenceTaskExecution.getJobId());
-            }
-            // otherwise get its parent's context
-            else {
-                parentContext = contextRepository.peek(sequenceTaskExecution.getParentId());
-            }
-
-            Context thisContext = contextRepository.peek(sequenceTaskExecution.getId());
-            MapContext newContext = new MapContext(parentContext);
-
-            newContext.putAll(thisContext.asMap());
-
-            contextRepository.push(taskExecution.getJobId(), newContext);
-
+        } else {
             sequenceTaskExecution.setEndTime(new Date());
             sequenceTaskExecution.setExecutionTime(
                 sequenceTaskExecution.getEndTime().getTime() - sequenceTaskExecution.getStartTime().getTime()
             );
-
-            List<TaskExecution> children = taskExecutionRepository.findByParentId(taskExecution.getParentId());
-
-            if (!children.isEmpty()) {
-                TaskExecution lastTaskExecution = children.get(children.size() - 1);
-
-                sequenceTaskExecution.setOutput(lastTaskExecution.getOutput());
-            }
 
             taskCompletionHandler.handle(sequenceTaskExecution);
         }
