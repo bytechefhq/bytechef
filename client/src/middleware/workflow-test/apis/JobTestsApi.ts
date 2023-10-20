@@ -30,7 +30,7 @@ export interface TestWorkflowRequest {
 /**
  * 
  */
-export class WorkflowTestsApi extends runtime.BaseAPI {
+export class JobTestsApi extends runtime.BaseAPI {
 
     /**
      * Create a request for testing a workflow.
