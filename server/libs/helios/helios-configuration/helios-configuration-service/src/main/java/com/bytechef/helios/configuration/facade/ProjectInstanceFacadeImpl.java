@@ -242,6 +242,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         projectInstanceService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
+    @Override
+    public ProjectInstanceWorkflow updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        return projectInstanceWorkflowService.update(projectInstanceWorkflow);
+    }
+
     private LocalDateTime getLastExecutionDate(long projectInstanceId) {
         LocalDateTime lastExecutionDate = null;
 

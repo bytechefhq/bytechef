@@ -37,8 +37,6 @@ public interface ProjectInstanceMapper extends Converter<ProjectInstanceDTO, Pro
     @Override
     ProjectInstanceModel convert(ProjectInstanceDTO projectInstanceDTO);
 
-    ProjectInstanceWorkflowModel map(ProjectInstanceWorkflow projectInstanceWorkflow);
-
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "tags", ignore = true)
     ProjectModel map(Project project);

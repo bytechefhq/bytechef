@@ -104,6 +104,11 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
+    public ProjectInstanceWorkflow update(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
         throw new UnsupportedOperationException();
     }

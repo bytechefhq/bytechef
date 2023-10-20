@@ -99,6 +99,19 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    public ProjectInstanceWorkflow update(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        ProjectInstanceWorkflow curProjectInstanceWorkflow = OptionalUtils.get(
+            projectInstanceWorkflowRepository.findById(Objects.requireNonNull(projectInstanceWorkflow.getId())));
+
+        curProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
+        curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
+        curProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
+        curProjectInstanceWorkflow.setVersion(projectInstanceWorkflow.getVersion());
+
+        return projectInstanceWorkflowRepository.save(curProjectInstanceWorkflow);
+    }
+
+    @Override
     @SuppressFBWarnings("NP")
     public List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
         Assert.notNull(projectInstanceWorkflows, "'projectInstanceWorkflows' must not be null");
@@ -106,15 +119,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
         List<ProjectInstanceWorkflow> updatedProjectInstanceWorkflows = new ArrayList<>();
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            ProjectInstanceWorkflow curProjectInstanceWorkflow = OptionalUtils.get(
-                projectInstanceWorkflowRepository.findById(Objects.requireNonNull(projectInstanceWorkflow.getId())));
-
-            curProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
-            curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
-            curProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
-            curProjectInstanceWorkflow.setVersion(projectInstanceWorkflow.getVersion());
-
-            updatedProjectInstanceWorkflows.add(projectInstanceWorkflowRepository.save(curProjectInstanceWorkflow));
+            updatedProjectInstanceWorkflows.add(update(projectInstanceWorkflow));
         }
 
         return updatedProjectInstanceWorkflows;
