@@ -19,11 +19,12 @@
 
 package com.bytechef.atlas.task.evaluator;
 
-import com.bytechef.commons.utils.UUIDUtils;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
+
+import java.util.UUID;
 
 /**
  * @author Arik Cohen
@@ -32,7 +33,7 @@ import org.springframework.expression.TypedValue;
 class Uuid implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        return new TypedValue(UUIDUtils.generate());
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        return new TypedValue(UUID.randomUUID());
     }
 }
