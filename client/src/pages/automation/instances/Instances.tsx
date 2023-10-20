@@ -5,7 +5,7 @@ import React from 'react';
 export const Instances = () => {
     return (
         <LayoutContainer
-            header={<PageHeader title="All Instances" />}
+            header={<PageHeader position="main" title="All Instances" />}
             leftSidebarHeader={<PageHeader leftSidebar title="Instances" />}
         ></LayoutContainer>
     );
