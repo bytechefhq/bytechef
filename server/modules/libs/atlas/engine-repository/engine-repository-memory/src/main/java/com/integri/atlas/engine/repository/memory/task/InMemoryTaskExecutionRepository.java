@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.util.Assert;
 
 /**
@@ -40,6 +41,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         TaskExecution taskExecution = executions.get(aId);
         Assert.notNull(taskExecution, "unknown task execution: " + aId);
         return taskExecution;
+    }
+
+    @Override
+    public List<TaskExecution> findByJobId(String jobId) {
+        return executions
+            .values()
+            .stream()
+            .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
+            .toList();
     }
 
     @Override

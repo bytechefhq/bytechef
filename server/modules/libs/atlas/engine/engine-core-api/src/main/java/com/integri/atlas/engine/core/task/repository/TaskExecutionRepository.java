@@ -35,6 +35,15 @@ public interface TaskExecutionRepository {
 
     /**
      * Returns a collection of {@link TaskExecution} instances which
+     * belong to the job of the given id.
+     *
+     * @param jobId
+     * @return
+     */
+    List<TaskExecution> findByJobId(String jobId);
+
+    /**
+     * Returns a collection of {@link TaskExecution} instances which
      * are the children of the given parent id.
      *
      * @param aParentId
