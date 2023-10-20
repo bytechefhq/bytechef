@@ -23,6 +23,7 @@ import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
 import com.integri.atlas.engine.repository.jdbc.counter.JdbcCounterRepository;
 import com.integri.atlas.engine.repository.jdbc.job.JdbcJobRepository;
@@ -89,12 +90,17 @@ public class TestConfiguration {
     }
 
     @Bean
-    JSONHelper jsonMapper(ObjectMapper objectMapper) {
+    JSONHelper jsonHelper(ObjectMapper objectMapper) {
         return new JSONHelper(objectMapper);
     }
 
     @Bean
     FileStorageService fileStorageService() {
         return new Base64FileStorageService();
+    }
+
+    @Bean
+    public XMLHelper xmlHelper() {
+        return new XMLHelper();
     }
 }

@@ -19,13 +19,13 @@ package com.integri.atlas.task.handler.json.file;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.atlas.json.JSONArrayUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
+import com.integri.atlas.json.JSONArrayUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
