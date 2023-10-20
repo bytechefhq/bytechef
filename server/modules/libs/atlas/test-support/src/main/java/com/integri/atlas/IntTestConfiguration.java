@@ -17,10 +17,13 @@
 package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.engine.coordinator.event.EventListener;
+import com.integri.atlas.engine.coordinator.event.EventListenerChain;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.counter.repository.CounterRepository;
+import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.xml.XMLHelper;
@@ -31,10 +34,12 @@ import com.integri.atlas.engine.repository.jdbc.task.JdbcTaskExecutionRepository
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import com.integri.atlas.file.storage.converter.FileEntryConverter;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -43,7 +48,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  */
 @EnableAutoConfiguration
 @SpringBootConfiguration
-public class TestConfiguration {
+public class IntTestConfiguration {
 
     @PostConstruct
     void afterPropertiesSet() {
@@ -53,6 +58,17 @@ public class TestConfiguration {
     @Bean
     CounterRepository counterRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcCounterRepository(jdbcTemplate);
+    }
+
+    @Bean
+    @Primary
+    EventListenerChain eventListener(List<EventListener> eventListeners) {
+        return new EventListenerChain(eventListeners);
+    }
+
+    @Bean
+    EventPublisher eventPublisher(EventListener eventListener) {
+        return eventListener::onApplicationEvent;
     }
 
     @Bean
