@@ -4,7 +4,7 @@ import Button from './Button';
 
 describe('Button', async () => {
     it('should render the button', () => {
-        render(<Button title="New Integration" />);
+        render(<Button label="New Integration" />);
 
         expect(screen.getByText('New Integration')).toBeInTheDocument();
     });

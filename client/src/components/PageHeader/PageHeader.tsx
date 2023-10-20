@@ -11,7 +11,7 @@ const PageHeader: React.FC<{
                 {subTitle}
             </h2>
 
-            <Button buttonLabel={buttonLabel} />
+            <Button label={buttonLabel} />
         </div>
     </div>
 );
