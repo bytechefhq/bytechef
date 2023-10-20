@@ -5,8 +5,10 @@ apis/index.ts
 index.ts
 models/CreateJob200ResponseModel.ts
 models/ExecutionErrorModel.ts
+models/InputModel.ts
 models/JobModel.ts
 models/JobParametersModel.ts
+models/OutputModel.ts
 models/PageModel.ts
 models/TaskExecutionModel.ts
 models/WebhookModel.ts
