@@ -11,17 +11,23 @@ import {useForm} from 'react-hook-form';
 
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    createWorkflowRequestMutation: UseMutationResult<any, object, any, unknown>;
-    id: string | number;
+    createWorkflowRequestMutation?: UseMutationResult<
+        any,
+        object,
+        any,
+        unknown
+    >;
+    parentId?: number;
     showTrigger?: boolean;
     visible?: boolean;
+    workflow?: WorkflowModel;
     onClose?: () => void;
 };
 
 const WorkflowDialog = ({
     createWorkflowRequestMutation,
-    id,
     onClose,
+    parentId,
     showTrigger = true,
     visible = false,
 }: WorkflowDialogProps) => {
@@ -40,7 +46,7 @@ const WorkflowDialog = ({
         } as WorkflowModel,
     });
 
-    const {isLoading, mutate} = createWorkflowRequestMutation;
+    const {isLoading, mutate} = createWorkflowRequestMutation!;
 
     function closeDialog() {
         setIsOpen(false);
@@ -57,7 +63,7 @@ const WorkflowDialog = ({
 
         mutate({
             createProjectWorkflowRequestModel: formData,
-            id,
+            id: parentId,
         });
 
         closeDialog();
