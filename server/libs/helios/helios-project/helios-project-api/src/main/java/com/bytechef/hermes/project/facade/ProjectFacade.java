@@ -17,11 +17,13 @@
 
 package com.bytechef.hermes.project.facade;
 
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.project.domain.Project;
-import com.bytechef.hermes.project.dto.ProjectExecution;
 import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -50,7 +52,7 @@ public interface ProjectFacade {
 
     Page<ProjectExecution> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartTime, LocalDateTime jobEndTime, Long projectId, Long projectInstanceId,
-        Long workflowId, Integer pageNumber);
+        String workflowId, Integer pageNumber);
 
     List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds);
 
@@ -58,4 +60,9 @@ public interface ProjectFacade {
 
     Project update(Project project);
 
+    @SuppressFBWarnings("EI")
+    record ProjectExecution(
+        /* ProjectInstance instance, */ Job job, Project project, List<TaskExecution> taskExecutions,
+        Workflow workflow) {
+    }
 }

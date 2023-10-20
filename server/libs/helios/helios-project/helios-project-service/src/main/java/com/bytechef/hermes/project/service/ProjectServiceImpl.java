@@ -17,11 +17,12 @@
 
 package com.bytechef.hermes.project.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.repository.ProjectRepository;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.Optional;
 
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,9 +56,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchProject(String name) {
+        return projectRepository.findByName(name);
+    }
+
+    @Override
     public Project create(Project project) {
         Assert.notNull(project, "'project' must not be null");
         Assert.isNull(project.getId(), "'id' must be null");
+        Assert.notEmpty(project.getWorkflowIds(), "'workflowIds' must not be empty");
 
         project.setProjectVersion(1);
         project.setStatus(Project.Status.UNPUBLISHED);
@@ -67,13 +74,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void delete(long id) {
-        projectRepository.deleteById(id);
+        projectRepository.delete(getProject(id));
     }
 
     @Override
     public Project getProject(long id) {
-        return projectRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(projectRepository.findById(id));
     }
 
     @Override
@@ -88,15 +94,14 @@ public class ProjectServiceImpl implements ProjectService {
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
             projectIterable = projectRepository.findAll(Sort.by("name"));
         } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            projectIterable = projectRepository.findByCategoryIdInOrderByName(categoryIds);
+            projectIterable = projectRepository.findAllByCategoryIdInOrderByName(categoryIds);
         } else if (CollectionUtils.isEmpty(categoryIds)) {
-            projectIterable = projectRepository.findByTagIdInOrderByName(tagIds);
+            projectIterable = projectRepository.findAllByTagIdInOrderByName(tagIds);
         } else {
-            projectIterable = projectRepository.findByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
+            projectIterable = projectRepository.findAllByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
         }
 
-        return StreamSupport.stream(projectIterable.spliterator(), false)
-            .toList();
+        return com.bytechef.commons.util.CollectionUtils.toList(projectIterable);
     }
 
     @Override

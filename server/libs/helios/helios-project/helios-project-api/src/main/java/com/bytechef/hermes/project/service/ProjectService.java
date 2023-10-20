@@ -21,6 +21,7 @@ import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.tag.domain.Tag;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -28,6 +29,8 @@ import java.util.List;
 public interface ProjectService {
 
     Project addWorkflow(long id, String workflowId);
+
+    Optional<Project> fetchProject(String name);
 
     Project create(Project project);
 
