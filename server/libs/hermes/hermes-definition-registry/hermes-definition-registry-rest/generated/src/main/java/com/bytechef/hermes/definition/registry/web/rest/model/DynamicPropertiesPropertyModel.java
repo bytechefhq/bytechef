@@ -12,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
-import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -30,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-26T12:56:34.547448+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-27T08:00:36.899199+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private PropertiesDataSourceModel propertiesDataSource;
@@ -82,16 +80,6 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   public DynamicPropertiesPropertyModel label(String label) {
     super.setLabel(label);
-    return this;
-  }
-
-  public DynamicPropertiesPropertyModel metadata(Map<String, Object> metadata) {
-    super.setMetadata(metadata);
-    return this;
-  }
-
-  public DynamicPropertiesPropertyModel putMetadataItem(String key, Object metadataItem) {
-    super.putMetadataItem(key, metadataItem);
     return this;
   }
 
