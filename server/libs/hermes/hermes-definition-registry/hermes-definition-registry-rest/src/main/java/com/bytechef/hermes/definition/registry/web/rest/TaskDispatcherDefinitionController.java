@@ -78,7 +78,7 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
         String taskDispatcherName, ServerWebExchange exchange) {
 
         return Mono.just(
-            taskDispatcherDefinitionService.getTaskDispatcherDefinitions(taskDispatcherName)
+            taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(taskDispatcherName)
                 .stream()
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))

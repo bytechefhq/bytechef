@@ -60,7 +60,7 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
     }
 
     @Override
-    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(String name) {
+    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
         return MonoUtils.get(
             rSocketRequester
                 .route("TaskDispatcherDefinitionService.getComponentDefinitionsForName")

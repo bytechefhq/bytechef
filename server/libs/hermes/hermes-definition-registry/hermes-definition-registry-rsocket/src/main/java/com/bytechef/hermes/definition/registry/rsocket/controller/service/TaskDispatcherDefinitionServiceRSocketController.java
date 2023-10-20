@@ -56,6 +56,6 @@ public class TaskDispatcherDefinitionServiceRSocketController {
 
     @MessageMapping("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
     public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions(String name) {
-        return Mono.just(taskDispatcherDefinitionService.getTaskDispatcherDefinitions(name));
+        return Mono.just(taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(name));
     }
 }
