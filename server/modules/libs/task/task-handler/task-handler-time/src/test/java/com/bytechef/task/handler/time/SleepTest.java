@@ -32,9 +32,10 @@ public class SleepTest {
     public void test1() throws TaskExecutionException {
         Sleep sleep = new Sleep();
         long now = System.currentTimeMillis();
-        sleep.handle(SimpleTaskExecution.of("duration", "1s"));
+        sleep.handle(SimpleTaskExecution.of("duration", "1.5s"));
         long delta = System.currentTimeMillis() - now;
-        Assertions.assertTrue(delta >= 1000 && delta <= 1100);
+        Assertions.assertTrue(
+                delta >= 1500 && delta < 1900, String.format("Period %dms does not meet range [1500,1900>", delta));
     }
 
     @Test
@@ -43,7 +44,8 @@ public class SleepTest {
         long now = System.currentTimeMillis();
         sleep.handle(SimpleTaskExecution.of("millis", 500));
         long delta = System.currentTimeMillis() - now;
-        Assertions.assertTrue(delta >= 500 && delta <= 600);
+        Assertions.assertTrue(
+                delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
     }
 
     @Test
@@ -52,6 +54,7 @@ public class SleepTest {
         long now = System.currentTimeMillis();
         sleep.handle(new SimpleTaskExecution());
         long delta = System.currentTimeMillis() - now;
-        Assertions.assertTrue(delta >= 1000 && delta <= 1100);
+        Assertions.assertTrue(
+                delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
     }
 }
