@@ -19,6 +19,7 @@
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
 import com.integri.atlas.engine.core.context.Context;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
@@ -84,6 +85,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         map.put("now", new Now());
         map.put("dateFormat", new DateFormat());
         map.put("config", new Config(aBuilder.environment));
+        map.put("parseJSON", new ParseJSON(aBuilder.jsonHelper));
         map.putAll(aBuilder.methodExecutors);
         methodExecutors = Collections.unmodifiableMap(map);
     }
@@ -176,6 +178,13 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
         private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
         private Environment environment = new EmptyEnvironment();
+        private JSONHelper jsonHelper;
+
+        public Builder jsonHelper(JSONHelper jsonHelper) {
+            this.jsonHelper = jsonHelper;
+
+            return this;
+        }
 
         public Builder methodExecutor(String aMethodName, MethodExecutor aMethodExecutor) {
             methodExecutors.put(aMethodName, aMethodExecutor);
