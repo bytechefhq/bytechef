@@ -16,34 +16,25 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.counter;
+package com.bytechef.atlas.repository;
+
+import com.bytechef.atlas.domain.Workflow;
+import java.util.Optional;
 
 /**
- * A repository that can be used to atomically set a counter value.
- *
  * @author Arik Cohen
+ * @author Ivica Cardic
+ * @since Jun 18, 2016
  */
-public interface CounterRepository {
-    /**
-     * Set the counter to the give value.
-     *
-     * @param counterName the name of the counter
-     * @param value the value to set the counter to.
-     */
-    void set(String counterName, long value);
+public interface WorkflowRepository {
 
-    /**
-     * Decrement the specified counter by 1.
-     *
-     * @param counterName the name of the counter
-     * @return the new value
-     */
-    long decrement(String counterName);
+    Iterable<Workflow> findAll();
 
-    /**
-     * Delete the specified counter.
-     *
-     * @param counterName the name of the counter
-     */
-    void delete(String counterName);
+    Optional<Workflow> findById(String id);
+
+    default Workflow save(Workflow workflow) {
+        throw new UnsupportedOperationException();
+    }
+
+    default void deleteById(String id) {}
 }

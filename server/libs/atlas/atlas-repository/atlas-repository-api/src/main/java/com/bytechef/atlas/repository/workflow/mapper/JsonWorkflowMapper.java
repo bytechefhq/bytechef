@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,32 +12,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.atlas.repository.workflow.mapper;
 
+import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.atlas.workflow.WorkflowResource;
-import com.bytechef.atlas.workflow.domain.Workflow;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
- * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class YamlWorkflowMapper extends BaseWorkflowMapper implements WorkflowMapperResolver {
+public class JsonWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
 
-    private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Workflow readValue(WorkflowResource aResource) {
-        return readValue(aResource, mapper);
+    @Override
+    public Workflow readValue(WorkflowResource workflowResource) {
+        return readValue(workflowResource, objectMapper);
     }
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == WorkflowFormat.YAML ? this : null;
+        return workflowResource.getWorkflowFormat() == WorkflowFormat.JSON ? this : null;
     }
 }

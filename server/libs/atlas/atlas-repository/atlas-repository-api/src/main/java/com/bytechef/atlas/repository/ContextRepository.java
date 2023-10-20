@@ -16,26 +16,27 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.workflow;
+package com.bytechef.atlas.repository;
 
-import com.bytechef.atlas.workflow.domain.Workflow;
-import java.util.List;
+import com.bytechef.atlas.domain.Context;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
+ * Stores context information for a job or task objects.
+ *
+ * <p>{@link Context} instances are used to evaluate workflow tasks before they are executed.
+ *
  * @author Arik Cohen
- * @author Ivica Cardic
- * @since Jun 18, 2016
+ * @since Mar 2017
  */
-public interface WorkflowRepository {
-    Workflow findOne(String id);
+@NoRepositoryBean
+public interface ContextRepository {
 
-    List<Workflow> findAll();
+    void deleteById(String id);
 
-    default Workflow create(String content, String format) {
-        throw new UnsupportedOperationException();
-    }
+    Iterable<Context> findAll();
 
-    default Workflow update(String id, String content, String format) {
-        throw new UnsupportedOperationException();
-    }
+    Context findTop1ByStackIdOrderByCreatedDateDesc(String stackId);
+
+    Context save(Context context);
 }
