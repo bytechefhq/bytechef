@@ -17,24 +17,35 @@
 
 package com.bytechef.hermes.workflow.facade;
 
-import com.bytechef.atlas.domain.Workflow.Format;
-import com.bytechef.atlas.domain.Workflow.SourceType;
-import com.bytechef.hermes.workflow.WorkflowDTO;
-
-import java.util.List;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowFacade {
+public class WorkflowFacadeTest {
 
-    WorkflowDTO create(String definition, Format format, SourceType sourceType);
+    @Disabled
+    @Test
+    public void testCreate() {
+        // TODO
+    }
 
-    WorkflowDTO getWorkflow(String id);
+    @Disabled
+    @Test
+    public void testGetWorkflow() {
+        // TODO
+    }
 
-    List<WorkflowDTO> getWorkflows();
+    @Disabled
+    @Test
+    public void testGetWorkflows() {
+        // TODO
+    }
 
-    List<WorkflowDTO> getWorkflows(List<String> workflowIds);
-
-    WorkflowDTO update(String id, String definition);
+    @Disabled
+    @Test
+    public void testUpdate() {
+        // TODO
+    }
 }
