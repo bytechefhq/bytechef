@@ -61,28 +61,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             query = buildQuery(status, startDate, endDate, workflowId, workflowIds, pageable, false);
 
             List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> {
-                Job job = new Job();
-
-                job.setCurrentTask(rs.getInt("current_task"));
-
-                Timestamp endDateTimestamp = rs.getTimestamp("end_date");
-
-                if (endDateTimestamp != null) {
-                    job.setEndDate(LocalDateTimeUtils.getLocalDateTime(endDateTimestamp));
-                }
-
-                job.setLabel(rs.getString("label"));
-                job.setId(rs.getLong("id"));
-                job.setPriority(rs.getInt("priority"));
-
-                Timestamp startDateTimestamp = rs.getTimestamp("start_date");
-
-                if (startDateTimestamp != null) {
-                    job.setStartDate(LocalDateTimeUtils.getLocalDateTime(startDateTimestamp));
-                }
-
-                job.setStatus(Job.Status.valueOf(rs.getInt("status")));
-                job.setWorkflowId(rs.getString("workflow_id"));
+                Job job = new Job(rs);
 
                 return job;
             }, query.arguments);
@@ -116,8 +95,9 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         if (StringUtils.hasText(status)) {
             query += "status = ? ";
 
-            arguments.add(Job.Status.valueOf(status)
-                .getId());
+            Job.Status jobStatus = Job.Status.valueOf(status);
+
+            arguments.add(jobStatus.getId());
         }
 
         if (startDate != null && StringUtils.hasText(status)) {

@@ -20,10 +20,15 @@
 package com.bytechef.atlas.execution.domain;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -146,6 +151,29 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public Job(long id) {
         this.id = id;
+    }
+
+    public Job(ResultSet rs) throws SQLException {
+        this.currentTask = rs.getInt("current_task");
+
+        Timestamp endDateTimestamp = rs.getTimestamp("end_date");
+
+        if (endDateTimestamp != null) {
+            this.endDate = LocalDateTimeUtils.getLocalDateTime(endDateTimestamp);
+        }
+
+        this.label = rs.getString("label");
+        this.id = rs.getLong("id");
+        this.priority = rs.getInt("priority");
+
+        Timestamp startDateTimestamp = rs.getTimestamp("start_date");
+
+        if (startDateTimestamp != null) {
+            this.startDate = LocalDateTimeUtils.getLocalDateTime(startDateTimestamp);
+        }
+
+        this.status = rs.getInt("status");
+        this.workflowId = rs.getString("workflow_id");
     }
 
     @Override
