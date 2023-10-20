@@ -305,8 +305,58 @@ components:
           format: "int64"
           readOnly: true
         workflowTask:
-          $ref: "../../hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowTask"
+          $ref: "#/components/schemas/WorkflowTask"
         type:
           description: "The type of the task."
           type: "string"
           readOnly: true
+    WorkflowTask:
+      description: "Represents a definition of the task."
+      type: "object"
+      required:
+      - "name"
+      - "type"
+      properties:
+        finalize:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ execution of a task -- regardless of whether it had failed or not."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        node:
+          description: "Defines the name of the type of the node that the task execution\
+            \ will be routed to. For instance, if the node value is \"encoder\", then\
+            \ the task will be routed to the \"encoder\" queue which is presumably\
+            \ subscribed to by worker nodes of \"encoder\" type."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        post:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ the successful execution of a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        pre:
+          description: "The (optional) list of tasks that are to be executed prior\
+            \ to a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        timeout:
+          description: "The timeout expression which describes when a task should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "Type of the task."
+          type: "string"

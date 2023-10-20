@@ -620,7 +620,7 @@ components:
           format: "int64"
           readOnly: true
         workflowTask:
-          $ref: "../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowTask"
+          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowTask"
         type:
           description: "The type of the task."
           type: "string"
