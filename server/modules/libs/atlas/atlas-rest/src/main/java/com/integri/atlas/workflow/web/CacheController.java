@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
-class CachesController {
+class CacheController {
 
     @Autowired(required = false)
     private List<Clearable> clearables = Collections.emptyList();

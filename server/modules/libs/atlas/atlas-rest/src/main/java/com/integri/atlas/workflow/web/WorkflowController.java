@@ -41,7 +41,7 @@ import org.springframework.web.servlet.HandlerMapping;
  */
 @RestController
 @ConditionalOnCoordinator
-public class WorkflowsController {
+public class WorkflowController {
 
     @Autowired
     private WorkflowRepository workflowRepository;
