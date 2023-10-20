@@ -18,21 +18,29 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.util.ComponentContextThreadLocal.ComponentContext;
 
 import java.util.Objects;
 
-public class ContextSupplier {
+/**
+ * @author Ivica Cardic
+ */
+public final class ComponentContextSupplier {
 
-    public static <T, E extends Exception> T get(Context context, Supplier<T, E> supplier) throws E {
-        Objects.requireNonNull(context, "'context' must not be null");
+    public static <T, E extends Exception> T get(
+        Context context, ComponentDefinition componentDefinition, Supplier<T, E> supplier) throws E {
+
+        Objects.requireNonNull(context, "'triggerContext' must not be null");
+        Objects.requireNonNull(componentDefinition, "'componentDefinition' must not be null");
         Objects.requireNonNull(supplier, "'supplier' must not be null");
 
-        ContextThreadLocal.set(context);
+        ComponentContextThreadLocal.set(new ComponentContext(context, componentDefinition));
 
         try {
             return supplier.get();
         } finally {
-            ContextThreadLocal.remove();
+            ComponentContextThreadLocal.remove();
         }
     }
 

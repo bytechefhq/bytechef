@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registrar.oas.task.handler;
 
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.registrar.task.handler.AbstractComponentTaskHandlerBeanDefinitionLoader;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -35,11 +34,10 @@ public class OpenApiComponentTaskHandlerBeanDefinitionLoader
     }
 
     @Override
-    protected BeanDefinition getBeanDefinition(
-        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
-        OpenApiComponentHandler openApiComponentHandler) {
+    protected BeanDefinition getComponentActionTaskHandlerBeanDefinition(
+        ActionDefinition actionDefinition, OpenApiComponentHandler openApiComponentHandler) {
 
-        return BeanDefinitionBuilder.genericBeanDefinition(OpenApiComponentTaskHandler.class)
+        return BeanDefinitionBuilder.genericBeanDefinition(OpenApiComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgReference("connectionService")

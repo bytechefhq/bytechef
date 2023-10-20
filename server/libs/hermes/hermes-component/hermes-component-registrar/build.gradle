@@ -3,11 +3,14 @@ dependencies {
     implementation "org.springframework:spring-jdbc"
     implementation "org.springframework.boot:spring-boot"
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
+    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:hermes:hermes-api")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
+    implementation project(":server:libs:hermes:hermes-worker:hermes-worker-api")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation libs.com.github.tomakehurst.wiremock
@@ -17,7 +20,7 @@ dependencies {
     testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
-    testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+    testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
     testImplementation project(":server:libs:modules:components:petstore")
     testImplementation project(":server:libs:test:test-int-support")
 }

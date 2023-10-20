@@ -40,7 +40,7 @@ import java.util.List;
 @Component
 public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private List<ComponentTaskHandlerBeanDefinitionLoader> componentTaskHandlerBeanDefinitionLoaders = List.of(
+    private final List<ComponentTaskHandlerBeanDefinitionLoader> componentTaskHandlerBeanDefinitionLoaders = List.of(
         new DefaultComponentTaskHandlerBeanDefinitionLoader(),
         new JdbcComponentTaskHandlerBeanDefinitionLoader(),
         new OpenApiComponentTaskHandlerBeanDefinitionLoader());
@@ -67,7 +67,7 @@ public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactory
                 ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(
                     getBeanName(
                         componentDefinition.getName(), componentDefinition.getVersion(),
-                        taskHandlerBeanDefinitionEntry.actionDefinitionName()),
+                        taskHandlerBeanDefinitionEntry.taskHandlerName()),
                     taskHandlerBeanDefinition);
             }
         }

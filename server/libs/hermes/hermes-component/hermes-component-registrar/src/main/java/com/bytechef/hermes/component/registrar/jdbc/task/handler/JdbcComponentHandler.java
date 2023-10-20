@@ -84,23 +84,23 @@ public class JdbcComponentHandler implements ComponentHandler {
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
     }
 
-    protected Map<String, Integer> performDelete(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeDelete(Context context, InputParameters inputParameters) {
         return deleteJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> performExecute(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeExecute(Context context, InputParameters inputParameters) {
         return executeJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> performInsert(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeInsert(Context context, InputParameters inputParameters) {
         return insertJdbcOperation.execute(context, inputParameters);
     }
 
-    protected List<Map<String, Object>> performQuery(Context context, InputParameters inputParameters) {
+    protected List<Map<String, Object>> executeQuery(Context context, InputParameters inputParameters) {
         return queryJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> performUpdate(Context context, InputParameters inputParameters) {
+    protected Map<String, Integer> executeUpdate(Context context, InputParameters inputParameters) {
         return updateJdbcOperation.execute(context, inputParameters);
     }
 
@@ -142,7 +142,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 "The list of properties which should be used as query parameters.")
                             .properties(bool(), dateTime(), number(), string()))
                     .outputSchema(array().items(object().properties(integer())))
-                    .execute(this::performQuery),
+                    .execute(this::executeQuery),
                 action(JdbcConstants.INSERT)
                     .display(display("Insert").description("Insert rows in database."))
                     .properties(
@@ -165,7 +165,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
                     .outputSchema(object().properties(integer()))
-                    .execute(this::performInsert),
+                    .execute(this::executeInsert),
                 action(JdbcConstants.UPDATE)
                     .display(display("Update").description("Update rows in database."))
                     .properties(
@@ -193,7 +193,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
                     .outputSchema(object().properties(integer()))
-                    .execute(this::performUpdate),
+                    .execute(this::executeUpdate),
                 action(JdbcConstants.DELETE)
                     .display(display("Delete").description("Delete rows from database."))
                     .properties(
@@ -216,7 +216,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
                     .outputSchema(object().properties(integer()))
-                    .execute(this::performDelete),
+                    .execute(this::executeDelete),
                 action(JdbcConstants.EXECUTE)
                     .display(display("Execute").description("Execute an SQL DML or DML statement."))
                     .properties(
@@ -237,6 +237,6 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 "The list of properties which should be used as parameters.")
                             .properties(bool(), dateTime(), number(), string()))
                     .outputSchema(object().properties(integer()))
-                    .execute(this::performExecute));
+                    .execute(this::executeExecute));
     }
 }

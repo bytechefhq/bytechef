@@ -24,6 +24,7 @@ import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstant
 import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
@@ -83,7 +84,7 @@ public class UpdateJdbcActionIntTest {
         Context context = Mockito.mock(Context.class);
 
         Mockito.when(context.fetchConnection())
-            .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
+            .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
         InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
@@ -120,7 +121,7 @@ public class UpdateJdbcActionIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        InputParameters connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
 
                         return dataSource;
                     }

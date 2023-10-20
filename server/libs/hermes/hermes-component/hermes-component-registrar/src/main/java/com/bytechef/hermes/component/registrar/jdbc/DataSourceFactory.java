@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.jdbc;
 
-import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,19 +35,19 @@ public class DataSourceFactory {
     private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
     public DataSource getDataSource(
-        InputParameters connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
+        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
 
-        Assert.notNull(connectionParameters, "'connectionParameters' must not be null");
+        Assert.notNull(connection, "'connection' must not be null");
         Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
         String url = "jdbc:" + databaseJdbcName + "://"
-            + connectionParameters.getString(JdbcConstants.HOST)
+            + connection.getString(JdbcConstants.HOST)
             + ":"
-            + connectionParameters.getString(JdbcConstants.PORT)
+            + connection.getString(JdbcConstants.PORT)
             + "/"
-            + connectionParameters.getString(JdbcConstants.DATABASE);
-        String username = connectionParameters.getString(JdbcConstants.USERNAME);
+            + connection.getString(JdbcConstants.DATABASE);
+        String username = connection.getString(JdbcConstants.USERNAME);
 
         return dataSourceMap.computeIfAbsent(url + username, key -> {
             DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
@@ -55,7 +55,7 @@ public class DataSourceFactory {
             dataSourceBuilder.driverClassName(jdbcDriverClassName);
             dataSourceBuilder.url(url);
             dataSourceBuilder.username(username);
-            dataSourceBuilder.password(connectionParameters.getString(JdbcConstants.PASSWORD));
+            dataSourceBuilder.password(connection.getString(JdbcConstants.PASSWORD));
 
             return dataSourceBuilder.build();
         });

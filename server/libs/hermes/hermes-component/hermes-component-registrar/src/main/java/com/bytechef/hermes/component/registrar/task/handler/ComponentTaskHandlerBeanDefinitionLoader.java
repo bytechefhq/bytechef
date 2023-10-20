@@ -37,6 +37,6 @@ public interface ComponentTaskHandlerBeanDefinitionLoader {
     }
 
     @SuppressFBWarnings("EI")
-    record TaskHandlerBeanDefinitionEntry(String actionDefinitionName, BeanDefinition taskHandlerBeanDefinition) {
+    record TaskHandlerBeanDefinitionEntry(String taskHandlerName, BeanDefinition taskHandlerBeanDefinition) {
     }
 }
