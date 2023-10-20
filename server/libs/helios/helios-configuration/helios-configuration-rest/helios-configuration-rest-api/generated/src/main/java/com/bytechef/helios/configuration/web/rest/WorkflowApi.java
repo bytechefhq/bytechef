@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-24T21:51:14.348201+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-03T14:12:02.835174+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {
@@ -70,10 +70,11 @@ public interface WorkflowApi {
 
 
     /**
-     * POST /workflows/{id}/duplicate : Duplicates existing workflow.
+     * POST /projects/{id}/workflows/{workflowId}/duplicate : Duplicates existing workflow.
      * Duplicates existing workflow.
      *
-     * @param id The id of a workflow. (required)
+     * @param id The id of a project. (required)
+     * @param workflowId The id of a workflow. (required)
      * @return The duplicated workflow object. (status code 200)
      */
     @Operation(
@@ -89,11 +90,12 @@ public interface WorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/workflows/{id}/duplicate",
+        value = "/projects/{id}/workflows/{workflowId}/duplicate",
         produces = { "application/json" }
     )
     default ResponseEntity<WorkflowModel> duplicateWorkflow(
-        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
