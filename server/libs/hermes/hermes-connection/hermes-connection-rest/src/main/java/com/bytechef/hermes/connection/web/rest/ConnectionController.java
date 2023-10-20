@@ -18,10 +18,9 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.ConnectionUpdateModel;
+import com.bytechef.hermes.connection.web.rest.model.PutConnectionRequestModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,14 +71,17 @@ public class ConnectionController implements ConnectionsApi {
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(conversionService.convert(
-            connectionService.add(conversionService.convert(connectionModel, Connection.class)),
+            connectionService.create(connectionModel.getName(), connectionModel.getComponentName(),
+                connectionModel.getComponentVersion(), connectionModel.getAuthorizationName(),
+                connectionModel.getParameters()),
             ConnectionModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<ConnectionModel>> putConnection(
-        String id, Mono<ConnectionUpdateModel> connectionUpdateModelMono, ServerWebExchange exchange) {
-        return connectionUpdateModelMono.map(connectionUpdateModel -> ResponseEntity.ok(conversionService.convert(
-            connectionService.update(id, connectionUpdateModel.getName()), ConnectionModel.class)));
+        String id, Mono<PutConnectionRequestModel> putConnectionRequestModelMono, ServerWebExchange exchange) {
+        return putConnectionRequestModelMono
+            .map(putConnectionRequestModel -> ResponseEntity.ok(conversionService.convert(
+                connectionService.update(id, putConnectionRequestModel.getName()), ConnectionModel.class)));
     }
 }
