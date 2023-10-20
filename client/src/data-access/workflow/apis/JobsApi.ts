@@ -32,7 +32,7 @@ import {
 } from '../models';
 
 export interface GetJobRequest {
-    id: string;
+    id: number;
 }
 
 export interface GetJobsRequest {
@@ -44,11 +44,11 @@ export interface PostJobRequest {
 }
 
 export interface RestartJobRequest {
-    id: string;
+    id: number;
 }
 
 export interface StopJobRequest {
-    id: string;
+    id: number;
 }
 
 /**

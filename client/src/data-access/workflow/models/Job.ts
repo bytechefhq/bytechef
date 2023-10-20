@@ -94,10 +94,10 @@ export interface Job {
     readonly outputs?: { [key: string]: object; };
     /**
      * The id of the parent task that created this job. Required for sub-flows.
-     * @type {string}
+     * @type {number}
      * @memberof Job
      */
-    readonly parentTaskExecutionId?: string;
+    readonly parentTaskExecutionId?: number;
     /**
      * The priority value.
      * @type {number}
