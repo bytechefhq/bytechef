@@ -47,7 +47,8 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
 
     @Override
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(
-        Boolean connectionDefinitions, Boolean connectionInstances) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions) {
 
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances("worker-service-app"))
@@ -57,8 +58,10 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
                     .route("ComponentDefinitionFacade.getComponentDefinitions")
                     .data(new HashMap<>() {
                         {
+                            put("actionDefinitions", actionDefinitions);
                             put("connectionDefinitions", connectionDefinitions);
                             put("connectionInstances", connectionInstances);
+                            put("triggerDefinitions", triggerDefinitions);
                         }
                     })
                     .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))

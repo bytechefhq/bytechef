@@ -38,6 +38,11 @@ public final class CollectionUtils {
     private CollectionUtils() {
     }
 
+    public static <T> boolean anyMatch(Collection<T> items, Predicate<? super T> predicate) {
+        return items.stream()
+            .anyMatch(predicate);
+    }
+
     public static <T> List<T> concat(List<T> list1, List<T> list2) {
         Assert.notNull(list1, "'list1' must not be null");
         Assert.notNull(list2, "'list2' must not be null");
