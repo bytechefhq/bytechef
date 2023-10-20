@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -63,8 +64,8 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
 
             if (isArray) {
                 Map<String, Integer> range = taskExecution.get("range");
-
                 Integer rangeStartIndex = null;
+                List<Map<String, ?>> items;
 
                 if (range != null) {
                     rangeStartIndex = range.get("startIndex");
@@ -76,10 +77,13 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
                     rangeEndIndex = range.get("endIndex");
                 }
 
-                List<Map<String, ?>> items = xmlHelper.deserialize(
-                    fileStorageService.readFileContent(fileEntry.getUrl()),
-                    List.class
-                );
+                try (
+                    Stream<Map<String, ?>> stream = xmlHelper.stream(
+                        fileStorageService.getFileContentStream(fileEntry.getUrl())
+                    )
+                ) {
+                    items = stream.toList();
+                }
 
                 if (
                     (rangeStartIndex != null && rangeStartIndex > 0) ||
