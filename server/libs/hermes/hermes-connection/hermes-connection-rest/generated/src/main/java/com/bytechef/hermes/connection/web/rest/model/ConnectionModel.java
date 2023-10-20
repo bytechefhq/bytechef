@@ -23,12 +23,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * TODO
+ * Contains all required information to open a connection to a service defined by componentName parameter.
  */
 
-@Schema(name = "Connection", description = "TODO")
+@Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-23T12:36:20.615811+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-26T23:43:53.466934+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -77,11 +77,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The name of an authorization used by this connection. Used for HTTP based services.
    * @return authorizationName
   */
   
-  @Schema(name = "authorizationName", description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "authorizationName", description = "The name of an authorization used by this connection. Used for HTTP based services.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getAuthorizationName() {
     return authorizationName;
   }
@@ -96,11 +96,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The name of a component that uses this connection.
    * @return componentName
   */
   @NotNull 
-  @Schema(name = "componentName", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "componentName", description = "The name of a component that uses this connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getComponentName() {
     return componentName;
   }
@@ -115,11 +115,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The version of a connection.
    * @return connectionVersion
   */
   @NotNull 
-  @Schema(name = "connectionVersion", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "connectionVersion", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getConnectionVersion() {
     return connectionVersion;
   }
@@ -134,11 +134,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -153,11 +153,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -172,11 +172,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The name of a connection.
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -191,11 +191,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The id of a connection.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -210,11 +210,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -229,11 +229,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -253,11 +253,11 @@ public class ConnectionModel {
   }
 
   /**
-   * TODO
+   * The parameters of a connection.
    * @return parameters
   */
   @NotNull 
-  @Schema(name = "parameters", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "parameters", description = "The parameters of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   public Map<String, Object> getParameters() {
     return parameters;
   }
