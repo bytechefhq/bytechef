@@ -21,16 +21,16 @@ import {
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
 import WorkflowEditor from './WorkflowEditor';
-import {
-    useGetComponentsQuery,
-    useGetFlowControlsQuery,
-    useGetIntegrationQuery,
-    useGetIntegrationWorkflowsQuery,
-} from 'queries/integration.queries';
 import Input from 'components/Input/Input';
 import {IntegrationModel} from '../../data-access/integration';
 import useRightSlideOverStore from './stores/rightSlideOver';
 import useLeftSidebarStore from './stores/leftSidebar';
+import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../queries/taskDispatcherDefinitions';
+import {
+    useGetIntegrationQuery,
+    useGetIntegrationWorkflowsQuery,
+} from '../../queries/integrations';
 
 const headerToggleItems: ToggleItem[] = [
     {
@@ -73,13 +73,13 @@ const Integration: React.FC = () => {
         data: components,
         isLoading: componentsLoading,
         error: componentsError,
-    } = useGetComponentsQuery();
+    } = useGetComponentDefinitionsQuery();
 
     const {
         data: flowControls,
         isLoading: flowControlsLoading,
         error: flowControlsError,
-    } = useGetFlowControlsQuery();
+    } = useGetTaskDispatcherDefinitionsQuery();
 
     const {
         data: integrationWorkflows,

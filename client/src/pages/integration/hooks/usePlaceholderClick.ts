@@ -1,15 +1,13 @@
-import {
-    useGetComponentsQuery,
-    useGetFlowControlsQuery,
-} from 'queries/integration.queries';
 import {NodeProps, useReactFlow} from 'reactflow';
+import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
 
 export default function usePlaceholderClick(id: NodeProps['id']) {
     const {getNode, setNodes, setEdges} = useReactFlow();
 
-    const {data: components} = useGetComponentsQuery();
+    const {data: components} = useGetComponentDefinitionsQuery();
 
-    const {data: flowControls} = useGetFlowControlsQuery();
+    const {data: flowControls} = useGetTaskDispatcherDefinitionsQuery();
 
     const onClick = () => {
         const placeholderNode = getNode(id);

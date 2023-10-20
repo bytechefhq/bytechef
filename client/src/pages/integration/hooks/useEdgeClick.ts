@@ -1,8 +1,6 @@
-import {
-    useGetComponentsQuery,
-    useGetFlowControlsQuery,
-} from 'queries/integration.queries';
 import {EdgeProps, useReactFlow} from 'reactflow';
+import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
 
 const uuid = (): string =>
     new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
@@ -12,9 +10,9 @@ const uuid = (): string =>
 function useEdgeClick(id: EdgeProps['id']) {
     const {getEdge, setEdges, setNodes} = useReactFlow();
 
-    const {data: components} = useGetComponentsQuery();
+    const {data: components} = useGetComponentDefinitionsQuery();
 
-    const {data: flowControls} = useGetFlowControlsQuery();
+    const {data: flowControls} = useGetTaskDispatcherDefinitionsQuery();
 
     const handleEdgeClick = () => {
         // first we retrieve the edge object to get the source and target id

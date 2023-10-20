@@ -7,10 +7,10 @@ import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {
-    IntegrationsKeys,
+    IntegrationKeys,
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '../../queries/integrations.queries';
+} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CategoryModel,
@@ -46,10 +46,10 @@ const IntegrationModal = () => {
     const mutation = useIntegrationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
-                IntegrationsKeys.integrationCategories
+                IntegrationKeys.integrationCategories
             );
-            queryClient.invalidateQueries(IntegrationsKeys.integrations);
-            queryClient.invalidateQueries(IntegrationsKeys.integrationTags);
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
 
             setIsOpen(false);
 
