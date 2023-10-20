@@ -30,7 +30,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ProjectExecutionDTO(
+public record WorkflowExecutionDTO(
     long id, ProjectInstance instance, Job job, Project project, List<TaskExecutionDTO> taskExecutions,
     Workflow workflow) {
 }

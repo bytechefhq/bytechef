@@ -18,7 +18,7 @@
 package com.bytechef.helios.project.facade;
 
 import com.bytechef.category.domain.Category;
-import com.bytechef.helios.project.dto.ProjectExecutionDTO;
+import com.bytechef.helios.project.dto.WorkflowExecutionDTO;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
@@ -48,9 +48,9 @@ public interface ProjectFacade {
 
     List<WorkflowDTO> getProjectWorkflows(long id);
 
-    ProjectExecutionDTO getProjectExecution(long id);
+    WorkflowExecutionDTO getWorkflowExecution(long id);
 
-    Page<ProjectExecutionDTO> searchProjectExecutions(
+    Page<WorkflowExecutionDTO> searchWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 

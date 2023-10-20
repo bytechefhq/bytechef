@@ -8,8 +8,8 @@ servers:
 tags:
 - name: "project-categories"
   description: "The Automation Project Categories API"
-- name: "project-executions"
-  description: "The Automation Project Executions API"
+- name: "workflow-executions"
+  description: "The Automation Workflow Executions API"
 - name: "project-instance-tags"
   description: "The Automation Project Instance Tags API"
 - name: "project-instances"
@@ -36,13 +36,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category"
-  /project-executions:
+  /workflow-executions:
     get:
-      description: "Get project executions."
-      summary: "Get project executions."
+      description: "Get workflow executions."
+      summary: "Get workflow executions."
       tags:
-      - "project-executions"
-      operationId: "getProjectExecutions"
+      - "workflow-executions"
+      operationId: "getWorkflowExecutions"
       parameters:
       - name: "jobStatus"
         description: "The status of an executed job"
@@ -100,21 +100,21 @@ paths:
           default: 0
       responses:
         "200":
-          description: "The page of project executions."
+          description: "The page of workflow executions."
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
-  /project-executions/{id}:
+  /workflow-executions/{id}:
     get:
-      description: "Get project execution by id."
-      summary: "Get project executions by id."
+      description: "Get workflow execution by id."
+      summary: "Get workflow executions by id."
       tags:
-      - "project-executions"
-      operationId: "getProjectExecution"
+      - "workflow-executions"
+      operationId: "getWorkflowExecution"
       parameters:
       - name: "id"
-        description: "The id of a project execution."
+        description: "The id of a workflow execution."
         in: "path"
         required: true
         schema:
@@ -122,11 +122,11 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The of project execution object."
+          description: "The of workflow execution object."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectExecution"
+                $ref: "#/components/schemas/WorkflowExecution"
   /project-instance-tags:
     get:
       description: "Get project instance tags."
@@ -894,12 +894,12 @@ components:
           enum:
           - "PUBLISHED"
           - "UNPUBLISHED"
-    ProjectExecution:
+    WorkflowExecution:
       description: "Contains information about execution of one of project workflows."
       type: "object"
       properties:
         id:
-          description: "The id of a project execution."
+          description: "The id of a workflow execution."
           type: "integer"
           format: "int64"
           readOnly: true
@@ -915,12 +915,12 @@ components:
             $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
         workflow:
           $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
-    ProjectExecutionBasic:
+    WorkflowExecutionBasic:
       description: "Contains information about execution of one of project workflows."
       type: "object"
       properties:
         id:
-          description: "The id of a project execution."
+          description: "The id of a workflow execution."
           type: "integer"
           format: "int64"
           readOnly: true

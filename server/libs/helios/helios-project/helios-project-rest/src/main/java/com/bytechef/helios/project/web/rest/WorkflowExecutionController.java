@@ -18,8 +18,8 @@
 package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.helios.project.facade.ProjectFacade;
-import com.bytechef.helios.project.web.rest.model.ProjectExecutionBasicModel;
-import com.bytechef.helios.project.web.rest.model.ProjectExecutionModel;
+import com.bytechef.helios.project.web.rest.model.WorkflowExecutionBasicModel;
+import com.bytechef.helios.project.web.rest.model.WorkflowExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -37,36 +37,36 @@ import java.time.LocalDateTime;
 @RestController
 
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
-public class ProjectExecutionController implements ProjectExecutionsApi {
+public class WorkflowExecutionController implements WorkflowExecutionsApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectExecutionController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public WorkflowExecutionController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<ProjectExecutionModel>> getProjectExecution(Long id, ServerWebExchange exchange) {
-        return Mono.just(projectFacade.getProjectExecution(id))
-            .map(projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class))
+    public Mono<ResponseEntity<WorkflowExecutionModel>> getWorkflowExecution(Long id, ServerWebExchange exchange) {
+        return Mono.just(projectFacade.getWorkflowExecution(id))
+            .map(worflowExecutionDTO -> conversionService.convert(worflowExecutionDTO, WorkflowExecutionModel.class))
             .map(ResponseEntity::ok);
     }
 
     @Override
-    public Mono<ResponseEntity<Page>> getProjectExecutions(
+    public Mono<ResponseEntity<Page>> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber, ServerWebExchange exchange) {
 
         return Mono.just(
             projectFacade
-                .searchProjectExecutions(
+                .searchWorkflowExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
-                .map(
-                    projectExecution -> conversionService.convert(projectExecution, ProjectExecutionBasicModel.class)))
+                .map(workflowExecutionDTO -> conversionService.convert(
+                    workflowExecutionDTO, WorkflowExecutionBasicModel.class)))
             .map(ResponseEntity::ok);
     }
 }
