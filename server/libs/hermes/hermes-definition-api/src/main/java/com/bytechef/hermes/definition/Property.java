@@ -172,6 +172,7 @@ public sealed interface Property<P extends Property<P>>
     Type getType();
 
     interface PropertyVisitor {
+
         Object visit(ArrayProperty arrayProperty);
 
         Object visit(BooleanProperty booleanProperty);
