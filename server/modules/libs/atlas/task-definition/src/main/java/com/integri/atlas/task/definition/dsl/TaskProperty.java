@@ -45,6 +45,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     protected String displayName;
     protected DisplayOption displayOption;
     protected String name;
+    protected String placeholder;
     protected Boolean required;
     protected TaskPropertyType type;
     protected TaskPropertyTypeOption typeOption;
@@ -533,8 +534,8 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     }
 
     @SuppressWarnings("unchecked")
-    public T typeOption(TaskPropertyTypeOption typeOption) {
-        this.typeOption = typeOption;
+    public T placeholder(String placeholder) {
+        this.placeholder = placeholder;
 
         return (T) this;
     }
@@ -542,6 +543,13 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     @SuppressWarnings("unchecked")
     public T required(Boolean required) {
         this.required = required;
+
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T typeOption(TaskPropertyTypeOption typeOption) {
+        this.typeOption = typeOption;
 
         return (T) this;
     }
@@ -566,12 +574,16 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         return name;
     }
 
-    public TaskPropertyTypeOption getTypeOption() {
-        return typeOption;
-    }
-
     public Boolean isRequired() {
         return required;
+    }
+
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
+    public TaskPropertyTypeOption getTypeOption() {
+        return typeOption;
     }
 
     public TaskPropertyType getType() {
@@ -623,7 +635,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     public static final class CollectionTaskProperty extends TaskProperty<CollectionTaskProperty> {
 
         private List<TaskProperty<?>> options;
-        private String placeholder;
 
         public CollectionTaskProperty(String name) {
             this.name = name;
@@ -739,21 +750,21 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
 
     public static final class GroupTaskProperty extends TaskProperty<GroupTaskProperty> {
 
-        private List<TaskProperty<?>> fields;
+        private List<TaskProperty<?>> groupProperties;
 
         public GroupTaskProperty(String name) {
             this.name = name;
-            this.type = TaskPropertyType.COLLECTION;
+            this.type = TaskPropertyType.GROUP;
         }
 
-        public GroupTaskProperty fields(TaskProperty<?>... fields) {
-            this.fields = List.of(fields);
+        public GroupTaskProperty groupProperties(TaskProperty<?>... fields) {
+            this.groupProperties = List.of(fields);
 
             return this;
         }
 
-        public List<TaskProperty<?>> getFields() {
-            return fields;
+        public List<TaskProperty<?>> getGroupProperties() {
+            return groupProperties;
         }
     }
 
@@ -764,8 +775,8 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             this.type = TaskPropertyType.JSON;
         }
 
-        public JSONTaskProperty defaultValue(TaskParameter.TaskParameterMap defaultValue) {
-            this.defaultValue = parameter(defaultValue);
+        public JSONTaskProperty defaultValue(TaskParameter defaultValue) {
+            this.defaultValue = defaultValue;
 
             return this;
         }
@@ -774,6 +785,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     public static final class MultiOptionTaskProperty extends TaskProperty<MultiOptionTaskProperty> {
 
         private List<TaskPropertyOption> options;
+        private String placeholder;
 
         public MultiOptionTaskProperty(String name) {
             this.name = name;
