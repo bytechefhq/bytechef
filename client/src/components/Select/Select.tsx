@@ -25,7 +25,7 @@ type SelectProps = {
     defaultValue?: string | undefined;
     options: ISelectOption[];
     onValueChange?(value: string): void;
-    value: string;
+    value?: string;
 };
 
 const Select = ({

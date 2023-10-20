@@ -51,7 +51,7 @@ export const useCreateProjectWorkflowRequestMutation = (
             );
 
             const workflows = await new ProjectsApi().getProjectWorkflows({
-                id: project.id,
+                id: project.id as number,
             });
 
             queryClient.setQueryData(
