@@ -96,6 +96,24 @@ public class JSONFileTaskHandlerTest {
     }
 
     @Test
+    public void testReadJSONArrayWithPath() throws Exception {
+        File file = getFile("sample_array_path.json");
+
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileType", "JSON");
+        taskExecution.put("operation", "READ");
+        taskExecution.put("path", "$.cities");
+
+        assertEquals(
+            JSONArrayUtil.of(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset())),
+            JSONArrayUtil.of((List<?>) jsonFileTaskHandler.handle(taskExecution)),
+            true
+        );
+    }
+
+    @Test
     public void testReadJSONL() throws Exception {
         File file = getFile("sample.jsonl");
 

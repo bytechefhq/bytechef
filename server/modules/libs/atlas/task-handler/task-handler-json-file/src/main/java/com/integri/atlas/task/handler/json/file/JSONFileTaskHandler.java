@@ -21,6 +21,8 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,27 +73,24 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         if (operation == Operation.READ) {
             boolean isArray = taskExecution.get("isArray", Boolean.class, true);
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
+            String path = taskExecution.get("path");
 
             if (isArray) {
-                Integer pageSize = taskExecution.get("pageSize");
-                Integer pageNumber = taskExecution.get("pageNumber");
-
+                InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
                 List<Map<String, ?>> items;
 
                 if (fileType == FileType.JSON) {
-                    try (
-                        Stream<Map<String, ?>> stream = jsonHelper.stream(
-                            fileStorageService.getFileContentStream(fileEntry.getUrl())
-                        )
-                    ) {
-                        items = stream.toList();
+                    if (path == null) {
+                        try (Stream<Map<String, ?>> stream = jsonHelper.stream(inputStream)) {
+                            items = stream.toList();
+                        }
+                    } else {
+                        DocumentContext documentContext = JsonPath.parse(inputStream);
+
+                        items = documentContext.read(path);
                     }
                 } else {
-                    try (
-                        BufferedReader bufferedReader = new BufferedReader(
-                            new InputStreamReader(fileStorageService.getFileContentStream(fileEntry.getUrl()))
-                        )
-                    ) {
+                    try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
                         items =
                             bufferedReader
                                 .lines()
@@ -100,6 +99,8 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                     }
                 }
 
+                Integer pageSize = taskExecution.get("pageSize");
+                Integer pageNumber = taskExecution.get("pageNumber");
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
