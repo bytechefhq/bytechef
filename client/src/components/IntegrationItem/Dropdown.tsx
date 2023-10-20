@@ -39,8 +39,8 @@ const menuItems: RadixMenuItem[] = [
 ];
 
 export const Dropdown: React.FC<{
-    id: string;
-}> = ({id}) => {
+    id?: number;
+}> = ({id = 0}) => {
     return (
         <div className="relative inline-block text-left">
             <Root>
@@ -52,7 +52,7 @@ export const Dropdown: React.FC<{
                     <Content
                         align="end"
                         className="w-48 rounded-lg bg-white px-1.5 py-1 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-800 md:w-56"
-                        id={id}
+                        id={id.toString()}
                         sideOffset={5}
                     >
                         {menuItems.map(({label, separator}, i) => (

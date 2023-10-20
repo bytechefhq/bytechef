@@ -4,18 +4,29 @@ import {Date} from './Date';
 import {TagList} from './TagList';
 
 const Footer: React.FC<{
-    category: string;
-    tag: string;
-    button: string;
-    date: string;
-}> = ({category, tag, button, date}) => {
+    category?: string;
+    tags?: string[];
+    date?: Date;
+}> = ({category, tags, date}) => {
     return (
-        <div>
-            <Category category={category} />
+        <div className="grid grid-cols-3 gap-4">
+            {category && (
+                <div className="w-96">
+                    <Category category={category} />
+                </div>
+            )}
 
-            <TagList tag={tag} button={button} />
+            {tags && (
+                <div className="flex justify-start">
+                    <TagList tags={tags} />
+                </div>
+            )}
 
-            <Date date={date} />
+            {date && (
+                <div className="grid justify-items-end">
+                    <Date date={date} />
+                </div>
+            )}
         </div>
     );
 };

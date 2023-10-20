@@ -4,18 +4,22 @@ import Header from './Header';
 
 export const IntegrationItem: React.FC<{
     button: string;
-    category: string;
-    date: string;
-    id: string;
     name: string;
-    status: string;
-    tag: string;
-}> = ({id, name, status, category, tag, button, date}) => {
+    status: boolean;
+    category?: string;
+    date?: Date;
+    id?: number;
+    description?: string;
+    tags?: string[];
+    workflowIds?: string[];
+}> = ({id, name, status, category, tags, date}) => {
     return (
-        <div>
-            <Header id={id} name={name} status={status} />
+        <ul role="list" className="space-y-3">
+            <li className="overflow-hidden rounded-md bg-white px-6 py-4 shadow">
+                <Header id={id} name={name} status={status} />
 
-            <Footer category={category} tag={tag} button={button} date={date} />
-        </div>
+                <Footer category={category} tags={tags} date={date} />
+            </li>
+        </ul>
     );
 };
