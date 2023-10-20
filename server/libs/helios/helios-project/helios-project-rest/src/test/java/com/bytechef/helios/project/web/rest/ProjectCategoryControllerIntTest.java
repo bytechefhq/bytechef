@@ -20,12 +20,14 @@ package com.bytechef.helios.project.web.rest;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = ProjectRestTestConfiguration.class)
 @WebFluxTest(value = ProjectController.class)
 public class ProjectCategoryControllerIntTest {
 

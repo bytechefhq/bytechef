@@ -20,12 +20,14 @@ package com.bytechef.dione.integration.web.rest;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
+import com.bytechef.dione.integration.web.rest.config.IntegrationRestTestConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = IntegrationRestTestConfiguration.class)
 @WebFluxTest(value = IntegrationController.class)
 public class IntegrationCategoryControllerIntTest {
 

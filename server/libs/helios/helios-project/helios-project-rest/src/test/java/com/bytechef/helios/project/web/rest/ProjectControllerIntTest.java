@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
+import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import com.bytechef.helios.project.web.rest.mapper.ProjectMapper;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.facade.ProjectFacade;
@@ -43,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
@@ -52,6 +54,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = ProjectRestTestConfiguration.class)
 @WebFluxTest(value = ProjectController.class)
 public class ProjectControllerIntTest {
 
