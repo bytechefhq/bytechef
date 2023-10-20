@@ -64,7 +64,7 @@ public class WebhookHeadersImpl implements WebhookHeaders {
 
         @Override
         @SuppressWarnings("unchecked")
-        public WebhookHeaders convert(Object value) {
+        public WebhookHeaders convert(Object value, Object typeKey) {
             Map<String, Object> source = (Map<String, Object>) value;
 
             return new WebhookHeadersImpl(MapValueUtils.getMap(source, "headers", String[].class));

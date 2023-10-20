@@ -37,7 +37,7 @@ public class DoubleTypeConversion implements TypeConverter.Conversion<Double> {
     }
 
     @Override
-    public Double convert(Object value) {
+    public Double convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

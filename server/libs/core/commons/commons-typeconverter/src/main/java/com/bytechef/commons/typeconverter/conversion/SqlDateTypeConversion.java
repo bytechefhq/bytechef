@@ -33,19 +33,19 @@ public class SqlDateTypeConversion implements TypeConverter.Conversion<Date> {
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            java.sql.Date.class,
-            java.sql.Date.class.getName(),
+            Date.class,
+            Date.class.getName(),
             TypeConverter.TYPE_SQL_DATE
         };
     }
 
     @Override
-    public Date convert(Object value) {
+    public Date convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
 
-        if (!(value instanceof java.sql.Date)) {
+        if (!(value instanceof Date)) {
             String v = value.toString();
 
             v = v.trim();

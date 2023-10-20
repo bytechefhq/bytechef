@@ -17,6 +17,8 @@
 
 package com.bytechef.commons.typeconverter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Potentially returns a different set of
  *
@@ -24,6 +26,7 @@ package com.bytechef.commons.typeconverter;
  */
 public class NaughtyConversion implements TypeConverter.Conversion {
 
+    @SuppressFBWarnings("EI")
     public Object[] getTypeKeys() {
         return keys;
     }
@@ -33,7 +36,7 @@ public class NaughtyConversion implements TypeConverter.Conversion {
         keys = value;
     }
 
-    public Object convert(Object value) {
+    public Object convert(Object value, Object typeKey) {
         return null;
     }
 

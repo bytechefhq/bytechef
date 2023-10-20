@@ -39,7 +39,7 @@ public class LocalTimeTypeConversion implements TypeConverter.Conversion<LocalTi
     }
 
     @Override
-    public LocalTime convert(Object value) {
+    public LocalTime convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

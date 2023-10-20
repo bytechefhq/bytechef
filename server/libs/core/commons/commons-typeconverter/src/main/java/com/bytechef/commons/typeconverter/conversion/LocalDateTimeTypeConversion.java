@@ -40,7 +40,7 @@ public class LocalDateTimeTypeConversion implements TypeConverter.Conversion<Loc
     }
 
     @Override
-    public LocalDateTime convert(Object value) {
+    public LocalDateTime convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

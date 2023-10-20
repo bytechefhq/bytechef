@@ -43,7 +43,7 @@ public class StringWrapper {
             };
         }
 
-        public Object convert(Object value) {
+        public Object convert(Object value, Object typeKey) {
             return new StringWrapper(value.toString());
         }
     }

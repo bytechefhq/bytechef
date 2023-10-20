@@ -22,7 +22,7 @@ import com.bytechef.commons.typeconverter.TypeConverter;
 import java.sql.Timestamp;
 
 /**
- * Convert to a {@link SqlTimestamp} by parsing a value as a string of form <code>yyyy-[m]m-[d]d hh:mm:ss[.f...]</code>.
+ * Convert to a {@link Timestamp} by parsing a value as a string of form <code>yyyy-[m]m-[d]d hh:mm:ss[.f...]</code>.
  *
  * @see java.sql.Date#valueOf(String)
  *
@@ -33,18 +33,18 @@ public class SqlTimestampTypeConversion implements TypeConverter.Conversion<Time
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            java.sql.Timestamp.class,
-            java.sql.Timestamp.class.getName(),
+            Timestamp.class,
+            Timestamp.class.getName(),
             TypeConverter.TYPE_SQL_TIMESTAMP
         };
     }
 
     @Override
-    public Timestamp convert(Object value) {
+    public Timestamp convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }
-        if (!(value instanceof java.sql.Timestamp)) {
+        if (!(value instanceof Timestamp)) {
             String v = value.toString();
 
             v = v.trim();

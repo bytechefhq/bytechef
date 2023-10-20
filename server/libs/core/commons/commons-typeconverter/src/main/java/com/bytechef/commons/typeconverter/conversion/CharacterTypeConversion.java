@@ -38,7 +38,7 @@ public class CharacterTypeConversion implements TypeConverter.Conversion<Charact
     }
 
     @Override
-    public Character convert(Object value) {
+    public Character convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

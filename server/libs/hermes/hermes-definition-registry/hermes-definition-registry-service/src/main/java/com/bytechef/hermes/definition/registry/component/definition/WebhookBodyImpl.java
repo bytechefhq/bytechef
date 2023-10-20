@@ -72,7 +72,7 @@ public class WebhookBodyImpl implements WebhookBody {
 
         @Override
         @SuppressWarnings("unchecked")
-        public WebhookBody convert(Object value) {
+        public WebhookBody convert(Object value, Object typeKey) {
             Map<String, ?> source = (Map<String, ?>) value;
 
             return new WebhookBodyImpl(

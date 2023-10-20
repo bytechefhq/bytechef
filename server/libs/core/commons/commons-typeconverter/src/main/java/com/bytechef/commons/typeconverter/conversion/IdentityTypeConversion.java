@@ -33,7 +33,7 @@ public class IdentityTypeConversion
     }
 
     @Override
-    public Object convert(Object value) {
+    public Object convert(Object value, Object typeKey) {
         return value;
     }
 }

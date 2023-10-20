@@ -37,7 +37,7 @@ public class ByteTypeConversion implements TypeConverter.Conversion<Byte> {
     }
 
     @Override
-    public Byte convert(Object value) {
+    public Byte convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

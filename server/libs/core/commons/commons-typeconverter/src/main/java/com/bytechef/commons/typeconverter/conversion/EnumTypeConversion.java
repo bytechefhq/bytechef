@@ -20,21 +20,38 @@ package com.bytechef.commons.typeconverter.conversion;
 import com.bytechef.commons.typeconverter.TypeConverter;
 
 /**
- * Returns the value as-is (no conversion)
+ * Convert to a {@link Enum} by parsing a value as a string.
  *
- * @author Todd Fast
+ * @author Ivica Cardic
  */
-public class UnknownTypeConversion implements TypeConverter.Conversion<Object> {
+public class EnumTypeConversion implements TypeConverter.Conversion<Object> {
 
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            TypeConverter.TYPE_UNKNOWN
+            Enum.class,
+            Enum.class.getName(),
+            TypeConverter.TYPE_ENUM
         };
     }
 
     @Override
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     public Object convert(Object value, Object typeKey) {
+        if (!(value instanceof Enum)) {
+            String v = value.toString();
+
+            v = v.trim();
+
+            if (v.length() == 0) {
+                value = null;
+            } else {
+                value = Enum.valueOf((Class) typeKey, v);
+            }
+        }
+
         return value;
     }
 }

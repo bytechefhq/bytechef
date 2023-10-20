@@ -18,7 +18,7 @@
 package com.bytechef.commons.typeconverter;
 
 import com.bytechef.commons.typeconverter.conversion.IdentityTypeConversion;
-import com.bytechef.commons.typeconverter.conversion.ObjectTypeConversion;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,32 +33,32 @@ import java.util.ServiceLoader;
  * <pre>
  * Integer i = (Integer) TypeConverter.convert(Integer.class, "123");
  * </pre>
- *
+ * <p>
  * or using the shortcut method:
  *
  * <pre>
  * int i = TypeConverter.asInt("123");
  * </pre>
- *
+ * <p>
  * The {@link TypeConverter} comes ready to convert all the primitive types, plus a few more like {@link java.sql.Date}
  * and {@link java.math.BigDecimal}.
  * <p>
- *
+ * <p>
  * It is possible to register classes that implement the new {@link Conversion} interface for conversion to a custom
  * type. For example, this means that you can define a class to convert arbitrary objects to type <code>Foo</code>, and
  * register it for use throughout the VM:
  *
  * <pre>
-    Conversion<?> fooConversion = new FooConversion();
-    TypeConverter.registerTypeConversion(Foo.class, fooConversion);
-    ...
-    Bar bar = new Bar();
-    Foo foo = TypeConverter.convert(Foo.class, bar);
-    ...
-    String s = "bar";
-    Foo foo = TypeConverter.convert(Foo.class, s);
+ * Conversion<?> fooConversion = new FooConversion();
+ * TypeConverter.registerTypeConversion(Foo.class, fooConversion);
+ * ...
+ * Bar bar = new Bar();
+ * Foo foo = TypeConverter.convert(Foo.class, bar);
+ * ...
+ * String s = "bar";
+ * Foo foo = TypeConverter.convert(Foo.class, s);
  * </pre>
- *
+ * <p>
  * {@link Conversion} classes are also discovered using the JDK's standard {@link ServiceLoader} mechanism. To make a
  * conversion discoverable, place a file named
  * <code>META-INF/services/com.bytechef.commons.typeconverter.TypeConverter$Conversion</code> in your project, the
@@ -66,7 +66,7 @@ import java.util.ServiceLoader;
  * documentation for more details on how to use the <code>META-INF/services</code> mechanism.
  * <p>
  * The {@link TypeConverter} allows specification of an arbitrary <i>type key</i> in the
- * {@link #registerTypeConversion(Object,Conversion)} and {@link #convert(Object,Object)} methods, so one can
+ * {@link #registerTypeConversion(Object, Conversion)} and {@link #convert(Object, Object)} methods, so one can
  * simultaneously register a conversion object under a {@link Class} object, a class name, and one or more logical type
  * name. For example, the following are valid ways of converting a string to an <code>int</code>:
  *
@@ -79,70 +79,70 @@ import java.util.ServiceLoader;
  * Integer i = (Integer) TypeConverter.convert("integer", "123");
  * int i = TypeConverter.asInt("123");
  * </pre>
- *
+ * <p>
  * Default type conversions have been registered under the following keys:
  *
  * <pre>
- *	Classes:
- *		java.lang.Object
- *		java.lang.String
- *		java.lang.Integer
- *		java.lang.Integer.TYPE (int)
- *		java.lang.Double
- *		java.lang.Double.TYPE (double)
- *		java.lang.Boolean
- *		java.lang.Boolean.TYPE (boolean)
- *		java.lang.Long
- *		java.lang.Long.TYPE (long)
- *		java.lang.Float
- *		java.lang.Float.TYPE (float)
- *		java.lang.Short
- *		java.lang.Short.TYPE (short)
- *		java.lang.Byte
- *		java.lang.Byte.TYPE (byte)
- *		java.lang.Character
- *		java.lang.Character.TYPE (char)
- *		java.math.BigDecimal
- *		java.sql.Date
- *		java.sql.Time
- *		java.sql.Timestamp
+ *  Classes:
+ *     java.lang.Object
+ *     java.lang.String
+ *     java.lang.Integer
+ *     java.lang.Integer.TYPE (int)
+ *     java.lang.Double
+ *     java.lang.Double.TYPE (double)
+ *     java.lang.Boolean
+ *     java.lang.Boolean.TYPE (boolean)
+ *     java.lang.Long
+ *     java.lang.Long.TYPE (long)
+ *     java.lang.Float
+ *     java.lang.Float.TYPE (float)
+ *     java.lang.Short
+ *     java.lang.Short.TYPE (short)
+ *     java.lang.Byte
+ *     java.lang.Byte.TYPE (byte)
+ *     java.lang.Character
+ *     java.lang.Character.TYPE (char)
+ *     java.math.BigDecimal
+ *     java.sql.Date
+ *     java.sql.Time
+ *     java.sql.Timestamp
  *
- *	Class name strings:
- *		"java.lang.Object"
- *		"java.lang.String"
- *		"java.lang.Integer"
- *		"java.lang.Double"
- *		"java.lang.Boolean"
- *		"java.lang.Long"
- *		"java.lang.Float"
- *		"java.lang.Short"
- *		"java.lang.Byte"
- *		"java.lang.Character"
- *		"java.math.BigDecimal"
- *		"java.sql.Date"
- *		"java.sql.Time"
- *		"java.sql.Timestamp"
+ *     Class name strings:
+ *     "java.lang.Object"
+ *     "java.lang.String"
+ *     "java.lang.Integer"
+ *     "java.lang.Double"
+ *     "java.lang.Boolean"
+ *     "java.lang.Long"
+ *     "java.lang.Float"
+ *     "java.lang.Short"
+ *     "java.lang.Byte"
+ *     "java.lang.Character"
+ *     "java.math.BigDecimal"
+ *     "java.sql.Date"
+ *     "java.sql.Time"
+ *     "java.sql.Timestamp"
  *
- *	Logical type name string constants:
- *		TypeConverter.TYPE_UNKNOWN ("null")
- *		TypeConverter.TYPE_OBJECT ("object")
- *		TypeConverter.TYPE_STRING ("string")
- *		TypeConverter.TYPE_INT ("int")
- *		TypeConverter.TYPE_INTEGER ("integer")
- *		TypeConverter.TYPE_DOUBLE ("double")
- *		TypeConverter.TYPE_BOOLEAN ("boolean")
- *		TypeConverter.TYPE_LONG ("long")
- *		TypeConverter.TYPE_FLOAT ("float")
- *		TypeConverter.TYPE_SHORT ("short")
- *		TypeConverter.TYPE_BYTE ("byte")
- *		TypeConverter.TYPE_CHAR ("char")
- *		TypeConverter.TYPE_CHARACTER ("character")
- *		TypeConverter.TYPE_BIG_DECIMAL ("bigdecimal")
- *		TypeConverter.TYPE_SQL_DATE ("sqldate")
- *		TypeConverter.TYPE_SQL_TIME ("sqltime")
- *		TypeConverter.TYPE_SQL_TIMESTAMP ("sqltimestamp")
+ *     Logical type name string constants:
+ *     TypeConverter.TYPE_UNKNOWN ("null")
+ *     TypeConverter.TYPE_OBJECT ("object")
+ *     TypeConverter.TYPE_STRING ("string")
+ *     TypeConverter.TYPE_INT ("int")
+ *     TypeConverter.TYPE_INTEGER ("integer")
+ *     TypeConverter.TYPE_DOUBLE ("double")
+ *     TypeConverter.TYPE_BOOLEAN ("boolean")
+ *     TypeConverter.TYPE_LONG ("long")
+ *     TypeConverter.TYPE_FLOAT ("float")
+ *     TypeConverter.TYPE_SHORT ("short")
+ *     TypeConverter.TYPE_BYTE ("byte")
+ *     TypeConverter.TYPE_CHAR ("char")
+ *     TypeConverter.TYPE_CHARACTER ("character")
+ *     TypeConverter.TYPE_BIG_DECIMAL ("bigdecimal")
+ *     TypeConverter.TYPE_SQL_DATE ("sqldate")
+ *     TypeConverter.TYPE_SQL_TIME ("sqltime")
+ *     TypeConverter.TYPE_SQL_TIMESTAMP ("sqltimestamp")
  * </pre>
- *
+ * <p>
  * The {@link TypeConverter} treats type keys of type {@link Class} slightly differently than other keys. If the
  * provided value is already of the type specified by the type key class, it is returned without a conversion taking
  * place. For example, a value of type <code>MySub</code> that extends the class <code>MySuper</code> would not be
@@ -151,89 +151,137 @@ import java.util.ServiceLoader;
  * <pre>
  * MySub o = TypeConverter.convert(MySuper.class, mySub);
  * </pre>
- *
+ * <p>
  * Finally, a class can optionally implement the {@link Listener} and/or {@link Convertible} interfaces to receive
  * conversion events or provide its own {@link Conversion} instance, respectively. This capability allows a class to
  * implement very rich custom type conversion logic.
  * <p>
- *
+ * <p>
  * Be warned that although the type conversion infrastructure in this class is designed to add only minimal overhead to
  * the conversion process, conversion of an object to another type is a potentially expensive operation and should be
  * used with discretion.
  *
+ * @author Todd Fast
  * @see Convertible
  * @see Conversion
  * @see Listener
- *
- * @author Todd Fast
  */
 public class TypeConverter {
 
-    /** Logical type name "null" */
+    /**
+     * Logical type name "null"
+     */
     public static final String TYPE_UNKNOWN = "null";
 
-    /** Logical type name "object" */
+    /**
+     * Logical type name "object"
+     */
     public static final String TYPE_OBJECT = "object";
 
-    /** Logical type name "string" */
+    /**
+     * Logical type name "string"
+     */
     public static final String TYPE_STRING = "string";
 
-    /** Logical type name "int" */
+    /**
+     * Logical type name "int"
+     */
     public static final String TYPE_INT = "int";
 
-    /** Logical type name "integer" */
+    /**
+     * Logical type name "integer"
+     */
     public static final String TYPE_INTEGER = "integer";
 
-    /** Logical type name "long" */
+    /**
+     * Logical type name "long"
+     */
     public static final String TYPE_LONG = "long";
 
-    /** Logical type name "float" */
+    /**
+     * Logical type name "float"
+     */
     public static final String TYPE_FLOAT = "float";
 
-    /** Logical type name "double" */
+    /**
+     * Logical type name "double"
+     */
     public static final String TYPE_DOUBLE = "double";
 
-    /** Logical type name "short" */
+    /**
+     * Logical type name "short"
+     */
     public static final String TYPE_SHORT = "short";
 
-    /** Logical type name "boolean" */
+    /**
+     * Logical type name "boolean"
+     */
     public static final String TYPE_BOOLEAN = "boolean";
 
-    /** Logical type name "byte" */
+    /**
+     * Logical type name "byte"
+     */
     public static final String TYPE_BYTE = "byte";
 
-    /** Logical type name "char" */
+    /**
+     * Logical type name "char"
+     */
     public static final String TYPE_CHAR = "char";
 
-    /** Logical type name "character" */
+    /**
+     * Logical type name "character"
+     */
     public static final String TYPE_CHARACTER = "character";
 
-    /** Logical type name "bigdecimal" */
+    /**
+     * Logical type name "bigdecimal"
+     */
     public static final String TYPE_BIG_DECIMAL = "bigdecimal";
 
-    /** Logical type name "sqldate" */
+    /**
+     * Logical type name "sqldate"
+     */
     public static final String TYPE_SQL_DATE = "sqldate";
 
-    /** Logical type name "sqltime" */
+    /**
+     * Logical type name "sqltime"
+     */
     public static final String TYPE_SQL_TIME = "sqltime";
 
-    /** Logical type name "sqltimestamp" */
+    /**
+     * Logical type name "sqltimestamp"
+     */
     public static final String TYPE_SQL_TIMESTAMP = "sqltimestamp";
 
-    /** Logical type name "date" */
+    /**
+     * Logical type name "date"
+     */
     public static final String TYPE_DATE = "date";
 
-    /** Logical type name "duration" */
+    /**
+     * Logical type name "duration"
+     */
     public static final String TYPE_DURATION = "duration";
 
-    /** Logical type name "localdate" */
+    /**
+     * Logical type name "localdate"
+     */
     public static final String TYPE_LOCAL_DATE = "localdate";
 
-    /** Logical type name "localdatetime" */
+    /**
+     * Logical type name "localdatetime"
+     */
     public static final String TYPE_LOCAL_DATE_TIME = "localdatetime";
 
-    /** Logical type name "localtime" */
+    /**
+     * Logical type name "localtime"
+     */
     public static final String TYPE_LOCAL_TIME = "localtime";
+
+    /**
+     * Logical type name "enum"
+     */
+    public static final Object TYPE_ENUM = "enum";
 
     private static final Map<Object, Conversion<?>> typeConversions = Collections.synchronizedMap(new HashMap<>());
 
@@ -242,9 +290,9 @@ public class TypeConverter {
     static {
         // Discover all type conversions on the classpath and register them
         @SuppressWarnings("rawtypes")
-        ServiceLoader<Conversion> loader = ServiceLoader.load(Conversion.class);
+        ServiceLoader<Conversion> serviceLoader = ServiceLoader.load(Conversion.class);
 
-        for (Conversion<?> conversion : loader) {
+        for (Conversion<?> conversion : serviceLoader) {
             registerTypeConversion(conversion);
         }
 
@@ -256,7 +304,6 @@ public class TypeConverter {
 
     /**
      * Cannot instantiate
-     *
      */
     private TypeConverter() {
         super();
@@ -265,16 +312,14 @@ public class TypeConverter {
     /**
      * Return the map of type conversion objects. The keys for the values in this map may be arbitrary objects, but the
      * values are of type <code>Conversion</code>.
-     *
      */
     public static Map<Object, Conversion<?>> getTypeConversions() {
-        return typeConversions;
+        return Collections.unmodifiableMap(typeConversions);
     }
 
     /**
      * Register a type conversion object under the specified key. This method can be used by developers to register
      * custom type conversion objects.
-     *
      */
     public static void registerTypeConversion(Object key, Conversion<?> conversion) {
         typeConversions.put(key, conversion);
@@ -282,7 +327,6 @@ public class TypeConverter {
 
     /**
      * Unregister a type conversion object under the specified key
-     *
      */
     public static void unregisterTypeConversion(Object key) {
         typeConversions.remove(key);
@@ -291,7 +335,6 @@ public class TypeConverter {
     /**
      * Register a type conversion object under the specified keys. This method can be used by developers to register
      * custom type conversion objects.
-     *
      */
     public static void registerTypeConversion(Conversion<?> conversion) {
         Object[] keys = conversion.getTypeKeys();
@@ -308,7 +351,6 @@ public class TypeConverter {
     /**
      * Unregister a type conversion object under all keys it specifies via the {@link Conversion#getTypeKeys} method.
      * Note, if this conversion is registered under other type keys, it will NOT be removed from those.
-     *
      */
     public static void unregisterTypeConversion(Conversion<?> conversion) {
         if (conversion != null) {
@@ -330,7 +372,6 @@ public class TypeConverter {
 
     /**
      * Discover all the type key mappings for this conversion
-     *
      */
     private static List<Object> getTypeKeys(Conversion<?> conversion) {
         List<Object> result = new ArrayList<>();
@@ -353,7 +394,6 @@ public class TypeConverter {
     /**
      * Return a {@link Conversion} to the target type. Note, the returned conversion instance is not the one that was
      * registered, but rather is proxied.
-     *
      */
     public static <T> Conversion<T> to(final Class<T> type) {
 
@@ -362,36 +402,41 @@ public class TypeConverter {
          * subtleties. The goal is to preserve the identical behavior as if {@link #asType(Class,Object)} were called.
          *
          */
-        return new Conversion<>() {
+        class ConversionProxy implements Conversion<T> {
 
             @Override
             public Object[] getTypeKeys() {
                 Conversion<?> conversion = typeConversions.get(type);
 
-                return (conversion != null)
-                    ? TypeConverter.getTypeKeys(conversion)
-                        .toArray(new Object[0])
-                    : new Object[0];
+                if (conversion == null) {
+                    return new Object[0];
+                } else {
+                    List<Object> typeKeysObjects = TypeConverter.getTypeKeys(conversion);
+
+                    return typeKeysObjects.toArray(new Object[0]);
+                }
             }
 
             @Override
-            public T convert(Object value) {
+            public T convert(Object value, Object typeKey) {
                 return TypeConverter.convert(type, value);
             }
-        };
+        }
+
+        return new ConversionProxy();
     }
 
     /**
      * Convert an object to the specified type. A type conversion object must have been previously registered for the
      * provided class in order for the conversion to succeed (with one exception, see below).
      * <p>
-     *
+     * <p>
      * Value objects that implement {@link Listener} interface will be notified of type conversion via the event methods
      * declared in that interface. Value objects that implement {@link Convertible} will be asked for an instance of
      * {@link Conversion} directly, and the returned object will be used to convert the type instead of the registered
      * type conversion object. These interfaces can be used to customize the type conversion process.
      * <p>
-     *
+     * <p>
      * Note, this method will check if the provided value is the same as or a subclass of the specified class. If it is,
      * this method returns the value object immediately without attempting to convert its type. One exception to this
      * rule is if the provided type key is {@link Object}, in which case the conversion is attempted anyway. The reason
@@ -415,13 +460,13 @@ public class TypeConverter {
      * previously registered under the provided key in order for the conversion to succeed (with one exception, see
      * below).
      * <p>
-     *
+     * <p>
      * Value objects that implement {@link Listener} interface will be notified of type conversion via the event methods
      * declared in that interface. Value objects that implement {@link Convertible} will be asked for an instance of
      * {@link Conversion} directly, and the returned object will be used to convert the type instead of the registered
      * type conversion object. These interfaces can be used to customize the type conversion process.
      * <p>
-     *
+     * <p>
      * Note, this method treats type keys of type {@link Class} differently than other type keys. That is, this method
      * will check if the provided value is the same as or a subclass of the specified class. If it is, this method
      * returns the value object immediately without attempting to convert its type. One exception to this rule is if the
@@ -439,7 +484,6 @@ public class TypeConverter {
      * @return The converted value object, or <code>null</code> if the original value is <code>null</code>
      */
     public static Object convert(Object typeKey, Object value) {
-
         if (value == null) {
             return null;
         }
@@ -456,7 +500,7 @@ public class TypeConverter {
                 ((Listener) value).beforeConversion(typeKey);
             }
 
-            Object result = conversion.convert(value);
+            Object result = conversion.convert(value, typeKey);
 
             if (value instanceof Listener) {
                 result = ((Listener) value).afterConversion(typeKey, result);
@@ -467,24 +511,6 @@ public class TypeConverter {
             throw new IllegalArgumentException("Could not find type " +
                 "conversion for type \"" + typeKey + "\" (value = \"" + value + "\")");
         }
-    }
-
-    /**
-     * Obtain a conversion for the specified type key and value
-     *
-     */
-    private static Conversion<?> getTypeConversion(
-        Object typeKey, Object value) {
-
-        // Check if the provided value is already of the target type
-        if (typeKey instanceof Class && typeKey != Object.class && ((Class<?>) typeKey).isInstance(value)) {
-            return IDENTITY_CONVERSION;
-        }
-
-        // Find the type conversion object
-        return (value instanceof Convertible)
-            ? ((Convertible) value).getTypeConversion(typeKey)
-            : typeConversions.get(typeKey);
     }
 
     /**
@@ -740,30 +766,50 @@ public class TypeConverter {
     }
 
     /**
+     * Obtain a conversion for the specified type key and value
+     */
+    private static Conversion<?> getTypeConversion(Object typeKey, Object value) {
+
+        // Check if the provided value is already of the target type
+        if (typeKey instanceof Class && typeKey != Object.class && ((Class<?>) typeKey).isInstance(value)) {
+            return IDENTITY_CONVERSION;
+        }
+
+        // Find the type conversion object
+        if (value instanceof Convertible) {
+            return ((Convertible) value).getTypeConversion(typeKey);
+        } else {
+            if (typeKey instanceof Class && ((Class<?>) typeKey).isEnum() || typeKey.equals("enum") ||
+                typeKey.equals("java.lang.Enum")) {
+
+                return typeConversions.get(Enum.class);
+            } else {
+                return typeConversions.get(typeKey);
+            }
+        }
+    }
+
+    /**
      * Converts a given value to a specific type
-     *
      */
     public interface Conversion<T> {
 
         /**
          * Return the keys under which to register this conversion. This list should always return the same values to
          * ensure correct behavior.
-         *
          */
         Object[] getTypeKeys();
 
         /**
          * Converts the provided value to the type represented by the implementer if this interface
-         *
          */
-        T convert(Object value);
+        T convert(Object value, Object typeKey);
     }
 
     /**
      * During type conversion by the {@link TypeConverter} class, value objects that implement this interface will be
      * called upon to provide their own type conversion objects instead of using the conversions registered with the
      * {@link TypeConverter} class.
-     *
      */
     public interface Convertible {
 
@@ -782,20 +828,17 @@ public class TypeConverter {
      * The listener interface for receiving type conversion events. A class that implements this interface will have the
      * event methods in this interface called when that class is being converted by the various conversion methods in
      * the {@link TypeConverter} class.
-     *
      */
     public interface Listener {
 
         /**
          * Called before conversion of a value occurs
-         *
          */
         void beforeConversion(Object targetTypeKey);
 
         /**
          * Called immediately after a conversion of a value occurs, providing the converted value and giving the
          * listener the opportunity to return a different value instead
-         *
          */
         Object afterConversion(Object targetTypeKey, Object convertedValue);
     }

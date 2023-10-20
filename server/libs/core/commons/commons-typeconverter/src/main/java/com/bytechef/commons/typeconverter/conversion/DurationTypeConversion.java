@@ -38,7 +38,7 @@ public class DurationTypeConversion implements TypeConverter.Conversion<Duration
     }
 
     @Override
-    public Duration convert(Object value) {
+    public Duration convert(Object value, Object typeKey) {
         if (value == null) {
             return null;
         }

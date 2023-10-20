@@ -193,7 +193,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
         }
 
         @SuppressWarnings("unchecked")
-        public WorkflowTrigger convert(Object value) {
+        public WorkflowTrigger convert(Object value, Object typeKey) {
             return new WorkflowTrigger((Map<String, ?>) value);
         }
     }
