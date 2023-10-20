@@ -11,6 +11,7 @@ import {
 import Button from 'components/Button/Button';
 import {Dialog, Transition} from '@headlessui/react';
 import Select from '../../components/Select/Select';
+import useStore from './store';
 
 type SidebarProps = {
     open: boolean;
@@ -18,6 +19,8 @@ type SidebarProps = {
 };
 
 const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
+    const {currentNode} = useStore();
+
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={closeSidebar}>
@@ -43,8 +46,9 @@ const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
                                                     <Dialog.Title className="text-lg font-medium text-gray-900">
                                                         <div className="flex items-center">
                                                             <span className="mr-2 text-base">
-                                                                Http Client
-                                                                (http-client-1)
+                                                                {
+                                                                    currentNode.label
+                                                                }
                                                             </span>
 
                                                             <Provider>
