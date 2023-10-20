@@ -17,14 +17,14 @@
 package com.integri.atlas.task.handler.mysql.v1_0;
 
 import static com.integri.atlas.engine.Constants.AUTH;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.DATABASE;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.HOST;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PASSWORD;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PORT;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.USERNAME;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DATABASE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.HOST;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PASSWORD;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PORT;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.USERNAME;
 
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
-import com.integri.atlas.task.commons.jdbc.DataSourceFactory;
+import com.integri.atlas.task.jdbc.commons.DataSourceFactory;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;

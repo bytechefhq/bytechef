@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.commons.jdbc;
+package com.integri.atlas.task.jdbc.commons;
 
 import static com.integri.atlas.task.descriptor.model.DSL.ARRAY_PROPERTY;
 import static com.integri.atlas.task.descriptor.model.DSL.BOOLEAN_PROPERTY;

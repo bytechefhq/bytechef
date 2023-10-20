@@ -67,7 +67,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-helpers")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-transform-json")
-    implementation project(":modules:libs:atlas:task-jdbc")
+    implementation project(":modules:libs:atlas:task-jdbc-commons")
 
     runtimeOnly "org.postgresql:postgresql"
 

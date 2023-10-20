@@ -21,6 +21,8 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+
+import com.integri.atlas.task.jdbc.commons.QueryJdbcTaskHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +37,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class InsertJdbcTaskHandlerIntTest {
+public class QueryJdbcTaskHandlerIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private InsertJdbcTaskHandler insertJdbcTaskHandler;
+    private QueryJdbcTaskHandler queryJdbcTaskHandler;
 
     @BeforeEach
     public void beforeEach() {
@@ -50,30 +52,29 @@ public class InsertJdbcTaskHandlerIntTest {
         jdbcTemplate.execute(
             """
             DROP TABLE IF EXISTS test;
-            CREATE TABLE test (
+            CREATE TABLE IF NOT EXISTS test (
                 id   varchar(256) not null primary key,
                 name varchar(256) not null
             );
+            INSERT INTO test VALUES('id1', 'name1');
+            INSERT INTO test VALUES('id2', 'name2');
+            INSERT INTO test VALUES('id3', 'name3');
+            INSERT INTO test VALUES('id4', 'name4');
         """
         );
     }
 
     @Test
-    public void testInsert() throws Exception {
+    public void testQuery() throws Exception {
         TaskExecution taskExecution = new SimpleTaskExecution(
-            Map.of(
-                "table",
-                "test",
-                "columns",
-                List.of("id", "name"),
-                "rows",
-                List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2"))
-            )
+            Map.of("query", "SELECT count(*) FROM test where id=:id", "parameters", Map.of("id", "id2"))
         );
 
-        Map<String, Integer> result = insertJdbcTaskHandler.handle(taskExecution);
+        queryJdbcTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(2, result.get("rows"));
+        List<Map<String, ?>> result = queryJdbcTaskHandler.handle(taskExecution);
+
+        Assertions.assertEquals(1, result.size());
     }
 
     @TestConfiguration
@@ -83,8 +84,8 @@ public class InsertJdbcTaskHandlerIntTest {
         private DataSource dataSource;
 
         @Bean
-        InsertJdbcTaskHandler insertJdbcTaskHandler(PlatformTransactionManager transactionManager) {
-            return new InsertJdbcTaskHandler(taskExecution -> dataSource, transactionManager);
+        QueryJdbcTaskHandler queryJdbcTaskHandler(PlatformTransactionManager transactionManager) {
+            return new QueryJdbcTaskHandler(taskExecution -> dataSource, transactionManager);
         }
     }
 }

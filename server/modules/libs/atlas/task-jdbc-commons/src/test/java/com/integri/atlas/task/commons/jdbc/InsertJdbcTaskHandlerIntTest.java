@@ -21,6 +21,8 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+
+import com.integri.atlas.task.jdbc.commons.InsertJdbcTaskHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,19 +37,17 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class UpdateJdbcTaskHandlerIntTest {
+public class InsertJdbcTaskHandlerIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private UpdateJdbcTaskHandler updateJdbcTaskHandler;
-
-    private JdbcTemplate jdbcTemplate;
+    private InsertJdbcTaskHandler insertJdbcTaskHandler;
 
     @BeforeEach
     public void beforeEach() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
         jdbcTemplate.execute(
             """
@@ -56,39 +56,37 @@ public class UpdateJdbcTaskHandlerIntTest {
                 id   varchar(256) not null primary key,
                 name varchar(256) not null
             );
-            INSERT INTO test VALUES('id1', 'name1');
-            INSERT INTO test VALUES('id2', 'name2');
-            INSERT INTO test VALUES('id3', 'name3');
-            INSERT INTO test VALUES('id4', 'name4');
         """
         );
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    public void testInsert() throws Exception {
         TaskExecution taskExecution = new SimpleTaskExecution(
-            Map.of("table", "test", "columns", List.of("name"), "rows", List.of(Map.of("id", "id2", "name", "name3")))
+            Map.of(
+                "table",
+                "test",
+                "columns",
+                List.of("id", "name"),
+                "rows",
+                List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2"))
+            )
         );
 
-        Map<String, Integer> result = updateJdbcTaskHandler.handle(taskExecution);
+        Map<String, Integer> result = insertJdbcTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(1, result.get("rows"));
-
-        Assertions.assertEquals(
-            "name3",
-            jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class)
-        );
+        Assertions.assertEquals(2, result.get("rows"));
     }
 
     @TestConfiguration
-    public static class UpdateJdbcTaskHandlerIntTestConfiguration {
+    public static class InsertJdbcTaskHandlerIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        UpdateJdbcTaskHandler updateJdbcTaskHandler(PlatformTransactionManager transactionManager) {
-            return new UpdateJdbcTaskHandler(taskExecution -> dataSource, transactionManager);
+        InsertJdbcTaskHandler insertJdbcTaskHandler(PlatformTransactionManager transactionManager) {
+            return new InsertJdbcTaskHandler(taskExecution -> dataSource, transactionManager);
         }
     }
 }

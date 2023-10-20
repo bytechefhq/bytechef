@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.commons.jdbc;
+package com.integri.atlas.task.jdbc.commons;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import org.springframework.jdbc.core.JdbcTemplate;

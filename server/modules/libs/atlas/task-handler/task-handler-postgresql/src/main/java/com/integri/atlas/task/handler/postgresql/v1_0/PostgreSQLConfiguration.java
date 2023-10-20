@@ -16,28 +16,28 @@
 
 package com.integri.atlas.task.handler.postgresql.v1_0;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.DATABASE;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.DELETE;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.EXECUTE;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.HOST;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.INSERT;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PASSWORD;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PORT;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.QUERY;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.UPDATE;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.USERNAME;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DATABASE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DELETE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.EXECUTE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.HOST;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.INSERT;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PASSWORD;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PORT;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.QUERY;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.UPDATE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.USERNAME;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.POSTGRESQL;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.VERSION_1_0;
 
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
-import com.integri.atlas.task.commons.jdbc.DataSourceFactory;
-import com.integri.atlas.task.commons.jdbc.DeleteJdbcTaskHandler;
-import com.integri.atlas.task.commons.jdbc.ExecuteJdbcTaskHandler;
-import com.integri.atlas.task.commons.jdbc.InsertJdbcTaskHandler;
-import com.integri.atlas.task.commons.jdbc.QueryJdbcTaskHandler;
-import com.integri.atlas.task.commons.jdbc.UpdateJdbcTaskHandler;
+import com.integri.atlas.task.jdbc.commons.DataSourceFactory;
+import com.integri.atlas.task.jdbc.commons.DeleteJdbcTaskHandler;
+import com.integri.atlas.task.jdbc.commons.ExecuteJdbcTaskHandler;
+import com.integri.atlas.task.jdbc.commons.InsertJdbcTaskHandler;
+import com.integri.atlas.task.jdbc.commons.QueryJdbcTaskHandler;
+import com.integri.atlas.task.jdbc.commons.UpdateJdbcTaskHandler;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
