@@ -21,10 +21,13 @@ import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.definition.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.definition.Authorization.AUTHORIZATION;
@@ -35,6 +38,9 @@ import static com.bytechef.hermes.definition.DefinitionDSL.option;
  * @author Ivica Cardic
  */
 public class MailchimpUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(MailchimpUtils.class);
+
     public static String getMailChimpServer(String accessToken) {
         Map<?, ?> response = (Map<?, ?>) HttpClientUtils
             .get("https://login.mailchimp.com/oauth2/metadata")
@@ -49,9 +55,11 @@ public class MailchimpUtils {
     @SuppressWarnings("unchecked")
     public static ComponentOptionsFunction getListIdOptions() {
         return (connection, inputParameters) -> {
+            String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
+
             Map<?, ?> response = (Map<?, ?>) HttpClientUtils
-                .get("https://%s.api.mailchimp.com/3.0/lists".formatted(
-                    getMailChimpServer(MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN))))
+                .get("https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken)))
+                .header("Authorization", "Bearer " + accessToken)
                 .queryParameters(
                     Map.of(
                         "fields", List.of("lists.id,lists.name,total_items"),
@@ -59,6 +67,12 @@ public class MailchimpUtils {
                 .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
                 .execute()
                 .body();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response" + response);
+            }
+
+            Objects.requireNonNull(response.get("lists"), "'lists' must not be null");
 
             List<Option<?>> options = new ArrayList<>();
 
