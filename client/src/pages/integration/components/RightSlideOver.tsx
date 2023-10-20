@@ -11,7 +11,7 @@ import {
 import Button from 'components/Button/Button';
 import {Dialog, Transition} from '@headlessui/react';
 import Select from '../../../components/Select/Select';
-import useStore from '../store/store';
+import useRightSlideOverStore from '../stores/rightSlideOver.store';
 
 type SidebarProps = {
     open: boolean;
@@ -19,7 +19,7 @@ type SidebarProps = {
 };
 
 const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
-    const {currentNode} = useStore();
+    const {currentNode} = useRightSlideOverStore();
 
     return (
         <Transition.Root show={open} as={Fragment}>
