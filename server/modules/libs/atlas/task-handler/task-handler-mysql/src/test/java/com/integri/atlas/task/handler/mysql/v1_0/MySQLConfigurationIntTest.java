@@ -16,16 +16,45 @@
 
 package com.integri.atlas.task.handler.mysql.v1_0;
 
+import static com.integri.atlas.engine.Constants.AUTH;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.DATABASE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.HOST;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PASSWORD;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PORT;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.USERNAME;
+
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import com.integri.atlas.task.commons.jdbc.DataSourceFactory;
+import com.zaxxer.hikari.HikariDataSource;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
+@SpringBootTest
 public class MySQLConfigurationIntTest {
+
+    @Autowired
+    private DataSourceFactory dataSourceFactory;
 
     @Test
     public void testDataSourceFactory() {
-        Assertions.fail();
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.put(
+            AUTH,
+            Map.of(HOST, "host", PORT, 1234, DATABASE, "database", USERNAME, "username", PASSWORD, "password")
+        );
+
+        HikariDataSource dataSource = (HikariDataSource) dataSourceFactory.createDataSource(taskExecution);
+
+        Assertions.assertEquals("com.mysql.jdbc.Driver", dataSource.getDriverClassName());
+        Assertions.assertEquals("jdbc:mysql://host:1234/database", dataSource.getJdbcUrl());
+        Assertions.assertEquals("password", dataSource.getPassword());
+        Assertions.assertEquals("username", dataSource.getUsername());
     }
 }
