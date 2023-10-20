@@ -264,7 +264,7 @@ public final class Integration implements Persistable<Long> {
     }
 
     public void setStatus(Status status) {
-        this.status = status.getId();
+        this.status = status == null ? 0 : status.getId();
     }
 
     public void setTagIds(List<Long> tagIds) {
