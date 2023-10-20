@@ -37,7 +37,7 @@ export interface ProjectInstanceWorkflowModel {
      * @type {{ [key: string]: object; }}
      * @memberof ProjectInstanceWorkflowModel
      */
-    inputParameters?: { [key: string]: object; };
+    inputs?: { [key: string]: object; };
     /**
      * The ids of connections used by a project instance.
      * @type {Array<number>}
@@ -137,7 +137,7 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
     }
     return {
         
-        'inputParameters': !exists(json, 'inputParameters') ? undefined : json['inputParameters'],
+        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'connectionIds': !exists(json, 'connectionIds') ? undefined : json['connectionIds'],
         'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ConnectionModelFromJSON)),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
@@ -163,7 +163,7 @@ export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkfl
     }
     return {
         
-        'inputParameters': value.inputParameters,
+        'inputs': value.inputs,
         'connectionIds': value.connectionIds,
         'enabled': value.enabled,
         'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
