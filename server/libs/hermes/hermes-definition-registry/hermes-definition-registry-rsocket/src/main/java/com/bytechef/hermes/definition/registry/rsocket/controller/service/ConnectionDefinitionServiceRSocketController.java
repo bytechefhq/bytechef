@@ -26,6 +26,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +60,7 @@ public class ConnectionDefinitionServiceRSocketController {
 
         connectionDefinitionService.executeAuthorizationApply(
             connection.componentName, connection.connectionVersion, connection.parameters, connection.authorizationName,
-            new Authorization.AuthorizationContext(headers, queryParameters, new HashMap<>()));
+            new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()));
 
         return Mono.just(Map.of("headers", headers, "queryParameters", queryParameters));
     }
@@ -108,6 +110,37 @@ public class ConnectionDefinitionServiceRSocketController {
             connectionDefinitionService.getOAuth2Parameters(
                 connection.componentName, connection.connectionVersion, connection.parameters,
                 connection.authorizationName));
+    }
+
+    record AuthorizationContextImpl(
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> body)
+        implements Authorization.AuthorizationContext {
+
+        private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+        @Override
+        public void setHeaders(Map<String, List<String>> headers) {
+            this.headers.putAll(headers);
+        }
+
+        @Override
+        public void setQueryParameters(Map<String, List<String>> queryParameters) {
+            this.queryParameters.putAll(queryParameters);
+        }
+
+        @Override
+        public void setBody(Map<String, String> body) {
+            this.body.putAll(body);
+        }
+
+        @Override
+        public void setUsernamePassword(String username, String password) {
+            String valueToEncode = username + ":" + password;
+
+            headers.put(
+                "Authorization",
+                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
+        }
     }
 
     private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {

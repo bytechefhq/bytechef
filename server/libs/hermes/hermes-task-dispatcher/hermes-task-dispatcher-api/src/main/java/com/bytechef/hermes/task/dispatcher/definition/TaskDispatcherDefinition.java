@@ -19,7 +19,6 @@ package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -30,24 +29,60 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-@JsonDeserialize(as = TaskDispatcherDSL.ModifiableTaskDispatcherDefinition.class)
 public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getDescription();
 
-    String getIcon();
+    /**
+     *
+     * @return
+     */
+    Optional<String> getIcon();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
-    List<Property<? extends Property<?>>> getOutputSchema();
+    /**
+     *
+     * @return
+     */
+    Optional<List<? extends Property<?>>> getOutputSchema();
 
-    List<Property<?>> getProperties();
+    /**
+     *
+     * @return
+     */
+    Optional<List<? extends Property<?>>> getProperties();
 
-    Resources getResources();
+    /**
+     * TODO
+     *
+     * @return
+     */
+    Optional<Resources> getResources();
 
-    String getTitle();
+    /**
+     *
+     * @return
+     */
+    Optional<String> getTitle();
 
+    /**
+     *
+     * @return
+     */
     int getVersion();
 
-    List<Property<?>> getTaskProperties();
+    /**
+     *
+     * @return
+     */
+    Optional<List<? extends Property<?>>> getTaskProperties();
 }

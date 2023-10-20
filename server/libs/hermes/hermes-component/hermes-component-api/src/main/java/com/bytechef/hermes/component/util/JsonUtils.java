@@ -18,6 +18,8 @@
 package com.bytechef.hermes.component.util;
 
 import java.io.InputStream;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -41,6 +43,10 @@ public final class JsonUtils {
         return jsonMapper.read(json, path);
     }
 
+    public static Stream<Map<String, ?>> stream(InputStream inputStream) {
+        return jsonMapper.stream(inputStream);
+    }
+
     public static String write(Object object) {
         return jsonMapper.write(object);
     }
@@ -55,6 +61,8 @@ public final class JsonUtils {
         <T> T read(InputStream inputStream, String path);
 
         <T> T read(String json, String path);
+
+        Stream<Map<String, ?>> stream(InputStream inputStream);
 
         String write(Object object);
     }

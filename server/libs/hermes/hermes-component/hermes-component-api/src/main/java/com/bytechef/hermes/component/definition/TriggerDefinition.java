@@ -20,9 +20,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -33,7 +31,6 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ModifiableTriggerDefinition.class)
 public interface TriggerDefinition {
 
     /**
@@ -80,7 +77,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    String getDescription();
+    Optional<String> getDescription();
 
     /**
      * TODO
@@ -117,7 +114,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    EditorDescriptionFunction getEditorDescription();
+    Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource();
 
     /**
      *
@@ -171,7 +168,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Object getSampleOutput();
+    Optional<Object> getSampleOutput();
 
     /**
      *
@@ -185,7 +182,11 @@ public interface TriggerDefinition {
      */
     Optional<StaticWebhookRequestFunction> getStaticWebhookRequest();
 
-    String getTitle();
+    /**
+     *
+     * @return
+     */
+    Optional<String> getTitle();
 
     /**
      *

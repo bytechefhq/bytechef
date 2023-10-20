@@ -15,39 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.definition.Option;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.OptionsDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface ComponentOptionsDataSource extends OptionsDataSource {
+@SuppressFBWarnings("EI")
+public record OptionsDataSourceDTO(List<String> loadOptionsDependsOn) {
 
-    /**
-     * The function that returns options.
-     *
-     * @return The function implementation
-     */
-    OptionsFunction getOptions();
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface OptionsFunction {
-
-        /**
-         *
-         * @param connection
-         * @param inputParameters
-         * @return
-         */
-        List<Option<?>> apply(Connection connection, InputParameters inputParameters);
+    public OptionsDataSourceDTO(OptionsDataSource optionsDataSource) {
+        this(OptionalUtils.orElse(optionsDataSource.getLoadOptionsDependsOn(), List.of()));
     }
 }

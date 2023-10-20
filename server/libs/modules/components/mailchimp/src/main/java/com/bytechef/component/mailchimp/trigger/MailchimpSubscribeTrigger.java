@@ -55,7 +55,7 @@ public class MailchimpSubscribeTrigger {
         .type(TriggerType.WEBHOOK_DYNAMIC)
         .properties(
             string(LIST_ID)
-                .options(MailchimpUtils.getListIdOptionsDataSource())
+                .options(MailchimpUtils.getListIdOptions())
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact."))
         .outputSchema(

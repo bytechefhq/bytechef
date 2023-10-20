@@ -17,14 +17,31 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Help;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record TriggerDefinitionBasicDTO(
-    Boolean batch, String description, Help help, String name, String title, TriggerType type) {
+    boolean batch, String description, Optional<HelpDTO> help, String name, String title, TriggerType type) {
+
+    public TriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+        this(
+            OptionalUtils.orElse(triggerDefinition.getBatch(), false),
+            TriggerDefinitionDTO.getDescription(triggerDefinition, componentDefinition),
+            getHelp(triggerDefinition.getHelp()), triggerDefinition.getName(),
+            TriggerDefinitionDTO.getTitle(triggerDefinition), triggerDefinition.getType());
+    }
+
+    private static Optional<HelpDTO> getHelp(Optional<Help> help) {
+        return help.map(HelpDTO::new);
+    }
 }

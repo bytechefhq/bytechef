@@ -19,8 +19,13 @@ package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.util.JsonMapper;
+import com.bytechef.hermes.component.util.JsonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +39,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ObjectHelperParseActionTest {
 
     private static final Context context = Mockito.mock(Context.class);
+
+    @BeforeAll
+    public static void beforeAll() {
+        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
+    }
 
     @Test
     public void testExecuteParse() {

@@ -18,16 +18,21 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource;
-import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
-import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.OptionsFunction;
-import com.bytechef.hermes.component.definition.EditorDescriptionFunction;
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
+import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.Option;
+import com.bytechef.hermes.definition.OptionsDataSource;
+import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -35,10 +40,10 @@ import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,13 +72,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getActionProperty(
             propertyName, actionName, componentName, componentVersion);
 
-        ComponentDynamicPropertiesDataSource dynamicPropertiesDataSource =
-            (ComponentDynamicPropertiesDataSource) property.getDynamicPropertiesDataSource();
+        PropertiesDataSource propertiesDataSource = property.getDynamicPropertiesDataSource();
 
-        ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction dynamicPropertiesFunction =
-            dynamicPropertiesDataSource.getDynamicProperties();
+        ComponentPropertiesFunction propertiesFunction = (ComponentPropertiesFunction) propertiesDataSource
+            .getProperties();
 
-        return dynamicPropertiesFunction.apply(
+        return propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
             new InputParametersImpl(actionParameters));
@@ -84,10 +88,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         String authorizationName, Map<String, Object> connectionParameters) {
 
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
             actionName, componentName, componentVersion);
 
-        EditorDescriptionFunction editorDescriptionFunction = actionDefinition.getEditorDescription();
+        EditorDescriptionFunction editorDescriptionFunction = OptionalUtils.mapOrElse(
+            actionDefinition.getEditorDescriptionDataSource(),
+            EditorDescriptionDataSource::getEditorDescription,
+            (
+                Context.Connection connection,
+                InputParameters inputParameters) -> ComponentDefinitionDTO.getTitle(componentDefinition) + ": " +
+                    ActionDefinitionDTO.getTitle(actionDefinition));
 
         return editorDescriptionFunction.apply(
             contextConnectionFactory.createConnection(
@@ -103,10 +116,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getActionProperty(propertyName, actionName, componentName, componentVersion);
 
-        ComponentOptionsDataSource optionsDataSource = (ComponentOptionsDataSource) OptionalUtils.get(
-            dynamicOptionsProperty.getOptionsDataSource());
+        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
-        OptionsFunction optionsFunction = optionsDataSource.getOptions();
+        ComponentOptionsFunction optionsFunction = (ComponentOptionsFunction) optionsDataSource.getOptions();
 
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
@@ -124,7 +136,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
 
-        OutputSchemaDataSource.OutputSchemaFunction outputSchemaFunction = outputSchemaDataSource.getOutputSchema();
+        OutputSchemaFunction outputSchemaFunction = outputSchemaDataSource.getOutputSchema();
 
         return outputSchemaFunction.apply(
             contextConnectionFactory.createConnection(
@@ -167,37 +179,37 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 actionName, componentName, componentVersion);
         }
 
-        return toActionDefinitionDTO(actionDefinition);
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        return toActionDefinitionDTO(actionDefinition, componentDefinition);
     }
 
     @Override
     public List<ActionDefinitionDTO> getComponentActionDefinitions(String componentName, int componentVersion) {
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         List<ActionDefinitionDTO> actionDefinitionDTOs =
             componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
                 .stream()
-                .map(this::toActionDefinitionDTO)
+                .map(actionDefinition -> toActionDefinitionDTO(actionDefinition, componentDefinition))
                 .toList();
-
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
 
         if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
             actionDefinitionDTOs = new ArrayList<>(actionDefinitionDTOs);
 
             actionDefinitionDTOs.add(
-                toActionDefinitionDTO(CustomAction.getCustomActionDefinition(componentDefinition)));
+                toActionDefinitionDTO(CustomAction.getCustomActionDefinition(componentDefinition),
+                    componentDefinition));
         }
 
         return actionDefinitionDTOs;
     }
 
-    private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
-        return new ActionDefinitionDTO(
-            OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
-            OptionalUtils.orElse(actionDefinition.getSampleOutput(), null),
-            OptionalUtils.orElse(actionDefinition.getHelp(), null), actionDefinition.getName(),
-            OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList()),
-            OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
-            actionDefinition.getTitle());
+    private ActionDefinitionDTO toActionDefinitionDTO(
+        ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+
+        return new ActionDefinitionDTO(actionDefinition, componentDefinition);
     }
 }

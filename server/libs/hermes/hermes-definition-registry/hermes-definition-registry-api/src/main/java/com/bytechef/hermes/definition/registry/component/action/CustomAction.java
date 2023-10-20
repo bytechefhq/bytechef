@@ -24,6 +24,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.Help;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.Property.ControlType;
 import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
@@ -85,11 +86,11 @@ public class CustomAction {
                 .label("Method")
                 .description("The http method.")
                 .options(
-                    option(RequestMethod.DELETE.name(), RequestMethod.DELETE),
-                    option(RequestMethod.GET.name(), RequestMethod.GET),
-                    option(RequestMethod.PATCH.name(), RequestMethod.PATCH),
-                    option(RequestMethod.POST.name(), RequestMethod.POST),
-                    option(RequestMethod.PUT.name(), RequestMethod.PUT))
+                    option(RequestMethod.DELETE.name(), RequestMethod.DELETE.name()),
+                    option(RequestMethod.GET.name(), RequestMethod.GET.name()),
+                    option(RequestMethod.PATCH.name(), RequestMethod.PATCH.name()),
+                    option(RequestMethod.POST.name(), RequestMethod.POST.name()),
+                    option(RequestMethod.PUT.name(), RequestMethod.PUT.name()))
                 .required(true)
                 .defaultValue(RequestMethod.GET.name()),
 
@@ -182,7 +183,11 @@ public class CustomAction {
         .execute(CustomAction::execute);
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
-        return CUSTOM_ACTION_DEFINITION.help(OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null));
+        return CUSTOM_ACTION_DEFINITION.help(
+            OptionalUtils.orElse(componentDefinition.getCustomActionHelp()
+                .map(Help::getBody), null),
+            OptionalUtils.orElse(componentDefinition.getCustomActionHelp()
+                .map(Help::getLearnMoreUrl), null));
     }
 
     protected static Object execute(ActionContext context, InputParameters inputParameters) {

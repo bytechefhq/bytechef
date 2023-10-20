@@ -19,8 +19,12 @@ package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.util.XmlMapper;
+import com.bytechef.hermes.component.util.XmlUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Ivica Cardic
  */
 public class XmlHelperParseActionTest {
+
+    @BeforeAll
+    public static void beforeAll() {
+        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
+    }
 
     @Test
     public void testExecuteParse() {
@@ -62,7 +71,7 @@ public class XmlHelperParseActionTest {
                     """);
 
         assertThat(XmlHelperParseAction.executeParse(Mockito.mock(Context.class), inputParameters))
-            .isEqualTo(Map.of(
-                "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
+            .isEqualTo(
+                Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }
 }

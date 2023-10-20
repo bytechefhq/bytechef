@@ -17,23 +17,11 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionBasicDTO;
-import com.bytechef.hermes.definition.registry.component.action.CustomAction;
-import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,54 +60,6 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {
-        return new ComponentDefinitionDTO(
-            getActions(componentDefinition),
-            OptionalUtils.orElse(componentDefinition.getCategory(), null),
-            OptionalUtils.mapOrElse(componentDefinition.getConnection(), this::toConnectionDefinitionDTO, null),
-            OptionalUtils.orElse(componentDefinition.getDescription(), null),
-            DefinitionUtils.readIcon(componentDefinition.getIcon()),
-            componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getResources(), null),
-            OptionalUtils.orElse(componentDefinition.getTags(), null),
-            OptionalUtils.mapOrElse(
-                componentDefinition.getTriggers(),
-                triggerDefinitions -> CollectionUtils.map(triggerDefinitions, this::toTriggerDefinitionBasicDTO),
-                Collections.emptyList()),
-            componentDefinition.getTitle(), componentDefinition.getVersion());
-    }
-
-    private List<ActionDefinitionBasicDTO> getActions(ComponentDefinition componentDefinition) {
-        List<ActionDefinitionBasicDTO> actionDefinitionBasicDTOs = OptionalUtils.mapOrElse(
-            componentDefinition.getActions(),
-            actionDefinitions -> CollectionUtils.map(actionDefinitions, this::toActionDefinitionBasicDTO),
-            Collections.emptyList());
-
-        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
-            actionDefinitionBasicDTOs = new ArrayList<>(actionDefinitionBasicDTOs);
-
-            actionDefinitionBasicDTOs.add(
-                toActionDefinitionBasicDTO(CustomAction.getCustomActionDefinition(componentDefinition)));
-        }
-
-        return actionDefinitionBasicDTOs;
-    }
-
-    private ActionDefinitionBasicDTO toActionDefinitionBasicDTO(ActionDefinition actionDefinition) {
-        return new ActionDefinitionBasicDTO(
-            OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
-            OptionalUtils.orElse(actionDefinition.getHelp(), null), actionDefinition.getName(),
-            actionDefinition.getTitle());
-    }
-
-    private ConnectionDefinitionBasicDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
-        return new ConnectionDefinitionBasicDTO(
-            OptionalUtils.orElse(connectionDefinition.getDescription(), null),
-            connectionDefinition.getName(), connectionDefinition.getTitle(), connectionDefinition.getVersion());
-    }
-
-    private TriggerDefinitionBasicDTO toTriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition) {
-        return new TriggerDefinitionBasicDTO(
-            OptionalUtils.orElse(triggerDefinition.getBatch(), false), triggerDefinition.getDescription(),
-            OptionalUtils.orElse(triggerDefinition.getHelp(), null), triggerDefinition.getName(),
-            triggerDefinition.getTitle(), triggerDefinition.getType());
+        return new ComponentDefinitionDTO(componentDefinition);
     }
 }

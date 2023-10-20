@@ -20,7 +20,6 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +29,6 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ModifiableConnectionDefinition.class)
 public sealed interface ConnectionDefinition permits ModifiableConnectionDefinition {
 
     String BASE_URI = "baseUri";
@@ -58,19 +56,7 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
      *
      * @return
      */
-    BaseUriFunction getBaseUri();
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getDescription();
-
-    /**
-     *
-     * @return
-     */
-    String getName();
+    Optional<BaseUriFunction> getBaseUri();
 
     /**
      *
@@ -84,12 +70,6 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
      * @return
      */
     Optional<TestConsumer> getTest();
-
-    /**
-     *
-     * @return
-     */
-    String getTitle();
 
     /**
      * TODO

@@ -19,13 +19,21 @@ package com.bytechef.hermes.component.util;
 
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
 public class JsonUtilsTest {
+
+    @BeforeAll
+    public static void beforeAll() {
+        JsonUtils.jsonMapper = new JsonMapper(new ObjectMapper());
+    }
 
     @Test
     public void testRead() {

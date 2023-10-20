@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ModifiableActionDefinition.class)
 public sealed interface ActionDefinition permits ModifiableActionDefinition {
 
     /**
@@ -51,13 +49,13 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return
      */
-    String getDescription();
+    Optional<String> getDescription();
 
     /**
      *
      * @return
      */
-    EditorDescriptionFunction getEditorDescription();
+    Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource();
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.
@@ -118,7 +116,7 @@ public sealed interface ActionDefinition permits ModifiableActionDefinition {
      *
      * @return
      */
-    String getTitle();
+    Optional<String> getTitle();
 
     /**
      *

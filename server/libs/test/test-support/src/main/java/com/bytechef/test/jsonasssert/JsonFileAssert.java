@@ -19,6 +19,7 @@ package com.bytechef.test.jsonasssert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,17 +45,16 @@ public class JsonFileAssert {
         try {
             String value = OBJECT_MAPPER.writeValueAsString(object);
 
-            JSONAssert.assertEquals(
-                Files.readString(
-                    Paths.get(
-                        JsonFileAssert.class
-                            .getClassLoader()
-                            .getResource(path)
-                            .toURI())),
-                value,
-                true);
+            JSONAssert.assertEquals(Files.readString(Paths.get(getUri(path))), value, true);
         } catch (IOException | JSONException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static URI getUri(String path) throws URISyntaxException {
+        return JsonFileAssert.class
+            .getClassLoader()
+            .getResource(path)
+            .toURI();
     }
 }

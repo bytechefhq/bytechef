@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.definition.Resources;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ModifiableComponentDefinition.class)
 public sealed interface ComponentDefinition permits ModifiableComponentDefinition {
 
     /**
@@ -80,7 +78,7 @@ public sealed interface ComponentDefinition permits ModifiableComponentDefinitio
      *
      * @return
      */
-    String getIcon();
+    Optional<String> getIcon();
 
     /**
      *
@@ -106,13 +104,13 @@ public sealed interface ComponentDefinition permits ModifiableComponentDefinitio
      *
      * @return
      */
-    Optional<String[]> getTags();
+    Optional<List<String>> getTags();
 
     /**
      *
      * @return
      */
-    String getTitle();
+    Optional<String> getTitle();
 
     /**
      *

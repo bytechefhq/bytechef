@@ -17,21 +17,31 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableOptionsDataSource.class)
 public interface OptionsDataSource {
 
     /**
      *
      * @return
      */
-    default List<String> getLoadOptionsDependsOn() {
-        return List.of();
+    default Optional<List<String>> getLoadOptionsDependsOn() {
+        return Optional.empty();
+    }
+
+    /**
+     *
+     * @return
+     */
+    OptionsFunction getOptions();
+
+    /**
+     *
+     */
+    interface OptionsFunction {
     }
 }

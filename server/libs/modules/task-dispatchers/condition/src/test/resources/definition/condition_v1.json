@@ -10,6 +10,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Raw expression",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "rawExpression",
@@ -35,6 +36,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Conditions",
+    "metadata": { },
     "placeholder": "Add Condition",
     "required": null,
     "name": "conditions",
@@ -48,6 +50,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": "Boolean",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "boolean",
@@ -55,10 +58,9 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": null,
       "options": null,
-      "optionsDataSource": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The boolean value to compare with the second one.",
@@ -66,6 +68,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value1",
@@ -91,6 +94,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "operation",
@@ -109,8 +113,8 @@
           "name": "Not Equals",
           "value": "NOT_EQUALS"
         } ],
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The boolean value to compare with the first one.",
@@ -118,6 +122,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value2",
@@ -137,6 +142,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
+      "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
@@ -145,6 +151,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": "Date & Time",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "dateTime",
@@ -152,10 +159,9 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": null,
       "options": null,
-      "optionsDataSource": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The date & time value to compare with the second one.",
@@ -163,6 +169,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value1",
@@ -179,6 +186,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "operation",
@@ -197,8 +205,8 @@
           "name": "Before",
           "value": "BEFORE"
         } ],
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The date & time value to compare with the first one.",
@@ -206,6 +214,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value2",
@@ -216,6 +225,7 @@
         "optionsDataSource": null,
         "controlType": "DATE_TIME"
       } ],
+      "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
@@ -224,6 +234,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": "Number",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "number",
@@ -231,10 +242,9 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": null,
       "options": null,
-      "optionsDataSource": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The number value to compare with the second one.",
@@ -242,6 +252,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value1",
@@ -261,6 +272,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "operation",
@@ -304,8 +316,8 @@
           "name": "Empty",
           "value": "EMPTY"
         } ],
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The number value to compare with the first one.",
@@ -313,6 +325,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value2",
@@ -326,6 +339,7 @@
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER"
       } ],
+      "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
@@ -334,6 +348,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": "String",
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": "string",
@@ -341,10 +356,9 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": null,
       "options": null,
-      "optionsDataSource": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The string value to compare with the second one.",
@@ -352,6 +366,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 1",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value1",
@@ -360,8 +375,8 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
@@ -369,6 +384,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Operation",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "operation",
@@ -417,8 +433,8 @@
           "name": "Empty",
           "value": "EMPTY"
         } ],
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The string value to compare with the first one.",
@@ -426,6 +442,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Value 2",
+        "metadata": { },
         "placeholder": null,
         "required": null,
         "name": "value2",
@@ -434,8 +451,8 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The regex value to compare with the first one.",
@@ -443,6 +460,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Regex",
+        "metadata": { },
         "placeholder": "/text/i",
         "required": null,
         "name": "value2",
@@ -451,12 +469,13 @@
         "exampleValue": null,
         "controlType": "INPUT_TEXT",
         "options": null,
-        "optionsDataSource": null,
-        "sampleDataType": null
+        "sampleDataType": null,
+        "optionsDataSource": null
       } ],
+      "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
     "controlType": "OBJECT_BUILDER"
@@ -467,6 +486,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Combine",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "combineOperation",
@@ -485,8 +505,8 @@
       "name": "Any",
       "value": "ANY"
     } ],
-    "optionsDataSource": null,
-    "sampleDataType": null
+    "sampleDataType": null,
+    "optionsDataSource": null
   }, {
     "advancedOption": null,
     "description": "The raw expression.",
@@ -494,6 +514,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": "Expression",
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "expression",
@@ -502,8 +523,8 @@
     "exampleValue": null,
     "controlType": "INPUT_TEXT",
     "options": null,
-    "optionsDataSource": null,
-    "sampleDataType": null
+    "sampleDataType": null,
+    "optionsDataSource": null
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -513,6 +534,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": null,
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "caseTrue",
@@ -526,6 +548,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": null,
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": null,
@@ -533,14 +556,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": "TASK",
       "options": null,
-      "optionsDataSource": null,
       "properties": null,
+      "optionsDataSource": null,
       "controlType": "EXPRESSION"
     } ],
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
     "controlType": "OBJECT_BUILDER"
@@ -551,6 +574,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "label": null,
+    "metadata": { },
     "placeholder": null,
     "required": null,
     "name": "caseFalse",
@@ -564,6 +588,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": null,
+      "metadata": { },
       "placeholder": null,
       "required": null,
       "name": null,
@@ -571,14 +596,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "additionalProperties": null,
-      "multipleValues": true,
+      "multipleValues": null,
       "objectType": "TASK",
       "options": null,
-      "optionsDataSource": null,
       "properties": null,
+      "optionsDataSource": null,
       "controlType": "EXPRESSION"
     } ],
-    "multipleValues": true,
+    "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
     "controlType": "OBJECT_BUILDER"

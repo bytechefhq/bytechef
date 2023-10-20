@@ -1,20 +1,15 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -24,17 +19,17 @@ import jakarta.annotation.Generated;
 @Schema(name = "DynamicPropertiesDataSource", description = "Defines function that should load properties.")
 @JsonTypeName("DynamicPropertiesDataSource")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
-public class DynamicPropertiesDataSourceModel {
+public class PropertiesDataSourceModel {
 
   @Valid
   private List<String> loadPropertiesDependsOn;
 
-  public DynamicPropertiesDataSourceModel loadPropertiesDependsOn(List<String> loadPropertiesDependsOn) {
+  public PropertiesDataSourceModel loadPropertiesDependsOn(List<String> loadPropertiesDependsOn) {
     this.loadPropertiesDependsOn = loadPropertiesDependsOn;
     return this;
   }
 
-  public DynamicPropertiesDataSourceModel addLoadPropertiesDependsOnItem(String loadPropertiesDependsOnItem) {
+  public PropertiesDataSourceModel addLoadPropertiesDependsOnItem(String loadPropertiesDependsOnItem) {
     if (this.loadPropertiesDependsOn == null) {
       this.loadPropertiesDependsOn = new ArrayList<>();
     }
@@ -46,7 +41,7 @@ public class DynamicPropertiesDataSourceModel {
    * The list of property names on which value change the properties should load/reload.
    * @return loadPropertiesDependsOn
   */
-  
+
   @Schema(name = "loadPropertiesDependsOn", description = "The list of property names on which value change the properties should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("loadPropertiesDependsOn")
   public List<String> getLoadPropertiesDependsOn() {
@@ -65,7 +60,7 @@ public class DynamicPropertiesDataSourceModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DynamicPropertiesDataSourceModel dynamicPropertiesDataSource = (DynamicPropertiesDataSourceModel) o;
+    PropertiesDataSourceModel dynamicPropertiesDataSource = (PropertiesDataSourceModel) o;
     return Objects.equals(this.loadPropertiesDependsOn, dynamicPropertiesDataSource.loadPropertiesDependsOn);
   }
 

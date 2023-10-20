@@ -17,9 +17,21 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.OptionsDataSource;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.ArrayPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.BooleanPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.DatePropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.DateTimePropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.DynamicPropertiesPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.IntegerPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.NullPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.NumberPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.ObjectPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.OneOfPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.OptionsDataSourceDTO;
+import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.StringPropertyDTO;
+import com.bytechef.hermes.definition.registry.dto.TimePropertyDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyModel;
@@ -52,100 +64,110 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, Property.PropertyVisitor {
+public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, PropertyDTO.PropertyVisitor {
 
     @Override
-    default PropertyModel convert(Property property) {
+    default PropertyModel convert(PropertyDTO property) {
         return (PropertyModel) property.accept(this);
     }
 
     @Override
-    default ArrayPropertyModel visit(Property.ArrayProperty arrayProperty) {
+    default ArrayPropertyModel visit(ArrayPropertyDTO arrayProperty) {
         return map(arrayProperty);
     }
 
     @Override
-    default BooleanPropertyModel visit(Property.BooleanProperty booleanProperty) {
+    default BooleanPropertyModel visit(BooleanPropertyDTO booleanProperty) {
         return map(booleanProperty);
     }
 
     @Override
-    default DatePropertyModel visit(Property.DateProperty dateProperty) {
+    default DatePropertyModel visit(DatePropertyDTO dateProperty) {
         return map(dateProperty);
     }
 
     @Override
-    default DateTimePropertyModel visit(Property.DateTimeProperty dateTimeProperty) {
+    default DateTimePropertyModel visit(DateTimePropertyDTO dateTimeProperty) {
         return map(dateTimeProperty);
     }
 
     @Override
-    default DynamicPropertiesPropertyModel visit(Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
+    default DynamicPropertiesPropertyModel visit(DynamicPropertiesPropertyDTO dynamicPropertiesProperty) {
         return map(dynamicPropertiesProperty);
     }
 
     @Override
-    default IntegerPropertyModel visit(Property.IntegerProperty integerProperty) {
+    default IntegerPropertyModel visit(IntegerPropertyDTO integerProperty) {
         return map(integerProperty);
     }
 
     @Override
-    default NullPropertyModel visit(Property.NullProperty nullProperty) {
+    default NullPropertyModel visit(NullPropertyDTO nullProperty) {
         return map(nullProperty);
     }
 
     @Override
-    default NumberPropertyModel visit(Property.NumberProperty numberProperty) {
+    default NumberPropertyModel visit(NumberPropertyDTO numberProperty) {
         return map(numberProperty);
     }
 
     @Override
-    default OneOfPropertyModel visit(Property.OneOfProperty oneOfProperty) {
+    default OneOfPropertyModel visit(OneOfPropertyDTO oneOfProperty) {
         return map(oneOfProperty);
     }
 
     @Override
-    default ObjectPropertyModel visit(Property.ObjectProperty objectProperty) {
+    default ObjectPropertyModel visit(ObjectPropertyDTO objectProperty) {
         return map(objectProperty);
     }
 
     @Override
-    default StringPropertyModel visit(Property.StringProperty stringProperty) {
+    default StringPropertyModel visit(StringPropertyDTO stringProperty) {
         return map(stringProperty);
     }
 
     @Override
-    default TimePropertyModel visit(Property.TimeProperty timeProperty) {
+    default TimePropertyModel visit(TimePropertyDTO timeProperty) {
         return map(timeProperty);
     }
 
-    ArrayPropertyModel map(Property.ArrayProperty arrayProperty);
+    ArrayPropertyModel map(ArrayPropertyDTO arrayProperty);
 
-    BooleanPropertyModel map(Property.BooleanProperty booleanProperty);
+    BooleanPropertyModel map(BooleanPropertyDTO booleanProperty);
 
-    DatePropertyModel map(Property.DateProperty dateProperty);
+    DatePropertyModel map(DatePropertyDTO dateProperty);
 
-    DateTimePropertyModel map(Property.DateTimeProperty dateTimeProperty);
+    DateTimePropertyModel map(DateTimePropertyDTO dateTimeProperty);
 
-    DynamicPropertiesPropertyModel map(Property.DynamicPropertiesProperty dynamicPropertiesProperty);
+    DynamicPropertiesPropertyModel map(DynamicPropertiesPropertyDTO dynamicPropertiesProperty);
 
-    IntegerPropertyModel map(Property.IntegerProperty integerProperty);
+    IntegerPropertyModel map(IntegerPropertyDTO integerProperty);
 
-    NullPropertyModel map(Property.NullProperty nullProperty);
+    NullPropertyModel map(NullPropertyDTO nullProperty);
 
-    NumberPropertyModel map(Property.NumberProperty numberProperty);
+    NumberPropertyModel map(NumberPropertyDTO numberProperty);
 
-    ObjectPropertyModel map(Property.ObjectProperty objectProperty);
+    ObjectPropertyModel map(ObjectPropertyDTO objectProperty);
 
-    OneOfPropertyModel map(Property.OneOfProperty oneOfProperty);
+    OneOfPropertyModel map(OneOfPropertyDTO oneOfProperty);
 
-    OptionsDataSourceModel map(OptionsDataSource optionsDataSource);
+    OptionsDataSourceModel map(OptionsDataSourceDTO optionsDataSource);
 
-    StringPropertyModel map(Property.StringProperty stringProperty);
+    StringPropertyModel map(StringPropertyDTO stringProperty);
 
-    TimePropertyModel map(Property.TimeProperty timeProperty);
+    TimePropertyModel map(TimePropertyDTO timeProperty);
 
-    OptionModel map(Option<?> option);
+    OptionModel map(OptionDTO option);
+
+    default List<PropertyModel> map(List<? extends PropertyDTO> properties) {
+        if (CollectionUtils.isEmpty(properties)) {
+            return Collections.emptyList();
+        } else {
+            return properties.stream()
+                .map(this::convert)
+                .toList();
+        }
+    }
 
     default Boolean mapToBoolean(Optional<Boolean> optional) {
         return optional.orElse(null);
@@ -175,37 +197,12 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
         return optional.orElse(null);
     }
 
-    default OptionsDataSourceModel mapToOptionsDataSourceModel(Optional<OptionsDataSource> optional) {
+    default OptionsDataSourceModel mapToOptionsDataSourceModel(Optional<OptionsDataSourceDTO> optional) {
         return optional.map(this::map)
             .orElse(null);
     }
 
-    default List<PropertyModel> mapToProperties(Optional<List<? extends Property<?>>> optional) {
-        return optional.map(
-            properties -> properties.stream()
-                .map(this::convert)
-                .toList())
-            .orElse(Collections.emptyList());
-    }
-
     default String mapToString(Optional<String> optional) {
         return optional.orElse(null);
-    }
-
-    default List<OptionModel> mapToOptions(Optional<List<Option<?>>> optional) {
-        return optional.map(options -> options.stream()
-            .map(this::map)
-            .toList())
-            .orElse(Collections.emptyList());
-    }
-
-    default List<PropertyModel> map(List<? extends Property<?>> properties) {
-        if (CollectionUtils.isEmpty(properties)) {
-            return Collections.emptyList();
-        } else {
-            return properties.stream()
-                .map(this::convert)
-                .toList();
-        }
     }
 }

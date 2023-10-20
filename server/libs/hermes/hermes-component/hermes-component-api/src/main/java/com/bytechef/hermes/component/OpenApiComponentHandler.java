@@ -38,7 +38,7 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
         BODY, PATH, HEADER, QUERY
     }
 
-    default ModifiableActionDefinition[] modifyActions(ModifiableActionDefinition... actionDefinitions) {
+    default List<ActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         return Arrays.stream(actionDefinitions)
             .map(this::modifyAction)
             .map(actionDefinition -> {
@@ -48,9 +48,9 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
                     .map(property -> modifyProperty((Property<?>) property))
                     .toArray(Property<?>[]::new);
 
-                return actionDefinition.properties(properties);
+                return (ActionDefinition) actionDefinition.properties(properties);
             })
-            .toArray(ModifiableActionDefinition[]::new);
+            .toList();
     }
 
     default ModifiableActionDefinition modifyAction(ModifiableActionDefinition actionDefinition) {

@@ -17,17 +17,58 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Help;
-import com.bytechef.hermes.definition.Property;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record ActionDefinitionDTO(
-    boolean batch, String description, Object sampleOutput, Help help, String name,
-    List<? extends Property<?>> outputSchema, List<? extends Property<?>> properties, String title) {
+    boolean batch, String description, boolean editorDescriptionDataSource, Optional<HelpDTO> help,
+    String name, List<? extends PropertyDTO> outputSchema, boolean outputSchemaDataSource,
+    List<? extends PropertyDTO> properties, Optional<Object> sampleOutput, boolean sampleOutputDataSource,
+    String title) {
+
+    public ActionDefinitionDTO(ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+        this(
+            OptionalUtils.orElse(actionDefinition.getBatch(), false),
+            getDescription(actionDefinition, componentDefinition),
+            OptionalUtils.mapOrElse(
+                actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false),
+            getHelp(actionDefinition.getHelp()), actionDefinition.getName(),
+            CollectionUtils.map(
+                OptionalUtils.orElse(actionDefinition.getOutputSchema(), List.of()), PropertyDTO::toPropertyDTO),
+            OptionalUtils.mapOrElse(
+                actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
+            CollectionUtils.map(
+                OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+                PropertyDTO::toPropertyDTO),
+            actionDefinition.getSampleOutput(),
+            OptionalUtils.mapOrElse(
+                actionDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false),
+            getTitle(actionDefinition));
+    }
+
+    public static String getDescription(ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+        return OptionalUtils.orElse(
+            actionDefinition.getDescription(),
+            ComponentDefinitionDTO.getTitle(componentDefinition) + ": " + getTitle(actionDefinition));
+    }
+
+    public static String getTitle(ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
+    }
+
+    private static Optional<HelpDTO> getHelp(Optional<Help> help) {
+        return help.map(HelpDTO::new);
+    }
 }

@@ -17,12 +17,9 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableOption.class)
 public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
 
     /**
