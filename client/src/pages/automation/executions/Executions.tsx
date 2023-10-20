@@ -12,18 +12,125 @@ import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/Project
 import {OnChangeValue} from 'react-select';
 import {useGetWorkflowsQuery} from 'queries/workflows.queries';
 import {useGetInstancesQuery} from 'queries/instances.queries';
-import {ProjectExecutionModelFromJSON} from 'middleware/project';
-import Input from 'components/Input/Input';
+import {
+    JobModel,
+    ProjectExecutionModel,
+    ProjectExecutionModelFromJSON,
+} from 'middleware/project';
+import {
+    CellContext,
+    createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
+import PageFooter from '../../../components/PageFooter/PageFooter';
+import Pagination from '../../../components/Pagination/Pagination';
+import DatePicker from '../../../components/DatePicker/DatePicker';
+import Badge from '../../../components/Badge/Badge';
+import EmptyList from '../../../components/EmptyList/EmptyList';
+import {QueueListIcon} from '@heroicons/react/24/outline';
+import {twMerge} from 'tailwind-merge';
+
+const columnHelper = createColumnHelper<ProjectExecutionModel>();
+
+const columns = [
+    columnHelper.accessor((row) => row.job, {
+        header: 'Status',
+        cell: (info) => (
+            <Badge
+                color={
+                    info.getValue()?.status === 'COMPLETED'
+                        ? 'green'
+                        : info.getValue()?.status === 'FAILED'
+                        ? 'red'
+                        : 'default'
+                }
+                text={info.getValue()?.status ?? ''}
+            />
+        ),
+    }),
+    columnHelper.accessor('project', {
+        header: 'Project',
+        cell: (info) => info.getValue()?.name,
+    }),
+    columnHelper.accessor('workflow', {
+        header: 'Workflow',
+        cell: (info) => info.getValue()?.label,
+    }),
+    columnHelper.accessor('instance', {
+        header: 'Instance',
+        cell: (info) => info.getValue()?.name,
+    }),
+    columnHelper.accessor((row) => row.job, {
+        header: 'Duration',
+        cell: (info) => getDuration(info),
+    }),
+    columnHelper.accessor((row) => row.job, {
+        header: 'Completed time',
+        cell: (info) => (
+            <>
+                {info.getValue()?.endTime?.toLocaleDateString()}{' '}
+                {info.getValue()?.endTime?.toLocaleTimeString()}
+            </>
+        ),
+    }),
+];
+
+const jobStatusOptions = [
+    {
+        label: GetProjectExecutionsJobStatusEnum.Started,
+        value: GetProjectExecutionsJobStatusEnum.Started,
+    },
+
+    {
+        label: GetProjectExecutionsJobStatusEnum.Completed,
+        value: GetProjectExecutionsJobStatusEnum.Completed,
+    },
+
+    {
+        label: GetProjectExecutionsJobStatusEnum.Created,
+        value: GetProjectExecutionsJobStatusEnum.Created,
+    },
+
+    {
+        label: GetProjectExecutionsJobStatusEnum.Stopped,
+        value: GetProjectExecutionsJobStatusEnum.Stopped,
+    },
+
+    {
+        label: GetProjectExecutionsJobStatusEnum.Failed,
+        value: GetProjectExecutionsJobStatusEnum.Failed,
+    },
+];
+
+function getDuration(
+    info: CellContext<ProjectExecutionModel, JobModel | undefined>
+): string | undefined {
+    const startTime = info.getValue()?.startTime?.getTime();
+    const endTime = info.getValue()?.endTime?.getTime();
+
+    if (startTime && endTime) {
+        return `${Math.round((endTime - startTime) / 1000)}s`;
+    } else {
+        return undefined;
+    }
+}
 
 export const Executions = () => {
     const [filterStatus, setFilterStatus] =
         useState<GetProjectExecutionsJobStatusEnum>();
 
-    const [filterStartDate] = useState<Date>(new Date());
-    const [filterEndDate] = useState<Date>(new Date());
+    const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
+        undefined
+    );
+    const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
+        undefined
+    );
     const [filterProjectId, setFilterProjectId] = useState<number>();
-    const [filterWorkflows, setFilterWorkflows] = useState<number>();
-    const [filterInstances, setFilterInstances] = useState<number>();
+    const [filterWorkflowId, setFilterWorkflowId] = useState<string>();
+    const [filterInstanceId, setFilterInstanceId] = useState<number>();
+    const [filterPageNumber, setFilterPageNumber] = useState<number>();
 
     const {
         isLoading: isLoadingProjects,
@@ -50,53 +157,42 @@ export const Executions = () => {
     } = useGetProjectExecutionsQuery({
         jobStatus: filterStatus,
         projectId: filterProjectId,
-        workflowId: filterWorkflows,
+        workflowId: filterWorkflowId,
         jobStartTime: filterStartDate,
         jobEndTime: filterEndDate,
-        projectInstanceId: filterInstances,
+        projectInstanceId: filterInstanceId,
+        pageNumber: filterPageNumber,
     });
-
-    const projectExecutions = projectExecutionsResponse?.content?.map(
-        (execution) => ProjectExecutionModelFromJSON(execution)
-    );
 
     return (
         <LayoutContainer
-            header={<PageHeader title="Workflow History" />}
+            footer={
+                projectExecutionsResponse?.content &&
+                projectExecutionsResponse.content.length > 0 && (
+                    <PageFooter position="main">
+                        <Pagination
+                            pageNumber={projectExecutionsResponse.number!}
+                            pageSize={projectExecutionsResponse.size!}
+                            totalElements={
+                                projectExecutionsResponse.totalElements!
+                            }
+                            totalPages={projectExecutionsResponse.totalPages!}
+                            onClick={setFilterPageNumber}
+                        />
+                    </PageFooter>
+                )
+            }
+            header={<PageHeader position="main" title="Executions" />}
             leftSidebarHeader={
                 <>
-                    <PageHeader leftSidebar title="Executions" />
+                    <PageHeader leftSidebar title="Execution History" />
 
-                    <div className="p-4">
+                    <div className="px-4">
                         <FilterableSelect
-                            name="jobStatus"
+                            isClearable
                             label="Status"
-                            options={[
-                                {
-                                    label: GetProjectExecutionsJobStatusEnum.Started,
-                                    value: GetProjectExecutionsJobStatusEnum.Started,
-                                },
-
-                                {
-                                    label: GetProjectExecutionsJobStatusEnum.Completed,
-                                    value: GetProjectExecutionsJobStatusEnum.Completed,
-                                },
-
-                                {
-                                    label: GetProjectExecutionsJobStatusEnum.Created,
-                                    value: GetProjectExecutionsJobStatusEnum.Created,
-                                },
-
-                                {
-                                    label: GetProjectExecutionsJobStatusEnum.Stopped,
-                                    value: GetProjectExecutionsJobStatusEnum.Stopped,
-                                },
-
-                                {
-                                    label: GetProjectExecutionsJobStatusEnum.Failed,
-                                    value: GetProjectExecutionsJobStatusEnum.Failed,
-                                },
-                            ]}
+                            name="jobStatus"
+                            options={jobStatusOptions}
                             onChange={(
                                 value: OnChangeValue<ISelectOption, false>
                             ) => {
@@ -104,22 +200,31 @@ export const Executions = () => {
                                     setFilterStatus(
                                         value.value as GetProjectExecutionsJobStatusEnum
                                     );
+                                } else {
+                                    setFilterStatus(undefined);
                                 }
                             }}
                         />
 
-                        <Input
-                            type="date"
-                            name="jobStartTime"
+                        <DatePicker
                             label="Start time"
+                            name="jobStartTime"
+                            placeholder="Select..."
+                            onChange={setFilterStartDate}
                         />
 
-                        <Input type="date" name="jobEndTime" label="End time" />
+                        <DatePicker
+                            label="End time"
+                            name="jobEndTime"
+                            placeholder="Select..."
+                            onChange={setFilterEndDate}
+                        />
 
                         {!isLoadingProjects && !errorInProjects && (
                             <FilterableSelect
-                                name="project"
+                                isClearable
                                 label="Projects"
+                                name="project"
                                 options={
                                     projects?.map((project) => ({
                                         label: project.name,
@@ -131,16 +236,18 @@ export const Executions = () => {
                                 ) => {
                                     if (value) {
                                         setFilterProjectId(Number(value.value));
+                                    } else {
+                                        setFilterProjectId(undefined);
                                     }
                                 }}
-                                isClearable
                             />
                         )}
 
                         {!isLoadingWorkflows && !errorInWorkflows && (
                             <FilterableSelect
-                                name="workflows"
+                                isClearable
                                 label="Workflows"
+                                name="workflows"
                                 options={
                                     workflows?.map((workflow) => ({
                                         label:
@@ -152,17 +259,19 @@ export const Executions = () => {
                                     value: OnChangeValue<ISelectOption, false>
                                 ) => {
                                     if (value) {
-                                        setFilterWorkflows(Number(value.value));
+                                        setFilterWorkflowId(value.value);
+                                    } else {
+                                        setFilterWorkflowId(undefined);
                                     }
                                 }}
-                                isClearable
                             />
                         )}
 
                         {!isLoadingInstances && !errorInInstances && (
                             <FilterableSelect
-                                name="instances"
+                                isClearable
                                 label="Instances"
+                                name="instances"
                                 options={
                                     instances?.map((instance) => ({
                                         label: instance.name,
@@ -173,54 +282,109 @@ export const Executions = () => {
                                     value: OnChangeValue<ISelectOption, false>
                                 ) => {
                                     if (value) {
-                                        setFilterInstances(Number(value.value));
+                                        setFilterInstanceId(
+                                            Number(value.value)
+                                        );
+                                    } else {
+                                        setFilterInstanceId(undefined);
                                     }
                                 }}
-                                isClearable
                             />
                         )}
                     </div>
                 </>
             }
         >
-            {!isLoadingProjectExecutions && !errorInProjectExecutions && (
-                <div className="p-2">
-                    <table className="w-full table-auto">
-                        <thead>
-                            <tr>
-                                <th>Status</th>
-
-                                <th>Project</th>
-
-                                <th>Workflow</th>
-
-                                <th>Instance</th>
-
-                                <th>Completed time</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {projectExecutions?.map((execution) => (
-                                <tr
-                                    key={`${execution.project}-${execution.instance}`}
-                                >
-                                    <td>{execution.job?.status}</td>
-
-                                    <td>{execution.project?.name}</td>
-
-                                    <td>{execution.workflow?.label}</td>
-
-                                    <td>{execution.instance?.name}</td>
-
-                                    <td>{execution.job?.endTime?.getDate()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+            {!isLoadingProjectExecutions &&
+                !errorInProjectExecutions &&
+                projectExecutionsResponse?.content && (
+                    <div
+                        className={twMerge(
+                            'w-full px-4 2xl:mx-auto 2xl:w-4/5',
+                            projectExecutionsResponse.content.length === 0
+                                ? 'place-self-center'
+                                : ''
+                        )}
+                    >
+                        {projectExecutionsResponse.content.length === 0 ? (
+                            <EmptyList
+                                icon={
+                                    <QueueListIcon className="h-12 w-12 text-gray-400" />
+                                }
+                                message={
+                                    !filterStatus &&
+                                    !filterProjectId &&
+                                    !filterWorkflowId &&
+                                    !filterStartDate &&
+                                    !filterEndDate &&
+                                    !filterInstanceId &&
+                                    !filterPageNumber
+                                        ? "You don't have any executed workflows yet."
+                                        : 'There is no executed workflows for the current criteria.'
+                                }
+                                title="No executed workflows"
+                            />
+                        ) : (
+                            <Table
+                                data={projectExecutionsResponse.content.map(
+                                    (execution) =>
+                                        ProjectExecutionModelFromJSON(execution)
+                                )}
+                            />
+                        )}
+                    </div>
+                )}
         </LayoutContainer>
+    );
+};
+
+const Table = ({data}: {data: ProjectExecutionModel[]}): JSX.Element => {
+    const table = useReactTable<ProjectExecutionModel>({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+    });
+
+    return (
+        <table className="w-full divide-y divide-gray-300 bg-white text-sm">
+            <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                            <th
+                                key={header.id}
+                                className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                            >
+                                {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                          header.column.columnDef.header,
+                                          header.getContext()
+                                      )}
+                            </th>
+                        ))}
+                    </tr>
+                ))}
+            </thead>
+
+            <tbody className="divide-y divide-gray-200 bg-white">
+                {table.getRowModel().rows.map((row) => (
+                    <tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                            <td
+                                key={cell.id}
+                                className="whitespace-nowrap py-4 px-3 text-sm text-gray-900"
+                            >
+                                {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext()
+                                )}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     );
 };
 
