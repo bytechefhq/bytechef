@@ -17,9 +17,12 @@
 
 package com.bytechef.cli.command.component.subcommand;
 
+import com.bytechef.hermes.component.RestComponentHandler;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -48,6 +51,9 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,11 +71,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RestComponentGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get("com.bytechef.hermes.component.definition",
         "Authorization");
@@ -78,11 +89,14 @@ public class RestComponentGenerator {
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
-    private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
-    private static final String COMPONENT_HANDLER = "ComponentHandler";
     private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
         .get("com.bytechef.hermes.component.constants", "ComponentConstants");
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
+        {
+            enable(SerializationFeature.INDENT_OUTPUT);
+            setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        }
+    };
 
     private final String basePackageName;
     private final String componentName;
@@ -90,11 +104,17 @@ public class RestComponentGenerator {
     private final OpenAPI openAPI;
     private final String outputPath;
     private final Set<String> schemas = new HashSet<>();
+    private final boolean internalComponent;
+    private final int version;
 
-    public RestComponentGenerator(String basePackageName, String componentName, String openApiPath, String outputPath)
-        throws IOException {
+    public RestComponentGenerator(
+        String basePackageName, String componentName, int version, boolean internalComponent, String openApiPath,
+        String outputPath) throws IOException {
+
         this.basePackageName = basePackageName;
         this.componentName = componentName;
+        this.version = version;
+        this.internalComponent = internalComponent;
         this.openAPI = parseOpenAPIFile(openApiPath);
         this.outputPath = outputPath;
 
@@ -112,28 +132,37 @@ public class RestComponentGenerator {
     }
 
     public void generate() throws Exception {
-        Path path = Files.createDirectories(
+        Path sourceMainJavaDirPath = Files.createDirectories(
             Paths.get(getAbsolutePathname("src" + File.separator + "main" + File.separator + "java")));
 
         int schemaSize = schemas.size();
 
-        writeAbstractComponentHandlerClass(path);
+        Path componentHandlerSourcePath = writeAbstractComponentHandlerSource(sourceMainJavaDirPath);
 
         while (schemaSize != schemas.size()) {
             schemaSize = schemas.size();
 
-            checkComponentSchemaClasses(schemas);
+            checkComponentSchemaSources(schemas);
         }
 
-        writeComponentSchemaClasses(schemas, path);
+        writeComponentSchemaSources(schemas, sourceMainJavaDirPath);
+        writeComponentHandlerSource(sourceMainJavaDirPath);
 
-        writeComponentHandlerClass(path);
+        if (internalComponent) {
+            Path sourceTestJavaDirPath = Files.createDirectories(
+                Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "java")));
 
-        writeRestComponentHandlerServiceTemplate();
+            writeAbstractComponentHandlerTest(sourceTestJavaDirPath);
+            writeComponentHandlerDefinition(
+                componentHandlerSourcePath, getPackageName(), getComponentHandlerClassName(componentName), version);
+            writeComponentHandlerTest(sourceTestJavaDirPath);
+        }
+
+        writeComponentHandlerServiceFile();
     }
 
     @SuppressWarnings("rawtypes")
-    private void checkComponentSchemaClasses(Set<String> schemas) {
+    private void checkComponentSchemaSources(Set<String> schemas) {
         Components components = openAPI.getComponents();
 
         if (components != null) {
@@ -149,6 +178,53 @@ public class RestComponentGenerator {
                 }
             }
         }
+    }
+
+    private Path compileComponentHandlerSource(Path sourcePath, String simpleClassName) {
+        JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+        List<String> javacOpts = new ArrayList<>();
+
+        javacOpts.add("-classpath");
+        javacOpts.add("libs/hermes-component-api-1.0.jar:libs/hermes-definition-api-1.0.jar");
+
+        Path parentPath = sourcePath.getParent();
+
+        for (String dirName : new String[] {
+            "action", "schema"
+        }) {
+            Path dirPath = parentPath.resolve(dirName);
+
+            File dirFile = dirPath.toFile();
+
+            File[] files = dirFile.listFiles((curDir, name) -> {
+                name = name.toLowerCase();
+
+                return name.endsWith(".java");
+            });
+
+            if (files != null) {
+                for (File file : files) {
+                    javacOpts.add(dirFile.getAbsolutePath() + "/" + file.getName());
+                }
+            }
+        }
+
+        Path tempDirPath;
+
+        try {
+            tempDirPath = Files.createTempDirectory("rest_component");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        javacOpts.add("-d");
+        javacOpts.add(tempDirPath.toString());
+        javacOpts.add(sourcePath.getParent() + "/Abstract" + simpleClassName + ".java");
+        javacOpts.add(sourcePath.getParent() + "/" + simpleClassName + ".java");
+
+        javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
+
+        return tempDirPath;
     }
 
     private Map<String, List<OperationItem>> filterOperationItemsMap(Map<String, List<OperationItem>> operationsMap) {
@@ -261,13 +337,15 @@ public class RestComponentGenerator {
             CodeBlock actionsCodeBlock = getActionsCodeBlock(operationItemsEntry.getValue(), openAPI);
 
             if (generatorConfig.openApi.useTags) {
-                String prefix = Arrays.stream(StringUtils.split(operationItemsEntry.getKey(), " "))
+                String key = operationItemsEntry.getKey();
+
+                String prefix = Arrays.stream(key.split(" "))
                     .map(StringUtils::capitalize)
                     .collect(Collectors.joining());
 
                 ClassName className = ClassName.get(getPackageName() + ".action", prefix + "Actions");
 
-                writeActionsClass(className, actionsCodeBlock, componentHandlerDirPath);
+                writeComponentActionsSource(className, actionsCodeBlock, componentHandlerDirPath);
 
                 codeBlocks.add(CodeBlock.of("$T.ACTIONS", className));
             } else {
@@ -615,6 +693,10 @@ public class RestComponentGenerator {
         return builder.build();
     }
 
+    private String getComponentHandlerClassName(String componentName) {
+        return StringUtils.capitalize(componentName) + "ComponentHandler";
+    }
+
     private CodeBlock getConnectionCodeBlock(OpenAPI openAPI) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
@@ -821,7 +903,8 @@ public class RestComponentGenerator {
                         )
                         """,
                     Map.class,
-                    StringUtils.upperCase(parameter.getIn())));
+                    parameter.getIn()
+                        .toUpperCase()));
 
                 codeBlocks.add(builder.build());
             }
@@ -1121,7 +1204,8 @@ public class RestComponentGenerator {
 
             Map<String, Schema> schemaMap = components.getSchemas();
 
-            String curSchemaName = StringUtils.remove(schema.get$ref(), "#/components/schemas/");
+            String curSchemaName = schema.get$ref()
+                .replace("#/components/schemas/", "");
 
             schemas.add(curSchemaName);
 
@@ -1148,12 +1232,122 @@ public class RestComponentGenerator {
         return openAPI;
     }
 
-    private void writeActionsClass(ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath)
-        throws IOException {
+    private RestComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {
+        File classFile = classPath.toFile();
+
+        URI classURI = classFile.toURI();
+
+        URL[] classUrls = new URL[] {
+            classURI.toURL()
+        };
+
+        URLClassLoader classLoader = URLClassLoader.newInstance(classUrls);
+
+        @SuppressWarnings("unchecked")
+        Class<RestComponentHandler> clazz = (Class<RestComponentHandler>) Class.forName(className, true, classLoader);
+
+        return clazz.getDeclaredConstructor()
+            .newInstance();
+    }
+
+    private Path writeAbstractComponentHandlerSource(Path sourceDirPath) throws IOException {
+        JavaFile javaFile = JavaFile.builder(
+            getPackageName(),
+            TypeSpec.classBuilder("Abstract" + getComponentHandlerClassName(componentName))
+                .addJavadoc("""
+                    Provides the base implementation for the REST based component.
+
+                    @generated
+                    """)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addSuperinterface(
+                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
+                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                    .initializer(getComponentCodeBlock(sourceDirPath))
+                    .build())
+                .addMethod(MethodSpec.methodBuilder("getDefinition")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(COMPONENT_DEFINITION_CLASS_NAME)
+                    .addStatement("return componentDefinition")
+                    .build())
+                .build())
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .build();
+
+        return javaFile.writeToPath(sourceDirPath);
+    }
+
+    private Path writeAbstractComponentHandlerTest(Path testDirPath) throws IOException {
+        String componentHandlerClassName = getComponentHandlerClassName(componentName);
+
+        JavaFile javaFile = JavaFile.builder(
+            getPackageName(),
+            TypeSpec.classBuilder("Abstract" + componentHandlerClassName + "Test")
+                .addJavadoc("""
+                    Provides the base test implementation for the REST based component.
+
+                    @generated
+                    """)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addMethod(MethodSpec.methodBuilder("testGetDefinition")
+                    .addAnnotation(ClassName.get("org.junit.jupiter.api", "Test"))
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement(
+                        "$T.assertEquals(\"definition/pipedrive_v1.json\", new $T().getDefinition())",
+                        ClassName.get("com.bytechef.test.jsonasssert", "JsonFileAssert"),
+                        ClassName.get(getPackageName(),
+                            componentHandlerClassName))
+                    .build())
+                .build())
+            .build();
+
+        return javaFile.writeToPath(testDirPath);
+    }
+
+    private void writeComponentActionsSource(
+        ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath) throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
+                .addJavadoc("""
+                    Provides a list of the component actions.
+
+                    @generated
+                    """)
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ParameterizedTypeName.get(
@@ -1199,91 +1393,110 @@ public class RestComponentGenerator {
         javaFile.writeTo(componentHandlerDirPath);
     }
 
-    private void writeAbstractComponentHandlerClass(Path componentHandlerDirPath) throws IOException {
-        JavaFile javaFile = JavaFile.builder(
-            getPackageName(),
-            TypeSpec.classBuilder("Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
-                .addJavadoc("""
-                    Provides the base implementation for the REST based component.
+    private void writeComponentHandlerServiceFile() throws IOException {
+        String servicesDirPathname = getAbsolutePathname(
+            "src" + File.separator + "main" + File.separator + "resources" + File.separator + "META-INF" +
+                File.separator + "services");
 
-                    @generated
-                    """)
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addSuperinterface(
-                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
-                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
-                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                    .initializer(getComponentCodeBlock(componentHandlerDirPath))
-                    .build())
-                .addMethod(MethodSpec.methodBuilder("getDefinition")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(COMPONENT_DEFINITION_CLASS_NAME)
-                    .addStatement("return componentDefinition")
-                    .build())
-                .build())
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-            .build();
+        Files.createDirectories(Paths.get(servicesDirPathname));
 
-        javaFile.writeTo(componentHandlerDirPath);
+        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".RestComponentHandler";
+
+        try (PrintWriter printWriter = new PrintWriter(
+            servicesDirPathname + File.separator + serviceName, StandardCharsets.UTF_8)) {
+
+            printWriter.println(getPackageName() + "." + getComponentHandlerClassName(componentName));
+        }
     }
 
-    private void writeComponentHandlerClass(Path componentHandlerDirPath) throws IOException {
-        String filename = componentHandlerDirPath + File.separator
-            + StringUtils.replaceChars(getPackageName(), ".", File.separator) + File.separator
-            + StringUtils.capitalize(componentName) + COMPONENT_HANDLER + ".java";
+    private Path writeComponentHandlerSource(Path sourceDirPath) throws IOException {
+        Path path = null;
+        String packageName = getPackageName();
+
+        String filename = sourceDirPath
+            .resolve(packageName.replace(".", File.separator))
+            .resolve(getComponentHandlerClassName(componentName) + ".java")
+            .toFile()
+            .getAbsolutePath();
 
         if (!new File(filename).exists()) {
             JavaFile javaFile = JavaFile.builder(
                 getPackageName(),
-                TypeSpec.classBuilder(StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
+                TypeSpec.classBuilder(getComponentHandlerClassName(componentName))
+                    .addJavadoc("@generated")
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(ClassName.get(
                         getPackageName(),
-                        "Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER))
+                        "Abstract" + getComponentHandlerClassName(componentName)))
                     .build())
                 .build();
-            javaFile.writeTo(componentHandlerDirPath);
+            path = javaFile.writeToPath(sourceDirPath);
+        }
+
+        return path;
+    }
+
+    private Path writeComponentHandlerTest(Path testDirPath) throws IOException {
+        Path path = null;
+        String packageName = getPackageName();
+
+        String componentHandlerTestClassname = getComponentHandlerClassName(componentName) + "Test";
+
+        String filename = testDirPath
+            .resolve(packageName.replace(".", File.separator))
+            .resolve(componentHandlerTestClassname + ".java")
+            .toFile()
+            .getAbsolutePath();
+
+        if (!new File(filename).exists()) {
+            JavaFile javaFile = JavaFile.builder(
+                getPackageName(),
+                TypeSpec.classBuilder(componentHandlerTestClassname)
+                    .addJavadoc("@generated")
+                    .addModifiers(Modifier.PUBLIC)
+                    .superclass(ClassName.get(
+                        getPackageName(),
+                        "Abstract" + componentHandlerTestClassname))
+                    .build())
+                .build();
+            path = javaFile.writeToPath(testDirPath);
+        }
+
+        return path;
+    }
+
+    private void writeComponentHandlerDefinition(
+        Path componentHandlerSourcePath, String packageName, String simpleClassName, int version) throws Exception {
+
+        Path definitionDirPath = Files.createDirectories(
+            Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources")
+                + File.separator + "definition"));
+
+        Path defintionFilePath = definitionDirPath.resolve(componentName + "_v" + version + ".json");
+
+        File definitionFile = defintionFilePath.toFile();
+
+        if (!definitionFile.exists()) {
+            Path classPath = compileComponentHandlerSource(componentHandlerSourcePath, simpleClassName);
+
+            RestComponentHandler restComponentHandler = runComponentHandlerClass(
+                classPath, packageName + "." + simpleClassName);
+
+            OBJECT_MAPPER.writeValue(definitionFile, restComponentHandler.getDefinition());
         }
     }
 
-    private void writeComponentSchemaClass(
+    private void writeComponentSchemaSource(
         ClassName className, CodeBlock componentSchemaCodeBlock, Path componentHandlerDirPath) throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
+                .addJavadoc("""
+                    Provides schema definition.
+
+                    @generated
+                    """)
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ParameterizedTypeName.get(
@@ -1327,7 +1540,7 @@ public class RestComponentGenerator {
     }
 
     @SuppressWarnings("rawtypes")
-    private void writeComponentSchemaClasses(Set<String> schemas, Path componentHandlerDirPath) throws IOException {
+    private void writeComponentSchemaSources(Set<String> schemas, Path sourceDirPath) throws IOException {
         Components components = openAPI.getComponents();
 
         if (components != null) {
@@ -1341,26 +1554,12 @@ public class RestComponentGenerator {
 
                     ClassName className = ClassName.get(getPackageName() + ".schema", entry.getKey() + "Schema");
 
-                    writeComponentSchemaClass(
+                    writeComponentSchemaSource(
                         className,
                         getObjectPropertiesCodeBlock(null, entry.getValue(), openAPI),
-                        componentHandlerDirPath);
+                        sourceDirPath);
                 }
             }
-        }
-    }
-
-    private void writeRestComponentHandlerServiceTemplate() throws IOException {
-        String servicesDirPathname = getAbsolutePathname("src" + File.separator + "main" + File.separator + "resources"
-            + File.separator + "META-INF" + File.separator + "services");
-
-        Files.createDirectories(Paths.get(servicesDirPathname));
-
-        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".Rest" + COMPONENT_HANDLER;
-
-        try (PrintWriter printWriter = new PrintWriter(servicesDirPathname + File.separator + serviceName,
-            StandardCharsets.UTF_8)) {
-            printWriter.println(getPackageName() + "." + StringUtils.capitalize(componentName) + COMPONENT_HANDLER);
         }
     }
 
