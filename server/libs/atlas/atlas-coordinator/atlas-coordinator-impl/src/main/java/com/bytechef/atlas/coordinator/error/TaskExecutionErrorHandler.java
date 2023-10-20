@@ -108,6 +108,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             job.setEndTime(new Date());
 
             jobService.update(job);
+
             eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
         }
     }

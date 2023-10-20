@@ -372,10 +372,12 @@ public final class TaskExecution
 
     @Override
     public long getRetryDelayMillis() {
-        long delay = Duration.parse("PT" + getRetryDelay())
-            .toMillis();
+        Duration duration = Duration.parse("PT" + getRetryDelay());
+
+        long delay = duration.toMillis();
         int retryAttempts = getRetryAttempts();
         int retryDelayFactor = getRetryDelayFactor();
+
         return delay * retryAttempts * retryDelayFactor;
     }
 
