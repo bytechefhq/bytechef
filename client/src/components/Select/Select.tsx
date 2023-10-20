@@ -37,6 +37,7 @@ type SelectProps = {
     customValueComponent?: React.ReactNode;
     defaultValue?: string | undefined;
     description?: string;
+    fieldsetClassName?: string;
     label?: string;
     onValueChange?(value: string): void;
     triggerClassName?: string;
@@ -48,13 +49,14 @@ const Select = ({
     customValueComponent,
     defaultValue,
     description,
+    fieldsetClassName,
     label,
     options,
     onValueChange,
     triggerClassName,
     value,
 }: SelectProps): JSX.Element => (
-    <fieldset className="w-full">
+    <fieldset className={twMerge('w-full', fieldsetClassName)}>
         {label && (
             <Label
                 className={twMerge(
