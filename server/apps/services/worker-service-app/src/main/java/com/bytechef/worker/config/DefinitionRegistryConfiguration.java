@@ -60,9 +60,10 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ActionDefinitionFacade actionDefinitionFacade(
-        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
+        ActionDefinitionService actionDefinitionService, ConnectionService connectionService,
+        ContextFactory contextFactory) {
 
-        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService);
+        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService, contextFactory);
     }
 
     @Bean
@@ -126,9 +127,10 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionFacade triggerDefinitionFacade(
-        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
+        ConnectionService connectionService, ContextFactory contextFactory,
+        TriggerDefinitionService triggerDefinitionService) {
 
-        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService);
+        return new TriggerDefinitionFacadeImpl(connectionService, contextFactory, triggerDefinitionService);
     }
 
     @Bean
