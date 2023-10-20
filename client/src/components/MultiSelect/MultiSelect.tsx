@@ -6,7 +6,12 @@ import './MultiSelect.css';
 type MultiSelectProps = {
     label: string;
     name: string;
+    options: {label: string; value: string}[];
+    value: {label: string; value: string}[];
     error?: string | undefined;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    onChange?: (value: any) => void;
+    onCreateOption?: (value: string) => void;
 };
 
 const MultiSelect = ({error, label, name, ...props}: MultiSelectProps) => (
