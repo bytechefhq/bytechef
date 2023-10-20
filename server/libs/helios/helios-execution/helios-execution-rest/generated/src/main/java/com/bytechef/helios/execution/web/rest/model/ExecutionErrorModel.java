@@ -1,30 +1,19 @@
-
-/*
- * Copyright 2023-present ByteChef Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.bytechef.helios.execution.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 
 import java.util.*;
 import jakarta.annotation.Generated;
@@ -35,106 +24,99 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-10-06T20:36:47.577089+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-19T19:33:24.415242+02:00[Europe/Berlin]")
 public class ExecutionErrorModel {
 
-    private String message;
+  private String message;
 
-    @Valid
-    private List<String> stackTrace;
+  @Valid
+  private List<String> stackTrace;
 
-    public ExecutionErrorModel message(String message) {
-        this.message = message;
-        return this;
+  public ExecutionErrorModel message(String message) {
+    this.message = message;
+    return this;
+  }
+
+  /**
+   * The error message.
+   * @return message
+  */
+  
+  @Schema(name = "message", description = "The error message.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("message")
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public ExecutionErrorModel stackTrace(List<String> stackTrace) {
+    this.stackTrace = stackTrace;
+    return this;
+  }
+
+  public ExecutionErrorModel addStackTraceItem(String stackTraceItem) {
+    if (this.stackTrace == null) {
+      this.stackTrace = new ArrayList<>();
     }
+    this.stackTrace.add(stackTraceItem);
+    return this;
+  }
 
-    /**
-     * The error message.
-     * 
-     * @return message
-     */
+  /**
+   * The error stacktrace.
+   * @return stackTrace
+  */
+  
+  @Schema(name = "stackTrace", description = "The error stacktrace.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("stackTrace")
+  public List<String> getStackTrace() {
+    return stackTrace;
+  }
 
-    @Schema(name = "message", description = "The error message.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("message")
-    public String getMessage() {
-        return message;
+  public void setStackTrace(List<String> stackTrace) {
+    this.stackTrace = stackTrace;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public void setMessage(String message) {
-        this.message = message;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    ExecutionErrorModel executionError = (ExecutionErrorModel) o;
+    return Objects.equals(this.message, executionError.message) &&
+        Objects.equals(this.stackTrace, executionError.stackTrace);
+  }
 
-    public ExecutionErrorModel stackTrace(List<String> stackTrace) {
-        this.stackTrace = stackTrace;
-        return this;
+  @Override
+  public int hashCode() {
+    return Objects.hash(message, stackTrace);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class ExecutionErrorModel {\n");
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    stackTrace: ").append(toIndentedString(stackTrace)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
     }
-
-    public ExecutionErrorModel addStackTraceItem(String stackTraceItem) {
-        if (this.stackTrace == null) {
-            this.stackTrace = new ArrayList<>();
-        }
-        this.stackTrace.add(stackTraceItem);
-        return this;
-    }
-
-    /**
-     * The error stacktrace.
-     * 
-     * @return stackTrace
-     */
-
-    @Schema(name = "stackTrace", description = "The error stacktrace.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("stackTrace")
-    public List<String> getStackTrace() {
-        return stackTrace;
-    }
-
-    public void setStackTrace(List<String> stackTrace) {
-        this.stackTrace = stackTrace;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ExecutionErrorModel executionError = (ExecutionErrorModel) o;
-        return Objects.equals(this.message, executionError.message) &&
-            Objects.equals(this.stackTrace, executionError.stackTrace);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(message, stackTrace);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class ExecutionErrorModel {\n");
-        sb.append("    message: ")
-            .append(toIndentedString(message))
-            .append("\n");
-        sb.append("    stackTrace: ")
-            .append(toIndentedString(stackTrace))
-            .append("\n");
-        sb.append("}");
-        return sb.toString();
-    }
-
-    /**
-     * Convert the given object to string with each line indented by 4 spaces (except the first line).
-     */
-    private String toIndentedString(Object o) {
-        if (o == null) {
-            return "null";
-        }
-        return o.toString()
-            .replace("\n", "\n    ");
-    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+

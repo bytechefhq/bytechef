@@ -1,34 +1,24 @@
-
-/*
- * Copyright 2023-present ByteChef Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.bytechef.helios.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
+import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 
 import java.util.*;
 import jakarta.annotation.Generated;
@@ -37,295 +27,255 @@ import jakarta.annotation.Generated;
  * Contains configuration and connections required for the execution of a particular project workflow.
  */
 
-@Schema(
-    name = "ProjectInstanceWorkflow",
-    description = "Contains configuration and connections required for the execution of a particular project workflow.")
+@Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-10-09T13:39:54.113168+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-19T19:33:27.276007+02:00[Europe/Berlin]")
 public class ProjectInstanceWorkflowModel {
 
-    @Valid
-    private Map<String, Object> inputs = new HashMap<>();
+  @Valid
+  private Map<String, Object> inputs = new HashMap<>();
 
-    @Valid
-    private List<@Valid ProjectInstanceWorkflowConnectionModel> connections;
+  @Valid
+  private List<@Valid ProjectInstanceWorkflowConnectionModel> connections;
 
-    private Boolean enabled;
+  private Boolean enabled;
 
-    private Long id;
+  private Long id;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime lastExecutionDate;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastExecutionDate;
 
-    private Long projectInstanceId;
+  private Long projectInstanceId;
 
-    private String workflowId;
+  private String workflowId;
 
-    private Integer version;
+  private Integer version;
 
-    public ProjectInstanceWorkflowModel inputs(Map<String, Object> inputs) {
-        this.inputs = inputs;
-        return this;
+  public ProjectInstanceWorkflowModel inputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public ProjectInstanceWorkflowModel putInputsItem(String key, Object inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new HashMap<>();
     }
+    this.inputs.put(key, inputsItem);
+    return this;
+  }
 
-    public ProjectInstanceWorkflowModel putInputsItem(String key, Object inputsItem) {
-        if (this.inputs == null) {
-            this.inputs = new HashMap<>();
-        }
-        this.inputs.put(key, inputsItem);
-        return this;
+  /**
+   * The input parameters of an project instance used as workflow input values.
+   * @return inputs
+  */
+  
+  @Schema(name = "inputs", description = "The input parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public Map<String, Object> getInputs() {
+    return inputs;
+  }
+
+  public void setInputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
+  }
+
+  public ProjectInstanceWorkflowModel connections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
+    this.connections = connections;
+    return this;
+  }
+
+  public ProjectInstanceWorkflowModel addConnectionsItem(ProjectInstanceWorkflowConnectionModel connectionsItem) {
+    if (this.connections == null) {
+      this.connections = new ArrayList<>();
     }
+    this.connections.add(connectionsItem);
+    return this;
+  }
 
-    /**
-     * The input parameters of an project instance used as workflow input values.
-     * 
-     * @return inputs
-     */
+  /**
+   * The connections used by a project instance.
+   * @return connections
+  */
+  @Valid 
+  @Schema(name = "connections", description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connections")
+  public List<@Valid ProjectInstanceWorkflowConnectionModel> getConnections() {
+    return connections;
+  }
 
-    @Schema(
-        name = "inputs", description = "The input parameters of an project instance used as workflow input values.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("inputs")
-    public Map<String, Object> getInputs() {
-        return inputs;
+  public void setConnections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
+    this.connections = connections;
+  }
+
+  public ProjectInstanceWorkflowModel enabled(Boolean enabled) {
+    this.enabled = enabled;
+    return this;
+  }
+
+  /**
+   * If a workflow is enabled or not in the project instance workflow.
+   * @return enabled
+  */
+  
+  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public ProjectInstanceWorkflowModel id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * The id of a project instance.
+   * @return id
+  */
+  
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public ProjectInstanceWorkflowModel lastExecutionDate(LocalDateTime lastExecutionDate) {
+    this.lastExecutionDate = lastExecutionDate;
+    return this;
+  }
+
+  /**
+   * The last execution date of a project instance.
+   * @return lastExecutionDate
+  */
+  @Valid 
+  @Schema(name = "lastExecutionDate", description = "The last execution date of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionDate")
+  public LocalDateTime getLastExecutionDate() {
+    return lastExecutionDate;
+  }
+
+  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
+    this.lastExecutionDate = lastExecutionDate;
+  }
+
+  public ProjectInstanceWorkflowModel projectInstanceId(Long projectInstanceId) {
+    this.projectInstanceId = projectInstanceId;
+    return this;
+  }
+
+  /**
+   * The id of a project instance.
+   * @return projectInstanceId
+  */
+  
+  @Schema(name = "projectInstanceId", description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectInstanceId")
+  public Long getProjectInstanceId() {
+    return projectInstanceId;
+  }
+
+  public void setProjectInstanceId(Long projectInstanceId) {
+    this.projectInstanceId = projectInstanceId;
+  }
+
+  public ProjectInstanceWorkflowModel workflowId(String workflowId) {
+    this.workflowId = workflowId;
+    return this;
+  }
+
+  /**
+   * The id of a workflow.
+   * @return workflowId
+  */
+  
+  @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowId")
+  public String getWorkflowId() {
+    return workflowId;
+  }
+
+  public void setWorkflowId(String workflowId) {
+    this.workflowId = workflowId;
+  }
+
+  public ProjectInstanceWorkflowModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public void setInputs(Map<String, Object> inputs) {
-        this.inputs = inputs;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
+    return Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
+        Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
+        Objects.equals(this.enabled, projectInstanceWorkflow.enabled) &&
+        Objects.equals(this.id, projectInstanceWorkflow.id) &&
+        Objects.equals(this.lastExecutionDate, projectInstanceWorkflow.lastExecutionDate) &&
+        Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
+        Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
+        Objects.equals(this.version, projectInstanceWorkflow.version);
+  }
 
-    public ProjectInstanceWorkflowModel connections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
-        this.connections = connections;
-        return this;
+  @Override
+  public int hashCode() {
+    return Objects.hash(inputs, connections, enabled, id, lastExecutionDate, projectInstanceId, workflowId, version);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class ProjectInstanceWorkflowModel {\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
+    sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
+    sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
     }
-
-    public ProjectInstanceWorkflowModel addConnectionsItem(ProjectInstanceWorkflowConnectionModel connectionsItem) {
-        if (this.connections == null) {
-            this.connections = new ArrayList<>();
-        }
-        this.connections.add(connectionsItem);
-        return this;
-    }
-
-    /**
-     * The connections used by a project instance.
-     * 
-     * @return connections
-     */
-    @Valid
-    @Schema(
-        name = "connections", description = "The connections used by a project instance.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("connections")
-    public List<@Valid ProjectInstanceWorkflowConnectionModel> getConnections() {
-        return connections;
-    }
-
-    public void setConnections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
-        this.connections = connections;
-    }
-
-    public ProjectInstanceWorkflowModel enabled(Boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
-
-    /**
-     * If a workflow is enabled or not in the project instance workflow.
-     * 
-     * @return enabled
-     */
-
-    @Schema(
-        name = "enabled", description = "If a workflow is enabled or not in the project instance workflow.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("enabled")
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public ProjectInstanceWorkflowModel id(Long id) {
-        this.id = id;
-        return this;
-    }
-
-    /**
-     * The id of a project instance.
-     * 
-     * @return id
-     */
-
-    @Schema(
-        name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("id")
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public ProjectInstanceWorkflowModel lastExecutionDate(LocalDateTime lastExecutionDate) {
-        this.lastExecutionDate = lastExecutionDate;
-        return this;
-    }
-
-    /**
-     * The last execution date of a project instance.
-     * 
-     * @return lastExecutionDate
-     */
-    @Valid
-    @Schema(
-        name = "lastExecutionDate", description = "The last execution date of a project instance.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("lastExecutionDate")
-    public LocalDateTime getLastExecutionDate() {
-        return lastExecutionDate;
-    }
-
-    public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
-        this.lastExecutionDate = lastExecutionDate;
-    }
-
-    public ProjectInstanceWorkflowModel projectInstanceId(Long projectInstanceId) {
-        this.projectInstanceId = projectInstanceId;
-        return this;
-    }
-
-    /**
-     * The id of a project instance.
-     * 
-     * @return projectInstanceId
-     */
-
-    @Schema(
-        name = "projectInstanceId", description = "The id of a project instance.",
-        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("projectInstanceId")
-    public Long getProjectInstanceId() {
-        return projectInstanceId;
-    }
-
-    public void setProjectInstanceId(Long projectInstanceId) {
-        this.projectInstanceId = projectInstanceId;
-    }
-
-    public ProjectInstanceWorkflowModel workflowId(String workflowId) {
-        this.workflowId = workflowId;
-        return this;
-    }
-
-    /**
-     * The id of a workflow.
-     * 
-     * @return workflowId
-     */
-
-    @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("workflowId")
-    public String getWorkflowId() {
-        return workflowId;
-    }
-
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
-    public ProjectInstanceWorkflowModel version(Integer version) {
-        this.version = version;
-        return this;
-    }
-
-    /**
-     * Get version
-     * 
-     * @return version
-     */
-
-    @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("__version")
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
-        return Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
-            Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
-            Objects.equals(this.enabled, projectInstanceWorkflow.enabled) &&
-            Objects.equals(this.id, projectInstanceWorkflow.id) &&
-            Objects.equals(this.lastExecutionDate, projectInstanceWorkflow.lastExecutionDate) &&
-            Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
-            Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
-            Objects.equals(this.version, projectInstanceWorkflow.version);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(inputs, connections, enabled, id, lastExecutionDate, projectInstanceId, workflowId,
-            version);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class ProjectInstanceWorkflowModel {\n");
-        sb.append("    inputs: ")
-            .append(toIndentedString(inputs))
-            .append("\n");
-        sb.append("    connections: ")
-            .append(toIndentedString(connections))
-            .append("\n");
-        sb.append("    enabled: ")
-            .append(toIndentedString(enabled))
-            .append("\n");
-        sb.append("    id: ")
-            .append(toIndentedString(id))
-            .append("\n");
-        sb.append("    lastExecutionDate: ")
-            .append(toIndentedString(lastExecutionDate))
-            .append("\n");
-        sb.append("    projectInstanceId: ")
-            .append(toIndentedString(projectInstanceId))
-            .append("\n");
-        sb.append("    workflowId: ")
-            .append(toIndentedString(workflowId))
-            .append("\n");
-        sb.append("    version: ")
-            .append(toIndentedString(version))
-            .append("\n");
-        sb.append("}");
-        return sb.toString();
-    }
-
-    /**
-     * Convert the given object to string with each line indented by 4 spaces (except the first line).
-     */
-    private String toIndentedString(Object o) {
-        if (o == null) {
-            return "null";
-        }
-        return o.toString()
-            .replace("\n", "\n    ");
-    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+

@@ -9,7 +9,6 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/TaskDispatcherDefinitio
 src/main/java/com/bytechef/hermes/configuration/web/rest/TriggerDefinitionApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/AnyPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ArrayPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/AuthorizationTypeModel.java
@@ -40,6 +39,7 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/model/ResourcesModel.ja
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/StringPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TaskDispatcherDefinitionModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/TaskDispatcherOperationRequestModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/TriggerDefinitionModel.java

@@ -18,56 +18,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ComponentOperationRequestModel
+ * TaskDispatcherOperationRequestModel
  */
 
-@JsonTypeName("ComponentOperationRequest")
+@JsonTypeName("TaskDispatcherOperationRequest")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-19T19:36:00.449921+02:00[Europe/Berlin]")
-public class ComponentOperationRequestModel {
-
-  private Long connectionId;
+public class TaskDispatcherOperationRequestModel {
 
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
-  public ComponentOperationRequestModel() {
+  public TaskDispatcherOperationRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ComponentOperationRequestModel(Long connectionId, Map<String, Object> parameters) {
-    this.connectionId = connectionId;
+  public TaskDispatcherOperationRequestModel(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
 
-  public ComponentOperationRequestModel connectionId(Long connectionId) {
-    this.connectionId = connectionId;
-    return this;
-  }
-
-  /**
-   * The connection id.
-   * @return connectionId
-  */
-  @NotNull 
-  @Schema(name = "connectionId", description = "The connection id.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("connectionId")
-  public Long getConnectionId() {
-    return connectionId;
-  }
-
-  public void setConnectionId(Long connectionId) {
-    this.connectionId = connectionId;
-  }
-
-  public ComponentOperationRequestModel parameters(Map<String, Object> parameters) {
+  public TaskDispatcherOperationRequestModel parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
     return this;
   }
 
-  public ComponentOperationRequestModel putParametersItem(String key, Object parametersItem) {
+  public TaskDispatcherOperationRequestModel putParametersItem(String key, Object parametersItem) {
     if (this.parameters == null) {
       this.parameters = new HashMap<>();
     }
@@ -98,21 +75,19 @@ public class ComponentOperationRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ComponentOperationRequestModel componentOperationRequest = (ComponentOperationRequestModel) o;
-    return Objects.equals(this.connectionId, componentOperationRequest.connectionId) &&
-        Objects.equals(this.parameters, componentOperationRequest.parameters);
+    TaskDispatcherOperationRequestModel taskDispatcherOperationRequest = (TaskDispatcherOperationRequestModel) o;
+    return Objects.equals(this.parameters, taskDispatcherOperationRequest.parameters);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, parameters);
+    return Objects.hash(parameters);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComponentOperationRequestModel {\n");
-    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+    sb.append("class TaskDispatcherOperationRequestModel {\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("}");
     return sb.toString();
