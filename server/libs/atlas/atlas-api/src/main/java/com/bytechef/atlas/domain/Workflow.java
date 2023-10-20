@@ -25,6 +25,7 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.workflow.mapper.WorkflowResource;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -104,7 +105,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private String id;
 
     @Transient
-    private List<Map<String, Object>> inputs = Collections.emptyList();
+    private List<Input> inputs = Collections.emptyList();
 
     @Transient
     private boolean isNew;
@@ -121,7 +122,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private LocalDateTime lastModifiedDate;
 
     @Transient
-    private List<Map<String, Object>> outputs = Collections.emptyList();
+    private List<Output> outputs = Collections.emptyList();
 
     @Transient
     private SourceType sourceType;
@@ -157,11 +158,20 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.format = format;
         this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
         this.id = id;
-        this.inputs = MapValueUtils.getList(
-            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+        this.inputs = CollectionUtils.map(
+            MapValueUtils.getList(source, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
+            map -> new Input(
+                MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
+                MapValueUtils.getString(map, WorkflowConstants.LABEL),
+                MapValueUtils.getString(map, WorkflowConstants.TYPE, "string"),
+                MapValueUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
         this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
-        this.outputs = MapValueUtils.getList(
-            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+        this.outputs = CollectionUtils.map(
+            MapValueUtils.getList(
+                source, WorkflowConstants.OUTPUTS, Map.class, Collections.emptyList()),
+            map -> new Output(
+                MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
+                MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
         this.retry = MapValueUtils.getInteger(source, WorkflowConstants.RETRY, 0);
         this.tasks = MapValueUtils
             .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
@@ -242,7 +252,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     }
 
     /** Returns the workflow's expected inputs */
-    public List<Map<String, Object>> getInputs() {
+    public List<Input> getInputs() {
         return Collections.unmodifiableList(inputs);
     }
 
@@ -260,7 +270,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     }
 
     /** Returns the workflow's expected outputs */
-    public List<Map<String, Object>> getOutputs() {
+    public List<Output> getOutputs() {
         return Collections.unmodifiableList(outputs);
     }
 
@@ -330,5 +340,11 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
+    }
+
+    public record Input(String name, String label, String type, boolean required) {
+    }
+
+    public record Output(String name, Object value) {
     }
 }
