@@ -17,17 +17,23 @@
 
 package com.bytechef.commons.util;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author Ivica Cardic
  */
-public final class OptionalUtils {
+public class MonoUtils {
 
-    private OptionalUtils() {
-    }
+    public static <T> T get(Mono<T> mono) {
+        Future<T> future = mono.toFuture();
 
-    public static <T> T get(Optional<T> optional) {
-        return optional.orElseThrow(IllegalArgumentException::new);
+        try {
+            return future.get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
