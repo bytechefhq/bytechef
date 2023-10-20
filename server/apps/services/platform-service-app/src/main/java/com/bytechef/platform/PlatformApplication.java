@@ -84,7 +84,7 @@ public class PlatformApplication {
             """
                 \n----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:
-                \tLocal: \t\t{}://localhost:{}{}
+                \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
                 \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
@@ -100,7 +100,7 @@ public class PlatformApplication {
             contextPath,
             Arrays.asList(environment.getActiveProfiles())
                 .contains("api-docs")
-                    ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
+                    ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
                     : "",
             environment.getActiveProfiles(),
             gitCommitId);
