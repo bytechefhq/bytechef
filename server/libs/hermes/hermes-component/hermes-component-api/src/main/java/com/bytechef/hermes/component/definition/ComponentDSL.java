@@ -27,7 +27,6 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOutputProperty;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -90,49 +88,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static ModifiableTriggerDefinition trigger(String name) {
         return new ModifiableTriggerDefinition(name);
-    }
-
-    private static <P extends InputProperty> List<P> checkInputProperties(P[] properties) {
-        if (properties != null) {
-            for (Property property : properties) {
-                String name = property.getName();
-
-                if (name == null || name.isEmpty()) {
-                    throw new IllegalArgumentException("Defined properties cannot to have empty names");
-                }
-            }
-
-            return Stream.of(properties)
-                .distinct()
-                .toList();
-        }
-
-        return null;
-    }
-
-    private static <P extends ModifiableOutputProperty<?>> List<P> checkOutputProperties(P[] properties) {
-        if (properties != null) {
-            for (Property property : properties) {
-                String name = property.getName();
-
-                if (name != null && !name.isEmpty()) {
-                    throw new IllegalArgumentException("Defined properties must have empty names");
-                }
-
-                Optional<String> optionalDisplayCondition = property.getDisplayCondition();
-
-                if (optionalDisplayCondition.isEmpty() && properties.length > 1) {
-                    throw new IllegalArgumentException(
-                        "If multiple output properties are defined, they must have display condition defined");
-                }
-            }
-
-            return Stream.of(properties)
-                .distinct()
-                .toList();
-        }
-
-        return null;
     }
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
@@ -1223,20 +1178,12 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(P property) {
-            if (outputSchemaFunction != null) {
-                throw new IllegalArgumentException("Output schema function is already set.");
-            }
-
             this.outputSchemaProperty = property;
 
             return this;
         }
 
         public ModifiableTriggerDefinition outputSchema(OutputSchemaFunction outputSchema) {
-            if (outputSchemaProperty != null) {
-                throw new IllegalArgumentException("Output schema properties are already set.");
-            }
-
             this.outputSchemaFunction = outputSchema;
 
             return this;
