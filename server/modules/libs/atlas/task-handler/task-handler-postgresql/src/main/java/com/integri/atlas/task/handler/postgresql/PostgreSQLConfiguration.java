@@ -21,8 +21,16 @@ import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_EX
 import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_INSERT;
 import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_QUERY;
 import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_UPDATE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_DATABASE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_HOST;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_PASSWORD;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_PORT;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_USERNAME;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.TASK_POSTGRESQL;
 
+import com.integri.atlas.engine.Accessor;
+import com.integri.atlas.engine.Constants;
+import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.task.commons.jdbc.DataSourceFactory;
 import com.integri.atlas.task.commons.jdbc.DeleteJdbcTaskHandler;
 import com.integri.atlas.task.commons.jdbc.ExecuteJdbcTaskHandler;
@@ -43,7 +51,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class PostgreSQLConfiguration {
 
-    private Map<String, DataSource> dataSourceMap = new HashMap<>();
+    private final Map<String, DataSource> dataSourceMap = new HashMap<>();
 
     @Bean(TASK_POSTGRESQL + "/" + OPERATION_DELETE)
     DeleteJdbcTaskHandler deleteJdbcTaskHandler(PlatformTransactionManager transactionManager) {
@@ -73,23 +81,38 @@ public class PostgreSQLConfiguration {
     @Bean(TASK_POSTGRESQL + "DataSourceFactory")
     DataSourceFactory dataSourceFactory() {
         return taskExecution -> {
-            String url = "jdbc:postgresql://localhost/postgres";
-            String username = "postgres";
-            String password = "postgres";
+            DataSource dataSource = null;
 
-            return dataSourceMap.computeIfAbsent(
-                url + username + password,
-                key -> {
-                    DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+            if (taskExecution.containsKey(Constants.AUTH)) {
+                Accessor taskAuthAccessor = new MapObject(taskExecution.getMap(Constants.AUTH));
 
-                    dataSourceBuilder.driverClassName("org.postgresql.Driver");
-                    dataSourceBuilder.url(url);
-                    dataSourceBuilder.username(username);
-                    dataSourceBuilder.password(password);
+                String url =
+                    "jdbc:postgresql://" +
+                    taskAuthAccessor.getString(PROPERTY_HOST) +
+                    ":" +
+                    taskAuthAccessor.getString(PROPERTY_PORT) +
+                    "/" +
+                    taskAuthAccessor.getString(PROPERTY_DATABASE);
+                String username = taskAuthAccessor.getString(PROPERTY_USERNAME);
+                String password = taskAuthAccessor.getString(PROPERTY_PASSWORD);
 
-                    return dataSourceBuilder.build();
-                }
-            );
+                dataSource =
+                    dataSourceMap.computeIfAbsent(
+                        url + username + password,
+                        key -> {
+                            DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+
+                            dataSourceBuilder.driverClassName("org.postgresql.Driver");
+                            dataSourceBuilder.url(url);
+                            dataSourceBuilder.username(username);
+                            dataSourceBuilder.password(password);
+
+                            return dataSourceBuilder.build();
+                        }
+                    );
+            }
+
+            return dataSource;
         };
     }
 }

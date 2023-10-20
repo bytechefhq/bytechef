@@ -21,8 +21,6 @@ package com.integri.atlas.task.definition.model;
  */
 public class DSL {
 
-    public static final String PROPERTY_TASK_AUTH_ID = "taskAuthId";
-
     public static TaskProperty.AnyTaskProperty ANY_PROPERTY() {
         return ANY_PROPERTY(null);
     }

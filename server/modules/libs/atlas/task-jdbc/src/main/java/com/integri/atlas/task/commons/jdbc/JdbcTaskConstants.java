@@ -16,27 +16,27 @@
 
 package com.integri.atlas.task.commons.jdbc;
 
-import static com.integri.atlas.task.definition.dsl.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.DATE_TIME_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.DATE_TIME_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.NUMBER_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
 
-import com.integri.atlas.task.definition.dsl.TaskOperation;
+import com.integri.atlas.task.definition.model.TaskOperation;
 
 /**
  * @author Ivica Cardic
  */
 public final class JdbcTaskConstants {
 
-    public static final String PROPERTY_TABLE = "table";
     public static final String OPERATION_QUERY = "query";
     public static final String OPERATION_INSERT = "insert";
     public static final String OPERATION_UPDATE = "update";
     public static final String OPERATION_DELETE = "delete";
     public static final String OPERATION_EXECUTE = "execute";
+    public static final String PROPERTY_TABLE = "table";
     public static final String PROPERTY_QUERY = "query";
     public static final String PROPERTY_PARAMETERS = "parameters";
     public static final String PROPERTY_SCHEMA = "schema";
@@ -45,6 +45,11 @@ public final class JdbcTaskConstants {
     public static final String PROPERTY_DELETE_KEY = "deleteKey";
     public static final String PROPERTY_EXECUTE = "execute";
     public static final String PROPERTY_UPDATE_KEY = "updateKey";
+    public static final String PROPERTY_HOST = "host";
+    public static final String PROPERTY_DATABASE = "database";
+    public static final String PROPERTY_USERNAME = "username";
+    public static final String PROPERTY_PASSWORD = "password";
+    public static final String PROPERTY_PORT = "port";
 
     public static TaskOperation[] TASK_OPERATIONS = {
         OPERATION(OPERATION_QUERY)
