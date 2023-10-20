@@ -1,10 +1,9 @@
 dependencies {
-    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
-
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-api"))
+    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation(project(":server:libs:configs:liquibase-config"))
