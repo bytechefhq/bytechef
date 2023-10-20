@@ -15,59 +15,67 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.task.handler;
+package com.bytechef.hermes.component.task.handler.loader;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.impl.ContextImpl;
-import com.bytechef.hermes.component.impl.ParametersImpl;
+import com.bytechef.hermes.component.ContextImpl;
+import com.bytechef.hermes.component.oas.OpenApiClient;
 import com.bytechef.hermes.component.util.ContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentTaskHandler implements TaskHandler<Object> {
+class OpenApiComponentTaskHandler implements TaskHandler<Object> {
+
+    private static final OpenApiClient OPEN_API_CLIENT = new OpenApiClient();
 
     private final ActionDefinition actionDefinition;
-    private final ConnectionDefinition connectionDefinition;
-    private final ComponentHandler componentHandler;
+    private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionService connectionService;
+    private final OpenApiComponentHandler openApiComponentHandler;
+
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public DefaultComponentTaskHandler(
-        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition, ComponentHandler componentHandler,
-        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
+    OpenApiComponentTaskHandler(
+        ActionDefinition actionDefinition, ConnectionDefinitionFacade connectionDefinitionFacade,
+        ConnectionService connectionService, OpenApiComponentHandler openApiComponentHandler,
+        EventPublisher eventPublisher,
+        FileStorageService fileStorageService) {
 
         this.actionDefinition = actionDefinition;
-        this.connectionDefinition = connectionDefinition;
-        this.componentHandler = componentHandler;
+        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionService = connectionService;
+        this.openApiComponentHandler = openApiComponentHandler;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) {
+    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         Context context = new ContextImpl(
-            connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
+            connectionDefinitionFacade, connectionService, eventPublisher, fileStorageService, taskExecution);
 
         return ContextSupplier.get(
             context,
-            () -> actionDefinition
-                .getPerformFunction()
-                .map(performFunction -> performFunction.apply(
-                    context, new ParametersImpl(taskExecution.getParameters())))
-                .orElseGet(() -> componentHandler.handle(
-                    actionDefinition, context, new ParametersImpl(taskExecution.getParameters()))));
+            () -> {
+                try {
+                    return openApiComponentHandler.postExecute(
+                        actionDefinition, OPEN_API_CLIENT.execute(actionDefinition, context, taskExecution));
+                } catch (Exception e) {
+                    throw new TaskExecutionException(e.getMessage(), e);
+                }
+            });
     }
 }

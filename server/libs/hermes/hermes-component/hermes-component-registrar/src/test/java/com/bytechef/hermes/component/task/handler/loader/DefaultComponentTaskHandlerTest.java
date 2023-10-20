@@ -15,22 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.postgresql;
+package com.bytechef.hermes.component.task.handler.loader;
 
-import com.bytechef.hermes.component.task.handler.loader.JdbcComponentHandler;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class PostgreSQLComponentDefinitionTest {
+public class DefaultComponentTaskHandlerTest {
 
+    @Disabled
     @Test
-    public void testGetComponentDefinition() {
-        JdbcComponentHandler jdbcComponentHandler = new JdbcComponentHandler(
-            null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition());
-
-        JsonFileAssert.assertEquals("definition/postgresql_v1.json", jdbcComponentHandler.getDefinition());
+    public void testHandle() {
+        // TODO
     }
 }

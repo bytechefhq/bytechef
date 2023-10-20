@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.jdbc.operation;
+package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
-import com.bytechef.hermes.component.jdbc.operation.ExecuteJdbcOperation;
-import com.bytechef.hermes.component.registrar.config.JdbcComponentRegistrarIntTestConfiguration;
+import com.bytechef.hermes.component.jdbc.config.JdbcComponentRegistrarIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,13 +43,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @EmbeddedSql
 @SpringBootTest(classes = JdbcComponentRegistrarIntTestConfiguration.class)
-public class ExecuteJdbcActionIntTest {
+public class QueryJdbcActionIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private ExecuteJdbcOperation executeJdbcOperation;
+    private QueryJdbcOperation queryJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -59,50 +59,54 @@ public class ExecuteJdbcActionIntTest {
         jdbcTemplate.execute("DROP TABLE IF EXISTS test;");
 
         jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.execute(
+            """
+                    CREATE TABLE test (
+                        id   varchar(256) not null primary key,
+                        name varchar(256) not null
+                    );
+                    INSERT INTO test VALUES('id1', 'name1');
+                    INSERT INTO test VALUES('id2', 'name2');
+                    INSERT INTO test VALUES('id3', 'name3');
+                    INSERT INTO test VALUES('id4', 'name4');
+                """);
     }
 
     @Test
-    public void testExecute() {
+    public void testQuery() {
+        Context context = Mockito.mock(Context.class);
+
+        Mockito.when(context.fetchConnection())
+            .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
+
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequiredString(JdbcConstants.EXECUTE))
-            .thenReturn(
-                """
-                        CREATE TABLE IF NOT EXISTS test (
-                            id   varchar(256) not null primary key,
-                            name varchar(256) not null
-                        )
-                    """);
-
-        executeJdbcOperation.execute(Mockito.mock(Context.class), parameters);
-
-        Assertions.assertEquals(0, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
-
         Mockito.when(parameters.getMap(JdbcConstants.PARAMETERS, Map.of()))
-            .thenReturn(Map.of("id", "id1", "name", "name1"));
-        Mockito.when(parameters.getRequiredString(JdbcConstants.EXECUTE))
-            .thenReturn("INSERT INTO test VALUES(:id, :name)");
+            .thenReturn(Map.of("id", "id2"));
+        Mockito.when(parameters.getRequiredString(JdbcConstants.QUERY))
+            .thenReturn("SELECT count(*) FROM test where id=:id");
 
-        executeJdbcOperation.execute(Mockito.mock(Context.class), parameters);
+        List<Map<String, Object>> result = queryJdbcOperation.execute(context, parameters);
 
-        Assertions.assertEquals(1, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
+        Assertions.assertEquals(1, result.size());
     }
 
     @TestConfiguration
-    public static class ExecuteJdbcActionIntTestConfiguration {
+    public static class InsertJdbcActionIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        ExecuteJdbcOperation executeJdbcOperation() {
-            return new ExecuteJdbcOperation(new JdbcExecutor(
+        QueryJdbcOperation queryJdbcOperation() {
+            return new QueryJdbcOperation(new JdbcExecutor(
                 null,
                 new DataSourceFactory() {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        Context.Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
                         return dataSource;
                     }
                 },

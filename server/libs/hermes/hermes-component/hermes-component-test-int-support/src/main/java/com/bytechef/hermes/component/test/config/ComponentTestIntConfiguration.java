@@ -23,6 +23,8 @@ import com.bytechef.atlas.sync.executor.config.WorkflowExecutorConfiguration;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import org.springframework.boot.SpringBootConfiguration;
@@ -54,6 +56,12 @@ public class ComponentTestIntConfiguration {
 
     @MockBean
     private ConnectionService connectionService;
+
+    @MockBean
+    private ConnectionDefinitionFacade connectionDefinitionFacade;
+
+    @MockBean
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @Bean
     FileStorageService base64FileStorageService() {

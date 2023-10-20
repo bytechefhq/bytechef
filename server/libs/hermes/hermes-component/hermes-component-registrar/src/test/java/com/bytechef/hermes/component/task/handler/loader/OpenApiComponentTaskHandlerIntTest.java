@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar;
+package com.bytechef.hermes.component.task.handler.loader;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -29,8 +29,6 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.task.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.connection.constant.ConnectionConstants;
@@ -38,6 +36,10 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -93,9 +95,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(properties = {
-    "spring.application.name=server-app"
-})
+@SpringBootTest
 @WireMockTest(httpPort = 9999)
 public class OpenApiComponentTaskHandlerIntTest {
 
@@ -121,14 +121,17 @@ public class OpenApiComponentTaskHandlerIntTest {
 
     private Connection connection;
 
+    @Autowired
+    private ConnectionDefinitionFacade connectionDefinitionFacade;
+
     @BeforeEach
     public void beforeEach() {
         connectionRepository.deleteAll();
 
         connection = new Connection();
 
-        connection.setComponentName("petshop");
-        connection.setConnectionVersion(1);
+        connection.setComponentName("petstore");
+        connection.setKey("key");
         connection.setName("PetShop Connection");
 
         connection = connectionRepository.save(connection);
@@ -138,7 +141,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     public void testHandleDELETE() throws Exception {
         stubFor(delete("/pet/1").willReturn(ok()));
 
-        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("deletePet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("deletePet");
 
         TaskExecution taskExecution = getTaskExecution(Map.of("petId", 1));
 
@@ -150,7 +153,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         stubFor(delete("/store/order/1").willReturn(ok()));
 
-        openApiComponentTaskHandler = createRestComponentHandler("deleteOrder");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("deleteOrder");
 
         taskExecution = getTaskExecution(Map.of("orderId", 1));
 
@@ -162,7 +165,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         stubFor(delete("/user/user1").willReturn(ok()));
 
-        openApiComponentTaskHandler = createRestComponentHandler("deleteUser");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("deleteUser");
 
         taskExecution = getTaskExecution(Map.of("username", "user1"));
 
@@ -233,7 +236,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("findPetsByStatus");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("findPetsByStatus");
 
         TaskExecution taskExecution = getTaskExecution(Map.of("status", "available"));
 
@@ -257,7 +260,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                                         "the allowable values `[available, pending, sold]`")))
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("findPetsByStatus");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("findPetsByStatus");
 
         taskExecution = getTaskExecution(Map.of("status", "unknown"));
 
@@ -281,7 +284,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("findPetsByTags");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("findPetsByTags");
 
         taskExecution = getTaskExecution(Map.of("tags", List.of("tag1")));
 
@@ -325,7 +328,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("getPetById");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("getPetById");
 
         taskExecution = getTaskExecution(Map.of("petId", 7));
 
@@ -350,7 +353,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("getInventory");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("getInventory");
 
         taskExecution = getTaskExecution(Collections.emptyMap());
 
@@ -379,7 +382,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("getOrderById");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("getOrderById");
 
         taskExecution = getTaskExecution(Map.of("orderId", 3));
 
@@ -398,7 +401,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                             .withBody("Logged in user session: 7284289668658063360")
                             .withHeader("Content-Type", "text/plain")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("loginUser");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("loginUser");
 
         taskExecution = getTaskExecution(Map.of());
 
@@ -411,7 +414,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         stubFor(get(urlPathEqualTo("/user/logout")).willReturn(ok()));
 
-        openApiComponentTaskHandler = createRestComponentHandler("logoutUser");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("logoutUser");
 
         taskExecution = getTaskExecution(Map.of());
 
@@ -442,7 +445,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("getUserByName");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("getUserByName");
 
         taskExecution = getTaskExecution(Map.of("username", "user1"));
 
@@ -482,7 +485,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("addPet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("addPet");
 
         TaskExecution taskExecution = getTaskExecution(
             Map.of(
@@ -548,11 +551,11 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("uploadFile");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("uploadFile");
 
         FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("text.txt", "This is text");
 
-        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", fileEntry.toComponentFileEntry()));
+        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", fileEntry.toContextFileEntry()));
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -580,7 +583,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("placeOrder");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("placeOrder");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -623,7 +626,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("createUser");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("createUser");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -670,7 +673,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("createUsersWithListInput");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("createUsersWithListInput");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -723,7 +726,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("updatePet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("updatePet");
 
         TaskExecution taskExecution = getTaskExecution(
             Map.of(
@@ -766,7 +769,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        openApiComponentTaskHandler = createRestComponentHandler("updateUser");
+        openApiComponentTaskHandler = createOpenApiComponentHandler("updateUser");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -790,16 +793,10 @@ public class OpenApiComponentTaskHandlerIntTest {
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
     }
 
-    private OpenApiComponentTaskHandler createRestComponentHandler(String actionName) {
+    private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
-            getActionDefinition(actionName), getConnectionDefinition(), connectionService,
+            getActionDefinition(actionName), connectionDefinitionFacade, connectionService,
             PETSTORE_COMPONENT_HANDLER, null, FILE_STORAGE_SERVICE);
-    }
-
-    private ConnectionDefinition getConnectionDefinition() {
-        ComponentDefinition componentDefinition = PETSTORE_COMPONENT_HANDLER.getDefinition();
-
-        return componentDefinition.getConnection();
     }
 
     private ActionDefinition getActionDefinition(String actionName) {
@@ -841,6 +838,16 @@ public class OpenApiComponentTaskHandlerIntTest {
         @Bean
         ObjectMapper objectMapper() {
             return new ObjectMapper();
+        }
+
+        @Bean
+        ConnectionDefinitionFacade connectionDefinitionFacade(ConnectionService connectionService) {
+            return new ConnectionDefinitionFacadeImpl(connectionDefinitionService(), connectionService);
+        }
+
+        @Bean
+        ConnectionDefinitionService connectionDefinitionService() {
+            return new ConnectionDefinitionServiceImpl(List.of(PETSTORE_COMPONENT_HANDLER.getDefinition()));
         }
 
         @EnableCaching

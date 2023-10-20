@@ -15,31 +15,35 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar;
+package com.bytechef.hermes.component.task.handler.loader;
 
 import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
-import com.bytechef.hermes.component.task.handler.JdbcComponentTaskHandler;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ServiceLoader;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandlerRegistrar {
+class JdbcComponentTaskHandlerFactoryLoader extends DefaultComponentTaskHandlerFactoryLoader {
 
     private final DataSourceFactory dataSourceFactory;
 
     @SuppressFBWarnings("EI2")
-    public JdbcComponentTaskHandlerRegistrar(
+    JdbcComponentTaskHandlerFactoryLoader(
         ConnectionService connectionService, DataSourceFactory dataSourceFactory, EventPublisher eventPublisher,
         FileStorageService fileStorageService) {
 
@@ -49,7 +53,9 @@ public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandl
     }
 
     @Override
-    public void registerTaskHandlers(ConfigurableListableBeanFactory beanFactory) {
+    public List<ComponentTaskHandlerFactory> loadComponentTaskHandlerFactories() {
+        List<ComponentTaskHandlerFactory> componentTaskHandlerFactories = new ArrayList<>();
+
         for (JdbcComponentDefinitionFactory jdbcComponentDefinitionFactory : ServiceLoader.load(
             JdbcComponentDefinitionFactory.class)) {
 
@@ -60,8 +66,22 @@ public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandl
                 jdbcComponentDefinition.getDatabaseJdbcName(), dataSourceFactory,
                 jdbcComponentDefinition.getJdbcDriverClassName());
 
-            registerComponentActionTaskHandlerAdapter(
-                new JdbcComponentTaskHandler(jdbcExecutor, jdbcComponentDefinition), beanFactory);
+            ComponentHandler componentHandler = new JdbcComponentHandler(jdbcExecutor, jdbcComponentDefinition);
+
+            ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+            componentTaskHandlerFactories.add(
+                new ComponentTaskHandlerFactory(
+                    componentDefinition,
+                    componentDefinition.getActions()
+                        .stream()
+                        .map(actionDefinition -> new TaskHandlerFactoryItem(
+                            actionDefinition.getName(),
+                            createTaskHandlerFactory(
+                                actionDefinition, componentDefinition.getConnection(), componentHandler)))
+                        .toList()));
         }
+
+        return componentTaskHandlerFactories;
     }
 }

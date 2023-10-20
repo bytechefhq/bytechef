@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.task.handler;
+package com.bytechef.hermes.component.task.handler.loader;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
@@ -66,7 +66,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class JdbcComponentTaskHandler implements ComponentHandler {
+public class JdbcComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
     private final DeleteJdbcOperation deleteJdbcOperation;
@@ -75,7 +75,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
     private final QueryJdbcOperation queryJdbcOperation;
     private final UpdateJdbcOperation updateJdbcOperation;
 
-    public JdbcComponentTaskHandler(JdbcExecutor jdbcExecutor, JdbcComponentDefinition jdbcComponentDefinition) {
+    public JdbcComponentHandler(JdbcExecutor jdbcExecutor, JdbcComponentDefinition jdbcComponentDefinition) {
         this.deleteJdbcOperation = new DeleteJdbcOperation(jdbcExecutor);
         this.executeJdbcOperation = new ExecuteJdbcOperation(jdbcExecutor);
         this.insertJdbcOperation = new InsertJdbcOperation(jdbcExecutor);

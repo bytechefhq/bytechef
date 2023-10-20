@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.config;
+package com.bytechef.hermes.component.jdbc.config;
 
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan("com.bytechef.hermes.component.registrar.jdbc")
+@ComponentScan("com.bytechef.hermes.component.jdbc")
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class JdbcComponentRegistrarIntTestConfiguration {

@@ -15,23 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.jdbc.operation;
+package com.bytechef.hermes.component.jdbc.operation;
 
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.COLUMNS;
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
-
-import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.operation.InsertJdbcOperation;
-import com.bytechef.hermes.component.registrar.config.JdbcComponentRegistrarIntTestConfiguration;
+import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
+import com.bytechef.hermes.component.jdbc.config.JdbcComponentRegistrarIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,13 +42,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @EmbeddedSql
 @SpringBootTest(classes = JdbcComponentRegistrarIntTestConfiguration.class)
-public class InsertJdbcActionIntTest {
+public class ExecuteJdbcActionIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private InsertJdbcOperation insertJdbcOperation;
+    private ExecuteJdbcOperation executeJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -64,49 +58,55 @@ public class InsertJdbcActionIntTest {
         jdbcTemplate.execute("DROP TABLE IF EXISTS test;");
 
         jdbcTemplate = new JdbcTemplate(dataSource);
-
-        jdbcTemplate.execute(
-            """
-                    CREATE TABLE test (
-                        id   varchar(256) not null primary key,
-                        name varchar(256) not null
-                    );
-                """);
     }
 
     @Test
-    public void testInsert() {
+    public void testExecute() {
+        Context context = Mockito.mock(Context.class);
+
+        Mockito.when(context.fetchConnection())
+            .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
+
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getList(COLUMNS, String.class, List.of()))
-            .thenReturn(List.of("id", "name"));
-        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")));
-        Mockito.when(parameters.getString(SCHEMA, "public"))
-            .thenReturn("public");
-        Mockito.when(parameters.getRequiredString(TABLE))
-            .thenReturn("test");
+        Mockito.when(parameters.getRequiredString(JdbcConstants.EXECUTE))
+            .thenReturn(
+                """
+                        CREATE TABLE IF NOT EXISTS test (
+                            id   varchar(256) not null primary key,
+                            name varchar(256) not null
+                        )
+                    """);
 
-        Map<String, Integer> result = insertJdbcOperation.execute(Mockito.mock(Context.class), parameters);
+        executeJdbcOperation.execute(context, parameters);
 
-        Assertions.assertEquals(2, result.get("rows"));
+        Assertions.assertEquals(0, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
+
+        Mockito.when(parameters.getMap(JdbcConstants.PARAMETERS, Map.of()))
+            .thenReturn(Map.of("id", "id1", "name", "name1"));
+        Mockito.when(parameters.getRequiredString(JdbcConstants.EXECUTE))
+            .thenReturn("INSERT INTO test VALUES(:id, :name)");
+
+        executeJdbcOperation.execute(context, parameters);
+
+        Assertions.assertEquals(1, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
     }
 
     @TestConfiguration
-    public static class InsertJdbcActionIntTestConfiguration {
+    public static class ExecuteJdbcActionIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        InsertJdbcOperation insertJdbcOperation() {
-            return new InsertJdbcOperation(new JdbcExecutor(
+        ExecuteJdbcOperation executeJdbcOperation() {
+            return new ExecuteJdbcOperation(new JdbcExecutor(
                 null,
                 new DataSourceFactory() {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
+                        Context.Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
                         return dataSource;
                     }
                 },

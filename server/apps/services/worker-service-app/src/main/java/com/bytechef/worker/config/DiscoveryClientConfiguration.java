@@ -18,7 +18,6 @@
 package com.bytechef.worker.config;
 
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
@@ -38,15 +37,14 @@ import java.util.stream.Collectors;
 @EnableDiscoveryClient
 public class DiscoveryClientConfiguration implements InitializingBean {
 
-    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
+    private final List<ComponentDefinition> componentDefinitions;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
 
     @SuppressFBWarnings("EI2")
     public DiscoveryClientConfiguration(
-        List<ComponentDefinitionFactory> componentDefinitionFactories,
-        ServiceMetadataRegistry serviceMetadataRegistry) {
+        List<ComponentDefinition> componentDefinitions, ServiceMetadataRegistry serviceMetadataRegistry) {
 
-        this.componentDefinitionFactories = componentDefinitionFactories;
+        this.componentDefinitions = componentDefinitions;
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
@@ -55,8 +53,7 @@ public class DiscoveryClientConfiguration implements InitializingBean {
         serviceMetadataRegistry.registerMetadata(
             Map.of(
                 "componentNames",
-                componentDefinitionFactories.stream()
-                    .map(ComponentDefinitionFactory::getDefinition)
+                componentDefinitions.stream()
                     .map(ComponentDefinition::getName)
                     .collect(Collectors.joining(","))));
     }
