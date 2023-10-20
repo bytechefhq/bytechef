@@ -5,7 +5,6 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
 import Tooltip from 'components/Tooltip/Tooltip';
-import {TagModel} from 'middleware/core/tag/models/TagModel';
 import {useState} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
@@ -13,6 +12,7 @@ import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
+import {TagModel} from '../../middleware/automation/configuration';
 import Input from '../Input/Input';
 import ArrayProperty from './ArrayProperty';
 import InputProperty from './InputProperty';
