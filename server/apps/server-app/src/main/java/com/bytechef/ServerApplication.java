@@ -36,8 +36,6 @@ public class ServerApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ServerApplication.class);
 
-    public ServerApplication() {}
-
     /**
      * Main method, used to run the application.
      *
@@ -73,7 +71,7 @@ public class ServerApplication {
 
         log.info(
                 """
-                    \n----------------------------------------------------------
+                    ----------------------------------------------------------
                     \tApplication '{}' is running! Access URLs:
                     \tLocal: \t\t{}://localhost:{}{}
                     \tExternal: \t{}://{}:{}{}

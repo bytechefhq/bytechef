@@ -31,6 +31,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DiscoveryClientConfiguration {
 
+	private DiscoveryClientConfiguration() {
+		throw new IllegalStateException("Not allowed to instantiate utility class");
+	}
+
     public static final String PLATFORM_SERVICE_APP = "platform-service-app";
 
     @Configuration
@@ -42,6 +46,10 @@ public class DiscoveryClientConfiguration {
     @ConditionalOnProperty(value = "discovery-client.provider", havingValue = "property")
     @EnableConfigurationProperties(DiscoveryClientPropertyProperties.class)
     static class PropertyDiscoveryClientConfiguration {
+
+		private PropertyDiscoveryClientConfiguration() {
+			throw new IllegalStateException("Not allowed to instantiate utility class");
+		}
 
         @Bean
         DiscoveryClient discoveryClient(DiscoveryClientPropertyProperties discoveryClientPropertyProperties) {
