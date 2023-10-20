@@ -36,8 +36,8 @@ const navigation: {
     },
     {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
     {
-        name: 'Execution History',
-        href: '/automation/executions',
+        name: 'Workflow Execution History',
+        href: '/automation/workflow-executions',
         icon: QueueListIcon,
     },
 ];

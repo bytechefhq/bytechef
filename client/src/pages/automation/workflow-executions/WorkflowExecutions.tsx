@@ -25,8 +25,8 @@ import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '../project/stores/useWorkflowExecutionDetailsDialogStore';
-import ExecutionDetailsDialog from './components/ExecutionDetailsDialog';
-import ExecutionsTable from './components/ExecutionsTable';
+import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
+import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 
 const jobStatusOptions = [
     {
@@ -51,7 +51,7 @@ const jobStatusOptions = [
     },
 ];
 
-export const Executions = () => {
+export const WorkflowExecutions = () => {
     const [filterStatus, setFilterStatus] =
         useState<GetWorkflowExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
@@ -131,10 +131,15 @@ export const Executions = () => {
                         </PageFooter>
                     )
                 }
-                header={<PageHeader position="main" title="Executions" />}
+                header={
+                    <PageHeader position="main" title="Workflow Executions" />
+                }
                 leftSidebarHeader={
                     <>
-                        <PageHeader leftSidebar title="Execution History" />
+                        <PageHeader
+                            leftSidebar
+                            title="Workflow Executions History"
+                        />
 
                         <div className="px-4">
                             <FilterableSelect
@@ -263,7 +268,7 @@ export const Executions = () => {
                             )}
                         >
                             {tableData ? (
-                                <ExecutionsTable data={tableData} />
+                                <WorkflowExecutionsTable data={tableData} />
                             ) : (
                                 <EmptyList
                                     icon={
@@ -277,11 +282,11 @@ export const Executions = () => {
                     )}
 
                 {workflowExecutionDetailsDialogOpen && (
-                    <ExecutionDetailsDialog />
+                    <WorkflowExecutionDetailsDialog />
                 )}
             </LayoutContainer>
         </PageLoader>
     );
 };
 
-export default Executions;
+export default WorkflowExecutions;

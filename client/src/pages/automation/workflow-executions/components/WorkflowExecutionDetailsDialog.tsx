@@ -7,7 +7,7 @@ import useWorkflowExecutionDetailsDialogStore from '../../project/stores/useWork
 import ReadOnlyWorkflow from './dialog-content/ReadOnlyWorkflow';
 import WorkflowTaskListAccordion from './dialog-content/WorkflowTaskListAccordion';
 
-const ExecutionDetailsDialog = () => {
+const WorkflowExecutionDetailsDialog = () => {
     const {
         workflowExecutionId,
         workflowExecutionDetailsDialogOpen,
@@ -32,7 +32,7 @@ const ExecutionDetailsDialog = () => {
     let duration;
 
     if (startTime && endTime) {
-        duration = `${Math.round(endTime - startTime)}ms`;
+        duration = Math.round(endTime - startTime);
     }
 
     const taskExecutionsCount = workflowExecution?.taskExecutions?.length || 0;
@@ -110,4 +110,4 @@ const ExecutionDetailsDialog = () => {
     );
 };
 
-export default ExecutionDetailsDialog;
+export default WorkflowExecutionDetailsDialog;
