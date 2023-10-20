@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Generates a random integer value.",
-      "label": "Int"
+      "title": "Int"
     },
     "name": "randomInt",
     "properties": [ {
@@ -23,13 +23,13 @@
   }, {
     "display": {
       "description": "Generates a random float value.",
-      "label": "Float"
+      "title": "Float"
     },
     "name": "randomFloat"
   } ],
   "display": {
     "description": "The Random Helper allows you to generate random values.",
-    "label": "Random Helper"
+    "title": "Random Helper"
   },
   "name": "randomHelper",
   "version": 1

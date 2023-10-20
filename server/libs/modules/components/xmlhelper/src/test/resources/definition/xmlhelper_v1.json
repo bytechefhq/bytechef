@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Converts the XML string to object/array.",
-      "label": "Convert from XML string"
+      "title": "Convert from XML string"
     },
     "name": "parse",
     "outputSchema": [ {
@@ -21,7 +21,7 @@
   }, {
     "display": {
       "description": "Writes the object/array to a XML string.",
-      "label": "Convert to XML string"
+      "title": "Convert to XML string"
     },
     "name": "stringify",
     "outputSchema": [ {
@@ -47,7 +47,7 @@
   } ],
   "display": {
     "description": "Converts between XML string and object/array.",
-    "label": "XML Helper"
+    "title": "XML Helper"
   },
   "name": "xmlHelper",
   "version": 1

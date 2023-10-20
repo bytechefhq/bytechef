@@ -1,7 +1,7 @@
 {
   "actions": [ {
     "display": {
-      "label": "Delay"
+      "title": "Delay"
     },
     "name": "delay",
     "properties": [ {
@@ -16,7 +16,7 @@
   } ],
   "display": {
     "description": "Sets a value which can then be referenced in other tasks.",
-    "label": "Delay"
+    "title": "Delay"
   },
   "name": "delay",
   "version": 1

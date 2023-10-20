@@ -1,7 +1,7 @@
 {
   "display": {
     "description": "Loops sequentially over list of items.",
-    "label": "Loop"
+    "title": "Loop"
   },
   "name": "loop",
   "outputSchema": [ {

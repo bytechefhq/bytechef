@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Execute an SQL query.",
-      "label": "Query"
+      "title": "Query"
     },
     "name": "query",
     "outputSchema": [ {
@@ -51,7 +51,7 @@
   }, {
     "display": {
       "description": "Insert rows in database.",
-      "label": "Insert"
+      "title": "Insert"
     },
     "name": "insert",
     "outputSchema": [ {
@@ -135,7 +135,7 @@
   }, {
     "display": {
       "description": "Update rows in database.",
-      "label": "Update"
+      "title": "Update"
     },
     "name": "update",
     "outputSchema": [ {
@@ -226,7 +226,7 @@
   }, {
     "display": {
       "description": "Delete rows from database.",
-      "label": "Delete"
+      "title": "Delete"
     },
     "name": "delete",
     "outputSchema": [ {
@@ -306,7 +306,7 @@
   }, {
     "display": {
       "description": "Execute an SQL DML or DML statement.",
-      "label": "Execute"
+      "title": "Execute"
     },
     "name": "execute",
     "outputSchema": [ {
@@ -394,7 +394,7 @@
     "authorizationRequired": false,
     "componentDisplay": {
       "description": "Query, insert nd update data from MySQL.",
-      "label": "MySQL"
+      "title": "MySQL"
     },
     "componentName": "mysql",
     "connectionVersion": 1,
@@ -432,7 +432,7 @@
   },
   "display": {
     "description": "Query, insert nd update data from MySQL.",
-    "label": "MySQL"
+    "title": "MySQL"
   },
   "name": "mysql",
   "version": 1

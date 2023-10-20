@@ -1,7 +1,7 @@
 {
   "display": {
     "description": "Breaks the loop execution.",
-    "label": "Loop Break"
+    "title": "Loop Break"
   },
   "name": "loop-break",
   "version": 1

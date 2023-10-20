@@ -49,11 +49,11 @@ public class ComponentDefinitionTest {
     @Test
     public void testActionDefinition() throws JSONException, JsonProcessingException {
         ActionDefinition action = ComponentDSL.action("name")
-            .display(display("label").description("description"));
+            .display(display("title").description("description"));
 
         jsonAssertEquals(
             """
-                {"display":{"description":"description","label":"label"},"name":"name"}
+                {"display":{"description":"description","title":"title"},"name":"name"}
                 """,
             action);
     }
@@ -301,7 +301,7 @@ public class ComponentDefinitionTest {
     public void testTaskHandlerDescription() throws JSONException, JsonProcessingException {
         ComponentDefinition componentDefinition;
         componentDefinition = ComponentDSL.component("name")
-            .display(display("label")
+            .display(display("title")
                 .description("description")
                 .subtitle("subtitle")
                 .icon("icon"))
@@ -309,7 +309,16 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                        {"display":{"description":"description","icon":"icon","label":"label","subtitle":"subtitle"},"name":"name","version":1.0}
+                {
+                    "display":{
+                        "description":"description",
+                        "icon":"icon",
+                        "title":"title",
+                        "subtitle":"subtitle"
+                    },
+                    "name":"name",
+                    "version":1.0
+                }
                 """,
             componentDefinition);
     }

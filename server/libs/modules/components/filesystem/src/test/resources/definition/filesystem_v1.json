@@ -1,7 +1,7 @@
 {
   "actions": [ {
     "display": {
-      "label": "Read from file"
+      "title": "Read from file"
     },
     "name": "readFile",
     "outputSchema": [ {
@@ -42,7 +42,7 @@
     } ]
   }, {
     "display": {
-      "label": "Write to file"
+      "title": "Write to file"
     },
     "name": "writeFile",
     "outputSchema": [ {
@@ -97,13 +97,13 @@
   }, {
     "display": {
       "description": "Creates a temporary directory oon the filesystem.",
-      "label": "Create Temp Directory"
+      "title": "Create Temp Directory"
     },
     "name": "createTempDir"
   }, {
     "display": {
       "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
-      "label": "File Path"
+      "title": "File Path"
     },
     "exampleOutput": "/data",
     "name": "getFilePath",
@@ -123,25 +123,25 @@
   }, {
     "display": {
       "description": "Lists a content of directory for the given path.",
-      "label": "List"
+      "title": "List"
     },
     "name": "ls"
   }, {
     "display": {
       "description": "Creates a directory.",
-      "label": "Create"
+      "title": "Create"
     },
     "name": "mkdir"
   }, {
     "display": {
       "description": "Removes the content of a directory.",
-      "label": "Remove"
+      "title": "Remove"
     },
     "name": "rm"
   } ],
   "display": {
     "description": "Reads or writes a binary file from/to disk",
-    "label": "Local File"
+    "title": "Local File"
   },
   "name": "filesystem",
   "version": 1

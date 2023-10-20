@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Converts the JSON string to object/array.",
-      "label": "Convert from JSON string"
+      "title": "Convert from JSON string"
     },
     "name": "parse",
     "outputSchema": [ {
@@ -46,7 +46,7 @@
   }, {
     "display": {
       "description": "Writes the object/array to a JSON string.",
-      "label": "Convert to JSON string"
+      "title": "Convert to JSON string"
     },
     "name": "stringify",
     "outputSchema": [ {
@@ -90,7 +90,7 @@
   } ],
   "display": {
     "description": "JSON Helper allows you to do various operations on objects.",
-    "label": "JSON Helper"
+    "title": "JSON Helper"
   },
   "name": "jsonHelper",
   "version": 1

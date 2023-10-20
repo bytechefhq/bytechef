@@ -1,9 +1,9 @@
 {
   "display": {
     "description": "Directs a stream based on true/false results of comparisons.",
-    "label": "Condition"
+    "title": "Condition"
   },
-  "name": "if",
+  "name": "condition",
   "properties": [ {
     "description": "Set condition as raw expression or list of conditions.",
     "label": "Raw expression",

@@ -1,7 +1,7 @@
 {
   "display": {
     "description": "Executes list of tasks in a sequence.",
-    "label": "Sequence"
+    "title": "Sequence"
   },
   "name": "sequence",
   "version": 1,

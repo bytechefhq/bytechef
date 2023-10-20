@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Executes the script.",
-      "label": "Execute"
+      "title": "Execute"
     },
     "name": "execute",
     "outputSchema": [ {
@@ -20,7 +20,7 @@
   } ],
   "display": {
     "description": "Allows you to run arbitrary Bash scripts.",
-    "label": "Bash"
+    "title": "Bash"
   },
   "name": "bash",
   "version": 1
