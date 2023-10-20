@@ -199,7 +199,7 @@ const NodeDetailsDialog = () => {
                                 )}
 
                                 <div className="relative h-full overflow-y-auto">
-                                    <div className="absolute left-0 top-0 w-full">
+                                    <div className="absolute left-0 top-0 h-full w-full">
                                         {activeTab === 'description' && (
                                             <DescriptionTab
                                                 component={currentComponent}
