@@ -93,7 +93,7 @@ const Select = ({
                 </Button>
             </Trigger>
 
-            <Portal className="z-20">
+            <Portal className="z-50">
                 <Content
                     className={twMerge(
                         'max-h-select-content-available-height min-w-select-trigger-width',
