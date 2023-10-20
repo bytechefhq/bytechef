@@ -1,5 +1,4 @@
 import {Close} from '@radix-ui/react-dialog';
-import {CheckIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
 import Dialog from 'components/Dialog/Dialog';
@@ -132,6 +131,7 @@ const ProjectInstanceDialog = ({
 
     return (
         <Dialog
+            className={twMerge(activeStepIndex === 1 && 'h-[800px]')}
             isOpen={isOpen}
             onOpenChange={(isOpen) => {
                 if (isOpen) {
@@ -145,86 +145,49 @@ const ProjectInstanceDialog = ({
                     ? `${projectInstance?.id ? 'Edit' : 'Create'} Instance`
                     : undefined
             }
-            large
-            wizard
         >
             <div className="flex h-full w-full rounded-l-lg">
-                <div className="w-1/3 rounded-l-lg bg-gray-100 p-4 font-semibold">
-                    <h2>{`${
-                        projectInstance?.id ? 'Edit' : 'New'
-                    } Instance`}</h2>
-
-                    {projectInstanceDialogSteps.map((step, index) => (
-                        <div key={step.name} className="relative pb-10">
-                            {index !==
-                                projectInstanceDialogSteps.length - 1 && (
-                                <div
-                                    className={twMerge(
-                                        'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300',
-                                        index < activeStepIndex && 'bg-gray-900'
-                                    )}
-                                    aria-hidden="true"
-                                />
-                            )}
-
-                            <div className="group relative mt-4 flex items-center">
-                                <span
-                                    className="flex items-center"
-                                    aria-hidden="true"
-                                >
-                                    <span
-                                        className={twMerge(
-                                            'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-gray-300 bg-white',
-                                            index <= activeStepIndex &&
-                                                'border-gray-900'
-                                        )}
-                                    >
-                                        {index < activeStepIndex && (
-                                            <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-900">
-                                                <CheckIcon
-                                                    className="h-5 w-5 text-white"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                        )}
-
-                                        {index === activeStepIndex && (
-                                            <span className="h-2.5 w-2.5 rounded-full bg-gray-900" />
-                                        )}
-
-                                        {index > activeStepIndex && (
-                                            <span className="h-2.5 w-2.5 rounded-full" />
-                                        )}
-                                    </span>
-                                </span>
-
-                                <span
-                                    className={twMerge(
-                                        'ml-4 flex min-w-0 flex-col text-sm font-medium',
-                                        index < activeStepIndex
-                                            ? 'text-gray-900'
-                                            : 'text-gray-500'
-                                    )}
-                                >
-                                    {step.name}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="flex w-2/3 flex-col">
-                    <header className="flex items-center p-4">
+                <div className="flex w-full flex-col">
+                    <header className="flex items-center py-2">
                         <h2 className="font-semibold">
-                            {projectInstanceDialogSteps[activeStepIndex].name}
+                            {`${
+                                projectInstance?.id ? 'Edit' : 'New'
+                            } Instance - ${
+                                projectInstanceDialogSteps[activeStepIndex].name
+                            }`}
                         </h2>
                     </header>
 
-                    <main className="h-full overflow-y-scroll p-4">
+                    <nav aria-label="Progress">
+                        <ol
+                            role="list"
+                            className="space-y-4 md:flex md:space-y-0"
+                        >
+                            {projectInstanceDialogSteps.map((step, index) => (
+                                <li key={step.name} className="md:flex-1">
+                                    <div
+                                        className={twMerge(
+                                            'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4',
+                                            index <= activeStepIndex
+                                                ? 'border-gray-900 hover:border-gray-800'
+                                                : 'border-gray-200 hover:border-gray-30'
+                                        )}
+                                    ></div>
+                                </li>
+                            ))}
+                        </ol>
+                    </nav>
+
+                    <main
+                        className={twMerge(
+                            'h-full',
+                            activeStepIndex === 1 && 'overflow-y-scroll px-1'
+                        )}
+                    >
                         {projectInstanceDialogSteps[activeStepIndex].content}
                     </main>
 
-                    <footer className="flex w-full justify-end space-x-2 self-end p-4">
+                    <footer className="flex w-full justify-end space-x-2 self-end pt-4">
                         {activeStepIndex === 0 && (
                             <>
                                 <Close asChild>

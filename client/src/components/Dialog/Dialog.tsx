@@ -16,11 +16,11 @@ import {twMerge} from 'tailwind-merge';
 
 type DialogProps = {
     children: ReactNode;
-    isOpen: boolean;
-    onOpenChange: Dispatch<SetStateAction<boolean>>;
+    className?: string;
     customTrigger?: ReactNode;
+    isOpen: boolean;
     description?: string;
-    large?: boolean;
+    onOpenChange: Dispatch<SetStateAction<boolean>>;
     title?: string;
     triggerLabel?: string;
     wizard?: boolean;
@@ -28,10 +28,10 @@ type DialogProps = {
 
 const Dialog = ({
     children,
+    className,
     customTrigger,
     description,
     isOpen,
-    large,
     onOpenChange,
     title,
     triggerLabel,
@@ -76,8 +76,8 @@ const Dialog = ({
                         forceMount
                         className={twMerge(
                             'fixed left-[50%] top-[50%] z-50 max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 md:w-full',
-                            large && 'h-[800px] w-[900px] md:max-w-2xl',
-                            !wizard && 'p-4'
+                            !wizard && 'p-4',
+                            className
                         )}
                     >
                         <Title className="text-base font-medium text-gray-900">

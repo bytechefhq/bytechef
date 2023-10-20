@@ -137,33 +137,35 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                 </Link>
                             </div>
 
-                            <DropdownMenu
-                                id={project.id}
-                                menuItems={[
-                                    {
-                                        label: 'Edit',
-                                        onClick: () => {
-                                            console.log('TODO');
+                            <div className="flex w-2/12 justify-end">
+                                <DropdownMenu
+                                    id={project.id}
+                                    menuItems={[
+                                        {
+                                            label: 'Edit',
+                                            onClick: () => {
+                                                console.log('TODO');
+                                            },
                                         },
-                                    },
-                                    {
-                                        label: 'Duplicate',
-                                        onClick: () => {
-                                            console.log('TODO');
+                                        {
+                                            label: 'Duplicate',
+                                            onClick: () => {
+                                                console.log('TODO');
+                                            },
                                         },
-                                    },
-                                    {
-                                        separator: true,
-                                    },
-                                    {
-                                        danger: true,
-                                        label: 'Delete',
-                                        onClick: () => {
-                                            console.log('TODO');
+                                        {
+                                            separator: true,
                                         },
-                                    },
-                                ]}
-                            />
+                                        {
+                                            danger: true,
+                                            label: 'Delete',
+                                            onClick: () => {
+                                                console.log('TODO');
+                                            },
+                                        },
+                                    ]}
+                                />
+                            </div>
                         </li>
                     );
                 })}
