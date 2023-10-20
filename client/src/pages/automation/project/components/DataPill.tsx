@@ -18,21 +18,27 @@ const DataPill = ({
                 event.dataTransfer.setData('name', property.name!)
             }
             className={twMerge(
-                'mr-auto flex cursor-pointer items-center rounded-xl border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50',
+                'mr-auto flex cursor-pointer items-center rounded-full border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50',
                 hasSubProperties &&
                     'flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
             )}
         >
             {hasSubProperties ? (
-                <ul>
-                    {property.properties?.map((subProperty) => (
-                        <DataPill
-                            key={subProperty.name}
-                            onClick={onClick}
-                            property={subProperty}
-                        />
-                    ))}
-                </ul>
+                <fieldset className="flex flex-col rounded-lg border-2 border-gray-400 px-2 pb-2">
+                    <legend className="px-2 pb-2 text-sm font-semibold uppercase text-gray-500">
+                        {property.label}
+                    </legend>
+
+                    <ul className="space-y-2">
+                        {property.properties?.map((subProperty) => (
+                            <DataPill
+                                key={subProperty.name}
+                                onClick={onClick}
+                                property={subProperty}
+                            />
+                        ))}
+                    </ul>
+                </fieldset>
             ) : (
                 <div className="flex items-center" onClick={onClick}>
                     <span className="mr-2" title={property.type}>
