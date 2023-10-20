@@ -64,8 +64,9 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> duplicateWorkflow(String id) {
-        return ResponseEntity.ok(conversionService.convert(workflowService.duplicateWorkflow(id), WorkflowModel.class));
+    public ResponseEntity<WorkflowModel> duplicateWorkflow(Long id, String workflowId) {
+        return ResponseEntity.ok(
+            conversionService.convert(projectFacade.duplicateWorkflow(id, workflowId), WorkflowModel.class));
     }
 
     @Override
