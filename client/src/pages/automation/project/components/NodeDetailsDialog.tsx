@@ -77,7 +77,7 @@ const NodeDetailsDialog = () => {
             componentVersion: currentComponent?.version as number,
             actionName: getActionName(),
         },
-        !!currentComponent
+        !!currentComponent?.actions
     );
 
     useEffect(() => {
