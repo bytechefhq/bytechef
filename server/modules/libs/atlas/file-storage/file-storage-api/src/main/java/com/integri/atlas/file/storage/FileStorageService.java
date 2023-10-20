@@ -29,7 +29,7 @@ public interface FileStorageService {
 
     boolean fileExists(String url) throws FileStorageException;
 
-    FileEntry storeFileContent(String fileName, String data) throws FileStorageException;
+    FileEntry storeFileContent(String fileName, String content) throws FileStorageException;
 
     FileEntry storeFileContent(String fileName, InputStream inputStream) throws FileStorageException;
 

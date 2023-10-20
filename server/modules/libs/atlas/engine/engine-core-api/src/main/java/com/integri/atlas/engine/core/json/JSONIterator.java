@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * @author Ivica Cardic
+ */
 class JSONIterator implements Iterator<Map<String, ?>> {
 
     private final JsonParser jsonParser;

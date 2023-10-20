@@ -80,8 +80,8 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String data) throws FileStorageException {
-        return storeFileContent(fileName, new ByteArrayInputStream(data.getBytes()));
+    public FileEntry storeFileContent(String fileName, String content) throws FileStorageException {
+        return storeFileContent(fileName, new ByteArrayInputStream(content.getBytes()));
     }
 
     @Override

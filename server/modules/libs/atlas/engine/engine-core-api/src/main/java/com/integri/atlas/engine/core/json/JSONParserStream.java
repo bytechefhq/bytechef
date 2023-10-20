@@ -47,6 +47,9 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Ivica Cardic
+ */
 class JSONParserStream implements Stream<Map<String, ?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONParserStream.class);
