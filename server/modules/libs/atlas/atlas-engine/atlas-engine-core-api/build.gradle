@@ -1,7 +1,6 @@
 dependencies {
     api "com.fasterxml.jackson.core:jackson-databind"
 
-    implementation "com.google.guava:guava"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework:spring-core"
 }
