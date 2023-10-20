@@ -21,6 +21,7 @@ import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
@@ -97,10 +98,10 @@ public class MailchimpSubscribeTrigger {
         String server = MailchimpUtils.getMailChimpServer(
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
-        Map<?, ?> response = (Map<?, ?>) context
+        Map<?, ?> response = context
             .http(http -> http.post("https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
                 server, inputParameters.getString(LIST_ID))))
-            .body(Http.Body.of(
+            .body(Body.of(
                 Map.of(
                     "url", webhookUrl,
                     "events", Map.of(SUBSCRIBE, true),
@@ -110,7 +111,7 @@ public class MailchimpSubscribeTrigger {
                         "api", true))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .body();
+            .getBody();
 
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }

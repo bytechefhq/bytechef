@@ -737,13 +737,13 @@ public interface Context {
         }
 
         @SuppressFBWarnings("EI")
-        record Response(Map<String, List<String>> headers, Object body, int statusCode) {
+        interface Response {
 
-            @SuppressWarnings("unchecked")
-            public <T> T getBody() {
-                return (T) body;
-            }
+            Map<String, List<String>> getHeaders();
 
+            <T> T getBody();
+
+            int getStatusCode();
         }
     }
 
