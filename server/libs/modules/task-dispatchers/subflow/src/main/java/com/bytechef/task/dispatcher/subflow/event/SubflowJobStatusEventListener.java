@@ -34,6 +34,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * an {@link EventListener} which is used for listening to subflow job status events. When a sub-flow completes/fails or
@@ -63,6 +64,7 @@ public class SubflowJobStatusEventListener implements EventListener {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void onApplicationEvent(Event event) {
         if (JobStatusEvent.JOB_STATUS.equals(event.getType())) {
             JobStatusEvent jobStatusWorkflowEvent = (JobStatusEvent) event;
@@ -75,28 +77,24 @@ public class SubflowJobStatusEventListener implements EventListener {
             }
 
             switch (status) {
-                case CREATED:
-                case STARTED:
-                    break;
-                case STOPPED: {
+                case CREATED, STARTED -> {
+                }
+                case STOPPED -> {
                     TaskExecution subflowTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
                     messageBroker.send(TaskMessageRoute.JOBS_STOP, subflowTaskExecution.getJobId());
 
-                    break;
                 }
-                case FAILED: {
+                case FAILED -> {
                     TaskExecution erroredTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
                     messageBroker.send(SystemMessageRoute.ERRORS, erroredTaskExecution);
-
-                    break;
                 }
-                case COMPLETED: {
+                case COMPLETED -> {
                     TaskExecution completionTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
@@ -105,18 +103,15 @@ public class SubflowJobStatusEventListener implements EventListener {
                     if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(
                             workflowFileStorageFacade.storeTaskExecutionOutput(
-                                completionTaskExecution.getId(), output));
+                                Objects.requireNonNull(completionTaskExecution.getId()), output));
                     } else {
                         // TODO check, it seems wrong
                         completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)));
                     }
 
                     messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, completionTaskExecution);
-
-                    break;
                 }
-                default:
-                    throw new IllegalStateException("Unknown status: %s".formatted(status));
+                default -> throw new IllegalStateException("Unknown status: %s".formatted(status));
             }
         }
     }
