@@ -48,12 +48,10 @@ public class RestComponentTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public RestComponentTaskHandler(
-        ActionDefinition actionDefinition,
-        ConnectionDefinition connectionDefinition,
-        ConnectionService connectionService,
-        RestComponentHandler restComponentHandler,
-        EventPublisher eventPublisher,
+        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
+        ConnectionService connectionService, RestComponentHandler restComponentHandler, EventPublisher eventPublisher,
         FileStorageService fileStorageService) {
+
         this.actionDefinition = actionDefinition;
         this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
