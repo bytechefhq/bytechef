@@ -85,7 +85,7 @@ public class WorkflowTestExecutorConfiguration {
 
     @Bean
     WorkflowTestExecutor workflowTestExecutor(
-        ObjectMapper objectMapper, TaskHandlerAccessor taskHandlerAccessor,
+        ObjectMapper objectMapper, TaskEvaluator taskEvaluator, TaskHandlerAccessor taskHandlerAccessor,
         List<WorkflowRepository> workflowRepositories) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
@@ -109,6 +109,7 @@ public class WorkflowTestExecutorConfiguration {
                 .contextService(contextService)
                 .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))
                 .jobService(jobService)
+                .syncMessageBroker(syncMessageBroker)
                 .taskCompletionHandlerFactories(
                     getTaskCompletionHandlerFactories(
                         contextService, counterService, taskEvaluator, taskExecutionService))
@@ -116,7 +117,7 @@ public class WorkflowTestExecutorConfiguration {
                 .taskDispatcherResolverFactories(
                     getTaskDispatcherResolverFactories(
                         contextService, counterService, syncMessageBroker, taskEvaluator, taskExecutionService))
-                .syncMessageBroker(syncMessageBroker)
+                .taskEvaluator(taskEvaluator)
                 .taskExecutionService(taskExecutionService)
                 .taskHandlerAccessor(taskHandlerAccessor)
                 .workflowService(workflowService)

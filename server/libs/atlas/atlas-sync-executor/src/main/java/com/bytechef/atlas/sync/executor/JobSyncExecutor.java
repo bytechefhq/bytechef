@@ -84,20 +84,19 @@ public class JobSyncExecutor {
             logger.error(error.getMessage());
         });
 
-        TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 new TaskDispatcherAdapterTaskHandlerResolver(
-                    builder.taskDispatcherAdapterFactories, taskHandlerResolverChain, taskEvaluator),
+                    builder.taskDispatcherAdapterFactories, taskHandlerResolverChain, builder.taskEvaluator),
                 new DefaultTaskHandlerResolver(builder.taskHandlerAccessor)));
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(taskHandlerResolverChain)
             .messageBroker(syncMessageBroker)
             .eventPublisher(builder.eventPublisher)
-            .taskEvaluator(taskEvaluator)
+            .taskEvaluator(builder.taskEvaluator)
             .build();
 
         syncMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
@@ -112,11 +111,11 @@ public class JobSyncExecutor {
                 Stream.of(new DefaultTaskDispatcher(syncMessageBroker, List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
-            builder.contextService, taskDispatcherChain, builder.taskExecutionService, taskEvaluator,
+            builder.contextService, taskDispatcherChain, builder.taskExecutionService, builder.taskEvaluator,
             builder.workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            builder.contextService, builder.eventPublisher, jobExecutor, jobService, taskEvaluator,
+            builder.contextService, builder.eventPublisher, jobExecutor, jobService, builder.taskEvaluator,
             builder.taskExecutionService, builder.workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
@@ -167,8 +166,9 @@ public class JobSyncExecutor {
         private JobService jobService;
         private SyncMessageBroker syncMessageBroker;
         private List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = Collections.emptyList();
-        public List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories = Collections.emptyList();
+        private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories = Collections.emptyList();
         private List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories = Collections.emptyList();
+        private TaskEvaluator taskEvaluator = TaskEvaluator.create();
         private TaskExecutionService taskExecutionService;
         private TaskHandlerAccessor taskHandlerAccessor;
         private WorkflowService workflowService;
@@ -205,6 +205,11 @@ public class JobSyncExecutor {
         public Builder taskCompletionHandlerFactories(
             List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories) {
             this.taskCompletionHandlerFactories = taskCompletionHandlerFactories;
+            return this;
+        }
+
+        public Builder taskEvaluator(TaskEvaluator taskEvaluator) {
+            this.taskEvaluator = taskEvaluator;
             return this;
         }
 
