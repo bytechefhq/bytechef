@@ -113,6 +113,8 @@ springdoc:
 #####
 
 bytechef:
+  data-storage:
+    provider: db
   file-storage:
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files
