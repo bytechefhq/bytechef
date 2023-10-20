@@ -35,9 +35,5 @@ subprojects {
 
         testImplementation ('org.springframework.boot:spring-boot-starter-test')
         testImplementation libs.org.mockito.mockito.inline
-
-        testRuntimeOnly "com.zaxxer:HikariCP"
-        testRuntimeOnly "org.postgresql:postgresql"
-        testRuntimeOnly libs.org.testcontainers.postgresql
     }
 }
