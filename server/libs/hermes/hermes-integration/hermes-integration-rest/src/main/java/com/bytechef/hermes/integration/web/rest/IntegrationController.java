@@ -20,6 +20,7 @@ package com.bytechef.hermes.integration.web.rest;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
+import com.bytechef.hermes.integration.web.rest.model.GetIntegrationTags200ResponseModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,6 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
 
 /**
  * @author Ivica Cardic
@@ -69,16 +72,21 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<String>>> getIntegrationTags(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(integrationFacade.getIntegrationTags())));
+    public Mono<ResponseEntity<GetIntegrationTags200ResponseModel>> getIntegrationTags(ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                new GetIntegrationTags200ResponseModel()
+                    .tags(new ArrayList<>(integrationFacade.getIntegrationTags()))));
     }
 
     @Override
     public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(integrationService.getIntegrations()
-            .stream()
-            .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-            .toList())));
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(integrationService.getIntegrations()
+                    .stream()
+                    .map(integration -> conversionService.convert(integration, IntegrationModel.class))
+                    .toList())));
     }
 
     @Override
@@ -86,10 +94,12 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
     public Mono<ResponseEntity<IntegrationModel>> postIntegration(
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
-        return integrationModelMono.map(integrationModel -> ResponseEntity.ok(conversionService.convert(
-            integrationFacade.create(integrationModel.getName(), integrationModel.getDescription(),
-                integrationModel.getCategory(), integrationModel.getWorkflowIds(), integrationModel.getTags()),
-            IntegrationModel.class)));
+        return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
+            conversionService.convert(
+                integrationFacade.create(
+                    integrationModel.getName(), integrationModel.getDescription(), integrationModel.getCategory(),
+                    integrationModel.getWorkflowIds(), integrationModel.getTags()),
+                IntegrationModel.class)));
     }
 
     @Override
@@ -99,8 +109,8 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.update(
-                    id, integrationModel.getName(), integrationModel.getDescription(), integrationModel.getCategory(),
-                    integrationModel.getWorkflowIds(), integrationModel.getTags()),
+                    id, integrationModel.getName(), integrationModel.getDescription(),
+                    integrationModel.getCategory(), integrationModel.getWorkflowIds(), integrationModel.getTags()),
                 IntegrationModel.class)));
     }
 
