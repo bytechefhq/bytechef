@@ -14,44 +14,40 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component;
+package com.bytechef.hermes.component.registrar.standard;
 
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.impl.ContextImpl;
-import com.bytechef.hermes.component.impl.ExecutionParametersImpl;
+import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.registrar.AbstractTaskHandlerRegistrar;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentActionAdapterTaskHandler implements TaskHandler<Object> {
+@Component
+public class StandardComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<ComponentHandler> {
 
-    private final PerformFunction performFunction;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public ComponentActionAdapterTaskHandler(
-            PerformFunction performFunction,
-            ConnectionService connectionService,
-            EventPublisher eventPublisher,
-            FileStorageService fileStorageService) {
-        this.performFunction = performFunction;
+    public StandardComponentTaskHandlerRegistrar(
+            ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        super(ComponentHandler.class);
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        Context context = new ContextImpl(connectionService, eventPublisher, fileStorageService, taskExecution);
-
-        return performFunction.apply(context, new ExecutionParametersImpl(taskExecution));
+    protected TaskHandler<?> createTaskHandler(Action action, ComponentHandler componentHandler) {
+        return new StandardComponentTaskHandler(
+                action, componentHandler, connectionService, eventPublisher, fileStorageService);
     }
 }
