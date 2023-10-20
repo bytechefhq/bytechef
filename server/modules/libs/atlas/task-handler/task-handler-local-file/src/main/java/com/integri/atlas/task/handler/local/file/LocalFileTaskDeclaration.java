@@ -16,18 +16,18 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDefinition;
-import com.integri.atlas.engine.core.task.description.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocalFileTaskDefinition implements TaskDefinition {
+public class LocalFileTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("localFile")
@@ -62,7 +62,7 @@ public class LocalFileTaskDefinition implements TaskDefinition {
         );
 
     @Override
-    public TaskSpecification getTaskSpecification() {
+    public TaskSpecification getSpecification() {
         return TASK_SPECIFICATION;
     }
 }

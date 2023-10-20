@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition;
+
+import com.integri.atlas.task.definition.dsl.TaskSpecification;
 
 /**
  * @author Ivica Cardic
  */
-public enum TaskPropertyType {
-    BOOLEAN,
-    COLLECTION,
-    COLOR,
-    DATE_TIME,
-    GROUP,
-    JSON,
-    MULTI_SELECT,
-    NUMBER,
-    SELECT,
-    STRING,
+public interface TaskDeclaration {
+    TaskSpecification getSpecification();
 }

@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientTaskDefinitionTest {
+public class HttpClientTaskDeclarationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,89 +36,85 @@ public class HttpClientTaskDefinitionTest {
     };
 
     @Test
-    public void testHttpClientTaskDescription() throws JsonProcessingException {
+    public void testHttpClientTaskSpecification() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "authentication":{
-                    "credentials":[
-                        {
-                            "name":"httpBasicAuth",
-                            "required":true,
-                            "displayOption":{
-                                "show":{
-                                    "authenticationType":["BASIC_AUTH"]
-                                }
+                "credentials":[
+                    {
+                        "name":"httpBasicAuth",
+                        "required":true,
+                        "displayOption":{
+                            "show":{
+                                "authenticationType":["BASIC_AUTH"]
                             }
-                        },
-                        {
-                            "name":"httpDigestAuth",
-                            "required":true,
-                            "displayOption":{
-                                "show":{
-                                    "authenticationType":["DIGEST_AUTH"]
-                                }
+                        }
+                    },
+                    {
+                        "name":"httpDigestAuth",
+                        "required":true,
+                        "displayOption":{
+                            "show":{
+                                "authenticationType":["DIGEST_AUTH"]
                             }
-                        },
-                        {
-                            name: 'httpHeaderAuth',
-                            required: true,
-                            displayOption: {
-                                show: {
-                                    authenticationType: [
-                                        "HEADER_AUTH",
-                                    ],
-                                },
+                        }
+                    },
+                    {
+                        name: 'httpHeaderAuth',
+                        required: true,
+                        displayOption: {
+                            show: {
+                                authenticationType: [
+                                    "HEADER_AUTH",
+                                ],
                             },
                         },
-                        {
-                            "name":"oAuth2Auth",
-                            "required":true,
-                            "displayOption":{
-                                "show":{
-                                    "authenticationType":["OAUTH2"]
-                                }
+                    },
+                    {
+                        "name":"oAuth2Auth",
+                        "required":true,
+                        "displayOption":{
+                            "show":{
+                                "authenticationType":["OAUTH2"]
                             }
                         }
-                    ],
-                    "properties":[
-                        {
-                            "displayName":"Authentication Type",
-                            "name":"authenticationType",
-                            "type":"SELECT",
-                            "options":[
-                                {
-                                    "value":"BASIC_AUTH",
-                                    "name":"Basic Auth"
-                                },
-                                {
-                                    "value":"DIGEST_AUTH",
-                                    "name":"Digest Auth"
-                                },
-                                {
-                                    "value":"HEADER_AUTH",
-                                    "name":"Header Auth"
-                                },
-                                 {
-                                    "value":"QUERY_AUTH",
-                                    "name":"Query Auth"
-                                },
-                                {
-                                    "value":"OAUTH2",
-                                    "name":"OAuth2"
-                                },
-                                {
-                                    "value":"",
-                                    "name":"None"
-                                }
-                            ]
-                        }
-                    ]
-                },
+                    }
+                ],
                 "description":"Makes an HTTP request and returns the response data",
                 "displayName":"HTTP Client",
-                "name":"httpClient"
-                ,"properties":[
+                "name":"httpClient",
+                "properties":[
+                    {
+                        "displayName":"Authentication Type",
+                        "name":"authenticationType",
+                        "type":"SELECT",
+                        "options":[
+                            {
+                                "value":"BASIC_AUTH",
+                                "name":"Basic Auth"
+                            },
+                            {
+                                "value":"DIGEST_AUTH",
+                                "name":"Digest Auth"
+                            },
+                            {
+                                "value":"HEADER_AUTH",
+                                "name":"Header Auth"
+                            },
+                             {
+                                "value":"QUERY_AUTH",
+                                "name":"Query Auth"
+                            },
+                            {
+                                "value":"OAUTH2",
+                                "name":"OAuth2"
+                            },
+                            {
+                                "value":"",
+                                "name":"None"
+                            }
+                        ]
+                    },
                     {
                         "defaultValue":"GET",
                         "description":"The request method to use.",
@@ -454,7 +450,7 @@ public class HttpClientTaskDefinitionTest {
             }
                 """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(HttpClientTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(HttpClientTaskDeclaration.TASK_SPECIFICATION)
             ),
             true
         );

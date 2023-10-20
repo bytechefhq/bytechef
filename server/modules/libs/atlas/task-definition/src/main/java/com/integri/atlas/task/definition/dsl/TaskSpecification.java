@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  *
- * Used for describing a task type.
+ * Used for specifying a task type.
  */
 public class TaskSpecification {
 
-    private TaskAuthentication authentication;
+    private List<TaskCredential> credentials;
     private String description;
     private String displayName;
     private String name;
@@ -38,8 +38,8 @@ public class TaskSpecification {
         return new TaskSpecification().name(name);
     }
 
-    public TaskSpecification authentication(TaskAuthentication authentication) {
-        this.authentication = authentication;
+    public TaskSpecification credentials(TaskCredential... credentials) {
+        this.credentials = List.of(credentials);
 
         return this;
     }
@@ -86,8 +86,8 @@ public class TaskSpecification {
         return this;
     }
 
-    public TaskAuthentication getAuthentication() {
-        return authentication;
+    public List<TaskCredential> getCredentials() {
+        return credentials;
     }
 
     public String getDescription() {

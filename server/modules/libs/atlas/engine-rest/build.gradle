@@ -5,5 +5,5 @@ dependencies {
     implementation "org.springframework:spring-web"
     implementation "org.springframework:spring-webmvc"
     implementation project(":modules:libs:atlas:engine:engine-coordinator-api")
-    implementation project(":modules:libs:atlas:task-specification")
+    implementation project(":modules:libs:atlas:task-definition")
 }

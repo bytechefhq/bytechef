@@ -16,26 +16,26 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDefinition;
-import com.integri.atlas.engine.core.task.description.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class SpreadsheetFileTaskDefinition implements TaskDefinition {
+public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("spreadsheetFile")
@@ -145,7 +145,7 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
         );
 
     @Override
-    public TaskSpecification getTaskSpecification() {
+    public TaskSpecification getSpecification() {
         return TASK_SPECIFICATION;
     }
 }

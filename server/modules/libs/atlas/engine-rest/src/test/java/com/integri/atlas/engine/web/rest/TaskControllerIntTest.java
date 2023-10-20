@@ -38,7 +38,7 @@ public class TaskControllerIntTest {
     private MockMvc mockMvc;
 
     @Test
-    public void testGetTaskDescriptor() throws Exception {
+    public void testGetTaskSpecification() throws Exception {
         mockMvc
             .perform(get("/tasks/task1").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -47,7 +47,7 @@ public class TaskControllerIntTest {
                     .json(
                         """
                 {
-                    "authentication":null,
+                    "credentials":null,
                     "description":null,
                     "displayName":null,
                     "name":"task1",
@@ -62,7 +62,7 @@ public class TaskControllerIntTest {
     }
 
     @Test
-    public void testGetTaskDescriptors() throws Exception {
+    public void testGetTaskSpecifications() throws Exception {
         mockMvc
             .perform(get("/tasks").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -72,7 +72,7 @@ public class TaskControllerIntTest {
                         """
                 [
                     {
-                        "authentication":null,
+                        "credentials":null,
                         "description":null,
                         "displayName":null,
                         "name":"task1",
@@ -82,7 +82,7 @@ public class TaskControllerIntTest {
                         "version":1.0
                     },
                     {
-                        "authentication":null,
+                        "credentials":null,
                         "description":null,
                         "displayName":null,
                         "name":"task2",

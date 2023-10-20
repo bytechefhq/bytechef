@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class LocalFileTaskDescriptionTest {
+public class LocalFileTaskDeclarationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,7 +36,7 @@ public class LocalFileTaskDescriptionTest {
     };
 
     @Test
-    public void testLocalFileTaskDescription() throws JsonProcessingException {
+    public void testLocalFileTaskSpecification() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
@@ -107,7 +107,7 @@ public class LocalFileTaskDescriptionTest {
                 }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(LocalFileTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(LocalFileTaskDeclaration.TASK_SPECIFICATION)
             ),
             true
         );

@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class SpreadsheetFileTaskDescriptionTest {
+public class SpreadsheetFileTaskDeclarationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,7 +36,7 @@ public class SpreadsheetFileTaskDescriptionTest {
     };
 
     @Test
-    public void testSpreadsheetFileTaskDescription() throws JsonProcessingException {
+    public void testSpreadsheetFileTaskSpecification() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
@@ -274,7 +274,7 @@ public class SpreadsheetFileTaskDescriptionTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(SpreadsheetFileTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(SpreadsheetFileTaskDeclaration.TASK_SPECIFICATION)
             ),
             true
         );

@@ -14,40 +14,52 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
-import java.util.List;
+/**
+ * @author Ivica Cardic
+ */
+public class TaskCredential {
 
-public class TaskAuthentication {
+    private String name;
+    private Boolean required;
+    private DisplayOption displayOption;
 
-    private List<TaskCredential> credentials;
-    private List<TaskProperty<?>> properties;
-
-    public static TaskAuthentication authentication() {
-        return new TaskAuthentication();
+    public static TaskCredential credential() {
+        return new TaskCredential();
     }
 
     public static TaskCredential credential(String name) {
         return TaskCredential.credential().name(name);
     }
 
-    public TaskAuthentication credentials(TaskCredential... credential) {
-        this.credentials = List.of(credential);
+    public TaskCredential name(String name) {
+        this.name = name;
 
         return this;
     }
 
-    public TaskAuthentication properties(TaskProperty<?>... properties) {
-        this.properties = List.of(properties);
+    public TaskCredential required(Boolean required) {
+        this.required = required;
 
         return this;
     }
 
-    public List<TaskCredential> getCredentials() {
-        return credentials;
+    public TaskCredential displayOption(DisplayOption displayOption) {
+        this.displayOption = displayOption;
+
+        return this;
     }
 
-    public List<TaskProperty<?>> getProperties() {
-        return properties;
+    public String getName() {
+        return name;
+    }
+
+    public Boolean getRequired() {
+        return required;
+    }
+
+    public DisplayOption getDisplayOption() {
+        return displayOption;
     }
 }
