@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.event;
 
 import com.integri.atlas.engine.Accessor;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Collections;
@@ -45,11 +45,11 @@ public class WorkflowEvent extends MapObject implements Accessor {
     }
 
     public String getType() {
-        return getRequiredString(DSL.TYPE);
+        return getRequiredString(Constants.TYPE);
     }
 
     public Date getCreateTime() {
-        return getDate(DSL.CREATE_TIME);
+        return getDate(Constants.CREATE_TIME);
     }
 
     public static WorkflowEvent of(String aType) {

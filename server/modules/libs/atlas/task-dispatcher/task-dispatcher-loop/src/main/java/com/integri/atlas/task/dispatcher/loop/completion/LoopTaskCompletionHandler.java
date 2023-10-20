@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.loop.completion;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
@@ -63,7 +63,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
 
-            return parentExecution.getType().equals(DSL.LOOP);
+            return parentExecution.getType().equals(Constants.LOOP);
         }
 
         return false;

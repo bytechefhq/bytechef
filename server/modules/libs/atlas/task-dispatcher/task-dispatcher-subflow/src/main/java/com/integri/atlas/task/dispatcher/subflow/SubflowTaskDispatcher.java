@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.subflow;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -48,9 +48,9 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     @Override
     public void dispatch(TaskExecution aTask) {
         Map<String, Object> params = new HashMap<>();
-        params.put(DSL.INPUTS, aTask.getMap(DSL.INPUTS, Collections.emptyMap()));
-        params.put(DSL.PARENT_TASK_EXECUTION_ID, aTask.getId());
-        params.put(DSL.WORKFLOW_ID, aTask.getRequiredString(DSL.WORKFLOW_ID));
+        params.put(Constants.INPUTS, aTask.getMap(Constants.INPUTS, Collections.emptyMap()));
+        params.put(Constants.PARENT_TASK_EXECUTION_ID, aTask.getId());
+        params.put(Constants.WORKFLOW_ID, aTask.getRequiredString(Constants.WORKFLOW_ID));
         messageBroker.send(Queues.SUBFLOWS, params);
     }
 

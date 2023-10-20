@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.sequence;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
@@ -105,7 +105,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(DSL.SEQUENCE)) {
+        if (task.getType().equals(Constants.SEQUENCE)) {
             return this;
         }
 

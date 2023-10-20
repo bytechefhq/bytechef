@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.parallel.completion;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.counter.repository.CounterRepository;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
@@ -62,7 +62,7 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
-            return parentExecution.getType().equals(DSL.PARALLEL);
+            return parentExecution.getType().equals(Constants.PARALLEL);
         }
         return false;
     }

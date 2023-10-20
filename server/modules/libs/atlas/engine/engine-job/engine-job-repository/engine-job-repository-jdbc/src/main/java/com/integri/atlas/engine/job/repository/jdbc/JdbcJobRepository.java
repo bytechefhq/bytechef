@@ -17,7 +17,7 @@
 package com.integri.atlas.engine.job.repository.jdbc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.data.Page;
 import com.integri.atlas.engine.data.ResultPage;
 import com.integri.atlas.engine.job.Job;
@@ -113,7 +113,8 @@ public class JdbcJobRepository implements JobRepository {
     public Optional<Job> getLatest() {
         List<Job> query = jdbcOperations.query(
             "select * from job order by create_time desc limit 1",
-            this::jobRowMappper);
+            this::jobRowMappper
+        );
         if (query.size() == 0) {
             return Optional.empty();
         }
@@ -213,7 +214,7 @@ public class JdbcJobRepository implements JobRepository {
         map.put("inputs", Json.deserialize(objectMapper, aRs.getString("inputs"), Map.class));
         map.put("outputs", Json.deserialize(objectMapper, aRs.getString("outputs"), Map.class));
         map.put("webhooks", Json.deserialize(objectMapper, aRs.getString("webhooks"), List.class));
-        map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
+        map.put(Constants.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
         return new SimpleJob(map);
     }
 
@@ -231,7 +232,7 @@ public class JdbcJobRepository implements JobRepository {
         map.put("inputs", Json.deserialize(objectMapper, aRs.getString("inputs"), Map.class));
         map.put("outputs", Json.deserialize(objectMapper, aRs.getString("outputs"), Map.class));
         map.put("webhooks", Json.deserialize(objectMapper, aRs.getString("webhooks"), List.class));
-        map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
+        map.put(Constants.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
         return new JobSummary(new SimpleJob(map));
     }
 

@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.switch_.completion;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
@@ -70,7 +70,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
 
-            return parentExecution.getType().equals(DSL.SWITCH);
+            return parentExecution.getType().equals(Constants.SWITCH);
         }
 
         return false;

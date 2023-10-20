@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.sequence.completion;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
@@ -65,7 +65,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
 
-            return parentTaskExecution.getType().equals(DSL.SEQUENCE);
+            return parentTaskExecution.getType().equals(Constants.SEQUENCE);
         }
 
         return false;

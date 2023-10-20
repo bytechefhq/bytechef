@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.task.execution;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.error.Error;
 import com.integri.atlas.engine.error.ErrorObject;
 import com.integri.atlas.engine.priority.Prioritizable;
@@ -52,128 +52,128 @@ public class SimpleTaskExecution extends SimpleWorkflowTask implements TaskExecu
 
     @Override
     public String getId() {
-        return getString(DSL.ID);
+        return getString(Constants.ID);
     }
 
     public void setId(String aId) {
-        set(DSL.ID, aId);
+        set(Constants.ID, aId);
     }
 
     @Override
     public String getParentId() {
-        return getString(DSL.PARENT_ID);
+        return getString(Constants.PARENT_ID);
     }
 
     public void setParentId(String aParentId) {
-        set(DSL.PARENT_ID, aParentId);
+        set(Constants.PARENT_ID, aParentId);
     }
 
     @Override
     public String getJobId() {
-        return getString(DSL.JOB_ID);
+        return getString(Constants.JOB_ID);
     }
 
     public void setJobId(String aJobId) {
-        set(DSL.JOB_ID, aJobId);
+        set(Constants.JOB_ID, aJobId);
     }
 
     @Override
     public TaskStatus getStatus() {
-        String status = getString(DSL.STATUS);
+        String status = getString(Constants.STATUS);
         if (status == null) return null;
         return TaskStatus.valueOf(status);
     }
 
     @Override
     public int getProgress() {
-        return get(DSL.PROGRESS, Integer.class, 0);
+        return get(Constants.PROGRESS, Integer.class, 0);
     }
 
     public void setProgress(int progress) {
-        set(DSL.PROGRESS, progress);
+        set(Constants.PROGRESS, progress);
     }
 
     @Override
     public Object getOutput() {
-        return get(DSL.OUTPUT);
+        return get(Constants.OUTPUT);
     }
 
     public void setOutput(Object aOutput) {
-        set(DSL.OUTPUT, aOutput);
+        set(Constants.OUTPUT, aOutput);
     }
 
     @Override
     public Error getError() {
-        if (containsKey(DSL.ERROR)) {
-            return new ErrorObject(getMap(DSL.ERROR));
+        if (containsKey(Constants.ERROR)) {
+            return new ErrorObject(getMap(Constants.ERROR));
         }
         return null;
     }
 
     public void setError(Error aError) {
-        set(DSL.ERROR, aError);
+        set(Constants.ERROR, aError);
     }
 
     public void setStatus(TaskStatus aStatus) {
-        set(DSL.STATUS, aStatus);
+        set(Constants.STATUS, aStatus);
     }
 
     @Override
     public Date getCreateTime() {
-        return getDate(DSL.CREATE_TIME);
+        return getDate(Constants.CREATE_TIME);
     }
 
     public void setCreateTime(Date aDate) {
-        set(DSL.CREATE_TIME, aDate);
+        set(Constants.CREATE_TIME, aDate);
     }
 
     @Override
     public Date getStartTime() {
-        return getDate(DSL.START_TIME);
+        return getDate(Constants.START_TIME);
     }
 
     public void setStartTime(Date aDate) {
-        set(DSL.START_TIME, aDate);
+        set(Constants.START_TIME, aDate);
     }
 
     @Override
     public Date getEndTime() {
-        return getDate(DSL.END_TIME);
+        return getDate(Constants.END_TIME);
     }
 
     public void setEndTime(Date aDate) {
-        set(DSL.END_TIME, aDate);
+        set(Constants.END_TIME, aDate);
     }
 
     @Override
     public long getExecutionTime() {
-        if (getDate(DSL.EXECUTION_TIME) != null) {
-            return getDate(DSL.EXECUTION_TIME).getTime();
+        if (getDate(Constants.EXECUTION_TIME) != null) {
+            return getDate(Constants.EXECUTION_TIME).getTime();
         }
         return 0;
     }
 
     public void setExecutionTime(long aExecutionTime) {
-        set(DSL.EXECUTION_TIME, aExecutionTime);
+        set(Constants.EXECUTION_TIME, aExecutionTime);
     }
 
     @Override
     public int getRetry() {
-        return getInteger(DSL.RETRY, 0);
+        return getInteger(Constants.RETRY, 0);
     }
 
     public void setRetry(int aRetry) {
-        set(DSL.RETRY, aRetry);
+        set(Constants.RETRY, aRetry);
     }
 
     @Override
     public int getRetryAttempts() {
-        return getInteger(DSL.RETRY_ATTEMPTS, 0);
+        return getInteger(Constants.RETRY_ATTEMPTS, 0);
     }
 
     @Override
     public String getRetryDelay() {
-        return getString(DSL.RETRY_DELAY, "1s");
+        return getString(Constants.RETRY_DELAY, "1s");
     }
 
     @Override
@@ -185,21 +185,21 @@ public class SimpleTaskExecution extends SimpleWorkflowTask implements TaskExecu
     }
 
     public void setRetryAttempts(int aRetryAttempts) {
-        set(DSL.RETRY_ATTEMPTS, aRetryAttempts);
+        set(Constants.RETRY_ATTEMPTS, aRetryAttempts);
     }
 
     @Override
     public int getRetryDelayFactor() {
-        return getInteger(DSL.RETRY_DELAY_FACTOR, 2);
+        return getInteger(Constants.RETRY_DELAY_FACTOR, 2);
     }
 
     @Override
     public int getPriority() {
-        return getInteger(DSL.PRIORITY, Prioritizable.DEFAULT_PRIORITY);
+        return getInteger(Constants.PRIORITY, Prioritizable.DEFAULT_PRIORITY);
     }
 
     public void setPriority(int aPriority) {
-        set(DSL.PRIORITY, aPriority);
+        set(Constants.PRIORITY, aPriority);
     }
 
     /**

@@ -17,7 +17,7 @@
 package com.integri.atlas.engine.job.service;
 
 import com.integri.atlas.engine.Accessor;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
@@ -68,19 +68,19 @@ public class JobService {
 
         validate(jobParams, workflow);
 
-        MapObject inputs = MapObject.of(jobParams.getMap(DSL.INPUTS, Collections.EMPTY_MAP));
-        List<Accessor> webhooks = jobParams.getList(DSL.WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
+        MapObject inputs = MapObject.of(jobParams.getMap(Constants.INPUTS, Collections.EMPTY_MAP));
+        List<Accessor> webhooks = jobParams.getList(Constants.WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
         List<String> tags = (List<String>) jobParams.get(TAGS);
 
         SimpleJob job = new SimpleJob();
 
         job.setId(UUIDGenerator.generate());
-        job.setLabel(jobParams.getString(DSL.LABEL, workflow.getLabel()));
-        job.setPriority(jobParams.getInteger(DSL.PRIORITY, Prioritizable.DEFAULT_PRIORITY));
+        job.setLabel(jobParams.getString(Constants.LABEL, workflow.getLabel()));
+        job.setPriority(jobParams.getInteger(Constants.PRIORITY, Prioritizable.DEFAULT_PRIORITY));
         job.setWorkflowId(workflow.getId());
         job.setStatus(JobStatus.CREATED);
         job.setCreateTime(new Date());
-        job.setParentTaskExecutionId((String) job.get(DSL.PARENT_TASK_EXECUTION_ID));
+        job.setParentTaskExecutionId((String) job.get(Constants.PARENT_TASK_EXECUTION_ID));
         job.setWebhooks(webhooks != null ? webhooks : Collections.EMPTY_LIST);
         job.setInputs(inputs);
 
@@ -145,21 +145,21 @@ public class JobService {
 
     private void validate(MapObject aCreateJobParams, Workflow aWorkflow) {
         // validate inputs
-        Map<String, Object> inputs = aCreateJobParams.getMap(DSL.INPUTS, Collections.EMPTY_MAP);
+        Map<String, Object> inputs = aCreateJobParams.getMap(Constants.INPUTS, Collections.EMPTY_MAP);
         List<Accessor> input = aWorkflow.getInputs();
 
         for (Accessor in : input) {
-            if (in.getBoolean(DSL.REQUIRED, false)) {
-                Assert.isTrue(inputs.containsKey(in.get(DSL.NAME)), "Missing required param: " + in.get("name"));
+            if (in.getBoolean(Constants.REQUIRED, false)) {
+                Assert.isTrue(inputs.containsKey(in.get(Constants.NAME)), "Missing required param: " + in.get("name"));
             }
         }
 
         // validate webhooks
-        List<Accessor> webhooks = aCreateJobParams.getList(DSL.WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
+        List<Accessor> webhooks = aCreateJobParams.getList(Constants.WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
 
         for (Accessor webhook : webhooks) {
-            Assert.notNull(webhook.getString(DSL.TYPE), "must define 'type' on webhook");
-            Assert.notNull(webhook.getString(DSL.URL), "must define 'url' on webhook");
+            Assert.notNull(webhook.getString(Constants.TYPE), "must define 'type' on webhook");
+            Assert.notNull(webhook.getString(Constants.URL), "must define 'url' on webhook");
         }
     }
 }

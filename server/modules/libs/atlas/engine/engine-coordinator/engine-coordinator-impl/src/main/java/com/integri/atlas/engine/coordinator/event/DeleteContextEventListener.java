@@ -17,7 +17,7 @@
 package com.integri.atlas.engine.coordinator.event;
 
 import com.integri.atlas.context.service.ContextService;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
@@ -49,7 +49,7 @@ public class DeleteContextEventListener implements EventListener {
     }
 
     private void handleEvent(WorkflowEvent workflowEvent) {
-        String jobId = workflowEvent.getRequiredString(DSL.JOB_ID);
+        String jobId = workflowEvent.getRequiredString(Constants.JOB_ID);
 
         Job job = jobRepository.getById(jobId);
 

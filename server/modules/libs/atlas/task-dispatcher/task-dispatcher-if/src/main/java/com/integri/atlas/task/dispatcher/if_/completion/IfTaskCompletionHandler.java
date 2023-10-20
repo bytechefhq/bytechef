@@ -19,7 +19,7 @@ package com.integri.atlas.task.dispatcher.if_.completion;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_FALSE;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_TRUE;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
@@ -68,7 +68,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
 
-            return parentTaskExecution.getType().equals(DSL.IF);
+            return parentTaskExecution.getType().equals(Constants.IF);
         }
 
         return false;

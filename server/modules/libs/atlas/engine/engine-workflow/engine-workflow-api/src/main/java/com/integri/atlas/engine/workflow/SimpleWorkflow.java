@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.workflow;
 
 import com.integri.atlas.engine.Accessor;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.error.Error;
 import com.integri.atlas.engine.error.ErrorObject;
@@ -40,17 +40,17 @@ public class SimpleWorkflow extends MapObject implements Workflow {
 
     @Override
     public String getId() {
-        return getString(DSL.ID);
+        return getString(Constants.ID);
     }
 
     @Override
     public String getLabel() {
-        return getString(DSL.LABEL);
+        return getString(Constants.LABEL);
     }
 
     @Override
     public List<WorkflowTask> getTasks() {
-        return getList(DSL.TASKS, WorkflowTask.class);
+        return getList(Constants.TASKS, WorkflowTask.class);
     }
 
     @Override
@@ -60,28 +60,28 @@ public class SimpleWorkflow extends MapObject implements Workflow {
 
     @Override
     public List<Accessor> getInputs() {
-        return getList(DSL.INPUTS, Accessor.class, Collections.emptyList());
+        return getList(Constants.INPUTS, Accessor.class, Collections.emptyList());
     }
 
     @Override
     public List<Accessor> getOutputs() {
-        return getList(DSL.OUTPUTS, Accessor.class, Collections.emptyList());
+        return getList(Constants.OUTPUTS, Accessor.class, Collections.emptyList());
     }
 
     @Override
     public Error getError() {
-        if (containsKey(DSL.ERROR)) {
-            return new ErrorObject(getMap(DSL.ERROR));
+        if (containsKey(Constants.ERROR)) {
+            return new ErrorObject(getMap(Constants.ERROR));
         }
         return null;
     }
 
     public void setError(Error aError) {
-        set(DSL.ERROR, aError);
+        set(Constants.ERROR, aError);
     }
 
     @Override
     public int getRetry() {
-        return getInteger(DSL.RETRY, 0);
+        return getInteger(Constants.RETRY, 0);
     }
 }

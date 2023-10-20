@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.parallel;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
@@ -86,7 +86,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(DSL.PARALLEL)) {
+        if (aTask.getType().equals(Constants.PARALLEL)) {
             return this;
         }
         return null;
