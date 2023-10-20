@@ -88,7 +88,8 @@ public interface ProjectWorkflowMapper extends Converter<Workflow, WorkflowModel
                         workflowTriggers
                             .stream()
                             .filter(
-                                workflowTask -> Objects.equals(workflowTask.getName(), workflowTriggerModel.getName()))
+                                workflowTrigger -> Objects.equals(
+                                    workflowTrigger.getName(), workflowTriggerModel.getName()))
                             .findFirst()
                             .orElseThrow())));
         }
