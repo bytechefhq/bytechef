@@ -24,7 +24,7 @@ public class HttpClientConstants {
 
     public static final String ALLOW_UNAUTHORIZED_CERTS = "allowUnauthorizedCerts";
     public static final String BODY_CONTENT = "bodyContent";
-    public static final String BODY_CONTENT_RAW_MIME_TYPE = "bodyContentRawMimeType";
+    public static final String BODY_CONTENT_MIME_TYPE = "bodyContentMimeType";
     public static final String BODY_CONTENT_TYPE = "bodyContentType";
     public static final String DELETE = "delete";
     public static final String FOLLOW_ALL_REDIRECTS = "followAllRedirects";

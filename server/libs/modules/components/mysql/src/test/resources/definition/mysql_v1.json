@@ -423,6 +423,7 @@
     "componentVersion": 1,
     "authorizations": [],
     "display": {
+      "description": "Query, insert nd update data from MySQL.",
       "label": "MySQL"
     },
     "properties": [
@@ -460,6 +461,7 @@
     ]
   },
   "display": {
+    "description": "Query, insert nd update data from MySQL.",
     "label": "MySQL"
   },
   "name": "mysql",

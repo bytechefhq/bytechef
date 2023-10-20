@@ -40,7 +40,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -112,7 +112,7 @@
             {
               "description": "The response is returned as a file object.",
               "name": "File",
-              "value": "FILE"
+              "value": "BINARY"
             }
           ]
         },
@@ -121,7 +121,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -195,7 +195,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -267,7 +267,7 @@
             {
               "description": "The response is returned as a file object.",
               "name": "File",
-              "value": "FILE"
+              "value": "BINARY"
             }
           ]
         },
@@ -276,7 +276,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -562,13 +562,14 @@
           "displayOption": {
             "show": {
               "bodyContentType": [
+                "BINARY",
                 "RAW"
               ]
             }
           },
           "label": "Content Type",
           "placeholder": "text/plain",
-          "name": "bodyContentRawMimeType",
+          "name": "bodyContentMimeType",
           "type": "STRING",
           "defaultValue": "text/plain"
         },
@@ -736,7 +737,7 @@
                 true
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -772,7 +773,7 @@
                 false
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -858,7 +859,7 @@
             {
               "description": "The response is returned as a file object.",
               "name": "File",
-              "value": "FILE"
+              "value": "BINARY"
             }
           ]
         },
@@ -867,7 +868,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -1153,13 +1154,14 @@
           "displayOption": {
             "show": {
               "bodyContentType": [
+                "BINARY",
                 "RAW"
               ]
             }
           },
           "label": "Content Type",
           "placeholder": "text/plain",
-          "name": "bodyContentRawMimeType",
+          "name": "bodyContentMimeType",
           "type": "STRING",
           "defaultValue": "text/plain"
         },
@@ -1327,7 +1329,7 @@
                 true
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -1363,7 +1365,7 @@
                 false
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -1449,7 +1451,7 @@
             {
               "description": "The response is returned as a file object.",
               "name": "File",
-              "value": "FILE"
+              "value": "BINARY"
             }
           ]
         },
@@ -1458,7 +1460,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -1744,13 +1746,14 @@
           "displayOption": {
             "show": {
               "bodyContentType": [
+                "BINARY",
                 "RAW"
               ]
             }
           },
           "label": "Content Type",
           "placeholder": "text/plain",
-          "name": "bodyContentRawMimeType",
+          "name": "bodyContentMimeType",
           "type": "STRING",
           "defaultValue": "text/plain"
         },
@@ -1918,7 +1921,7 @@
                 true
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -1954,7 +1957,7 @@
                 false
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -2040,7 +2043,7 @@
             {
               "description": "The response is returned as a file object.",
               "name": "File",
-              "value": "FILE"
+              "value": "BINARY"
             }
           ]
         },
@@ -2049,7 +2052,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -2245,7 +2248,7 @@
                 true
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -2281,7 +2284,7 @@
                 false
               ],
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
@@ -2367,7 +2370,7 @@
             {
               "description": "The response is returned as a file object.",
               "name": "File",
-              "value": "FILE"
+              "value": "BINARY"
             }
           ]
         },
@@ -2376,7 +2379,7 @@
           "displayOption": {
             "show": {
               "responseFormat": [
-                "FILE"
+                "BINARY"
               ]
             }
           },
