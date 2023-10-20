@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.configuration.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

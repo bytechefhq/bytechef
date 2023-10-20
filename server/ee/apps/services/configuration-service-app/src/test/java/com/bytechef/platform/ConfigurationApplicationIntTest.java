@@ -28,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @EmbeddedRedis
 @EmbeddedSql
 @SpringBootTest
-public class PlatformApplicationIntTest {
+public class ConfigurationApplicationIntTest {
 
     @Test
     void testContextLoads() {

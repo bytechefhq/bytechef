@@ -74,7 +74,7 @@ public class JobServiceClient implements JobService {
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/job-service/get-task-execution-job/{taskExecutionId}")
                 .build(taskExecutionId))
             .retrieve()
@@ -88,7 +88,7 @@ public class JobServiceClient implements JobService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/job-service/resume-to-status-started/{id}")
                 .build(id))
             .retrieve()
@@ -110,7 +110,7 @@ public class JobServiceClient implements JobService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/job-service/set-status-to-started/{id}")
                 .build(id))
             .retrieve()
@@ -124,7 +124,7 @@ public class JobServiceClient implements JobService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/job-service/set-status-to-stopped/{id}")
                 .build(id))
             .retrieve()
@@ -138,7 +138,7 @@ public class JobServiceClient implements JobService {
             .build()
             .put()
             .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
+                .host("execution-service-app")
                 .path("/api/internal/job-service/update")
                 .build())
             .bodyValue(job)

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.atlas.execution.service.JobService;
@@ -25,8 +25,6 @@ import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectFacadeImpl;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacadeImpl;
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacade;
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacadeImpl;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
@@ -60,14 +58,5 @@ public class ProjectConfiguration {
 
         return new ProjectFacadeImpl(
             categoryService, projectInstanceService, projectService, tagService, workflowService);
-    }
-
-    @Bean
-    ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade(
-        JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
-        ProjectService projectService, WorkflowService workflowService) {
-
-        return new ProjectWorkflowExecutionFacadeImpl(
-            jobFacade, jobService, projectInstanceService, projectService, workflowService);
     }
 }

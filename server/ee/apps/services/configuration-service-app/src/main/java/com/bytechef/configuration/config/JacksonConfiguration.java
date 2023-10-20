@@ -15,22 +15,32 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.config;
+package com.bytechef.configuration.config;
 
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.openapitools.jackson.nullable.JsonNullableModule;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@Profile("dev")
-public class CorsConfiguration implements WebMvcConfigurer {
+public class JacksonConfiguration {
 
-    @Override
-    public void addCorsMappings(CorsRegistry corsRegistry) {
-        corsRegistry.addMapping("/**");
+    @Bean
+    JavaTimeModule javaTimeModule() {
+        return new JavaTimeModule();
+    }
+
+    @Bean
+    Jdk8Module jdk8Module() {
+        return new Jdk8Module();
+    }
+
+    @Bean
+    JsonNullableModule jsonNullableModule() {
+        return new JsonNullableModule();
     }
 }
