@@ -17,19 +17,20 @@
 
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
+import com.bytechef.hermes.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.task.dispatcher.web.rest.config.TaskDispatcherDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Ivica Cardic
@@ -38,15 +39,19 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WebFluxTest(TaskDispatcherDefinitionController.class)
 public class TaskDispatcherDefinitionControllerIntTest {
 
-    private static final List<TaskDispatcherDefinitionFactory> TASK_DISPATCHER_DEFINITION_FACTORIES = List.of(
-        () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
-        () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher2"));
+    @MockBean
+    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
     public void testGetTaskDispatcherDefinitions() {
+        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
+            .thenReturn(
+                Flux.fromIterable(List.of(TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
+                    TaskDispatcherDSL.taskDispatcher("task-dispatcher2"))));
+
         try {
             webTestClient
                 .get()
@@ -71,15 +76,6 @@ public class TaskDispatcherDefinitionControllerIntTest {
                         """);
         } catch (Exception exception) {
             Assertions.fail(exception);
-        }
-    }
-
-    @TestConfiguration
-    static class TaskDispatcherFactoryConfiguration {
-
-        @Bean
-        public List<TaskDispatcherDefinitionFactory> taskDispatcherFactories() {
-            return TASK_DISPATCHER_DEFINITION_FACTORIES;
         }
     }
 }

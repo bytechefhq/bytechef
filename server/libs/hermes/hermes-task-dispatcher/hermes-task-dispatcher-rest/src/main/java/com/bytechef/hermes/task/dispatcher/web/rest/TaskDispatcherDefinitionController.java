@@ -18,8 +18,8 @@
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.hermes.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,8 +27,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,10 +44,11 @@ import reactor.core.publisher.Mono;
 @SuppressFBWarnings("EI")
 @Tag(name = "task-dispatcher-definitions")
 public class TaskDispatcherDefinitionController {
-    private final List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories;
 
-    public TaskDispatcherDefinitionController(List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
-        this.taskDispatcherDefinitionFactories = taskDispatcherDefinitionFactories;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+
+    public TaskDispatcherDefinitionController(TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
 
     /**
@@ -58,9 +57,9 @@ public class TaskDispatcherDefinitionController {
      * @return OK (status code 200)
      */
     @Operation(
-        description = "Returns all task dispatcher definitions.",
+        description = "Get all task dispatcher definitions.",
         operationId = "getTaskDispatcherDefinitions",
-        summary = "Returns all task dispatcher definitions.",
+        summary = "Get all task dispatcher definitions.",
         tags = {
             "task-dispatcher-definitions"
         },
@@ -82,8 +81,8 @@ public class TaskDispatcherDefinitionController {
         })
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinition>>> getTaskDispatcherDefinitions(
         @Parameter(hidden = true) ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskDispatcherDefinitionFactories.stream()
-            .map(TaskDispatcherDefinitionFactory::getDefinition)
-            .collect(Collectors.toList()))));
+        return Mono.just(
+            ResponseEntity.ok(
+                taskDispatcherDefinitionService.getTaskDispatcherDefinitions()));
     }
 }
