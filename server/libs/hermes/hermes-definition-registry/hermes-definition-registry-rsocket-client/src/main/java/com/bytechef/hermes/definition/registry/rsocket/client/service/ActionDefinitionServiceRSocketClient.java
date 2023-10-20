@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
@@ -45,64 +44,42 @@ public class ActionDefinitionServiceRSocketClient extends AbstractRSocketClient
 
     @Override
     public String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters) {
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("ActionDefinitionService.executeEditorDescription")
-            .data(new EditorDescription(
-                actionName, actionParameters, authorizationName, componentName, componentVersion, connectionParameters))
-            .retrieveMono(String.class));
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Option<?>> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("ActionDefinitionService.executeOptions")
-            .data(new Options(
-                actionName, actionParameters, authorizationName, componentName, componentVersion, connectionParameters,
-                propertyName))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends Property<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters) {
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("ActionDefinitionService.executeOutputSchema")
-            .data(new OutputSchema(
-                actionName, actionParameters, authorizationName, componentName, componentVersion, connectionParameters))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<? extends Property<?>> executeProperties(
+    public List<? extends Property<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("ActionDefinitionService.executeProperties")
-            .data(new Properties(
-                actionName, actionParameters, authorizationName, componentName, componentVersion, connectionParameters,
-                propertyName))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters) {
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("ActionDefinitionService.executeSampleOutput")
-            .data(new SampleOutput(
-                actionName, actionParameters, authorizationName, componentName, componentVersion, connectionParameters))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -125,30 +102,5 @@ public class ActionDefinitionServiceRSocketClient extends AbstractRSocketClient
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(new ParameterizedTypeReference<>() {});
-    }
-
-    private record EditorDescription(
-        String actionName, Map<String, Object> actionParameters, String authorizationName, String componentName,
-        int componentVersion, Map<String, Object> connectionParameters) {
-    }
-
-    private record Options(
-        String actionName, Map<String, Object> actionParameters, String authorizationName, String componentName,
-        int componentVersion, Map<String, Object> connectionParameters, String propertyName) {
-    }
-
-    private record OutputSchema(
-        String actionName, Map<String, Object> actionParameters, String authorizationName, String componentName,
-        int componentVersion, Map<String, Object> connectionParameters) {
-    }
-
-    private record Properties(
-        String actionName, Map<String, Object> actionParameters, String authorizationName, String componentName,
-        int componentVersion, Map<String, Object> connectionParameters, String propertyName) {
-    }
-
-    private record SampleOutput(
-        String actionName, Map<String, Object> actionParameters, String authorizationName, String componentName,
-        int componentVersion, Map<String, Object> connectionParameters) {
     }
 }

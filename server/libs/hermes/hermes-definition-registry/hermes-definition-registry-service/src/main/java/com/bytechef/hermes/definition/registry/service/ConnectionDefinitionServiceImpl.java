@@ -137,7 +137,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName) {
 
@@ -148,10 +148,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ClientIdFunction clientIdFunction = authorization.getClientId();
         ScopesFunction scopesFunction = authorization.getScopes();
 
-        return new OAuth2AuthorizationParametersDTO(
+        return Mono.just(new OAuth2AuthorizationParametersDTO(
             authorizationUrlFunction.apply(new InputParametersImpl(connectionParameters)),
             clientIdFunction.apply(new InputParametersImpl(connectionParameters)),
-            scopesFunction.apply(new InputParametersImpl(connectionParameters)));
+            scopesFunction.apply(new InputParametersImpl(connectionParameters))));
     }
 
     @Override

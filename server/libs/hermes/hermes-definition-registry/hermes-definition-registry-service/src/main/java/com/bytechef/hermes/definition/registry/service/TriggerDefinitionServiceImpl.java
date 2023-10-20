@@ -19,10 +19,10 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource;
 import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
 import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.OptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentPropertiesDataSource;
-import com.bytechef.hermes.component.definition.ComponentPropertiesDataSource.PropertiesFunction;
+import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction;
 import com.bytechef.hermes.component.definition.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
@@ -119,9 +119,28 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
+    public List<? extends Property<?>> executeDynamicProperties(
+        String propertyName, String triggerName, String componentName, int componentVersion,
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
+
+        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
+            propertyName, triggerName, componentName, componentVersion);
+
+        ComponentDynamicPropertiesDataSource dynamicPropertiesDataSource =
+            (ComponentDynamicPropertiesDataSource) property.getDynamicPropertiesDataSource();
+
+        DynamicPropertiesFunction dynamicPropertiesFunction = dynamicPropertiesDataSource.getDynamicProperties();
+
+        return dynamicPropertiesFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(triggerParameters));
+    }
+
+    @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -169,7 +188,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<Option<?>> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> triggerParameters) {
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
         OptionsProperty property = (OptionsProperty) componentDefinitionRegistry.getTriggerProperty(
             propertyName, triggerName, componentName, componentVersion);
@@ -186,28 +205,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<? extends Property<?>> executeProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> triggerParameters) {
-
-        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
-            propertyName, triggerName, componentName, componentVersion);
-
-        ComponentPropertiesDataSource optionsDataSource =
-            (ComponentPropertiesDataSource) property.getPropertiesDataSource();
-
-        PropertiesFunction propertiesFunction = optionsDataSource.getProperties();
-
-        return propertiesFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(triggerParameters));
-    }
-
-    @Override
     public List<? extends Property<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -225,8 +225,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);

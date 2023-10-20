@@ -56,7 +56,7 @@ public interface ConnectionDefinitionService {
 
     Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono();
 
-    OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName);
 }

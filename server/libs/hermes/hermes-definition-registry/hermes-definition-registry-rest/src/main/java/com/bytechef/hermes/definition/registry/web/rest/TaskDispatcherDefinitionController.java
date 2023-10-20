@@ -52,9 +52,8 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
 
         return taskDispatcherDefinitionService
             .getTaskDispatcherDefinitionMono(taskDispatcherName, taskDispatcherVersion)
-            .mapNotNull(
-                taskDispatcherDefinition -> conversionService.convert(
-                    taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+            .map(taskDispatcherDefinition -> conversionService.convert(
+                taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -64,13 +63,11 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
 
         return Mono.just(
             taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
-                .mapNotNull(
-                    taskDispatcherDefinitions -> taskDispatcherDefinitions
-                        .stream()
-                        .map(
-                            taskDispatcherDefinition -> conversionService.convert(
-                                taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
-                        .toList())
+                .map(taskDispatcherDefinitions -> taskDispatcherDefinitions
+                    .stream()
+                    .map(taskDispatcherDefinition -> conversionService.convert(
+                        taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+                    .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
@@ -81,13 +78,12 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
 
         return Mono.just(
             taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(taskDispatcherName)
-                .mapNotNull(
-                    taskDispatcherDefinitions -> taskDispatcherDefinitions
-                        .stream()
-                        .map(
-                            taskDispatcherDefinition -> conversionService.convert(
-                                taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
-                        .toList())
+                .map(taskDispatcherDefinitions -> taskDispatcherDefinitions
+                    .stream()
+                    .map(
+                        taskDispatcherDefinition -> conversionService.convert(
+                            taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
+                    .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }

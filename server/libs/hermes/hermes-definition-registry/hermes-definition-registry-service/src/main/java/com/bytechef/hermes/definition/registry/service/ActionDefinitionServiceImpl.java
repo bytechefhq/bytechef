@@ -20,9 +20,9 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ComponentDynamicPropertiesDataSource;
 import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
 import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.OptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentPropertiesDataSource;
 import com.bytechef.hermes.component.definition.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
@@ -61,9 +61,29 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    public List<? extends Property<?>> executeDynamicProperties(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
+
+        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getActionProperty(
+            propertyName, actionName, componentName, componentVersion);
+
+        ComponentDynamicPropertiesDataSource dynamicPropertiesDataSource =
+            (ComponentDynamicPropertiesDataSource) property.getDynamicPropertiesDataSource();
+
+        ComponentDynamicPropertiesDataSource.DynamicPropertiesFunction dynamicPropertiesFunction =
+            dynamicPropertiesDataSource.getDynamicProperties();
+
+        return dynamicPropertiesFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(actionParameters));
+    }
+
+    @Override
     public String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters) {
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
         ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
             actionName, componentName, componentVersion);
@@ -79,7 +99,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<Option<?>> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
         OptionsProperty property = (OptionsProperty) componentDefinitionRegistry.getActionProperty(
             propertyName, actionName, componentName, componentVersion);
@@ -97,8 +117,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<? extends Property<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
         ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
             actionName, componentName, componentVersion);
@@ -114,9 +134,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters) {
+    public Mono<Object> executeSampleOutput(
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
         ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
             actionName, componentName, componentVersion);
@@ -126,29 +146,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         SampleOutputDataSource.SampleOutputFunction sampleOutputFunction = sampleOutputDataSource.getSampleOutput();
 
-        return sampleOutputFunction.apply(
+        return Mono.just(sampleOutputFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
-    }
-
-    @Override
-    public List<? extends Property<?>> executeProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
-
-        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getActionProperty(
-            propertyName, actionName, componentName, componentVersion);
-
-        ComponentPropertiesDataSource optionsDataSource =
-            (ComponentPropertiesDataSource) property.getPropertiesDataSource();
-
-        ComponentPropertiesDataSource.PropertiesFunction propertiesFunction = optionsDataSource.getProperties();
-
-        return propertiesFunction.apply(
-            contextConnectionFactory.createConnection(
-                componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters));
+            new InputParametersImpl(actionParameters)));
     }
 
     @Override

@@ -30,8 +30,12 @@ import com.bytechef.hermes.definition.registry.component.factory.InputParameters
 import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
@@ -59,6 +63,13 @@ import java.util.Optional;
 
 @Configuration
 public class DefinitionRegistryConfiguration {
+
+    @Bean
+    ActionDefinitionFacade actionDefinitionFacade(
+        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
+
+        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService);
+    }
 
     @Bean
     ActionDefinitionService actionDefinitionService(
@@ -152,6 +163,13 @@ public class DefinitionRegistryConfiguration {
     @Bean
     InputParametersFactory inputParametersFactory() {
         return new InputParametersFactoryImpl();
+    }
+
+    @Bean
+    TriggerDefinitionFacade triggerDefinitionFacade(
+        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
+
+        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService);
     }
 
     @Bean
@@ -256,9 +274,10 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+        public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
             String componentName, int connectionVersion, Map<String, Object> connectionParameters,
             String authorizationName) {
+
             return connectionDefinitionService.getOAuth2Parameters(
                 componentName, connectionVersion, connectionParameters, authorizationName);
         }

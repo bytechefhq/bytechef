@@ -45,8 +45,8 @@ public interface TriggerDefinitionService {
         String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output);
 
     String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters);
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters);
 
     void executeListenerDisable(
         String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
@@ -58,19 +58,19 @@ public interface TriggerDefinitionService {
 
     List<Option<?>> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> triggerParameters);
-
-    List<? extends Property<?>> executeProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> triggerParameters);
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters);
 
     List<? extends Property<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters);
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters);
+
+    List<? extends Property<?>> executeDynamicProperties(
+        String propertyName, String triggerName, String componentName, int componentVersion,
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters);
 
     Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters);
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters);
 
     TriggerDefinitionDTO getTriggerDefinition(String triggerName, String componentName, int componentVersion);
 
