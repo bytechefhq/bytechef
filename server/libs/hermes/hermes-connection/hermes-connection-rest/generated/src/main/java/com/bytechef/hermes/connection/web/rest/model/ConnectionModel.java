@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:12:27.587783+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:15:03.783538+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -35,7 +35,7 @@ public class ConnectionModel {
   private String componentName;
 
   @JsonProperty("componentVersion")
-  private String componentVersion;
+  private Integer componentVersion;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -59,7 +59,7 @@ public class ConnectionModel {
 
   @JsonProperty("parameters")
   @Valid
-  private Map<String, Object> parameters = null;
+  private Map<String, Object> parameters = new HashMap<>();
 
   public ConnectionModel authorizationName(String authorizationName) {
     this.authorizationName = authorizationName;
@@ -89,8 +89,8 @@ public class ConnectionModel {
    * TODO
    * @return componentName
   */
-  
-  @Schema(name = "componentName", description = "TODO", required = false)
+  @NotNull 
+  @Schema(name = "componentName", description = "TODO", required = true)
   public String getComponentName() {
     return componentName;
   }
@@ -99,7 +99,7 @@ public class ConnectionModel {
     this.componentName = componentName;
   }
 
-  public ConnectionModel componentVersion(String componentVersion) {
+  public ConnectionModel componentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
     return this;
   }
@@ -108,13 +108,13 @@ public class ConnectionModel {
    * TODO
    * @return componentVersion
   */
-  
-  @Schema(name = "componentVersion", description = "TODO", required = false)
-  public String getComponentVersion() {
+  @NotNull 
+  @Schema(name = "componentVersion", description = "TODO", required = true)
+  public Integer getComponentVersion() {
     return componentVersion;
   }
 
-  public void setComponentVersion(String componentVersion) {
+  public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
 
@@ -165,8 +165,8 @@ public class ConnectionModel {
    * TODO
    * @return name
   */
-  
-  @Schema(name = "name", description = "TODO", required = false)
+  @NotNull 
+  @Schema(name = "name", description = "TODO", required = true)
   public String getName() {
     return name;
   }
@@ -238,9 +238,6 @@ public class ConnectionModel {
   }
 
   public ConnectionModel putParametersItem(String key, Object parametersItem) {
-    if (this.parameters == null) {
-      this.parameters = new HashMap<>();
-    }
     this.parameters.put(key, parametersItem);
     return this;
   }
@@ -249,8 +246,8 @@ public class ConnectionModel {
    * TODO
    * @return parameters
   */
-  
-  @Schema(name = "parameters", description = "TODO", required = false)
+  @NotNull 
+  @Schema(name = "parameters", description = "TODO", required = true)
   public Map<String, Object> getParameters() {
     return parameters;
   }

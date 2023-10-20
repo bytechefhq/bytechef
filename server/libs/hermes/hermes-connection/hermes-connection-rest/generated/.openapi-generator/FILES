@@ -1,4 +1,4 @@
 src/main/java/com/bytechef/hermes/connection/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/connection/web/rest/ConnectionsApi.java
 src/main/java/com/bytechef/hermes/connection/web/rest/model/ConnectionModel.java
-src/main/java/com/bytechef/hermes/connection/web/rest/model/ConnectionUpdateModel.java
+src/main/java/com/bytechef/hermes/connection/web/rest/model/PutConnectionRequestModel.java

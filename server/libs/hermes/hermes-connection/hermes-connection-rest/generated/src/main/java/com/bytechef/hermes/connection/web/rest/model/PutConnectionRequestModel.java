@@ -16,17 +16,17 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ConnectionUpdateModel
+ * PutConnectionRequestModel
  */
 
-@JsonTypeName("ConnectionUpdate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:12:27.587783+01:00[Europe/Zagreb]")
-public class ConnectionUpdateModel {
+@JsonTypeName("putConnection_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:15:03.783538+01:00[Europe/Zagreb]")
+public class PutConnectionRequestModel {
 
   @JsonProperty("name")
   private String name;
 
-  public ConnectionUpdateModel name(String name) {
+  public PutConnectionRequestModel name(String name) {
     this.name = name;
     return this;
   }
@@ -53,8 +53,8 @@ public class ConnectionUpdateModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ConnectionUpdateModel connectionUpdate = (ConnectionUpdateModel) o;
-    return Objects.equals(this.name, connectionUpdate.name);
+    PutConnectionRequestModel putConnectionRequest = (PutConnectionRequestModel) o;
+    return Objects.equals(this.name, putConnectionRequest.name);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class ConnectionUpdateModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConnectionUpdateModel {\n");
+    sb.append("class PutConnectionRequestModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
