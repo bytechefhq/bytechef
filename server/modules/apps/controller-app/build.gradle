@@ -5,12 +5,12 @@ plugins {
 group = "com.bytechef.api"
 description = ""
 
-apply from: "gradle/docker.gradle"
+apply from: "../../../gradle/docker.gradle"
 
 if (project.hasProperty("prod")) {
-    apply from: "gradle/profile_prod.gradle"
+    apply from: "../../../gradle/profile_prod.gradle"
 } else {
-    apply from: "gradle/profile_dev.gradle"
+    apply from: "../../../gradle/profile_dev.gradle"
 }
 
 compileJava.dependsOn processResources
