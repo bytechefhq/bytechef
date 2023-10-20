@@ -1,0 +1,123 @@
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+
+health:
+  metrics:
+    export:
+      # Prometheus is the default metrics backend
+      prometheus:
+        enabled: true
+        step: 60
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          '*'
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  info:
+    git:
+      mode: full
+
+openapi:
+  openAPIDefinition:
+    base-path: /api
+
+spring:
+  application:
+    name: worker-service-app
+  cloud:
+    consul:
+      discovery:
+        instanceId: ${spring.application.name}:${random.value}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      write-null-map-values: false
+    date-format: ${workflow.serialization.date-format}
+    time-zone: UTC
+  profiles:
+    active: #spring.profiles.active#
+    group:
+      dev:
+        - dev
+        - api-docs
+  jmx:
+    enabled: false
+#  main:
+#    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      console-available: true
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
+  task:
+    execution:
+      thread-name-prefix: worker-service-app-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: worker-service-app-scheduling-
+      pool:
+        size: 2
+
+#####
+
+discovery-client:
+  provider: property
+file:
+  storage:
+    provider: filesystem
+    file-storage-dir: /tmp/bytechef/files
+
+workflow:
+  message-broker:
+    provider: amqp
+  persistence:
+    provider: jdbc
+  serialization:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  worker:
+    subscriptions:
+      tasks: "10"

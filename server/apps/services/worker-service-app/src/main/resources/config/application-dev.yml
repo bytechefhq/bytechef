@@ -1,0 +1,22 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: DEBUG
+
+server:
+  port: 7444
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+  jackson:
+    serialization:
+      indent-output: true
+
+discovery-client:
+  property:
+    platform-service-app:
+      instances:
+        - host: localhost
+          port: 7222

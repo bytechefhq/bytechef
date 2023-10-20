@@ -16,21 +16,20 @@
 
 package com.bytechef.config;
 
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.bytechef.atlas.task.execution.evaluator.spel.TempDir;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
-public class TaskEvaluatorConfiguration {
+@Profile("dev")
+public class CorsConfiguration implements WebFluxConfigurer {
 
-    @Bean
-    TaskEvaluator taskEvaluator(Environment environment) {
-        return SpelTaskEvaluator.builder()
-                .environment(environment)
-                .methodExecutor("tempDir", new TempDir())
-                .build();
+    @Override
+    public void addCorsMappings(CorsRegistry corsRegistry) {
+        corsRegistry.addMapping("/**");
     }
 }
