@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
 public class FilesystemFileStorageConfiguration {
 
     @Bean
-    FileStorageService fileSystemFileStorageService(FileStorageProperties storageProperties) {
+    FileStorageService fileStorageService(FileStorageProperties storageProperties) {
         return new FilesystemFileStorageService(storageProperties.getFileStorageDir());
     }
 }

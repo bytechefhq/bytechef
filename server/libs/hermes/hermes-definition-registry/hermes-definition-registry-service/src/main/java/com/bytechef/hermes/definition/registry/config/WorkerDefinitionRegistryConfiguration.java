@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.config;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionAccessor;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
@@ -33,8 +33,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 /**
  * @author Ivica Cardic
  */
@@ -43,8 +41,8 @@ import java.util.List;
 public class WorkerDefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionService actionDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ActionDefinitionServiceImpl(componentDefinitions);
+    ActionDefinitionService actionDefinitionService(ComponentDefinitionAccessor componentDefinitionAccessor) {
+        return new ActionDefinitionServiceImpl(componentDefinitionAccessor.getComponentDefinitions());
     }
 
     @Bean
@@ -55,8 +53,8 @@ public class WorkerDefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionService componentDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ComponentDefinitionServiceImpl(componentDefinitions);
+    ComponentDefinitionService componentDefinitionService(ComponentDefinitionAccessor componentDefinitionAccessor) {
+        return new ComponentDefinitionServiceImpl(componentDefinitionAccessor.getComponentDefinitions());
     }
 
     @Bean
@@ -67,7 +65,7 @@ public class WorkerDefinitionRegistryConfiguration {
     }
 
     @Bean
-    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ConnectionDefinitionServiceImpl(componentDefinitions);
+    ConnectionDefinitionService connectionDefinitionService(ComponentDefinitionAccessor componentDefinitionAccessor) {
+        return new ConnectionDefinitionServiceImpl(componentDefinitionAccessor.getComponentDefinitions());
     }
 }

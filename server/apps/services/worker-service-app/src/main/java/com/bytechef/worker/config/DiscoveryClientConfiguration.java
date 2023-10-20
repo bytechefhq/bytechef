@@ -19,6 +19,7 @@ package com.bytechef.worker.config;
 
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionAccessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -42,9 +43,9 @@ public class DiscoveryClientConfiguration implements InitializingBean {
 
     @SuppressFBWarnings("EI2")
     public DiscoveryClientConfiguration(
-        List<ComponentDefinition> componentDefinitions, ServiceMetadataRegistry serviceMetadataRegistry) {
+        ComponentDefinitionAccessor componentDefinitionAccessor, ServiceMetadataRegistry serviceMetadataRegistry) {
 
-        this.componentDefinitions = componentDefinitions;
+        this.componentDefinitions = componentDefinitionAccessor.getComponentDefinitions();
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
