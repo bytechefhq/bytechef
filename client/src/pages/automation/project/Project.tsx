@@ -1,5 +1,7 @@
-import {ProjectModel} from '@/middleware/automation/configuration';
-import {WorkflowModel} from '@/middleware/core/workflow/configuration';
+import {
+    ProjectModel,
+    WorkflowModel,
+} from '@/middleware/automation/configuration';
 import {useCreateProjectWorkflowRequestMutation} from '@/mutations/projects.mutations';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {

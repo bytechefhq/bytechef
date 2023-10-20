@@ -16,10 +16,10 @@ import {
 } from 'middleware/automation/execution';
 import {
     useGetProjectInstancesQuery,
+    useGetProjectWorkflowExecutionsQuery,
     useGetProjectsQuery,
-    useGetWorkflowExecutionsQuery,
+    useGetWorkflowsQuery,
 } from 'queries/projects.queries';
-import {useGetWorkflowsQuery} from 'queries/workflows.queries';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
@@ -77,7 +77,7 @@ export const WorkflowExecutions = () => {
         data: WorkflowExecutionsPage,
         error: WorkflowExecutionsError,
         isLoading: WorkflowExecutionsLoading,
-    } = useGetWorkflowExecutionsQuery({
+    } = useGetProjectWorkflowExecutionsQuery({
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
