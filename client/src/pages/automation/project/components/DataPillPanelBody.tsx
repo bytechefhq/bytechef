@@ -1,6 +1,6 @@
 import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
+import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
-import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {PropertyType} from '@/types/projectTypes';
 import {
     Accordion,
@@ -11,7 +11,6 @@ import {
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import getFilteredProperties from '../utils/getFilteredProperties';
 import DataPill from './DataPill';
@@ -19,31 +18,17 @@ import DataPill from './DataPill';
 const DataPillPanelBody = ({
     containerHeight,
     dataPillFilterQuery,
+    previousComponents,
 }: {
     containerHeight: number;
     dataPillFilterQuery: string;
+    previousComponents: ComponentDefinitionBasicModel[];
 }) => {
-    const {componentActions, componentNames} = useWorkflowDefinitionStore();
-
-    const {currentNode} = useNodeDetailsDialogStore();
+    const {componentActions} = useWorkflowDefinitionStore();
 
     const taskTypes = componentActions?.map(
         (componentAction) =>
             `${componentAction.componentName}/1/${componentAction.actionName}`
-    );
-
-    const currentNodeIndex = componentNames.indexOf(currentNode.name);
-
-    const previousComponentNames =
-        componentNames.length > 1
-            ? componentNames.slice(0, currentNodeIndex)
-            : componentNames;
-
-    const {data: previousComponents} = useGetComponentDefinitionsQuery(
-        {
-            include: previousComponentNames,
-        },
-        !!componentNames.length
     );
 
     const {data: actionData} = useGetActionDefinitionsQuery(
