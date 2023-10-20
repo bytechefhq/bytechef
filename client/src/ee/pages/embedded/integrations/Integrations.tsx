@@ -56,6 +56,7 @@ const Integrations = () => {
         <LayoutContainer
             header={
                 <PageHeader
+                    centerTitle={true}
                     position="main"
                     right={<IntegrationDialog integration={undefined} />}
                     title={title}
