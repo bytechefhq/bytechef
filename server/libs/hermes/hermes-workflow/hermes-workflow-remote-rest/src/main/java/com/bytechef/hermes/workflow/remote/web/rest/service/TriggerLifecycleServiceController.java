@@ -54,7 +54,7 @@ public class TriggerLifecycleServiceController {
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.PUT,
         value = "/trigger-lifecycle-service/save/{workflowExecutionId}",
         consumes = {
             "application/json"
