@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.web.rest.config;
 
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -31,7 +31,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class WorkflowRestTestConfiguration {
 
     @MockBean
-    private JobFacade jobFacade;
+    private JobFactory jobFactory;
 
     @MockBean
     private JobService jobService;

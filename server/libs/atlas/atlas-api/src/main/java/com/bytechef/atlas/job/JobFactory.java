@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.facade;
+package com.bytechef.atlas.job;
 
 import com.bytechef.atlas.dto.JobParametersDTO;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobFacade {
+public interface JobFactory {
 
     long create(JobParametersDTO jobParametersDTO);
 }

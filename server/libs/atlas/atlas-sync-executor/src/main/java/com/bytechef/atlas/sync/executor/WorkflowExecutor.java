@@ -31,8 +31,8 @@ import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.facade.JobFacade;
-import com.bytechef.atlas.facade.JobFacadeImpl;
+import com.bytechef.atlas.job.JobFactory;
+import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -184,19 +184,19 @@ public class WorkflowExecutor {
                         taskExecutionService),
                 Stream.of(defaultTaskCompletionHandler)));
 
-        JobFacade jobFacade = new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker);
+        JobFactory jobFactory = new JobFactoryImpl(contextService, eventPublisher, jobService, messageBroker);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain), eventPublisher, jobExecutor, jobFacade,
+            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain), eventPublisher, jobExecutor, jobFactory,
             jobService, taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
-        long jobId = jobFacade.create(new JobParametersDTO(inputs, workflowId));
+        long jobId = jobFactory.create(new JobParametersDTO(inputs, workflowId));
 
         return jobService.getJob(jobId);
     }

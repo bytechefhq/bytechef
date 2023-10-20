@@ -29,7 +29,7 @@ import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
@@ -59,7 +59,7 @@ public class Coordinator {
     private final ErrorHandler<? super Errorable> errorHandler;
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
-    private final JobFacade jobFacade;
+    private final JobFactory jobFactory;
     private final JobService jobService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
@@ -67,13 +67,13 @@ public class Coordinator {
 
     public Coordinator(
         ErrorHandler<? super Errorable> errorHandler, EventPublisher eventPublisher, JobExecutor jobExecutor,
-        JobFacade jobFacade, JobService jobService, TaskCompletionHandler taskCompletionHandler,
+        JobFactory jobFactory, JobService jobService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
 
         this.errorHandler = errorHandler;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
-        this.jobFacade = jobFacade;
+        this.jobFactory = jobFactory;
         this.jobService = jobService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -86,7 +86,7 @@ public class Coordinator {
      * @param jobParametersDTO The Key-Value map representing the workflow parameters
      */
     public void create(JobParametersDTO jobParametersDTO) {
-        jobFacade.create(jobParametersDTO);
+        jobFactory.create(jobParametersDTO);
     }
 
     public void start(Long jobId) {

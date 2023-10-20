@@ -28,7 +28,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
@@ -97,7 +97,7 @@ public class CoordinatorIntTest {
     private ContextService contextService;
 
     @Autowired
-    private JobFacade jobFacade;
+    private JobFactory jobFactory;
 
     @Autowired
     private JobService jobService;
@@ -129,7 +129,7 @@ public class CoordinatorIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Coordinator coordinator = new Coordinator(
-                null, null, null, jobFacade, jobService, null, null, taskExecutionService);
+                null, null, null, jobFactory, jobService, null, null, taskExecutionService);
 
             coordinator.create(new JobParametersDTO("aGVsbG8x"));
         });
@@ -176,13 +176,13 @@ public class CoordinatorIntTest {
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            e -> {}, e -> {}, jobExecutor, jobFacade, jobService, taskCompletionHandler,
+            e -> {}, e -> {}, jobExecutor, jobFactory, jobService, taskCompletionHandler,
             (TaskDispatcher) taskDispatcher, taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
-        long jobId = jobFacade.create(new JobParametersDTO(Collections.singletonMap("yourName", "me"), workflowId));
+        long jobId = jobFactory.create(new JobParametersDTO(Collections.singletonMap("yourName", "me"), workflowId));
 
         return jobService.getJob(jobId);
     }
