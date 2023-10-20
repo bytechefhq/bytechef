@@ -33,5 +33,6 @@ public interface ConnectionModelMapper extends Converter<ConnectionModel, Connec
     @Mapping(target = "parameters", source = "parameters")
     @Mapping(target = "update", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
+    @Mapping(target = "key", ignore = true)
     Connection convert(ConnectionModel connectionModel);
 }

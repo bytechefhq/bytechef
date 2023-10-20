@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.connection.facade;
 
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
@@ -33,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
@@ -68,17 +68,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinitions(
                 connection.getComponentName())
                 .stream()
-                .filter(curConnectionDefinition -> curConnectionDefinition.getVersion() == connection
-                    .getConnectionVersion())
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(IllegalStateException::new);
 
             Authorization authorization = connectionDefinition.getAuthorizations()
                 .stream()
                 .filter(
                     curAuthorization -> Objects.equals(curAuthorization.getName(), connection.getAuthorizationName()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(IllegalArgumentException::new);
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
@@ -87,13 +85,16 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-                BiFunction<com.bytechef.hermes.component.Connection, String, Authorization.AuthorizationCallbackResponse> authorizationCallbackFunction = authorization
+                Authorization.FourFunction<Context.Connection, String, String, String, Authorization.AuthorizationCallbackResponse> authorizationCallbackFunction = authorization
                     .getAuthorizationCallbackFunction();
 
                 Authorization.AuthorizationCallbackResponse authorizationCallbackResponse = authorizationCallbackFunction
                     .apply(
-                        connection.toComponentConnection(),
-                        connection.getParameter(ComponentConstants.AUTHORIZATION_CODE));
+                        connection.toContextConnection(),
+                        connection.getParameter(ComponentConstants.AUTHORIZATION_CODE),
+                        null, // TODO redirectUri
+                        null // TODO pkce verifier
+                    );
 
                 connection.putAllParameters(authorizationCallbackResponse.toMap());
             }

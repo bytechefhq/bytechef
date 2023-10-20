@@ -106,7 +106,7 @@ public class ConnectionRepositoryIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setConnectionVersion(1);
+        connection.setKey("key");
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
         connection.setVersion(1);

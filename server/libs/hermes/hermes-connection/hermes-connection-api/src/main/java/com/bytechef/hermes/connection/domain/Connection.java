@@ -27,6 +27,7 @@ import java.util.Set;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.annotation.CreatedBy;
@@ -54,8 +55,8 @@ public final class Connection implements Persistable<Long> {
     @Column("component_name")
     private String componentName;
 
-    @Column("connection_version")
-    private int connectionVersion;
+    @MappedCollection(idColumn = "connection_id")
+    private Set<ConnectionTag> connectionTags = new HashSet<>();
 
     @CreatedBy
     @Column("created_by")
@@ -68,8 +69,8 @@ public final class Connection implements Persistable<Long> {
     @Id
     private Long id;
 
-    @MappedCollection(idColumn = "connection_id")
-    private Set<ConnectionTag> connectionTags = new HashSet<>();
+    @Column
+    private String key;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -135,14 +136,10 @@ public final class Connection implements Persistable<Long> {
     }
 
     /**
-     * Return the name of a component.
+     * Return the name of a component this connection can be used for.
      */
     public String getComponentName() {
         return componentName;
-    }
-
-    public int getConnectionVersion() {
-        return connectionVersion;
     }
 
     public String getCreatedBy() {
@@ -163,6 +160,10 @@ public final class Connection implements Persistable<Long> {
      */
     public Long getId() {
         return id;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public String getLastModifiedBy() {
@@ -228,12 +229,12 @@ public final class Connection implements Persistable<Long> {
         this.componentName = componentName;
     }
 
-    public void setConnectionVersion(int connectionVersion) {
-        this.connectionVersion = connectionVersion;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public void setName(String name) {
@@ -259,7 +260,7 @@ public final class Connection implements Persistable<Long> {
         this.version = version;
     }
 
-    public com.bytechef.hermes.component.Connection toComponentConnection() {
+    public Context.Connection toContextConnection() {
         return new ConnectionImpl(this);
     }
 
@@ -267,11 +268,11 @@ public final class Connection implements Persistable<Long> {
     public String toString() {
         return "Connection{" + ", id="
             + id + ", name='"
-            + name + '\'' + "authorizationName='"
+            + name + '\'' + ", key='"
+            + key + '\'' + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
             + componentName + '\'' + ", connectionTags="
-            + connectionTags + ", connectionVersion="
-            + connectionVersion + ", parameters="
+            + connectionTags + ", parameters="
             + parameters + ", version="
             + version + ", createdBy='"
             + createdBy + '\'' + ", createdDate="
@@ -287,30 +288,16 @@ public final class Connection implements Persistable<Long> {
         return this;
     }
 
-    private static class ConnectionImpl implements com.bytechef.hermes.component.Connection {
-        private final String authorizationName;
-        private final String name;
+    private static class ConnectionImpl implements Context.Connection {
         private final Map<String, Object> parameters;
 
         public ConnectionImpl(Connection connection) {
-            this.authorizationName = connection.getAuthorizationName();
-            this.name = connection.getName();
             this.parameters = connection.getParameters();
         }
 
         @Override
         public boolean containsParameter(String name) {
             return parameters.containsKey(name);
-        }
-
-        @Override
-        public String getAuthorizationName() {
-            return authorizationName;
-        }
-
-        @Override
-        public String getName() {
-            return name;
         }
 
         @Override
@@ -327,8 +314,6 @@ public final class Connection implements Persistable<Long> {
         @Override
         public String toString() {
             return "ConnectionImpl{" +
-                "authorizationName='" + authorizationName + '\'' +
-                ", name='" + name + '\'' +
                 ", parameters=" + parameters +
                 '}';
         }

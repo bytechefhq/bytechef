@@ -21,7 +21,7 @@ import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.facade.ConnectionFacadeImpl;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.connection.service.impl.ConnectionServiceImpl;
+import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
