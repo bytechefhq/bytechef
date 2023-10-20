@@ -5,6 +5,6 @@ dependencies {
 
     implementation "jakarta.validation:jakarta.validation-api"
     implementation "org.springframework:spring-context"
-    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework:spring-web"
     implementation project(":server:libs:core:commons:commons-util")
 }

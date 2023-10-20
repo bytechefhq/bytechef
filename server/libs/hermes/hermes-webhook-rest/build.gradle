@@ -1,7 +1,7 @@
 dependencies {
     implementation "org.slf4j:slf4j-api"
-    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework:spring-web"
     implementation project(":server:libs:core:commons:commons-util")
 
-    testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+    testImplementation "org.springframework.boot:spring-boot-starter-web"
 }

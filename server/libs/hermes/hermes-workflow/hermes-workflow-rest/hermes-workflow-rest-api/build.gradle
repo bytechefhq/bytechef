@@ -14,5 +14,5 @@ dependencies {
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation libs.org.mapstruct
     implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
-    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework:spring-web"
 }
