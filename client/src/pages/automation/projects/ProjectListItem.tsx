@@ -1,7 +1,7 @@
 import {CalendarIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import Badge from '../../../components/Badge/Badge';
@@ -71,8 +71,6 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         },
     });
 
-    const initialWorkflowId = project.workflowIds![0];
-
     const dropdownItems: IDropdownMenuItem[] = [
         {
             label: 'Edit',
@@ -98,100 +96,95 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     return (
         <>
-            <li className="flex items-center rounded-md border-b border-b-gray-100 bg-white p-2 py-3 hover:bg-gray-50">
-                {initialWorkflowId && (
-                    <Link
-                        className="flex-1 pr-8"
-                        to={`/automation/projects/${project.id}/workflow/${initialWorkflowId}`}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="relative flex items-center">
-                                {project.description ? (
-                                    <HoverCard text={project.description}>
-                                        <span className="mr-2 text-base font-semibold text-gray-900">
-                                            {project.name}
-                                        </span>
-                                    </HoverCard>
-                                ) : (
+            <li className="flex items-center bg-white p-2 py-3 hover:bg-gray-50">
+                <div className="flex-1 pr-8">
+                    <div className="flex items-center justify-between">
+                        <div className="relative flex items-center">
+                            {project.description ? (
+                                <HoverCard text={project.description}>
                                     <span className="mr-2 text-base font-semibold text-gray-900">
                                         {project.name}
                                     </span>
-                                )}
+                                </HoverCard>
+                            ) : (
+                                <span className="mr-2 text-base font-semibold text-gray-900">
+                                    {project.name}
+                                </span>
+                            )}
 
-                                {project.category && (
-                                    <span className="text-xs uppercase text-gray-700">
-                                        {project.category.name}
-                                    </span>
-                                )}
+                            {project.category && (
+                                <span className="text-xs uppercase text-gray-700">
+                                    {project.category.name}
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="ml-2 flex shrink-0">
+                            <Badge
+                                color={
+                                    project.status ===
+                                    ProjectModelStatusEnum.Published
+                                        ? 'green'
+                                        : 'default'
+                                }
+                                text={
+                                    project.status ===
+                                    ProjectModelStatusEnum.Published
+                                        ? `Published V${project.projectVersion}`
+                                        : 'Not Published'
+                                }
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div
+                            className="flex h-[38px] items-center"
+                            onClick={(event) => event.preventDefault()}
+                        >
+                            <div className="mr-4 text-xs font-semibold text-gray-700">
+                                {project.workflowIds?.length === 1
+                                    ? `${project.workflowIds?.length} workflow`
+                                    : `${project.workflowIds?.length} workflows`}
                             </div>
 
-                            <div className="ml-2 flex shrink-0">
-                                <Badge
-                                    color={
-                                        project.status ===
-                                        ProjectModelStatusEnum.Published
-                                            ? 'green'
-                                            : 'default'
+                            {project.tags && (
+                                <TagList
+                                    id={project.id!}
+                                    remainingTags={remainingTags}
+                                    tags={project.tags}
+                                    updateTagsMutation={
+                                        updateProjectTagsMutation
                                     }
-                                    text={
-                                        project.status ===
-                                        ProjectModelStatusEnum.Published
-                                            ? `Published V${project.projectVersion}`
-                                            : 'Not Published'
-                                    }
+                                    getRequest={(id, tags) => ({
+                                        id: id!,
+                                        updateTagsRequestModel: {
+                                            tags: tags || [],
+                                        },
+                                    })}
                                 />
-                            </div>
+                            )}
                         </div>
 
-                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div
-                                className="flex h-[38px] items-center"
-                                onClick={(event) => event.preventDefault()}
-                            >
-                                <div className="mr-4 text-xs font-semibold text-gray-700">
-                                    {project.workflowIds?.length === 1
-                                        ? `${project.workflowIds?.length} workflow`
-                                        : `${project.workflowIds?.length} workflows`}
-                                </div>
-
-                                {project.tags && (
-                                    <TagList
-                                        id={project.id!}
-                                        remainingTags={remainingTags}
-                                        tags={project.tags}
-                                        updateTagsMutation={
-                                            updateProjectTagsMutation
-                                        }
-                                        getRequest={(id, tags) => ({
-                                            id: id!,
-                                            updateTagsRequestModel: {
-                                                tags: tags || [],
-                                            },
-                                        })}
+                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            {project.status ===
+                            ProjectModelStatusEnum.Published ? (
+                                <>
+                                    <CalendarIcon
+                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                        aria-hidden="true"
                                     />
-                                )}
-                            </div>
 
-                            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                {project.status ===
-                                ProjectModelStatusEnum.Published ? (
-                                    <>
-                                        <CalendarIcon
-                                            className="mr-1 h-5 w-5 shrink-0 text-gray-400"
-                                            aria-hidden="true"
-                                        />
-
-                                        <span>
-                                            {project.publishedDate?.toLocaleDateString()}
-                                        </span>
-                                    </>
-                                ) : (
-                                    '-'
-                                )}
-                            </div>
+                                    <span>
+                                        {project.publishedDate?.toLocaleDateString()}
+                                    </span>
+                                </>
+                            ) : (
+                                '-'
+                            )}
                         </div>
-                    </Link>
-                )}
+                    </div>
+                </div>
 
                 <DropdownMenu id={project.id} menuItems={dropdownItems} />
             </li>
