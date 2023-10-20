@@ -381,6 +381,8 @@ components:
         title:
           description: "The title"
           type: "string"
+    AnyValue:
+      description: "Can be anything: string, number, array, object, etc. (except `null`)"
     ActionDefinitionBasic:
       description: "An action is a portion of reusable code that accomplish a specific\
         \ task. When building a workflow, each action is represented as a task inside\
@@ -774,8 +776,7 @@ components:
           description: "The name of an option."
           type: "string"
         value:
-          description: "The value of an option."
-          type: "object"
+          $ref: "#/components/schemas/AnyValue"
     OptionsDataSource:
       description: "Defines function that should dynamically load options for the\
         \ property."
