@@ -33,8 +33,6 @@ import com.integri.atlas.file.storage.converter.FileEntryConverter;
 import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -43,7 +41,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  * @author Ivica Cardic
  */
 @EnableAutoConfiguration
-@ImportAutoConfiguration(DataSourceAutoConfiguration.class)
 @SpringBootConfiguration
 public class TestConfiguration {
 
