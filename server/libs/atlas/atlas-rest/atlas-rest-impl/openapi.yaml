@@ -131,7 +131,7 @@ paths:
       description: "Get task executions of a job."
       summary: "Get task executions of a job."
       tags:
-      - "task-executions"
+      - "jobs"
       operationId: "getJobTaskExecutions"
       parameters:
       - name: "id"
@@ -291,7 +291,7 @@ components:
       type: "object"
       required:
       - "priority"
-      - "startTime"
+      - "startDate"
       - "status"
       properties:
         createdBy:
@@ -309,7 +309,7 @@ components:
           type: "integer"
           format: "int32"
           readOnly: true
-        endTime:
+        endDate:
           description: "The time execution entered end status COMPLETED, STOPPED,\
             \ FAILED"
           type: "string"
@@ -357,7 +357,7 @@ components:
           type: "integer"
           format: "int32"
           readOnly: true
-        startTime:
+        startDate:
           description: "The time of when the job began."
           type: "string"
           format: "date-time"
@@ -373,7 +373,7 @@ components:
           - "COMPLETED"
           readOnly: true
         webhooks:
-          description: "A list of the webhooks configured."
+          description: "The list of the webhooks configured."
           type: "array"
           items:
             type: "object"
@@ -441,7 +441,7 @@ components:
           description: "The total number of elements."
           type: "integer"
         content:
-          description: "A list of elements."
+          description: "The list of elements."
           type: "array"
           items:
             type: "object"
@@ -451,7 +451,7 @@ components:
       required:
       - "jobId"
       - "priority"
-      - "startTime"
+      - "startDate"
       - "status"
       properties:
         createdBy:
@@ -463,7 +463,7 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        endTime:
+        endDate:
           description: "The time when this task instance ended (CANCELLED, FAILED,\
             \ COMPLETED)."
           type: "string"
@@ -536,7 +536,7 @@ components:
           type: "integer"
           format: "int32"
           readOnly: true
-        startTime:
+        startDate:
           description: "The time when this task instance was started."
           type: "string"
           format: "date-time"
@@ -581,6 +581,11 @@ components:
           format: "date-time"
           readOnly: true
         definition:
+          description: "The definition of a workflow."
+          type: "string"
+          writeOnly: true
+        description:
+          description: "The description of a workflow."
           type: "string"
           writeOnly: true
         format:

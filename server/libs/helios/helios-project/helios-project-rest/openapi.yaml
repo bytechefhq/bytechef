@@ -43,22 +43,22 @@ paths:
           - "STOPPED"
           - "FAILED"
           - "COMPLETED"
-      - name: "jobStartTime"
-        description: "The start time of a job."
+      - name: "jobStartDate"
+        description: "The start date of a job."
         in: "query"
         required: false
         schema:
           type: "string"
           format: "date-time"
-      - name: "jobEndTime"
-        description: "The end time of a job."
+      - name: "jobEndDate"
+        description: "The end date of a job."
         in: "query"
         required: false
         schema:
           type: "string"
           format: "date-time"
       - name: "projectId"
-        description: "The id of aproject."
+        description: "The id of a project."
         in: "query"
         required: false
         schema:
@@ -92,6 +92,113 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
+  /project-instance-tags:
+    get:
+      description: "Get project instance tags."
+      summary: "Get project instance tags."
+      tags:
+      - "project-instance-tags"
+      operationId: "getProjectInstanceTags"
+      responses:
+        "200":
+          description: "A list of project tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+  /project-instances/{id}:
+    delete:
+      description: "Delete a project instance."
+      summary: "Delete a project instance."
+      tags:
+      - "project-instances"
+      operationId: "deleteProjectInstance"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get a project instance by id."
+      summary: "Get a project instance by id."
+      tags:
+      - "project-instances"
+      operationId: "getProjectInstance"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The project object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInstance"
+    put:
+      description: "Update an existing project instance."
+      summary: "Update an existing project instance."
+      tags:
+      - "project-instances"
+      operationId: "updateProjectInstance"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInstance"
+        required: true
+      responses:
+        "200":
+          description: "The updated project instnce object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInstance"
+  /project-instances/{id}/tags:
+    put:
+      description: "Updates tags of an existing project instance."
+      summary: "Updates tags of an existing project instance."
+      tags:
+      - "project-instances"
+      operationId: "updateProjectInstanceTags"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
   /project-instances:
     get:
       description: "Get project instances."
@@ -101,7 +208,7 @@ paths:
       operationId: "getProjectInstances"
       parameters:
       - name: "projectIds"
-        description: "A list of the project ids used for filtering project instances."
+        description: "The list of the project ids used for filtering project instances."
         in: "query"
         required: false
         schema:
@@ -110,7 +217,7 @@ paths:
             type: "integer"
             format: "int64"
       - name: "tagIds"
-        description: "A list of tag ids of used for filtering project instances."
+        description: "The list of tag ids of used for filtering project instances."
         in: "query"
         required: false
         schema:
@@ -127,6 +234,25 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ProjectInstance"
+    post:
+      description: "Create a new project instance."
+      summary: "Create a new project instance."
+      tags:
+      - "project-instances"
+      operationId: "createProjectInstance"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInstance"
+        required: true
+      responses:
+        "200":
+          description: "The project instance object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInstance"
   /project-tags:
     get:
       description: "Get project tags."
@@ -153,7 +279,7 @@ paths:
       operationId: "getProjects"
       parameters:
       - name: "categoryIds"
-        description: "A list of the category ids used for filtering projects."
+        description: "The list of the category ids used for filtering projects."
         in: "query"
         required: false
         schema:
@@ -161,8 +287,14 @@ paths:
           items:
             type: "integer"
             format: "int64"
+      - name: "projectInstances"
+        description: "Use for filtering projects for which project instances exist."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
       - name: "tagIds"
-        description: "A list of tag ids of used for filtering projects."
+        description: "The list of tag ids of used for filtering projects."
         in: "query"
         required: false
         schema:
@@ -200,14 +332,14 @@ paths:
                 $ref: "#/components/schemas/Project"
   /projects/{id}:
     delete:
-      description: "Delete an project."
-      summary: "Delete an project."
+      description: "Delete a project."
+      summary: "Delete a project."
       tags:
       - "projects"
       operationId: "deleteProject"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -217,14 +349,14 @@ paths:
         "200":
           description: "Successful operation."
     get:
-      description: "Get an project by id."
-      summary: "Get an project by id."
+      description: "Get a project by id."
+      summary: "Get a project by id."
       tags:
       - "projects"
       operationId: "getProject"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -245,7 +377,7 @@ paths:
       operationId: "updateProject"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -273,7 +405,7 @@ paths:
       operationId: "duplicateProject"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -295,7 +427,7 @@ paths:
       operationId: "getProjectWorkflows"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -318,7 +450,7 @@ paths:
       operationId: "createProjectWorkflow"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -330,10 +462,10 @@ paths:
             schema:
               type: "object"
               required:
-              - "name"
+              - "label"
               properties:
-                name:
-                  description: "The workflow name."
+                label:
+                  description: "The descriptive name for a workflow."
                   type: "string"
                 description:
                   description: "The workflow description."
@@ -348,7 +480,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -358,7 +490,7 @@ paths:
       operationId: "updateProjectTags"
       parameters:
       - name: "id"
-        description: "The id of an project."
+        description: "The id of a project."
         in: "path"
         required: true
         schema:
@@ -368,13 +500,7 @@ paths:
         content:
           application/json:
             schema:
-              description: "The request object that contains the array of tags."
-              type: "object"
-              properties:
-                tags:
-                  type: "array"
-                  items:
-                    $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+              $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
         "200":
@@ -402,7 +528,7 @@ components:
           description: "The total number of elements."
           type: "integer"
         content:
-          description: "A list of elements."
+          description: "The list of elements."
           type: "array"
           items:
             type: "object"
@@ -423,17 +549,14 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        description:
+          description: "The description of a project."
+          type: "string"
         id:
           description: "The id of a project."
           type: "integer"
           format: "int64"
           readOnly: true
-        name:
-          description: "The name of a project."
-          type: "string"
-        description:
-          description: "The description of a project."
-          type: "string"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -443,6 +566,9 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        name:
+          description: "The name of a project."
+          type: "string"
         publishedDate:
           description: "The published date."
           type: "string"
@@ -451,7 +577,7 @@ components:
           description: "The version of a project."
           type: "integer"
         status:
-          description: "A status of a project."
+          description: "The status of a project."
           type: "string"
           enum:
           - "PUBLISHED"
@@ -491,11 +617,28 @@ components:
       required:
       - "name"
       properties:
-        configuration:
-          description: "The configuration of an project instance."
+        configurationParameters:
+          description: "The configuration parameters of an project instance used as\
+            \ workflow input values."
           type: "object"
           additionalProperties:
             type: "object"
+        connectionIds:
+          description: "The ids of connections used by a project instance."
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          writeOnly: true
+        connections:
+          description: "The connections used by a project instance."
+          type: "array"
+          items:
+            $ref: "../../../hermes/hermes-connection/hermes-connection-rest/hermes-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+          readOnly: true
+        description:
+          description: "The description of a project instance."
+          type: "string"
         createdBy:
           description: "The created by."
           type: "string"
@@ -510,11 +653,10 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        name:
-          description: "The name of a project instance."
+        lastExecutionDate:
+          description: "The last execution date of a project instance."
           type: "string"
-        project:
-          $ref: "#/components/schemas/Project"
+          format: "date-time"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -524,9 +666,33 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        name:
+          description: "The name of a project instance."
+          type: "string"
+        project:
+          $ref: "#/components/schemas/Project"
+        projectId:
+          description: "Th id of a project."
+          type: "integer"
+          format: "int64"
+          writeOnly: false
+        status:
+          description: "The status of a project instance."
+          type: "string"
+          enum:
+          - "DISABLED"
+          - "ENABLED"
         tags:
           type: "array"
           items:
             $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         __version:
           type: "integer"
+    UpdateTagsRequest:
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
