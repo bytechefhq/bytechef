@@ -104,9 +104,9 @@ public class Worker {
                 eventPublisher.publishEvent(
                         new TaskStartedWorkflowEvent(taskExecution.getJobId(), taskExecution.getId()));
 
-                TaskExecution completionTaskExecution = doExecuteTask(taskExecution);
+                TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+                messageBroker.send(Queues.COMPLETIONS, completedTaskExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -134,6 +134,7 @@ public class Worker {
             } catch (InterruptedException e) {
                 handleException(taskExecution, e);
             }
+
             taskExecutions.remove(taskExecution.getId());
         }
     }
@@ -226,10 +227,11 @@ public class Worker {
         messageBroker.send(Queues.ERRORS, updatedTaskExecution);
     }
 
-    private long calculateTimeout(TaskExecution aTask) {
-        if (aTask.getTimeout() != null) {
-            return Duration.parse("PT" + aTask.getTimeout()).toMillis();
+    private long calculateTimeout(TaskExecution taskExecution) {
+        if (taskExecution.getTimeout() != null) {
+            return Duration.parse("PT" + taskExecution.getTimeout()).toMillis();
         }
+
         return DEFAULT_TIME_OUT;
     }
 
