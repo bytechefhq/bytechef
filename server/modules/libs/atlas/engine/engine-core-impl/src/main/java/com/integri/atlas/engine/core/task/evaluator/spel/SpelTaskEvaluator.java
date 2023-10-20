@@ -86,8 +86,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         map.put("now", new Now());
         map.put("dateFormat", new DateFormat());
         map.put("config", new Config(aBuilder.environment));
-        map.put("parseJSON", new ParseJSON(aBuilder.jsonHelper));
+        map.put("readJSON", new ReadJSON(aBuilder.jsonHelper));
         map.put("readXML", new ReadXML(aBuilder.xmlHelper));
+        map.put("writeJSON", new WriteJSON(aBuilder.jsonHelper));
         map.put("writeXML", new WriteXML(aBuilder.xmlHelper));
         map.putAll(aBuilder.methodExecutors);
         methodExecutors = Collections.unmodifiableMap(map);

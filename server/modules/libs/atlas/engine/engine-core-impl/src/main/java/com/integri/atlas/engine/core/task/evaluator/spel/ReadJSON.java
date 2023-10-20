@@ -27,11 +27,11 @@ import org.springframework.expression.TypedValue;
 /**
  * @author Ivica Cardic
  */
-public class ParseJSON implements MethodExecutor {
+public class ReadJSON implements MethodExecutor {
 
     private final JSONHelper jsonHelper;
 
-    public ParseJSON(JSONHelper jsonHelper) {
+    public ReadJSON(JSONHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 

@@ -27,6 +27,7 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.core.xml.XMLHelper;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -420,18 +421,47 @@ public class SpelTaskEvaluatorTest {
             .jsonHelper(new JSONHelper(new ObjectMapper()))
             .build();
 
-        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${parseJSON('{\"field1\": \"value1\"}')}");
+        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${readJSON('{\"field1\": \"value1\"}')}");
 
         TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
 
         Assertions.assertEquals(Map.of("field1", "value1"), evaluatedTaskExecution.get("myValue", Map.class));
 
-        taskExecution = SimpleTaskExecution.of("myValue", "${parseJSON('[{\"field1\": \"value1\"}]')}");
+        taskExecution = SimpleTaskExecution.of("myValue", "${readJSON('[{\"field1\": \"value1\"}]')}");
 
         evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
 
         Assertions.assertEquals(List.of(Map.of("field1", "value1")), evaluatedTaskExecution.get("myValue", List.class));
     }
+
+    @Test
+    public void test44() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator
+            .builder()
+            .jsonHelper(new JSONHelper(new ObjectMapper()))
+            .build();
+
+        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${writeJSON(map)}");
+
+        MapContext mapContext = new MapContext();
+
+        mapContext.set("map", Map.of("field1", "value1"));
+
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
+
+        Assertions.assertEquals("{\"field1\":\"value1\"}", evaluatedTaskExecution.get("myValue", String.class));
+
+        taskExecution = SimpleTaskExecution.of("myValue", "${writeJSON(list)}");
+
+        mapContext = new MapContext();
+
+        mapContext.set("list", List.of(Map.of("field1", "value1")));
+
+        evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
+
+        Assertions.assertEquals("[{\"field1\":\"value1\"}]", evaluatedTaskExecution.get("myValue", String.class));
+    }
+
     @Test
     public void test45() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().xmlHelper(new XMLHelper()).build();

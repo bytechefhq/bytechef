@@ -34,18 +34,18 @@ public class JSONHelper {
         this.objectMapper = objectMapper;
     }
 
-    public <T> T deserialize(String value, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(value, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public <T> T deserialize(String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T deserialize(String value, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(value, clazz);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
