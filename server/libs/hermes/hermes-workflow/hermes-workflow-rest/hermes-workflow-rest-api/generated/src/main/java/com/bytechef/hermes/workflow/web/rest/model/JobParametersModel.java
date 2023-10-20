@@ -2,6 +2,7 @@ package com.bytechef.hermes.workflow.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.hermes.workflow.web.rest.model.JobWorkflowConnectionModel;
 import com.bytechef.hermes.workflow.web.rest.model.WebhookModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -26,8 +27,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-06T08:20:36.906696+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-10T20:32:26.667648+02:00[Europe/Zagreb]")
 public class JobParametersModel {
+
+  @Valid
+  private List<@Valid JobWorkflowConnectionModel> connections;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
@@ -57,6 +61,34 @@ public class JobParametersModel {
    */
   public JobParametersModel(String workflowId) {
     this.workflowId = workflowId;
+  }
+
+  public JobParametersModel connections(List<@Valid JobWorkflowConnectionModel> connections) {
+    this.connections = connections;
+    return this;
+  }
+
+  public JobParametersModel addConnectionsItem(JobWorkflowConnectionModel connectionsItem) {
+    if (this.connections == null) {
+      this.connections = new ArrayList<>();
+    }
+    this.connections.add(connectionsItem);
+    return this;
+  }
+
+  /**
+   * Get connections
+   * @return connections
+  */
+  @Valid 
+  @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connections")
+  public List<@Valid JobWorkflowConnectionModel> getConnections() {
+    return connections;
+  }
+
+  public void setConnections(List<@Valid JobWorkflowConnectionModel> connections) {
+    this.connections = connections;
   }
 
   public JobParametersModel inputs(Map<String, Object> inputs) {
@@ -204,7 +236,8 @@ public class JobParametersModel {
       return false;
     }
     JobParametersModel jobParameters = (JobParametersModel) o;
-    return Objects.equals(this.inputs, jobParameters.inputs) &&
+    return Objects.equals(this.connections, jobParameters.connections) &&
+        Objects.equals(this.inputs, jobParameters.inputs) &&
         Objects.equals(this.label, jobParameters.label) &&
         Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId) &&
         Objects.equals(this.priority, jobParameters.priority) &&
@@ -214,13 +247,14 @@ public class JobParametersModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
+    return Objects.hash(connections, inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class JobParametersModel {\n");
+    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");

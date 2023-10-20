@@ -8,6 +8,7 @@ src/main/java/com/bytechef/hermes/workflow/web/rest/model/ExecutionErrorModel.ja
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/InputModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/JobModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/JobParametersModel.java
+src/main/java/com/bytechef/hermes/workflow/web/rest/model/JobWorkflowConnectionModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/TaskExecutionModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/WebhookModel.java

@@ -20,12 +20,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-06T08:20:36.906696+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-10T20:32:26.667648+02:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;
 
-  private Integer connectionVersion;
+  private Integer componentVersion;
 
   /**
    * Default constructor
@@ -39,9 +39,9 @@ public class WorkflowConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowConnectionModel(String componentName, Integer connectionVersion) {
+  public WorkflowConnectionModel(String componentName, Integer componentVersion) {
     this.componentName = componentName;
-    this.connectionVersion = connectionVersion;
+    this.componentVersion = componentVersion;
   }
 
   public WorkflowConnectionModel componentName(String componentName) {
@@ -64,24 +64,24 @@ public class WorkflowConnectionModel {
     this.componentName = componentName;
   }
 
-  public WorkflowConnectionModel connectionVersion(Integer connectionVersion) {
-    this.connectionVersion = connectionVersion;
+  public WorkflowConnectionModel componentVersion(Integer componentVersion) {
+    this.componentVersion = componentVersion;
     return this;
   }
 
   /**
-   * Get connectionVersion
-   * @return connectionVersion
+   * Get componentVersion
+   * @return componentVersion
   */
   @NotNull 
-  @Schema(name = "connectionVersion", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("connectionVersion")
-  public Integer getConnectionVersion() {
-    return connectionVersion;
+  @Schema(name = "componentVersion", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentVersion")
+  public Integer getComponentVersion() {
+    return componentVersion;
   }
 
-  public void setConnectionVersion(Integer connectionVersion) {
-    this.connectionVersion = connectionVersion;
+  public void setComponentVersion(Integer componentVersion) {
+    this.componentVersion = componentVersion;
   }
 
   @Override
@@ -94,12 +94,12 @@ public class WorkflowConnectionModel {
     }
     WorkflowConnectionModel workflowConnection = (WorkflowConnectionModel) o;
     return Objects.equals(this.componentName, workflowConnection.componentName) &&
-        Objects.equals(this.connectionVersion, workflowConnection.connectionVersion);
+        Objects.equals(this.componentVersion, workflowConnection.componentVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, connectionVersion);
+    return Objects.hash(componentName, componentVersion);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class WorkflowConnectionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowConnectionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
+    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }
