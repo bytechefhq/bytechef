@@ -50,4 +50,17 @@ public class ProjectInstanceWorkflowServiceController {
 
         return ResponseEntity.ok(projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(key, taskName));
     }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/project-instance-workflow-service/update-enabled/{id}/{enabled}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Void> updateEnabled(@PathVariable long id, @PathVariable boolean enabled) {
+        projectInstanceWorkflowService.updateEnabled(id, enabled);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
 }

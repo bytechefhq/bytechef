@@ -18,7 +18,6 @@
 package com.bytechef.helios.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.domain.ProjectInstance.Status;
 import com.bytechef.helios.configuration.repository.ProjectInstanceRepository;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,7 +52,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
         Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be notNull");
         Assert.notNull(projectInstance.getName(), "'projectId' must not be notNull");
 
-        projectInstance.setStatus(Status.DISABLED);
+        projectInstance.setEnabled(false);
 
         return projectInstanceRepository.save(projectInstance);
     }
@@ -115,15 +114,6 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
-    public ProjectInstance update(long id, Status status) {
-        ProjectInstance projectInstance = getProjectInstance(id);
-
-        projectInstance.setStatus(status);
-
-        return projectInstanceRepository.save(projectInstance);
-    }
-
-    @Override
     @SuppressFBWarnings("NP")
     public ProjectInstance update(ProjectInstance projectInstance) {
         Assert.notNull(projectInstance, "'projectInstance' must not be notNull");
@@ -136,10 +126,19 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
         curProjectInstance.setDescription(projectInstance.getDescription());
         curProjectInstance.setName(projectInstance.getName());
-        curProjectInstance.setStatus(projectInstance.getStatus());
+        curProjectInstance.setEnabled(projectInstance.isEnabled());
         curProjectInstance.setTagIds(projectInstance.getTagIds());
         curProjectInstance.setVersion(projectInstance.getVersion());
 
         return projectInstanceRepository.save(curProjectInstance);
+    }
+
+    @Override
+    public void updateEnabled(long id, boolean enabled) {
+        ProjectInstance projectInstance = getProjectInstance(id);
+
+        projectInstance.setEnabled(enabled);
+
+        projectInstanceRepository.save(projectInstance);
     }
 }

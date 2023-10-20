@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.remote.web.rest.job;
+package com.bytechef.helios.execution.remote.web.rest.facade;
 
-import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.helios.execution.facade.ProjectInstanceRequesterFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,25 +29,25 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
-public class ProjectInstanceWorkflowJobFactoryController {
+public class ProjectInstanceRequesterFacadeController {
 
-    private final ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory;
+    private final ProjectInstanceRequesterFacade projectInstanceRequesterFacade;
 
-    public ProjectInstanceWorkflowJobFactoryController(
-        ProjectInstanceWorkflowJobFactory projectInstanceWorkflowJobFactory) {
+    public ProjectInstanceRequesterFacadeController(
+        ProjectInstanceRequesterFacade projectInstanceRequesterFacade) {
 
-        this.projectInstanceWorkflowJobFactory = projectInstanceWorkflowJobFactory;
+        this.projectInstanceRequesterFacade = projectInstanceRequesterFacade;
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/project-instance-workflow-job-factory/create-job/{instanceId}/{workflowId}",
+        value = "/project-instance-workflow-facade/create-job/{projectInstanceId}/{workflowId}",
         produces = {
             "application/json"
         })
     public ResponseEntity<Long> createJob(
-        @PathVariable long instanceId, @PathVariable String workflowId) {
+        @PathVariable long projectInstanceId, @PathVariable String workflowId) {
 
-        return ResponseEntity.ok(projectInstanceWorkflowJobFactory.createJob(instanceId, workflowId));
+        return ResponseEntity.ok(projectInstanceRequesterFacade.createJob(projectInstanceId, workflowId));
     }
 }
