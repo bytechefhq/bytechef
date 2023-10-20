@@ -74,7 +74,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
                 queryParamsFactory.getQueryParams(taskExecution)
             ),
             httpHeadersFactory.getHttpHeaders(taskExecution),
-            httpBodyFactory.getBodyPublisher(taskExecution, this),
+            httpBodyFactory.getBodyPublisher(taskExecution),
             httpBodyFactory.getBodyHandler(taskExecution)
         );
 

@@ -46,10 +46,7 @@ public class HttpBodyFactory {
         this.jsonHelper = jsonHelper;
     }
 
-    public HttpRequest.BodyPublisher getBodyPublisher(
-        TaskExecution taskExecution,
-        HttpClientTaskHandler httpClientTaskHandler
-    ) {
+    public HttpRequest.BodyPublisher getBodyPublisher(TaskExecution taskExecution) {
         HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
         if (taskExecution.containsKey(PROPERTY_BODY_PARAMETERS)) {
             String bodyParams;
