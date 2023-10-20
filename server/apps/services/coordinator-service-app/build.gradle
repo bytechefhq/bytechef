@@ -6,6 +6,7 @@ springBoot {
 }
 
 dependencies {
+    implementation libs.org.openapitools.jackson.databind.nullable
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-cache"
