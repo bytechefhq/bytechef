@@ -45,7 +45,7 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
     return (
         <div className="max-h-full flex-[1_1_1px] p-4">
             {outputSchema.map((schema: PropertyType, index) => (
-                <>
+                <div key={`${schema.name}_${index}`}>
                     <div className="mb-1 flex items-center">
                         <span title={schema.type}>
                             {TYPE_ICONS[schema.type as keyof typeof TYPE_ICONS]}
@@ -56,19 +56,17 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
                         </span>
                     </div>
 
-                    {schema.properties ? (
-                        <SchemaProperties
-                            key={`${schema.name}_${index}`}
-                            properties={schema.properties}
-                        />
-                    ) : (
+                    {schema.properties && (
+                        <SchemaProperties properties={schema.properties} />
+                    )}
+
+                    {!schema.properties && !!schema.controlType && (
                         <PropertyField
                             data={schema}
-                            key={`${schema.name}_${index}`}
                             label={schema.controlType!}
                         />
                     )}
-                </>
+                </div>
             ))}
         </div>
     );
