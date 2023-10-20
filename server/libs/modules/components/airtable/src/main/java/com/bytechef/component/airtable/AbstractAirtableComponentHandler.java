@@ -18,9 +18,8 @@
 package com.bytechef.component.airtable;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.component.airtable.action.CreateRecordAction;
+import com.bytechef.component.airtable.action.AirtableCreateRecordAction;
 import com.bytechef.component.airtable.connection.AirtableConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -31,15 +30,14 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  * @generated
  */
 public abstract class AbstractAirtableComponentHandler implements OpenApiComponentHandler {
-    private final ComponentDefinition componentDefinition = component("airtable")
-        .display(
-            modifyDisplay(
-                display("Airtable")
-                    .description(
-                        "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.")))
-        .actions(modifyActions(CreateRecordAction.ACTION_DEFINITION))
-        .connection(modifyConnection(AirtableConnection.CONNECTION_DEFINITION))
-        .triggers(getTriggers());
+    private final ComponentDefinition componentDefinition = modifyComponent(
+        component("airtable")
+            .title("Airtable")
+            .description(
+                "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way."))
+                    .actions(modifyActions(AirtableCreateRecordAction.ACTION_DEFINITION))
+                    .connection(modifyConnection(AirtableConnection.CONNECTION_DEFINITION))
+                    .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

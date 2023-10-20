@@ -18,28 +18,27 @@
 package com.bytechef.component.pipedrive;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.component.pipedrive.action.AddDealAction;
-import com.bytechef.component.pipedrive.action.AddLeadAction;
-import com.bytechef.component.pipedrive.action.AddOrganizationAction;
-import com.bytechef.component.pipedrive.action.AddPersonAction;
-import com.bytechef.component.pipedrive.action.DeleteDealAction;
-import com.bytechef.component.pipedrive.action.DeleteLeadAction;
-import com.bytechef.component.pipedrive.action.DeleteOrganizationAction;
-import com.bytechef.component.pipedrive.action.DeletePersonAction;
-import com.bytechef.component.pipedrive.action.GetDealAction;
-import com.bytechef.component.pipedrive.action.GetDealsAction;
-import com.bytechef.component.pipedrive.action.GetLeadAction;
-import com.bytechef.component.pipedrive.action.GetLeadsAction;
-import com.bytechef.component.pipedrive.action.GetOrganizationAction;
-import com.bytechef.component.pipedrive.action.GetOrganizationsAction;
-import com.bytechef.component.pipedrive.action.GetPersonAction;
-import com.bytechef.component.pipedrive.action.GetPersonsAction;
-import com.bytechef.component.pipedrive.action.SearchDealsAction;
-import com.bytechef.component.pipedrive.action.SearchLeadsAction;
-import com.bytechef.component.pipedrive.action.SearchOrganizationAction;
-import com.bytechef.component.pipedrive.action.SearchPersonsAction;
+import com.bytechef.component.pipedrive.action.PipedriveAddDealAction;
+import com.bytechef.component.pipedrive.action.PipedriveAddLeadAction;
+import com.bytechef.component.pipedrive.action.PipedriveAddOrganizationAction;
+import com.bytechef.component.pipedrive.action.PipedriveAddPersonAction;
+import com.bytechef.component.pipedrive.action.PipedriveDeleteDealAction;
+import com.bytechef.component.pipedrive.action.PipedriveDeleteLeadAction;
+import com.bytechef.component.pipedrive.action.PipedriveDeleteOrganizationAction;
+import com.bytechef.component.pipedrive.action.PipedriveDeletePersonAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetDealAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetDealsAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetLeadAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetLeadsAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetOrganizationAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetOrganizationsAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetPersonAction;
+import com.bytechef.component.pipedrive.action.PipedriveGetPersonsAction;
+import com.bytechef.component.pipedrive.action.PipedriveSearchDealsAction;
+import com.bytechef.component.pipedrive.action.PipedriveSearchLeadsAction;
+import com.bytechef.component.pipedrive.action.PipedriveSearchOrganizationAction;
+import com.bytechef.component.pipedrive.action.PipedriveSearchPersonsAction;
 import com.bytechef.component.pipedrive.connection.PipedriveConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -50,22 +49,24 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  * @generated
  */
 public abstract class AbstractPipedriveComponentHandler implements OpenApiComponentHandler {
-    private final ComponentDefinition componentDefinition = component("pipedrive")
-        .display(
-            modifyDisplay(
-                display("Pipedrive")
-                    .description(null)))
-        .actions(modifyActions(GetDealsAction.ACTION_DEFINITION, AddDealAction.ACTION_DEFINITION,
-            SearchDealsAction.ACTION_DEFINITION, DeleteDealAction.ACTION_DEFINITION, GetDealAction.ACTION_DEFINITION,
-            GetLeadsAction.ACTION_DEFINITION, AddLeadAction.ACTION_DEFINITION, DeleteLeadAction.ACTION_DEFINITION,
-            GetLeadAction.ACTION_DEFINITION, SearchLeadsAction.ACTION_DEFINITION,
-            GetOrganizationsAction.ACTION_DEFINITION, AddOrganizationAction.ACTION_DEFINITION,
-            SearchOrganizationAction.ACTION_DEFINITION, DeleteOrganizationAction.ACTION_DEFINITION,
-            GetOrganizationAction.ACTION_DEFINITION, GetPersonsAction.ACTION_DEFINITION,
-            AddPersonAction.ACTION_DEFINITION, SearchPersonsAction.ACTION_DEFINITION,
-            DeletePersonAction.ACTION_DEFINITION, GetPersonAction.ACTION_DEFINITION))
-        .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION))
-        .triggers(getTriggers());
+    private final ComponentDefinition componentDefinition = modifyComponent(
+        component("pipedrive")
+            .title("Pipedrive")
+            .description(null))
+                .actions(modifyActions(PipedriveGetDealsAction.ACTION_DEFINITION,
+                    PipedriveAddDealAction.ACTION_DEFINITION, PipedriveSearchDealsAction.ACTION_DEFINITION,
+                    PipedriveDeleteDealAction.ACTION_DEFINITION, PipedriveGetDealAction.ACTION_DEFINITION,
+                    PipedriveGetLeadsAction.ACTION_DEFINITION, PipedriveAddLeadAction.ACTION_DEFINITION,
+                    PipedriveDeleteLeadAction.ACTION_DEFINITION, PipedriveGetLeadAction.ACTION_DEFINITION,
+                    PipedriveSearchLeadsAction.ACTION_DEFINITION, PipedriveGetOrganizationsAction.ACTION_DEFINITION,
+                    PipedriveAddOrganizationAction.ACTION_DEFINITION,
+                    PipedriveSearchOrganizationAction.ACTION_DEFINITION,
+                    PipedriveDeleteOrganizationAction.ACTION_DEFINITION,
+                    PipedriveGetOrganizationAction.ACTION_DEFINITION, PipedriveGetPersonsAction.ACTION_DEFINITION,
+                    PipedriveAddPersonAction.ACTION_DEFINITION, PipedriveSearchPersonsAction.ACTION_DEFINITION,
+                    PipedriveDeletePersonAction.ACTION_DEFINITION, PipedriveGetPersonAction.ACTION_DEFINITION))
+                .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -18,9 +18,8 @@
 package com.bytechef.component.mailchimp;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.component.mailchimp.action.AddMemberToListAction;
+import com.bytechef.component.mailchimp.action.MailchimpAddMemberToListAction;
 import com.bytechef.component.mailchimp.connection.MailchimpConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -31,14 +30,13 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  * @generated
  */
 public abstract class AbstractMailchimpComponentHandler implements OpenApiComponentHandler {
-    private final ComponentDefinition componentDefinition = component("mailchimp")
-        .display(
-            modifyDisplay(
-                display("Mailchimp")
-                    .description("Mailchimp REST API documentation")))
-        .actions(modifyActions(AddMemberToListAction.ACTION_DEFINITION))
-        .connection(modifyConnection(MailchimpConnection.CONNECTION_DEFINITION))
-        .triggers(getTriggers());
+    private final ComponentDefinition componentDefinition = modifyComponent(
+        component("mailchimp")
+            .title("Mailchimp")
+            .description("Mailchimp REST API documentation"))
+                .actions(modifyActions(MailchimpAddMemberToListAction.ACTION_DEFINITION))
+                .connection(modifyConnection(MailchimpConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

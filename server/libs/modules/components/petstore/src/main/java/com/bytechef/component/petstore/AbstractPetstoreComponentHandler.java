@@ -18,27 +18,24 @@
 package com.bytechef.component.petstore;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.component.petstore.action.AddPetAction;
-import com.bytechef.component.petstore.action.CreateUserAction;
-import com.bytechef.component.petstore.action.CreateUsersWithListInputAction;
-import com.bytechef.component.petstore.action.DeleteOrderAction;
-import com.bytechef.component.petstore.action.DeletePetAction;
-import com.bytechef.component.petstore.action.DeleteUserAction;
-import com.bytechef.component.petstore.action.FindPetsByStatusAction;
-import com.bytechef.component.petstore.action.FindPetsByTagsAction;
-import com.bytechef.component.petstore.action.GetInventoryAction;
-import com.bytechef.component.petstore.action.GetOrderByIdAction;
-import com.bytechef.component.petstore.action.GetPetByIdAction;
-import com.bytechef.component.petstore.action.GetUserByNameAction;
-import com.bytechef.component.petstore.action.LoginUserAction;
-import com.bytechef.component.petstore.action.LogoutUserAction;
-import com.bytechef.component.petstore.action.PlaceOrderAction;
-import com.bytechef.component.petstore.action.UpdatePetAction;
-import com.bytechef.component.petstore.action.UpdatePetWithFormAction;
-import com.bytechef.component.petstore.action.UpdateUserAction;
-import com.bytechef.component.petstore.action.UploadFileAction;
+import com.bytechef.component.petstore.action.PetstoreAddPetAction;
+import com.bytechef.component.petstore.action.PetstoreCreateUserAction;
+import com.bytechef.component.petstore.action.PetstoreCreateUsersWithListInputAction;
+import com.bytechef.component.petstore.action.PetstoreDeleteOrderAction;
+import com.bytechef.component.petstore.action.PetstoreDeletePetAction;
+import com.bytechef.component.petstore.action.PetstoreDeleteUserAction;
+import com.bytechef.component.petstore.action.PetstoreFindPetsByStatusAction;
+import com.bytechef.component.petstore.action.PetstoreFindPetsByTagsAction;
+import com.bytechef.component.petstore.action.PetstoreGetInventoryAction;
+import com.bytechef.component.petstore.action.PetstoreGetOrderByIdAction;
+import com.bytechef.component.petstore.action.PetstoreGetPetByIdAction;
+import com.bytechef.component.petstore.action.PetstoreGetUserByNameAction;
+import com.bytechef.component.petstore.action.PetstorePlaceOrderAction;
+import com.bytechef.component.petstore.action.PetstoreUpdatePetAction;
+import com.bytechef.component.petstore.action.PetstoreUpdatePetWithFormAction;
+import com.bytechef.component.petstore.action.PetstoreUpdateUserAction;
+import com.bytechef.component.petstore.action.PetstoreUploadFileAction;
 import com.bytechef.component.petstore.connection.PetstoreConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -49,22 +46,22 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  * @generated
  */
 public abstract class AbstractPetstoreComponentHandler implements OpenApiComponentHandler {
-    private final ComponentDefinition componentDefinition = component("petstore")
-        .display(
-            modifyDisplay(
-                display("Petstore")
-                    .description("This is a sample Pet Store Server based on the OpenAPI 3.0 specification.")))
-        .actions(modifyActions(AddPetAction.ACTION_DEFINITION, UpdatePetAction.ACTION_DEFINITION,
-            FindPetsByStatusAction.ACTION_DEFINITION, FindPetsByTagsAction.ACTION_DEFINITION,
-            DeletePetAction.ACTION_DEFINITION, GetPetByIdAction.ACTION_DEFINITION,
-            UpdatePetWithFormAction.ACTION_DEFINITION, UploadFileAction.ACTION_DEFINITION,
-            GetInventoryAction.ACTION_DEFINITION, PlaceOrderAction.ACTION_DEFINITION,
-            DeleteOrderAction.ACTION_DEFINITION, GetOrderByIdAction.ACTION_DEFINITION,
-            CreateUserAction.ACTION_DEFINITION, CreateUsersWithListInputAction.ACTION_DEFINITION,
-            LoginUserAction.ACTION_DEFINITION, LogoutUserAction.ACTION_DEFINITION, DeleteUserAction.ACTION_DEFINITION,
-            GetUserByNameAction.ACTION_DEFINITION, UpdateUserAction.ACTION_DEFINITION))
-        .connection(modifyConnection(PetstoreConnection.CONNECTION_DEFINITION))
-        .triggers(getTriggers());
+    private final ComponentDefinition componentDefinition = modifyComponent(
+        component("petstore")
+            .title("Petstore")
+            .description("This is a sample Pet Store Server based on the OpenAPI 3.0 specification."))
+                .actions(modifyActions(PetstoreAddPetAction.ACTION_DEFINITION,
+                    PetstoreUpdatePetAction.ACTION_DEFINITION, PetstoreFindPetsByStatusAction.ACTION_DEFINITION,
+                    PetstoreFindPetsByTagsAction.ACTION_DEFINITION, PetstoreDeletePetAction.ACTION_DEFINITION,
+                    PetstoreGetPetByIdAction.ACTION_DEFINITION, PetstoreUpdatePetWithFormAction.ACTION_DEFINITION,
+                    PetstoreUploadFileAction.ACTION_DEFINITION, PetstoreGetInventoryAction.ACTION_DEFINITION,
+                    PetstorePlaceOrderAction.ACTION_DEFINITION, PetstoreDeleteOrderAction.ACTION_DEFINITION,
+                    PetstoreGetOrderByIdAction.ACTION_DEFINITION, PetstoreCreateUserAction.ACTION_DEFINITION,
+                    PetstoreCreateUsersWithListInputAction.ACTION_DEFINITION,
+                    PetstoreDeleteUserAction.ACTION_DEFINITION, PetstoreGetUserByNameAction.ACTION_DEFINITION,
+                    PetstoreUpdateUserAction.ACTION_DEFINITION))
+                .connection(modifyConnection(PetstoreConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -22,7 +22,6 @@ import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -36,8 +35,7 @@ public class MailchimpConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
             AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .display(
-                    display("OAuth2 Authorization Code"))
+                .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)
                         .label("Client Id")
