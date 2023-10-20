@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,6 +17,7 @@ import com.bytechef.athena.configuration.dto.IntegrationDTO;
 import com.bytechef.athena.configuration.facade.IntegrationFacade;
 import com.bytechef.athena.configuration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.athena.configuration.web.rest.mapper.IntegrationMapper;
+import com.bytechef.athena.configuration.web.rest.model.CategoryModel;
 import com.bytechef.athena.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.athena.configuration.web.rest.model.TagModel;
 import com.bytechef.athena.configuration.web.rest.model.UpdateTagsRequestModel;
@@ -26,9 +26,9 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
-import com.bytechef.athena.configuration.web.rest.model.CategoryModel;
 import com.bytechef.tag.domain.Tag;
-
+import java.util.Iterator;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,10 +44,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Disabled

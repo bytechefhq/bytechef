@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -9,6 +8,8 @@
 package com.bytechef.athena.configuration.constant;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class IntegrationConstants {

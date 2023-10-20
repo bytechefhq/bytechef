@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -9,15 +8,16 @@
 package com.bytechef.athena.configuration.domain;
 
 import com.bytechef.tag.domain.Tag;
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.Objects;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Table("integration_tag")

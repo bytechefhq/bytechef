@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,11 +16,19 @@
 
 package com.bytechef.component.jsonfile.action;
 
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILENAME;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.SOURCE;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
 import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
-
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
@@ -31,16 +38,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILENAME;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileConstants.SOURCE;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
  * @author Ivica Cardic

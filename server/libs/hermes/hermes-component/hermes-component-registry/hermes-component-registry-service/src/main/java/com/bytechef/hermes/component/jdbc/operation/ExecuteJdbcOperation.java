@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,9 +17,8 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
-
+import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import java.util.Map;
 
 /**

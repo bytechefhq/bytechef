@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -24,6 +23,7 @@ import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oblac.jrsmq.RedisSMQ;
 import com.oblac.jrsmq.RedisSMQConfig;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,8 +32,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import java.time.Duration;
 
 /**
  * @author Ivica Cardic

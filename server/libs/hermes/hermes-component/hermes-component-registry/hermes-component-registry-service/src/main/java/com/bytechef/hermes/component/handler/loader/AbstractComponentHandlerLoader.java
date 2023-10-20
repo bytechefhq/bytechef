@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -24,7 +23,6 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.hermes.component.definition.ComponentHandlerWrapper;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;

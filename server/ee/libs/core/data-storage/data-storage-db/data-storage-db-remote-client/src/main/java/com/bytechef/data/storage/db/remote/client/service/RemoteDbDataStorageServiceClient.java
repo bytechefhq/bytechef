@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -11,11 +10,12 @@ package com.bytechef.data.storage.db.remote.client.service;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 
-import java.util.Optional;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class RemoteDbDataStorageServiceClient implements DbDataStorageService {

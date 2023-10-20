@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -12,15 +11,16 @@ import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.data.storage.db.remote.client.service.RemoteDbDataStorageServiceClient;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.service.DataStorageService;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Optional;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Configuration

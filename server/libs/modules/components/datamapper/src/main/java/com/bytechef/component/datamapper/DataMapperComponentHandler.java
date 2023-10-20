@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,8 @@
 
 package com.bytechef.component.datamapper;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+
 import com.bytechef.component.datamapper.action.DataMapperMapKeysAction;
 import com.bytechef.component.datamapper.action.DataMapperMapListToObjectAction;
 import com.bytechef.component.datamapper.action.DataMapperMapMultipleValuesBetweenObjectsAction;
@@ -27,8 +28,6 @@ import com.bytechef.component.datamapper.action.DataMapperMapValuesAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
-
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 /**
  * @author Ivica Cardic

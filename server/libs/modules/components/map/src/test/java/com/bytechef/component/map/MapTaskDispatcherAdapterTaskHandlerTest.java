@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,40 +18,38 @@
 
 package com.bytechef.component.map;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
-import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.atlas.worker.event.TaskExecutionEvent;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
-import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.commons.util.MapUtils;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.message.event.MessageEvent;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.FINALIZE;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.NAME;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PARAMETERS;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.POST;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PRE;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
+
+import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.event.MessageEvent;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Arik Cohen

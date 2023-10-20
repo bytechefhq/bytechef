@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.task.dispatcher.sequence;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;

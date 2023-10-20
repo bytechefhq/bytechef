@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.component.mysql;
 
 import static com.bytechef.component.mysql.constant.MySQLConstants.MYSQL;
-
 import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponent;
 
 import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;

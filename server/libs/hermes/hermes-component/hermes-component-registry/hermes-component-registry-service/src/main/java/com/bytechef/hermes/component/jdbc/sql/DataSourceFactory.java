@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,12 +16,11 @@
 
 package com.bytechef.hermes.component.jdbc.sql;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
-
-import com.bytechef.commons.util.MapUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 

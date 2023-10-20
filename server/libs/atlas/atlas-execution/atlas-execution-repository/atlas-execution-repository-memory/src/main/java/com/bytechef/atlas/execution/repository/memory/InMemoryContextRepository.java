@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -21,13 +20,12 @@ package com.bytechef.atlas.execution.repository.memory;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
+import com.bytechef.file.storage.domain.FileEntry;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
-
-import com.bytechef.file.storage.domain.FileEntry;
 import org.apache.commons.lang3.Validate;
 
 /**

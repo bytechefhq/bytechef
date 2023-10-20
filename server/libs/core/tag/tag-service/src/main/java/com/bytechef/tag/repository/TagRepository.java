@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,9 +17,7 @@
 package com.bytechef.tag.repository;
 
 import com.bytechef.tag.domain.Tag;
-
 import java.util.Optional;
-
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;

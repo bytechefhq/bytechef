@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,26 +16,6 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.Context.Http.Body;
-import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
-import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
-import com.bytechef.hermes.definition.Property.ControlType;
-import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
-
-import java.util.List;
-import java.util.Map;
-
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
@@ -49,6 +28,25 @@ import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
+
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
+import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.definition.Help;
+import com.bytechef.hermes.definition.Property.ControlType;
+import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic

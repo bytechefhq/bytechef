@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,21 +16,8 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.registry.domain.Property;
-import com.bytechef.hermes.registry.domain.AnyProperty;
-import com.bytechef.hermes.registry.domain.ArrayProperty;
-import com.bytechef.hermes.registry.domain.BooleanProperty;
-import com.bytechef.hermes.registry.domain.DateProperty;
-import com.bytechef.hermes.registry.domain.DateTimeProperty;
-import com.bytechef.hermes.registry.domain.DynamicPropertiesProperty;
-import com.bytechef.hermes.registry.domain.IntegerProperty;
-import com.bytechef.hermes.registry.domain.NullProperty;
-import com.bytechef.hermes.registry.domain.NumberProperty;
-import com.bytechef.hermes.registry.domain.ObjectProperty;
-import com.bytechef.hermes.registry.domain.OptionsDataSource;
-import com.bytechef.hermes.registry.domain.StringProperty;
-import com.bytechef.hermes.registry.domain.TimeProperty;
 import com.bytechef.hermes.configuration.web.rest.model.AnyPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.ArrayPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.BooleanPropertyModel;
@@ -46,13 +32,25 @@ import com.bytechef.hermes.configuration.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TimePropertyModel;
+import com.bytechef.hermes.registry.domain.AnyProperty;
+import com.bytechef.hermes.registry.domain.ArrayProperty;
+import com.bytechef.hermes.registry.domain.BooleanProperty;
+import com.bytechef.hermes.registry.domain.DateProperty;
+import com.bytechef.hermes.registry.domain.DateTimeProperty;
+import com.bytechef.hermes.registry.domain.DynamicPropertiesProperty;
+import com.bytechef.hermes.registry.domain.IntegerProperty;
+import com.bytechef.hermes.registry.domain.NullProperty;
+import com.bytechef.hermes.registry.domain.NumberProperty;
+import com.bytechef.hermes.registry.domain.ObjectProperty;
+import com.bytechef.hermes.registry.domain.OptionsDataSource;
+import com.bytechef.hermes.registry.domain.Property;
+import com.bytechef.hermes.registry.domain.StringProperty;
+import com.bytechef.hermes.registry.domain.TimeProperty;
+import java.util.Collections;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
-import com.bytechef.commons.util.CollectionUtils;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Ivica Cardic

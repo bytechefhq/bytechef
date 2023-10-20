@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.category.service;
 
 import com.bytechef.category.domain.Category;
-
 import java.util.List;
 
 public interface CategoryService {

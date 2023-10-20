@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,17 @@
 
 package com.bytechef.component.randomhelper.action;
 
-import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.END_INCLUSIVE;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_FLOAT;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.START_INCLUSIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+
+import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 /**
  * @author Ivica Cardic

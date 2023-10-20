@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -8,19 +7,23 @@
 
 package com.bytechef.athena.configuration.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.athena.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.athena.configuration.domain.Integration;
 import com.bytechef.athena.configuration.dto.IntegrationDTO;
 import com.bytechef.athena.configuration.repository.IntegrationRepository;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -28,12 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @SpringBootTest(

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,9 +18,12 @@
 
 package com.bytechef.message.broker.kafka.config;
 
-import com.bytechef.message.route.MessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
+import com.bytechef.message.route.MessageRoute;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -32,10 +34,6 @@ import org.springframework.kafka.annotation.KafkaListenerConfigurer;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
 import org.springframework.kafka.config.MethodKafkaListenerEndpoint;
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
-
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Arik Cohen

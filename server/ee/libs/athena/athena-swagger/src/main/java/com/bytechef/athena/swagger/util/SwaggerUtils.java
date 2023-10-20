@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -10,6 +9,11 @@ package com.bytechef.athena.swagger.util;
 
 import org.springdoc.core.models.GroupedOpenApi;
 
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 public class SwaggerUtils {
 
     public static final GroupedOpenApi EMBEDDED_GROUP_API = GroupedOpenApi.builder()

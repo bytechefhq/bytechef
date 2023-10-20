@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,8 @@
 
 package com.bytechef.component.rabbitmq;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+
 import com.bytechef.component.rabbitmq.action.RabbitMqSendMessageAction;
 import com.bytechef.component.rabbitmq.connection.RabbitMqConnection;
 import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
@@ -24,8 +25,6 @@ import com.bytechef.component.rabbitmq.trigger.RabbitMqNewMessageTrigger;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
-
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 /**
  * @author Ivica Cardic

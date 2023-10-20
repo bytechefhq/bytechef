@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -11,7 +10,9 @@ package com.bytechef.execution.config;
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
@@ -24,17 +25,16 @@ import com.bytechef.hermes.execution.repository.converter.StringToWorkflowTrigge
 import com.bytechef.hermes.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.hermes.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.hermes.execution.repository.converter.WorkflowTriggerToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.FileEntryToStringConverter;
-import com.bytechef.atlas.execution.repository.jdbc.converter.StringToFileEntryConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Configuration

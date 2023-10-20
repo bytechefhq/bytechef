@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,16 @@
 
 package com.bytechef.hermes.coordinator.event.listener;
 
-import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.coordinator.event.ErrorEvent;
-import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import java.time.LocalDateTime;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic

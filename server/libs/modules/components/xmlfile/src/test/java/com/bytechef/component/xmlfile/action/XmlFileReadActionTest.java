@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,17 +16,16 @@
 
 package com.bytechef.component.xmlfile.action;
 
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTRY;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.IS_ARRAY;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE;
+
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,11 +33,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTRY;
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.IS_ARRAY;
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic

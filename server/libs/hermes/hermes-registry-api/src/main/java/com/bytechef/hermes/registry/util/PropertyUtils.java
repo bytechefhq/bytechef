@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -23,7 +22,6 @@ import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.ObjectProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
-
 import java.util.List;
 
 /**

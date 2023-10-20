@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,9 +18,9 @@
 
 package com.bytechef.message.broker.amqp;
 
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
 import org.apache.commons.lang3.Validate;
 import org.springframework.amqp.core.AmqpTemplate;

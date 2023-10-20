@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -9,12 +8,14 @@
 package com.bytechef.athena.configuration.web.rest.mapper;
 
 import com.bytechef.athena.configuration.web.rest.mapper.config.IntegrationMapperSpringConfiguration;
-import com.bytechef.category.domain.Category;
 import com.bytechef.athena.configuration.web.rest.model.CategoryModel;
+import com.bytechef.category.domain.Category;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfiguration.class)

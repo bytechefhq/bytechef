@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -8,17 +7,18 @@
 
 package com.bytechef.discovery.redis.config;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class RedisDiscoveryServiceProviderEnvironmentPostProcessor implements EnvironmentPostProcessor {

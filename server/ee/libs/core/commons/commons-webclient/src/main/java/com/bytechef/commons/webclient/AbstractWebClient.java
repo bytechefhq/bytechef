@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -8,15 +7,19 @@
 
 package com.bytechef.commons.webclient;
 
+import java.net.URI;
+import java.util.function.Function;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.util.function.Function;
-
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 public class AbstractWebClient {
 
     private final WebClient.Builder webClientBuilder;

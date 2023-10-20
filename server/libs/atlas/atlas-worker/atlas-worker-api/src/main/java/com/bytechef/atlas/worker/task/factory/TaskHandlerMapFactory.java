@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.atlas.worker.task.factory;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-
 import java.util.Map;
 
 /**

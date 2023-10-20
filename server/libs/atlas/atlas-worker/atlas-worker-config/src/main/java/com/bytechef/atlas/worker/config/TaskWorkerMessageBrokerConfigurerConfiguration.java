@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,9 +19,7 @@ package com.bytechef.atlas.worker.config;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-
 import java.util.Map;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

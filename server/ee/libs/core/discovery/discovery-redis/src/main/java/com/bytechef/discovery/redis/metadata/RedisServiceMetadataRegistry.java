@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -11,13 +10,14 @@ package com.bytechef.discovery.redis.metadata;
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public class RedisServiceMetadataRegistry implements ServiceMetadataRegistry {

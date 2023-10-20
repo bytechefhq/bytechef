@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,22 +19,24 @@ package com.bytechef.helios.connection.facade;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
+import com.bytechef.helios.connection.config.ConnectionIntTestConfiguration;
+import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
-import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
-import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -47,9 +48,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic

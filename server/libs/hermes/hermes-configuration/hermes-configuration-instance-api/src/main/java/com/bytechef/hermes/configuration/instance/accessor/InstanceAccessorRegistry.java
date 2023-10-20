@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,12 +16,11 @@
 
 package com.bytechef.hermes.configuration.instance.accessor;
 
-import org.apache.commons.lang3.Validate;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic

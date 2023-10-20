@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,11 +18,10 @@ package com.bytechef.file.storage.domain;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.core.convert.converter.Converter;
-
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic

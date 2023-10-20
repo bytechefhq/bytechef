@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -24,12 +23,11 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 
 /**
  * a simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for testing.

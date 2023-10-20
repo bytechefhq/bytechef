@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,11 +16,10 @@
 
 package com.bytechef.hermes.component.definition;
 
-import java.util.List;
-import java.util.Map;
-
 import com.bytechef.commons.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

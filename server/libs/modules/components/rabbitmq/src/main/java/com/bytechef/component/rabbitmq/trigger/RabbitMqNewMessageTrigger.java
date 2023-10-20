@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,15 @@
 
 package com.bytechef.component.rabbitmq.trigger;
 
+import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
+import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWORD;
+import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PORT;
+import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
+import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
+import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
@@ -24,25 +32,13 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitte
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
-import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWORD;
-import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PORT;
-import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
-import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
-import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic

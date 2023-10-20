@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,7 +18,6 @@ package com.bytechef.hermes.coordinator.event;
 
 import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.message.event.MessageEvent;
-
 import java.time.LocalDateTime;
 
 /**

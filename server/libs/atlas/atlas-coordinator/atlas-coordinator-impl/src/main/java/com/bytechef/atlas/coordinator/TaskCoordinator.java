@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,6 +18,8 @@
 
 package com.bytechef.atlas.coordinator;
 
+import com.bytechef.atlas.configuration.task.CancelControlTask;
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobResumeEvent;
@@ -31,21 +32,17 @@ import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.task.CancelControlTask;
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-
+import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.error.ExecutionError;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-
-import com.bytechef.commons.util.ExceptionUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

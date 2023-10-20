@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -24,7 +23,6 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.hermes.component.definition.ActionDefinitionWrapper;
 import com.bytechef.hermes.component.handler.ComponentTaskHandler;
-
 import java.util.function.BiFunction;
 
 /**

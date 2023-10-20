@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,9 @@
 
 package com.bytechef.component.airtable.trigger;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.ParameterMap;
@@ -24,15 +26,10 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 public class AirtableNewRecordTrigger {
 

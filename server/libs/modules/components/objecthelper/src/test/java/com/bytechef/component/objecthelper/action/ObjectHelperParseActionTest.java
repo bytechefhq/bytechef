@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,18 +16,15 @@
 
 package com.bytechef.component.objecthelper.action;
 
-import com.bytechef.hermes.component.definition.Context;
-
-import com.bytechef.hermes.component.definition.ParameterMap;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.List;
-import java.util.Map;
-
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic

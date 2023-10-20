@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -18,7 +17,6 @@
 package com.bytechef.hermes.task.dispatcher.registry.service;
 
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-
 import java.util.List;
 
 /**

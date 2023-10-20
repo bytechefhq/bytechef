@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -14,15 +13,16 @@ import com.bytechef.athena.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.athena.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.athena.configuration.web.rest.model.WorkflowRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @RestController

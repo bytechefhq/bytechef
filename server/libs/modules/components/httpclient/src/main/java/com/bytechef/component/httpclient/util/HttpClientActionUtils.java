@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -16,22 +15,6 @@
  */
 
 package com.bytechef.component.httpclient.util;
-
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
-import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
-import com.bytechef.hermes.component.definition.Context.Http.Body;
-import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
-import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.BODY_CONTENT;
@@ -52,6 +35,20 @@ import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
+import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
+import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic

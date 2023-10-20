@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -20,7 +19,6 @@
 package com.bytechef.atlas.configuration.repository;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-
 import java.util.List;
 import java.util.Optional;
 

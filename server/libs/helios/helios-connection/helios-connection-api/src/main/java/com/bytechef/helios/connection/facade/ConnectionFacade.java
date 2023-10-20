@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,7 +18,6 @@ package com.bytechef.helios.connection.facade;
 
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.tag.domain.Tag;
-
 import java.util.List;
 
 /**

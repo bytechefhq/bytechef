@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,10 @@
 
 package com.bytechef.component.aws.s3.util;
 
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACCESS_KEY_ID;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.REGION;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SECRET_ACCESS_KEY;
+
 import com.bytechef.hermes.component.definition.ParameterMap;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -24,10 +27,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACCESS_KEY_ID;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.REGION;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SECRET_ACCESS_KEY;
 
 /**
  * @author Ivica Cardic

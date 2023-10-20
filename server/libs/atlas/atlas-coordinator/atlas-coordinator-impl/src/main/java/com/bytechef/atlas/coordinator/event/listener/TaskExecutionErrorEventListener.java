@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,19 +18,18 @@
 
 package com.bytechef.atlas.coordinator.event.listener;
 
+import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.error.ExecutionError;
-import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
-
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

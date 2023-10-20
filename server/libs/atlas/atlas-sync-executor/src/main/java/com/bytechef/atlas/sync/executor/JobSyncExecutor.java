@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -20,8 +19,10 @@ package com.bytechef.atlas.sync.executor;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
-
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
+import com.bytechef.atlas.coordinator.event.JobStartEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
@@ -36,37 +37,32 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.coordinator.event.JobStartEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.error.ExecutionError;
-import com.bytechef.atlas.execution.facade.JobFacadeImpl;
-import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
+import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
+import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
-
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.event.MessageEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
-
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.message.event.MessageEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;

@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,6 +16,12 @@
 
 package com.bytechef.component.webhook.util;
 
+import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
+import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
+import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
+import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
+import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
+
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
@@ -26,15 +31,8 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateFunction;
-
 import java.util.Map;
 import java.util.Objects;
-
-import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
-import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
-import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
-import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
-import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
 /**
  * @author Ivica Cardic

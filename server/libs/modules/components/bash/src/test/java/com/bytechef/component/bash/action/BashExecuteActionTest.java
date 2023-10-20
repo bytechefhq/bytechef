@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016-2020 the original author or authors.
  *
@@ -19,15 +18,14 @@
 
 package com.bytechef.component.bash.action;
 
+import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
+
 import com.bytechef.component.bash.BashComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-
 import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 
 /**
  * @author Arik Cohen

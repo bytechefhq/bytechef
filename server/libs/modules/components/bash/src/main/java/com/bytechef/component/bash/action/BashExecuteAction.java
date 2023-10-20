@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -17,12 +16,15 @@
 
 package com.bytechef.component.bash.action;
 
+import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
+import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import org.zeroturnaround.exec.ProcessExecutor;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -33,12 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-
-import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
-import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
  * @author Ivica Cardic

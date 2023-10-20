@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -14,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled")

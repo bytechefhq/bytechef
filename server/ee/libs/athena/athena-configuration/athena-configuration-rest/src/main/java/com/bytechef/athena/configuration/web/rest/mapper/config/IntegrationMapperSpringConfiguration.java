@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -12,6 +11,8 @@ import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring")

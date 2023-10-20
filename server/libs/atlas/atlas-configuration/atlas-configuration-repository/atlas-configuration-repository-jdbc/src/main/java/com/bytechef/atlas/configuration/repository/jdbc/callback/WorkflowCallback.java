@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023-present ByteChef Inc.
  *
@@ -19,7 +18,6 @@ package com.bytechef.atlas.configuration.repository.jdbc.callback;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import java.util.UUID;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
 import org.springframework.stereotype.Component;
