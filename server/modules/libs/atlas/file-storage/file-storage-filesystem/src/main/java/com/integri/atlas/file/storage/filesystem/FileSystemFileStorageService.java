@@ -42,38 +42,12 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream openInputStream(String url) {
-        Path path = resolveDirectory();
-
-        String filePath = getFilePath(url);
-
-        try {
-            return Files.newInputStream(path.resolve(filePath), StandardOpenOption.READ);
-        } catch (IOException ioe) {
-            throw new FileStorageException("Failed to open file " + url, ioe);
-        }
+    public FileEntry addFile(String fileName, String data) throws FileStorageException {
+        return addFile(fileName, new ByteArrayInputStream(data.getBytes()));
     }
 
     @Override
-    public String read(String url) throws FileStorageException {
-        Path path = resolveDirectory();
-
-        String filePath = getFilePath(url);
-
-        try {
-            return Files.readString(path.resolve(filePath));
-        } catch (IOException ioe) {
-            throw new FileStorageException("Failed to open file " + filePath, ioe);
-        }
-    }
-
-    @Override
-    public FileEntry write(String fileName, String data) throws FileStorageException {
-        return write(fileName, new ByteArrayInputStream(data.getBytes()));
-    }
-
-    @Override
-    public FileEntry write(String fileName, InputStream inputStream) throws FileStorageException {
+    public FileEntry addFile(String fileName, InputStream inputStream) throws FileStorageException {
         Path path = resolveDirectory();
 
         path = path.resolve(UUIDGenerator.generate());
@@ -91,6 +65,29 @@ public class FileSystemFileStorageService implements FileStorageService {
         }
 
         return FileEntry.of(fileName, "file:" + path);
+    }
+
+    @Override
+    public String getContent(String url) throws FileStorageException {
+        Path path = resolveDirectory();
+        String filePath = getFilePath(url);
+
+        try {
+            return Files.readString(path.resolve(filePath));
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to open file " + filePath, ioe);
+        }
+    }
+
+    @Override
+    public InputStream getContentStream(String url) {
+        Path path = resolveDirectory();
+
+        try {
+            return Files.newInputStream(path.resolve(getFilePath(url)), StandardOpenOption.READ);
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to open file " + url, ioe);
+        }
     }
 
     private String getFilePath(String url) {

@@ -45,6 +45,6 @@ class AddFile implements MethodExecutor {
             data = String.valueOf(arguments[1]);
         }
 
-        return new TypedValue(fileStorageService.write(fileName, data));
+        return new TypedValue(fileStorageService.addFile(fileName, data));
     }
 }

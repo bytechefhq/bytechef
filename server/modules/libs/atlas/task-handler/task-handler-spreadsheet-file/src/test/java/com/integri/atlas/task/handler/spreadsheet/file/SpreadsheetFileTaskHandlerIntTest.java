@@ -51,7 +51,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
             Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
             Map.of(
                 "fileEntry",
-                fileStorageService.write(
+                fileStorageService.addFile(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, Charset.defaultCharset())
                 )
@@ -90,7 +90,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
                 Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
                 Map.of(
                     "fileEntry",
-                    fileStorageService.write(
+                    fileStorageService.addFile(
                         sampleFile.getName(),
                         Files.contentOf(sampleFile, Charset.defaultCharset())
                     )

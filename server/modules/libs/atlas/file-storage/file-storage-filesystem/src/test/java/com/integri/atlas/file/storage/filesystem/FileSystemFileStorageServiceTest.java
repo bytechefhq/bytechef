@@ -39,29 +39,29 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        FileEntry fileEntry = fileStorageService.write(
+        FileEntry fileEntry = fileStorageService.addFile(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
 
-        InputStream inputStream = fileStorageService.openInputStream(fileEntry.getUrl());
+        InputStream inputStream = fileStorageService.getContentStream(fileEntry.getUrl());
 
         Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testRead() {
-        FileEntry fileEntry = fileStorageService.write(
+        FileEntry fileEntry = fileStorageService.addFile(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
 
-        Assertions.assertThat(fileStorageService.read(fileEntry.getUrl())).isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileStorageService.getContent(fileEntry.getUrl())).isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testWrite() {
-        FileEntry fileEntry = fileStorageService.write(
+        FileEntry fileEntry = fileStorageService.addFile(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );

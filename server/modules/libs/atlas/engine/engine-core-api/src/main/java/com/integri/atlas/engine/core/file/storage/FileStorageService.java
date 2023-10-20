@@ -23,11 +23,11 @@ import java.io.InputStream;
  * @author Ivica Cardic
  */
 public interface FileStorageService {
-    FileEntry write(String fileName, String data) throws FileStorageException;
+    FileEntry addFile(String fileName, String data) throws FileStorageException;
 
-    FileEntry write(String fileName, InputStream inputStream) throws FileStorageException;
+    FileEntry addFile(String fileName, InputStream inputStream) throws FileStorageException;
 
-    InputStream openInputStream(String url) throws FileStorageException;
+    String getContent(String url) throws FileStorageException;
 
-    String read(String url) throws FileStorageException;
+    InputStream getContentStream(String url) throws FileStorageException;
 }

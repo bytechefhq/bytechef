@@ -52,7 +52,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = fileStorageService.write(
+        FileEntry fileEntry = fileStorageService.addFile(
             "sample.txt",
             Files.contentOf(getFile(), Charset.defaultCharset())
         );
@@ -74,7 +74,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
             Map.of("localFile", new LocalFileTaskHandler(fileStorageService)),
             Map.of(
                 "fileEntry",
-                fileStorageService.write(
+                fileStorageService.addFile(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(getFile(), Charset.defaultCharset())
                 ),
