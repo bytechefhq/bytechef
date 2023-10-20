@@ -18,13 +18,11 @@
 package com.bytechef.hermes.worker;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.event.TriggerStartedWorkflowEvent;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
-import com.bytechef.hermes.definition.registry.util.WorkflowTaskUtils;
-import com.bytechef.hermes.definition.registry.dto.TaskType;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler.TriggerOutput;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.SystemMessageRoute;
@@ -40,10 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
@@ -93,11 +88,9 @@ public class TriggerWorker {
                 eventPublisher.publishEvent(new TriggerStartedWorkflowEvent(
                     Objects.requireNonNull(triggerExecution.getId())));
 
-                List<TriggerExecution> completedTriggerExecutions = doExecuteTrigger(triggerExecution);
+                TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
-                for (TriggerExecution completedTriggerExecution : completedTriggerExecutions) {
-                    messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, completedTriggerExecution);
-                }
+                messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, completedTriggerExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -140,8 +133,7 @@ public class TriggerWorker {
 
             for (TriggerExecutionFuture<?> triggerExecutionFuture : triggerExecutions.values()) {
                 if (Objects.equals(triggerExecutionFuture.triggerExecution.getId(), id)) {
-                    logger.info(
-                        "Cancelling trigger id ={}", triggerExecutionFuture.triggerExecution.getId());
+                    logger.info("Cancelling trigger id={}", triggerExecutionFuture.triggerExecution.getId());
 
                     triggerExecutionFuture.cancel(true);
                 }
@@ -149,43 +141,26 @@ public class TriggerWorker {
         }
     }
 
-    private List<TriggerExecution> doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
-        List<TriggerExecution> triggerExecutions = new ArrayList<>();
-
+    private TriggerExecution doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
         long startTime = System.currentTimeMillis();
 
         TriggerHandler<?> triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
 
-        Object output = triggerHandler.handle(triggerExecution.clone());
-
-        long endTime = System.currentTimeMillis();
+        TriggerOutput output = triggerHandler.handle(triggerExecution.clone());
 
         if (output == null) {
-            triggerExecutions.add(createCompletedTriggerExecution(triggerExecution.clone(), startTime, endTime));
+            triggerExecution.setState(null);
         } else {
-            TaskType taskType = WorkflowTaskUtils.getTaskType(triggerExecution.getType());
-
-            TriggerDefinitionDTO triggerDefinitionDTO = triggerDefinitionService.getTriggerDefinition(
-                taskType.componentName(), taskType.componentVersion(), taskType.operationName());
-
-            if (!triggerDefinitionDTO.batch() && output instanceof Collection<?> collectionOutput) {
-                for (Object outputItem : collectionOutput) {
-                    triggerExecution = createCompletedTriggerExecution(triggerExecution.clone(), startTime, endTime);
-
-                    triggerExecution.setOutput(outputItem);
-
-                    triggerExecutions.add(triggerExecution);
-                }
-            } else {
-                triggerExecution = createCompletedTriggerExecution(triggerExecution.clone(), startTime, endTime);
-
-                triggerExecution.setOutput(output);
-
-                triggerExecutions.add(triggerExecution);
-            }
+            triggerExecution.setBatch(output.batch());
+            triggerExecution.setOutput(output.value());
+            triggerExecution.setState(output.state());
         }
 
-        return triggerExecutions;
+        triggerExecution.setEndDate(LocalDateTime.now());
+        triggerExecution.setExecutionTime(System.currentTimeMillis() - startTime);
+        triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
+
+        return triggerExecution;
     }
 
     private long calculateTimeout(TriggerExecution triggerExecution) {
@@ -196,18 +171,6 @@ public class TriggerWorker {
         }
 
         return DEFAULT_TIME_OUT;
-    }
-
-    private static TriggerExecution createCompletedTriggerExecution(
-        TriggerExecution triggerExecution, long startTime, long endTime) throws CloneNotSupportedException {
-
-        TriggerExecution completedTriggerExecution = triggerExecution.clone();
-
-        completedTriggerExecution.setEndDate(LocalDateTime.now());
-        completedTriggerExecution.setExecutionTime(endTime - startTime);
-        completedTriggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
-
-        return completedTriggerExecution;
     }
 
     private void handleException(TriggerExecution triggerExecution, Exception exception) {

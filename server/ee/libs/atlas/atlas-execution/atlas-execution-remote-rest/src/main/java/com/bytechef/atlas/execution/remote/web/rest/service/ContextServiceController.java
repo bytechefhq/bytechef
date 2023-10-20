@@ -50,7 +50,7 @@ public class ContextServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Map<String, Object>> peek(@PathVariable long stackId, @PathVariable Classname classname) {
+    public ResponseEntity<Map<String, ?>> peek(@PathVariable long stackId, @PathVariable Classname classname) {
         return ResponseEntity.ok(contextService.peek(stackId, classname));
     }
 
@@ -60,7 +60,7 @@ public class ContextServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Map<String, Object>> peek(
+    public ResponseEntity<Map<String, ?>> peek(
         @PathVariable long stackId, @PathVariable int subStackId, @PathVariable Classname classname) {
 
         return ResponseEntity.ok(contextService.peek(stackId, subStackId, classname));

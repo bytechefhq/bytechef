@@ -71,6 +71,9 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         }
     }
 
+    @Transient
+    private boolean batch;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -111,6 +114,9 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Column("start_date")
     private LocalDateTime startDate;
 
+    @Transient
+    private Object state;
+
     @Column
     private Status status;
 
@@ -133,7 +139,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
      * @param context The context value to evaluate the task against
      * @return the evaluated {@link TriggerExecution} instance.
      */
-    public TriggerExecution evaluate(Map<String, Object> context) {
+    public TriggerExecution evaluate(Map<String, ?> context) {
         WorkflowTrigger workflowTrigger = getWorkflowTrigger();
 
         Map<String, Object> map = Evaluator.evaluate(workflowTrigger.toMap(), context);
@@ -260,6 +266,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return startDate;
     }
 
+    public Object getState() {
+        return state;
+    }
+
     /**
      * Get the current status of this task.
      *
@@ -291,6 +301,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return workflowTrigger;
     }
 
+    public boolean isBatch() {
+        return batch;
+    }
+
     @Override
     public boolean isNew() {
         return id == null;
@@ -300,6 +314,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         metadata.put(key, value);
 
         return this;
+    }
+
+    public void setBatch(boolean batch) {
+        this.batch = batch;
     }
 
     public void setEndDate(LocalDateTime endDate) {
@@ -334,6 +352,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
+    }
+
+    public void setState(Object state) {
+        this.state = state;
     }
 
     public void setStatus(Status status) {

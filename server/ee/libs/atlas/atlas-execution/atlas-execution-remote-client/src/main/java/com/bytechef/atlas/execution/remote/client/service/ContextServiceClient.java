@@ -40,7 +40,7 @@ public class ContextServiceClient implements ContextService {
     }
 
     @Override
-    public Map<String, Object> peek(long stackId, Classname classname) {
+    public Map<String, ?> peek(long stackId, Classname classname) {
         return loadBalancedWebClientBuilder
             .build()
             .get()
@@ -54,7 +54,7 @@ public class ContextServiceClient implements ContextService {
     }
 
     @Override
-    public Map<String, Object> peek(long stackId, int subStackId, Classname classname) {
+    public Map<String, ?> peek(long stackId, int subStackId, Classname classname) {
         return loadBalancedWebClientBuilder
             .build()
             .get()
@@ -68,7 +68,7 @@ public class ContextServiceClient implements ContextService {
     }
 
     @Override
-    public void push(long stackId, Classname classname, Map<String, Object> context) {
+    public void push(long stackId, Classname classname, Map<String, ?> context) {
         loadBalancedWebClientBuilder
             .build()
             .post()
@@ -83,7 +83,7 @@ public class ContextServiceClient implements ContextService {
     }
 
     @Override
-    public void push(long stackId, int subStackId, Classname classname, Map<String, Object> context) {
+    public void push(long stackId, int subStackId, Classname classname, Map<String, ?> context) {
         loadBalancedWebClientBuilder
             .build()
             .post()

@@ -46,16 +46,16 @@ import java.util.Collections;
         "bytechef.persistence.provider=jdbc",
         "bytechef.workflow-repository.jdbc.enabled=true"
     })
-public class JobFacadeIntTest {
+public class JobFactoryFacadeIntTest {
 
     @Autowired
-    private JobFacade jobFacade;
+    private JobFactoryFacade jobFactoryFacade;
 
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> jobFacade.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
+            () -> jobFactoryFacade.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
     }
 
     @TestConfiguration
@@ -68,8 +68,8 @@ public class JobFacadeIntTest {
         private WorkflowService workflowService;
 
         @Bean
-        JobFacade jobFactory(JobService jobService, MessageBroker messageBroker) {
-            return new JobFacadeImpl(contextService, e -> {}, jobService, messageBroker, workflowService);
+        JobFactoryFacade jobFactory(JobService jobService, MessageBroker messageBroker) {
+            return new JobFactoryFacadeImpl(contextService, e -> {}, jobService, messageBroker, workflowService);
         }
 
         @Bean

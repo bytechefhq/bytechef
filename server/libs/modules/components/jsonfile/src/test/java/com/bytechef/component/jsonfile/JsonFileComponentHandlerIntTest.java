@@ -69,7 +69,7 @@ public class JsonFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
@@ -88,7 +88,7 @@ public class JsonFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeJSONFile");
 

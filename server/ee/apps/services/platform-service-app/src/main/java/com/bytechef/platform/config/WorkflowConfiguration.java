@@ -20,8 +20,8 @@ package com.bytechef.platform.config;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.facade.JobFacadeImpl;
+import com.bytechef.atlas.execution.facade.JobFactoryFacade;
+import com.bytechef.atlas.execution.facade.JobFactoryFacadeImpl;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.atlas.execution.repository.CounterRepository;
 import com.bytechef.atlas.execution.repository.JobRepository;
@@ -60,11 +60,11 @@ public class WorkflowConfiguration {
     }
 
     @Bean
-    JobFacade jobFactory(
+    JobFactoryFacade jobFactory(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker, WorkflowService workflowService) {
 
-        return new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker, workflowService);
+        return new JobFactoryFacadeImpl(contextService, eventPublisher, jobService, messageBroker, workflowService);
     }
 
     @Bean

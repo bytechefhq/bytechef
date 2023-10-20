@@ -130,7 +130,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private void complete(Job job) {
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
+        Map<String, ?> context = contextService.peek(job.getId(), Context.Classname.JOB);
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Map<String, Object> source = new HashMap<>();

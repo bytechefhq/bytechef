@@ -21,6 +21,7 @@ import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
@@ -31,14 +32,12 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
-import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -59,33 +58,27 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private static final String PARAMETERS = "parameters";
 
     private final ContextFactory contextFactory;
-    private final TriggerStateService triggerStateService;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
-    public DefaultComponentTriggerHandler(
-        TriggerDefinition triggerDefinition, TriggerStateService triggerStateService,
-        ContextFactory contextFactory) {
-
+    public DefaultComponentTriggerHandler(TriggerDefinition triggerDefinition, ContextFactory contextFactory) {
         this.contextFactory = contextFactory;
-        this.triggerStateService = triggerStateService;
         this.triggerDefinition = triggerDefinition;
     }
 
     @Override
-    public Object handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
+    public TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
         TriggerContext context = contextFactory.createTriggerContext(
             MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
 
         return ComponentContextSupplier.get(context, () -> doHandle(triggerExecution, context));
     }
 
-    private Object doHandle(TriggerExecution triggerExecution, TriggerContext triggerContext)
+    private TriggerOutput doHandle(TriggerExecution triggerExecution, TriggerContext triggerContext)
         throws TriggerExecutionException {
 
-        Object output;
+        TriggerOutput output;
         TriggerType triggerType = triggerDefinition.getType();
-        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
             !validateWebhook(triggerContext, triggerExecution)) {
@@ -103,10 +96,9 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                             MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                             MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
                             MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
-                            OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null),
-                            triggerContext));
+                            (DynamicWebhookEnableOutput) triggerExecution.getState(), triggerContext));
 
-                    return webhookOutput.getValue();
+                    return new TriggerOutput(webhookOutput.getValue(), null, false);
                 })
                 .orElseThrow();
         } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
@@ -121,16 +113,16 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                             MapValueUtils.getRequired(triggerExecution.getMetadata(), METHOD, WebhookMethod.class),
                             triggerContext));
 
-                    return webhookOutput.getValue();
+                    return new TriggerOutput(webhookOutput.getValue(), null, false);
                 })
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             output = triggerDefinition.getPoll()
                 .map(pollFunction -> {
+                    @SuppressWarnings("unchecked")
                     PollOutput pollOutput = pollFunction.apply(
                         new PollContext(
-                            triggerExecution.getParameters(),
-                            OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null),
+                            triggerExecution.getParameters(), (Map<String, Object>) triggerExecution.getState(),
                             triggerContext));
 
                     List<Map<?, ?>> records = new ArrayList<>(
@@ -144,11 +136,9 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                         records.addAll(pollOutput.records());
                     }
 
-                    if (pollOutput.closureParameters() != null) {
-                        triggerStateService.save(workflowExecutionId, pollOutput.closureParameters());
-                    }
-
-                    return records;
+                    return new TriggerOutput(
+                        records, pollOutput.closureParameters(),
+                        OptionalUtils.orElse(triggerDefinition.getBatch(), false));
                 })
                 .orElseThrow();
         } else {

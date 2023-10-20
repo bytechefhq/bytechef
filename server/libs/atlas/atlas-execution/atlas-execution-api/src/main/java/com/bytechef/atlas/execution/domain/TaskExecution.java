@@ -179,7 +179,7 @@ public final class TaskExecution
      * @param context The context value to evaluate the task against
      * @return the evaluated {@link TaskExecution} instance.
      */
-    public TaskExecution evaluate(Map<String, Object> context) {
+    public TaskExecution evaluate(Map<String, ?> context) {
         WorkflowTask workflowTask = getWorkflowTask();
 
         Map<String, Object> map = Evaluator.evaluate(workflowTask.toMap(), context);
@@ -288,7 +288,7 @@ public final class TaskExecution
         return maxRetries;
     }
 
-    public Map<String, Object> getMetadata() {
+    public Map<String, ?> getMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
 
@@ -471,7 +471,7 @@ public final class TaskExecution
         this.maxRetries = maxRetries;
     }
 
-    public void setMetadata(Map<String, Object> metadata) {
+    public void setMetadata(Map<String, ?> metadata) {
         if (metadata == null) {
             this.metadata = new HashMap<>();
         } else {
@@ -564,7 +564,7 @@ public final class TaskExecution
         private Long parentId;
         private int priority;
         private int progress;
-        private Map<String, Object> metadata;
+        private Map<String, ?> metadata;
         private int maxRetries;
         private int retryAttempts;
         private String retryDelay = "1s";
@@ -597,7 +597,7 @@ public final class TaskExecution
             return this;
         }
 
-        public Builder metadata(Map<String, Object> metadata) {
+        public Builder metadata(Map<String, ?> metadata) {
             this.metadata = metadata;
             return this;
         }

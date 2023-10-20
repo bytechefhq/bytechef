@@ -129,7 +129,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         return createdDate;
     }
 
-    public Map<String, Object> getInputs() {
+    public Map<String, ?> getInputs() {
         return Collections.unmodifiableMap(inputs.getMap());
     }
 
@@ -183,7 +183,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setInputs(Map<String, Object> inputs) {
+    public void setInputs(Map<String, ?> inputs) {
         if (!CollectionUtils.isEmpty(inputs)) {
             this.inputs = new MapWrapper(inputs);
         }

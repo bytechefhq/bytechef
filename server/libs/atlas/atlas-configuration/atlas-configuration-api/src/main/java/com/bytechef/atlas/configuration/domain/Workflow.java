@@ -167,7 +167,7 @@ public final class Workflow implements Persistable<String> {
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String definition, Format format, String id, Map<String, Object> source, Map<String, Object> metadata) {
+        String definition, Format format, String id, Map<String, ?> source, Map<String, Object> metadata) {
 
         Assert.notNull(definition, "'definition' must not be null");
         Assert.notNull(format, "'format' must not be null");
@@ -180,7 +180,7 @@ public final class Workflow implements Persistable<String> {
         this.id = id;
         this.metadata = new HashMap<>(metadata);
 
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
+        for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
                 this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
             } else if (WorkflowConstants.INPUTS.equals(entry.getKey())) {
@@ -384,7 +384,7 @@ public final class Workflow implements Persistable<String> {
     public record Output(String name, Object value) {
     }
 
-    private static Map<String, Object> readWorkflowMap(String definition, String id, int format) throws Exception {
+    private static Map<String, ?> readWorkflowMap(String definition, String id, int format) throws Exception {
         return WorkflowReader.readWorkflowMap(
             new WorkflowResource(
                 id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),

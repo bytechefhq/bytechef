@@ -26,11 +26,11 @@ import java.util.Map;
  */
 public interface ContextService {
 
-    Map<String, Object> peek(long stackId, Context.Classname classname);
+    Map<String, ?> peek(long stackId, Context.Classname classname);
 
-    Map<String, Object> peek(long stackId, int subStackId, Context.Classname classname);
+    Map<String, ?> peek(long stackId, int subStackId, Context.Classname classname);
 
-    void push(long stackId, Context.Classname classname, Map<String, Object> context);
+    void push(long stackId, Context.Classname classname, Map<String, ?> context);
 
-    void push(long stackId, int subStackId, Context.Classname classname, Map<String, Object> context);
+    void push(long stackId, int subStackId, Context.Classname classname, Map<String, ?> context);
 }

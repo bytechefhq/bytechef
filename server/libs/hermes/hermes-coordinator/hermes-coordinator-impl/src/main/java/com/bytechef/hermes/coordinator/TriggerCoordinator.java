@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
@@ -29,6 +30,8 @@ import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -51,18 +54,23 @@ public class TriggerCoordinator {
     private final MessageBroker messageBroker;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
+    private final TriggerExecutionService triggerExecutionService;
+    private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry, MessageBroker messageBroker,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
+        TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
         this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
         this.messageBroker = messageBroker;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
+        this.triggerExecutionService = triggerExecutionService;
+        this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
 
@@ -97,11 +105,12 @@ public class TriggerCoordinator {
         InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
             workflowExecutionId.getInstanceType());
 
-        triggerExecution = instanceWorkflowManager.saveTriggerExecution(
+        triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
                 instanceWorkflowManager.getInputs(
-                    workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())),
-            workflowExecutionId);
+                    workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())));
+
+        triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
 
         try {
             triggerDispatcher.dispatch(triggerExecution);

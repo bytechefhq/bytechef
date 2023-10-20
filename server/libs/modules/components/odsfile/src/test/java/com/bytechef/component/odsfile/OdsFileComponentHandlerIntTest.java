@@ -67,7 +67,7 @@ public class OdsFileComponentHandlerIntTest {
             Assertions.assertThat(job.getStatus())
                 .isEqualTo(Job.Status.COMPLETED);
 
-            Map<String, Object> outputs = job.getOutputs();
+            Map<String, ?> outputs = job.getOutputs();
 
             JSONAssert.assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -88,7 +88,7 @@ public class OdsFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, Object> outputs = job.getOutputs();
+        Map<String, ?> outputs = job.getOutputs();
 
         Assertions.assertThat(((Map) outputs.get("writeOdsFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.ods");

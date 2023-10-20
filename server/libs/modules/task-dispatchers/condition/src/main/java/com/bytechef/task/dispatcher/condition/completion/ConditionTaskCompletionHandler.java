@@ -112,7 +112,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            Map<String, Object> context = contextService.peek(
+            Map<String, ?> context = contextService.peek(
                 conditionTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             subTaskExecution.evaluate(context);
