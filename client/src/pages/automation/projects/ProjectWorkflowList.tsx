@@ -2,11 +2,16 @@ import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
 import WorkflowDialog from '@/components/WorkflowDialog/WorkflowDialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import {useUpdateWorkflowMutation} from '@/mutations/projects.mutations';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {CalendarIcon} from '@heroicons/react/24/outline';
+import {useQueryClient} from '@tanstack/react-query';
 import {ProjectModel, WorkflowModel} from 'middleware/helios/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
-import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
+import {
+    ProjectKeys,
+    useGetProjectWorkflowsQuery,
+} from 'queries/projects.queries';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -32,6 +37,16 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     >(undefined);
 
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
+    const queryClient = useQueryClient();
+
+    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(ProjectKeys.projects);
+
+            setShowEditWorkflowDialog(false);
+        },
+    });
 
     return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
@@ -185,12 +200,15 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
 
                             {showEditWorkflowDialog && (
                                 <WorkflowDialog
-                                    showTrigger={false}
-                                    visible
-                                    workflow={selectedWorkflow!}
                                     onClose={() =>
                                         setShowEditWorkflowDialog(false)
                                     }
+                                    showTrigger={false}
+                                    updateWorkflowMutationMutation={
+                                        updateWorkflowMutationMutation
+                                    }
+                                    visible
+                                    workflow={selectedWorkflow!}
                                 />
                             )}
                         </li>

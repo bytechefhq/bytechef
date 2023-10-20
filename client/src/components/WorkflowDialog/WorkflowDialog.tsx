@@ -1,4 +1,4 @@
-import {WorkflowModel} from '@/middleware/helios/configuration';
+import {WorkflowModel, WorkflowRequestModel} from '@/middleware/helios/configuration';
 import {PlusIcon} from '@heroicons/react/24/outline';
 import {Close} from '@radix-ui/react-dialog';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -17,11 +17,18 @@ type WorkflowDialogProps = {
         any,
         unknown
     >;
+    onClose?: () => void;
     parentId?: number;
     showTrigger?: boolean;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    updateWorkflowMutationMutation?: UseMutationResult<
+        any,
+        object,
+        any,
+        unknown
+    >;
     visible?: boolean;
     workflow?: WorkflowModel;
-    onClose?: () => void;
 };
 
 const WorkflowDialog = ({
@@ -29,7 +36,9 @@ const WorkflowDialog = ({
     onClose,
     parentId,
     showTrigger = true,
+    updateWorkflowMutationMutation,
     visible = false,
+    workflow,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
@@ -41,12 +50,14 @@ const WorkflowDialog = ({
         reset,
     } = useForm({
         defaultValues: {
-            description: '',
-            label: '',
+            description: workflow?.description || '',
+            label: workflow?.label || '',
         } as WorkflowModel,
     });
 
-    const {isLoading, mutate} = createWorkflowRequestMutation!;
+    const {isLoading, mutate} = createWorkflowRequestMutation
+        ? createWorkflowRequestMutation!
+        : updateWorkflowMutationMutation!;
 
     function closeDialog() {
         setIsOpen(false);
@@ -58,13 +69,36 @@ const WorkflowDialog = ({
         reset();
     }
 
-    function createWorkflow() {
+    function saveWorkflow() {
         const formData = getValues();
 
-        mutate({
-            createProjectWorkflowRequestModel: formData,
-            id: parentId,
-        });
+        if (workflow) {
+            mutate({
+                id: workflow.id,
+                workflowRequestModel: {
+                    definition: JSON.stringify(
+                        {
+                            ...JSON.parse(workflow.definition!),
+                            description: formData.description,
+                            label: formData.label,
+                        }
+                    )
+                }
+            });
+        } else {
+            mutate({
+                id: parentId,
+                workflowRequestModel: {
+                    definition: JSON.stringify(
+                        {
+                            description: formData.description,
+                            label: formData.label,
+                            tasks: []
+                        }
+                    )
+                }
+            });
+        }
 
         closeDialog();
     }
@@ -114,7 +148,7 @@ const WorkflowDialog = ({
 
                 <Button
                     label={isLoading ? 'Saving...' : 'Save'}
-                    onClick={handleSubmit(createWorkflow)}
+                    onClick={handleSubmit(saveWorkflow)}
                     type="submit"
                     disabled={isLoading}
                 />

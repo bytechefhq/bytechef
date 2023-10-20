@@ -76,15 +76,16 @@ const Project = () => {
         isLoading: projectWorkflowsLoading,
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
-    const createWorkflowMutation = useCreateProjectWorkflowRequestMutation({
-        onSuccess: (workflow) => {
-            queryClient.invalidateQueries(
-                ProjectKeys.projectWorkflows(parseInt(projectId!))
-            );
+    const createProjectWorkflowRequestMutation =
+        useCreateProjectWorkflowRequestMutation({
+            onSuccess: (workflow) => {
+                queryClient.invalidateQueries(
+                    ProjectKeys.projectWorkflows(parseInt(projectId!))
+                );
 
-            setCurrentWorkflow(workflow);
-        },
-    });
+                setCurrentWorkflow(workflow);
+            },
+        });
 
     useEffect(() => {
         if (currentWorkflow.id) {
@@ -153,7 +154,7 @@ const Project = () => {
                                 {!!projectId && (
                                     <WorkflowDialog
                                         createWorkflowRequestMutation={
-                                            createWorkflowMutation
+                                            createProjectWorkflowRequestMutation
                                         }
                                         parentId={+projectId}
                                     />
