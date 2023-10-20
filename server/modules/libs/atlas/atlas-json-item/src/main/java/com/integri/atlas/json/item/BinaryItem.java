@@ -20,6 +20,7 @@ package com.integri.atlas.json.item;
 
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 
@@ -28,17 +29,12 @@ import org.json.JSONObject;
  */
 public class BinaryItem extends JSONObject {
 
-    private String data;
-    private String extension;
-    private String mimeType;
-    private String name;
-
     public static BinaryItem of(String fileName, String data) {
         BinaryItem binaryItem = new BinaryItem();
 
         binaryItem.setData(data);
         binaryItem.setExtension(FilenameUtils.getExtension(fileName));
-        binaryItem.setName(fileName);
+        binaryItem.setName(FilenameUtils.getName(fileName));
 
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
 
@@ -47,35 +43,63 @@ public class BinaryItem extends JSONObject {
         return binaryItem;
     }
 
+    public static BinaryItem of(String fileName, String data, Map<String, ?> map) {
+        BinaryItem binaryItem = BinaryItem.of(fileName, data);
+
+        for (String key : map.keySet()) {
+            binaryItem.put(key, map.get(key));
+        }
+
+        return binaryItem;
+    }
+
+    public static BinaryItem of(String json) {
+        BinaryItem binaryItem = new BinaryItem();
+
+        JSONObject jsonObject = new JSONObject(json);
+
+        for (String key : jsonObject.keySet()) {
+            switch (key) {
+                case "data" -> binaryItem.setData(jsonObject.getString("data"));
+                case "extension" -> binaryItem.setExtension(jsonObject.getString("extension"));
+                case "mimeType" -> binaryItem.setMimeType(jsonObject.getString("mimeType"));
+                case "name" -> binaryItem.setName(jsonObject.getString("name"));
+                default -> binaryItem.put(key, jsonObject.getString(key));
+            }
+        }
+
+        return binaryItem;
+    }
+
     public String getData() {
-        return data;
+        return getString("data");
     }
 
     public void setData(String data) {
-        this.data = data;
+        put("data", data);
     }
 
     public String getExtension() {
-        return extension;
+        return getString("extension");
     }
 
     public void setExtension(String extension) {
-        this.extension = extension;
+        put("extension", extension);
     }
 
     public String getMimeType() {
-        return mimeType;
+        return getString("mimeType");
     }
 
     public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+        put("mimeType", mimeType);
     }
 
     public String getName() {
-        return name;
+        return getString("name");
     }
 
     public void setName(String name) {
-        this.name = name;
+        put("name", name);
     }
 }
