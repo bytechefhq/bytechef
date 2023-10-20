@@ -77,12 +77,6 @@ export interface PropertyModel {
      */
     label?: string;
     /**
-     * The additional data that can be used during processing.
-     * @type {{ [key: string]: object; }}
-     * @memberof PropertyModel
-     */
-    metadata?: { [key: string]: object; };
-    /**
      * The property name.
      * @type {string}
      * @memberof PropertyModel
@@ -168,7 +162,6 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'expressionDisabled': !exists(json, 'expressionDisabled') ? undefined : json['expressionDisabled'],
         'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
         'label': !exists(json, 'label') ? undefined : json['label'],
-        'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
         'name': !exists(json, 'name') ? undefined : json['name'],
         'placeholder': !exists(json, 'placeholder') ? undefined : json['placeholder'],
         'required': !exists(json, 'required') ? undefined : json['required'],
@@ -191,7 +184,6 @@ export function PropertyModelToJSON(value?: PropertyModel | null): any {
         'expressionDisabled': value.expressionDisabled,
         'hidden': value.hidden,
         'label': value.label,
-        'metadata': value.metadata,
         'name': value.name,
         'placeholder': value.placeholder,
         'required': value.required,
