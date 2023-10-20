@@ -16,21 +16,29 @@
 
 package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.TOKEN;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.*;
 
+import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
 import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
-
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
  */
-public class BearerHttpAuth implements HttpAuth {
+public class ApiKeyAuth implements Auth {
 
     @Override
     public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
-        headers.add(new HttpHeader("Authorization", "Bearer " + taskAuth.getProperty(TOKEN)));
+        Accessor properties = taskAuth.getProperties();
+
+        if (ApiTokenLocation.valueOf(StringUtils.upperCase(properties.getString(ADD_TO))) == ApiTokenLocation.HEADER) {
+            headers.add(new HttpHeader(properties.getString(KEY), properties.getString(VALUE)));
+        } else {
+            queryParameters.add(new HttpQueryParam(properties.getString(KEY), properties.getString(VALUE)));
+        }
     }
 }

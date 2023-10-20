@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class OAuth2HttpAuth implements HttpAuth {
+public class OAuth2Auth implements Auth {
 
     @Override
     public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
