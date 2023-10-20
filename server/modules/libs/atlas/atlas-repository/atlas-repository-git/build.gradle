@@ -1,9 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:atlas-repository:atlas-repository-api")
-
-    implementation "commons-io:commons-io"
-    implementation 'org.eclipse.jgit:org.eclipse.jgit'
-    implementation "org.springframework:spring-core"
-
-    testImplementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-}
