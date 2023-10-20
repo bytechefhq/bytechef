@@ -1,4 +1,4 @@
-label: If Task Date Time Operands
+label: If Task Boolean Operands
 
 inputs:
   - name: value1
@@ -10,41 +10,41 @@ inputs:
     required: true
 
 outputs:
-  - name: afterResult
-    value: ${afterResult}
+  - name: equalsResult
+    value: ${equalsResult}
 
-  - name: beforeResult
-    value: ${beforeResult}
+  - name: notEqualsResult
+    value: ${notEqualsResult}
 
 tasks:
   - type: if
     conditions:
-      - dateTime:
+      - number:
           value1: ${value1}
-          operation: after
+          operation: equals
           value2: ${value2}
     combineOperation: any
     caseTrue:
-      - name: afterResult
+      - name: equalsResult
         type: core/var
         value: "true branch"
     caseFalse:
-      - name: afterResult
+      - name: equalsResult
         type: core/var
         value: "false branch"
 
   - type: if
     conditions:
-      - dateTime:
+      - number:
           value1: ${value1}
-          operation: before
+          operation: notEquals
           value2: ${value2}
     combineOperation: any
     caseTrue:
-      - name: beforeResult
+      - name: notEqualsResult
         type: core/var
         value: "true branch"
     caseFalse:
-      - name: beforeResult
+      - name: notEqualsResult
         type: core/var
         value: "false branch"
