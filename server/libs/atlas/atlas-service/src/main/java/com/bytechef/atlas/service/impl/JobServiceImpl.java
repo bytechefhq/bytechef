@@ -60,8 +60,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job add(JobParametersDTO jobParametersDTO) {
         String workflowId = jobParametersDTO.getWorkflowId();
+    public Job create(JobParameters jobParameters) {
 
         Workflow workflow = workflowRepository.findById(workflowId)
             .orElseThrow();

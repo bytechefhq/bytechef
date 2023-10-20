@@ -125,7 +125,7 @@ public class WorkflowControllerIntTest {
                 """)
             .format(WorkflowModel.FormatEnum.JSON);
 
-        when(workflowService.add(any())).thenReturn(workflow);
+        when(workflowService.create(any(), any())).thenReturn(workflow);
 
         try {
             assert workflow.getId() != null;

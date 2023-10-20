@@ -99,7 +99,7 @@ public class JobExecutor {
 
         TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
-        evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+        evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
         taskDispatcher.dispatch(evaluatedTaskExecution);
     }

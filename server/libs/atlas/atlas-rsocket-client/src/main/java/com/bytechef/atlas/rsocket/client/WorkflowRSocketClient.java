@@ -20,6 +20,7 @@ package com.bytechef.atlas.rsocket.client;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import java.util.List;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,9 @@ public class WorkflowRSocketClient implements WorkflowService {
     }
 
     @Override
-    public Workflow add(Workflow workflow) {
+    public Workflow create(Workflow workflow, Workflow.ProviderType providerType) {
+        workflow.setProviderType(providerType);
+
         return rSocketRequester
             .route("createWorkflow")
             .data(workflow)

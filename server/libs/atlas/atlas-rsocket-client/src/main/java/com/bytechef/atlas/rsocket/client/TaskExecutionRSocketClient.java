@@ -37,7 +37,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
     }
 
     @Override
-    public TaskExecution add(TaskExecution taskExecution) {
+    public TaskExecution create(TaskExecution taskExecution) {
         return rSocketRequester
             .route("createTaskExecution")
             .data(taskExecution)

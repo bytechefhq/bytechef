@@ -89,7 +89,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             retryTaskExecution.setError(null);
             retryTaskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
 
-            retryTaskExecution = taskExecutionService.add(retryTaskExecution);
+            retryTaskExecution = taskExecutionService.create(retryTaskExecution);
 
             taskDispatcher.dispatch(retryTaskExecution);
         }
