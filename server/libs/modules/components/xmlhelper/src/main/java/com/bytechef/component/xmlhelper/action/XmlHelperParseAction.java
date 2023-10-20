@@ -39,10 +39,11 @@ public class XmlHelperParseAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(PARSE)
         .title("Convert from XML string")
         .description("Converts the XML string to object/array.")
-        .properties(string(SOURCE)
-            .label("Source")
-            .description("The XML string to convert to the data.")
-            .required(true))
+        .properties(
+            string(SOURCE)
+                .label("Source")
+                .description("The XML string to convert to the data.")
+                .required(true))
         .outputSchema(object())
         .perform(XmlHelperParseAction::perform);
 

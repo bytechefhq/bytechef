@@ -17,7 +17,7 @@
 
 package com.bytechef.component.jsonfile.action;
 
-import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
+import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -34,11 +34,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILENAME;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.WRITE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILENAME;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.SOURCE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.WRITE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
@@ -61,9 +61,9 @@ public class JsonFileWriteAction {
                 .label("File Type")
                 .description("The file type to choose.")
                 .options(
-                    option("JSON", JsonFileTaskConstants.FileType.JSON.name()),
-                    option("JSON Line", JsonFileTaskConstants.FileType.JSONL.name()))
-                .defaultValue(JsonFileTaskConstants.FileType.JSON.name())
+                    option("JSON", JsonFileConstants.FileType.JSON.name()),
+                    option("JSON Line", JsonFileConstants.FileType.JSONL.name()))
+                .defaultValue(JsonFileConstants.FileType.JSON.name())
                 .required(true),
             integer(TYPE)
                 .label("Type")
@@ -94,12 +94,12 @@ public class JsonFileWriteAction {
     @SuppressWarnings("unchecked")
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context)
         throws ComponentExecutionException {
-        JsonFileTaskConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
+        JsonFileConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
         Object source = MapUtils.getRequired(inputParameters, SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        if (fileType == JsonFileTaskConstants.FileType.JSON) {
+        if (fileType == JsonFileConstants.FileType.JSON) {
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
                 printWriter.println(JsonUtils.write(source));
             }
@@ -119,9 +119,9 @@ public class JsonFileWriteAction {
         }
     }
 
-    private static String getDefaultFileName(JsonFileTaskConstants.FileType fileType, String defaultFilename) {
+    private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
         return defaultFilename == null
-            ? "file." + (fileType == JsonFileTaskConstants.FileType.JSON ? "json" : "jsonl")
+            ? "file." + (fileType == JsonFileConstants.FileType.JSON ? "json" : "jsonl")
             : defaultFilename;
     }
 }

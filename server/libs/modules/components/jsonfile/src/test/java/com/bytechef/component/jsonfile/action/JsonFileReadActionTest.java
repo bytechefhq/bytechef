@@ -18,7 +18,7 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
-import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
+import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapUtils;
@@ -42,12 +42,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_ENTRY;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.IS_ARRAY;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_NUMBER;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_SIZE;
-import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PATH;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_ENTRY;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.IS_ARRAY;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_SIZE;
+import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PATH;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
@@ -77,7 +77,7 @@ public class JsonFileReadActionTest {
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSON");
             mapUtilsMockedStatic
                 .when(() -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(false)))
@@ -115,7 +115,7 @@ public class JsonFileReadActionTest {
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSON");
             mapUtilsMockedStatic.when(
                 () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
@@ -148,7 +148,7 @@ public class JsonFileReadActionTest {
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSON");
             mapUtilsMockedStatic.when(
                 () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
@@ -183,7 +183,7 @@ public class JsonFileReadActionTest {
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
             mapUtilsMockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSONL");
             mapUtilsMockedStatic.when(
                 () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
@@ -214,7 +214,7 @@ public class JsonFileReadActionTest {
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
             mockedStatic.when(() -> MapUtils.getString(
-                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
+                Mockito.anyMap(), Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
                 .thenReturn("JSONL");
             mockedStatic.when(
                 () -> MapUtils.getBoolean(Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
