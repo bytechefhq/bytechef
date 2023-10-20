@@ -36,7 +36,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class FilesystemCreateTempDirAction {
 
-    public static final ActionDefinition CREATE_TEMP_DIR_ACTION = action(CREATE_TEMP_DIR)
+    public static final ActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .display(display("Create Temp Directory")
             .description("Creates a temporary directory oon the filesystem."))
         .perform(FilesystemCreateTempDirAction::performCreateTempDir);

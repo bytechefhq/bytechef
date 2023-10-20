@@ -36,7 +36,7 @@ public class LoggerErrorAction {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerErrorAction.class);
 
-    public static final ActionDefinition ERROR_ACTION = action(ERROR)
+    public static final ActionDefinition ACTION_DEFINITION = action(ERROR)
         .display(display("Error"))
         .properties(string(TEXT))
         .perform(LoggerErrorAction::performError);

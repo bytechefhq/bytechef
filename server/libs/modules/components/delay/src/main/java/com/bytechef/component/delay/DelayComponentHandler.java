@@ -32,7 +32,7 @@ public class DelayComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(DELAY)
         .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
-        .actions(DelayDelayAction.DELAY_ACTION);
+        .actions(DelayDelayAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

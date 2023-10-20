@@ -36,7 +36,7 @@ public class LoggerDebugAction {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerDebugAction.class);
 
-    public static final ActionDefinition DEBUG_ACTION = action(DEBUG)
+    public static final ActionDefinition ACTION_DEFINITION = action(DEBUG)
         .display(display("Debug"))
         .properties(string(TEXT))
         .perform(LoggerDebugAction::performDebug);

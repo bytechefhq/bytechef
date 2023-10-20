@@ -38,9 +38,9 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         .display(display("AWS S3")
             .description("AWS S3 is a simple object storage service provided by Amazon Web Services."))
         .actions(
-            AwsS3GetObjectAction.GET_OBJECT_ACTION, AwsS3GetUrlAction.GET_URL_ACTION,
-            AwsS3ListObjectsAction.LIST_OBJECTS_ACTION,
-            AwsS3PresignGetObjectAction.PRESIGN_GET_OBJECT_ACTION, AwsS3PutObjectAction.PUT_OBJECT_ACTION);
+            AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
+            AwsS3ListObjectsAction.ACTION_DEFINITION,
+            AwsS3PresignGetObjectAction.ACTION_DEFINITION, AwsS3PutObjectAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

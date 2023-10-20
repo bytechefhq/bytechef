@@ -35,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class FilesystemMkdirAction {
 
-    public static final ActionDefinition MKDIR_ACTION = action(MKDIR)
+    public static final ActionDefinition ACTION_DEFINITION = action(MKDIR)
         .display(display("Create").description("Creates a directory."))
         .perform(FilesystemMkdirAction::performMkdir);
 

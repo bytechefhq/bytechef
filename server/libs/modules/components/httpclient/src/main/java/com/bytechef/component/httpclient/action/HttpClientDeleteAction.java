@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class HttpClientDeleteAction {
 
-    public static final ActionDefinition DELETE_ACTION = action(DELETE)
+    public static final ActionDefinition ACTION_DEFINITION = action(DELETE)
         .display(display("DELETE").description("The request method to use."))
         .properties(
             HttpClientUtils.toArray(

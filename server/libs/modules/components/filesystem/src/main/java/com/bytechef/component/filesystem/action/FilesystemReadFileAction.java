@@ -39,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemReadFileAction {
 
-    public static final ActionDefinition READ_FILE_ACTION = action(READ_FILE)
+    public static final ActionDefinition ACTION_DEFINITION = action(READ_FILE)
         .display(display("Read from file"))
         .properties(string(FILENAME)
             .label("Filename")

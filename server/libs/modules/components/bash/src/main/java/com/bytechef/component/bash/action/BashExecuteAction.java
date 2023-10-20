@@ -45,7 +45,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class BashExecuteAction {
 
-    public static final ActionDefinition EXECUTE_ACTION = action(EXECUTE)
+    public static final ActionDefinition ACTION_DEFINITION = action(EXECUTE)
         .display(display("Execute").description("Executes the script."))
         .properties(string(SCRIPT)
             .label("Script")

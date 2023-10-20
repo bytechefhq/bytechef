@@ -41,7 +41,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class FilesystemLsAction {
 
-    public static final ActionDefinition LS_ACTION = action(LS)
+    public static final ActionDefinition ACTION_DEFINITION = action(LS)
         .display(display("List")
             .description("Lists a content of directory for the given path."))
         .perform(FilesystemLsAction::performLs);

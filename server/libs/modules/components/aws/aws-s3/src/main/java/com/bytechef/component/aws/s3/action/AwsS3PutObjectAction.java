@@ -45,7 +45,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3PutObjectAction {
 
-    public static final ActionDefinition PUT_OBJECT_ACTION = action(PUT_OBJECT)
+    public static final ActionDefinition ACTION_DEFINITION = action(PUT_OBJECT)
         .display(display("Put Object").description("Store an object to AWS S3."))
         .properties(
             string(URI)

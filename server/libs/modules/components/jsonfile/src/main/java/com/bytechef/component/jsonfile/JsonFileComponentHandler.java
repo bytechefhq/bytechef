@@ -34,8 +34,8 @@ public class JsonFileComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(JSON_FILE)
         .display(display("JSON File").description("Reads and writes data from a JSON file."))
         .actions(
-            JsonFileReadAction.READ_ACTION,
-            JsonFileWriteAction.WRITE_ACTION);
+            JsonFileReadAction.ACTION_DEFINITION,
+            JsonFileWriteAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -38,7 +38,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class FilesystemRmAction {
 
-    public static final ActionDefinition RM_ACTION = action(RM)
+    public static final ActionDefinition ACTION_DEFINITION = action(RM)
         .display(display("Remove").description("Removes the content of a directory."))
         .perform(FilesystemRmAction::performRm);
 

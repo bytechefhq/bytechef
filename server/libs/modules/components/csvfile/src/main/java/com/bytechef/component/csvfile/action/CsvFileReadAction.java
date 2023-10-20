@@ -64,7 +64,7 @@ public class CsvFileReadAction {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
 
-    public static final ActionDefinition READ_ACTION = action(READ)
+    public static final ActionDefinition ACTION_DEFINITION = action(READ)
         .display(display("Read from file").description("Reads data from a csv file."))
         .properties(
             fileEntry(FILE_ENTRY)

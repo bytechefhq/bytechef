@@ -35,9 +35,9 @@ public class FileStorageComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILE_STORAGE)
         .display(display("File Storage").description("Reads and writes data from a file"))
         .actions(
-            FileStorageReadAction.READ_ACTION,
-            FileStorageWriteAction.WRITE_ACTION,
-            FileStorageDownloadAction.DOWNLOAD_ACTION);
+            FileStorageReadAction.ACTION_DEFINITION,
+            FileStorageWriteAction.ACTION_DEFINITION,
+            FileStorageDownloadAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

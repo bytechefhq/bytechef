@@ -47,7 +47,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FileStorageDownloadAction {
 
-    public static final ActionDefinition DOWNLOAD_ACTION = action(DOWNLOAD)
+    public static final ActionDefinition ACTION_DEFINITION = action(DOWNLOAD)
         .display(display("Download file").description("Download thr file from the URL."))
         .properties(
             string(FileStorageConstants.URL)
