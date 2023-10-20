@@ -38,9 +38,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
+    })
 @EnableAutoConfiguration
 @Import({
     WorkflowRepositoryConfiguration.class
