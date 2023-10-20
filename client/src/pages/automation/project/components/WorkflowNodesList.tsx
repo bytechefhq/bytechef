@@ -31,7 +31,7 @@ const WorkflowNodesListItem = ({
         <li
             className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable={draggable}
-            id={node.display?.label}
+            id={node.display?.title}
             onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
         >
@@ -39,7 +39,7 @@ const WorkflowNodesListItem = ({
 
             <div className="flex flex-col">
                 <p className="text-sm font-medium text-gray-900">
-                    {node.display?.label}
+                    {node.display?.title}
                 </p>
 
                 <p className="line-clamp-2 text-left text-xs text-gray-500">

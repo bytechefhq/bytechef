@@ -38,7 +38,7 @@ export default function useHandleDrop(): [
                 icon: droppedNode.display?.icon || (
                     <PlayIcon className="h-8 w-8 text-gray-700" />
                 ),
-                label: droppedNode.display?.label,
+                label: droppedNode.display?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
             },
             type: 'workflow',
@@ -116,7 +116,7 @@ export default function useHandleDrop(): [
                 icon: droppedNode.display?.icon || (
                     <PlayIcon className="h-8 w-8 text-gray-700" />
                 ),
-                label: droppedNode.display?.label,
+                label: droppedNode.display?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
             },
             id: getRandomId(),

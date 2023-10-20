@@ -183,7 +183,7 @@ const ConnectionDialog = ({
                           : []),
                       ...connectionDefinition.authorizations.map(
                           (authorization) => ({
-                              label: authorization?.display?.label as string,
+                              label: authorization?.display?.title as string,
                               value: authorization.name as string,
                           })
                       ),
@@ -613,7 +613,7 @@ const ConnectionDialog = ({
                                                 {
                                                     connectionDefinition
                                                         ?.componentDisplay
-                                                        ?.label
+                                                        ?.title
                                                 }
                                             </span>
                                             {` connection under name `}

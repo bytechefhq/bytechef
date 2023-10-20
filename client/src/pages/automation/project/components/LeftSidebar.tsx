@@ -31,7 +31,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({data, filter}): JSX.Element => {
                     component.name
                         ?.toLowerCase()
                         .includes(filter.toLowerCase()) ||
-                    component.display?.label
+                    component.display?.title
                         ?.toLowerCase()
                         .includes(filter.toLowerCase())
             )
@@ -43,7 +43,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({data, filter}): JSX.Element => {
                     flowControl.name
                         ?.toLowerCase()
                         .includes(filter.toLowerCase()) ||
-                    flowControl.display?.label
+                    flowControl.display?.title
                         ?.toLowerCase()
                         .includes(filter.toLowerCase())
             )

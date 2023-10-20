@@ -102,7 +102,7 @@ const NodeDetailsDialog = () => {
 
                                             <div className="overflow-hidden rounded-md bg-gray-100 py-2">
                                                 <span className="inline-flex px-4 text-sm font-medium">
-                                                    {firstAction.display.label}
+                                                    {firstAction.display.title}
                                                 </span>
 
                                                 <p className="mt-1 line-clamp-2 w-full overflow-hidden px-4 text-xs text-gray-500">
@@ -120,7 +120,7 @@ const NodeDetailsDialog = () => {
                                             options={currentComponent?.actions.map(
                                                 (action) => ({
                                                     label: action.display
-                                                        .label!,
+                                                        .title!,
                                                     value: action.name,
                                                     description:
                                                         action.display
