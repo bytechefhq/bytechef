@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-26T09:25:21.049913+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-06T21:22:56.917741+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "jobs", description = "the jobs API")
 public interface JobsApi {
@@ -63,14 +63,14 @@ public interface JobsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<JobModel>> getJob(
-        @Parameter(name = "id", description = "The id of the job to return.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to return.", required = true) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"outputs\" : { \"key\" : \"{}\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 0, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"parentTaskExecutionId\" : \"parentTaskExecutionId\", \"webhooks\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"startTime\" : \"2000-01-23T04:56:07.000+00:00\", \"endTime\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : \"id\", \"workflowId\" : \"workflowId\", \"status\" : \"CREATED\" }";
+                String exampleString = "{ \"outputs\" : { \"key\" : \"{}\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 0, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"parentTaskExecutionId\" : 6, \"webhooks\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"startTime\" : \"2000-01-23T04:56:07.000+00:00\", \"endTime\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : \"id\", \"workflowId\" : \"workflowId\", \"status\" : \"CREATED\" }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -103,7 +103,7 @@ public interface JobsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-        @Parameter(name = "id", description = "The id of the job to return task executions for.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to return task executions for.", required = true) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -188,7 +188,7 @@ public interface JobsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"outputs\" : { \"key\" : \"{}\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 0, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"parentTaskExecutionId\" : \"parentTaskExecutionId\", \"webhooks\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"startTime\" : \"2000-01-23T04:56:07.000+00:00\", \"endTime\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : \"id\", \"workflowId\" : \"workflowId\", \"status\" : \"CREATED\" }";
+                String exampleString = "{ \"outputs\" : { \"key\" : \"{}\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 0, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"parentTaskExecutionId\" : 6, \"webhooks\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"startTime\" : \"2000-01-23T04:56:07.000+00:00\", \"endTime\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : \"id\", \"workflowId\" : \"workflowId\", \"status\" : \"CREATED\" }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -229,7 +229,7 @@ public interface JobsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"jobId\" : \"jobId\" }";
+                String exampleString = "{ \"jobId\" : 0 }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -259,7 +259,7 @@ public interface JobsApi {
         value = "/jobs/{id}/restart"
     )
     default Mono<ResponseEntity<Void>> restartJob(
-        @Parameter(name = "id", description = "The id of the job to restart.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to restart.", required = true) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -289,7 +289,7 @@ public interface JobsApi {
         value = "/jobs/{id}/stop"
     )
     default Mono<ResponseEntity<Void>> stopJob(
-        @Parameter(name = "id", description = "The id of the job to stop.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to stop.", required = true) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();

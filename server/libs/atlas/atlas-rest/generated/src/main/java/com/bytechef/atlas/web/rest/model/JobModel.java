@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-26T09:25:21.049913+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-06T21:22:56.917741+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -71,7 +71,7 @@ public class JobModel {
   private Map<String, Object> outputs = null;
 
   @JsonProperty("parentTaskExecutionId")
-  private String parentTaskExecutionId;
+  private Long parentTaskExecutionId;
 
   @JsonProperty("priority")
   private Integer priority;
@@ -356,7 +356,7 @@ public class JobModel {
     this.outputs = outputs;
   }
 
-  public JobModel parentTaskExecutionId(String parentTaskExecutionId) {
+  public JobModel parentTaskExecutionId(Long parentTaskExecutionId) {
     this.parentTaskExecutionId = parentTaskExecutionId;
     return this;
   }
@@ -367,11 +367,11 @@ public class JobModel {
   */
   
   @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", required = false)
-  public String getParentTaskExecutionId() {
+  public Long getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
 
-  public void setParentTaskExecutionId(String parentTaskExecutionId) {
+  public void setParentTaskExecutionId(Long parentTaskExecutionId) {
     this.parentTaskExecutionId = parentTaskExecutionId;
   }
 
