@@ -519,6 +519,10 @@ public final class TaskExecution
         this.taskNumber = taskNumber;
     }
 
+    public void setWorkflowTask(WorkflowTask workflowTask) {
+        this.workflowTask = workflowTask;
+    }
+
     @Override
     public String toString() {
         return "TaskExecution{" + "createdBy='"

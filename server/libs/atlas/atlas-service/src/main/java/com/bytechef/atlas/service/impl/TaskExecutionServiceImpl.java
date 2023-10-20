@@ -89,6 +89,10 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
             taskExecution.setStartTime(currentTaskExecution.getStartTime());
         }
 
+        // Do not override initial workflow task definition
+
+        taskExecution.setWorkflowTask(currentTaskExecution.getWorkflowTask());
+
         return taskExecutionRepository.save(taskExecution);
     }
 }
