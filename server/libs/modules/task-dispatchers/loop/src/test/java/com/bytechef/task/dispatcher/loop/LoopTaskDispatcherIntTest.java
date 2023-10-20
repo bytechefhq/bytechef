@@ -17,8 +17,13 @@
 
 package com.bytechef.task.dispatcher.loop;
 
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -69,7 +74,7 @@ public class LoopTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_1".getBytes(StandardCharsets.UTF_8)),
-            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(2, 11)
@@ -83,7 +88,7 @@ public class LoopTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_2".getBytes(StandardCharsets.UTF_8)),
-            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(1, 10)
@@ -99,7 +104,7 @@ public class LoopTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_3".getBytes(StandardCharsets.UTF_8)),
-            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 13)
@@ -113,7 +118,7 @@ public class LoopTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_4".getBytes(StandardCharsets.UTF_8)),
-            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -127,7 +132,7 @@ public class LoopTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_5".getBytes(StandardCharsets.UTF_8)),
-            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -141,7 +146,7 @@ public class LoopTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_6".getBytes(StandardCharsets.UTF_8)),
-            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(3, 8)
@@ -150,27 +155,30 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar2"));
     }
 
-    private TaskDispatcherWorkflowTestSupport.TaskCompletionHandlersFunction getTaskCompletionHandlers() {
-        return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
-            new IfTaskCompletionHandler(
+    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
+        CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new IfTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
-            new LoopTaskCompletionHandler(
+            (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
-            new SequenceTaskCompletionHandler(
+            (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private static TaskDispatcherWorkflowTestSupport.TaskDispatcherResolversFunction getTaskDispatcherResolvers() {
-        return (
-            contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
-            taskExecutionService) -> List.of(
-                new IfTaskDispatcher(
-                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
-                new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
-                new LoopTaskDispatcher(
-                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
-                new SequenceTaskDispatcher(
-                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
+        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskDispatcher) -> new IfTaskDispatcher(
+                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+            (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
+            (taskDispatcher) -> new LoopTaskDispatcher(
+                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+            (taskDispatcher) -> new SequenceTaskDispatcher(
+                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
     private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {

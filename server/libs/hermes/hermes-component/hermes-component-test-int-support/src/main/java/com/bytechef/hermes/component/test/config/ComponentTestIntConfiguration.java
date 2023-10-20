@@ -120,6 +120,16 @@ public class ComponentTestIntConfiguration {
     public static class WorkflowExecutorConfiguration {
 
         @Bean
+        ComponentWorkflowTestSupport componentWorkflowTestSupport(
+            ContextService contextService, EventPublisher eventPublisher, JobService jobService,
+            TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+            WorkflowService workflowService) {
+
+            return new ComponentWorkflowTestSupport(
+                contextService, jobService, eventPublisher, taskExecutionService, taskHandlerMap, workflowService);
+        }
+
+        @Bean
         ContextService contextService() {
             return new ContextServiceImpl(new InMemoryContextRepository());
         }
@@ -149,16 +159,6 @@ public class ComponentTestIntConfiguration {
         WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
             return new WorkflowServiceImpl(
                 new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
-        }
-
-        @Bean
-        ComponentWorkflowTestSupport workflowSyncExecutor(
-            ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-            TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-            WorkflowService workflowService) {
-
-            return new ComponentWorkflowTestSupport(
-                contextService, jobService, eventPublisher, taskExecutionService, taskHandlerMap, workflowService);
         }
     }
 }

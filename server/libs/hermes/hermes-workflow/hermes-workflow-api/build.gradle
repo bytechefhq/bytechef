@@ -3,7 +3,7 @@ dependencies {
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.springframework:spring-context"
-    implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+    implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
     implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-memory")
     implementation project(":server:libs:atlas:atlas-service")

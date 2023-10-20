@@ -108,6 +108,15 @@ public class TaskDispatcherIntTestConfiguration {
         }
 
         @Bean
+        TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
+            ContextService contextService, CounterService counterService, EventPublisher eventPublisher,
+            JobService jobService, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+
+            return new TaskDispatcherWorkflowTestSupport(
+                contextService, counterService, jobService, eventPublisher, taskExecutionService, workflowService);
+        }
+
+        @Bean
         TaskExecutionService taskExecutionService() {
             return new TaskExecutionServiceImpl(taskExecutionRepository());
         }
@@ -121,15 +130,6 @@ public class TaskDispatcherIntTestConfiguration {
         WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
             return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(),
                 workflowRepositories);
-        }
-
-        @Bean
-        TaskDispatcherWorkflowTestSupport workflowSyncExecutor(
-            ContextService contextService, CounterService counterService, EventPublisher eventPublisher,
-            JobService jobService, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
-
-            return new TaskDispatcherWorkflowTestSupport(
-                contextService, counterService, jobService, eventPublisher, taskExecutionService, workflowService);
         }
     }
 }
