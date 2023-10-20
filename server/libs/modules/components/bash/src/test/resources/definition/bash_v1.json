@@ -11,18 +11,18 @@
         "label": "Execute"
       },
       "name": "execute",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "Script written in bash.",
           "label": "Script",
           "name": "script",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "ANY"
+          "required": true,
+          "type": "STRING"
         }
       ]
     }

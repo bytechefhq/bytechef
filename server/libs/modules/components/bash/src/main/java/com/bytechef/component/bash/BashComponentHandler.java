@@ -16,13 +16,14 @@
 
 package com.bytechef.component.bash;
 
+import static com.bytechef.component.bash.constants.BashConstants.BASH;
+import static com.bytechef.component.bash.constants.BashConstants.EXECUTE;
+import static com.bytechef.component.bash.constants.BashConstants.SCRIPT;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.createComponent;
 import static com.bytechef.hermes.component.ComponentDSL.display;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 
-import com.bytechef.component.bash.constants.BashConstants;
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -48,15 +49,15 @@ public class BashComponentHandler implements ComponentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(BashComponentHandler.class);
 
-    private ComponentDefinition componentDefinition = createComponent(BashConstants.BASH)
+    private ComponentDefinition componentDefinition = createComponent(BASH)
             .display(display("Bash").description("Allows you to run arbitrary Bash scripts."))
-            .actions(action(BashConstants.EXECUTE)
+            .actions(action(EXECUTE)
                     .display(display("Execute").description("Executes the script."))
-                    .inputs(string(BashConstants.SCRIPT)
+                    .properties(string(SCRIPT)
                             .label("Script")
                             .description("Script written in bash.")
                             .required(true))
-                    .outputSchema(ComponentDSL.any())
+                    .output(string())
                     .performFunction(this::performExecute));
 
     @Override
