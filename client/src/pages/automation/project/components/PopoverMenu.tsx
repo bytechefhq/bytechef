@@ -25,7 +25,7 @@ const PopoverMenu = ({children, id, edge = false}: PopoverMenuProps) => {
                     sideOffset={4}
                     side="right"
                     // eslint-disable-next-line tailwindcss/no-custom-classname
-                    className="relative w-96 animate-slide-down rounded-lg bg-white shadow-md will-change-auto dark:bg-gray-800"
+                    className="relative w-112 animate-slide-down rounded-lg bg-white shadow-md will-change-auto dark:bg-gray-800"
                 >
                     <Arrow className="fill-current text-white dark:text-gray-800" />
 

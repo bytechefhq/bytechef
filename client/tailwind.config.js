@@ -152,6 +152,9 @@ module.exports = {
                 'span-24': 'span 24 / span 24',
                 24: '24 / 24',
             },
+            width: {
+                112: '30rem',
+            },
         },
     },
     variants: {
