@@ -57,6 +57,11 @@ public class ProjectInstanceWorkflowServiceImpl
     }
 
     @Override
+    public void delete(Long id) {
+        projectInstanceWorkflowRepository.deleteById(id);
+    }
+
+    @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
         String workflowConnectionOperationName, String workflowConnectionKey) {
 

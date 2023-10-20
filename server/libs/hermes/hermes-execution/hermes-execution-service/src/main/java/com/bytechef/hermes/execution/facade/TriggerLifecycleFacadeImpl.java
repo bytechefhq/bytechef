@@ -54,7 +54,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
     @Override
     public void executeTriggerDisable(
         String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, Long connectionId) {
 
         ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
 
@@ -82,14 +82,13 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
                 componentOperation.operationName(), triggerParameters,
                 workflowExecutionId.toString(), connectionId);
             case POLLING -> triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
-            default -> throw new IllegalArgumentException("Invalid trigger type");
         }
     }
 
     @Override
     public void executeTriggerEnable(
         String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
+        Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
 
@@ -122,7 +121,6 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
                 componentOperation.componentName(), componentOperation.componentVersion(),
                 componentOperation.operationName(), triggerParameters, workflowExecutionId.toString(), connectionId);
             case POLLING -> triggerScheduler.schedulePollingTrigger(workflowExecutionId);
-            default -> throw new IllegalArgumentException("Invalid trigger type");
         }
     }
 }
