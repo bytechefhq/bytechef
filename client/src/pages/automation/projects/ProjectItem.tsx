@@ -5,7 +5,7 @@ import DropdownMenu, {
 import {ProjectModel, StatusModel, TagModel} from '../../../middleware/project';
 import {
     useDeleteProjectMutation,
-    useCreateProjectMutation,
+    useDuplicateProjectMutation,
     useUpdateProjectTagsMutation,
 } from '../../../mutations/projects.mutations';
 import {ProjectKeys} from '../../../queries/projects.queries';
@@ -13,7 +13,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
 import ProjectDialog from './ProjectDialog';
-import duplicate from './utils/duplicate';
 import Name from './components/Name';
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import WorkflowDialog from './WorkflowDialog';
@@ -21,15 +20,10 @@ import TagList from '../../../components/TagList/TagList';
 
 interface ProjectItemProps {
     project: ProjectModel;
-    projectNames: string[];
     remainingTags?: TagModel[];
 }
 
-const ProjectItem = ({
-    project,
-    remainingTags,
-    projectNames,
-}: ProjectItemProps) => {
+const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -44,7 +38,7 @@ const ProjectItem = ({
         {
             label: 'Duplicate',
             onClick: () => {
-                duplicate(project!, projectNames, createProjectMutation);
+                duplicateProjectMutation.mutate(project.id!);
             },
         },
         {
@@ -65,21 +59,17 @@ const ProjectItem = ({
 
     const queryClient = useQueryClient();
 
-    const createProjectMutation = useCreateProjectMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
-
-            queryClient.invalidateQueries(ProjectKeys.projectCategories);
-
-            queryClient.invalidateQueries(ProjectKeys.projectTags);
-        },
-    });
-
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projects);
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
             queryClient.invalidateQueries(ProjectKeys.projectTags);
+        },
+    });
+
+    const duplicateProjectMutation = useDuplicateProjectMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(ProjectKeys.projects);
         },
     });
 

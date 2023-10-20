@@ -63,9 +63,6 @@ const ProjectList = () => {
                                     <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
                                         <ProjectItem
                                             project={project}
-                                            projectNames={projects.map(
-                                                (project) => project.name
-                                            )}
                                             key={project.id}
                                             remainingTags={tags?.filter(
                                                 (tag) =>
