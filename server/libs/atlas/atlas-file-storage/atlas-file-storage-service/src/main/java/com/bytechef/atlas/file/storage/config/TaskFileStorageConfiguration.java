@@ -17,8 +17,8 @@
 
 package com.bytechef.atlas.file.storage.config;
 
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
@@ -38,45 +38,46 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(FilesystemFileStorageProperties.class)
-public class WorkflowFileStorageConfiguration {
+public class TaskFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowFileStorageConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskFileStorageConfiguration.class);
 
     private final FilesystemFileStorageProperties filesystemFileStorageProperties;
 
     @SuppressFBWarnings("EI")
-    public WorkflowFileStorageConfiguration(FilesystemFileStorageProperties filesystemFileStorageProperties) {
+    public TaskFileStorageConfiguration(FilesystemFileStorageProperties filesystemFileStorageProperties) {
         this.filesystemFileStorageProperties = filesystemFileStorageProperties;
     }
 
     @Bean
     @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
-    WorkflowFileStorageFacade workflowAsyncFileStorageFacade(
+    TaskFileStorageFacade workflowAsyncTaskFileStorageFacade(
         ObjectMapper objectMapper,
         @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
             logger.info(
-                "Workflow async output storage provider type enabled: %s".formatted(
+                "Workflow async task output storage provider type enabled: %s".formatted(
                     workflowAsyncOutputStorageProvider));
         }
 
-        return new WorkflowFileStorageFacadeImpl(
+        return new TaskFileStorageFacadeImpl(
             getFileStorageService(workflowAsyncOutputStorageProvider), objectMapper);
     }
 
     @Bean
     @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
-    WorkflowFileStorageFacade workflowSyncFileStorageFacade(
+    TaskFileStorageFacade workflowSyncTaskFileStorageFacade(
         ObjectMapper objectMapper,
         @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
             logger.info(
-                "Workflow sync output storage provider type enabled: %s".formatted(workflowSyncOutputStorageProvider));
+                "Workflow sync task output storage provider type enabled: %s".formatted(
+                    workflowSyncOutputStorageProvider));
         }
 
-        return new WorkflowFileStorageFacadeImpl(
+        return new TaskFileStorageFacadeImpl(
             getFileStorageService(workflowSyncOutputStorageProvider), objectMapper);
     }
 

@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowFileStorageFacade {
+public interface TaskFileStorageFacade {
 
     Map<String, ?> readContextValue(@NonNull FileEntry fileEntry);
 

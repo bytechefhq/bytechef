@@ -21,10 +21,12 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.WritingConverter;
 
 /**
  * @author Ivica Cardic
  */
+@WritingConverter
 public class FileEntryToStringConverter implements Converter<FileEntry, String> {
 
     private final ObjectMapper objectMapper;

@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.subflow.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -51,10 +51,10 @@ public class SubflowTaskDispatcherConfiguration {
         SubflowJobStatusEventListener subflowJobStatusEventListener(
             ApplicationEventPublisher eventPublisher, JobService jobService,
             TaskExecutionService taskExecutionService,
-            @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
+            @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade) {
 
             return new SubflowJobStatusEventListener(
-                eventPublisher, jobService, taskExecutionService, workflowFileStorageFacade);
+                eventPublisher, jobService, taskExecutionService, taskFileStorageFacade);
         }
     }
 }

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowFileStorageFacadeTest {
+public class TriggerFileStorageFacadeTest {
 
     @Disabled
     @Test

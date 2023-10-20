@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":server:libs:helios:helios-execution:helios-execution-rest"))
     implementation(project(":server:libs:helios:helios-execution:helios-execution-service"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-service"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-service"))
     implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-impl"))
     implementation(project(":server:libs:core:liquibase-config"))
 

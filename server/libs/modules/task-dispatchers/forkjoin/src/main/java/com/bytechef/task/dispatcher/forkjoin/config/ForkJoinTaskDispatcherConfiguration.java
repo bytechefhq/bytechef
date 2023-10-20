@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.forkjoin.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -47,8 +47,8 @@ public class ForkJoinTaskDispatcherConfiguration {
     private CounterService counterService;
 
     @Autowired
-    @Qualifier("workflowAsyncFileStorageFacade")
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    @Qualifier("workflowAsyncTaskFileStorageFacade")
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @Autowired
     private TaskExecutionService taskExecutionService;
@@ -57,13 +57,13 @@ public class ForkJoinTaskDispatcherConfiguration {
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
             taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
-            workflowFileStorageFacade);
+            taskFileStorageFacade);
     }
 
     @Bean("forkJoinTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory forkTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ForkJoinTaskDispatcher(
             eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-            workflowFileStorageFacade);
+            taskFileStorageFacade);
     }
 }

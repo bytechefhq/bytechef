@@ -26,7 +26,7 @@ import com.bytechef.atlas.coordinator.event.JobStartEvent;
 import com.bytechef.atlas.coordinator.event.JobStopEvent;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
@@ -46,18 +46,18 @@ public class JobFacadeImpl implements JobFacade {
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final JobService jobService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+        TaskFileStorageFacade taskFileStorageFacade, WorkflowService workflowService) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.jobService = jobService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
         this.workflowService = workflowService;
     }
 
@@ -75,7 +75,7 @@ public class JobFacadeImpl implements JobFacade {
 
         contextService.push(
             jobId, Context.Classname.JOB,
-            workflowFileStorageFacade.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
+            taskFileStorageFacade.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
 
         eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
         eventPublisher.publishEvent(new JobStartEvent(jobId));

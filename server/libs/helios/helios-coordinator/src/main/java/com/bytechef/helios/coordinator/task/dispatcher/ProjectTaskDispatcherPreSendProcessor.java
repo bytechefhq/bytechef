@@ -73,11 +73,11 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
 
-        Long projectInstanceId = (Long) job.getMetadata(MetadataConstants.INSTANCE_ID);
+        Number projectInstanceId = (Number) job.getMetadata(MetadataConstants.INSTANCE_ID);
 
         if (projectInstanceId != null) {
             taskExecution
-                .putMetadata(MetadataConstants.INSTANCE_ID, projectInstanceId)
+                .putMetadata(MetadataConstants.INSTANCE_ID, projectInstanceId.longValue())
                 .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT_TYPE);
         }
 

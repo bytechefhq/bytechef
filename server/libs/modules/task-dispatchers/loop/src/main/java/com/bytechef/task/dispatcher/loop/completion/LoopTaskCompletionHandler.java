@@ -27,7 +27,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -52,19 +52,19 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public LoopTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskFileStorageFacade taskFileStorageFacade) {
 
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
-                workflowFileStorageFacade.readContextValue(
+                taskFileStorageFacade.readContextValue(
                     contextService.peek(
                         Validate.notNull(loopTaskExecution.getId(), "parentId"), Classname.TASK_EXECUTION)));
 
@@ -125,7 +125,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(
                 Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                workflowFileStorageFacade.storeContextValue(
+                taskFileStorageFacade.storeContextValue(
                     Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, newContext));
 
             taskDispatcher.dispatch(subTaskExecution);

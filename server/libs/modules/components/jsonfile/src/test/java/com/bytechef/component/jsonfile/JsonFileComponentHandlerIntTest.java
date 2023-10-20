@@ -18,7 +18,7 @@
 package com.bytechef.component.jsonfile;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -57,7 +57,7 @@ public class JsonFileComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private WorkflowFileStorageFacade workflowFileStorageFacade;
+    private TaskFileStorageFacade taskFileStorageFacade;
 
     @Test
     public void testRead() throws JSONException {
@@ -75,7 +75,7 @@ public class JsonFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
 
         JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
@@ -95,7 +95,7 @@ public class JsonFileComponentHandlerIntTest {
             .isEqualTo(Job.Status.COMPLETED);
 
         FileEntry fileEntry = MapUtils.get(
-            workflowFileStorageFacade.readJobOutputs(job.getOutputs()), "writeJSONFile", FileEntry.class);
+            taskFileStorageFacade.readJobOutputs(job.getOutputs()), "writeJSONFile", FileEntry.class);
 
         Assertions.assertThat(fileEntry.getName())
             .isEqualTo("file.json");

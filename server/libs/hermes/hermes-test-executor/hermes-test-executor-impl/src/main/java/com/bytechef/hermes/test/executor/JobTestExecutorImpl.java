@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
@@ -43,19 +43,19 @@ public class JobTestExecutorImpl implements JobTestExecutor {
     private final ContextService contextService;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public JobTestExecutorImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
         JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskFileStorageFacade taskFileStorageFacade) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     @Override
@@ -64,17 +64,17 @@ public class JobTestExecutorImpl implements JobTestExecutor {
 
         return new JobDTO(
             job,
-            workflowFileStorageFacade.readContextValue(job.getOutputs()),
+            taskFileStorageFacade.readContextValue(job.getOutputs()),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
                 taskExecution -> new TaskExecutionDTO(
                     getComponentDefinition(taskExecution),
-                    workflowFileStorageFacade.readContextValue(
+                    taskFileStorageFacade.readContextValue(
                         contextService.peek(
                             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                     taskExecution.getOutput() == null
                         ? null
-                        : workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
+                        : taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
                     taskExecution)));
     }
 

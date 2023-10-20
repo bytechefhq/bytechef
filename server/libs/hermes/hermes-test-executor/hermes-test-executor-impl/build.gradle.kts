@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-service"))
     implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))

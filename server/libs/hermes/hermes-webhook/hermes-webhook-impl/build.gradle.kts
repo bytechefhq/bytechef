@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-instance-api"))
     implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-api"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
+    implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api"))
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-api"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))

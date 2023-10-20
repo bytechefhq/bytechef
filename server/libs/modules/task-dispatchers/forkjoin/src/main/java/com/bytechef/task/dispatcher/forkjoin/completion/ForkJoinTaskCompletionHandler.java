@@ -23,7 +23,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -62,21 +62,21 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     private final CounterService counterService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
-    private final WorkflowFileStorageFacade workflowFileStorageFacade;
+    private final TaskFileStorageFacade taskFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public ForkJoinTaskCompletionHandler(
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
         CounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
         ContextService contextService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        TaskFileStorageFacade taskFileStorageFacade) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
         this.taskDispatcher = taskDispatcher;
         this.contextService = contextService;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
+        this.taskFileStorageFacade = taskFileStorageFacade;
     }
 
     @Override
@@ -97,16 +97,16 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
             Map<String, Object> newContext = new HashMap<>(
-                workflowFileStorageFacade.readContextValue(
+                taskFileStorageFacade.readContextValue(
                     contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION)));
 
             newContext.put(
                 taskExecution.getName(),
-                workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
+                taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
 
             contextService.push(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION,
-                workflowFileStorageFacade.storeContextValue(
+                taskFileStorageFacade.storeContextValue(
                     taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION, newContext));
         }
 
@@ -139,7 +139,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                             branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, branch))))
                 .build();
 
-            Map<String, ?> context = workflowFileStorageFacade.readContextValue(
+            Map<String, ?> context = taskFileStorageFacade.readContextValue(
                 contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION));
 
             branchTaskExecution.evaluate(context);
@@ -148,7 +148,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(
                 Validate.notNull(branchTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                workflowFileStorageFacade.storeContextValue(
+                taskFileStorageFacade.storeContextValue(
                     Validate.notNull(branchTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(branchTaskExecution);

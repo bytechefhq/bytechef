@@ -24,8 +24,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -67,7 +67,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         }
     };
 
-    private final WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
+    private final TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
         new Base64FileStorageService(), objectMapper);
 
     @Test
@@ -162,7 +162,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             Executors.newSingleThreadExecutor(),
-            taskHandlerResolver, workflowFileStorageFacade);
+            taskHandlerResolver, taskFileStorageFacade);
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
 

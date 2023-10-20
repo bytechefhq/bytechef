@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.worker;
 
+import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
 import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
@@ -60,21 +61,23 @@ public class TriggerWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final ApplicationEventPublisher eventPublisher;
+    private final TriggerFileStorageFacade triggerFileStorageFacade;
     private final TriggerWorkerExecutor triggerWorkerExecutor;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
     private final TriggerHandlerResolver triggerHandlerResolver;
 
     public TriggerWorker(
-        ApplicationEventPublisher eventPublisher, TriggerWorkerExecutor executorService,
-        TriggerHandlerResolver triggerHandlerResolver) {
+        ApplicationEventPublisher eventPublisher, TriggerFileStorageFacade triggerFileStorageFacade,
+        TriggerWorkerExecutor executorService, TriggerHandlerResolver triggerHandlerResolver) {
 
         this.eventPublisher = eventPublisher;
+        this.triggerFileStorageFacade = triggerFileStorageFacade;
         this.triggerWorkerExecutor = executorService;
         this.triggerHandlerResolver = triggerHandlerResolver;
     }
 
     public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
-        logger.debug("Received trigger execution event: {}", triggerExecutionEvent);
+        logger.debug("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
 
         TriggerExecution triggerExecution = triggerExecutionEvent.getTriggerExecution();
         CountDownLatch latch = new CountDownLatch(1);
@@ -126,7 +129,7 @@ public class TriggerWorker {
         if (event instanceof CancelControlTriggerEvent cancelControlTriggerEvent) {
             CancelControlTrigger cancelControlTrigger = cancelControlTriggerEvent.getControlTrigger();
 
-            logger.debug("Received cancel control trigger: {}", cancelControlTrigger);
+            logger.debug("onCancelControlTriggerEvent: cancelControlTrigger={}", cancelControlTrigger);
 
             long id = cancelControlTrigger.getTriggerExecutionId();
 
@@ -151,7 +154,9 @@ public class TriggerWorker {
             triggerExecution.setState(null);
         } else {
             triggerExecution.setBatch(triggerOutput.batch());
-            triggerExecution.setOutput(triggerOutput.value());
+            triggerExecution.setOutput(
+                triggerFileStorageFacade.storeTriggerExecutionOutput(
+                    Validate.notNull(triggerExecution.getId(), "id"), triggerOutput.value()));
             triggerExecution.setState(triggerOutput.state());
         }
 
