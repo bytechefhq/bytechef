@@ -30,12 +30,12 @@ public interface IntegrationService {
 
     Integration create(String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
 
-    void delete(Long id);
+    void delete(long id);
 
-    Integration getIntegration(Long id);
+    Integration getIntegration(long id);
 
     List<Integration> getIntegrations();
 
     Integration update(
-        Long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
+        long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
 }
