@@ -81,7 +81,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
                     job.setStartDate(LocalDateTimeUtils.getLocalDateTime(startDateTimestamp));
                 }
 
-                job.setStatus(Job.Status.valueOf(rs.getString("status")));
+                job.setStatus(Job.Status.valueOf(rs.getInt("status")));
                 job.setWorkflowId(rs.getString("workflow_id"));
 
                 return job;
