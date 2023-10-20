@@ -73,9 +73,7 @@ public class JobController implements JobsApi {
 
         return jobParametersModelMono
             .map(jobParametersModel -> new CreateJob200ResponseModel()
-                .jobId(
-                    jobFactory.create(
-                        conversionService.convert(jobParametersModel, JobParameters.class))))
+                .jobId(jobFactory.create(conversionService.convert(jobParametersModel, JobParameters.class))))
             .map(ResponseEntity::ok);
     }
 
