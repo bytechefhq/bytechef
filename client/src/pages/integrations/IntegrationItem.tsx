@@ -20,6 +20,7 @@ import TagList from './components/TagList';
 import duplicate from './utils/duplicate';
 import Name from './components/Name';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
+import WorkflowModal from './WorkflowModal';
 
 interface IntegrationItemProps {
     integration: IntegrationModel;
@@ -34,6 +35,7 @@ const IntegrationItem = ({
 }: IntegrationItemProps) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showWorkflowModal, setShowWorkflowModal] = useState(false);
 
     const dropdownItems: DropdownMenuItemProps[] = [
         {
@@ -54,6 +56,9 @@ const IntegrationItem = ({
         },
         {
             label: 'New Workflow',
+            onClick: (id: number, event: React.MouseEvent) => {
+                setShowWorkflowModal(true);
+            },
         },
         {
             separator: true,
@@ -189,8 +194,15 @@ const IntegrationItem = ({
                     }}
                 />
             )}
+
+            {showWorkflowModal && (
+                <WorkflowModal id={id} visible version={undefined} />
+            )}
         </>
     );
 };
 
 export default IntegrationItem;
+function setShowTrigger(arg0: boolean) {
+    throw new Error('Function not implemented.');
+}

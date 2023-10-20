@@ -31,6 +31,7 @@ import {
     useGetIntegrationQuery,
     useGetIntegrationWorkflowsQuery,
 } from '../../queries/integrations';
+import WorkflowModal from 'pages/integrations/WorkflowModal';
 
 const headerToggleItems: ToggleItem[] = [
     {
@@ -85,6 +86,8 @@ const Integration: React.FC = () => {
         integrationWorkflowsLoading,
         integration,
     ]);
+
+    const [showWorkflowModal, setShowWorkflowModal] = useState<boolean>(false);
 
     return (
         <>
@@ -151,11 +154,17 @@ const Integration: React.FC = () => {
                                                 <PlusIcon className="h-5 w-5" />
                                             }
                                             size="small"
+                                            onClick={() =>
+                                                setShowWorkflowModal(true)
+                                            }
                                         />
                                     </div>
                                 </div>
                             </div>
 
+                            {showWorkflowModal && (
+                                <WorkflowModal visible version={undefined} />
+                            )}
                             <div>
                                 <ToggleGroup
                                     defaultValue="designer"

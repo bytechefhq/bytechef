@@ -21,6 +21,7 @@ interface ModalProps {
     isOpen: boolean;
     title: string;
     triggerLabel?: string;
+    description?: string;
     setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
