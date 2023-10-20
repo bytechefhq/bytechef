@@ -7,8 +7,8 @@ package com.bytechef.hermes.integration.web.rest;
 
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
-import java.util.List;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
+import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import com.bytechef.hermes.integration.web.rest.model.TagModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-20T23:05:10.694831+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-08T13:23:46.808411+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "the integrations API")
 public interface IntegrationsApi {
@@ -401,7 +401,7 @@ public interface IntegrationsApi {
      * Updates tags of an existing integration.
      *
      * @param id The id of the integration. (required)
-     * @param tagModel  (required)
+     * @param putIntegrationTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -419,12 +419,12 @@ public interface IntegrationsApi {
     )
     default Mono<ResponseEntity<Void>> putIntegrationTags(
         @Parameter(name = "id", description = "The id of the integration.", required = true) @PathVariable("id") Long id,
-        @Parameter(name = "TagModel", description = "", required = true) @Valid @RequestBody Flux<TagModel> tagModel,
+        @Parameter(name = "PutIntegrationTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<PutIntegrationTagsRequestModel> putIntegrationTagsRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.thenMany(tagModel).then(Mono.empty());
+        return result.then(putIntegrationTagsRequestModel).then(Mono.empty());
 
     }
 
