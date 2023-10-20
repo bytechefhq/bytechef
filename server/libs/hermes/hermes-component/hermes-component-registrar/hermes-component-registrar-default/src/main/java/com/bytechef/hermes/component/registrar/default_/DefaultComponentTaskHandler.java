@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.standard;
+package com.bytechef.hermes.component.registrar.default_;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
@@ -22,33 +22,38 @@ import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.PerformFunction;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.impl.ContextImpl;
 import com.bytechef.hermes.component.impl.ExecutionParametersImpl;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
  */
-public class StandardComponentTaskHandler implements TaskHandler<Object> {
+public class DefaultComponentTaskHandler implements TaskHandler<Object> {
 
-    private final Action action;
+    private final ActionDefinition actionDefinition;
+    private ConnectionDefinition connectionDefinition;
     private final ComponentHandler componentHandler;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public StandardComponentTaskHandler(
-            Action action,
+    public DefaultComponentTaskHandler(
+            ActionDefinition actionDefinition,
+            ConnectionDefinition connectionDefinition,
             ComponentHandler componentHandler,
             ConnectionService connectionService,
             EventPublisher eventPublisher,
             FileStorageService fileStorageService) {
-        this.action = action;
+        this.actionDefinition = actionDefinition;
+        this.connectionDefinition = connectionDefinition;
         this.componentHandler = componentHandler;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
@@ -57,12 +62,13 @@ public class StandardComponentTaskHandler implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        Context context = new ContextImpl(connectionService, eventPublisher, fileStorageService, taskExecution);
-        PerformFunction performFunction = action.getPerformFunction();
+        Context context = new ContextImpl(
+                connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
+        BiFunction<Context, ExecutionParameters, Object> performFunction = actionDefinition.getPerformFunction();
 
         if (performFunction == null) {
             return componentHandler.handle(
-                    action, context, new ExecutionParametersImpl(taskExecution.getWorkflowTask()));
+                    actionDefinition, context, new ExecutionParametersImpl(taskExecution.getWorkflowTask()));
         } else {
             return performFunction.apply(context, new ExecutionParametersImpl(taskExecution.getWorkflowTask()));
         }

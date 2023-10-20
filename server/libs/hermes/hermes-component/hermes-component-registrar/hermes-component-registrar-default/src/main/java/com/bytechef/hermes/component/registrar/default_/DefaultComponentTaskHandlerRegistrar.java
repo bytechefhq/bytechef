@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.standard;
+package com.bytechef.hermes.component.registrar.default_;
 
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.registrar.AbstractTaskHandlerRegistrar;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -30,14 +31,14 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class StandardComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<ComponentHandler> {
+public class DefaultComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<ComponentHandler> {
 
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public StandardComponentTaskHandlerRegistrar(
+    public DefaultComponentTaskHandlerRegistrar(
             ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
         super(ComponentHandler.class);
         this.connectionService = connectionService;
@@ -46,8 +47,16 @@ public class StandardComponentTaskHandlerRegistrar extends AbstractTaskHandlerRe
     }
 
     @Override
-    protected TaskHandler<?> createTaskHandler(Action action, ComponentHandler componentHandler) {
-        return new StandardComponentTaskHandler(
-                action, componentHandler, connectionService, eventPublisher, fileStorageService);
+    protected TaskHandler<?> createTaskHandler(
+            ActionDefinition actionDefinition,
+            ConnectionDefinition connectionDefinition,
+            ComponentHandler componentHandler) {
+        return new DefaultComponentTaskHandler(
+                actionDefinition,
+                connectionDefinition,
+                componentHandler,
+                connectionService,
+                eventPublisher,
+                fileStorageService);
     }
 }
