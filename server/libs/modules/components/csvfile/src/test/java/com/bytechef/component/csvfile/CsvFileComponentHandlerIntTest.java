@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.csv.file;
+package com.bytechef.component.csvfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
-import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
@@ -34,15 +35,13 @@ import java.util.Map;
 import org.assertj.core.util.Files;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class CsvFileComponentHandlerIntTest {
 
     @Autowired
@@ -56,7 +55,7 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = workflowExecutor.execute(
-                "csv-file_v1_read",
+                "csvfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -69,7 +68,7 @@ public class CsvFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        JSONAssert.assertEquals(
+        assertEquals(
                 JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
                 JsonArrayUtils.of((List<?>) outputs.get("readCsvFile")),
                 true);
@@ -78,7 +77,7 @@ public class CsvFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-                "csv-file_v1_write",
+                "csvfile_v1_write",
                 Map.of(
                         "rows",
                         JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
@@ -87,11 +86,13 @@ public class CsvFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry = new MockFileEntry(outputs, "writeCsvFile");
+        assertThat(MapUtils.getMapKey(outputs, "writeCsvFile", WorkflowConstants.NAME))
+                .isEqualTo("file.csv");
+
         File sampleFile = getFile("sample_header.csv");
 
         job = workflowExecutor.execute(
-                "csv-file_v1_read",
+                "csvfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -105,8 +106,6 @@ public class CsvFileComponentHandlerIntTest {
                 JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
                 JsonArrayUtils.of((List<?>) outputs.get("readCsvFile")),
                 true);
-
-        assertThat(fileEntry.getName()).isEqualTo("file.csv");
     }
 
     private File getFile(String fileName) throws IOException {

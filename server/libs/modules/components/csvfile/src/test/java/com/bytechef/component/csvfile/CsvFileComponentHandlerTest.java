@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.csv.file;
+package com.bytechef.component.csvfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
@@ -22,11 +22,11 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.component.test.json.JsonObjectUtils;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,7 +49,7 @@ public class CsvFileComponentHandlerTest {
 
     @Test
     public void testGetDescription() {
-        DefinitionAssert.assertEquals("definition/csv-file_v1.json", csvFileComponentHandler.getDefinition());
+        AssertUtils.assertEquals("definition/csvfile_v1.json", csvFileComponentHandler.getDefinition());
     }
 
     @Test
