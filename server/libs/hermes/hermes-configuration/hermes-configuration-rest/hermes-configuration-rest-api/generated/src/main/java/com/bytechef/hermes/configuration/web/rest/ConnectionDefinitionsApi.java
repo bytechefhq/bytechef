@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-22T07:40:21.691849+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-23T07:56:53.952402+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-definitions", description = "The Core Connection Definitions API")
 public interface ConnectionDefinitionsApi {

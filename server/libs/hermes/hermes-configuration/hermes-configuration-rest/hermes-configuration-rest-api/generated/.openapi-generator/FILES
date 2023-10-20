@@ -25,7 +25,6 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/model/DatePropertyModel
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/model/GetActionDefinitionsTaskTypesParameterInnerModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/HelpModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/InputModel.java

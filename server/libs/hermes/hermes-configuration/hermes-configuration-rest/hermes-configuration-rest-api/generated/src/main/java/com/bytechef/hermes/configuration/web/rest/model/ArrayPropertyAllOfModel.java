@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ArrayProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-22T07:40:21.691849+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-23T07:56:53.952402+02:00[Europe/Zagreb]")
 public class ArrayPropertyAllOfModel {
 
   @Valid
