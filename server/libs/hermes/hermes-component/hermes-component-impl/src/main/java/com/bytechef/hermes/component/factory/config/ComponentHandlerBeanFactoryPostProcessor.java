@@ -31,6 +31,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,6 +41,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     private static final List<ComponentHandlerBeanDefinitionLoader> COMPONENT_HANDLER_BEAN_DEFINITION_LOADERS =
