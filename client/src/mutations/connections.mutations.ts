@@ -2,7 +2,7 @@ import {useMutation} from '@tanstack/react-query';
 import {
     ConnectionModel,
     ConnectionsApi,
-    PutConnectionTagsRequest,
+    UpdateConnectionTagsRequest,
 } from '../middleware/connection';
 
 type ConnectionMutationProps = {
@@ -15,12 +15,12 @@ type ConnectionMutationDeleteProps = {
     onError?: (error: object, id: number) => void;
 };
 
-export const useConnectionCreateMutation = (
+export const useCreateConnectionMutation = (
     mutationProps?: ConnectionMutationProps
 ) =>
     useMutation({
         mutationFn: (connectionModel: ConnectionModel) => {
-            return new ConnectionsApi().postConnection({
+            return new ConnectionsApi().createConnection({
                 connectionModel,
             });
         },
@@ -28,7 +28,7 @@ export const useConnectionCreateMutation = (
         onError: mutationProps?.onError,
     });
 
-export const useConnectionDeleteMutation = (
+export const useDeleteConnectionMutation = (
     mutationProps?: ConnectionMutationDeleteProps
 ) =>
     useMutation({
@@ -42,16 +42,16 @@ export const useConnectionDeleteMutation = (
     });
 
 type ConnectionTagsMutationProps = {
-    onSuccess?: (result: void, variables: PutConnectionTagsRequest) => void;
-    onError?: (error: object, variables: PutConnectionTagsRequest) => void;
+    onSuccess?: (result: void, variables: UpdateConnectionTagsRequest) => void;
+    onError?: (error: object, variables: UpdateConnectionTagsRequest) => void;
 };
 
 export const useConnectionTagsMutation = (
     mutationProps?: ConnectionTagsMutationProps
 ) =>
     useMutation({
-        mutationFn: (request: PutConnectionTagsRequest) => {
-            return new ConnectionsApi().putConnectionTags(request);
+        mutationFn: (request: UpdateConnectionTagsRequest) => {
+            return new ConnectionsApi().updateConnectionTags(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
