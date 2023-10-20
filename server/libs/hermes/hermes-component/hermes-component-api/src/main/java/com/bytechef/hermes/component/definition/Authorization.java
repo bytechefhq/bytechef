@@ -31,6 +31,7 @@ import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import java.util.function.Function;
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = ComponentDSL.ModifiableAuthorization.class)
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
 
