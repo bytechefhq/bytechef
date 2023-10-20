@@ -14,5 +14,5 @@ $SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/by
 echo "Generate Pipedrive OpenAPI Connector"
 $SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/pipedrive/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components pipedrive
 
-echo "Generate Shopify OpenAPI Connector"
-$SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/shopify/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components shopify
+#echo "Generate Shopify OpenAPI Connector"
+#$SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/shopify/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components shopify
