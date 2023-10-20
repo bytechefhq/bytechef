@@ -49,7 +49,7 @@ import com.bytechef.component.petstore.action.UpdatePetAction;
 import com.bytechef.component.petstore.action.UpdatePetWithFormAction;
 import com.bytechef.component.petstore.action.UpdateUserAction;
 import com.bytechef.component.petstore.action.UploadFileAction;
-import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import java.util.List;
 
@@ -58,20 +58,12 @@ import java.util.List;
  *
  * @generated
  */
-public abstract class AbstractPetstoreComponentHandler implements RestComponentHandler {
+public abstract class AbstractPetstoreComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = component("petstore")
         .display(
             modifyDisplay(
                 display("Petstore")
-                    .description(
-                        "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about\n"
-                            + "Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\n"
-                            + "You can now help us improve the API whether it's by making changes to the definition itself or to the code.\n"
-                            + "That way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n"
-                            + "\n"
-                            + "Some useful links:\n"
-                            + "- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)\n"
-                            + "- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)")))
+                    .description("This is a sample Pet Store Server based on the OpenAPI 3.0 specification.")))
         .actions(modifyActions(AddPetAction.ACTION_DEFINITION, UpdatePetAction.ACTION_DEFINITION,
             FindPetsByStatusAction.ACTION_DEFINITION, FindPetsByTagsAction.ACTION_DEFINITION,
             DeletePetAction.ACTION_DEFINITION, GetPetByIdAction.ACTION_DEFINITION,
@@ -98,7 +90,6 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                                 .label("Client Secret")
                                 .required(true))
                         .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
-                        .refreshUrl(connection -> null)
                         .scopes(connection -> List.of("write:pets", "read:pets")),
                     authorization(
                         AuthorizationType.API_KEY.name()

@@ -17,7 +17,7 @@
 
 package com.bytechef.component.jira.action;
 
-import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
+import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -26,7 +26,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.component.jira.property.SearchResultsProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
