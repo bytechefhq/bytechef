@@ -26,6 +26,9 @@ import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegi
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
