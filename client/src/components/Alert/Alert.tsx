@@ -26,7 +26,7 @@ const Alert = ({type = 'info', text}: AlertProps) => (
             <div className="shrink-0">
                 {type === 'error' && (
                     <XCircleIcon
-                        className="h-5 w-5 text-blue-400"
+                        className="h-5 w-5 text-red-400"
                         aria-hidden="true"
                     />
                 )}
@@ -40,14 +40,14 @@ const Alert = ({type = 'info', text}: AlertProps) => (
 
                 {type === 'success' && (
                     <CheckCircleIcon
-                        className="h-5 w-5 text-blue-400"
+                        className="h-5 w-5 text-green-400"
                         aria-hidden="true"
                     />
                 )}
 
                 {type === 'warning' && (
                     <ExclamationTriangleIcon
-                        className="h-5 w-5 text-blue-400"
+                        className="h-5 w-5 text-yellow-400"
                         aria-hidden="true"
                     />
                 )}
