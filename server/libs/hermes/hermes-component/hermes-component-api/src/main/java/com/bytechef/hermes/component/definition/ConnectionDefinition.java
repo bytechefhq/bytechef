@@ -86,12 +86,6 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
 
     /**
      *
-     * @return
-     */
-    boolean isAuthorizationRequired();
-
-    /**
-     *
      */
     @FunctionalInterface
     interface BaseUriFunction {

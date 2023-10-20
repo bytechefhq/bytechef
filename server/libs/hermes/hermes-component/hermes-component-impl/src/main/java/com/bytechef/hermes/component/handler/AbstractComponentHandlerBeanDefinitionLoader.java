@@ -76,7 +76,7 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 BeanDefinition triggeBeanDefinition = getComponentTriggerHandlerBeanDefinition(
-                    triggerDefinition, componentDefinitionFactory);
+                    triggerDefinition);
 
                 if (triggeBeanDefinition == null) {
                     continue;
@@ -85,7 +85,7 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
                 handlerBeanDefinitionEntries.add(
                     new HandlerBeanDefinitionEntry(
                         triggerDefinition.getName(),
-                        getComponentTriggerHandlerBeanDefinition(triggerDefinition, componentDefinitionFactory)));
+                        getComponentTriggerHandlerBeanDefinition(triggerDefinition)));
             }
 
             componentHandlerFactories.add(
@@ -98,15 +98,12 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
     protected abstract BeanDefinition getComponentActionTaskHandlerBeanDefinition(
         ActionDefinition actionDefinition, T componentDefinitionFactory);
 
-    protected BeanDefinition getComponentTriggerHandlerBeanDefinition(
-        TriggerDefinition triggerDefinition, T componentDefinitionFactory) {
-
+    protected BeanDefinition getComponentTriggerHandlerBeanDefinition(TriggerDefinition triggerDefinition) {
         BeanDefinition beanDefinition = null;
         TriggerType triggerType = triggerDefinition.getType();
 
         if (triggerType != TriggerType.LISTENER) {
             beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTriggerHandler.class)
-                .addConstructorArgValue(componentDefinitionFactory)
                 .addConstructorArgReference("contextFactory")
                 .addConstructorArgReference("dataStorageService")
                 .addConstructorArgValue(triggerDefinition)

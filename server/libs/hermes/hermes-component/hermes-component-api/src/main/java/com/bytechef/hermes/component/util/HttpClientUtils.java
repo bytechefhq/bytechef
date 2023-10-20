@@ -243,6 +243,11 @@ public final class HttpClientUtils {
      */
     @SuppressFBWarnings("EI")
     public record Response(Map<String, List<String>> headers, Object body, int statusCode) {
+
+        @SuppressWarnings("unchecked")
+        public <T> T getBody() {
+            return (T) body;
+        }
     }
 
     /**

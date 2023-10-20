@@ -18,27 +18,23 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
  * @author Ivica Cardic
  */
 final class ComponentContextThreadLocal {
 
-    private static final ThreadLocal<ComponentContext> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+    private static final ThreadLocal<Context> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
 
-    static ComponentContext get() {
+    static Context get() {
         return CONTEXT_THREAD_LOCAL.get();
     }
 
-    static void set(ComponentContext context) {
+    static void set(Context context) {
         CONTEXT_THREAD_LOCAL.set(context);
     }
 
     static void remove() {
         CONTEXT_THREAD_LOCAL.remove();
-    }
-
-    public record ComponentContext(Context context, ComponentDefinition componentDefinition) {
     }
 }

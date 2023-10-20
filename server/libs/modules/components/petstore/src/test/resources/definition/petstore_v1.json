@@ -4510,7 +4510,6 @@
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": true,
     "authorizations": [ {
       "detectOn": null,
       "description": null,

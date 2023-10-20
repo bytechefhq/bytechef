@@ -4178,7 +4178,6 @@
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": false,
     "authorizations": [ {
       "detectOn": null,
       "description": null,

@@ -20,9 +20,7 @@ package com.bytechef.hermes.component.util;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
@@ -53,11 +51,8 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,17 +68,11 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
         Configuration configuration, RequestMethod requestMethod) throws Exception {
 
-        ComponentContextThreadLocal.ComponentContext componentContext = ComponentContextThreadLocal.get();
-        ComponentDefinition componentDefinition = null;
-        Context context = null;
+        Context context = ComponentContextThreadLocal.get();
 
-        if (componentContext != null) {
-            componentDefinition = componentContext.componentDefinition();
-            context = componentContext.context();
-        }
-
-        HttpClient httpClient = createHttpClient(context, componentDefinition, headers, queryParameters, configuration);
-        HttpRequest httpRequest = createHTTPRequest(context, urlString, requestMethod, headers, queryParameters, body);
+        HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
+        HttpRequest httpRequest = createHTTPRequest(
+            context, urlString, requestMethod, headers, queryParameters, body);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
@@ -132,8 +121,8 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
     }
 
     HttpClient createHttpClient(
-        Context context, ComponentDefinition componentDefinition, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Configuration configuration) {
+        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
+        Configuration configuration) {
 
         Methanol.Builder builder = Methanol.newBuilder()
             .version(HttpClient.Version.HTTP_1_1);
@@ -152,7 +141,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
             }
         }
 
-        applyAuthorization(context, componentDefinition, headers, queryParameters);
+        applyAuthorization(context, headers, queryParameters);
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(HttpClient.Redirect.NORMAL);
@@ -242,33 +231,15 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
     }
 
     private static void applyAuthorization(
-        Context context, ComponentDefinition componentDefinition, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters) {
+        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters) {
 
         if (context == null) {
             return;
         }
 
-        if (componentDefinition == null) {
-            OptionalUtils.ifPresent(
-                context.fetchConnection(),
-                connection -> connection.applyAuthorization(
-                    new AuthorizationContextImpl(headers, queryParameters, new HashMap<>())));
-        } else {
-            ConnectionDefinition connectionDefinition = OptionalUtils.orElse(
-                componentDefinition.getConnection(), null);
-
-            if (connectionDefinition != null && connectionDefinition.isAuthorizationRequired()) {
-                Context.Connection connection = context.getConnection();
-
-                connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()));
-            } else {
-                OptionalUtils.ifPresent(
-                    context.fetchConnection(),
-                    connection -> connection.applyAuthorization(
-                        new AuthorizationContextImpl(headers, queryParameters, new HashMap<>())));
-            }
-        }
+        OptionalUtils.ifPresent(
+            context.fetchConnection(),
+            connection -> connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters)));
     }
 
     private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -425,10 +396,8 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
     @SuppressFBWarnings("EI")
     private record AuthorizationContextImpl(
-        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> body)
-        implements Authorization.AuthorizationContext {
-
-        private static final Base64.Encoder ENCODER = Base64.getEncoder();
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
+        implements AuthorizationContext {
 
         @Override
         public void setHeaders(Map<String, List<String>> headers) {
@@ -438,20 +407,6 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         @Override
         public void setQueryParameters(Map<String, List<String>> queryParameters) {
             this.queryParameters.putAll(queryParameters);
-        }
-
-        @Override
-        public void setBody(Map<String, String> body) {
-            this.body.putAll(body);
-        }
-
-        @Override
-        public void setUsernamePassword(String username, String password) {
-            String valueToEncode = username + ":" + password;
-
-            headers.put(
-                "Authorization",
-                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
         }
     }
 }
