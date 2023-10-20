@@ -1,6 +1,7 @@
 dependencies {
     api project(":server:libs:atlas:atlas-api")
 
+    implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-tx"
     implementation "org.springframework:spring-context"
@@ -12,5 +13,5 @@ dependencies {
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     testImplementation project(":server:libs:atlas:atlas-upgrade")
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }
