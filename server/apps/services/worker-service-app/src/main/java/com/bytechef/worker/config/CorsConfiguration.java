@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.worker.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
