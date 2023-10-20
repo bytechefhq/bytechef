@@ -175,9 +175,7 @@ const ConnectionDialog = ({
         () =>
             connectionDefinition && connectionDefinition.authorizations
                 ? [
-                      ...(connectionDefinition.authorizationRequired === false
-                          ? [{label: 'None', value: ''}]
-                          : []),
+                      ...[{label: 'None', value: ''}],
                       ...connectionDefinition.authorizations.map(
                           (authorization) => ({
                               label: authorization?.title as string,
@@ -514,8 +512,6 @@ const ConnectionDialog = ({
                                             setAuthorizationName(
                                                 event.target.value
                                             ),
-                                        required:
-                                            connectionDefinition?.authorizationRequired,
                                     })}
                                 />
                             )}
