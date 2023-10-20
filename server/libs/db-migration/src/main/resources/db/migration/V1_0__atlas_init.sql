@@ -8,9 +8,6 @@ CREATE TABLE IF NOT EXISTS context (
     created_by               VARCHAR(256) NOT NULL
     );
 
-CREATE INDEX IF NOT EXISTS idx_context_stack_id ON context (stack_id, classname_id);
-CREATE INDEX IF NOT EXISTS idx_context_stack_id_sub_stack_id ON context (stack_id, sub_stack_id, classname_id);
-
 CREATE TABLE IF NOT EXISTS counter (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     value                    BIGINT       NOT NULL,
@@ -38,9 +35,6 @@ CREATE TABLE IF NOT EXISTS job (
     last_modified_by         VARCHAR(256) NOT NULL,
     version                  BIGINT       NOT NULL
     );
-
-CREATE INDEX IF NOT EXISTS idx_job_create_time ON job (created_date);
-CREATE INDEX IF NOT EXISTS idx_job_status ON job (status);
 
 CREATE TABLE IF NOT EXISTS task_execution (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
@@ -77,6 +71,10 @@ CREATE TABLE IF NOT EXISTS workflow (
     version                  BIGINT       NOT NULL
     );
 
+CREATE INDEX IF NOT EXISTS idx_context_stack_id ON context (stack_id, classname_id);
+CREATE INDEX IF NOT EXISTS idx_context_stack_id_sub_stack_id ON context (stack_id, sub_stack_id, classname_id);
+CREATE INDEX IF NOT EXISTS idx_job_create_time ON job (created_date);
+CREATE INDEX IF NOT EXISTS idx_job_status ON job (status);
 CREATE INDEX IF NOT EXISTS idx_task_execution_job_id ON task_execution (job_id);
 
 ALTER TABLE job ADD CONSTRAINT fk_job_task_execution FOREIGN KEY (parent_task_execution_id) REFERENCES task_execution (id);
