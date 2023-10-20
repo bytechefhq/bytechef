@@ -8,21 +8,16 @@ const Header: React.FC<{
     status: boolean;
     description?: string;
     id?: number;
-}> = ({id, name, status, description}) => {
+}> = ({id, name, status, description = 'Description not available'}) => {
     return (
         <div className="flex justify-between">
             <div className="">
-                <Name
-                    name={name}
-                    description={description || 'Description not available'}
-                />
+                <Name name={name} description={description} />
 
                 <Status status={status} />
             </div>
 
-            <div className="mx-4">
-                <Dropdown id={id} />
-            </div>
+            <Dropdown id={id} />
         </div>
     );
 };

@@ -1,40 +1,29 @@
 import React from 'react';
-import * as HoverCardPrimitive from '@radix-ui/react-hover-card';
-import {clsx} from 'clsx';
+import {Root, Trigger, Content} from '@radix-ui/react-hover-card';
 
 export const Name: React.FC<{name: string; description: string}> = ({
     name,
     description,
 }) => {
     return (
-        <HoverCardPrimitive.Root>
-            <HoverCardPrimitive.Trigger asChild>
-                <span
-                    className={clsx(
-                        'items-center justify-center rounded-full bg-white dark:bg-gray-900'
-                    )}
-                >
+        <Root>
+            <Trigger asChild>
+                <span className="text-lg font-semibold text-gray-700">
                     {name}
                 </span>
-            </HoverCardPrimitive.Trigger>
+            </Trigger>
 
-            <HoverCardPrimitive.Content
+            <Content
                 align="center"
                 sideOffset={4}
-                className={clsx(
-                    'max-w-md rounded-lg p-4 md:w-full',
-                    'bg-white dark:bg-gray-800',
-                    'border'
-                )}
+                className="max-w-md rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 md:w-full"
             >
                 <div className="flex h-full w-full space-x-4">
-                    <div>
-                        <p className="mt-1 text-sm font-normal text-gray-700 dark:text-gray-400">
-                            {description}
-                        </p>
-                    </div>
+                    <p className="mt-1 text-sm font-normal text-gray-700 dark:text-gray-400">
+                        {description}
+                    </p>
                 </div>
-            </HoverCardPrimitive.Content>
-        </HoverCardPrimitive.Root>
+            </Content>
+        </Root>
     );
 };
