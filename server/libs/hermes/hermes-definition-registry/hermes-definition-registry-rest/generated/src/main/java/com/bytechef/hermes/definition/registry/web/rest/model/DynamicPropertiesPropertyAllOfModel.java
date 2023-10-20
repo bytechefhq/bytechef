@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DynamicPropertiesProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-01T11:10:46.527237+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-05T17:08:56.569805+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyAllOfModel {
 
   private PropertiesDataSourceModel propertiesDataSource;
