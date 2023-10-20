@@ -203,15 +203,15 @@ public class SpreadsheetFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"range",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
-                                        "displayName":"Start Row index",
+                                        "displayName":"The start row index",
                                         "name":"startRow",
                                         "type":"NUMBER"
                                     },
                                     {
-                                        "displayName":"End Row index",
+                                        "displayName":"The end row index",
                                         "name":"endRow","type":"NUMBER"
                                     }
                                 ]

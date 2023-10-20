@@ -108,9 +108,9 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                         .displayName("Range")
                         .description("The range to read from the table.")
                         .displayOption(show("operation", "READ"))
-                        .fields(
-                            NUMBER_PROPERTY("startRow").displayName("Start Row index"),
-                            NUMBER_PROPERTY("endRow").displayName("End Row index")
+                        .groupProperties(
+                            NUMBER_PROPERTY("startRow").displayName("The start row index"),
+                            NUMBER_PROPERTY("endRow").displayName("The end row index")
                         ),
                     BOOLEAN_PROPERTY("readAsString")
                         .displayName("Read As String")

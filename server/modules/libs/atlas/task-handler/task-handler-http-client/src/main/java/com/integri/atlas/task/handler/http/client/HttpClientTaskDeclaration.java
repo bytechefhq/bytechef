@@ -158,7 +158,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                 .options(
                     GROUP_PROPERTY("parameter")
                         .displayName("Parameter")
-                        .fields(
+                        .groupProperties(
                             STRING_PROPERTY("name")
                                 .displayName("Name")
                                 .description("Name of the parameter.")
@@ -188,7 +188,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                 .options(
                     GROUP_PROPERTY("parameter")
                         .displayName("Parameter")
-                        .fields(
+                        .groupProperties(
                             STRING_PROPERTY("name")
                                 .displayName("Name")
                                 .description("Name of the parameter.")
@@ -236,7 +236,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                 .options(
                     GROUP_PROPERTY("parameter")
                         .displayName("Parameter")
-                        .fields(
+                        .groupProperties(
                             STRING_PROPERTY("name")
                                 .displayName("Name")
                                 .description("Name of the parameter.")

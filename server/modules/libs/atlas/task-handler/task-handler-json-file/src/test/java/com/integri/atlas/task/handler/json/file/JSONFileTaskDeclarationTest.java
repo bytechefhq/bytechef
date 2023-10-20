@@ -106,8 +106,8 @@ public class JSONFileTaskDeclarationTest {
                                 "name":"fileName",
                                 "type":"STRING"
                             },
-                                                        {
-                                "description":"The range to read from the json array.",
+                            {
+                                "description":"The range to read from the JSON array.",
                                 "displayName":"Range",
                                 "displayOption":{
                                     "show":{
@@ -115,15 +115,15 @@ public class JSONFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"range",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
-                                        "displayName":"Start index of the json array",
+                                        "displayName":"The start index of the JSON array",
                                         "name":"startIndex",
                                         "type":"NUMBER"
                                     },
                                     {
-                                        "displayName":"End index of the json array",
+                                        "displayName":"The end index of the JSON array",
                                         "name":"endIndex","type":"NUMBER"
                                     }
                                 ]

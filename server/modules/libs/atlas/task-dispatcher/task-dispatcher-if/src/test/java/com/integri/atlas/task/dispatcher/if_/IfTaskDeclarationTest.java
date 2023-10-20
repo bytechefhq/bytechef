@@ -57,8 +57,8 @@ public class IfTaskDeclarationTest {
                             {
                                 "displayName":"Boolean",
                                 "name":"boolean",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":false,
                                         "description":"The boolean value to compare with the second one.",
@@ -95,8 +95,8 @@ public class IfTaskDeclarationTest {
                             {
                                 "displayName":"Date & Time",
                                 "name":"dateTime",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":"",
                                         "description":"The date & time value to compare with the second one.",
@@ -132,8 +132,8 @@ public class IfTaskDeclarationTest {
                             {
                                 "displayName":"Number",
                                 "name":"number",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":0,
                                         "description":"The number value to compare with the second one.",
@@ -195,8 +195,8 @@ public class IfTaskDeclarationTest {
                             {
                                 "displayName":"String",
                                 "name":"string",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":"",
                                         "description":"The string value to compare with the second one.",
