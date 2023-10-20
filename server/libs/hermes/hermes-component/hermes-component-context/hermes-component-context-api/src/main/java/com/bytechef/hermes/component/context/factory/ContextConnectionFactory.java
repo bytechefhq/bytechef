@@ -15,25 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.component.context.factory;
 
-import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.OptionsDataSource;
+import com.bytechef.hermes.component.Context;
 
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface ComponentOptionsFunction extends OptionsDataSource.OptionsFunction {
-
-    /**
-     * @param connection
-     * @param inputParameters
-     * @return
-     */
-    List<Option<?>> apply(Connection connection, Map<String, ?> inputParameters, String searchText);
+public interface ContextConnectionFactory {
+    Context.Connection createConnection(
+        String componentName, int componentVersion, Map<String, ?> connectionParameters, String authorizationName);
 }

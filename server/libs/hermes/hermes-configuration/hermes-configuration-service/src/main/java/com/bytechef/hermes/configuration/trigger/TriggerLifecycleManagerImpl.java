@@ -53,7 +53,7 @@ public class TriggerLifecycleManagerImpl implements TriggerLifecycleManager {
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-            triggerLifecycleService.fetchValue(workflowExecutionId.toString()), null);
+            triggerLifecycleService.fetchValue(workflowExecutionId), null);
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
             workflowTrigger.getTriggerName());
@@ -98,7 +98,7 @@ public class TriggerLifecycleManagerImpl implements TriggerLifecycleManager {
                     createWebhookUrl(workflowExecutionId), workflowExecutionId.toString());
 
                 if (output != null) {
-                    triggerLifecycleService.save(workflowExecutionId.toString(), output);
+                    triggerLifecycleService.save(workflowExecutionId, output);
 
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(

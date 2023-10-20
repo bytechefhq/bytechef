@@ -19,14 +19,16 @@ package com.bytechef.worker.config;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactoryImpl;
+import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
@@ -44,7 +46,6 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -113,7 +114,7 @@ public class DefinitionRegistryConfiguration {
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService) {
 
-        return new ContextConnectionFactory(componentDefinitionService, connectionDefinitionService);
+        return new ContextConnectionFactoryImpl(componentDefinitionService, connectionDefinitionService);
     }
 
     @Bean

@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.configuration.domain;
 
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -62,12 +63,12 @@ public class TriggerLifecycle implements Persistable<Long> {
     private int version;
 
     @Column("workflow_execution_id")
-    private String workflowExecutionId;
+    private WorkflowExecutionId workflowExecutionId;
 
     public TriggerLifecycle() {
     }
 
-    public TriggerLifecycle(String workflowExecutionId, Object value) {
+    public TriggerLifecycle(WorkflowExecutionId workflowExecutionId, Object value) {
         this.value = new TriggerLifecycleValue(value, value.getClass());
         this.workflowExecutionId = workflowExecutionId;
     }
@@ -105,7 +106,7 @@ public class TriggerLifecycle implements Persistable<Long> {
         return version;
     }
 
-    public String getWorkflowExecutionId() {
+    public WorkflowExecutionId getWorkflowExecutionId() {
         return workflowExecutionId;
     }
 
@@ -146,7 +147,7 @@ public class TriggerLifecycle implements Persistable<Long> {
         this.version = version;
     }
 
-    public void setWorkflowExecutionId(String workflowExecutionId) {
+    public void setWorkflowExecutionId(WorkflowExecutionId workflowExecutionId) {
         this.workflowExecutionId = workflowExecutionId;
     }
 

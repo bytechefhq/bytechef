@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.service;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 public interface TriggerLifecycleService {
 
-    <T> Optional<T> fetchValue(String workflowExecutionId);
+    <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId);
 
-    void save(String workflowExecutionId, TriggerDefinition.DynamicWebhookEnableOutput value);
+    void save(WorkflowExecutionId workflowExecutionId, Object value);
 }

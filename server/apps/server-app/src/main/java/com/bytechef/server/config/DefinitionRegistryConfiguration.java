@@ -19,6 +19,9 @@ package com.bytechef.server.config;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactoryImpl;
+import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -30,8 +33,7 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeI
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
-import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
+import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -42,7 +44,6 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistryImpl;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
@@ -101,7 +102,7 @@ public class DefinitionRegistryConfiguration {
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService) {
 
-        return new ContextConnectionFactory(componentDefinitionService, connectionDefinitionService);
+        return new ContextConnectionFactoryImpl(componentDefinitionService, connectionDefinitionService);
     }
 
     @Bean
