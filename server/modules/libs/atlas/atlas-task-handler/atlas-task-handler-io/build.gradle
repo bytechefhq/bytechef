@@ -8,5 +8,4 @@ dependencies {
     implementation "org.springframework:spring-context"
 
     testImplementation "org.apache.commons:commons-lang3"
-    testImplementation "org.junit.jupiter:junit-jupiter"
 }
