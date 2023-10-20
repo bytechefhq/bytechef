@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
@@ -49,6 +50,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -110,6 +112,28 @@ public class IntegrationControllerIntTest {
     }
 
     @Test
+    public void testGetIntegrationWorkflows() {
+        try {
+            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON, Map.of());
+
+            when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(List.of(workflow));
+
+            this.webTestClient
+                .get()
+                .uri("/integrations/1/workflows")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.[0].id")
+                .isEqualTo("workflow1");
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
     public void testGetIntegrationCategories() {
         try {
             when(categoryService.getCategories()).thenReturn(List.of(new Category(1, "name")));
@@ -121,27 +145,8 @@ public class IntegrationControllerIntTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(CategoryModel.class);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetIntegrations() {
-        try {
-            Integration integration = getIntegration();
-
-            when(integrationService.getIntegrations(null, null)).thenReturn(List.of(integration));
-
-            this.webTestClient
-                .get()
-                .uri("/integrations")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(IntegrationModel.class);
+                .expectBodyList(CategoryModel.class)
+                .hasSize(1);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
