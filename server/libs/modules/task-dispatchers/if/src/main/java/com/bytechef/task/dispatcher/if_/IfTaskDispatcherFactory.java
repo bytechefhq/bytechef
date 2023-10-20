@@ -35,6 +35,7 @@ import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.COMBINE_OPERATION;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CONDITIONS;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.DATE_TIME;
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.IF;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.NUMBER;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.OPERATION;
@@ -60,10 +61,15 @@ public class IfTaskDispatcherFactory implements TaskDispatcherFactory {
         .display(display("If").description("Directs a stream based on true/false results of comparisons."))
         .display(display("Boolean Condition"))
         .properties(
+            bool(RAW_EXPRESSION)
+                .label("Raw expression")
+                .description("Set condition as raw expression or list of conditions.")
+                .defaultValue(false),
             array(CONDITIONS)
                 .label("Conditions")
                 .placeholder("Add Condition")
                 .description("The type of values to compare.")
+                .displayOption(show(RAW_EXPRESSION, false))
                 .items(
                     object(BOOLEAN)
                         .label("Boolean")
@@ -196,7 +202,10 @@ public class IfTaskDispatcherFactory implements TaskDispatcherFactory {
                         "Any",
                         CombineOperation.ANY.name(),
                         "If any condition is met, the workflow goes into \"true\" branch."))
-                .defaultValue(CombineOperation.ALL.name()))
+                .defaultValue(CombineOperation.ALL.name()),
+            string(EXPRESSION)
+                .label("Expression")
+                .description("The raw expression."))
         .taskProperties(
             array(CASE_TRUE)
                 .description(
