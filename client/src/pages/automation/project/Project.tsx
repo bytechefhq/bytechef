@@ -10,28 +10,28 @@ import {
 } from '@radix-ui/react-icons';
 import LeftSidebar from './components/LeftSidebar';
 import RightSlideOver from './components/RightSlideOver';
-import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import ToggleGroup, {
     ToggleItem,
-} from '../../components/ToggleGroup/ToggleGroup';
-import Select from '../../components/Select/Select';
-import {WorkflowModel} from '../../middleware/workflow';
+} from '../../../components/ToggleGroup/ToggleGroup';
+import Select from '../../../components/Select/Select';
+import {WorkflowModel} from '../../../middleware/workflow';
 import {
     ArrowLeftOnRectangleIcon,
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
 import WorkflowEditor from './WorkflowEditor';
 import Input from 'components/Input/Input';
-import {IntegrationModel} from '../../middleware/integration';
+import {ProjectModel} from '../../../middleware/project';
 import useRightSlideOverStore from './stores/useRightSlideOverStore';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
-import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';
-import {useGetTaskDispatcherDefinitionsQuery} from '../../queries/taskDispatcherDefinitions';
+import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
 import {
-    useGetIntegrationQuery,
-    useGetIntegrationWorkflowsQuery,
-} from '../../queries/integrations';
-import WorkflowDialog from 'pages/integrations/WorkflowDialog';
+    useGetProjectQuery,
+    useGetProjectWorkflowsQuery,
+} from '../../../queries/projects';
+import WorkflowDialog from 'pages/automation/projects/WorkflowDialog';
 
 const headerToggleItems: ToggleItem[] = [
     {
@@ -44,8 +44,8 @@ const headerToggleItems: ToggleItem[] = [
     },
 ];
 
-const Integration: React.FC = () => {
-    const {integrationId} = useParams<{integrationId: string}>();
+const Project: React.FC = () => {
+    const {projectId} = useParams<{projectId: string}>();
     const {rightSlideOverOpen, setRightSlideOverOpen} =
         useRightSlideOverStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
@@ -53,9 +53,9 @@ const Integration: React.FC = () => {
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
 
-    const {data: integration} = useGetIntegrationQuery(
-        parseInt(integrationId!),
-        useLoaderData() as IntegrationModel
+    const {data: project} = useGetProjectQuery(
+        parseInt(projectId!),
+        useLoaderData() as ProjectModel
     );
 
     const {
@@ -71,20 +71,20 @@ const Integration: React.FC = () => {
     } = useGetTaskDispatcherDefinitionsQuery();
 
     const {
-        data: integrationWorkflows,
-        isLoading: integrationWorkflowsLoading,
-        error: integrationWorkflowsError,
-    } = useGetIntegrationWorkflowsQuery(integration?.id as number);
+        data: projectWorkflows,
+        isLoading: projectWorkflowsLoading,
+        error: projectWorkflowsError,
+    } = useGetProjectWorkflowsQuery(project?.id as number);
 
     useEffect(() => {
-        if (!integrationWorkflowsLoading && !integrationWorkflowsError) {
-            setCurrentWorkflow(integrationWorkflows[0]);
+        if (!projectWorkflowsLoading && !projectWorkflowsError) {
+            setCurrentWorkflow(projectWorkflows[0]);
         }
     }, [
-        integrationWorkflows,
-        integrationWorkflowsError,
-        integrationWorkflowsLoading,
-        integration,
+        projectWorkflows,
+        projectWorkflowsError,
+        projectWorkflowsLoading,
+        project,
     ]);
 
     const [showWorkflowDialog, setShowWorkflowDialog] =
@@ -94,10 +94,10 @@ const Integration: React.FC = () => {
         <>
             {!componentsLoading &&
             !flowControlsLoading &&
-            !integrationWorkflowsLoading &&
+            !projectWorkflowsLoading &&
             !componentsError &&
             !flowControlsError &&
-            !integrationWorkflowsError ? (
+            !projectWorkflowsError ? (
                 <LayoutContainer
                     className="border-l border-gray-200 bg-gray-100"
                     header={
@@ -117,18 +117,16 @@ const Integration: React.FC = () => {
                                 displayType="icon"
                             />
 
-                            <h1 className="mr-6 py-4 pr-4">
-                                {integration?.name}
-                            </h1>
+                            <h1 className="mr-6 py-4 pr-4">{project?.name}</h1>
 
                             <div className="flex py-4 px-2">
                                 <div className="flex rounded-md bg-white">
                                     {currentWorkflow && (
                                         <Select
                                             defaultValue={
-                                                integrationWorkflows[0].id
+                                                projectWorkflows[0].id
                                             }
-                                            options={integrationWorkflows.map(
+                                            options={projectWorkflows.map(
                                                 (workflow: WorkflowModel) => ({
                                                     label: workflow.label!,
                                                     value: workflow.id!,
@@ -136,7 +134,7 @@ const Integration: React.FC = () => {
                                             )}
                                             onValueChange={(value: string) => {
                                                 setCurrentWorkflow(
-                                                    integrationWorkflows.find(
+                                                    projectWorkflows.find(
                                                         (
                                                             workflow: WorkflowModel
                                                         ) =>
@@ -248,4 +246,4 @@ const Integration: React.FC = () => {
     );
 };
 
-export default Integration;
+export default Project;

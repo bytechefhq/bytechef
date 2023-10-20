@@ -1,16 +1,17 @@
 import {createBrowserRouter} from 'react-router-dom';
 import App from './App';
 import ErrorPage from './ErrorPage';
-import Integration from './pages/integration/Integration';
+import Project from './pages/automation/project/Project';
 import Integrations from './pages/embedded/integrations/Integrations';
 import Connections from './pages/connections/Connections';
 import Settings from './pages/settings/Settings';
 import Instances from './pages/instances/Instances';
 import Executions from './pages/executions/Executions';
 import {QueryClient} from '@tanstack/react-query';
-import {IntegrationsApi} from './middleware/integration';
-import {IntegrationKeys} from './queries/integrations';
+import {ProjectsApi} from './middleware/project';
+import {ProjectKeys} from './queries/projects';
 import OAuthPopup from './pages/connections/oauth2/OAuthPopup';
+import Projects from './pages/automation/projects/Projects';
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '',
-                element: <Integrations />,
+                element: <Projects />,
             },
             {
                 path: 'automation',
@@ -34,20 +35,18 @@ export const router = createBrowserRouter([
                     {
                         loader: async ({params}) =>
                             queryClient.ensureQueryData(
-                                IntegrationKeys.integration(
-                                    +params.integrationId!
-                                ),
+                                ProjectKeys.project(+params.projectId!),
                                 () =>
-                                    new IntegrationsApi().getIntegration({
-                                        id: +params.integrationId!,
+                                    new ProjectsApi().getProject({
+                                        id: +params.projectId!,
                                     })
                             ),
                         path: 'integrations/:integrationId',
-                        element: <Integration />,
+                        element: <Project />,
                     },
                     {
-                        path: 'integrations',
-                        element: <Integrations />,
+                        path: 'projects',
+                        element: <Projects />,
                     },
                     {
                         path: 'instances',

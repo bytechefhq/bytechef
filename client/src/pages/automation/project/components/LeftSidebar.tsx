@@ -3,7 +3,7 @@ import {Provider} from '@radix-ui/react-tooltip';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '../../../middleware/definition-registry';
+} from '../../../../middleware/definition-registry';
 import WorkflowNodesList from './WorkflowNodesList';
 
 interface SidebarProps {

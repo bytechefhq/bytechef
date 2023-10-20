@@ -5,7 +5,7 @@ import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '../../../middleware/definition-registry';
+} from '../../../../middleware/definition-registry';
 import WorkflowNodesList from '../components/WorkflowNodesList';
 
 const uuid = (): string =>

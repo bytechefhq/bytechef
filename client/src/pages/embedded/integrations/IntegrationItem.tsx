@@ -174,10 +174,7 @@ const IntegrationItem = ({
                     </div>
                 </Link>
 
-                <DropdownMenu
-                    id={integration.id}
-                    menuItems={dropdownItems}
-                />
+                <DropdownMenu id={integration.id} menuItems={dropdownItems} />
             </div>
 
             {showEditDialog && (

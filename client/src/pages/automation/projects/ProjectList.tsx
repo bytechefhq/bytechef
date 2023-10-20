@@ -1,22 +1,22 @@
 import {
-    useGetIntegrationsQuery,
-    useGetIntegrationTagsQuery,
-} from '../../queries/integrations';
-import IntegrationItem from 'pages/integrations/IntegrationItem';
+    useGetProjectsQuery,
+    useGetProjectTagsQuery,
+} from '../../../queries/projects';
+import ProjectItem from 'pages/automation/projects/ProjectItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
-import EmptyList from '../../components/EmptyList/EmptyList';
-import IntegrationDialog from './IntegrationDialog';
+import EmptyList from '../../../components/EmptyList/EmptyList';
+import ProjectDialog from './ProjectDialog';
 import {FolderPlusIcon} from '@heroicons/react/24/outline';
 
-const IntegrationList = () => {
+const ProjectList = () => {
     const [searchParams] = useSearchParams();
 
     const {
         isLoading,
         error,
-        data: integrations,
-    } = useGetIntegrationsQuery({
+        data: projects,
+    } = useGetProjectsQuery({
         categoryIds: searchParams.get('categoryId')
             ? [parseInt(searchParams.get('categoryId')!)]
             : undefined,
@@ -25,13 +25,13 @@ const IntegrationList = () => {
             : undefined,
     });
 
-    const {data: tags} = useGetIntegrationTagsQuery();
+    const {data: tags} = useGetProjectTagsQuery();
 
     return (
         <div
             className={twMerge(
                 'flex place-self-center px-2 sm:w-full 2xl:w-4/5',
-                integrations?.length === 0 ? 'h-full items-center' : ''
+                projects?.length === 0 ? 'h-full items-center' : ''
             )}
         >
             <ul role="list" className="w-full divide-y divide-gray-100">
@@ -43,11 +43,9 @@ const IntegrationList = () => {
 
                 {!isLoading &&
                     !error &&
-                    (integrations?.length === 0 ? (
+                    (projects?.length === 0 ? (
                         <EmptyList
-                            button={
-                                <IntegrationDialog integration={undefined} />
-                            }
+                            button={<ProjectDialog project={undefined} />}
                             icon={
                                 <FolderPlusIcon className="h-12 w-12 text-gray-400" />
                             }
@@ -55,24 +53,23 @@ const IntegrationList = () => {
                             title="No projects"
                         />
                     ) : (
-                        integrations.map((integration) => {
-                            const integrationTagIds = integration.tags?.map(
+                        projects.map((project) => {
+                            const projectTagIds = project.tags?.map(
                                 (tag) => tag.id
                             );
 
                             return (
-                                <div key={integration.id}>
+                                <div key={project.id}>
                                     <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                        <IntegrationItem
-                                            integration={integration}
-                                            integrationNames={integrations.map(
-                                                (integration) =>
-                                                    integration.name
+                                        <ProjectItem
+                                            project={project}
+                                            projectNames={projects.map(
+                                                (project) => project.name
                                             )}
-                                            key={integration.id}
+                                            key={project.id}
                                             remainingTags={tags?.filter(
                                                 (tag) =>
-                                                    !integrationTagIds?.includes(
+                                                    !projectTagIds?.includes(
                                                         tag.id
                                                     )
                                             )}
@@ -86,4 +83,4 @@ const IntegrationList = () => {
         </div>
     );
 };
-export default IntegrationList;
+export default ProjectList;

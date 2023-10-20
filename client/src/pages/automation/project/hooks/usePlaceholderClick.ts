@@ -1,6 +1,6 @@
 import {NodeProps, useReactFlow} from 'reactflow';
-import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
-import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
+import {useGetComponentDefinitionsQuery} from '../../../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../../queries/taskDispatcherDefinitions';
 
 export default function usePlaceholderClick(id: NodeProps['id']) {
     const {getNode, setNodes, setEdges} = useReactFlow();

@@ -1,8 +1,8 @@
 import React, {ReactNode} from 'react';
 import {Arrow, Content, Portal, Root, Trigger} from '@radix-ui/react-popover';
 import ContextualMenu from '../nodes/ContextualMenu';
-import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
-import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
+import {useGetComponentDefinitionsQuery} from '../../../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../../queries/taskDispatcherDefinitions';
 
 interface PopoverMenuProps {
     children: ReactNode;

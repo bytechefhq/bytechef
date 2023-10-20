@@ -4,10 +4,10 @@ import Dialog from 'components/Dialog/Dialog';
 import {useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCreateIntegrationWorkflowRequestMutation} from '../../mutations/integrations.mutations';
-import {WorkflowModel} from 'middleware/integration';
+import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
+import {WorkflowModel} from 'middleware/project';
 import TextArea from 'components/TextArea/TextArea';
-import {IntegrationKeys} from '../../queries/integrations';
+import {ProjectKeys} from '../../../queries/projects';
 
 interface WorkflowDialogProps {
     id?: number;
@@ -38,9 +38,9 @@ const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
         },
     });
 
-    const {mutate, isLoading} = useCreateIntegrationWorkflowRequestMutation({
+    const {mutate, isLoading} = useCreateProjectWorkflowRequestMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(ProjectKeys.projects);
 
             closeDialog();
         },
@@ -56,7 +56,7 @@ const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
 
         mutate({
             id: id!,
-            createIntegrationWorkflowRequestModel: formData,
+            createProjectWorkflowRequestModel: formData,
         });
     }
 
