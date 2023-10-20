@@ -38,7 +38,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-bento4")
     implementation project(":modules:libs:atlas:task-handler:task-handler-core")
     implementation project(":modules:libs:atlas:task-handler:task-handler-http-client")
-    implementation project(":modules:libs:atlas:task-handler:task-handler-local-file")
+    implementation project(":modules:libs:atlas:task-handler:task-handler-binary-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-spreadsheet-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-io")
     implementation project(":modules:libs:atlas:task-handler:task-handler-media")

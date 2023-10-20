@@ -18,7 +18,7 @@
     {
       "name": "readFromFile",
       "label": "Read from file",
-      "type": "localFile",
+      "type": "binaryFile",
       "operation": "READ",
       "fileName": "${fileName}"
     }
