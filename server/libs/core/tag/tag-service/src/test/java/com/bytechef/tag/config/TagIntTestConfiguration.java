@@ -23,7 +23,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
-@ComponentScan(basePackages = "com.bytechef.tag")
+@ComponentScan(basePackages = {
+    "com.bytechef.liquibase.config", "com.bytechef.tag"
+})
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class TagIntTestConfiguration {

@@ -74,17 +74,19 @@ spring:
       write-null-map-values: false
     date-format: ${bytechef.serialization.date-format}
     time-zone: UTC
+  jmx:
+    enabled: false
+  liquibase:
+    contexts: mono
+  output:
+    ansi:
+      console-available: true
   profiles:
     active: #spring.profiles.active#
     group:
       dev:
         - dev
         - api-docs
-  jmx:
-    enabled: false
-  output:
-    ansi:
-      console-available: true
   rabbitmq:
     listener:
       direct:

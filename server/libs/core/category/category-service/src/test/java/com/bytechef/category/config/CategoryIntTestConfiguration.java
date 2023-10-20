@@ -26,7 +26,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = "com.bytechef.category")
+@ComponentScan(basePackages = {
+    "com.bytechef.liquibase.config", "com.bytechef.category"
+})
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class CategoryIntTestConfiguration {
