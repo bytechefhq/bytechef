@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.server;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@Configuration
-public class JacksonConfiguration {
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest
+class ServerApplicationIntTest {
 
-    @Bean
-    JavaTimeModule javaTimeModule() {
-        return new JavaTimeModule();
-    }
+    @Test
+    void testContextLoads() {}
 }

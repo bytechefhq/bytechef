@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef;
+package com.bytechef.server;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -25,13 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.core.env.Environment;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.bytechef")
 public class ServerApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ServerApplication.class);
@@ -43,8 +42,6 @@ public class ServerApplication {
      */
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(ServerApplication.class);
-
-        springApplication.addListeners(new ApplicationPidFileWriter());
 
         Environment environment = springApplication.run(args).getEnvironment();
 
