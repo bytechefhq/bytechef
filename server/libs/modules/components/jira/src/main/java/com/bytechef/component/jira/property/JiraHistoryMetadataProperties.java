@@ -17,56 +17,72 @@
 
 package com.bytechef.component.jira.property;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class JiraHistoryMetadataProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("type").label("Type")
-                .description("The type of the history record.")
-                .required(false),
-            string("description").label("Description")
-                .description("The description of the history record.")
-                .required(false),
-            string("descriptionKey").label("Description Key")
-                .description("The description key of the history record.")
-                .required(false),
-            string("activityDescription").label("Activity Description")
-                .description("The activity described in the history record.")
-                .required(false),
-            string("activityDescriptionKey").label("Activity Description Key")
-                .description("The key of the activity described in the history record.")
-                .required(false),
-            string("emailDescription").label("Email Description")
-                .description("The description of the email address associated the history record.")
-                .required(false),
-            string("emailDescriptionKey").label("Email Description Key")
-                .description("The description key of the email address associated the history record.")
-                .required(false),
-            object("actor").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
-                .label("Actor")
-                .description("Details of user or system associated with a issue history metadata item.")
-                .required(false),
-            object("generator").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
-                .label("Generator")
-                .description("Details of user or system associated with a issue history metadata item.")
-                .required(false),
-            object("cause").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
-                .label("Cause")
-                .description("Details of user or system associated with a issue history metadata item.")
-                .required(false),
-            object("extraData").additionalProperties(string())
-                .placeholder("Add to Extra Data")
-                .label("Extra Data")
-                .description("Additional arbitrary information about the history record.")
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("type").label("Type")
+            .description("The type of the history record.")
+            .required(false),
+        string("description").label("Description")
+            .description("The description of the history record.")
+            .required(false),
+        string("descriptionKey").label("Description Key")
+            .description("The description key of the history record.")
+            .required(false),
+        string("activityDescription").label("Activity Description")
+            .description("The activity described in the history record.")
+            .required(false),
+        string("activityDescriptionKey").label("Activity Description Key")
+            .description("The key of the activity described in the history record.")
+            .required(false),
+        string("emailDescription").label("Email Description")
+            .description("The description of the email address associated the history record.")
+            .required(false),
+        string("emailDescriptionKey").label("Email Description Key")
+            .description("The description key of the email address associated the history record.")
+            .required(false),
+        object("actor").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .placeholder("Add to Actor")
+            .label("Actor")
+            .description("Details of user or system associated with a issue history metadata item.")
+            .required(false),
+        object("generator").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .placeholder("Add to Generator")
+            .label("Generator")
+            .description("Details of user or system associated with a issue history metadata item.")
+            .required(false),
+        object("cause").properties(JiraHistoryMetadataParticipantProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .placeholder("Add to Cause")
+            .label("Cause")
+            .description("Details of user or system associated with a issue history metadata item.")
+            .required(false),
+        object("extraData").additionalProperties(string())
+            .placeholder("Add to Extra Data")
+            .label("Extra Data")
+            .description("Additional arbitrary information about the history record.")
+            .required(false));
 }

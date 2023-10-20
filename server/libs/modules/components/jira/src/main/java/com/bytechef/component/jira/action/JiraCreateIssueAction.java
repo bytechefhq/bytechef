@@ -35,6 +35,7 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.component.jira.property.JiraCreatedIssueProperties;
 import com.bytechef.component.jira.property.JiraIssueUpdateDetailsProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,6 +89,10 @@ public class JiraCreateIssueAction {
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))
-        .sampleOutput(
-            "{\"id\":\"10000\",\"key\":\"ED-24\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10000\",\"transition\":{\"status\":200,\"errorCollection\":{\"errorMessages\":[],\"errors\":{}}}}");
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", 10000.0), Map.entry("key", "ED-24"),
+            Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10000"),
+            Map.entry("transition",
+                Map.<String, Object>ofEntries(Map.entry("status", 200),
+                    Map.entry("errorCollection", Map.<String, Object>ofEntries(Map.entry("errorMessages", List.of()),
+                        Map.entry("errors", Map.<String, Object>ofEntries())))))));
 }

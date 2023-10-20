@@ -18,33 +18,41 @@
 package com.bytechef.component.jira.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class JiraPageOfChangelogsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            integer("startAt").label("Start At")
-                .description("The index of the first item returned on the page.")
-                .required(false),
-            integer("maxResults").label("Max Results")
-                .description("The maximum number of results that could be on the page.")
-                .required(false),
-            integer("total").label("Total")
-                .description("The number of results on the page.")
-                .required(false),
-            array("histories").items(object().properties(JiraChangelogProperties.PROPERTIES)
-                .description("A changelog."))
-                .placeholder("Add to Histories")
-                .label("Histories")
-                .description("The list of changelogs.")
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        integer("startAt").label("Start At")
+            .description("The index of the first item returned on the page.")
+            .required(false),
+        integer("maxResults").label("Max Results")
+            .description("The maximum number of results that could be on the page.")
+            .required(false),
+        integer("total").label("Total")
+            .description("The number of results on the page.")
+            .required(false),
+        array("histories").items(object().properties(JiraChangelogProperties.PROPERTIES)
+            .additionalProperties(
+                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+            .description("A changelog."))
+            .placeholder("Add to Histories")
+            .label("Histories")
+            .description("The list of changelogs.")
+            .required(false));
 }
