@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.oas.handler;
+package com.bytechef.hermes.component.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,33 +30,32 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
+public class ComponentTaskHandler implements TaskHandler<Object> {
 
     private final String actionName;
     private final ActionDefinitionService actionDefinitionService;
-    private final OpenApiComponentHandler openApiComponentHandler;
+    private final String componentName;
+    private final int componentVersion;
 
     @SuppressFBWarnings("EI2")
-    public OpenApiComponentActionTaskHandler(
-        String actionName, ActionDefinitionService actionDefinitionService,
-        OpenApiComponentHandler openApiComponentHandler) {
+    public ComponentTaskHandler(
+        String componentName, int componentVersion, String actionName,
+        ActionDefinitionService actionDefinitionService) {
 
         this.actionName = actionName;
         this.actionDefinitionService = actionDefinitionService;
-        this.openApiComponentHandler = openApiComponentHandler;
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         try {
-
-            return openApiComponentHandler.postExecute(
-                actionName,
-                (Response) actionDefinitionService.executePerform(
-                    openApiComponentHandler.getName(), openApiComponentHandler.getVersion(), actionName,
-                    Objects.requireNonNull(taskExecution.getId()), taskExecution.getParameters(),
-                    MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class)));
+            return actionDefinitionService.executePerform(
+                componentName, componentVersion, actionName, Objects.requireNonNull(taskExecution.getId()),
+                taskExecution.getParameters(),
+                MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

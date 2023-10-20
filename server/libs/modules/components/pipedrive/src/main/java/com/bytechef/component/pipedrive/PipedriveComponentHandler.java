@@ -45,9 +45,9 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
 
     @Override
     public ComponentDSL.ModifiableComponentDefinition modifyComponent(
-        ComponentDSL.ModifiableComponentDefinition componentDefinition) {
+        ComponentDSL.ModifiableComponentDefinition modifiableComponentDefinition) {
 
-        return componentDefinition
+        return modifiableComponentDefinition
             .description("The first CRM designed by salespeople, for salespeople. Do more to grow your business.")
             .customAction(true)
             .icon("path:assets/pipedrive.svg");
@@ -67,24 +67,26 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
 
     @Override
     public DefinitionDSL.ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, DefinitionDSL.ModifiableProperty<?> property) {
+        ActionDefinition actionDefinition, DefinitionDSL.ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(property.getName(), "owner_id") || Objects.equals(property.getName(), "user_id")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/users", null));
-        } else if (Objects.equals(property.getName(), "org_id")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/organizations", null));
-        } else if (Objects.equals(property.getName(), "person_id")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/persons", null));
-        } else if (Objects.equals(property.getName(), "pipeline_id")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/pipelines", null));
-        } else if (Objects.equals(property.getName(), "stage_id")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/stages", "pipeline_id"));
-        } else if (Objects.equals(property.getName(), "currency")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/currencies", null));
-        } else if (Objects.equals(property.getName(), "filter_id")) {
-            ((ModifiableIntegerProperty) property).options(PipedriveUtils.getOptions("/filters", null));
+        if (Objects.equals(modifiableProperty.getName(), "owner_id")
+            || Objects.equals(modifiableProperty.getName(), "user_id")) {
+            ((ModifiableIntegerProperty) modifiableProperty).options(PipedriveUtils.getOptions("/users", null));
+        } else if (Objects.equals(modifiableProperty.getName(), "org_id")) {
+            ((ModifiableIntegerProperty) modifiableProperty).options(PipedriveUtils.getOptions("/organizations", null));
+        } else if (Objects.equals(modifiableProperty.getName(), "person_id")) {
+            ((ModifiableIntegerProperty) modifiableProperty).options(PipedriveUtils.getOptions("/persons", null));
+        } else if (Objects.equals(modifiableProperty.getName(), "pipeline_id")) {
+            ((ModifiableIntegerProperty) modifiableProperty).options(PipedriveUtils.getOptions("/pipelines", null));
+        } else if (Objects.equals(modifiableProperty.getName(), "stage_id")) {
+            ((ModifiableIntegerProperty) modifiableProperty)
+                .options(PipedriveUtils.getOptions("/stages", "pipeline_id"));
+        } else if (Objects.equals(modifiableProperty.getName(), "currency")) {
+            ((ModifiableIntegerProperty) modifiableProperty).options(PipedriveUtils.getOptions("/currencies", null));
+        } else if (Objects.equals(modifiableProperty.getName(), "filter_id")) {
+            ((ModifiableIntegerProperty) modifiableProperty).options(PipedriveUtils.getOptions("/filters", null));
         }
 
-        return property;
+        return modifiableProperty;
     }
 }

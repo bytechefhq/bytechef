@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentActionTaskHandlerTest {
+public class ComponentTaskHandlerTest {
 
     @Disabled
     @Test

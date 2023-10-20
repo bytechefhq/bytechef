@@ -54,24 +54,24 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
 
     @Override
     public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> property) {
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(property.getName(), BASE_ID)) {
-            ((ModifiableStringProperty) property).options(AirtableUtils.getBaseIdOptions());
+        if (Objects.equals(modifiableProperty.getName(), BASE_ID)) {
+            ((ModifiableStringProperty) modifiableProperty).options(AirtableUtils.getBaseIdOptions());
         }
 
-        if (Objects.equals(property.getName(), "__item")) {
-            ((ModifiableDynamicPropertiesProperty) property)
+        if (Objects.equals(modifiableProperty.getName(), "__item")) {
+            ((ModifiableDynamicPropertiesProperty) modifiableProperty)
                 .loadPropertiesDependsOn(BASE_ID, TABLE_ID)
                 .properties(AirtableUtils.getFieldsProperties());
         }
 
-        if (Objects.equals(property.getName(), TABLE_ID)) {
-            ((ModifiableStringProperty) property)
+        if (Objects.equals(modifiableProperty.getName(), TABLE_ID)) {
+            ((ModifiableStringProperty) modifiableProperty)
                 .loadOptionsDependsOn(BASE_ID)
                 .options(AirtableUtils.getTableIdOptions());
         }
 
-        return property;
+        return modifiableProperty;
     }
 }

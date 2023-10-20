@@ -19,11 +19,9 @@ package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.registry.component.util.CustomActionUtils;
 import com.bytechef.commons.util.IconUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -163,19 +161,11 @@ public class ComponentDefinition {
 
     private static List<ActionDefinitionBasic>
         getActions(com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition) {
-        List<ActionDefinitionBasic> actionDefinitionBasics = OptionalUtils.mapOrElse(
+
+        return OptionalUtils.mapOrElse(
             componentDefinition.getActions(),
             actionDefinitions -> CollectionUtils.map(actionDefinitions, ActionDefinitionBasic::new),
             Collections.emptyList());
-
-        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
-            actionDefinitionBasics = new ArrayList<>(actionDefinitionBasics);
-
-            actionDefinitionBasics.add(
-                new ActionDefinitionBasic(CustomActionUtils.getCustomActionDefinition(componentDefinition)));
-        }
-
-        return actionDefinitionBasics;
     }
 
     private static String getTitle(String componentName, String componentTitle) {

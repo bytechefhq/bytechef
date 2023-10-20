@@ -25,7 +25,9 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.component.factory.ComponentHandlerListFactory;
 import com.bytechef.hermes.definition.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -44,21 +46,31 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
         .title("Manual")
-        .triggers(trigger("trigger"));
+        .triggers(trigger("trigger").type(TriggerType.STATIC_WEBHOOK));
 
     private final List<ComponentDefinition> componentDefinitions;
     private final List<ConnectionDefinition> connectionDefinitions;
 
     public ComponentDefinitionRegistryImpl(List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        this(componentDefinitionFactories, null);
+    }
+
+    public ComponentDefinitionRegistryImpl(
+        List<ComponentDefinitionFactory> componentDefinitionFactories,
+        ComponentHandlerListFactory componentHandlerListFactory) {
+
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
-            componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
-                .toList(),
+            CollectionUtils.concat(
+                (List<ComponentDefinition>) CollectionUtils.map(
+                    componentDefinitionFactories, ComponentDefinitionFactory::getDefinition),
+                componentHandlerListFactory == null
+                    ? List.of()
+                    : CollectionUtils.map(
+                        componentHandlerListFactory.getComponentHandlers(),
+                        ComponentDefinitionFactory::getDefinition)),
             MANUAL_COMPONENT_DEFINITION);
 
-        this.componentDefinitions = componentDefinitions.stream()
-            .sorted(this::compare)
-            .toList();
+        this.componentDefinitions = CollectionUtils.sorted(componentDefinitions, this::compare);
 
         // Validate
 
@@ -224,8 +236,8 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
     private void validate(List<ComponentDefinition> componentDefinitions) {
         for (ComponentDefinition componentDefinition : componentDefinitions) {
-            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
-                .orElse(List.of());
+            List<? extends ActionDefinition> actionDefinitions = OptionalUtils.orElse(
+                componentDefinition.getActions(), List.of());
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
@@ -236,14 +248,25 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
                     throw new IllegalStateException("Output schema can be define either as a property or function");
                 }
+
+                if (OptionalUtils.isPresent(actionDefinition.getOutputSchema()) &&
+                    OptionalUtils.isPresent(actionDefinition.getOutputSchemaDataSource())) {
+
+                    throw new IllegalStateException("Output schema can be define either as a property or function");
+                }
             }
 
-            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers()
-                .orElse(List.of());
+            List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
+                componentDefinition.getTriggers(), List.of());
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(OptionalUtils.orElse(triggerDefinition.getOutputSchema(), null));
+
+                if (triggerDefinition.getType() == null) {
+                    throw new IllegalStateException(
+                        "Trigger type for trigger=%s is not defined".formatted(triggerDefinition.getName()));
+                }
             }
         }
     }

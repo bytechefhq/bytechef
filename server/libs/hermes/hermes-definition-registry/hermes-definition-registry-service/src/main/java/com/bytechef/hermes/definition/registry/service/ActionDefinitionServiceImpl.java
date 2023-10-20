@@ -38,17 +38,14 @@ import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
-import com.bytechef.hermes.definition.registry.component.util.CustomActionUtils;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.domain.Property;
 import com.bytechef.hermes.definition.registry.domain.Option;
 import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -162,8 +159,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         return ComponentContextSupplier.get(
             context,
-            () -> OptionalUtils.map(
-                actionDefinition.getPerform(), performFunction -> performFunction.apply(inputParameters, context)));
+            () -> OptionalUtils.mapOrElse(
+                actionDefinition.getPerform(), performFunction -> performFunction.apply(inputParameters, context),
+                null));
     }
 
     @Override
@@ -189,22 +187,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
-
-        List<ActionDefinition> actions =
-            componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
-                .stream()
-                .map(ActionDefinition::new)
-                .toList();
-
-        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
-            actions = new ArrayList<>(actions);
-
-            actions.add(new ActionDefinition(CustomActionUtils.getCustomActionDefinition(componentDefinition)));
-        }
-
-        return actions;
+        return componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
+            .stream()
+            .map(ActionDefinition::new)
+            .toList();
     }
 
     @Override
@@ -293,18 +279,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private com.bytechef.hermes.component.definition.ActionDefinition resolveActionDefinition(
         String componentName, int componentVersion, String actionName) {
 
-        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition;
-
-        if (Objects.equals(actionName, CustomActionUtils.CUSTOM)) {
-            ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-                componentName, componentVersion);
-
-            actionDefinition = CustomActionUtils.getCustomActionDefinition(componentDefinition);
-        } else {
-            actionDefinition = componentDefinitionRegistry.getActionDefinition(
-                componentName, componentVersion, actionName);
-        }
-
-        return actionDefinition;
+        return componentDefinitionRegistry.getActionDefinition(
+            componentName, componentVersion, actionName);
     }
 }

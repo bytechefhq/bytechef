@@ -18,6 +18,8 @@
 package com.bytechef.atlas.worker.task.handler;
 
 import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

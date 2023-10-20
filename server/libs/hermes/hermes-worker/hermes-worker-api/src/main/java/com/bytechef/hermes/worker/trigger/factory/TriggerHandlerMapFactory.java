@@ -15,23 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.worker.config;
+package com.bytechef.hermes.worker.trigger.factory;
 
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@Configuration
-public class TaskHandlerRegistryConfiguration {
+public interface TriggerHandlerMapFactory {
 
-    @Bean
-    TaskHandlerRegistry taskHandlerRegistry(Map<String, TaskHandler<?>> taskHandlerMap) {
-        return taskHandlerMap::get;
-    }
+    Map<String, TriggerHandler> getTriggerHandlerMap();
 }

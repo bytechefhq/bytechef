@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.test.config;
 
+import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
@@ -28,10 +30,13 @@ import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
+import com.bytechef.hermes.definition.registry.component.factory.ComponentHandlerListFactory;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -64,7 +69,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -97,6 +101,9 @@ public class ComponentTestIntConfiguration {
     @MockBean(name = "dataStorageService")
     private DataStorageService dataStorageService;
 
+    @MockBean
+    private MessageBroker messageBroker;
+
     @Bean
     ActionDefinitionService actionDefinitionService(
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
@@ -108,9 +115,10 @@ public class ComponentTestIntConfiguration {
 
     @Bean
     ComponentDefinitionRegistry componentDefinitionRegistry(
-        List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        List<ComponentDefinitionFactory> componentDefinitionFactories,
+        ComponentHandlerListFactory componentHandlerListFactory) {
 
-        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories);
+        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories, componentHandlerListFactory);
     }
 
     @Bean
@@ -135,17 +143,18 @@ public class ComponentTestIntConfiguration {
             connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
     }
 
-    @MockBean
-    private MessageBroker messageBroker;
-
     @Bean
     FileStorageService fileStorageService() {
         return new Base64FileStorageService();
     }
 
-    @EnableCaching
-    @TestConfiguration
-    public static class CacheConfiguration {
+    @Bean
+    TriggerDefinitionService triggerDefinitionService(
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+        ContextFactory contextFactory, MessageBroker messageBroker) {
+
+        return new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextConnectionFactory, contextFactory, messageBroker);
     }
 
     @TestConfiguration
@@ -180,10 +189,11 @@ public class ComponentTestIntConfiguration {
         JobTestExecutor componentWorkflowTestSupport(
             ContextService contextService, EventPublisher eventPublisher, JobService jobService,
             TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-            WorkflowService workflowService) {
+            TaskHandlerMapFactory taskHandlerMapFactory, WorkflowService workflowService) {
 
             return new JobTestExecutor(
-                contextService, jobService, eventPublisher, taskExecutionService, taskHandlerMap, workflowService);
+                contextService, jobService, eventPublisher, taskExecutionService,
+                MapUtils.concat(taskHandlerMap, taskHandlerMapFactory.getTaskHandlerMap()), workflowService);
         }
 
         @Bean

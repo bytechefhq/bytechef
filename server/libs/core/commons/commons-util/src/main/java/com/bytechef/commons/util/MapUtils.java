@@ -644,6 +644,13 @@ public final class MapUtils {
         return entry.stream();
     }
 
+    public static <K, V, T> Map<K, V> toMap(
+        List<T> list, Function<T, ? extends K> keyMapper, Function<T, ? extends V> valueMapper) {
+
+        return list.stream()
+            .collect(Collectors.toMap(keyMapper, valueMapper));
+    }
+
     public static <K, V, K1, V1> Map<K1, V1> toMap(
         Map<K, V> map, Function<Map.Entry<K, V>, ? extends K1> keyMapper,
         Function<Map.Entry<K, V>, ? extends V1> valueMapper) {
