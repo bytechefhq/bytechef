@@ -168,7 +168,7 @@ const Integration: React.FC = () => {
                     leftSidebarHeader={
                         <>
                             <h3 className="mt-4 text-center font-bold uppercase text-gray-600">
-                                Workflow elements
+                                Workflow nodes
                             </h3>
 
                             <Input
@@ -177,7 +177,7 @@ const Integration: React.FC = () => {
                                 onChange={(event) =>
                                     setFilter(event.target.value)
                                 }
-                                placeholder="Filter workflow elements"
+                                placeholder="Filter workflow nodes"
                                 value={filter}
                             />
                         </>

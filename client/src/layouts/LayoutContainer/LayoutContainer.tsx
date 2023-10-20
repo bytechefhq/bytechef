@@ -95,6 +95,7 @@ const LayoutContainer: React.FC<
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>
+
                         <div className="w-14 shrink-0" aria-hidden="true">
                             {/* Dummy element to force sidebar to shrink to fit close icon */}
                         </div>
@@ -107,9 +108,7 @@ const LayoutContainer: React.FC<
                     <nav className="flex h-full flex-col border-l border-gray-200 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                         {leftSidebarHeader}
 
-                        <div className="overflow-y-auto">
-                            <div>{leftSidebarBody}</div>
-                        </div>
+                        <div className="overflow-y-auto">{leftSidebarBody}</div>
                     </nav>
                 </aside>
             )}
@@ -130,7 +129,7 @@ const LayoutContainer: React.FC<
                                 <aside className="flex">
                                     <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                                         <div className="overflow-y-auto">
-                                            <div>{rightToolbarBody}</div>
+                                            {rightToolbarBody}
                                         </div>
                                     </nav>
                                 </aside>

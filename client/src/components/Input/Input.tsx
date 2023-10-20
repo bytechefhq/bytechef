@@ -1,5 +1,6 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import {forwardRef} from 'react';
 
 type InputProps = {
@@ -28,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         },
         ref
     ) => (
-        <fieldset className={cx('mb-3', fieldsetClassName)}>
+        <fieldset className={twMerge(cx('mb-3', fieldsetClassName))}>
             {label && (
                 <label
                     htmlFor={name}
