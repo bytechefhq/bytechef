@@ -69,6 +69,19 @@ public class JobController implements JobsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
+        Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
+        return workflowParametersModelMono.map(workflowParametersModel -> {
+            JobParameters jobParameters = conversionService.convert(
+                workflowParametersModel, JobParameters.class);
+
+            long jobId = jobFacade.create(jobParameters);
+
+            return ResponseEntity.ok(new CreateJob200ResponseModel().jobId(jobId));
+        });
+    }
+
+    @Override
     public Mono<ResponseEntity<JobModel>> getJob(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class)));
     }
@@ -95,19 +108,6 @@ public class JobController implements JobsApi {
         return Mono.just(ResponseEntity.ok(
             conversionService.convert(jobService.fetchLatestJob()
                 .orElse(null), JobModel.class)));
-    }
-
-    @Override
-    public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
-        Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
-        return workflowParametersModelMono.map(workflowParametersModel -> {
-            JobParameters jobParameters = conversionService.convert(
-                workflowParametersModel, JobParameters.class);
-
-            long jobId = jobFacade.create(jobParameters);
-
-            return ResponseEntity.ok(new CreateJob200ResponseModel().jobId(jobId));
-        });
     }
 
     @Override
