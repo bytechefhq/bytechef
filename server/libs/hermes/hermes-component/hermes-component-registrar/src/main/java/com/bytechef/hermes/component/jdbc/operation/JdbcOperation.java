@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 
 /**
  * @author Ivica Cardic
@@ -27,5 +27,5 @@ import com.bytechef.hermes.component.ExecutionParameters;
  */
 public interface JdbcOperation<T> {
 
-    T execute(Context context, ExecutionParameters executionParameters);
+    T execute(Context context, Parameters parameters);
 }

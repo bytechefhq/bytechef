@@ -19,7 +19,7 @@ package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
@@ -100,16 +100,16 @@ public class JsonFileReadAction {
         .perform(JsonFileReadAction::performRead);
 
     @SuppressWarnings("unchecked")
-    public static Object performRead(Context context, ExecutionParameters executionParameters)
+    public static Object performRead(Context context, Parameters parameters)
         throws ActionExecutionException {
 
-        JsonFileTaskConstants.FileType fileType = getFileType(executionParameters);
-        FileEntry fileEntry = executionParameters.getRequired(FILE_ENTRY, FileEntry.class);
-        boolean isArray = executionParameters.getBoolean(IS_ARRAY, true);
+        JsonFileTaskConstants.FileType fileType = getFileType(parameters);
+        FileEntry fileEntry = parameters.getRequired(FILE_ENTRY, FileEntry.class);
+        boolean isArray = parameters.getBoolean(IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = executionParameters.getString(PATH);
+            String path = parameters.getString(PATH);
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
@@ -129,12 +129,12 @@ public class JsonFileReadAction {
                         .map(line -> (Map<String, ?>) JsonUtils.read(line, Map.class))
                         .collect(Collectors.toList());
                 } catch (IOException ioException) {
-                    throw new ActionExecutionException("Unable to open json file " + executionParameters, ioException);
+                    throw new ActionExecutionException("Unable to open json file " + parameters, ioException);
                 }
             }
 
-            Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
-            Integer pageNumber = executionParameters.getInteger(PAGE_NUMBER);
+            Integer pageSize = parameters.getInteger(PAGE_SIZE);
+            Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -157,8 +157,8 @@ public class JsonFileReadAction {
         return result;
     }
 
-    public static JsonFileTaskConstants.FileType getFileType(ExecutionParameters executionParameters) {
-        String fileType = executionParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name());
+    public static JsonFileTaskConstants.FileType getFileType(Parameters parameters) {
+        String fileType = parameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name());
 
         return JsonFileTaskConstants.FileType.valueOf(fileType.toUpperCase());
     }

@@ -23,7 +23,7 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,14 +43,14 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, ExecutionParameters executionParameters) {
+    public Map<String, Integer> execute(Context context, Parameters parameters) {
         Map<String, Integer> result;
 
-        String deleteKey = executionParameters.getString(DELETE_KEY, "id");
+        String deleteKey = parameters.getString(DELETE_KEY, "id");
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) executionParameters.getList(ROWS, Map.class, Collections.emptyList());
-        String schema = executionParameters.getString(SCHEMA, "public");
-        String table = executionParameters.getRequiredString(TABLE);
+        List<Map<String, ?>> rows = (List) parameters.getList(ROWS, Map.class, Collections.emptyList());
+        String schema = parameters.getString(SCHEMA, "public");
+        String table = parameters.getRequiredString(TABLE);
 
         if (rows.isEmpty()) {
             result = Map.of("rows", 0);

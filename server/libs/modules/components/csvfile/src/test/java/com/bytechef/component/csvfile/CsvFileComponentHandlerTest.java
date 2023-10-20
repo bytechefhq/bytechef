@@ -30,7 +30,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.csvfile.action.CsvFileReadAction;
 import com.bytechef.component.csvfile.action.CsvFileWriteAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
@@ -315,7 +315,7 @@ public class CsvFileComponentHandlerTest {
             .getFile());
     }
 
-    private ExecutionParameters getReadParameters(
+    private Parameters getReadParameters(
         boolean headerRow,
         boolean includeEmptyCells,
         Integer pageNumber,
@@ -324,21 +324,21 @@ public class CsvFileComponentHandlerTest {
         File file)
         throws FileNotFoundException {
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(DELIMITER, ","))
+        Mockito.when(parameters.getString(DELIMITER, ","))
             .thenReturn(",");
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getBoolean(HEADER_ROW, true))
+        Mockito.when(parameters.getBoolean(HEADER_ROW, true))
             .thenReturn(headerRow);
-        Mockito.when(executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
+        Mockito.when(parameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
             .thenReturn(includeEmptyCells);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(pageNumber);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(pageSize);
-        Mockito.when(executionParameters.getBoolean(READ_AS_STRING, false))
+        Mockito.when(parameters.getBoolean(READ_AS_STRING, false))
             .thenReturn(readAsString);
 
         if (file != null) {
@@ -346,17 +346,17 @@ public class CsvFileComponentHandlerTest {
                 .thenReturn(new FileInputStream(file));
         }
 
-        return executionParameters;
+        return parameters;
     }
 
     @SuppressWarnings("raw")
-    private ExecutionParameters getWriteParameters(List<Map> items) {
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+    private Parameters getWriteParameters(List<Map> items) {
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getList(ROWS, Map.class, List.of()))
+        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
             .thenReturn(items);
 
-        return executionParameters;
+        return parameters;
     }
 
     private List<Map<String, Object>> read(InputStream inputStream) throws IOException {

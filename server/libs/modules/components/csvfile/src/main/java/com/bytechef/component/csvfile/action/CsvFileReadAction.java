@@ -20,7 +20,7 @@ package com.bytechef.component.csvfile.action;
 import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
@@ -105,15 +105,15 @@ public class CsvFileReadAction {
         .output(array())
         .perform(CsvFileReadAction::performRead);
 
-    public static List<Map<String, Object>> performRead(Context context, ExecutionParameters executionParameters) {
-        String delimiter = executionParameters.getString(DELIMITER, ",");
-        boolean headerRow = executionParameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
-        Integer pageNumber = executionParameters.getInteger(PAGE_NUMBER);
-        boolean readAsString = executionParameters.getBoolean(READ_AS_STRING, false);
+    public static List<Map<String, Object>> performRead(Context context, Parameters parameters) {
+        String delimiter = parameters.getString(DELIMITER, ",");
+        boolean headerRow = parameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = parameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = parameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = parameters.getBoolean(READ_AS_STRING, false);
 
-        try (InputStream inputStream = context.getFileStream(executionParameters.get(FILE_ENTRY, FileEntry.class))) {
+        try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, FileEntry.class))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 

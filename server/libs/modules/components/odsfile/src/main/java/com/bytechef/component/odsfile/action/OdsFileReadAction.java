@@ -18,7 +18,7 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
@@ -99,17 +99,17 @@ public class OdsFileReadAction {
         .output(array())
         .perform(OdsFileReadAction::performRead);
 
-    public static List<Map<String, ?>> performRead(Context context, ExecutionParameters executionParameters) {
-        boolean headerRow = executionParameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
-        Integer pageNumber = executionParameters.getInteger(PAGE_NUMBER);
-        boolean readAsString = executionParameters.getBoolean(READ_AS_STRING, false);
-        String sheetName = executionParameters.getString(SHEET_NAME);
+    public static List<Map<String, ?>> performRead(Context context, Parameters parameters) {
+        boolean headerRow = parameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = parameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = parameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = parameters.getBoolean(READ_AS_STRING, false);
+        String sheetName = parameters.getString(SHEET_NAME);
 
-        try (InputStream inputStream = context.getFileStream(executionParameters.get(FILE_ENTRY, FileEntry.class))) {
+        try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, FileEntry.class))) {
             if (inputStream == null) {
-                throw new ActionExecutionException("Unable to get file content from task " + executionParameters);
+                throw new ActionExecutionException("Unable to get file content from task " + parameters);
             }
 
             Integer rangeStartRow = null;
@@ -131,7 +131,7 @@ public class OdsFileReadAction {
                     readAsString,
                     sheetName));
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to handle task " + executionParameters, exception);
+            throw new ActionExecutionException("Unable to handle task " + parameters, exception);
         }
     }
 

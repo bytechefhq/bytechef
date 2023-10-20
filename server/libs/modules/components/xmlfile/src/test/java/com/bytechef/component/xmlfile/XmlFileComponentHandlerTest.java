@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.component.xmlfile.action.XmlFileReadAction;
 import com.bytechef.component.xmlfile.action.XmlFileWriteAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
@@ -81,14 +81,14 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(context.readFileToString(Mockito.any(FileEntry.class)))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(false);
 
-        assertThat((Map<String, ?>) XmlFileReadAction.performRead(context, executionParameters))
+        assertThat((Map<String, ?>) XmlFileReadAction.performRead(context, parameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
     }
 
@@ -99,35 +99,35 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(null);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(null);
 
-        assertThat((List<?>) XmlFileReadAction.performRead(context, executionParameters))
+        assertThat((List<?>) XmlFileReadAction.performRead(context, parameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(1);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        assertThat(((List<?>) XmlFileReadAction.performRead(context, executionParameters)).size())
+        assertThat(((List<?>) XmlFileReadAction.performRead(context, parameters)).size())
             .isEqualTo(2);
     }
 
@@ -135,12 +135,12 @@ public class XmlFileComponentHandlerTest {
     public void testPerformWrite() {
         File file = getFile(SAMPLE_XML);
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
 
-        XmlFileWriteAction.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, parameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -156,14 +156,14 @@ public class XmlFileComponentHandlerTest {
 
         Mockito.reset(context);
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILENAME))
+        Mockito.when(parameters.getString(FILENAME))
             .thenReturn(TEST_XML);
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
 
-        XmlFileWriteAction.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, parameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -177,12 +177,12 @@ public class XmlFileComponentHandlerTest {
     public void testPerformWriteArray() {
         File file = getFile(SAMPLE_ARRAY_XML);
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
-        XmlFileWriteAction.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, parameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -198,14 +198,14 @@ public class XmlFileComponentHandlerTest {
 
         Mockito.reset(context);
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
-        Mockito.when(executionParameters.getString(FILENAME))
+        Mockito.when(parameters.getString(FILENAME))
             .thenReturn(TEST_XML);
 
-        XmlFileWriteAction.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, parameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

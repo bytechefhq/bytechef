@@ -20,7 +20,7 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import java.util.List;
@@ -65,7 +65,7 @@ public class HttpClientGetAction {
             fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
         .perform(HttpClientGetAction::performGet);
 
-    public static Object performGet(Context context, ExecutionParameters executionParameters) {
-        return HttpClientActionUtils.execute(context, executionParameters, RequestMethod.GET);
+    public static Object performGet(Context context, Parameters parameters) {
+        return HttpClientActionUtils.execute(context, parameters, RequestMethod.GET);
     }
 }

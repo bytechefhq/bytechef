@@ -18,7 +18,7 @@
 package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -62,18 +62,18 @@ public class AwsS3ListObjectsAction {
         .perform(AwsS3ListObjectsAction::performListObjects);
 
     public static List<S3ObjectDescription> performListObjects(
-        Context context, ExecutionParameters executionParameters) {
+        Context context, Parameters parameters) {
         S3ClientBuilder builder = S3Client.builder();
 
         try (S3Client s3Client = builder.build()) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(executionParameters.getRequiredString(BUCKET))
-                .prefix(executionParameters.getRequiredString(PREFIX))
+                .bucket(parameters.getRequiredString(BUCKET))
+                .prefix(parameters.getRequiredString(PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
-                .map(o -> new S3ObjectDescription(executionParameters.getRequiredString(BUCKET), o))
+                .map(o -> new S3ObjectDescription(parameters.getRequiredString(BUCKET), o))
                 .collect(Collectors.toList());
         }
     }

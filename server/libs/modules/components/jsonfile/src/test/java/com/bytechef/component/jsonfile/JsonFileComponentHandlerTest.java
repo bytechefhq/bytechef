@@ -31,7 +31,7 @@ import com.bytechef.component.jsonfile.action.JsonFileReadAction;
 import com.bytechef.component.jsonfile.action.JsonFileWriteAction;
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
@@ -80,18 +80,18 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(context.readFileToString(Mockito.any(FileEntry.class)))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY))
+        Mockito.when(parameters.getBoolean(IS_ARRAY))
             .thenReturn(false);
 
         assertEquals(
             new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)),
-            new JSONObject((Map<String, ?>) JsonFileReadAction.performRead(context, executionParameters)),
+            new JSONObject((Map<String, ?>) JsonFileReadAction.performRead(context, parameters)),
             true);
     }
 
@@ -102,41 +102,41 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(null);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(null);
 
         assertEquals(
             new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) JsonFileReadAction.performRead(context, executionParameters)),
+            new JSONArray((List<?>) JsonFileReadAction.performRead(context, parameters)),
             true);
 
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(1);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        Assertions.assertThat(((List<?>) JsonFileReadAction.performRead(context, executionParameters)).size())
+        Assertions.assertThat(((List<?>) JsonFileReadAction.performRead(context, parameters)).size())
             .isEqualTo(2);
     }
 
@@ -147,41 +147,41 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(null);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(null);
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) JsonFileReadAction.performRead(context, executionParameters)),
+            new JSONArray((List<?>) JsonFileReadAction.performRead(context, parameters)),
             true);
 
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
-        Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
+        Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(1);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        Assertions.assertThat(((List<?>) JsonFileReadAction.performRead(context, executionParameters)).size())
+        Assertions.assertThat(((List<?>) JsonFileReadAction.performRead(context, parameters)).size())
             .isEqualTo(2);
     }
 
@@ -189,14 +189,14 @@ public class JsonFileComponentHandlerTest {
     public void testPerformWriteJSON() throws JSONException {
         File file = getFile("sample.json");
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
-        JsonFileWriteAction.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, parameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -218,14 +218,14 @@ public class JsonFileComponentHandlerTest {
     public void testPerformWriteJSONArray() throws JSONException {
         File file = getFile("sample_array.json");
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        JsonFileWriteAction.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, parameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -244,16 +244,16 @@ public class JsonFileComponentHandlerTest {
 
         Mockito.reset(context);
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILENAME))
+        Mockito.when(parameters.getString(FILENAME))
             .thenReturn("test.json");
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        JsonFileWriteAction.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, parameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -266,15 +266,15 @@ public class JsonFileComponentHandlerTest {
     @Test
     public void testPerformWriteJSONL() throws JSONException {
         File file = getFile("sample.jsonl");
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(
                 linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        JsonFileWriteAction.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, parameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -293,17 +293,17 @@ public class JsonFileComponentHandlerTest {
 
         Mockito.reset(context);
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILENAME))
+        Mockito.when(parameters.getString(FILENAME))
             .thenReturn("test.jsonl");
-        Mockito.when(executionParameters.getString(FILE_TYPE, FileType.JSON.name()))
+        Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(
                 linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        JsonFileWriteAction.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, parameters);
 
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));

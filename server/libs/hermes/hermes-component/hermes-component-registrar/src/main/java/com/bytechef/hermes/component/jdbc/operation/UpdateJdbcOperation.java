@@ -24,7 +24,7 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
 import java.util.Arrays;
 import java.util.List;
@@ -43,13 +43,13 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, ExecutionParameters executionParameters) {
-        List<String> columns = executionParameters.getList(COLUMNS, String.class, List.of());
+    public Map<String, Integer> execute(Context context, Parameters parameters) {
+        List<String> columns = parameters.getList(COLUMNS, String.class, List.of());
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) executionParameters.getList(ROWS, Map.class, List.of());
-        String schema = executionParameters.getString(SCHEMA, "public");
-        String table = executionParameters.getRequiredString(TABLE);
-        String updateKey = executionParameters.getString(UPDATE_KEY, "id");
+        List<Map<String, ?>> rows = (List) parameters.getList(ROWS, Map.class, List.of());
+        String schema = parameters.getString(SCHEMA, "public");
+        String table = parameters.getRequiredString(TABLE);
+        String updateKey = parameters.getString(UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
             context.getConnection(),

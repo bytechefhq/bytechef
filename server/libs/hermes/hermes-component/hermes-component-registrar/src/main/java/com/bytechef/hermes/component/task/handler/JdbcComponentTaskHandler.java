@@ -49,7 +49,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
@@ -90,24 +90,24 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
         return componentDefinition;
     }
 
-    protected Map<String, Integer> performDelete(Context context, ExecutionParameters executionParameters) {
-        return deleteJdbcOperation.execute(context, executionParameters);
+    protected Map<String, Integer> performDelete(Context context, Parameters parameters) {
+        return deleteJdbcOperation.execute(context, parameters);
     }
 
-    protected Map<String, Integer> performExecute(Context context, ExecutionParameters executionParameters) {
-        return executeJdbcOperation.execute(context, executionParameters);
+    protected Map<String, Integer> performExecute(Context context, Parameters parameters) {
+        return executeJdbcOperation.execute(context, parameters);
     }
 
-    protected Map<String, Integer> performInsert(Context context, ExecutionParameters executionParameters) {
-        return insertJdbcOperation.execute(context, executionParameters);
+    protected Map<String, Integer> performInsert(Context context, Parameters parameters) {
+        return insertJdbcOperation.execute(context, parameters);
     }
 
-    protected List<Map<String, Object>> performQuery(Context context, ExecutionParameters executionParameters) {
-        return queryJdbcOperation.execute(context, executionParameters);
+    protected List<Map<String, Object>> performQuery(Context context, Parameters parameters) {
+        return queryJdbcOperation.execute(context, parameters);
     }
 
-    protected Map<String, Integer> performUpdate(Context context, ExecutionParameters executionParameters) {
-        return updateJdbcOperation.execute(context, executionParameters);
+    protected Map<String, Integer> performUpdate(Context context, Parameters parameters) {
+        return updateJdbcOperation.execute(context, parameters);
     }
 
     private ComponentDefinition getComponentDefinition(String name, Display display) {

@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 
@@ -46,10 +46,10 @@ public class FilesystemLsAction {
             .description("Lists a content of directory for the given path."))
         .perform(FilesystemLsAction::performLs);
 
-    public static List<FileInfo> performLs(Context context, ExecutionParameters executionParameters) {
-        Path root = Paths.get(executionParameters.getRequiredString("path"));
+    public static List<FileInfo> performLs(Context context, Parameters parameters) {
+        Path root = Paths.get(parameters.getRequiredString("path"));
 
-        boolean recursive = executionParameters.getBoolean("recursive", false);
+        boolean recursive = parameters.getBoolean("recursive", false);
 
         try (Stream<Path> stream = Files.walk(root)) {
             return stream.filter(p -> recursive || p.getParent()

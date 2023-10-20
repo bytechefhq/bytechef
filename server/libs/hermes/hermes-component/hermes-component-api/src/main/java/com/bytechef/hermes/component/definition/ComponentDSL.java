@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.DefinitionDSL;
@@ -96,7 +96,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<Property<?>> properties;
 
         @JsonIgnore
-        private BiFunction<Context, ExecutionParameters, Object> performFunction;
+        private BiFunction<Context, Parameters, Object> performFunction;
 
         private ModifiableActionDefinition() {
         }
@@ -142,7 +142,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition perform(BiFunction<Context, ExecutionParameters, Object> performFunction) {
+        public ModifiableActionDefinition perform(BiFunction<Context, Parameters, Object> performFunction) {
             this.performFunction = performFunction;
 
             return this;
@@ -184,7 +184,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<BiFunction<Context, ExecutionParameters, Object>> getPerformFunction() {
+        public Optional<BiFunction<Context, Parameters, Object>> getPerformFunction() {
             return Optional.ofNullable(performFunction);
         }
     }

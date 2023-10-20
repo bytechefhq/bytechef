@@ -18,7 +18,7 @@
 package com.bytechef.component.httpclient.util;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
@@ -130,22 +130,22 @@ public class HttpClientActionUtils {
     }
 
     public static Object execute(
-        Context context, ExecutionParameters executionParameters, RequestMethod requestMethod) {
+        Context context, Parameters parameters, RequestMethod requestMethod) {
 
         return exchange(
-            executionParameters.getRequiredString(URI), requestMethod)
+            parameters.getRequiredString(URI), requestMethod)
                 .configuration(
-                    allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                        .filename(executionParameters.getString(RESPONSE_FILENAME))
-                        .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
-                        .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
-                        .proxy(executionParameters.getString(PROXY))
-                        .responseFormat(getResponseFormat(executionParameters))
-                        .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000))))
-                .headers(executionParameters.getMap(HEADER_PARAMETERS))
-                .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
-                .payload(getPayload(executionParameters, getBodyContentType(executionParameters)))
+                    allowUnauthorizedCerts(parameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                        .filename(parameters.getString(RESPONSE_FILENAME))
+                        .followAllRedirects(parameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(parameters.getBoolean(FOLLOW_REDIRECT, false))
+                        .fullResponse(parameters.getBoolean(FULL_RESPONSE, false))
+                        .proxy(parameters.getString(PROXY))
+                        .responseFormat(getResponseFormat(parameters))
+                        .timeout(Duration.ofMillis(parameters.getInteger(TIMEOUT, 10000))))
+                .headers(parameters.getMap(HEADER_PARAMETERS))
+                .queryParameters(parameters.getMap(QUERY_PARAMETERS))
+                .payload(getPayload(parameters, getBodyContentType(parameters)))
                 .execute();
     }
 
@@ -159,45 +159,45 @@ public class HttpClientActionUtils {
         return allProperties.toArray(size -> new Property<?>[size]);
     }
 
-    private static BodyContentType getBodyContentType(ExecutionParameters executionParameters) {
-        String bodyContentTypeParameter = executionParameters.getString(BODY_CONTENT_TYPE);
+    private static BodyContentType getBodyContentType(Parameters parameters) {
+        String bodyContentTypeParameter = parameters.getString(BODY_CONTENT_TYPE);
 
         return bodyContentTypeParameter == null
             ? null
             : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
     }
 
-    private static Payload getPayload(ExecutionParameters executionParameters, BodyContentType bodyContentType) {
+    private static Payload getPayload(Parameters parameters, BodyContentType bodyContentType) {
         Payload payload = null;
 
-        if (executionParameters.containsKey(BODY_CONTENT)) {
+        if (parameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
                 payload = Payload.of(
-                    executionParameters.get(BODY_CONTENT, FileEntry.class),
-                    executionParameters.getString(BODY_CONTENT_MIME_TYPE));
+                    parameters.get(BODY_CONTENT, FileEntry.class),
+                    parameters.getString(BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 payload = Payload.of(
-                    executionParameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
+                    parameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                payload = Payload.of(executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                payload = Payload.of(parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.JSON) {
                 payload = Payload.of(
-                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                    parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.RAW) {
                 payload = Payload.of(
-                    executionParameters.getString(BODY_CONTENT),
-                    executionParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
+                    parameters.getString(BODY_CONTENT),
+                    parameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
             } else {
-                payload = Payload.of(executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                payload = Payload.of(parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             }
         }
 
         return payload;
     }
 
-    private static ResponseFormat getResponseFormat(ExecutionParameters executionParameters) {
-        return executionParameters.containsKey(RESPONSE_FORMAT)
-            ? ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT))
+    private static ResponseFormat getResponseFormat(Parameters parameters) {
+        return parameters.containsKey(RESPONSE_FORMAT)
+            ? ResponseFormat.valueOf(parameters.getString(RESPONSE_FORMAT))
             : null;
     }
 }

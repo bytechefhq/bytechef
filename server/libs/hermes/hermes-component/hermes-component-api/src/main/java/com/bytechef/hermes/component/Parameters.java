@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface ExecutionParameters {
+public interface Parameters {
 
     /**
      * Determined if the given task contains the given key.

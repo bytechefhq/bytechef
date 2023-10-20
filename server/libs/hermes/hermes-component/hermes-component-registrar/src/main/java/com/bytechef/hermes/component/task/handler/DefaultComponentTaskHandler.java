@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.impl.ContextImpl;
-import com.bytechef.hermes.component.impl.ExecutionParametersImpl;
+import com.bytechef.hermes.component.impl.ParametersImpl;
 import com.bytechef.hermes.component.util.ContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -66,8 +66,8 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
             () -> actionDefinition
                 .getPerformFunction()
                 .map(performFunction -> performFunction.apply(
-                    context, new ExecutionParametersImpl(taskExecution.getParameters())))
+                    context, new ParametersImpl(taskExecution.getParameters())))
                 .orElseGet(() -> componentHandler.handle(
-                    actionDefinition, context, new ExecutionParametersImpl(taskExecution.getParameters()))));
+                    actionDefinition, context, new ParametersImpl(taskExecution.getParameters()))));
     }
 }

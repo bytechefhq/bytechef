@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.impl;
 
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -30,12 +30,12 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ExecutionParametersImpl implements ExecutionParameters {
+public class ParametersImpl implements Parameters {
 
     private final Map<String, Object> parameters;
 
     @SuppressFBWarnings("EI2")
-    public ExecutionParametersImpl(Map<String, Object> parameters) {
+    public ParametersImpl(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 
@@ -246,7 +246,7 @@ public class ExecutionParametersImpl implements ExecutionParameters {
 
     @Override
     public String toString() {
-        return "ExecutionParametersImpl{" +
+        return "ParametersImpl{" +
             "parameters=" + parameters +
             '}';
     }
