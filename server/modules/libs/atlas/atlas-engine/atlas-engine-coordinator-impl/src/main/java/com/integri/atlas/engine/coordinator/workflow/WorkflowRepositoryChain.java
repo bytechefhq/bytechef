@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.pipeline;
+package com.integri.atlas.engine.coordinator.workflow;
 
 import com.integri.atlas.engine.coordinator.cache.Clearable;
 import java.util.List;
@@ -33,57 +33,57 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Jun 2, 2017
  */
-public class PipelineRepositoryChain implements PipelineRepository, Clearable {
+public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
-    private final List<PipelineRepository> repositories;
+    private final List<WorkflowRepository> repositories;
 
     private CacheManager cacheManager = new ConcurrentMapCacheManager();
 
-    private static final String CACHE_ALL = PipelineRepositoryChain.class.getName() + ".all";
-    private static final String CACHE_ONE = PipelineRepositoryChain.class.getName() + ".one";
+    private static final String CACHE_ALL = WorkflowRepositoryChain.class.getName() + ".all";
+    private static final String CACHE_ONE = WorkflowRepositoryChain.class.getName() + ".one";
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public PipelineRepositoryChain(List<PipelineRepository> aRepositories) {
+    public WorkflowRepositoryChain(List<WorkflowRepository> aRepositories) {
         Assert.notNull(aRepositories, "'aRepositories' can not be null");
         repositories = aRepositories;
     }
 
     @Override
-    public Pipeline findOne(String aId) {
+    public Workflow findOne(String aId) {
         Cache oneCache = cacheManager.getCache(CACHE_ONE);
         if (oneCache.get(aId) != null) {
-            return (Pipeline) oneCache.get(aId).get();
+            return (Workflow) oneCache.get(aId).get();
         }
         Cache allCache = cacheManager.getCache(CACHE_ALL);
         if (allCache.get(CACHE_ALL) != null) {
-            List<Pipeline> pipelines = (List<Pipeline>) allCache.get(CACHE_ALL).get();
-            for (Pipeline p : pipelines) {
+            List<Workflow> workflows = (List<Workflow>) allCache.get(CACHE_ALL).get();
+            for (Workflow p : workflows) {
                 if (p.getId().equals(aId)) {
                     return p;
                 }
             }
         }
-        for (PipelineRepository repository : repositories) {
+        for (WorkflowRepository repository : repositories) {
             try {
-                Pipeline pipeline = repository.findOne(aId);
-                oneCache.put(aId, pipeline);
-                return pipeline;
+                Workflow workflow = repository.findOne(aId);
+                oneCache.put(aId, workflow);
+                return workflow;
             } catch (Exception e) {
                 logger.debug("{}", e.getMessage());
             }
         }
-        throw new IllegalArgumentException("Unknown pipeline: " + aId);
+        throw new IllegalArgumentException("Unknown workflow: " + aId);
     }
 
     @Override
-    public List<Pipeline> findAll() {
+    public List<Workflow> findAll() {
         Cache cache = cacheManager.getCache(CACHE_ALL);
         if (cache.get(CACHE_ALL) != null) {
-            return (List<Pipeline>) cache.get(CACHE_ALL).get();
+            return (List<Workflow>) cache.get(CACHE_ALL).get();
         }
 
-        List<Pipeline> pipelines = repositories
+        List<Workflow> workflows = repositories
             .stream()
             .map(r -> r.findAll())
             .flatMap(List::stream)
@@ -94,8 +94,8 @@ public class PipelineRepositoryChain implements PipelineRepository, Clearable {
                 return a.getLabel().compareTo(b.getLabel());
             })
             .collect(Collectors.toList());
-        cache.put(CACHE_ALL, pipelines);
-        return pipelines;
+        cache.put(CACHE_ALL, workflows);
+        return workflows;
     }
 
     @Override

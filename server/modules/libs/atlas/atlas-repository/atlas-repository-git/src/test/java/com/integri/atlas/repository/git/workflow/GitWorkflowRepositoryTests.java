@@ -16,23 +16,26 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.git.pipeline;
+package com.integri.atlas.repository.git.workflow;
 
-import com.integri.atlas.engine.coordinator.pipeline.IdentifiableResource;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
+import com.integri.atlas.engine.coordinator.workflow.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import java.util.Arrays;
 import java.util.List;
+
+import com.integri.atlas.repository.git.workflow.GitOperations;
+import com.integri.atlas.repository.git.workflow.GitWorkflowRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-public class GitPipelineRepositoryTests {
+public class GitWorkflowRepositoryTests {
 
     @Test
     public void test1() {
-        GitPipelineRepository r = new GitPipelineRepository(new DummyGitOperations());
-        List<Pipeline> findAll = r.findAll();
+        GitWorkflowRepository r = new GitWorkflowRepository(new DummyGitOperations());
+        List<Workflow> findAll = r.findAll();
         Assertions.assertEquals("demo/hello/123", findAll.iterator().next().getId());
     }
 
@@ -43,13 +46,13 @@ public class GitPipelineRepositoryTests {
         @Override
         public List<IdentifiableResource> getHeadFiles() {
             return Arrays.asList(
-                new IdentifiableResource("demo/hello/123", resolver.getResource("file:pipelines/demo/hello.yaml"))
+                new IdentifiableResource("demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"))
             );
         }
 
         @Override
         public IdentifiableResource getFile(String aFileId) {
-            return new IdentifiableResource("demo/hello/123", resolver.getResource("file:pipelines/demo/hello.yaml"));
+            return new IdentifiableResource("demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"));
         }
     }
 }

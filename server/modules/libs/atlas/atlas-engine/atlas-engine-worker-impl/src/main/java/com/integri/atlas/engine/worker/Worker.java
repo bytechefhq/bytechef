@@ -26,7 +26,7 @@ import com.integri.atlas.engine.core.event.PiperEvent;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.ControlTask;
-import com.integri.atlas.engine.core.task.PipelineTask;
+import com.integri.atlas.engine.core.task.WorkflowTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -190,9 +190,9 @@ public class Worker {
         }
     }
 
-    private void executeSubTasks(TaskExecution aTask, List<PipelineTask> aSubTasks, MapContext aContext)
+    private void executeSubTasks(TaskExecution aTask, List<WorkflowTask> aSubTasks, MapContext aContext)
         throws Exception {
-        for (PipelineTask subTask : aSubTasks) {
+        for (WorkflowTask subTask : aSubTasks) {
             SimpleTaskExecution subTaskExecution = new SimpleTaskExecution(subTask.asMap());
             subTaskExecution.setId(UUIDGenerator.generate());
             subTaskExecution.setJobId(aTask.getJobId());

@@ -4,13 +4,13 @@ Piper is an open-source, distributed workflow engine built on Spring Boot, desig
 
 Piper can run on one or a thousand machines depending on your scaling needs. 
 
-In Piper, work to be done is defined as a set of tasks called a Pipeline. Pipelines can be sourced from many locations but typically they live on a Git repository where they can be versioned and tracked.
+In Piper, work to be done is defined as a set of tasks called a Workflow. Workflows can be sourced from many locations but typically they live on a Git repository where they can be versioned and tracked.
 
 Piper was originally built to support the need to transcode massive amounts of video in parallel. Since transcoding video is a CPU and time instensive process I had to scale horizontally. Moreover, I needed a way to monitor these long running jobs, auto-retry them and otherwise control their execution. 
 
 # Tasks
 
-Tasks are the basic building blocks of a pipeline. Each task has a `type` property which maps to a `TaskHandler` implementation, responsible for carrying out the task.
+Tasks are the basic building blocks of a workflow. Each task has a `type` property which maps to a `TaskHandler` implementation, responsible for carrying out the task.
 
 For example here's the `RandomInt` `TaskHandler` implementation:
 
@@ -30,14 +30,14 @@ For example here's the `RandomInt` `TaskHandler` implementation:
 While it doesn't do much beyond generating a random integer, it does  demonstrate how a `TaskHandler` works. a `Task` instance is passed as  an argument to 
 the `TaskHandler` which contains all the Key-Value pairs of that task.
 
-The `TaskHandler` is then responsible for executing the task using this input and optionally returning an output which can be used by other pipeline tasks downstream.
+The `TaskHandler` is then responsible for executing the task using this input and optionally returning an output which can be used by other workflow tasks downstream.
 
 
-# Pipelines
+# Workflows
 
-Piper pipelines are authored in YAML, a JSON superset. 
+Piper workflows are authored in YAML, a JSON superset. 
 
-Here is an example of a basic pipeline definition.
+Here is an example of a basic workflow definition.
 
 ```
 name: Hello Demo
@@ -45,7 +45,7 @@ name: Hello Demo
 inputs:                --+
   - name: yourName       |
     label: Your Name     | - This defines the inputs
-    type: string         |   expected by the pipeline
+    type: string         |   expected by the workflow
     required: true     --+
     
 outputs:                 --+
@@ -75,7 +75,7 @@ tasks:
 
 So tasks are nothing but a collection of key-value pairs. At a minimum each task contains a `type` property which maps to an appropriate `TaskHandler` that needs to execute it.
 
-Tasks may also specify a `name` property which can be used to name the output of the task so it can be used later in the pipeline.
+Tasks may also specify a `name` property which can be used to name the output of the task so it can be used later in the workflow.
 
 The `label` property is used to give a human-readble description for the task.
 
@@ -106,7 +106,7 @@ Piper is composed of the following components:
 
 **Database**: This piece holds all the jobs state in the system, what tasks completed, failed etc. It is used by the Coordinator as its "mind". 
 
-**Pipeline Repository**: The component where pipelines (workflows) are created, edited etc. by pipeline engineers.
+**Workflow Repository**: The component where workflows (workflows) are created, edited etc. by workflow engineers.
 
 # Control Flow
 
@@ -208,7 +208,7 @@ Starts a new job as a sub-flow of the current job. Output of the sub-flow job is
 
 ```    
 - type: subflow
-  pipelineId: copy_files
+  workflowId: copy_files
   inputs: 
     - source: /path/to/source/dir
     - destination: /path/to/destination/dir
@@ -256,7 +256,7 @@ Registering webhooks is done when creating the job. E.g.:
 
 ```
 {
-  "pipelineId": "demo/hello",
+  "workflowId": "demo/hello",
   "inputs": {
     ...
   },
@@ -696,7 +696,7 @@ Start a demo job:
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"pipelineId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
+     -d '{"workflowId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -712,7 +712,7 @@ Which should give you something like this as a response:
   "id": "8221553af238431ab006cc178eb59129",
   "label": "Hello Demo",
   "priority": 0,
-  "pipelineId": "demo/hello",
+  "workflowId": "demo/hello",
   "status": "CREATED",
   "tags": []
 }
@@ -721,17 +721,17 @@ Which should give you something like this as a response:
 
 If you'll refresh your browser page now you should see the executing job. 
 
-In case you are wondering, the `demo/hello` pipeline is located at <a href="https://github.com/creactiviti/piper/blob/master/piper-core/src/main/resources/pipelines/demo/hello.yaml" target="_blank">here</a>
+In case you are wondering, the `demo/hello` workflow is located at <a href="https://github.com/creactiviti/piper/blob/master/piper-core/src/main/resources/workflows/demo/hello.yaml" target="_blank">here</a>
 
 
-## Writing your first pipeline
+## Writing your first workflow
 
-Create the directory `~/piper/pipelines` and create a file in there called `mypipeline.yaml`.
+Create the directory `~/piper/workflows` and create a file in there called `myworkflow.yaml`.
 
 Edit the file and the following text:
 
 ```
-label: My Pipeline
+label: My Workflow
 
 inputs:
   - name: name
@@ -752,10 +752,10 @@ tasks:
 Execute your workflow
 
 ```
-curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"mypipeline","inputs":{"name":"Arik"}}' http://localhost:8080/jobs
+curl -s -X POST -H Content-Type:application/json -d '{"workflowId":"myworkflow","inputs":{"name":"Arik"}}' http://localhost:8080/jobs
 ```
 
-You can make changes to your pipeline and execute the `./scripts/clear.sh` to clear the cache to reload the pipeline.
+You can make changes to your workflow and execute the `./scripts/clear.sh` to clear the cache to reload the workflow.
 
 ## Scaling Piper
 
@@ -779,13 +779,13 @@ From another terminal window, start a Worker:
 ./scripts/worker.sh 
 ```
 
-Execute the demo pipeline: 
+Execute the demo workflow: 
 
 ```
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"pipelineId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
+     -d '{"workflowId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -801,7 +801,7 @@ Transcode a source video to an SD (480p) output:
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"pipelineId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"sd"}}' \
+     -d '{"workflowId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"sd"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -811,7 +811,7 @@ Transcode a source video to an HD (1080p) output:
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"pipelineId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"hd"}}' \
+     -d '{"workflowId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"hd"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -823,13 +823,13 @@ See [Transcoding video at scale with Piper](https://medium.com/@arik.c.mail/tran
 
 See [Adaptive Streaming with Piper](https://medium.com/@arik.c.mail/adaptive-streaming-with-piper-b37e55d95466)
 
-# Using Git as a Pipeline Repository backend
+# Using Git as a Workflow Repository backend
 
-Rather than storing the pipelines in your local file system you can use Git to store them for you. This has great advantages, not the least of which is pipeline versioning, Pull Requests and everything else Git has to offer.
+Rather than storing the workflows in your local file system you can use Git to store them for you. This has great advantages, not the least of which is workflow versioning, Pull Requests and everything else Git has to offer.
 
-To enable Git as a pipeline repository set the `piper.pipeline-repository.git.enabled` flag to `true` in `./scripts/development.sh` and restart Piper. By default, Piper will use the demo repository [piper-pipelines](https://github.com/creactiviti/piper-pipelines).
+To enable Git as a workflow repository set the `piper.workflow-repository.git.enabled` flag to `true` in `./scripts/development.sh` and restart Piper. By default, Piper will use the demo repository [piper-workflows](https://github.com/creactiviti/piper-workflows).
 
-You can change it by using the `piper.pipeline-repository.git.url` and `piper.pipeline-repository.git.search-paths` configuration parameters.  
+You can change it by using the `piper.workflow-repository.git.url` and `piper.workflow-repository.git.search-paths` configuration parameters.  
 
 # Configuration
 
@@ -841,25 +841,25 @@ piper.coordinator.enabled=true
 # turn on the Worker process and listen to tasks.
 piper.worker.enabled=true
 # when worker is enabled, subscribe to the default "tasks" queue with 5 concurrent consumers. 
-# you may also route pipeline tasks to other arbitrarilty named task queues by specifying the "node"
+# you may also route workflow tasks to other arbitrarilty named task queues by specifying the "node"
 # property on any give task. 
 # E.g. node: captions will route to the captions queue which a worker would subscribe to with piper.worker.subscriptions.captions
 # note: queue must be created before tasks can be routed to it. Piper will create the queue if it isn't already there when the worker
 # bootstraps.
 piper.worker.subscriptions.tasks=5 
-# enable a git-based pipeline repository
-piper.pipeline-repository.git.enabled=true
+# enable a git-based workflow repository
+piper.workflow-repository.git.enabled=true
 # The URL to the Git Repo
-piper.pipeline-repository.git.url=https://github.com/myusername/my-pipelines.git
-piper.pipeline-repository.git.branch=master
-piper.pipeline-repository.git.username=me
-piper.pipeline-repository.git.password=secret
-# folders within the git repo that are scanned for pipelines.
-piper.pipeline-repository.git.search-paths=demo/,video/
-# enable file system based pipeline repository
-piper.pipeline-repository.filesystem.enabled=true
-# location of pipelines on the file system.
-piper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml
+piper.workflow-repository.git.url=https://github.com/myusername/my-workflows.git
+piper.workflow-repository.git.branch=master
+piper.workflow-repository.git.username=me
+piper.workflow-repository.git.password=secret
+# folders within the git repo that are scanned for workflows.
+piper.workflow-repository.git.search-paths=demo/,video/
+# enable file system based workflow repository
+piper.workflow-repository.filesystem.enabled=true
+# location of workflows on the file system.
+piper.workflow-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml
 # data source
 spring.datasource.platform=postgres # only postgres is supported at the moment
 spring.datasource.url=jdbc:postgresql://localhost:5432/piper
@@ -880,10 +880,10 @@ Start a local Postgres database:
 
 Create an empty directory: 
 ```
-mkdir pipelines
-cd pipelines
+mkdir workflows
+cd workflows
 ```
-Create a simple pipeline file --  `hello.yaml` -- and paste the following to it: 
+Create a simple workflow file --  `hello.yaml` -- and paste the following to it: 
 ```
 label: Hello World
 inputs:
@@ -907,9 +907,9 @@ docker run \
   -e piper.worker.enabled=true \
   -e piper.coordinator.enabled=true \
   -e piper.worker.subscriptions.tasks=1 \
-  -e piper.pipeline-repository.filesystem.enabled=true \
-  -e piper.pipeline-repository.filesystem.location-pattern=/pipelines/**/*.yaml \
-  -v $PWD:/pipelines \
+  -e piper.workflow-repository.filesystem.enabled=true \
+  -e piper.workflow-repository.filesystem.location-pattern=/workflows/**/*.yaml \
+  -v $PWD:/workflows \
   -p 8080:8080 \
   creactiviti/piper
 ```
@@ -917,7 +917,7 @@ docker run \
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"pipelineId":"hello","inputs":{"name":"Joe Jones"}}' \
+     -d '{"workflowId":"hello","inputs":{"name":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 # License

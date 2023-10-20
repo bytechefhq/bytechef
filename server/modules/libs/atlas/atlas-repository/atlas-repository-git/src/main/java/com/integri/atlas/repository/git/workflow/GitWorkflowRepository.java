@@ -16,25 +16,25 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.git.pipeline;
+package com.integri.atlas.repository.git.workflow;
 
-import com.integri.atlas.engine.config.PipelineRepositoryProperties.GitProperties;
-import com.integri.atlas.engine.coordinator.pipeline.IdentifiableResource;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
-import com.integri.atlas.repository.yaml.pipeline.YamlPipelineRepository;
+import com.integri.atlas.engine.config.WorkflowRepositoryProperties.GitProperties;
+import com.integri.atlas.engine.coordinator.workflow.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
+import com.integri.atlas.repository.yaml.workflow.YamlWorkflowRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GitPipelineRepository extends YamlPipelineRepository {
+public class GitWorkflowRepository extends YamlWorkflowRepository {
 
     private final GitOperations git;
 
-    public GitPipelineRepository(GitOperations aGitOperations) {
+    public GitWorkflowRepository(GitOperations aGitOperations) {
         git = aGitOperations;
     }
 
-    public GitPipelineRepository(GitProperties aGitProperties) {
+    public GitWorkflowRepository(GitProperties aGitProperties) {
         git =
             new JGitTemplate(
                 aGitProperties.getUrl(),
@@ -46,19 +46,19 @@ public class GitPipelineRepository extends YamlPipelineRepository {
     }
 
     @Override
-    public List<Pipeline> findAll() {
+    public List<Workflow> findAll() {
         synchronized (this) {
             List<IdentifiableResource> resources = git.getHeadFiles();
-            List<Pipeline> pipelines = resources.stream().map(r -> parsePipeline(r)).collect(Collectors.toList());
-            return pipelines;
+            List<Workflow> workflows = resources.stream().map(r -> parseWorkflow(r)).collect(Collectors.toList());
+            return workflows;
         }
     }
 
     @Override
-    public Pipeline findOne(String aId) {
+    public Workflow findOne(String aId) {
         synchronized (this) {
             IdentifiableResource resource = git.getFile(aId);
-            return parsePipeline(resource);
+            return parseWorkflow(resource);
         }
     }
 }

@@ -21,7 +21,7 @@ package com.integri.atlas.engine.coordinator.job;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.error.Errorable;
 import com.integri.atlas.engine.core.error.Prioritizable;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +59,7 @@ public interface Job extends Errorable, Prioritizable {
 
     /**
      * Returns the index of the step on the job's
-     * pipeline on which the job is working on right
+     * workflow on which the job is working on right
      * now.
      *
      * @return int
@@ -76,16 +76,16 @@ public interface Job extends Errorable, Prioritizable {
     List<TaskExecution> getExecution();
 
     /**
-     * Return the job's pipeline id.
+     * Return the job's workflow id.
      *
-     * @return {@link Pipeline}
+     * @return {@link Workflow}
      */
-    String getPipelineId();
+    String getWorkflowId();
 
     /**
      * Return the job's human-readable name.
      *
-     * @return {@link Pipeline}
+     * @return {@link Workflow}
      */
     String getLabel();
 

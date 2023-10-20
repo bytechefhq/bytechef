@@ -16,43 +16,43 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.pipeline;
+package com.integri.atlas.engine.coordinator.workflow;
 
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.error.Errorable;
-import com.integri.atlas.engine.core.task.PipelineTask;
+import com.integri.atlas.engine.core.task.WorkflowTask;
 import java.util.List;
 
 /**
- * Pipelines are the the blueprints that describe
+ * Workflows are the the blueprints that describe
  * the execution of a job.
  *
  * @author Arik Cohen
  * @since Jun 12, 2016
  */
-public interface Pipeline extends Errorable {
+public interface Workflow extends Errorable {
     /**
-     * Returns the unique identifier of the pipeline.
+     * Returns the unique identifier of the workflow.
      */
     String getId();
 
     /**
-     * Returns a descriptive name for the pipeline.
+     * Returns a descriptive name for the workflow.
      */
     String getLabel();
 
     /**
-     * Returns the steps that make up the pipeline.
+     * Returns the steps that make up the workflow.
      */
-    List<PipelineTask> getTasks();
+    List<WorkflowTask> getTasks();
 
     /**
-     * Returns the pipeline's expected inputs
+     * Returns the workflow's expected inputs
      */
     List<Accessor> getInputs();
 
     /**
-     * Returns the pipeline's expected outputs
+     * Returns the workflow's expected outputs
      */
     List<Accessor> getOutputs();
 

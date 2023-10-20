@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.pipeline;
+package com.integri.atlas.engine.coordinator.workflow;
 
 import java.io.File;
 import java.io.IOException;

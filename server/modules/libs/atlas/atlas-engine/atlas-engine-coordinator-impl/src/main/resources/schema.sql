@@ -4,7 +4,7 @@ create table job (
   id                       varchar(256) not null primary key,
   status                   varchar(256) not null,
   current_task             int          not null,
-  pipeline_id              varchar(256) not null,
+  workflow_id              varchar(256) not null,
   label                    varchar(256)     null,
   create_time              timestamp    not null,
   start_time               timestamp        null,

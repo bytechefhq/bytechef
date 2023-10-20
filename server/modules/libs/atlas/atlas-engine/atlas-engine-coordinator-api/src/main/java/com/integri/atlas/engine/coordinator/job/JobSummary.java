@@ -60,8 +60,8 @@ public class JobSummary {
         return job.getCurrentTask();
     }
 
-    public String getPipelineId() {
-        return job.getPipelineId();
+    public String getWorkflowId() {
+        return job.getWorkflowId();
     }
 
     public String getLabel() {

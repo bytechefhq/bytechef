@@ -6,10 +6,10 @@ java -jar \
      -Dpiper.coordinator.enabled=true \
      -Dpiper.worker.enabled=true \
      -Dpiper.worker.subscriptions.tasks=5 \
-     -Dpiper.pipeline-repository.git.enabled=true \
-     -Dpiper.pipeline-repository.git.url=https://github.com/creactiviti/piper-pipelines.git \
-     -Dpiper.pipeline-repository.git.search-paths=demo/,video/ \
-     -Dpiper.pipeline-repository.filesystem.enabled=true \
-     -Dpiper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
+     -Dpiper.workflow-repository.git.enabled=true \
+     -Dpiper.workflow-repository.git.url=https://github.com/creactiviti/piper-workflows.git \
+     -Dpiper.workflow-repository.git.search-paths=demo/,video/ \
+     -Dpiper.workflow-repository.filesystem.enabled=true \
+     -Dpiper.workflow-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
      -Dspring.datasource.initialization-mode=always \
      lib/atlas-app.jar

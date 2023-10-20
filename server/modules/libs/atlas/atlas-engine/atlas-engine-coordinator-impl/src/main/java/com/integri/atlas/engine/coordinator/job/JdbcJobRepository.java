@@ -98,7 +98,7 @@ public class JdbcJobRepository implements JobRepository {
     public Job merge(Job aJob) {
         MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
         jdbc.update(
-            "update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,pipeline_id=:pipelineId,label=:label,outputs=:outputs where id = :id ",
+            "update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,workflow_id=:workflowId,label=:label,outputs=:outputs where id = :id ",
             sqlParameterSource
         );
         return aJob;
@@ -108,7 +108,7 @@ public class JdbcJobRepository implements JobRepository {
     public void create(Job aJob) {
         MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
         jdbc.update(
-            "insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)",
+            "insert into job (id,create_time,start_time,status,current_task,workflow_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:workflowId,:label,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)",
             sqlParameterSource
         );
     }
@@ -123,7 +123,7 @@ public class JdbcJobRepository implements JobRepository {
         sqlParameterSource.addValue("id", job.getId());
         sqlParameterSource.addValue("status", job.getStatus().toString());
         sqlParameterSource.addValue("currentTask", job.getCurrentTask());
-        sqlParameterSource.addValue("pipelineId", job.getPipelineId());
+        sqlParameterSource.addValue("workflowId", job.getWorkflowId());
         sqlParameterSource.addValue("label", job.getLabel());
         sqlParameterSource.addValue("createTime", job.getCreateTime());
         sqlParameterSource.addValue("startTime", job.getStartTime());
@@ -149,7 +149,7 @@ public class JdbcJobRepository implements JobRepository {
         map.put("id", aRs.getString("id"));
         map.put("status", aRs.getString("status"));
         map.put("currentTask", aRs.getInt("current_task"));
-        map.put("pipelineId", aRs.getString("pipeline_id"));
+        map.put("workflowId", aRs.getString("workflow_id"));
         map.put("label", aRs.getString("label"));
         map.put("createTime", aRs.getTimestamp("create_time"));
         map.put("startTime", aRs.getTimestamp("start_time"));
@@ -168,7 +168,7 @@ public class JdbcJobRepository implements JobRepository {
         map.put("id", aRs.getString("id"));
         map.put("status", aRs.getString("status"));
         map.put("currentTask", aRs.getInt("current_task"));
-        map.put("pipelineId", aRs.getString("pipeline_id"));
+        map.put("workflowId", aRs.getString("workflow_id"));
         map.put("label", aRs.getString("label"));
         map.put("createTime", aRs.getTimestamp("create_time"));
         map.put("startTime", aRs.getTimestamp("start_time"));

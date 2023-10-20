@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.config;
 
-public class PipelineRepositoryProperties {
+public class WorkflowRepositoryProperties {
 
     private GitProperties git;
     private ClasspathProperties classpath;

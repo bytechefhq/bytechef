@@ -18,6 +18,7 @@
 
 package com.integri.atlas.engine.coordinator;
 
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.context.Context;
@@ -30,8 +31,7 @@ import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
-import com.integri.atlas.engine.coordinator.pipeline.PipelineRepository;
+import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -52,7 +52,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     private JobRepository jobRepository;
-    private PipelineRepository pipelineRepository;
+    private WorkflowRepository workflowRepository;
     private TaskExecutionRepository jobTaskRepository;
     private ContextRepository contextRepository;
     private JobExecutor jobExecutor;
@@ -92,13 +92,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private boolean hasMoreTasks(Job aJob) {
-        Pipeline pipeline = pipelineRepository.findOne(aJob.getPipelineId());
-        return aJob.getCurrentTask() + 1 < pipeline.getTasks().size();
+        Workflow workflow = workflowRepository.findOne(aJob.getWorkflowId());
+        return aJob.getCurrentTask() + 1 < workflow.getTasks().size();
     }
 
     private void complete(SimpleJob aJob) {
-        Pipeline pipeline = pipelineRepository.findOne(aJob.getPipelineId());
-        List<Accessor> outputs = pipeline.getOutputs();
+        Workflow workflow = workflowRepository.findOne(aJob.getWorkflowId());
+        List<Accessor> outputs = workflow.getOutputs();
         Context context = contextRepository.peek(aJob.getId());
         SimpleTaskExecution jobOutput = new SimpleTaskExecution();
         for (Accessor output : outputs) {
@@ -119,8 +119,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         jobRepository = aJobRepository;
     }
 
-    public void setPipelineRepository(PipelineRepository aPipelineRepository) {
-        pipelineRepository = aPipelineRepository;
+    public void setWorkflowRepository(WorkflowRepository aWorkflowRepository) {
+        workflowRepository = aWorkflowRepository;
     }
 
     public void setJobTaskRepository(TaskExecutionRepository aJobTaskRepository) {

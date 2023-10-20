@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.yaml.pipeline;
+package com.integri.atlas.repository.yaml.workflow;
 
 import com.google.common.base.Throwables;
 import java.io.IOException;
@@ -25,26 +25,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.integri.atlas.engine.coordinator.pipeline.IdentifiableResource;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
+import com.integri.atlas.engine.coordinator.workflow.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-public class ResourceBasedPipelineRepository extends YamlPipelineRepository {
+public class ResourceBasedWorkflowRepository extends YamlWorkflowRepository {
 
-    private String locationPattern = "classpath:pipelines/**/*.yaml";
+    private String locationPattern = "classpath:workflows/**/*.yaml";
 
-    private static final String PREFIX = "pipelines/";
+    private static final String PREFIX = "workflows/";
 
-    public ResourceBasedPipelineRepository() {}
+    public ResourceBasedWorkflowRepository() {}
 
-    public ResourceBasedPipelineRepository(String aLocationPattern) {
+    public ResourceBasedWorkflowRepository(String aLocationPattern) {
         locationPattern = aLocationPattern;
     }
 
     @Override
-    public List<Pipeline> findAll() {
+    public List<Workflow> findAll() {
         try {
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources(locationPattern);
@@ -54,23 +54,23 @@ public class ResourceBasedPipelineRepository extends YamlPipelineRepository {
         }
     }
 
-    private Pipeline read(Resource aResource) {
+    private Workflow read(Resource aResource) {
         try {
             String uri = aResource.getURI().toString();
             String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
-            return parsePipeline(new IdentifiableResource(id, aResource));
+            return parseWorkflow(new IdentifiableResource(id, aResource));
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
     }
 
     @Override
-    public Pipeline findOne(String aId) {
-        List<Pipeline> pipelines = findAll();
-        Optional<Pipeline> findFirst = pipelines.stream().filter(p -> p.getId().equals(aId)).findFirst();
+    public Workflow findOne(String aId) {
+        List<Workflow> workflows = findAll();
+        Optional<Workflow> findFirst = workflows.stream().filter(p -> p.getId().equals(aId)).findFirst();
         if (findFirst.isPresent()) {
             return findFirst.get();
         }
-        throw new IllegalArgumentException("Unknown pipeline: " + aId);
+        throw new IllegalArgumentException("Unknown workflow: " + aId);
     }
 }

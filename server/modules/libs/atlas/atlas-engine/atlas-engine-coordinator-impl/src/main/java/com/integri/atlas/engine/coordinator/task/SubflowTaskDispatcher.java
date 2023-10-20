@@ -51,7 +51,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         Map<String, Object> params = new HashMap<>();
         params.put(DSL.INPUTS, aTask.getMap(DSL.INPUTS, Collections.emptyMap()));
         params.put(DSL.PARENT_TASK_EXECUTION_ID, aTask.getId());
-        params.put(DSL.PIPELINE_ID, aTask.getRequiredString(DSL.PIPELINE_ID));
+        params.put(DSL.WORKFLOW_ID, aTask.getRequiredString(DSL.WORKFLOW_ID));
         messageBroker.send(Queues.SUBFLOWS, params);
     }
 
