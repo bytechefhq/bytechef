@@ -164,9 +164,6 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                 return;
             }
 
-            // Clear stuff ...
-            cleanup(intervalRef, popupRef, handleMessageListener);
-
             curStateRef.current = message?.data?.payload.state;
 
             try {
@@ -208,6 +205,9 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                     error: (genericError as Error).toString(),
                     loading: false,
                 });
+            } finally {
+                // Clear stuff ...
+                cleanup(intervalRef, popupRef, handleMessageListener);
             }
         }
         window.addEventListener('message', handleMessageListener);
