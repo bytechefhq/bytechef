@@ -19,14 +19,11 @@ package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,40 +32,31 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnWorker
-public class WorkerMessageBrokerConfiguration implements ApplicationContextAware {
+public class WorkerMessageBrokerConfiguration {
 
+    private final ApplicationContext applicationContext;
     private final WorkerProperties workerProperties;
 
-    private ApplicationContext applicationContext;
-
     @SuppressFBWarnings("EI2")
-    public WorkerMessageBrokerConfiguration(WorkerProperties workerProperties) {
+    public WorkerMessageBrokerConfiguration(
+        ApplicationContext applicationContext, WorkerProperties workerProperties) {
+
+        this.applicationContext = applicationContext;
         this.workerProperties = workerProperties;
     }
 
     @Bean
-    MessageBrokerConfigurer workerMessageBrokerConfigurer() {
-        return new MessageBrokerConfigurer() {
+    MessageBrokerConfigurer<?> workerMessageBrokerConfigurer() {
+        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
+            Worker worker = applicationContext.getBean(Worker.class);
 
-            @Override
-            public <T> void configure(
-                T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar) {
+            Map<String, Object> subscriptions = workerProperties.getSubscriptions();
 
-                Worker worker = applicationContext.getBean(Worker.class);
+            subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
 
-                Map<String, Object> subscriptions = workerProperties.getSubscriptions();
-
-                subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
-
-                messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
-            }
+            messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
         };
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }
