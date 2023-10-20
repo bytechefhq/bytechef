@@ -32,15 +32,15 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @AutoConfigureMockMvc
 @SpringBootTest
-public class TaskSpecificationControllerIntTest {
+public class TaskDefinitionHandlerControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void testGetTaskSpecification() throws Exception {
+    public void testGetTaskDefinition() throws Exception {
         mockMvc
-            .perform(get("/task-specifications/task1").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/task-definitions/task1").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(
                 content()
@@ -52,7 +52,6 @@ public class TaskSpecificationControllerIntTest {
                     "displayName":null,
                     "name":"task1",
                     "icon":null,
-                    "properties":null,
                     "subtitle":null,
                     "version":1.0
                 }
@@ -62,37 +61,35 @@ public class TaskSpecificationControllerIntTest {
     }
 
     @Test
-    public void testGetTaskSpecifications() throws Exception {
+    public void testGetTaskDefinitions() throws Exception {
         mockMvc
-            .perform(get("/task-specifications").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/task-definitions").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(
                 content()
                     .json(
                         """
-                [
-                    {
-                        "authentication":null,
-                        "description":null,
-                        "displayName":null,
-                        "name":"task1",
-                        "icon":null,
-                        "properties":null,
-                        "subtitle":null,
-                        "version":1.0
-                    },
-                    {
-                        "authentication":null,
-                        "description":null,
-                        "displayName":null,
-                        "name":"task2",
-                        "icon":null,
-                        "properties":null,
-                        "subtitle":null,
-                        "version":1.0
-                    }
-                ]
-                """
+                        [
+                            {
+                                "authentication":null,
+                                "description":null,
+                                "displayName":null,
+                                "name":"task1",
+                                "icon":null,
+                                "subtitle":null,
+                                "version":1.0
+                            },
+                            {
+                                "authentication":null,
+                                "description":null,
+                                "displayName":null,
+                                "name":"task2",
+                                "icon":null,
+                                "subtitle":null,
+                                "version":1.0
+                            }
+                        ]
+                        """
                     )
             );
     }

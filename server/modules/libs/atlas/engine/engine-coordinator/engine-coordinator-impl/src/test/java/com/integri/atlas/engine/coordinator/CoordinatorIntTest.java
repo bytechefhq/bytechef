@@ -37,7 +37,7 @@ import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import com.integri.atlas.engine.workflow.repository.mapper.JSONWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.JsonWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.resource.ResourceBasedWorkflowRepository;
@@ -72,7 +72,7 @@ public class CoordinatorIntTest {
 
     @Test
     public void testStartJob_JSON() {
-        testStartJob("samples/hello.json", new JSONWorkflowMapper());
+        testStartJob("samples/hello.json", new JsonWorkflowMapper());
     }
 
     @Test
@@ -156,7 +156,7 @@ public class CoordinatorIntTest {
                 CoordinatorImpl coordinator = new CoordinatorImpl();
 
                 coordinator.setJobService(
-                    new JobService(null, new ResourceBasedWorkflowRepository(new JSONWorkflowMapper()))
+                    new JobService(null, new ResourceBasedWorkflowRepository(new JsonWorkflowMapper()))
                 );
 
                 coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello.json")));

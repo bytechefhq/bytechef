@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.definition;
+package com.integri.atlas.task.dispatcher.sequence;
 
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDefinitionHandler;
+import com.integri.atlas.task.definition.dsl.DSL;
+import com.integri.atlas.task.definition.dsl.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDefinition {
-    TaskSpecification getSpecification();
+public class SequenceTaskDefinitionHandler implements TaskDefinitionHandler {
+
+    private static final TaskDefinition TASK_DEFINITION = DSL
+        .create(SequenceTaskConstants.TASK_SEQUENCE)
+        .displayName("Sequence")
+        .description("Executes list of tasks in a sequence");
+
+    @Override
+    public TaskDefinition getTaskDefinition() {
+        return TASK_DEFINITION;
+    }
 }

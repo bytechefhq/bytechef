@@ -41,7 +41,7 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
+public class JsonFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Test
     public void testRead() throws IOException {
@@ -111,7 +111,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("jsonFile", new JSONFileTaskHandler(fileStorageService, jsonHelper));
+        return Map.of("jsonFile", new JsonFileTaskHandler(fileStorageService, jsonHelper));
     }
 
     private File getFile(String fileName) throws IOException {

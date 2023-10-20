@@ -27,13 +27,13 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-class JSONIterator implements Iterator<Map<String, ?>> {
+class JsonIterator implements Iterator<Map<String, ?>> {
 
     private final JsonParser jsonParser;
     private final ObjectMapper objectMapper;
     private Map<String, ?> value;
 
-    public JSONIterator(JsonParser jsonParser, ObjectMapper objectMapper) {
+    public JsonIterator(JsonParser jsonParser, ObjectMapper objectMapper) {
         this.jsonParser = jsonParser;
         this.objectMapper = objectMapper;
 

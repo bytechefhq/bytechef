@@ -17,8 +17,8 @@
 package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.task.definition.TaskDefinition;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDefinitionHandler;
+import com.integri.atlas.task.definition.dsl.TaskDefinition;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,26 +31,29 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
-public class TaskSpecificationController {
+public class TaskDefinitionController {
 
-    private final List<TaskDefinition> taskDefinitions;
+    private final List<TaskDefinitionHandler> taskDefinitionHandlers;
 
-    public TaskSpecificationController(List<TaskDefinition> taskDefinitions) {
-        this.taskDefinitions = taskDefinitions;
+    public TaskDefinitionController(List<TaskDefinitionHandler> taskDefinitionHandlers) {
+        this.taskDefinitionHandlers = taskDefinitionHandlers;
     }
 
-    @GetMapping(value = "/task-specifications/{name}")
-    public TaskSpecification getTaskSpecification(@PathVariable("name") String name) {
-        return taskDefinitions
+    @GetMapping(value = "/task-definitions/{name}")
+    public TaskDefinition getTaskDefinition(@PathVariable("name") String name) {
+        return taskDefinitionHandlers
             .stream()
-            .map(TaskDefinition::getSpecification)
-            .filter(taskSpecification -> Objects.equals(taskSpecification.getName(), name))
+            .map(TaskDefinitionHandler::getTaskDefinition)
+            .filter(taskDefinition -> Objects.equals(taskDefinition.getName(), name))
             .findFirst()
             .orElseThrow();
     }
 
-    @GetMapping(value = "/task-specifications")
-    public List<TaskSpecification> getTaskSpecifications() {
-        return taskDefinitions.stream().map(TaskDefinition::getSpecification).collect(Collectors.toList());
+    @GetMapping(value = "/task-definitions")
+    public List<TaskDefinition> getTaskDefinitions() {
+        return taskDefinitionHandlers
+            .stream()
+            .map(TaskDefinitionHandler::getTaskDefinition)
+            .collect(Collectors.toList());
     }
 }

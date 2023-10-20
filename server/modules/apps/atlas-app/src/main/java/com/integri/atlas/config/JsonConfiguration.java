@@ -18,7 +18,9 @@
 
 package com.integri.atlas.config;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
@@ -27,11 +29,16 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  * @author Ivica Cardic
  */
 @Configuration
-public class JSONConfiguration implements Jackson2ObjectMapperBuilderCustomizer {
+public class JsonConfiguration implements Jackson2ObjectMapperBuilderCustomizer {
 
     @Override
     public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
         //aJacksonObjectMapperBuilder.serializerByType(Throwable.class, new ExceptionSerializer());
         //aJacksonObjectMapperBuilder.deserializerByType(JobTaskException.class, new JobTaskExceptionDeserializer());
+    }
+
+    @Bean
+    JavaTimeModule javaTimeModule() {
+        return new JavaTimeModule();
     }
 }

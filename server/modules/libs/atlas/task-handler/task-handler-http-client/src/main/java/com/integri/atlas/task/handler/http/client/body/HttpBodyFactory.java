@@ -49,7 +49,7 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class HttpBodyFactory {
 
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
     private final FileStorageService fileStorageService;
 
     public HttpBodyFactory(FileStorageService fileStorageService, JSONHelper jsonHelper) {

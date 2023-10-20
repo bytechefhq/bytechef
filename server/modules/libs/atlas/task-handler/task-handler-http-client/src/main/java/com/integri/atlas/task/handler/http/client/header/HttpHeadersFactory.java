@@ -26,7 +26,7 @@ import static com.integri.atlas.task.handler.http.client.header.HttpHeader.BOUND
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,9 +45,9 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class HttpHeadersFactory {
 
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
 
-    public HttpHeadersFactory(JSONHelper jsonHelper) {
+    public HttpHeadersFactory(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 

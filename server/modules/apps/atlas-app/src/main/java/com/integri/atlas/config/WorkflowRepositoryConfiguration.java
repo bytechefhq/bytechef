@@ -19,7 +19,7 @@ package com.integri.atlas.config;
 import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.workflow.repository.WorkflowRepositoryChain;
 import com.integri.atlas.engine.workflow.repository.git.GitWorkflowRepository;
-import com.integri.atlas.engine.workflow.repository.mapper.JSONWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.JsonWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapperChain;
 import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
@@ -89,8 +89,8 @@ public class WorkflowRepositoryConfiguration {
     }
 
     @Bean
-    JSONWorkflowMapper jsonWorkflowMapper() {
-        return new JSONWorkflowMapper();
+    JsonWorkflowMapper jsonWorkflowMapper() {
+        return new JsonWorkflowMapper();
     }
 
     @Bean

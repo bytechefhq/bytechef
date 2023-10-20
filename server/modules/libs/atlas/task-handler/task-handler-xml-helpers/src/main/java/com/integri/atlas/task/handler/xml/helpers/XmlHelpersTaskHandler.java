@@ -20,7 +20,7 @@ import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.Operation;
 import org.apache.commons.lang3.StringUtils;
@@ -32,10 +32,10 @@ import org.springframework.stereotype.Component;
 @Component(TASK_XML_HELPERS)
 public class XmlHelpersTaskHandler implements TaskHandler<Object> {
 
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
     private final XmlHelper xmlHelper;
 
-    public XmlHelpersTaskHandler(JSONHelper jsonHelper, XmlHelper xmlHelper) {
+    public XmlHelpersTaskHandler(JsonHelper jsonHelper, XmlHelper xmlHelper) {
         this.jsonHelper = jsonHelper;
         this.xmlHelper = xmlHelper;
     }

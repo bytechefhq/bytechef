@@ -19,10 +19,9 @@ package com.integri.atlas.task.handler.json.file;
 /**
  * @author Ivica Cardic
  */
-public class JSONFileTaskConstants {
+public class JsonFileTaskConstants {
 
     public static final String PROPERTY_FILE_TYPE = "fileType";
-    public static final String PROPERTY_OPERATION = "operation";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_IS_ARRAY = "isArray";
     public static final String PROPERTY_FILE_NAME = "fileName";
@@ -37,7 +36,7 @@ public class JSONFileTaskConstants {
         JSONL,
     }
 
-    public enum Operation {
+    public enum Action {
         READ,
         WRITE,
     }

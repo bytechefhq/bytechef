@@ -24,7 +24,7 @@ import com.integri.atlas.engine.workflow.WorkflowResource;
 /**
  * @author Ivica Cardic
  */
-public class JSONWorkflowMapper extends BaseWorkflowMapper implements WorkflowMapperResolver {
+public class JsonWorkflowMapper extends BaseWorkflowMapper implements WorkflowMapperResolver {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

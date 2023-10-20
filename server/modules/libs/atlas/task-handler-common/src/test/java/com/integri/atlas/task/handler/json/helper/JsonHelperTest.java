@@ -28,9 +28,9 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class JSONHelperTest {
+public class JsonHelperTest {
 
-    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
+    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
 
     @Test
     public void testCheck() {
