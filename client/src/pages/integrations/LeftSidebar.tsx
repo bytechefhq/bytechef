@@ -3,10 +3,10 @@ import {
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
 } from '../../queries/integrations.queries';
-import IntegrationsSidebarItem, {Type} from './IntegrationsSidebarItem';
+import LeftSidebarItem, {Type} from './LeftSidebarItem';
 import {useSearchParams} from 'react-router-dom';
 
-const IntegrationsSidebar: React.FC = () => {
+const LeftSidebar: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [current, setCurrent] = useState<{id?: number; type: Type}>({
         id: searchParams.get('categoryId')
@@ -25,11 +25,11 @@ const IntegrationsSidebar: React.FC = () => {
     };
 
     return (
-        <>
+        <div className="px-2">
             <div className="mb-4 space-y-1" aria-label="Categories">
                 <SidebarSubtitle title="Categories" />
 
-                <IntegrationsSidebarItem
+                <LeftSidebarItem
                     item={{
                         name: 'All Categories',
                         type: Type.Category,
@@ -40,7 +40,7 @@ const IntegrationsSidebar: React.FC = () => {
 
                 {!categoriesIsLoading &&
                     categories?.map((item) => (
-                        <IntegrationsSidebarItem
+                        <LeftSidebarItem
                             key={item.id}
                             item={{
                                 id: item.id,
@@ -54,40 +54,41 @@ const IntegrationsSidebar: React.FC = () => {
                         />
                     ))}
             </div>
-            <div className="space-y-1" aria-label="Categories">
+            <div className="mb-4 space-y-1" aria-label="Categories">
                 <SidebarSubtitle title="Tags" />
 
-                {!tagsIsLoading && tags?.length === 0 ? (
-                    <p className="px-3 text-xs">No tags.</p>
-                ) : (
-                    tags?.map((item) => (
-                        <IntegrationsSidebarItem
-                            key={item.id}
-                            item={{
-                                id: item.id,
-                                name: item.name,
-                                type: Type.Tag,
-                                current:
-                                    current?.id === item.id &&
-                                    current.type === Type.Tag,
-                                onItemClick,
-                            }}
-                        />
-                    ))
-                )}
+                {!tagsIsLoading &&
+                    (tags?.length === 0 ? (
+                        <p className="px-3 text-xs">No tags.</p>
+                    ) : (
+                        tags?.map((item) => (
+                            <LeftSidebarItem
+                                key={item.id}
+                                item={{
+                                    id: item.id,
+                                    name: item.name,
+                                    type: Type.Tag,
+                                    current:
+                                        current?.id === item.id &&
+                                        current.type === Type.Tag,
+                                    onItemClick,
+                                }}
+                            />
+                        ))
+                    ))}
             </div>
-        </>
+        </div>
     );
 };
 
 const SidebarSubtitle: React.FC<{title: string}> = ({title}) => {
     return (
         <div>
-            <h4 className="py-1 px-3 pr-4 text-sm font-medium tracking-tight text-gray-900 dark:text-gray-200">
+            <h4 className="py-1 px-2 pr-4 text-sm font-medium tracking-tight text-gray-900 dark:text-gray-200">
                 {title}
             </h4>
         </div>
     );
 };
 
-export default IntegrationsSidebar;
+export default LeftSidebar;
