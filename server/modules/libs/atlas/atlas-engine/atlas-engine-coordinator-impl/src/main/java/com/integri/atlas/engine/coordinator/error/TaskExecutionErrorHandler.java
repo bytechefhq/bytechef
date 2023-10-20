@@ -22,7 +22,7 @@ import com.integri.atlas.engine.core.error.Error;
 import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
@@ -91,7 +91,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             mjob.setEndTime(new Date());
             jobRepository.merge(mjob);
             eventPublisher.publishEvent(
-                PiperEvent.of(Events.JOB_STATUS, "jobId", mjob.getId(), "status", mjob.getStatus())
+                WorkflowEvent.of(Events.JOB_STATUS, "jobId", mjob.getId(), "status", mjob.getStatus())
             );
         }
     }

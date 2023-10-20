@@ -26,7 +26,7 @@ import com.integri.atlas.engine.coordinator.job.JobRepository;
 import java.util.List;
 
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
@@ -51,7 +51,7 @@ public class JobStatusWebhookEventListener implements EventListener {
         jobRepository = aJobRepository;
     }
 
-    private void handleEvent(PiperEvent aEvent) {
+    private void handleEvent(WorkflowEvent aEvent) {
         String jobId = aEvent.getRequiredString(DSL.JOB_ID);
         Job job = jobRepository.getById(jobId);
         if (job == null) {
@@ -96,7 +96,7 @@ public class JobStatusWebhookEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(PiperEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent aEvent) {
         if (aEvent.getType().equals(Events.JOB_STATUS)) {
             handleEvent(aEvent);
         }

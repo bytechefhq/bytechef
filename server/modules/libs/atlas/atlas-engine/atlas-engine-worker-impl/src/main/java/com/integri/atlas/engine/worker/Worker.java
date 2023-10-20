@@ -22,7 +22,7 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.error.ErrorObject;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.ControlTask;
@@ -102,7 +102,7 @@ public class Worker {
         Future<?> future = executors.submit(() -> {
             try {
                 eventPublisher.publishEvent(
-                    PiperEvent.of(Events.TASK_STARTED, "taskId", aTask.getId(), "jobId", aTask.getJobId())
+                    WorkflowEvent.of(Events.TASK_STARTED, "taskId", aTask.getId(), "jobId", aTask.getJobId())
                 );
                 SimpleTaskExecution completion = doExecuteTask(aTask);
                 messageBroker.send(Queues.COMPLETIONS, completion);

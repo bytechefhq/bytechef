@@ -20,8 +20,8 @@ package com.integri.atlas.engine.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "piper")
-public class PiperProperties {
+@ConfigurationProperties(prefix = "atlas")
+public class AtlasProperties {
 
     private SerializationProperties serialization;
     private PersistenceProperties persistence;

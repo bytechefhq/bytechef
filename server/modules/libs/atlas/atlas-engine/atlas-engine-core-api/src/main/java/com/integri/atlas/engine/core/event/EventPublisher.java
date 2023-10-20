@@ -29,5 +29,5 @@ public interface EventPublisher {
      * application of an application event.
      * @param event the event to publish
      */
-    void publishEvent(PiperEvent event);
+    void publishEvent(WorkflowEvent event);
 }

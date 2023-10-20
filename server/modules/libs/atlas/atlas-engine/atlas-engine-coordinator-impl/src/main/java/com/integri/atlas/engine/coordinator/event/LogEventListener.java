@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class LogEventListener implements EventListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void onApplicationEvent(PiperEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent aEvent) {
         logger.debug("{}", aEvent);
     }
 }

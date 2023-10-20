@@ -22,7 +22,7 @@ import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
@@ -56,7 +56,7 @@ public class TaskStartedEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(PiperEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent aEvent) {
         if (Events.TASK_STARTED.equals(aEvent.getType())) {
             String taskId = aEvent.getString("taskId");
             TaskExecution task = taskExecutionRepository.findOne(taskId);
@@ -77,7 +77,7 @@ public class TaskStartedEventListener implements EventListener {
                     taskExecutionRepository.merge(mtask);
                 }
                 if (mtask.getParentId() != null) {
-                    PiperEvent pevent = PiperEvent.of(Events.TASK_STARTED, "taskId", mtask.getParentId());
+                    WorkflowEvent pevent = WorkflowEvent.of(Events.TASK_STARTED, "taskId", mtask.getParentId());
                     onApplicationEvent(pevent);
                 }
             }

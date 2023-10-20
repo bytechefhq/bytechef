@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Conditional;
 
 /**
  * Configuration annotation for a conditional element that depends on
- * the property <code>piper.roles</code> containing the value
+ * the property <code>atlas.roles</code> containing the value
  * <code>worker</code>
  *
  * @author Arik Cohen

@@ -26,7 +26,7 @@ import com.integri.atlas.engine.core.context.ContextRepository;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
@@ -111,7 +111,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setCurrentTask(-1);
         job.setOutputs(evaledjobOutput);
         jobRepository.merge(job);
-        eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus()));
         log.debug("Job {} completed successfully", aJob.getId());
     }
 

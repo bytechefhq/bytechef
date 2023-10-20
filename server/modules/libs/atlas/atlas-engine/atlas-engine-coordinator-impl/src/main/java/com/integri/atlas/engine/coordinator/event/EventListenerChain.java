@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class EventListenerChain implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(PiperEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent aEvent) {
         for (EventListener listener : listeners) {
             listener.onApplicationEvent(aEvent);
         }

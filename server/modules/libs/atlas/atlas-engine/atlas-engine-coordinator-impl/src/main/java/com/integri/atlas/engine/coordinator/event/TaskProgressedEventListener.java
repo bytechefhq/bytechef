@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.coordinator.event;
 
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecutionRepository;
@@ -41,7 +41,7 @@ public class TaskProgressedEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(PiperEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent aEvent) {
         if (Events.TASK_PROGRESSED.equals(aEvent.getType())) {
             String taskId = aEvent.getString("taskId");
             int progress = aEvent.getInteger("progress", 0);

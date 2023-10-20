@@ -19,6 +19,6 @@
 package com.integri.atlas.engine.coordinator.messagebroker;
 
 public interface Exchanges {
-    static final String TASKS = "piper.tasks";
-    static final String CONTROL = "piper.control";
+    static final String TASKS = "atlas.tasks";
+    static final String CONTROL = "atlas.control";
 }

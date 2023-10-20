@@ -19,7 +19,7 @@
 package com.integri.atlas.config;
 
 import com.integri.atlas.repository.git.workflow.GitWorkflowRepository;
-import com.integri.atlas.engine.config.PiperProperties;
+import com.integri.atlas.engine.config.AtlasProperties;
 import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.WorkflowRepositoryChain;
 import com.integri.atlas.repository.yaml.workflow.ResourceBasedWorkflowRepository;
@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 
 @Configuration
-@EnableConfigurationProperties(PiperProperties.class)
+@EnableConfigurationProperties(AtlasProperties.class)
 public class WorkflowRepositoryConfiguration {
 
     @Bean
@@ -44,24 +44,24 @@ public class WorkflowRepositoryConfiguration {
 
     @Bean
     @Order(1)
-    @ConditionalOnProperty(name = "piper.workflow-repository.classpath.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "atlas.workflow-repository.classpath.enabled", havingValue = "true")
     ResourceBasedWorkflowRepository resourceBasedWorkflowRepository() {
         return new ResourceBasedWorkflowRepository();
     }
 
     @Bean
     @Order(2)
-    @ConditionalOnProperty(name = "piper.workflow-repository.filesystem.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "atlas.workflow-repository.filesystem.enabled", havingValue = "true")
     ResourceBasedWorkflowRepository fileSystemBasedWorkflowRepository(
-        @Value("${piper.workflow-repository.filesystem.location-pattern}") String aBasePath
+        @Value("${atlas.workflow-repository.filesystem.location-pattern}") String aBasePath
     ) {
         return new ResourceBasedWorkflowRepository(String.format("file:%s", aBasePath));
     }
 
     @Bean
     @Order(3)
-    @ConditionalOnProperty(name = "piper.workflow-repository.git.enabled", havingValue = "true")
-    GitWorkflowRepository gitWorkflowRepository(PiperProperties aProperties) {
+    @ConditionalOnProperty(name = "atlas.workflow-repository.git.enabled", havingValue = "true")
+    GitWorkflowRepository gitWorkflowRepository(AtlasProperties aProperties) {
         return new GitWorkflowRepository(aProperties.getWorkflowRepository().getGit());
     }
 }
