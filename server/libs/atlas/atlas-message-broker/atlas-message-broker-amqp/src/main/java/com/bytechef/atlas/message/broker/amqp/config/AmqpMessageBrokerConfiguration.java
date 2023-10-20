@@ -138,7 +138,7 @@ public class AmqpMessageBrokerConfiguration
 
     @Bean
     Queue controlQueue() {
-        return new Queue(Queues.CONTROL, true, true, true);
+        return new Queue(Exchanges.CONTROL + "/" + Exchanges.CONTROL, true, true, true);
     }
 
     @Bean
