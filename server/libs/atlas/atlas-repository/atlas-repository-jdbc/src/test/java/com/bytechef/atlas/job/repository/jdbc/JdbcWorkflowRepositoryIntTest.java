@@ -19,8 +19,7 @@ package com.bytechef.atlas.job.repository.jdbc;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
-import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.workflow.WorkflowFormat;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired
-    private WorkflowRepository workflowRepository;
+    private WorkflowCrudRepository workflowCrudRepository;
 
     @Test
     public void testFindById() {
@@ -53,11 +52,11 @@ public class JdbcWorkflowRepositoryIntTest {
                     action: set
                     value: "1234"
                 """);
-        workflow.setFormat(WorkflowFormat.YAML);
+        workflow.setFormat(Workflow.Format.YAML);
 
-        workflow = workflowRepository.save(workflow);
+        workflow = workflowCrudRepository.save(workflow);
 
-        Workflow resultWorkflow = workflowRepository.findById(workflow.getId())
+        Workflow resultWorkflow = workflowCrudRepository.findById(workflow.getId())
             .orElseThrow();
 
         Assertions.assertEquals("My Label", resultWorkflow.getLabel());

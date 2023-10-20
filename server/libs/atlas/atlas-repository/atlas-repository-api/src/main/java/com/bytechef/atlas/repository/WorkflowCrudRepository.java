@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.resource;
+package com.bytechef.atlas.repository;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 
 /**
  * @author Ivica Cardic
  */
-public class FilesystemResourceWorkflowRepository extends AbstractResourceWorkflowRepository {
+public interface WorkflowCrudRepository extends WorkflowRepository {
 
-    public FilesystemResourceWorkflowRepository(String locationPattern, WorkflowMapper workflowMapper) {
-        super(String.format("file:%s", locationPattern), workflowMapper);
-    }
+    void deleteById(String id);
 
-    @Override
-    public Workflow.ProviderType getProviderType() {
-        return Workflow.ProviderType.FILESYSTEM;
-    }
+    Workflow save(Workflow workflow);
 }

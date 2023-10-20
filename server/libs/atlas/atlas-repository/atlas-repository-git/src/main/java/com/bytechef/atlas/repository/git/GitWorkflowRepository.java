@@ -57,10 +57,10 @@ public class GitWorkflowRepository implements WorkflowRepository {
     public Iterable<Workflow> findAll() {
         synchronized (this) {
             List<WorkflowResource> resources = gitWorkflowOperations.getHeadFiles();
-            List<Workflow> workflows = resources.stream()
-                .map(r -> workflowMapper.readValue(r))
+
+            return resources.stream()
+                .map(workflowMapper::readValue)
                 .collect(Collectors.toList());
-            return workflows;
         }
     }
 
@@ -71,5 +71,10 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
             return Optional.of(workflowMapper.readValue(resource));
         }
+    }
+
+    @Override
+    public Workflow.ProviderType getProviderType() {
+        return Workflow.ProviderType.GIT;
     }
 }

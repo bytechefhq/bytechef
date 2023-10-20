@@ -33,10 +33,5 @@ public interface WorkflowRepository {
 
     Optional<Workflow> findById(String id);
 
-    default Workflow save(Workflow workflow) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void deleteById(String id) {
-    }
+    Workflow.ProviderType getProviderType();
 }
