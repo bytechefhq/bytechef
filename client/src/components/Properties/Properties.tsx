@@ -13,6 +13,7 @@ import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
 import Input from '../Input/Input';
+import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
 export interface PropertyFormProps {
@@ -48,16 +49,13 @@ export const Property = ({
     const [integerValue, setIntegerValue] = useState('');
 
     const {
-        additionalProperties,
         controlType,
         defaultValue = '',
         description,
         hidden,
-        items,
         label,
         name,
         options,
-        properties,
         required,
         type,
         types,
@@ -273,17 +271,7 @@ export const Property = ({
                 </ul>
             )}
 
-            {type === 'ARRAY' && (
-                <ul className="w-full">
-                    {items?.map((item, index) => (
-                        <Property
-                            customClassName="border-l ml-2 pl-2 last-of-type:mb-0"
-                            key={`${item.name}_${index}`}
-                            property={item}
-                        />
-                    ))}
-                </ul>
-            )}
+            {type === 'ARRAY' && <ArrayProperty property={property} />}
 
             {type === 'BOOLEAN' && (
                 <Select
@@ -298,13 +286,7 @@ export const Property = ({
                 />
             )}
 
-            {type === 'OBJECT' && (
-                <ObjectProperty
-                    additionalProperties={additionalProperties}
-                    properties={properties!}
-                    label={label}
-                />
-            )}
+            {type === 'OBJECT' && <ObjectProperty property={property} />}
         </li>
     );
 };
