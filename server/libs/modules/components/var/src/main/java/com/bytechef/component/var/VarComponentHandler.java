@@ -24,10 +24,12 @@ import com.bytechef.component.var.action.VarSetAction;
 import com.bytechef.component.var.constant.VarConstants;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class VarComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(VarConstants.VAR)

@@ -23,10 +23,12 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponen
 
 import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(JdbcComponentDefinitionFactory.class)
 public class PostgreSQLJdbcComponentDefinitionFactory implements JdbcComponentDefinitionFactory {
 
     private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(POSTGRESQL)

@@ -30,10 +30,12 @@ import com.bytechef.component.httpclient.action.HttpClientPutAction;
 import com.bytechef.component.httpclient.connection.HttpClientConnection;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class HttpClientComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HTTP_CLIENT)

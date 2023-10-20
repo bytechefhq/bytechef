@@ -24,12 +24,14 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import com.bytechef.component.bash.action.BashExecuteAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * The Bash component executes arbitrary Bash scripts.
  *
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class BashComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(BASH)

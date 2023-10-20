@@ -25,10 +25,12 @@ import com.bytechef.component.xlsxfile.action.XlsxFileWriteAction;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class XlsxFileComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XlsxFileConstants.XLSX_FILE)

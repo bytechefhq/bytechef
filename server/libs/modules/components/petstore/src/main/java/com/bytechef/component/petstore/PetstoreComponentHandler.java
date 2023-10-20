@@ -17,8 +17,12 @@
 
 package com.bytechef.component.petstore;
 
+import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.google.auto.service.AutoService;
+
 /**
  * @generated
  */
+@AutoService(OpenApiComponentHandler.class)
 public class PetstoreComponentHandler extends AbstractPetstoreComponentHandler {
 }

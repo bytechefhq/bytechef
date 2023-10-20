@@ -26,10 +26,12 @@ import com.bytechef.component.filestorage.action.FileStorageReadAction;
 import com.bytechef.component.filestorage.action.FileStorageWriteAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class FileStorageComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILE_STORAGE)

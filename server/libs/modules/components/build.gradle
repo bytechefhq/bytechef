@@ -4,10 +4,13 @@ subprojects {
     }
 
     dependencies {
+        annotationProcessor libs.com.google.auto.service.auto.service
+
         api project(":server:libs:hermes:hermes-component:hermes-component-api")
 
         implementation "com.fasterxml.jackson.core:jackson-databind"
         implementation "org.slf4j:slf4j-api"
+        implementation libs.com.google.auto.service.auto.service.annotations
 
         testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
         testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test-int-support")
