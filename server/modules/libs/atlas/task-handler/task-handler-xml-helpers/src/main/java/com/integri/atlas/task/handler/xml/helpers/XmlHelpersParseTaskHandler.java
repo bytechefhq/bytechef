@@ -20,7 +20,7 @@ import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.commons.xml.XmlHelper;
+import com.integri.atlas.task.commons.xml.XmlHelper;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 

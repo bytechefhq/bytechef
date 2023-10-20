@@ -16,19 +16,19 @@
 
 package com.integri.atlas.task.handler.mysql;
 
-import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_DELETE;
-import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_EXECUTE;
-import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_INSERT;
-import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_QUERY;
-import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_UPDATE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_DELETE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_EXECUTE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_INSERT;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_QUERY;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.OPERATION_UPDATE;
 import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.TASK_MYSQL;
 
-import com.integri.atlas.task.handler.commons.jdbc.DataSourceFactory;
-import com.integri.atlas.task.handler.commons.jdbc.DeleteJdbcTaskHandler;
-import com.integri.atlas.task.handler.commons.jdbc.ExecuteJdbcTaskHandler;
-import com.integri.atlas.task.handler.commons.jdbc.InsertJdbcTaskHandler;
-import com.integri.atlas.task.handler.commons.jdbc.QueryJdbcTaskHandler;
-import com.integri.atlas.task.handler.commons.jdbc.UpdateJdbcTaskHandler;
+import com.integri.atlas.task.commons.jdbc.DataSourceFactory;
+import com.integri.atlas.task.commons.jdbc.DeleteJdbcTaskHandler;
+import com.integri.atlas.task.commons.jdbc.ExecuteJdbcTaskHandler;
+import com.integri.atlas.task.commons.jdbc.InsertJdbcTaskHandler;
+import com.integri.atlas.task.commons.jdbc.QueryJdbcTaskHandler;
+import com.integri.atlas.task.commons.jdbc.UpdateJdbcTaskHandler;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;

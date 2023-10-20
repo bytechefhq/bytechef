@@ -1,0 +1,15 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-worker:engine-worker-api")
+    api project(":modules:libs:atlas:task-definition:task-definition-api")
+
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-jdbc"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
+    testImplementation project(":modules:libs:atlas:test-commons")
+
+    testRuntimeOnly "org.postgresql:postgresql"
+    testRuntimeOnly "org.testcontainers:postgresql"
+}
