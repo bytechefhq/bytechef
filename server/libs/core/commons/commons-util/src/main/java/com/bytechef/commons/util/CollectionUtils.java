@@ -45,6 +45,14 @@ public final class CollectionUtils {
             .toList();
     }
 
+    public static <T> List<T> concat(List<T> list1, List<T> list2) {
+        Assert.notNull(list1, "'list1' must not be null");
+        Assert.notNull(list2, "'list2' must not be null");
+
+        return Stream.concat(list1.stream(), list2.stream())
+            .toList();
+    }
+
     public static <T> List<T> concat(Stream<T> stream1, Stream<T> stream2) {
         Assert.notNull(stream1, "'stream1' must not be null");
         Assert.notNull(stream1, "'stream1' must not be null");

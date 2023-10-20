@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -47,9 +48,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @SuppressFBWarnings("EI2")
     public TriggerDefinitionServiceImpl(
-        List<ComponentDefinition> componentDefinitions, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
 
-        this.componentDefinitions = componentDefinitions;
+        this.componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
         this.contextConnectionFactory = contextConnectionFactory;
     }
 

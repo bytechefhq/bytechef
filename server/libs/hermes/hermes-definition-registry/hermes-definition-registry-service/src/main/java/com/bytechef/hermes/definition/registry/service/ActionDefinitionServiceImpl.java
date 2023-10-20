@@ -21,6 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,8 +40,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private final List<ComponentDefinition> componentDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public ActionDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
-        this.componentDefinitions = componentDefinitions;
+    public ActionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        this.componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
     }
 
     @Override

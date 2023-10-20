@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.definition.registry.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
@@ -36,14 +37,8 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     private final List<TaskDispatcherDefinition> taskDispatcherDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public TaskDispatcherDefinitionServiceImpl(List<TaskDispatcherDefinition> taskDispatcherDefinitions) {
-        this.taskDispatcherDefinitions = taskDispatcherDefinitions.stream()
-            .sorted((o1, o2) -> {
-                String o1Name = o1.getName();
-
-                return o1Name.compareTo(o2.getName());
-            })
-            .toList();
+    public TaskDispatcherDefinitionServiceImpl(TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry) {
+        this.taskDispatcherDefinitions = taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions();
     }
 
     @Override

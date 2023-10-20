@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.registrar.factory.config;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.registry.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.component.registrar.oas.handler.OpenApiComponentHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.registrar.handler.ComponentHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.registrar.handler.ComponentHandlerBeanDefinitionLoader.HandlerBeanDefinitionEntry;
@@ -30,9 +31,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -56,16 +61,15 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
                     componentHandlerBeanDefinitionLoader.loadComponentHandlerBeanDefinitions()))
             .toList();
 
+        List<ComponentDefinition> componentDefinitions = new ArrayList<>();
+
         for (ComponentHandlerBeanDefinition componentHandlerBeanDefinition : componentHandlerFactories) {
             ComponentDefinitionFactory componentDefinitionFactory =
                 componentHandlerBeanDefinition.componentDefinitionFactory();
 
             ComponentDefinition componentDefinition = componentDefinitionFactory.getDefinition();
 
-            beanFactory.registerSingleton(
-                getBeanName(
-                    componentDefinition.getName(), componentDefinition.getVersion(), "ComponentDefinitionFactory", '_'),
-                componentDefinitionFactory);
+            componentDefinitions.add(componentDefinition);
 
             for (HandlerBeanDefinitionEntry handlerBeanDefinitionEntry : componentHandlerBeanDefinition
                 .handlerBeanDefinitionEntries()) {
@@ -79,9 +83,30 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
                     handlerBeanDefinition);
             }
         }
+
+        ManagedList<BeanDefinition> componentDefinitionFactoryManagedList = new ManagedList<>();
+
+        Arrays.stream(beanFactory.getBeanNamesForType(ComponentDefinitionFactory.class))
+            .map(beanFactory::getBeanDefinition)
+            .forEach(componentDefinitionFactoryManagedList::add);
+
+        ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(
+            "componentDefinitionRegistry",
+            getComponentDefinitionRegistryBeanDefinition(
+                componentDefinitions, componentDefinitionFactoryManagedList));
     }
 
     private String getBeanName(String componentName, int componentVersion, String typeName, char delimiter) {
         return componentName + delimiter + "v" + componentVersion + delimiter + typeName;
+    }
+
+    private BeanDefinition getComponentDefinitionRegistryBeanDefinition(
+        List<ComponentDefinition> componentDefinitions,
+        ManagedList<BeanDefinition> componentDefinitionFactoryManagedList) {
+
+        return BeanDefinitionBuilder.genericBeanDefinition(ComponentDefinitionRegistryImpl.class)
+            .addConstructorArgValue(componentDefinitions)
+            .addConstructorArgValue(componentDefinitionFactoryManagedList)
+            .getBeanDefinition();
     }
 }

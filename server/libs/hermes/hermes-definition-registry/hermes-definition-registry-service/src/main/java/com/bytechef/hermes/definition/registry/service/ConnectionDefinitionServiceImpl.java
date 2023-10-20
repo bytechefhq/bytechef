@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
@@ -51,8 +52,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     private final List<ConnectionDefinition> connectionDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public ConnectionDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
-        this.componentDefinitions = componentDefinitions;
+    public ConnectionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        this.componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
         this.connectionDefinitions = componentDefinitions.stream()
             .map(componentDefinition -> OptionalUtils.orElse(componentDefinition.getConnection(), null))
             .filter(Objects::nonNull)
