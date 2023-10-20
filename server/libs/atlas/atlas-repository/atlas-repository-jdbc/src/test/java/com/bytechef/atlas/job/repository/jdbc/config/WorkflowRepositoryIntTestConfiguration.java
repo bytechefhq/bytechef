@@ -17,7 +17,6 @@
 
 package com.bytechef.atlas.job.repository.jdbc.config;
 
-import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
@@ -34,7 +33,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Arrays;
@@ -48,9 +46,6 @@ import java.util.List;
         "com.bytechef.atlas.repository.jdbc"
     })
 @EnableAutoConfiguration
-@Import({
-    WorkflowMapperConfiguration.class
-})
 @SpringBootConfiguration
 public class WorkflowRepositoryIntTestConfiguration {
 

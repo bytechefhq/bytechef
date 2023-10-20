@@ -6,5 +6,4 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
 
     testImplementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
 }

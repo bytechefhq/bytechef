@@ -31,7 +31,6 @@ import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
@@ -192,8 +191,7 @@ public class CoordinatorIntTest {
     @EnableAutoConfiguration
     @Import({
         ResourceWorkflowRepositoryConfiguration.class,
-        WorkflowConfiguration.class,
-        WorkflowMapperConfiguration.class
+        WorkflowConfiguration.class
     })
     @Configuration
     public static class CoordinatorIntTestConfiguration {

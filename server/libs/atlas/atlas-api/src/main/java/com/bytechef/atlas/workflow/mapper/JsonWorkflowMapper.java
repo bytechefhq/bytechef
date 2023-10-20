@@ -15,21 +15,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.workflow.mapper;
+package com.bytechef.atlas.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Map;
+
 /**
  * @author Ivica Cardic
  */
-public class JsonWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
+class JsonWorkflowMapper extends AbstractWorkflowMapper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
-    public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, OBJECT_MAPPER);
+    public Workflow readWorkflow(WorkflowResource workflowResource) {
+        return readWorkflow(workflowResource, OBJECT_MAPPER);
+    }
+
+    @Override
+    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
+        return readWorkflowMap(workflowResource, OBJECT_MAPPER);
     }
 
     @Override

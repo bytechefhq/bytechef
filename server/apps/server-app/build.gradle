@@ -27,7 +27,6 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-redis")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-git")
-    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:atlas:atlas-rest:atlas-rest-impl")

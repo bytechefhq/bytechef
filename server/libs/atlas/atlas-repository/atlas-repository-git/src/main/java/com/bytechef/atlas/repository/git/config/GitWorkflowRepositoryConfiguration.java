@@ -18,7 +18,6 @@
 package com.bytechef.atlas.repository.git.config;
 
 import com.bytechef.atlas.repository.git.GitWorkflowRepository;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,14 +29,12 @@ public class GitWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(4)
-    GitWorkflowRepository gitWorkflowRepository(
-        GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties, WorkflowMapper workflowMapper) {
+    GitWorkflowRepository gitWorkflowRepository(GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties) {
         return new GitWorkflowRepository(
             gitWorkflowRepositoryProperties.getUrl(),
             gitWorkflowRepositoryProperties.getBranch(),
             gitWorkflowRepositoryProperties.getSearchPaths(),
             gitWorkflowRepositoryProperties.getUsername(),
-            gitWorkflowRepositoryProperties.getPassword(),
-            workflowMapper);
+            gitWorkflowRepositoryProperties.getPassword());
     }
 }

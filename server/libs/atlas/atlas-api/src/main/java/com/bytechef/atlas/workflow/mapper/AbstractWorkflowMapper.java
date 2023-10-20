@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.workflow.mapper;
+package com.bytechef.atlas.workflow.mapper;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.commons.util.ExceptionUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -28,7 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,25 +37,29 @@ import org.springframework.util.FileCopyUtils;
 /**
  * @author Matija Petanjek
  */
-public abstract class AbstractWorkflowMapper implements WorkflowMapper {
+abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
-    public Workflow readValue(WorkflowResource workflowResource, ObjectMapper objectMapper) {
-        Workflow workflow;
-
+    protected Workflow readWorkflow(WorkflowResource workflowResource, ObjectMapper objectMapper) {
         try {
             String definition = readDefinition(workflowResource);
 
             Map<String, Object> workflowMap = parse(definition, objectMapper);
 
-            workflow = new Workflow(
-                workflowResource.getId(), definition, workflowResource.getWorkflowFormat(), workflowMap);
-        } catch (Exception e) {
-            workflow = new Workflow(
-                workflowResource.getId(),
-                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+            return new Workflow(
+                definition, workflowResource.getWorkflowFormat(), workflowResource.getId(), workflowMap);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        return workflow;
+    protected Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, ObjectMapper objectMapper) {
+        try {
+            String definition = readDefinition(workflowResource);
+
+            return parse(definition, objectMapper);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<String, Object> parse(String workflow, ObjectMapper objectMapper) throws JsonProcessingException {
@@ -69,7 +71,9 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
 
-        Assert.notNull(rawTasks, "no tasks found");
+        if (rawTasks == null) {
+            rawTasks = Collections.emptyList();
+        }
 
         List<Map<String, Object>> tasks = new ArrayList<>();
 

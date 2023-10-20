@@ -1,9 +1,0 @@
-dependencies {
-    api project(":server:libs:atlas:atlas-api")
-    api project(":server:libs:atlas:atlas-repository:atlas-repository-api")
-
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
-    implementation "org.springframework:spring-context"
-    implementation "org.springframework:spring-core"
-    implementation "org.slf4j:slf4j-api"
-}

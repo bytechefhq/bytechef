@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.task.dispatcher.test.config;
 
-import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.sync.executor.config.WorkflowExecutorConfiguration;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -40,8 +39,7 @@ import org.springframework.context.annotation.Import;
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
 @Import({
-    ResourceWorkflowRepositoryConfiguration.class, WorkflowExecutorConfiguration.class,
-    WorkflowMapperConfiguration.class
+    ResourceWorkflowRepositoryConfiguration.class, WorkflowExecutorConfiguration.class
 })
 @SpringBootConfiguration
 public class TaskDispatcherIntTestConfiguration {
