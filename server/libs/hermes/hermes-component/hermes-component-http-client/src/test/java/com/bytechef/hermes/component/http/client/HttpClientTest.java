@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.http.client;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.connection.ConnectionConstants.CONNECTION_ID;
 
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;

@@ -40,7 +40,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.showWhen;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -48,6 +47,7 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.utils.JsonUtils;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

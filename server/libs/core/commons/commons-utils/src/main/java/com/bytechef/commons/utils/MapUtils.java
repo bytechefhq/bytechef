@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.collection;
+package com.bytechef.commons.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
@@ -24,10 +24,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
@@ -36,34 +34,6 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 public class MapUtils {
-
-    public static <T> Map<String, ?> of(Map<String, T> map, Function<T, ?> valueProcessor) {
-        Map<String, Object> resultMap = new HashMap<>(map);
-
-        if (valueProcessor != null) {
-            for (Map.Entry<String, T> entry : map.entrySet()) {
-                resultMap.put(entry.getKey(), valueProcessor.apply(entry.getValue()));
-            }
-        }
-
-        return resultMap;
-    }
-
-    public static <T> Map<String, Object> of(List<T> values) {
-        return of(values, null);
-    }
-
-    public static <T> Map<String, Object> of(List<T> values, Function<T, ?> valueProcessor) {
-        Map<String, Object> map = new HashMap<>();
-
-        int count = 1;
-
-        for (T value : values) {
-            map.put("column_" + count++, valueProcessor == null ? value : valueProcessor.apply(value));
-        }
-
-        return map;
-    }
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
@@ -227,12 +197,6 @@ public class MapUtils {
         Map<String, Object> value = getMap(map, key);
 
         return value != null ? value : defaultValue;
-    }
-
-    public static Object getMapKey(Map<String, Object> map, String key, String mapKey) {
-        Map<String, Object> value = getMap(map, key);
-
-        return value != null ? value.get(mapKey) : null;
     }
 
     public static String getRequiredString(Map<String, Object> map, String key) {

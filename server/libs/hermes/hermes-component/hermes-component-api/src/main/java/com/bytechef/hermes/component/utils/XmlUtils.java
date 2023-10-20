@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.xml;
+package com.bytechef.hermes.component.utils;
 
-import com.bytechef.commons.exception.ProcessingException;
+import com.bytechef.hermes.component.exception.ProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;

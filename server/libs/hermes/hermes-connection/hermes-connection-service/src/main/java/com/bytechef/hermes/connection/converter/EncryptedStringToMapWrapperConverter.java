@@ -17,8 +17,8 @@
 package com.bytechef.hermes.connection.converter;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
-import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.encryption.Encryption;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -39,10 +39,15 @@ public class EncryptedStringToMapWrapperConverter implements Converter<String, E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public EncryptedMapWrapper convert(String source) {
-        return source == null
-                ? null
-                : new EncryptedMapWrapper(JsonUtils.read(objectMapper, encryption.decrypt(source), Map.class));
+        return source == null ? null : new EncryptedMapWrapper(read(objectMapper, encryption.decrypt(source)));
+    }
+
+    private Map read(ObjectMapper objectMapper, String json) {
+        try {
+            return objectMapper.readValue(json, Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

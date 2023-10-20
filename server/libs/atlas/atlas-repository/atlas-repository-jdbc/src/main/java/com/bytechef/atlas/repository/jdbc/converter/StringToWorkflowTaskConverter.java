@@ -17,7 +17,7 @@
 package com.bytechef.atlas.repository.jdbc.converter;
 
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.commons.json.JsonUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
@@ -37,8 +37,15 @@ public class StringToWorkflowTaskConverter implements Converter<String, Workflow
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public WorkflowTask convert(String source) {
-        return source == null ? null : JsonUtils.read(objectMapper, source, WorkflowTask.class);
+        return source == null ? null : read(objectMapper, source);
+    }
+
+    private WorkflowTask read(ObjectMapper objectMapper, String json) {
+        try {
+            return objectMapper.readValue(json, WorkflowTask.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

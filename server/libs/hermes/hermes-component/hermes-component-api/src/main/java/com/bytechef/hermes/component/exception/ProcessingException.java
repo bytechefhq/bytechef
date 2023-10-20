@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.exception;
+package com.bytechef.hermes.component.exception;
 
 /**
  * @author Igor Beslic

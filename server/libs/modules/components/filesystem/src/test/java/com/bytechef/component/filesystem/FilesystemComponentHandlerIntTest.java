@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
-import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -59,7 +58,7 @@ public class FilesystemComponentHandlerIntTest {
         FileEntry fileEntry =
                 fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), Charset.defaultCharset()));
 
-        assertThat(MapUtils.getMap(outputs, "readLocalFile"))
+        assertThat(outputs.get("readLocalFile"))
                 .hasFieldOrPropertyWithValue("extension", "txt")
                 .hasFieldOrPropertyWithValue("mimeType", "text/plain")
                 .hasFieldOrPropertyWithValue("name", "sample.txt")

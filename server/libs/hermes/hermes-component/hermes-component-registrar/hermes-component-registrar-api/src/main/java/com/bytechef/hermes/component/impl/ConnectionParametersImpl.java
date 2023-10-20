@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.component.impl;
 
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.connection.domain.Connection;
 import java.util.Map;

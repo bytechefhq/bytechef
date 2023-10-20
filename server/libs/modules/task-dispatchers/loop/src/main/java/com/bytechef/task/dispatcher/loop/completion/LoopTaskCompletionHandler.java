@@ -34,7 +34,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
+import com.bytechef.commons.utils.LocalDateTimeUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;

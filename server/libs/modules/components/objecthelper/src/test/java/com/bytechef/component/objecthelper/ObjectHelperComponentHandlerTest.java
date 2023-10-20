@@ -18,9 +18,9 @@ package com.bytechef.component.objecthelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.hermes.component.test.mock.MockContext;
 import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.hermes.component.utils.JsonUtils;
 import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.IOException;
 import java.util.List;

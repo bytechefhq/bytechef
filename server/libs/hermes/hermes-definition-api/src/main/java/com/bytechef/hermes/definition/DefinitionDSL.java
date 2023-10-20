@@ -232,7 +232,7 @@ public class DefinitionDSL {
 
         private ModifiableDisplayOption() {}
 
-        private static ModifiableDisplayOption of(List<DisplayOptionCondition> displayOptionConditions) {
+        static ModifiableDisplayOption of(List<DisplayOptionCondition> displayOptionConditions) {
             ModifiableDisplayOption displayOption = new ModifiableDisplayOption();
 
             for (DisplayOptionCondition displayOptionCondition : displayOptionConditions) {
@@ -410,6 +410,12 @@ public class DefinitionDSL {
 
             public ModifiableAnyProperty label(String label) {
                 this.label = label;
+
+                return this;
+            }
+
+            public ModifiableAnyProperty placeholder(String placeholder) {
+                this.placeholder = placeholder;
 
                 return this;
             }
@@ -662,7 +668,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public BooleanProperty defaultValue(boolean defaultValue) {
+            public ModifiableBooleanProperty defaultValue(boolean defaultValue) {
                 this.defaultValue = defaultValue;
 
                 return this;

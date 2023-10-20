@@ -119,8 +119,7 @@ public class ConnectionControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostConnection() {
         Connection connection = getConnection();
-        ConnectionModel connectionModel =
-                new ConnectionModel().name("name").label("label").parameters(Map.of("key1", "value1"));
+        ConnectionModel connectionModel = new ConnectionModel().name("name").parameters(Map.of("key1", "value1"));
 
         when(connectionService.add(any())).thenReturn(connection);
 
@@ -138,8 +137,6 @@ public class ConnectionControllerIntTest {
                     .expectBody()
                     .jsonPath("$.id")
                     .isEqualTo(connection.getId())
-                    .jsonPath("$.label")
-                    .isEqualTo(connection.getLabel())
                     .jsonPath("$.name")
                     .isEqualTo(connection.getName())
                     .jsonPath("$.parameters")
@@ -157,8 +154,6 @@ public class ConnectionControllerIntTest {
         Connection connection = getConnection();
         ConnectionUpdateModel connectionUpdateModel = new ConnectionUpdateModel().name("name2");
 
-        connection.setLabel("label2");
-
         when(connectionService.update(anyString(), anyString())).thenReturn(connection);
 
         try {
@@ -174,8 +169,8 @@ public class ConnectionControllerIntTest {
                     .expectBody()
                     .jsonPath("$.id")
                     .isEqualTo(connection.getId())
-                    .jsonPath("$.label")
-                    .isEqualTo("label2");
+                    .jsonPath("$.name")
+                    .isEqualTo("name2");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -185,7 +180,6 @@ public class ConnectionControllerIntTest {
         Connection connection = new Connection();
 
         connection.setId("1");
-        connection.setLabel("label");
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
 

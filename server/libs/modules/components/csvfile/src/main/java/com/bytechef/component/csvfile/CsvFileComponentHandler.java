@@ -39,8 +39,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.commons.collection.MapUtils;
-import com.bytechef.commons.lang.ValueUtils;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -48,6 +46,8 @@ import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.utils.MapUtils;
+import com.bytechef.hermes.component.utils.ValueUtils;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

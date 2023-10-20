@@ -21,7 +21,7 @@ import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.RAW_EXPRESSION;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants;
 import java.util.ArrayList;
 import java.util.Collections;

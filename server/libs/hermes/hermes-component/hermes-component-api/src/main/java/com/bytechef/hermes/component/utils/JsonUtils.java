@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.json;
+package com.bytechef.hermes.component.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

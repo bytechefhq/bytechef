@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.date;
+package com.bytechef.commons.utils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

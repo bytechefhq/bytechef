@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.lang;
+package com.bytechef.hermes.component.utils;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;

@@ -17,7 +17,6 @@
 package com.bytechef.atlas.repository.jdbc.converter;
 
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.commons.json.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
@@ -38,6 +37,14 @@ public class WorkflowTaskToStringConverter implements Converter<WorkflowTask, St
 
     @Override
     public String convert(WorkflowTask source) {
-        return JsonUtils.write(objectMapper, source);
+        return write(objectMapper, source);
+    }
+
+    private String write(ObjectMapper objectMapper, Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

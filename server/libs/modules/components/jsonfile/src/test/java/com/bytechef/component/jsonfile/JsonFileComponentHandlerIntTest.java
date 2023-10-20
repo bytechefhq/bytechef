@@ -23,7 +23,6 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
-import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -88,7 +87,7 @@ public class JsonFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(MapUtils.getMapKey(outputs, "writeJSONFile", WorkflowConstants.NAME))
+        assertThat(((Map) outputs.get("writeJSONFile")).get(WorkflowConstants.NAME))
                 .isEqualTo("file.json");
 
         File sampleFile = getFile("sample_array.json");
