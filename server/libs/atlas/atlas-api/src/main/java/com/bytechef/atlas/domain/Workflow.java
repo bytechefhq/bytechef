@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.annotation.CreatedBy;
@@ -57,6 +58,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @Table
 public final class Workflow implements Errorable, Persistable<String>, Serializable {
 

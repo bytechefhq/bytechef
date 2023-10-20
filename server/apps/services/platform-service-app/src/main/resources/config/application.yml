@@ -66,8 +66,6 @@ openapi:
 spring:
   application:
     name: platform-service-app
-  cache:
-    type: simple
   cloud:
     redis:
       discovery:

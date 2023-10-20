@@ -55,8 +55,6 @@ openapi:
 spring:
   application:
     name: coordinator-service-app
-  cache:
-    type: simple
   cloud:
     redis:
       discovery:

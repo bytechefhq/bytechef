@@ -66,8 +66,6 @@ openapi:
 spring:
   application:
     name: server-app
-  cache:
-    type: simple
   jackson:
     default-property-inclusion: non_null
     serialization:
