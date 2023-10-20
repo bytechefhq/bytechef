@@ -22,12 +22,10 @@ import java.util.Arrays;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class Encryption {
 
     private final EncryptionKey encryptionKey;
