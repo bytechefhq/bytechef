@@ -21,16 +21,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
-
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +52,28 @@ public class JSONHelper {
 
     public JSONHelper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+
+        Configuration.setDefaults(
+            new Configuration.Defaults() {
+                private final JsonProvider jsonProvider = new JacksonJsonProvider();
+                private final MappingProvider mappingProvider = new JacksonMappingProvider();
+
+                @Override
+                public JsonProvider jsonProvider() {
+                    return jsonProvider;
+                }
+
+                @Override
+                public MappingProvider mappingProvider() {
+                    return mappingProvider;
+                }
+
+                @Override
+                public Set<Option> options() {
+                    return EnumSet.noneOf(Option.class);
+                }
+            }
+        );
     }
 
     public Object checkJSON(Object object) {
