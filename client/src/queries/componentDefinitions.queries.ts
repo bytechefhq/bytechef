@@ -19,13 +19,14 @@ export const ComponentDefinitionKeys = {
 };
 
 export const useGetComponentDefinitionQuery = (
-    request: GetComponentDefinitionRequest
+    request: GetComponentDefinitionRequest,
+    enabledCondition?: boolean
 ) =>
     useQuery<ComponentDefinitionModel, Error>(
         ComponentDefinitionKeys.componentDefinition(request),
         () => new ComponentDefinitionApi().getComponentDefinition(request),
         {
-            enabled: !!request.componentName,
+            enabled: false || enabledCondition,
         }
     );
 
