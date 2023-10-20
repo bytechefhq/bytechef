@@ -158,9 +158,10 @@ subprojects {
 
     configurations {
         all {
+            // https://github.com/testcontainers/testcontainers-java/issues/970
             /* exclude junit 4 dependencies */
-            exclude group: 'junit', module: 'junit'
-            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+            // exclude group: 'junit', module: 'junit'
+            // exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         }
     }
 }
