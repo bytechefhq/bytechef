@@ -48,7 +48,7 @@ public class WorkflowController {
         this.workflowRepository = workflowRepository;
     }
 
-    @PostMapping(path = "/workflows", consumes = { "application/json", "application/yaml" })
+    @PostMapping(path = "/workflows", consumes = { MediaType.APPLICATION_JSON_VALUE, "application/yaml" })
     public ResponseEntity<Workflow> create(
         @RequestBody String content,
         @RequestHeader("Content-Type") String contentType
@@ -58,7 +58,7 @@ public class WorkflowController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(workflow);
     }
 
-    @PutMapping(path = "/workflows/{id}", consumes = { "application/json", "application/yaml" })
+    @PutMapping(path = "/workflows/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, "application/yaml" })
     public ResponseEntity<Workflow> update(
         @PathVariable String id,
         @RequestBody String content,
@@ -73,12 +73,12 @@ public class WorkflowController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(workflow);
     }
 
-    @GetMapping("/workflows")
+    @GetMapping(value = "/workflows", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Workflow> list() {
         return workflowRepository.findAll();
     }
 
-    @GetMapping("/workflows/**")
+    @GetMapping(value = "/workflows/**", produces = MediaType.APPLICATION_JSON_VALUE)
     public Workflow get(HttpServletRequest aRequest) {
         String path = (String) aRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String workflowId = path.replaceFirst("/workflows/", "");

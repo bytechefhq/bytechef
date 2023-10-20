@@ -19,9 +19,10 @@ package com.integri.atlas.engine.web.rest;
 import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.registry.TaskDefinitionHandlerRegistry;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,25 +34,23 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class TaskDefinitionController {
 
-    private final List<TaskDefinitionHandler> taskDefinitionHandlers;
+    private final TaskDefinitionHandlerRegistry taskDefinitionHandlerRegistry;
 
-    public TaskDefinitionController(List<TaskDefinitionHandler> taskDefinitionHandlers) {
-        this.taskDefinitionHandlers = taskDefinitionHandlers;
+    public TaskDefinitionController(TaskDefinitionHandlerRegistry taskDefinitionHandlerRegistry) {
+        this.taskDefinitionHandlerRegistry = taskDefinitionHandlerRegistry;
     }
 
-    @GetMapping(value = "/task-definitions/{name}")
+    @GetMapping(value = "/task-definitions/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TaskDefinition getTaskDefinition(@PathVariable("name") String name) {
-        return taskDefinitionHandlers
-            .stream()
-            .map(TaskDefinitionHandler::getTaskDefinition)
-            .filter(taskDefinition -> Objects.equals(taskDefinition.getName(), name))
-            .findFirst()
-            .orElseThrow();
+        TaskDefinitionHandler taskDefinitionHandler = taskDefinitionHandlerRegistry.getTaskDefinitionHandler(name);
+
+        return taskDefinitionHandler.getTaskDefinition();
     }
 
-    @GetMapping(value = "/task-definitions")
+    @GetMapping(value = "/task-definitions", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TaskDefinition> getTaskDefinitions() {
-        return taskDefinitionHandlers
+        return taskDefinitionHandlerRegistry
+            .getTaskDefinitionHandlers()
             .stream()
             .map(TaskDefinitionHandler::getTaskDefinition)
             .collect(Collectors.toList());
