@@ -63,7 +63,6 @@ local.properties
 classes/
 **/out/
 **/dist/
-**/generated/generated
 
 ######################
 # Visual Studio Code
@@ -80,6 +79,7 @@ classes/
 ######################
 .gradle/
 **/build/
+**/generated/generated
 
 ######################
 # Package Files
