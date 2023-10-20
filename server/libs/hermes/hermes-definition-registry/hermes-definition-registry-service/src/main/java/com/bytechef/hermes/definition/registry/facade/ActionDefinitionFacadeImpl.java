@@ -70,13 +70,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId) {
+        Map<String, Object> actionParameters, long connectionId, String searchText) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
             componentName, componentVersion, actionName, propertyName, actionParameters,
-            connection.getAuthorizationName(), connection.getParameters());
+            connection.getAuthorizationName(), connection.getParameters(), searchText);
     }
 
     @Override

@@ -57,14 +57,15 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId) {
+        Map<String, Object> actionParameters, long connectionId, String searchText) {
 
         return WORKER_WEB_CLIENT
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-options"))
             .bodyValue(
                 new Options(
-                    actionName, propertyName, actionParameters, componentName, componentVersion, connectionId))
+                    actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
+                    searchText))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<OptionDTO>>() {})
             .block();
@@ -125,7 +126,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
 
     private record Options(
         String actionName, String propertyName, Map<String, Object> actionParameters, String componentName,
-        int componentVersion, long connectionId) {
+        int componentVersion, long connectionId, String searchText) {
     }
 
     private record OutputSchema(

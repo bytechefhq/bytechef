@@ -160,13 +160,14 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public ResponseEntity<List<OptionModel>> getComponentActionPropertyOptions(
-        String componentName, Integer componentVersion, String actionName, String propertyName,
+        String componentName, Integer componentVersion, String actionName, String propertyName, String searchText,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(CollectionUtils.map(
             actionDefinitionFacade.executeOptions(
                 componentName, componentVersion, actionName, propertyName,
-                componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId()),
+                componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
+                searchText),
             option -> conversionService.convert(option, OptionModel.class)));
     }
 
@@ -292,15 +293,15 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public ResponseEntity<List<OptionModel>> getComponentTriggerPropertyOptions(
-        String componentName, Integer componentVersion, String triggerName, String propertyName,
+        String componentName, Integer componentVersion, String triggerName, String propertyName, String searchText,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
                 triggerDefinitionFacade.executeOptions(
                     componentName, componentVersion, triggerName, propertyName,
-                    componentOperationRequestModel.getParameters(),
-                    componentOperationRequestModel.getConnectionId()),
+                    componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
+                    searchText),
                 option -> conversionService.convert(option, OptionModel.class)));
     }
 }

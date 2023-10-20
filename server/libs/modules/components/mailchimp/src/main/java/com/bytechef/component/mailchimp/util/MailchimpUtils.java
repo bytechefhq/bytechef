@@ -52,7 +52,7 @@ public class MailchimpUtils {
     }
 
     public static ComponentOptionsFunction getListIdOptions() {
-        return (connection, inputParameters) -> {
+        return (connection, inputParameters, searchText) -> {
             String accessToken = MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN);
 
             Map<String, ?> response = HttpClientUtils

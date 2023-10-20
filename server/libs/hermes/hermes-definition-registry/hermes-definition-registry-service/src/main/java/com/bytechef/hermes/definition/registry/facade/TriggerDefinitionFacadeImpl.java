@@ -70,13 +70,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId) {
+        Map<String, Object> triggerParameters, long connectionId, String searchText) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeOptions(
             componentName, componentVersion, triggerName, propertyName, triggerParameters,
-            connection.getAuthorizationName(), connection.getParameters());
+            connection.getAuthorizationName(), connection.getParameters(), searchText);
     }
 
     @Override

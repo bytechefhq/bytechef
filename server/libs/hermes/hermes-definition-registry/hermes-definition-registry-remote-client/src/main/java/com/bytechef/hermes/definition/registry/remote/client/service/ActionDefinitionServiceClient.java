@@ -50,7 +50,8 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters) {
+        Map<String, ?> actionParameters, String authorizationName, Map<String, ?> connectionParameters,
+        String searchText) {
 
         throw new UnsupportedOperationException();
     }

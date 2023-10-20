@@ -34,7 +34,7 @@ public interface TriggerDefinitionFacade {
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId);
+        Map<String, Object> triggerParameters, long connectionId, String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,

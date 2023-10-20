@@ -57,14 +57,15 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId) {
+        Map<String, Object> triggerParameters, long connectionId, String searchText) {
 
         return WORKER_WEB_CLIENT
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definition-service/execute-options"))
             .bodyValue(
                 new Options(
-                    triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId))
+                    triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
+                    searchText))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<OptionDTO>>() {})
             .block();
@@ -125,7 +126,7 @@ public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implemen
 
     private record Options(
         String triggerName, String propertyName, Map<String, Object> triggerParameters,
-        String componentName, int componentVersion, long connectionId) {
+        String componentName, int componentVersion, long connectionId, String searchText) {
     }
 
     private record OutputSchema(
