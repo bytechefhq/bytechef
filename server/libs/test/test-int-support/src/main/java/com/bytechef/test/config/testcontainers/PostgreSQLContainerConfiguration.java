@@ -15,17 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.annotation;
+package com.bytechef.test.config.testcontainers;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 /**
  * @author Ivica Cardic
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface EmbeddedRedis {
+@TestConfiguration(proxyBeanMethods = false)
+public class PostgreSQLContainerConfiguration {
+
+    @Bean
+    @ServiceConnection
+    public PostgreSQLContainer<?> postgreSQLContainer() {
+        return new PostgreSQLContainer<>("postgres:15.4-alpine");
+    }
 }

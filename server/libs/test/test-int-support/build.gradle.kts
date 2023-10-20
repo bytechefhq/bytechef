@@ -5,6 +5,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.testcontainers:testcontainers")
     implementation("org.testcontainers:postgresql")
+    implementation("org.springframework.boot:spring-boot-testcontainers")
 
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
