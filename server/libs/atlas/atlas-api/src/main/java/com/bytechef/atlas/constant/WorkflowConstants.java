@@ -40,7 +40,7 @@ public class WorkflowConstants {
     public static final String PARAMETERS = "parameters";
     public static final String POST = "post";
     public static final String PRE = "pre";
-    public static final String RETRY = "retry";
+    public static final String MAX_RETRIES = "maxRetries";
     public static final String REQUIRED = "required";
     public static final String TASK_NUMBER = "taskNumber";
     public static final String TASKS = "tasks";
@@ -61,7 +61,7 @@ public class WorkflowConstants {
         PARAMETERS,
         POST,
         PRE,
-        RETRY,
+        MAX_RETRIES,
         REQUIRED,
         TASKS,
         TIMEOUT,

@@ -78,7 +78,7 @@ public class TaskExecutionErrorHandlerTest {
 
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
         erroredTaskExecution.setId(1234L);
-        erroredTaskExecution.setRetry(1);
+        erroredTaskExecution.setMaxRetries(1);
 
         when(taskExecutionService.update(any())).thenReturn(erroredTaskExecution);
 

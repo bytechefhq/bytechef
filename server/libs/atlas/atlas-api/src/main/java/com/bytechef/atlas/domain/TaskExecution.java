@@ -117,7 +117,7 @@ public final class TaskExecution
     private int progress;
 
     @Column
-    private int retry;
+    private int maxRetries;
 
     @Column("retry_attempts")
     private int retryAttempts;
@@ -316,8 +316,8 @@ public final class TaskExecution
     }
 
     @Override
-    public int getRetry() {
-        return retry;
+    public int getMaxRetries() {
+        return maxRetries;
     }
 
     @Override
@@ -440,8 +440,8 @@ public final class TaskExecution
         this.progress = progress;
     }
 
-    public void setRetry(int retry) {
-        this.retry = retry;
+    public void setMaxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
     }
 
     public void setRetryDelay(String retryDelay) {
@@ -486,8 +486,8 @@ public final class TaskExecution
             + error + ", priority="
             + priority + ", progress="
             + progress + ", taskNumber="
-            + taskNumber + ", retry="
-            + retry + ", retryAttempts="
+            + taskNumber + ", maxRetries="
+            + maxRetries + ", retryAttempts="
             + retryAttempts + ", retryDelay='"
             + retryDelay + '\'' + ", retryDelayFactor="
             + retryDelayFactor + ", workflowTask="
@@ -508,7 +508,7 @@ public final class TaskExecution
         private Long parentId;
         private int priority;
         private int progress;
-        private int retry;
+        private int maxRetries;
         private int retryAttempts;
         private String retryDelay = "1s";
         private int retryDelayFactor = 2;
@@ -560,8 +560,8 @@ public final class TaskExecution
             return this;
         }
 
-        public Builder retry(int retry) {
-            this.retry = retry;
+        public Builder maxRetries(int maxRetries) {
+            this.maxRetries = maxRetries;
             return this;
         }
 
@@ -613,7 +613,7 @@ public final class TaskExecution
             taskExecution.setParentId(parentId);
             taskExecution.setPriority(priority);
             taskExecution.setProgress(progress);
-            taskExecution.setRetry(retry);
+            taskExecution.setMaxRetries(maxRetries);
             taskExecution.setRetryAttempts(retryAttempts);
             taskExecution.setRetryDelay(retryDelay);
             taskExecution.setRetryDelayFactor(retryDelayFactor);

@@ -79,7 +79,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         taskExecution = taskExecutionService.update(taskExecution);
 
         // if the task is retryable, then retry it
-        if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
+        if (taskExecution.getRetryAttempts() < taskExecution.getMaxRetries()) {
             taskExecution.setStatus(TaskStatus.CREATED);
             taskExecution.setError(null);
             taskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);

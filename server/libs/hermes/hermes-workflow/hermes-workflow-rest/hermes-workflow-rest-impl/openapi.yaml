@@ -573,7 +573,7 @@ components:
           type: "integer"
           format: "int32"
           readOnly: true
-        retry:
+        maxRetries:
           description: "The maximum number of times that a task may retry."
           type: "integer"
           format: "int32"
@@ -712,7 +712,7 @@ components:
           - "FILESYSTEM"
           - "GIT"
           - "JDBC"
-        retry:
+        maxRetries:
           description: "The maximum number of times a task may retry."
           type: "integer"
           format: "int32"

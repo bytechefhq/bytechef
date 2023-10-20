@@ -125,8 +125,8 @@ public class JobExecutor {
             .workflowTask(workflowTask)
             .build();
 
-        if (workflow.getRetry() > 0 && taskExecution.getRetry() < 1) {
-            taskExecution.setRetry(workflow.getRetry());
+        if (workflow.getMaxRetries() > 0 && taskExecution.getMaxRetries() < 1) {
+            taskExecution.setMaxRetries(workflow.getMaxRetries());
         }
 
         return taskExecution;

@@ -31,7 +31,7 @@ public interface Retryable {
      *
      * @return int the maximum number of retries.
      */
-    int getRetry();
+    int getMaxRetries();
 
     /**
      * The number of times that this message has been retried.
