@@ -125,11 +125,21 @@ public class OdsFileTaskHandlerTest {
 
     @Test
     public void testWriteODS() throws Exception {
-        FileEntry fileEntry = odsFileWriteTaskHandler.handle(getWriteSimpleTaskExecution(
-                JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+        String jsonContent = Files.contentOf(getFile("sample.json"), Charset.defaultCharset());
+
+        assertThat(jsonContent).isNotNull();
+
+        SimpleTaskExecution simpleTaskExecution = getWriteSimpleTaskExecution(JsonArrayUtils.toList(jsonContent));
+
+        assertThat(simpleTaskExecution).isNotNull();
+
+        FileEntry fileEntry = odsFileWriteTaskHandler.handle(simpleTaskExecution);
+
+        assertThat(fileEntry).isNotNull();
+        assertThat(fileEntry.getName()).isNotNull();
 
         assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+                JsonArrayUtils.of(jsonContent),
                 JsonArrayUtils.of(odsFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))),
                 true);
