@@ -122,7 +122,7 @@ const Project: React.FC = () => {
 
                         <h1 className="mr-6 py-4 pr-4">{project?.name}</h1>
 
-                        <div className="my-4 mx-2 flex rounded-md border border-gray-100 bg-white">
+                        <div className="mx-2 my-4 flex rounded-md border border-gray-100 bg-white">
                             {currentWorkflow && !!projectWorkflows && (
                                 <Select
                                     defaultValue={workflowId}

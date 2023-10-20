@@ -1,7 +1,7 @@
 import React, {ReactNode} from 'react';
 
 const SidebarSubtitle = ({title}: {title: string}): JSX.Element => (
-    <h4 className="py-1 px-2 pr-4 text-sm font-medium tracking-tight text-gray-900 dark:text-gray-200">
+    <h4 className="px-2 py-1 pr-4 text-sm font-medium tracking-tight text-gray-900 dark:text-gray-200">
         {title}
     </h4>
 );

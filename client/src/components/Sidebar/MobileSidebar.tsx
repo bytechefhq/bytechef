@@ -61,7 +61,7 @@ export function MobileSidebar({
                                 leaveFrom="opacity-100"
                                 leaveTo="opacity-0"
                             >
-                                <div className="absolute top-0 right-0 -mr-12 pt-4">
+                                <div className="absolute right-0 top-0 -mr-12 pt-4">
                                     <Button
                                         className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                                         displayType="icon"
@@ -80,7 +80,7 @@ export function MobileSidebar({
                                 </div>
                             </Transition.Child>
 
-                            <div className="pt-5 pb-4">
+                            <div className="pb-4 pt-5">
                                 <div className="flex shrink-0 items-center px-4">
                                     <img
                                         className="h-8 w-auto"

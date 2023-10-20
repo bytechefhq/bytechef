@@ -407,7 +407,7 @@ const Table = ({data}: {data: ProjectExecutionBasicModel[]}): JSX.Element => {
                         {row.getVisibleCells().map((cell) => (
                             <td
                                 key={cell.id}
-                                className="whitespace-nowrap py-4 px-3 text-sm text-gray-900"
+                                className="whitespace-nowrap px-3 py-4 text-sm text-gray-900"
                             >
                                 {flexRender(
                                     cell.column.columnDef.cell,

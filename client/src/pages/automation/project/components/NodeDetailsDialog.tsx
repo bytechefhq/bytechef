@@ -104,7 +104,7 @@ const NodeDetailsDialog = () => {
 
                                                 {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
 
-                                                <p className="mt-1 w-full overflow-hidden px-4 text-xs text-gray-500 line-clamp-2">
+                                                <p className="mt-1 line-clamp-2 w-full overflow-hidden px-4 text-xs text-gray-500">
                                                     {
                                                         firstAction.display
                                                             .description

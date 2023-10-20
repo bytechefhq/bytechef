@@ -30,7 +30,7 @@ export default function Settings() {
                                 item.current
                                     ? 'text-black dark:bg-gray-600 dark:text-gray-300'
                                     : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                'group flex items-center py-2 px-2 text-sm font-medium',
+                                'group flex items-center px-2 py-2 text-sm font-medium',
                                 'rounded-md'
                             )}
                         >

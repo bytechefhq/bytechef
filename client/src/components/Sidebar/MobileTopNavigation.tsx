@@ -10,7 +10,7 @@ export function MobileTopNavigation({
 }) {
     return (
         <div className="lg:hidden">
-            <div className="flex items-center justify-between bg-white py-2 px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between bg-white px-4 py-2 sm:px-6 lg:px-8">
                 <div>
                     <img
                         className="h-8 w-auto"

@@ -200,7 +200,7 @@ const ContextualMenu = ({
         <div className="nowheel rounded-md bg-white shadow-md">
             {typeof components === 'undefined' ||
                 (typeof flowControls === 'undefined' && (
-                    <div className="py-2 px-3 text-xs text-gray-500">
+                    <div className="px-3 py-2 text-xs text-gray-500">
                         Something went wrong.
                     </div>
                 ))}

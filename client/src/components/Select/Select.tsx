@@ -98,7 +98,7 @@ const Select = ({
                                         {selectItem.description && (
                                             // eslint-disable-next-line tailwindcss/no-custom-classname
                                             <span
-                                                className="mt-1 text-xs text-gray-500 line-clamp-2"
+                                                className="mt-1 line-clamp-2 text-xs text-gray-500"
                                                 title={selectItem.description}
                                             >
                                                 {selectItem.description}
