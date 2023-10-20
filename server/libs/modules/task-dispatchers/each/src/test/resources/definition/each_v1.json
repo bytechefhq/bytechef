@@ -148,6 +148,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "expressionDisabled": null
@@ -328,6 +329,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -352,6 +354,7 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
+    "sampleDataType": null,
     "expressionDisabled": null
   }, {
     "advancedOption": null,
@@ -368,6 +371,7 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
+    "sampleDataType": null,
     "expressionDisabled": null
   } ],
   "resources": null,

@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "set",
     "outputSchema": null,
@@ -152,15 +153,19 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Set value"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Sets a value which can then be referenced in other tasks.",
   "icon": "path:assets/var.svg",
   "tags": null,

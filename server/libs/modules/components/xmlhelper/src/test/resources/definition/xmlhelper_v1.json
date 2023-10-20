@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Converts the XML string to object/array.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "parse",
     "outputSchema": [ {
@@ -41,14 +42,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Convert from XML string"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Writes the object/array to a XML string.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "stringify",
     "outputSchema": [ {
@@ -66,6 +70,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -119,11 +124,14 @@
       } ],
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Convert to XML string"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Converts between XML string and object/array.",
   "icon": "path:assets/xmlhelper.svg",
   "tags": null,

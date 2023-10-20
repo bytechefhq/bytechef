@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Delay action execution.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "sleep",
     "outputSchema": null,
@@ -25,11 +26,14 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Sleep"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Sets a value which can then be referenced in other tasks.",
   "icon": "path:assets/delay.svg",
   "tags": null,

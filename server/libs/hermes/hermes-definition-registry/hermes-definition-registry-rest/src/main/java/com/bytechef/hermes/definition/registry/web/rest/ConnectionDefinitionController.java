@@ -48,6 +48,7 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<OAuth2AuthorizationParametersModel>> getOAuth2AuthorizationParameters(
         Mono<GetOAuth2AuthorizationParametersRequestModel> parametersRequestModelMono, ServerWebExchange exchange) {
 

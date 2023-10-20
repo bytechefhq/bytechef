@@ -22,6 +22,7 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     private final ActionDefinitionService actionDefinitionService;
     private final ConnectionService connectionService;
 
+    @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
         ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
 

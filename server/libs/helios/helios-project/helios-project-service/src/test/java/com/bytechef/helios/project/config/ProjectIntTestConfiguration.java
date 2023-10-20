@@ -19,6 +19,9 @@ package com.bytechef.helios.project.config;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
 import com.bytechef.event.EventPublisher;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.message.broker.MessageBroker;
 
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -28,6 +31,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -54,6 +58,14 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private MessageBroker messageBroker;
+
+    @MockBean
+    ComponentDefinitionRegistry componentDefinitionRegistry;
+
+    @Bean
+    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
+    }
 
     @EnableCaching
     @TestConfiguration

@@ -18,7 +18,9 @@
 package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -47,6 +49,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 public class ComponentDefinitionControllerIntTest {
 
     @MockBean
+    private ActionDefinitionFacade actionDefinitionFacade;
+
+    @MockBean
     private ActionDefinitionService actionDefinitionService;
 
     @MockBean
@@ -63,6 +68,9 @@ public class ComponentDefinitionControllerIntTest {
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+
+    @MockBean
+    TriggerDefinitionFacade triggerDefinitionFacade;
 
     @MockBean
     private TriggerDefinitionService triggerDefinitionService;

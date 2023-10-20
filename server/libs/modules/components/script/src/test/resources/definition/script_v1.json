@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Executes custom Java code.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "java",
     "outputSchema": [ {
@@ -151,6 +152,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -313,6 +315,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -339,14 +342,17 @@
       "controlType": "CODE_EDITOR",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Java"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Executes custom JavaScript code.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "javascript",
     "outputSchema": [ {
@@ -495,6 +501,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -657,6 +664,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -683,14 +691,17 @@
       "controlType": "CODE_EDITOR",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "JavaScript"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Executes custom Python code.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "python",
     "outputSchema": [ {
@@ -839,6 +850,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -1001,6 +1013,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -1027,14 +1040,17 @@
       "controlType": "CODE_EDITOR",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Python"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Executes custom R code.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "r",
     "outputSchema": [ {
@@ -1183,6 +1199,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -1345,6 +1362,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -1371,14 +1389,17 @@
       "controlType": "CODE_EDITOR",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "R"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Executes custom Ruby code.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "ruby",
     "outputSchema": [ {
@@ -1527,6 +1548,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "expressionDisabled": null
@@ -1689,6 +1711,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "expressionDisabled": null
@@ -1715,13 +1738,17 @@
       "controlType": "CODE_EDITOR",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Ruby"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
   "icon": "path:assets/script.svg",
   "tags": null,

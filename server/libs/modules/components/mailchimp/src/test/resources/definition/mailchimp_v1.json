@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Add a new member to the list.",
-    "exampleOutput": "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\": \"string\", \"contact_id\": \"string\", \"full_name\": \"string\", \"web_id\": 0, \"email_type\": \"string\", \"status\": \"subscribed\", \"unsubscribe_reason\": \"string\", \"consents_to_one_to_one_messaging\": true, \"merge_fields\": { \"property1\": null, \"property2\": null }, \"interests\": { \"property1\": true, \"property2\": true }, \"stats\": { \"avg_open_rate\": 0, \"avg_click_rate\": 0, \"ecommerce_data\": { \"total_revenue\": 0, \"number_of_orders\": 0, \"currency_code\": \"USD\" } }, \"ip_signup\": \"string\", \"timestamp_signup\": \"2019-08-24T14:15:22Z\", \"ip_opt\": \"string\", \"timestamp_opt\": \"2019-08-24T14:15:22Z\", \"member_rating\": 0, \"last_changed\": \"2019-08-24T14:15:22Z\", \"language\": \"string\", \"vip\": true, \"email_client\": \"string\", \"location\": { \"latitude\": 0, \"longitude\": 0, \"gmtoff\": 0, \"dstoff\": 0, \"country_code\": \"string\", \"timezone\": \"string\", \"region\": \"string\" }, \"marketing_permissions\": [ { \"marketing_permission_id\": \"string\", \"text\": \"string\", \"enabled\": true } ], \"last_note\": { \"note_id\": 0, \"created_at\": \"2019-08-24T14:15:22Z\", \"created_by\": \"string\", \"note\": \"string\" }, \"source\": \"string\", \"tags_count\": 0, \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"list_id\": \"string\", \"_links\": [ { \"rel\": \"string\", \"href\": \"string\", \"method\": \"GET\", \"targetSchema\": \"string\", \"schema\": \"string\" } ] }",
+    "sampleOutput": "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\": \"string\", \"contact_id\": \"string\", \"full_name\": \"string\", \"web_id\": 0, \"email_type\": \"string\", \"status\": \"subscribed\", \"unsubscribe_reason\": \"string\", \"consents_to_one_to_one_messaging\": true, \"merge_fields\": { \"property1\": null, \"property2\": null }, \"interests\": { \"property1\": true, \"property2\": true }, \"stats\": { \"avg_open_rate\": 0, \"avg_click_rate\": 0, \"ecommerce_data\": { \"total_revenue\": 0, \"number_of_orders\": 0, \"currency_code\": \"USD\" } }, \"ip_signup\": \"string\", \"timestamp_signup\": \"2019-08-24T14:15:22Z\", \"ip_opt\": \"string\", \"timestamp_opt\": \"2019-08-24T14:15:22Z\", \"member_rating\": 0, \"last_changed\": \"2019-08-24T14:15:22Z\", \"language\": \"string\", \"vip\": true, \"email_client\": \"string\", \"location\": { \"latitude\": 0, \"longitude\": 0, \"gmtoff\": 0, \"dstoff\": 0, \"country_code\": \"string\", \"timezone\": \"string\", \"region\": \"string\" }, \"marketing_permissions\": [ { \"marketing_permission_id\": \"string\", \"text\": \"string\", \"enabled\": true } ], \"last_note\": { \"note_id\": 0, \"created_at\": \"2019-08-24T14:15:22Z\", \"created_by\": \"string\", \"note\": \"string\" }, \"source\": \"string\", \"tags_count\": 0, \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"list_id\": \"string\", \"_links\": [ { \"rel\": \"string\", \"href\": \"string\", \"method\": \"GET\", \"targetSchema\": \"string\", \"schema\": \"string\" } ] }",
     "help": null,
     "name": "addMemberToList",
     "outputSchema": [ {
@@ -37,6 +38,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -53,6 +55,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -69,6 +72,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -85,6 +89,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -101,6 +106,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -117,6 +123,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -133,6 +140,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -174,6 +182,7 @@
           "value": "transactional"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -190,6 +199,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -232,6 +242,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -268,6 +279,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -402,6 +414,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -424,6 +437,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -440,6 +454,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -456,6 +471,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -472,6 +488,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -506,6 +523,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -522,6 +540,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -552,6 +571,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -659,6 +679,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -675,6 +696,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -691,6 +713,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -739,6 +762,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -755,6 +779,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -829,6 +854,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -845,6 +871,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -861,6 +888,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -880,6 +908,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -949,6 +978,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -968,6 +998,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1013,6 +1044,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1029,6 +1061,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1045,6 +1078,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1061,6 +1095,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1077,6 +1112,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -1106,6 +1142,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1153,6 +1190,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1194,6 +1232,7 @@
           "value": "transactional"
         } ],
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1210,6 +1249,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1238,6 +1278,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -1274,6 +1315,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -1298,6 +1340,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1415,6 +1458,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1454,6 +1498,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1470,6 +1515,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1486,6 +1532,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1502,6 +1549,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1530,6 +1578,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "multipleValues": true,
@@ -1541,6 +1590,7 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Add a new member to the list."
   } ],
@@ -1565,6 +1615,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1581,6 +1632,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "OAuth2 Authorization Code",
@@ -1592,6 +1644,8 @@
     "title": "Mailchimp",
     "version": 1
   },
+  "customAction": true,
+  "customActionHelp": null,
   "description": "Mailchimp REST API documentation",
   "icon": "path:assets/mailchimp.svg",
   "tags": null,
@@ -1602,18 +1656,11 @@
   "triggers": [ {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Triggers when an Audience subscriber is added to the list.",
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": null,
-    "listenerDisable": null,
     "name": "subscribe",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -1663,6 +1710,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1679,6 +1727,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1695,6 +1744,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1711,6 +1761,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1727,6 +1778,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1743,6 +1795,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -1776,6 +1829,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1792,6 +1846,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1808,6 +1863,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           }, {
             "advancedOption": null,
@@ -1824,6 +1880,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "controlType": "JSON_BUILDER",
@@ -1862,13 +1919,13 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The list id of intended audience to which you would like to add the contact.",
@@ -1884,13 +1941,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "Subscribe",
     "type": "WEBHOOK_DYNAMIC",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   } ]
 }

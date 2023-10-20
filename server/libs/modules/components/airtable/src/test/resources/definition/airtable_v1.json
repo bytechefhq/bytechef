@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Adds a record into an Airtable table.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "createRecord",
     "outputSchema": [ {
@@ -196,6 +197,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "expressionDisabled": null
@@ -226,6 +228,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -242,6 +245,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -418,6 +422,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "expressionDisabled": null
@@ -433,6 +438,7 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Creates a record."
   } ],
@@ -457,6 +463,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "title": "Bearer Token",
@@ -468,6 +475,8 @@
     "title": "Airtable",
     "version": 1
   },
+  "customAction": true,
+  "customActionHelp": null,
   "description": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
   "icon": "path:assets/airtable.svg",
   "tags": null,
@@ -478,21 +487,13 @@
   "triggers": [ {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Trigger off when a new entry is added to the table that you have selected.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": null,
-    "listenerDisable": null,
     "name": "newRecord",
-    "nodeDescription": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "poll": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The base id.",
@@ -508,6 +509,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -524,6 +526,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -540,13 +543,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "New Record",
     "type": "POLLING",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   } ]
 }

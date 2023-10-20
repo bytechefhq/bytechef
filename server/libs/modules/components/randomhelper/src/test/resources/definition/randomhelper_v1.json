@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Generates a random integer value.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "randomInt",
     "outputSchema": null,
@@ -43,21 +44,26 @@
       "controlType": "INPUT_INTEGER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Int"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Generates a random float value.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "randomFloat",
     "outputSchema": null,
     "properties": null,
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Float"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "The Random Helper allows you to generate random values.",
   "icon": "path:assets/randomhelper.svg",
   "tags": null,

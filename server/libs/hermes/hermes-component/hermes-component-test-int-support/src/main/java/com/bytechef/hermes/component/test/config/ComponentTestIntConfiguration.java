@@ -20,6 +20,10 @@ package com.bytechef.hermes.component.test.config;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
@@ -81,6 +85,20 @@ public class ComponentTestIntConfiguration {
 
     @MockBean(name = "connectionDefinitionService")
     private ConnectionDefinitionService connectionDefinitionService;
+
+    @Bean
+    ContextFactory contextFactory(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+
+        return new ContextFactoryImpl(
+            connectionDefinitionService, connectionService, eventPublisher, fileStorageService);
+    }
+
+    @Bean
+    InputParametersFactory inputParametersFactory() {
+        return new InputParametersFactoryImpl();
+    }
 
     @MockBean
     private MessageBroker messageBroker;

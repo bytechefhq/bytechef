@@ -85,8 +85,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
             .findFirst()
             .orElseThrow(
                 () -> new IllegalArgumentException(
-                    "The component '%s' does not contain the '%s' action.".formatted(
-                        componentName, actionName)));
+                    "The component '%s' does not contain the '%s' action.".formatted(componentName, actionName)));
     }
 
     @Override

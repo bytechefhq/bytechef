@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Execute an SQL query.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "query",
     "outputSchema": [ {
@@ -77,6 +78,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -159,17 +161,20 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Query"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Insert rows in database.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "insert",
     "outputSchema": [ {
@@ -226,6 +231,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -242,6 +248,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -270,6 +277,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -447,6 +455,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "expressionDisabled": null
@@ -465,12 +474,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Insert"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Update rows in database.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "update",
     "outputSchema": [ {
@@ -527,6 +538,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -543,6 +555,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -571,6 +584,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "multipleValues": true,
@@ -593,6 +607,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -764,6 +779,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "expressionDisabled": null
@@ -782,12 +798,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Update"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Delete rows from database.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "delete",
     "outputSchema": [ {
@@ -844,6 +862,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -860,6 +879,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -876,6 +896,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1047,6 +1068,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "expressionDisabled": null
@@ -1065,12 +1087,14 @@
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Delete"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "execute",
     "outputSchema": [ {
@@ -1127,6 +1151,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1298,6 +1323,7 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
+            "sampleDataType": null,
             "expressionDisabled": null
           } ],
           "expressionDisabled": null
@@ -1396,11 +1422,13 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Execute"
   } ],
@@ -1425,6 +1453,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1459,6 +1488,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1475,6 +1505,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1491,11 +1522,14 @@
       "controlType": "INPUT_PASSWORD",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "title": "MySQL",
     "version": 1
   },
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Query, insert nd update data from MySQL.",
   "icon": "path:assets/mysql.svg",
   "tags": null,

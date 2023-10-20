@@ -2,6 +2,8 @@
   "actions": null,
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
   "icon": "path:assets/schedule.svg",
   "tags": null,
@@ -12,18 +14,11 @@
   "triggers": [ {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Trigger off at a specific time either on a daily basis or selected days of the week.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "everyDay",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -56,6 +51,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -226,13 +222,13 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -402,29 +398,22 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "Every day",
     "type": "LISTENER",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   }, {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Trigger off at a specific day of the week.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "everyWeek",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -457,6 +446,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -527,13 +517,13 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -638,29 +628,22 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "Every week",
     "type": "LISTENER",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   }, {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Trigger off at a specific time in month.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "everyMonth",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -693,6 +676,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -763,13 +747,13 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -839,29 +823,22 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "Every month",
     "type": "LISTENER",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   }, {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Trigger off periodically, for example every minute or day, based on a set interval.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "interval",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -894,6 +871,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -936,7 +914,6 @@
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -994,27 +971,19 @@
       "controlType": "SELECT",
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "Interval",
     "type": "LISTENER",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   }, {
     "batch": null,
     "deduplicate": null,
+    "deprecated": null,
     "description": "Trigger off based on a custom schedule.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "exampleOutput": null,
-    "exampleOutputDataSource": null,
+    "sampleOutput": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "cron",
-    "nodeDescription": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -1047,6 +1016,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1063,6 +1033,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -1079,13 +1050,13 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "JSON_BUILDER",
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]",
@@ -1101,6 +1072,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -1117,13 +1089,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
-    "staticWebhookRequest": null,
+    "sampleOutputDataSource": null,
     "title": "Cron",
     "type": "LISTENER",
     "webhookBodyRaw": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null
   } ]
 }

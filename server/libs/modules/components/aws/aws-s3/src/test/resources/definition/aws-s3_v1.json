@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "deprecated": null,
     "description": "Get the AWS S3 object.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getObject",
     "outputSchema": [ {
@@ -37,6 +38,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -53,6 +55,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -69,6 +72,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -85,6 +89,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -105,6 +110,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -121,14 +127,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Get Object"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "getUrl",
     "outputSchema": [ {
@@ -146,6 +155,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -163,14 +173,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Get URL"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Get the list AWS S3 objects.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "listObjects",
     "outputSchema": [ {
@@ -217,6 +230,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -233,6 +247,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         }, {
           "advancedOption": null,
@@ -249,6 +264,7 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
+          "sampleDataType": null,
           "expressionDisabled": null
         } ],
         "controlType": "JSON_BUILDER",
@@ -275,6 +291,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -291,14 +308,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "List Objects"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Get the url of an pre-signed AWS S3 object.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "presignGetObject",
     "outputSchema": [ {
@@ -316,6 +336,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -333,14 +354,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Get Pre-signed Object"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Store an object to AWS S3.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "putObject",
     "outputSchema": [ {
@@ -358,6 +382,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -375,6 +400,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     }, {
       "advancedOption": null,
@@ -408,6 +434,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -424,6 +451,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -440,6 +468,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -456,6 +485,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -475,13 +505,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Put Object"
   } ],
   "category": null,
   "connection": null,
+  "customAction": true,
+  "customActionHelp": null,
   "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
   "icon": "path:assets/awss3.svg",
   "tags": null,

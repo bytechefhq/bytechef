@@ -22,6 +22,7 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     private final ConnectionService connectionService;
     private final TriggerDefinitionService triggerDefinitionService;
 
+    @SuppressFBWarnings("EI")
     public TriggerDefinitionFacadeImpl(
         ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
 

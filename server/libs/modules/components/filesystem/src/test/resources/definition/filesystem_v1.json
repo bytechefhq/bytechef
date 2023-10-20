@@ -1,8 +1,9 @@
 {
   "actions": [ {
     "batch": null,
-    "description": "filesystem: readFile",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Filesystem: Read from file",
+    "sampleOutput": null,
     "help": null,
     "name": "readFile",
     "outputSchema": [ {
@@ -37,6 +38,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -53,6 +55,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -69,6 +72,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -85,6 +89,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -105,14 +110,17 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Read from file"
   }, {
     "batch": null,
-    "description": "filesystem: writeFile",
-    "exampleOutput": null,
+    "deprecated": null,
+    "description": "Filesystem: Write to file",
+    "sampleOutput": null,
     "help": null,
     "name": "writeFile",
     "outputSchema": [ {
@@ -186,6 +194,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -202,6 +211,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -218,6 +228,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       }, {
         "advancedOption": null,
@@ -234,6 +245,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
+        "sampleDataType": null,
         "expressionDisabled": null
       } ],
       "controlType": "INPUT_TEXT",
@@ -253,24 +265,29 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Write to file"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Creates a temporary directory oon the filesystem.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "createTempDir",
     "outputSchema": null,
     "properties": null,
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Create Temp Directory"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
-    "exampleOutput": "/data",
+    "sampleOutput": "/data",
     "help": null,
     "name": "getFilePath",
     "outputSchema": [ {
@@ -288,6 +305,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
     "properties": [ {
@@ -305,43 +323,53 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
+      "sampleDataType": null,
       "expressionDisabled": null
     } ],
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "File Path"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Lists a content of directory for the given path.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "ls",
     "outputSchema": null,
     "properties": null,
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "List"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Creates a directory.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "mkdir",
     "outputSchema": null,
     "properties": null,
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Create"
   }, {
     "batch": null,
+    "deprecated": null,
     "description": "Removes the content of a directory.",
-    "exampleOutput": null,
+    "sampleOutput": null,
     "help": null,
     "name": "rm",
     "outputSchema": null,
     "properties": null,
+    "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
     "title": "Remove"
   } ],
   "category": null,
   "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
   "description": "Allows multiple operations over files on the filesystem.",
   "icon": "path:assets/filesystem.svg",
   "tags": null,
