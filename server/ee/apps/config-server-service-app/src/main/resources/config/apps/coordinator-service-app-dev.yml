@@ -1,0 +1,7 @@
+server:
+  port: 7333
+
+spring:
+  devtools:
+    livereload:
+        port: 35730

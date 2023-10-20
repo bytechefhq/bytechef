@@ -8,6 +8,7 @@ springBoot {
 dependencies {
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation(project(":server:libs:configs:liquibase-config"))
     implementation(project(":server:libs:core:message-broker:message-broker-amqp"))

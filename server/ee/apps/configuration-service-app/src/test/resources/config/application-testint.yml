@@ -1,2 +1,15 @@
 server:
   port: 9999
+
+openapi:
+  openAPIDefinition:
+    base-path:
+      automation: /api/automation
+      core: /api/core
+      embedded: /api/embedded
+
+bytechef:
+  workflow:
+    repository:
+      jdbc:
+        enabled: true
