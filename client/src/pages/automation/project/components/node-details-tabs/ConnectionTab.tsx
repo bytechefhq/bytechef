@@ -40,7 +40,7 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                     />
 
                     <Button
-                        displayType={'secondary'}
+                        displayType="secondary"
                         className="mt-auto p-2"
                         icon={<PlusIcon className="h-5 w-5" />}
                         onClick={() => setShowEditConnectionDialog(true)}
