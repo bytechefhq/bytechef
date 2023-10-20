@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import java.util.Arrays;
@@ -44,11 +44,11 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
         Map<String, Integer> result;
 
-        String deleteKey = MapValueUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
-        List<Map<String, ?>> rows = MapValueUtils.getList(
+        String deleteKey = MapUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
+        List<Map<String, ?>> rows = MapUtils.getList(
             inputParameters, JdbcConstants.ROWS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
-        String schema = MapValueUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
-        String table = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
+        String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
+        String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 
         if (rows.isEmpty()) {
             result = Map.of("rows", 0);

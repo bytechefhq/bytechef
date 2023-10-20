@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
@@ -37,8 +37,8 @@ public class ExecuteJdbcOperation implements JdbcOperation<Map<String, Integer>>
 
     @Override
     public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
-        String executeStatement = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.EXECUTE);
-        Map<String, ?> parameterMap = MapValueUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
+        String executeStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.EXECUTE);
+        Map<String, ?> parameterMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
 
         int rowsAffected = jdbcExecutor.update(context.getConnection(), executeStatement, parameterMap);
 

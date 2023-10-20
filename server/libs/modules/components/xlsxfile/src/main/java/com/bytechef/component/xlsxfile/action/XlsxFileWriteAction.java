@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -88,9 +88,9 @@ public class XlsxFileWriteAction {
         "rawtypes", "unchecked"
     })
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        String fileName = MapValueUtils.getString(inputParameters, FILENAME, getaDefaultFileName());
-        List<Map<String, ?>> rows = (List) MapValueUtils.getList(inputParameters, ROWS, List.of());
-        String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME, "Sheet");
+        String fileName = MapUtils.getString(inputParameters, FILENAME, getaDefaultFileName());
+        List<Map<String, ?>> rows = (List) MapUtils.getList(inputParameters, ROWS, List.of());
+        String sheetName = MapUtils.getString(inputParameters, SHEET_NAME, "Sheet");
 
         try {
             return context.storeFileContent(

@@ -19,7 +19,7 @@ package com.bytechef.hermes.configuration.trigger;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
@@ -50,15 +50,15 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private WorkflowTrigger(Map<String, ?> source) {
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.LABEL.equals(entry.getKey())) {
-                this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+                this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
-                this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
+                this.name = MapUtils.getString(source, WorkflowConstants.NAME);
             } else if (WorkflowConstants.PARAMETERS.equals(entry.getKey())) {
-                this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
+                this.parameters = MapUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
-                this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
+                this.timeout = MapUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
-                this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
+                this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
             }
@@ -100,11 +100,11 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
-        return MapValueUtils.get(extensions, name, elementType, defaultValue);
+        return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
-        return MapValueUtils.getList(extensions, name, elementType, defaultValue);
+        return MapUtils.getList(extensions, name, elementType, defaultValue);
     }
 
     @Override

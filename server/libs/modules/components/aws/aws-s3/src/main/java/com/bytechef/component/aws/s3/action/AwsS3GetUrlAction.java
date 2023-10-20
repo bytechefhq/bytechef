@@ -21,7 +21,7 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 
@@ -58,8 +58,8 @@ public class AwsS3GetUrlAction {
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             return s3Client.utilities()
                 .getUrl(GetUrlRequest.builder()
-                    .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                    .key(MapValueUtils.getRequiredString(inputParameters, KEY))
+                    .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
+                    .key(MapUtils.getRequiredString(inputParameters, KEY))
                     .build())
                 .toString();
         }

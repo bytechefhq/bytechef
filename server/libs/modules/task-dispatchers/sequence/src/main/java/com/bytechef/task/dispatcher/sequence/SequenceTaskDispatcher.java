@@ -29,7 +29,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -69,7 +69,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+        List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
             taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         if (subWorkflowTasks.isEmpty()) {
@@ -77,7 +77,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, taskExecution);
         } else {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 

@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDe
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -73,15 +73,15 @@ public class AirtableNewRecordTrigger {
         List<Map<?, ?>> records = (List<Map<?, ?>>) HttpClientUtils
             .get(
                 "/{%s}/{%s}".formatted(
-                    MapValueUtils.getRequiredString(inputParameters, TABLE_ID),
-                    MapValueUtils.getRequiredString(inputParameters, BASE_ID)))
+                    MapUtils.getRequiredString(inputParameters, TABLE_ID),
+                    MapUtils.getRequiredString(inputParameters, BASE_ID)))
             .queryParameters(
                 Map.of(
                     "filterByFormula",
                     List.of(
                         "IS_AFTER({%s}, DATETIME_PARSE(\"%s\", \"YYYY-MM-DD HH:mm:ss\"))"
                             .formatted(
-                                MapValueUtils.getRequiredString(inputParameters, TRIGGER_FIELD),
+                                MapUtils.getRequiredString(inputParameters, TRIGGER_FIELD),
                                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
             .configuration(responseType(ResponseType.JSON))
             .execute()

@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
@@ -181,7 +181,7 @@ public final class Connection implements Persistable<Long> {
 
     @SuppressWarnings("unchecked")
     public <T> T getParameter(String name) {
-        return (T) MapValueUtils.get(parameters.getMap(), name);
+        return (T) MapUtils.get(parameters.getMap(), name);
     }
 
     /**

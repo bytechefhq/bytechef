@@ -20,7 +20,7 @@ package com.bytechef.component.xlsxfile.action;
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
@@ -55,7 +55,7 @@ public class XlsxFileWriteActionTest {
     public void testPerformWriteXLSX() throws IOException, JSONException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
             Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), mockedStatic);
 
             XlsxFileWriteAction.perform(inputParameters, context);
@@ -87,12 +87,12 @@ public class XlsxFileWriteActionTest {
             .getFile());
     }
 
-    private Map<String, ?> getWriteParameters(List<?> items, MockedStatic<MapValueUtils> mockedStatic) {
-        mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.anyString()))
+    private Map<String, ?> getWriteParameters(List<?> items, MockedStatic<MapUtils> mockedStatic) {
+        mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.anyString()))
             .thenReturn("file.xlsx");
-        mockedStatic.when(() -> MapValueUtils.getList(Mockito.anyMap(), Mockito.eq(ROWS), Mockito.eq(List.of())))
+        mockedStatic.when(() -> MapUtils.getList(Mockito.anyMap(), Mockito.eq(ROWS), Mockito.eq(List.of())))
             .thenReturn(items);
-        mockedStatic.when(() -> MapValueUtils.getString(Mockito.anyMap(), Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
+        mockedStatic.when(() -> MapUtils.getString(Mockito.anyMap(), Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
             .thenReturn("Sheet");
 
         return Map.of();

@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -107,16 +107,16 @@ public class CsvFileReadAction {
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, Object>> perform(Map<String, ?> inputParameters, Context context) {
-        String delimiter = MapValueUtils.getString(inputParameters, DELIMITER, ",");
-        boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
-        boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
-        Integer pageNumber = MapValueUtils.getInteger(inputParameters, PAGE_NUMBER);
-        Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
-        boolean readAsString = MapValueUtils.getBoolean(inputParameters, READ_AS_STRING, false);
+        String delimiter = MapUtils.getString(inputParameters, DELIMITER, ",");
+        boolean headerRow = MapUtils.getBoolean(inputParameters, HEADER_ROW, true);
+        boolean includeEmptyCells = MapUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
+        Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
+        Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
+        boolean readAsString = MapUtils.getBoolean(inputParameters, READ_AS_STRING, false);
 
         try (
             InputStream inputStream = context.getFileStream(
-                MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class))) {
+                MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 

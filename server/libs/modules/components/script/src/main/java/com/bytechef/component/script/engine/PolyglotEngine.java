@@ -23,7 +23,7 @@ import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.TypeLiteral;
@@ -42,14 +42,14 @@ public class PolyglotEngine {
             .engine(engine)
             .allowAllAccess(true)
             .build()) {
-            polyglotContext.eval(languageId, MapValueUtils.getRequiredString(inputParameters, SCRIPT));
+            polyglotContext.eval(languageId, MapUtils.getRequiredString(inputParameters, SCRIPT));
 
             Function<ProxyObject, Object> performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform")
                 .as(new TypeLiteral<>() {});
 
             return performFunction
-                .apply(ProxyObject.fromMap((Map<String, Object>) MapValueUtils.getMap(inputParameters, INPUT)));
+                .apply(ProxyObject.fromMap((Map<String, Object>) MapUtils.getMap(inputParameters, INPUT)));
         }
     }
 }

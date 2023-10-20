@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
@@ -41,11 +41,11 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
 
     @Override
     public Map<String, Integer> execute(Context context, Map<String, ?> inputParameters) {
-        List<String> columns = MapValueUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
-        List<Map<String, ?>> rows = MapValueUtils.getList(
+        List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
+        List<Map<String, ?>> rows = MapUtils.getList(
             inputParameters, JdbcConstants.ROWS, new ParameterizedTypeReference<>() {}, List.of());
-        String schema = MapValueUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
-        String table = MapValueUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
+        String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
+        String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
             context.getConnection(),

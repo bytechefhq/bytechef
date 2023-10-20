@@ -19,7 +19,7 @@ package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,11 +60,11 @@ public class XmlFileReadActionTest {
     public void testPerformRead() throws IOException {
         File file = getFile(SAMPLE_XML);
 
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getBoolean(
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(false);
 
@@ -89,16 +89,16 @@ public class XmlFileReadActionTest {
     public void testPerformReadArray() throws FileNotFoundException {
         File file = getFile(SAMPLE_ARRAY_XML);
 
-        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(
+        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getBoolean(
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(true);
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(null);
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(null);
 
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
@@ -119,15 +119,15 @@ public class XmlFileReadActionTest {
                             "color", "YELLOW",
                             "petals", "5")));
 
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getBoolean(
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(true);
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_NUMBER)))
                 .thenReturn(1);
-            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
+            mapValueUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(2);
 
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))

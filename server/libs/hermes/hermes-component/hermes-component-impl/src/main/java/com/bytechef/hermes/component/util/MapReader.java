@@ -28,302 +28,302 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public final class MapValueReader implements MapValueUtils.MapValueReader {
+public final class MapReader implements MapUtils.MapReader {
 
     @Override
     public boolean containsKey(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.containsKey(map, key);
+        return com.bytechef.commons.util.MapUtils.containsKey(map, key);
     }
 
     @Override
     public Object get(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.get(map, key);
+        return com.bytechef.commons.util.MapUtils.get(map, key);
     }
 
     @Override
     public <T> T get(Map<String, ?> map, String key, Class<T> returnType) {
-        return com.bytechef.commons.util.MapValueUtils.get(map, key, returnType);
+        return com.bytechef.commons.util.MapUtils.get(map, key, returnType);
     }
 
     @Override
     public <T> T get(Map<String, ?> map, String key, Class<T> returnType, T defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.get(map, key, returnType, defaultValue);
+        return com.bytechef.commons.util.MapUtils.get(map, key, returnType, defaultValue);
     }
 
     @Override
     public Object[] getArray(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getArray(map, key);
+        return com.bytechef.commons.util.MapUtils.getArray(map, key);
     }
 
     @Override
     public Object[] getArray(Map<String, ?> map, String key, Object[] defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getArray(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getArray(map, key, defaultValue);
     }
 
     @Override
     public <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType) {
-        return com.bytechef.commons.util.MapValueUtils.getArray(map, key, elementType);
+        return com.bytechef.commons.util.MapUtils.getArray(map, key, elementType);
     }
 
     @Override
     public <T> T[] getArray(Map<String, ?> map, String key, Class<T> elementType, T[] defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getArray(map, key, elementType, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getArray(map, key, elementType, defaultValue);
     }
 
     @Override
     public Boolean getBoolean(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getBoolean(map, key);
+        return com.bytechef.commons.util.MapUtils.getBoolean(map, key);
     }
 
     @Override
     public boolean getBoolean(Map<String, ?> map, String key, boolean defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getBoolean(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getBoolean(map, key, defaultValue);
     }
 
     @Override
     public Date getDate(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getDate(map, key);
+        return com.bytechef.commons.util.MapUtils.getDate(map, key);
     }
 
     @Override
     public Date getDate(Map<String, ?> map, String key, Date defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getDate(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getDate(map, key, defaultValue);
     }
 
     @Override
     public Double getDouble(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getDouble(map, key);
+        return com.bytechef.commons.util.MapUtils.getDouble(map, key);
     }
 
     @Override
     public double getDouble(Map<String, ?> map, String key, double defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getDouble(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getDouble(map, key, defaultValue);
     }
 
     @Override
     public Duration getDuration(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getDuration(map, key);
+        return com.bytechef.commons.util.MapUtils.getDuration(map, key);
     }
 
     @Override
     public Duration getDuration(Map<String, ?> map, String key, Duration defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getDuration(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getDuration(map, key, defaultValue);
     }
 
     @Override
     public Float getFloat(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getFloat(map, key);
+        return com.bytechef.commons.util.MapUtils.getFloat(map, key);
     }
 
     @Override
     public float getFloat(Map<String, ?> map, String key, float defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getFloat(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getFloat(map, key, defaultValue);
     }
 
     @Override
     public Integer getInteger(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getInteger(map, key);
+        return com.bytechef.commons.util.MapUtils.getInteger(map, key);
     }
 
     @Override
     public int getInteger(Map<String, ?> map, String key, int defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getInteger(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getInteger(map, key, defaultValue);
     }
 
     @Override
     public List<?> getList(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getList(map, key);
+        return com.bytechef.commons.util.MapUtils.getList(map, key);
     }
 
     @Override
     public List<?> getList(Map<String, ?> map, String key, List<?> defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getList(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getList(map, key, defaultValue);
     }
 
     @Override
     public <T> List<T> getList(Map<String, ?> map, String key, Class<T> elementType) {
-        return com.bytechef.commons.util.MapValueUtils.getList(map, key, elementType);
+        return com.bytechef.commons.util.MapUtils.getList(map, key, elementType);
     }
 
     @Override
     public <T> List<T> getList(Map<String, ?> map, String key, Class<T> elementType, List<T> defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getList(map, key, elementType, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getList(map, key, elementType, defaultValue);
     }
 
     @Override
     public List<?> getList(Map<String, ?> map, String key, Class<?>[] elementTypes) {
-        return com.bytechef.commons.util.MapValueUtils.getList(map, key, elementTypes);
+        return com.bytechef.commons.util.MapUtils.getList(map, key, elementTypes);
     }
 
     @Override
     public List<?> getList(Map<String, ?> map, String key, List<Class<?>> elementTypes, List<?> defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getList(map, key, elementTypes, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getList(map, key, elementTypes, defaultValue);
     }
 
     @Override
     public LocalDate getLocalDate(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getLocalDate(map, key);
+        return com.bytechef.commons.util.MapUtils.getLocalDate(map, key);
     }
 
     @Override
     public LocalDate getLocalDate(Map<String, ?> map, String key, LocalDate defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getLocalDate(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getLocalDate(map, key, defaultValue);
     }
 
     @Override
     public LocalDateTime getLocalDateTime(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getLocalDateTime(map, key);
+        return com.bytechef.commons.util.MapUtils.getLocalDateTime(map, key);
     }
 
     @Override
     public LocalDateTime getLocalDateTime(Map<String, ?> map, String key, LocalDateTime defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getLocalDateTime(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getLocalDateTime(map, key, defaultValue);
     }
 
     @Override
     public LocalTime getLocalTime(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getLocalTime(map, key);
+        return com.bytechef.commons.util.MapUtils.getLocalTime(map, key);
     }
 
     @Override
     public LocalTime getLocalTime(Map<String, ?> map, String key, LocalTime defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getLocalTime(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getLocalTime(map, key, defaultValue);
     }
 
     @Override
     public Long getLong(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getLong(map, key);
+        return com.bytechef.commons.util.MapUtils.getLong(map, key);
     }
 
     @Override
     public long getLong(Map<String, ?> map, String key, long defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getLong(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getLong(map, key, defaultValue);
     }
 
     @Override
     public Map<String, ?> getMap(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getMap(map, key);
+        return com.bytechef.commons.util.MapUtils.getMap(map, key);
     }
 
     @Override
     public Map<String, ?> getMap(Map<String, ?> map, String key, Map<String, ?> defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getMap(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getMap(map, key, defaultValue);
     }
 
     @Override
     public <V> Map<String, V> getMap(Map<String, ?> map, String key, Class<V> valueType) {
-        return com.bytechef.commons.util.MapValueUtils.getMap(map, key, valueType);
+        return com.bytechef.commons.util.MapUtils.getMap(map, key, valueType);
     }
 
     @Override
     public <V> Map<String, V> getMap(Map<String, ?> map, String key, Class<V> valueType, Map<String, V> defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getMap(map, key, valueType, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getMap(map, key, valueType, defaultValue);
     }
 
     @Override
     public Map<String, ?> getMap(Map<String, ?> map, String key, List<Class<?>> valueTypes) {
-        return com.bytechef.commons.util.MapValueUtils.getMap(map, key, valueTypes);
+        return com.bytechef.commons.util.MapUtils.getMap(map, key, valueTypes);
     }
 
     @Override
     public Map<String, ?> getMap(
         Map<String, ?> map, String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
 
-        return com.bytechef.commons.util.MapValueUtils.getMap(map, key, valueTypes, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getMap(map, key, valueTypes, defaultValue);
     }
 
     @Override
     public Object getRequired(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequired(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequired(map, key);
     }
 
     @Override
     public <T> T getRequired(Map<String, ?> map, String key, Class<T> returnType) {
-        return com.bytechef.commons.util.MapValueUtils.getRequired(map, key, returnType);
+        return com.bytechef.commons.util.MapUtils.getRequired(map, key, returnType);
     }
 
     @Override
     public Object[] getRequiredArray(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredArray(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredArray(map, key);
     }
 
     @Override
     public <T> T[] getRequiredArray(Map<String, ?> map, String key, Class<T> elementType) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredArray(map, key, elementType);
+        return com.bytechef.commons.util.MapUtils.getRequiredArray(map, key, elementType);
     }
 
     @Override
     public Boolean getRequiredBoolean(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredBoolean(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredBoolean(map, key);
     }
 
     @Override
     public Date getRequiredDate(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredDate(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredDate(map, key);
     }
 
     @Override
     public Double getRequiredDouble(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredDouble(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredDouble(map, key);
     }
 
     @Override
     public Float getRequiredFloat(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredFloat(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredFloat(map, key);
     }
 
     @Override
     public Integer getRequiredInteger(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredInteger(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredInteger(map, key);
     }
 
     @Override
     public List<?> getRequiredList(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredList(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredList(map, key);
     }
 
     @Override
     public <T> List<T> getRequiredList(Map<String, ?> map, String key, Class<T> elementType) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredList(map, key, elementType);
+        return com.bytechef.commons.util.MapUtils.getRequiredList(map, key, elementType);
     }
 
     @Override
     public LocalDate getRequiredLocalDate(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredLocalDate(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredLocalDate(map, key);
     }
 
     @Override
     public LocalDateTime getRequiredLocalDateTime(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredLocalDateTime(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredLocalDateTime(map, key);
     }
 
     @Override
     public LocalTime getRequiredLocalTime(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredLocalTime(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredLocalTime(map, key);
     }
 
     @Override
     public Map<String, ?> getRequiredMap(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredMap(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredMap(map, key);
     }
 
     @Override
     public <V> Map<String, V> getRequiredMap(Map<String, ?> map, String key, Class<V> valueType) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredMap(map, key, valueType);
+        return com.bytechef.commons.util.MapUtils.getRequiredMap(map, key, valueType);
     }
 
     @Override
     public String getRequiredString(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getRequiredString(map, key);
+        return com.bytechef.commons.util.MapUtils.getRequiredString(map, key);
     }
 
     @Override
     public String getString(Map<String, ?> map, String key) {
-        return com.bytechef.commons.util.MapValueUtils.getString(map, key);
+        return com.bytechef.commons.util.MapUtils.getString(map, key);
     }
 
     @Override
     public String getString(Map<String, ?> map, String key, String defaultValue) {
-        return com.bytechef.commons.util.MapValueUtils.getString(map, key, defaultValue);
+        return com.bytechef.commons.util.MapUtils.getString(map, key, defaultValue);
     }
 }

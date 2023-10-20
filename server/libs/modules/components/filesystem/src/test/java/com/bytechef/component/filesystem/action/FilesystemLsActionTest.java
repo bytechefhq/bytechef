@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -44,10 +44,10 @@ public class FilesystemLsActionTest {
     public void testLs1() {
         File file = getLsFile();
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> Paths.get(MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> Paths.get(MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
                 .thenReturn(file.getAbsolutePath());
-            mockedStatic.when(() -> MapValueUtils.getBoolean(
+            mockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
                 .thenReturn(true);
 
@@ -66,10 +66,10 @@ public class FilesystemLsActionTest {
     public void testLs2() {
         File file = getLsFile();
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> Paths.get(MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> Paths.get(MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
                 .thenReturn(file.getAbsolutePath());
-            mockedStatic.when(() -> MapValueUtils.getBoolean(
+            mockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
                 .thenReturn(true);
 
@@ -88,10 +88,10 @@ public class FilesystemLsActionTest {
     public void testLs3() {
         File file = getLsFile();
 
-        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
-            mockedStatic.when(() -> Paths.get(MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
+        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
+            mockedStatic.when(() -> Paths.get(MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH))))
                 .thenReturn(file.getAbsolutePath());
-            mockedStatic.when(() -> MapValueUtils.getBoolean(
+            mockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
                 .thenReturn(false);
 

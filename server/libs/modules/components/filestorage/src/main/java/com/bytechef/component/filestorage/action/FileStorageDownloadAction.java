@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -70,7 +70,7 @@ public class FileStorageDownloadAction {
      */
     protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         try {
-            URL url = new URL(MapValueUtils.getRequiredString(inputParameters, FileStorageConstants.URL));
+            URL url = new URL(MapUtils.getRequiredString(inputParameters, FileStorageConstants.URL));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.connect();
@@ -87,7 +87,7 @@ public class FileStorageDownloadAction {
 
                 try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
                     return context.storeFileContent(
-                        MapValueUtils.getRequiredString(inputParameters, FILENAME), fileInputStream);
+                        MapUtils.getRequiredString(inputParameters, FILENAME), fileInputStream);
                 }
             }
 
