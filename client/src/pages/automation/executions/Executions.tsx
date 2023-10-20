@@ -1,114 +1,251 @@
-/* eslint-disable react/jsx-key */
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import PageHeader from 'components/PageHeader/PageHeader';
-import Input from 'components/Input/Input';
-import {DATA} from './ExecutionsData';
-import {useReactTable} from '@tanstack/react-table';
-
-const columns = [
-    {
-        Header: 'Status',
-        accessor: 'status',
-    },
-    {
-        Header: 'Project',
-        accessor: 'project',
-    },
-    {
-        Header: 'Workflow',
-        accessor: 'workflow',
-    },
-    {
-        Header: 'Instance',
-        accessor: 'instance',
-    },
-    {
-        Header: 'Completed time',
-        accessor: 'date',
-    },
-];
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import {useState} from 'react';
+import FilterableSelect, {
+    ISelectOption,
+} from 'components/FilterableSelect/FilterableSelect';
+import {
+    useGetProjectExecutionsQuery,
+    useGetProjectsQuery,
+} from 'queries/projects.queries';
+import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
+import {OnChangeValue} from 'react-select';
+import {useGetWorkflowsQuery} from 'queries/workflows.queries';
+import {useGetInstancesQuery} from 'queries/instances,queries';
+import {ProjectExecutionModelFromJSON} from 'middleware/project';
 
 export const Executions = () => {
-    const tableInstance = useReactTable({
-        columns,
-        data: DATA,
+    const [filterStatus, setFilterStatus] =
+        useState<GetProjectExecutionsJobStatusEnum>();
+
+    const [filterStartDate, setFilterStartDate] = useState<Date>(new Date());
+
+    const [filterEndDate, setFilterEndDate] = useState<Date>(new Date());
+
+    const [filterProjectId, setFilterProjectId] = useState<number>();
+
+    const [filterWorkflows, setFilterWorkflows] = useState<number>();
+
+    const [filterInstances, setFilterInstances] = useState<number>();
+
+    const {
+        isLoading: isLoadingProjects,
+        error: errorInProjects,
+        data: projects,
+    } = useGetProjectsQuery({});
+
+    const {
+        isLoading: isLoadingWorkflows,
+        error: errorInWorkflows,
+        data: workflows,
+    } = useGetWorkflowsQuery();
+
+    const {
+        isLoading: isLoadingInstances,
+        error: errorInInstances,
+        data: instances,
+    } = useGetInstancesQuery();
+
+    const {
+        isLoading: isLoadingProjectExecutions,
+        error: errorInProjectExecutions,
+        data: projectExecutionsResponse,
+    } = useGetProjectExecutionsQuery({
+        jobStatus: filterStatus,
+        projectId: filterProjectId,
+        workflowId: filterWorkflows,
+        jobStartTime: filterStartDate,
+        jobEndTime: filterEndDate,
+        projectInstanceId: filterInstances,
     });
 
-    const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} =
-        tableInstance;
+    const projectExecutions = projectExecutionsResponse?.content?.map(
+        (execution) => ProjectExecutionModelFromJSON(execution)
+    );
 
     return (
         <LayoutContainer
-            bodyClassName="p-4"
-            header={<PageHeader position="main" title="Workflow History" />}
+            header={<PageHeader title="Workflow History" />}
             leftSidebarHeader={
                 <>
                     <PageHeader leftSidebar title="Executions" />
 
                     <div className="p-4">
-                        <Input name="Status" label="Status" />
+                        <FilterableSelect
+                            name="Status"
+                            label="Status"
+                            options={[
+                                {
+                                    label: GetProjectExecutionsJobStatusEnum.Started,
+                                    value: GetProjectExecutionsJobStatusEnum.Started,
+                                },
 
-                        <Input
-                            type="date"
-                            name="Start time"
-                            label="Start time"
+                                {
+                                    label: GetProjectExecutionsJobStatusEnum.Completed,
+                                    value: GetProjectExecutionsJobStatusEnum.Completed,
+                                },
+
+                                {
+                                    label: GetProjectExecutionsJobStatusEnum.Created,
+                                    value: GetProjectExecutionsJobStatusEnum.Created,
+                                },
+
+                                {
+                                    label: GetProjectExecutionsJobStatusEnum.Stopped,
+                                    value: GetProjectExecutionsJobStatusEnum.Stopped,
+                                },
+
+                                {
+                                    label: GetProjectExecutionsJobStatusEnum.Failed,
+                                    value: GetProjectExecutionsJobStatusEnum.Failed,
+                                },
+                            ]}
+                            onChange={(
+                                value: OnChangeValue<ISelectOption, false>
+                            ) => {
+                                if (value) {
+                                    setFilterStatus(
+                                        value.value as GetProjectExecutionsJobStatusEnum
+                                    );
+                                }
+                            }}
                         />
 
-                        <Input type="date" name="End time" label="End time" />
+                        <div className="mb-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                Start Time
+                            </label>
 
-                        <Input name="Projects" label="Projects" />
+                            <DatePicker
+                                className="block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800"
+                                title="Start Time"
+                                selected={filterStartDate}
+                                onChange={(date) =>
+                                    setFilterStartDate(date || new Date())
+                                }
+                            />
+                        </div>
 
-                        <Input name="Workflows" label="Workflows" />
+                        <div className="mb-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                End Time
+                            </label>
 
-                        <Input name="Instances" label="Instances" />
+                            <DatePicker
+                                className="block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800"
+                                name="End time"
+                                selected={filterEndDate}
+                                onChange={(date) =>
+                                    setFilterEndDate(date || new Date())
+                                }
+                            />
+                        </div>
+
+                        {!isLoadingProjects && !errorInProjects && (
+                            <FilterableSelect
+                                name="Projects"
+                                label="Projects"
+                                options={
+                                    projects?.map((x) => ({
+                                        label: x.name,
+                                        value: (x.id || 0).toString(),
+                                    })) || []
+                                }
+                                onChange={(
+                                    value: OnChangeValue<ISelectOption, false>
+                                ) => {
+                                    if (value) {
+                                        setFilterProjectId(Number(value.value));
+                                    }
+                                }}
+                                isClearable
+                            />
+                        )}
+
+                        {!isLoadingWorkflows && !errorInWorkflows && (
+                            <FilterableSelect
+                                name="Workflows"
+                                label="Workflows"
+                                options={
+                                    workflows?.map((x) => ({
+                                        label: x.label || 'undefined label',
+                                        value: (x.id || 0).toString(),
+                                    })) || []
+                                }
+                                onChange={(
+                                    value: OnChangeValue<ISelectOption, false>
+                                ) => {
+                                    if (value) {
+                                        setFilterWorkflows(Number(value.value));
+                                    }
+                                }}
+                                isClearable
+                            />
+                        )}
+
+                        {!isLoadingInstances && !errorInInstances && (
+                            <FilterableSelect
+                                name="Instances"
+                                label="Instances"
+                                options={
+                                    instances?.map((x) => ({
+                                        label: x.name,
+                                        value: (x.id || 0).toString(),
+                                    })) || []
+                                }
+                                onChange={(
+                                    value: OnChangeValue<ISelectOption, false>
+                                ) => {
+                                    if (value) {
+                                        setFilterInstances(Number(value.value));
+                                    }
+                                }}
+                                isClearable
+                            />
+                        )}
                     </div>
                 </>
             }
         >
-            <table
-                {...getTableProps()}
-                className="w-full border text-sm 2xl:mx-auto 2xl:w-4/5"
-            >
-                <thead>
-                    {headerGroups.map((headerGroup) => (
-                        <tr
-                            {...headerGroup.getHeaderGroupProps()}
-                            className="bg-gray-200"
-                        >
-                            {headerGroup.headers.map((column) => (
-                                <th
-                                    {...column.getHeaderProps()}
-                                    className="border px-4 py-2 font-medium uppercase text-gray-600"
-                                >
-                                    {column.render('Header')}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
+            {!isLoadingProjectExecutions && !errorInProjectExecutions && (
+                <div className="p-2">
+                    <table className="w-full table-auto">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
 
-                <tbody {...getTableBodyProps()}>
-                    {rows.map((row) => {
-                        prepareRow(row);
+                                <th>Project</th>
 
-                        return (
-                            <tr
-                                {...row.getRowProps()}
-                                className="hover:bg-gray-100"
-                            >
-                                {row.cells.map((cell) => (
-                                    <td
-                                        {...cell.getCellProps()}
-                                        className="border border-gray-300 px-4 py-2"
-                                    >
-                                        {cell.render('Cell')}
-                                    </td>
-                                ))}
+                                <th>Workflow</th>
+
+                                <th>Instance</th>
+
+                                <th>Completed time</th>
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                        </thead>
+
+                        <tbody>
+                            {projectExecutions?.map((execution) => (
+                                <tr
+                                    key={`${execution.project}-${execution.instance}`}
+                                >
+                                    <td>{execution.job?.status}</td>
+
+                                    <td>{execution.project?.name}</td>
+
+                                    <td>{execution.workflow?.label}</td>
+
+                                    <td>{execution.instance?.name}</td>
+
+                                    <td>{execution.job?.endTime?.getDate()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </LayoutContainer>
     );
 };
