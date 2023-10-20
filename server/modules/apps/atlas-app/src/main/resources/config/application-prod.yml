@@ -11,7 +11,7 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/atlas
+    url: jdbc:postgresql://localhost:5432/integri
     username: root
     password:
     hikari:
