@@ -2,7 +2,6 @@ import {
     useGetIntegrationsQuery,
     useGetIntegrationTagsQuery,
 } from '../../queries/integrations.queries';
-import React from 'react';
 import IntegrationItem from 'pages/integrations/IntegrationItem';
 import {Link, useSearchParams} from 'react-router-dom';
 
@@ -38,43 +37,49 @@ const IntegrationList = () => {
                     (integrations?.length === 0 ? (
                         <p>You do not have any Integration created yet.</p>
                     ) : (
-                        integrations.map((integration) => (
-                            <div key={integration.id}>
-                                <Link
-                                    to={`/automation/integrations/${integration.id}`}
-                                    onClick={(event) => {
-                                        event.preventDefault();
-                                    }}
-                                >
-                                    <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                        <IntegrationItem
-                                            key={integration.id}
-                                            category={integration.category}
-                                            description={
-                                                integration.description
-                                            }
-                                            id={integration.id}
-                                            lastDatePublished={
-                                                undefined // missing lastDatePublished
-                                            }
-                                            name={integration.name}
-                                            published={false} // missing api
-                                            remainingTags={tags?.filter(
-                                                (tag) =>
-                                                    integration.tags?.findIndex(
-                                                        (x) => x.id === tag.id
-                                                    ) === -1
-                                            )}
-                                            tags={integration.tags}
-                                            version={integration.version}
-                                            workflowIds={
-                                                integration.workflowIds
-                                            }
-                                        />
-                                    </li>
-                                </Link>
-                            </div>
-                        ))
+                        integrations.map((integration) => {
+                            const integrationTagIds =
+                                integration.tags?.map((tag) => tag.id) || [];
+                            return (
+                                <div key={integration.id}>
+                                    <Link
+                                        to={`/automation/integrations/${integration.id}`}
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                        }}
+                                    >
+                                        <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
+                                            <IntegrationItem
+                                                key={integration.id}
+                                                category={integration.category}
+                                                description={
+                                                    integration.description
+                                                }
+                                                id={integration.id}
+                                                lastDatePublished={
+                                                    undefined // missing lastDatePublished
+                                                }
+                                                name={integration.name}
+                                                published={false} // missing api
+                                                remainingTags={
+                                                    tags?.filter(
+                                                        (tag) =>
+                                                            !integrationTagIds?.includes(
+                                                                tag.id
+                                                            )
+                                                    ) || []
+                                                }
+                                                tags={integration.tags}
+                                                version={integration.version}
+                                                workflowIds={
+                                                    integration.workflowIds
+                                                }
+                                            />
+                                        </li>
+                                    </Link>
+                                </div>
+                            );
+                        })
                     ))}
             </ul>
         </div>
