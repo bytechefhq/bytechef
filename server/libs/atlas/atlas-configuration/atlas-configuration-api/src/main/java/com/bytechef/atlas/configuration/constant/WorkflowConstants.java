@@ -35,6 +35,7 @@ public class WorkflowConstants {
     public static final String ID = "id";
     public static final String INPUTS = "inputs";
     public static final String LABEL = "label";
+    public static final String MAX_RETRIES = "maxRetries";
     public static final String METADATA = "metadata";
     public static final String NAME = "name";
     public static final String NODE = "node";
@@ -43,8 +44,8 @@ public class WorkflowConstants {
     public static final String PATH = "path";
     public static final String POST = "post";
     public static final String PRE = "pre";
-    public static final String MAX_RETRIES = "maxRetries";
     public static final String REQUIRED = "required";
+    public static final String RESOURCE_WORKFLOW_LOCATION_PATTERN = "/**/*.{json|yml|yaml}";
     public static final String TASK_NUMBER = "taskNumber";
     public static final String TASKS = "tasks";
     public static final String TIMEOUT = "timeout";

@@ -18,10 +18,13 @@
 package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
@@ -70,7 +73,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 .formatted(description, label);
         }
 
-        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+        Workflow workflow = workflowService.create(
+            definition, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_WORKFLOW_TYPE);
 
         projectService.addWorkflow(id, workflow.getId());
 
@@ -91,7 +95,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         if (org.springframework.util.CollectionUtils.isEmpty(projectDTO.workflowIds())) {
-            Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+            Workflow workflow = workflowService.create(
+                null, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_WORKFLOW_TYPE);
 
             project.setWorkflowIds(List.of(Objects.requireNonNull(workflow.getId())));
         }
@@ -247,7 +252,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
         for (String workflowId : workflowIds) {
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
+            workflow = workflowService.create(
+                workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(),
+                ProjectConstants.PROJECT_WORKFLOW_TYPE);
 
             newWorkflowIds.add(workflow.getId());
         }

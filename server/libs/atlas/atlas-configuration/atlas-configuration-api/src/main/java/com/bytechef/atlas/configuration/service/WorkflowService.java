@@ -18,6 +18,8 @@
 package com.bytechef.atlas.configuration.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 
 import java.util.List;
 
@@ -26,17 +28,21 @@ import java.util.List;
  */
 public interface WorkflowService {
 
-    Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType);
+    Workflow create(String definition, Format format, SourceType sourceType, int type);
 
     void delete(String id);
 
     Workflow duplicateWorkflow(String id);
 
+    List<Workflow> getFilesystemWorkflows(int type);
+
     Workflow getWorkflow(String id);
 
-    List<Workflow> getWorkflows();
+    List<Workflow> getWorkflows(int type);
 
     List<Workflow> getWorkflows(List<String> workflowIds);
+
+    void refreshCache(String id);
 
     Workflow update(String id, String definition);
 }

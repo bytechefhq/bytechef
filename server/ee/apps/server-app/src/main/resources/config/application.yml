@@ -168,20 +168,24 @@ bytechef:
       classpath:
         # Enable classpath based workflow repository
         enabled: false
+        projects:
+          location-pattern: workflows/projects/**/*.{json|yml|yaml}
       filesystem:
         # Enable filesystem based workflow repository
         enabled: true
-        # Location of workflows on the file system
-        location-pattern: ${user.home}/bytechef/**/*.yaml
+        projects:
+          # Location of workflows on the file system
+          location-pattern: ${user.home}/bytechef/data/workflows/projects/**/*.yaml
       git:
         # Enable a git-based workflow repository
         enabled: false
-        # The URL to the Git Repo
-        url: https://github.com/bytechefhq/bytechef-workflows.git
-        branch: master
-        username:
-        password:
-        # Folders within the git repo that are scanned for workflows
-        search-paths:
+        projects:
+          # The URL to the Git Repo
+          url: https://github.com/bytechefhq/bytechef-workflows.git
+          branch: master
+          username:
+          password:
+          # Folders within the git repo that are scanned for workflows
+          search-paths:
       jdbc:
         enabled: true

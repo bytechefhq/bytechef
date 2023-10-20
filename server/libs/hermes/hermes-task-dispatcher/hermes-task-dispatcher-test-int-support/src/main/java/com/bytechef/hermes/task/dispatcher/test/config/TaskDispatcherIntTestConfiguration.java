@@ -17,6 +17,9 @@
 
 package com.bytechef.hermes.task.dispatcher.test.config;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
+import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
@@ -24,7 +27,6 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
@@ -46,10 +48,11 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -59,14 +62,20 @@ import java.util.List;
     exclude = {
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
-@Import({
-    ResourceWorkflowRepositoryConfiguration.class
-})
 @Configuration
 public class TaskDispatcherIntTestConfiguration {
 
     @TestConfiguration
     public static class WorkflowExecutionConfiguration {
+
+        @Bean
+        ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
+            ResourcePatternResolver resourcePatternResolver) {
+
+            return new ClassPathResourceWorkflowRepository(
+                resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
+                    Map.of(0, "workflows"), "classpath", WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
+        }
 
         @Bean
         RemoteContextService contextService() {

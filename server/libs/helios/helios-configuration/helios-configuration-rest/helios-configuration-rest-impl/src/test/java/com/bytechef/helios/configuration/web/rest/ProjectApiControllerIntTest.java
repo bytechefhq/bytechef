@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
@@ -177,7 +178,7 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON);
+            Workflow workflow = new Workflow("workflow1", "{}", Format.JSON, 0);
 
             when(projectFacade.getProjectWorkflows(1L)).thenReturn(List.of(workflow));
 
@@ -299,8 +300,7 @@ public class ProjectApiControllerIntTest {
             .label("workflowLabel")
             .description("workflowDescription");
         Workflow workflow = new Workflow(
-            "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
-            Workflow.Format.JSON);
+            "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", Format.JSON, 0);
 
         when(projectFacade.addProjectWorkflow(anyLong(), any(), any(), any()))
             .thenReturn(workflow);

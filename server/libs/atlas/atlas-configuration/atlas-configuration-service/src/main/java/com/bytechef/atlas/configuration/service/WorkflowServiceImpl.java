@@ -18,6 +18,7 @@
 package com.bytechef.atlas.configuration.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
@@ -67,7 +68,7 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
     @Override
     @SuppressFBWarnings("NP")
     public Workflow create(
-        String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType) {
+        String definition, @NonNull Workflow.Format format, @NonNull SourceType sourceType, int type) {
         Assert.notNull(format, "'format' must not be null");
         Assert.notNull(sourceType, "'sourceType' must not be null");
 
@@ -84,11 +85,7 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
             workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
             workflowCrudRepository -> save(workflow, workflowCrudRepository));
 
-        // Load definition into Workflow instance
-
-        Assert.notNull(savedWorkflow.getId(), "'id' must not  be null");
-
-        return getWorkflow(savedWorkflow.getId());
+        return getWorkflow(Objects.requireNonNull(savedWorkflow.getId()));
     }
 
     @Override
@@ -105,7 +102,19 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
     public Workflow duplicateWorkflow(String id) {
         Workflow workflow = getWorkflow(id);
 
-        return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
+        return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), workflow.getType());
+    }
+
+    @Override
+    public List<Workflow> getFilesystemWorkflows(int type) {
+        WorkflowRepository workflowRepository = CollectionUtils.getFirst(
+            workflowRepositories,
+            curWorkflowRepository -> curWorkflowRepository.getSourceType() == SourceType.FILESYSTEM);
+
+        return workflowRepository.findAll(type)
+            .stream()
+            .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()))
+            .toList();
     }
 
     @Override
@@ -174,9 +183,67 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
 
     @Override
     @SuppressFBWarnings("NP")
+    public void refreshCache(String id) {
+        Assert.notNull(id, "'id' must not be null");
+
+        Workflow workflow = null;
+
+        for (WorkflowRepository workflowRepository : workflowRepositories) {
+            try {
+                Optional<Workflow> workflowOptional = workflowRepository.findById(id);
+
+                if (workflowOptional.isPresent()) {
+                    workflow = workflowOptional.get();
+                }
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("{}", e.getMessage());
+                }
+            }
+        }
+
+        Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
+
+        if (cacheOne.get(id) != null) {
+            if (workflow == null) {
+                cacheOne.evictIfPresent(id);
+            } else {
+                cacheOne.put(id, workflow);
+            }
+        }
+
+        Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));
+
+        if (cacheAll.get(CACHE_ALL) != null) {
+            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
+
+            @SuppressWarnings("unchecked")
+            List<Workflow> workflows = (List<Workflow>) Objects.requireNonNull(valueWrapper.get());
+
+            if (workflow == null) {
+                CollectionUtils.findFirst(workflows, curWorkflow -> Objects.equals(curWorkflow.getId(), id))
+                    .ifPresent(workflows::remove);
+            } else {
+                int index = workflows.indexOf(workflow);
+
+                if (index == -1) {
+                    workflows.add(workflow);
+                } else {
+                    workflows.remove(index);
+
+                    workflows.add(index, workflow);
+                }
+            }
+
+            cacheAll.put(CACHE_ALL, workflows);
+        }
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public List<Workflow> getWorkflows() {
+    public List<Workflow> getWorkflows(int type) {
         List<Workflow> workflows;
 
         Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));
@@ -184,7 +251,7 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = workflowRepositories.stream()
                 .flatMap(workflowRepository -> {
-                    List<Workflow> curWorkflows = workflowRepository.findAll();
+                    List<Workflow> curWorkflows = workflowRepository.findAll(type);
 
                     return curWorkflows
                         .stream()
@@ -239,6 +306,10 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
 
             workflow = workflowCrudRepository.save(curWorkflow);
         }
+
+        // Load definition into Workflow instance
+
+        workflow = OptionalUtils.get(workflowCrudRepository.findById(workflow.getId()));
 
         Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
 

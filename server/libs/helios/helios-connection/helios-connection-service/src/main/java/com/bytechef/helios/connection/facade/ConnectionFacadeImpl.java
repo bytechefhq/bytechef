@@ -20,6 +20,7 @@ package com.bytechef.helios.connection.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
@@ -201,7 +202,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private boolean isConnectionUsed(long id) {
-        List<Workflow> workflows = workflowService.getWorkflows();
+        List<Workflow> workflows = workflowService.getWorkflows(ProjectConstants.PROJECT_WORKFLOW_TYPE);
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
