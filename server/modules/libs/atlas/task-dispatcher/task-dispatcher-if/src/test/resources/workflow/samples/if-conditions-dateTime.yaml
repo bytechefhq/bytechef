@@ -9,13 +9,6 @@ inputs:
     type: string
     required: true
 
-outputs:
-  - name: afterResult
-    value: ${afterResult}
-
-  - name: beforeResult
-    value: ${beforeResult}
-
 tasks:
   - type: if
     conditions:
