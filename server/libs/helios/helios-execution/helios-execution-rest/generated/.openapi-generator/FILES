@@ -1,9 +1,9 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/helios/execution/web/rest/ApiUtil.java
-src/main/java/com/bytechef/helios/execution/web/rest/JobsApi.java
-src/main/java/com/bytechef/helios/execution/web/rest/WorkflowExecutionsApi.java
-src/main/java/com/bytechef/helios/execution/web/rest/WorkflowTestsApi.java
+src/main/java/com/bytechef/helios/execution/web/rest/ProjectJobApi.java
+src/main/java/com/bytechef/helios/execution/web/rest/ProjectWorkflowExecutionApi.java
+src/main/java/com/bytechef/helios/execution/web/rest/ProjectWorkflowTestApi.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/CreateJob200ResponseModel.java

@@ -7,7 +7,6 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
-import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,10 +33,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:21.897054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-project-instance", description = "The Automation Project Instance API")
-public interface ProjectInstancesApi {
+@Tag(name = "project-instance", description = "The Project Instance API")
+public interface ProjectInstanceApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -54,7 +53,7 @@ public interface ProjectInstancesApi {
         operationId = "createProjectInstance",
         summary = "Create a new project instance",
         description = "Create a new project instance.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project instance object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
@@ -85,7 +84,7 @@ public interface ProjectInstancesApi {
 
 
     /**
-     * POST /project-instances/{id}/workflows/{workflowId}/jobs : Create a request for running a new job
+     * POST /project-instances/{id}/project-workflows/{workflowId}/project-jobs : Create a request for running a new job
      * Create a request for running a new job.
      *
      * @param id The id of a project instance. (required)
@@ -96,7 +95,7 @@ public interface ProjectInstancesApi {
         operationId = "createProjectInstanceWorkflowJob",
         summary = "Create a request for running a new job",
         description = "Create a request for running a new job.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CreateProjectInstanceWorkflowJob200ResponseModel.class))
@@ -105,7 +104,7 @@ public interface ProjectInstancesApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/project-instances/{id}/workflows/{workflowId}/jobs",
+        value = "/project-instances/{id}/project-workflows/{workflowId}/project-jobs",
         produces = { "application/json" }
     )
     default ResponseEntity<CreateProjectInstanceWorkflowJob200ResponseModel> createProjectInstanceWorkflowJob(
@@ -137,7 +136,7 @@ public interface ProjectInstancesApi {
         operationId = "deleteProjectInstance",
         summary = "Delete a project instance",
         description = "Delete a project instance.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -166,7 +165,7 @@ public interface ProjectInstancesApi {
         operationId = "enableProjectInstance",
         summary = "Enable/disable a project instance",
         description = "Enable/disable a project instance.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -185,7 +184,7 @@ public interface ProjectInstancesApi {
 
 
     /**
-     * POST /project-instances/{id}/workflows/{workflowId}/enable/{enable} : Enable/disable a workflow of a project instance
+     * POST /project-instances/{id}/project-workflows/{workflowId}/enable/{enable} : Enable/disable a workflow of a project instance
      * Enable/disable a workflow of a project instance.
      *
      * @param id The id of a project instance. (required)
@@ -197,14 +196,14 @@ public interface ProjectInstancesApi {
         operationId = "enableProjectInstanceWorkflow",
         summary = "Enable/disable a workflow of a project instance",
         description = "Enable/disable a workflow of a project instance.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/project-instances/{id}/workflows/{workflowId}/enable/{enable}"
+        value = "/project-instances/{id}/project-workflows/{workflowId}/enable/{enable}"
     )
     default ResponseEntity<Void> enableProjectInstanceWorkflow(
         @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
@@ -227,7 +226,7 @@ public interface ProjectInstancesApi {
         operationId = "getProjectInstance",
         summary = "Get a project instance by id",
         description = "Get a project instance by id.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
@@ -268,7 +267,7 @@ public interface ProjectInstancesApi {
         operationId = "getProjectInstances",
         summary = "Get project instances",
         description = "Get project instances.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of project instances.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProjectInstanceModel.class)))
@@ -310,7 +309,7 @@ public interface ProjectInstancesApi {
         operationId = "updateProjectInstance",
         summary = "Update an existing project instance",
         description = "Update an existing project instance.",
-        tags = { "automation-project-instance" },
+        tags = { "project-instance" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project instnce object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectInstanceModel.class))
@@ -336,37 +335,6 @@ public interface ProjectInstancesApi {
                 }
             }
         });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /project-instances/{id}/project-instance-tags : Updates tags of an existing project instance
-     * Updates tags of an existing project instance.
-     *
-     * @param id The id of a project instance. (required)
-     * @param updateTagsRequestModel  (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "updateProjectInstanceTags",
-        summary = "Updates tags of an existing project instance",
-        description = "Updates tags of an existing project instance.",
-        tags = { "automation-project-instance-tag" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/project-instances/{id}/project-instance-tags",
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<Void> updateProjectInstanceTags(
-        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
-    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

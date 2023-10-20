@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.helios.configuration.web.rest;
+package com.bytechef.dione.configuration.web.rest;
 
-import com.bytechef.helios.configuration.web.rest.model.TagModel;
+import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,38 +32,38 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:21.897054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:19.930975+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-project-tag", description = "The Automation Project Tag API")
-public interface ProjectTagsApi {
+@Tag(name = "integration-category", description = "The Integration Category API")
+public interface IntegrationCategoryApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /project-tags : Get project tags.
-     * Get project tags.
+     * GET /integration-categories : Get integration categories
+     * Get integration categories.
      *
-     * @return A list of project tags. (status code 200)
+     * @return A list of categories. (status code 200)
      */
     @Operation(
-        operationId = "getProjectTags",
-        summary = "Get project tags.",
-        description = "Get project tags.",
-        tags = { "automation-project-tag" },
+        operationId = "getIntegrationCategories",
+        summary = "Get integration categories",
+        description = "Get integration categories.",
+        tags = { "integration-category" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of project tags.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
+            @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-tags",
+        value = "/integration-categories",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<TagModel>> getProjectTags(
+    default ResponseEntity<List<CategoryModel>> getIntegrationCategories(
         
     ) {
         getRequest().ifPresent(request -> {

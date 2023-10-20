@@ -7,7 +7,6 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
-import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,10 +34,10 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:21.897054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "automation-project", description = "The Automation Project API")
-public interface ProjectsApi {
+@Tag(name = "project", description = "The Project API")
+public interface ProjectApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
@@ -55,7 +54,7 @@ public interface ProjectsApi {
         operationId = "createProject",
         summary = "Create a new project.",
         description = "Create a new project.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -86,7 +85,7 @@ public interface ProjectsApi {
 
 
     /**
-     * POST /projects/{id}/workflows : Create new workflow and adds it to an existing project.
+     * POST /projects/{id}/project-workflows : Create new workflow and adds it to an existing project.
      * Create new workflow and adds it to an existing project.
      *
      * @param id The id of a project. (required)
@@ -97,7 +96,7 @@ public interface ProjectsApi {
         operationId = "createProjectWorkflow",
         summary = "Create new workflow and adds it to an existing project.",
         description = "Create new workflow and adds it to an existing project.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
@@ -106,7 +105,7 @@ public interface ProjectsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/projects/{id}/workflows",
+        value = "/projects/{id}/project-workflows",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -139,7 +138,7 @@ public interface ProjectsApi {
         operationId = "deleteProject",
         summary = "Delete a project.",
         description = "Delete a project.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
@@ -167,7 +166,7 @@ public interface ProjectsApi {
         operationId = "duplicateProject",
         summary = "Duplicates existing project.",
         description = "Duplicates existing project.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The duplicated project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -207,7 +206,7 @@ public interface ProjectsApi {
         operationId = "getProject",
         summary = "Get a project by id.",
         description = "Get a project by id.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -237,46 +236,6 @@ public interface ProjectsApi {
 
 
     /**
-     * GET /projects/{id}/workflows : Get workflows for particular project.
-     * Get workflows for particular project.
-     *
-     * @param id The id of a project. (required)
-     * @return The updated project object. (status code 200)
-     */
-    @Operation(
-        operationId = "getProjectWorkflows",
-        summary = "Get workflows for particular project.",
-        description = "Get workflows for particular project.",
-        tags = { "automation-workflow" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/projects/{id}/workflows",
-        produces = { "application/json" }
-    )
-    default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
-        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"triggers\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ], \"__version\" : 1, \"maxRetries\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ] }, { \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"triggers\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ], \"__version\" : 1, \"maxRetries\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"key\" : \"key\" } ], \"timeout\" : \"timeout\" } ] } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
      * GET /projects : Get projects.
      * Get projects.
      *
@@ -289,7 +248,7 @@ public interface ProjectsApi {
         operationId = "getProjects",
         summary = "Get projects.",
         description = "Get projects.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of projects.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProjectModel.class)))
@@ -332,7 +291,7 @@ public interface ProjectsApi {
         operationId = "updateProject",
         summary = "Update an existing project.",
         description = "Update an existing project.",
-        tags = { "automation-project" },
+        tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectModel.class))
@@ -358,37 +317,6 @@ public interface ProjectsApi {
                 }
             }
         });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /projects/{id}/project-tags : Updates tags of an existing project.
-     * Updates tags of an existing project.
-     *
-     * @param id The id of a project. (required)
-     * @param updateTagsRequestModel  (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "updateProjectTags",
-        summary = "Updates tags of an existing project.",
-        description = "Updates tags of an existing project.",
-        tags = { "automation-project-tag" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/projects/{id}/project-tags",
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<Void> updateProjectTags(
-        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
-    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.dione.configuration.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,26 +32,26 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:21.405732+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:20.612572+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "embedded-integration-category", description = "The Embedded Integration Category API")
-public interface IntegrationCategoriesApi {
+@Tag(name = "project-category", description = "The Project Category API")
+public interface ProjectCategoryApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /integration-categories : Get integration categories
-     * Get integration categories.
+     * GET /project-categories : Get categories
+     * Get categories.
      *
      * @return A list of categories. (status code 200)
      */
     @Operation(
-        operationId = "getIntegrationCategories",
-        summary = "Get integration categories",
-        description = "Get integration categories.",
-        tags = { "embedded-integration-category" },
+        operationId = "getProjectCategories",
+        summary = "Get categories",
+        description = "Get categories.",
+        tags = { "project-category" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryModel.class)))
@@ -60,10 +60,10 @@ public interface IntegrationCategoriesApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integration-categories",
+        value = "/project-categories",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<CategoryModel>> getIntegrationCategories(
+    default ResponseEntity<List<CategoryModel>> getProjectCategories(
         
     ) {
         getRequest().ifPresent(request -> {
