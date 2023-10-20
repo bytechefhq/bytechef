@@ -383,23 +383,23 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+    SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
         return new SwitchTaskCompletionHandler(
-            taskExecutionRepository,
-            aTaskCompletionHandler,
-            taskDispatcher(),
             contextRepository,
+            taskExecutionRepository,
+            taskCompletionHandler,
+            taskDispatcher(),
             taskEvaluator
         );
     }
 
     @Bean
-    SwitchTaskDispatcher switchTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+    SwitchTaskDispatcher switchTaskDispatcher(TaskDispatcher taskDispatcher) {
         return new SwitchTaskDispatcher(
-            aTaskDispatcher,
-            taskExecutionRepository,
-            messageBroker,
             contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
             taskEvaluator
         );
     }

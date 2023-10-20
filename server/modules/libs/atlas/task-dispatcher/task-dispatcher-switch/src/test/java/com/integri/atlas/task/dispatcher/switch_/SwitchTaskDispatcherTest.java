@@ -41,29 +41,35 @@ import org.mockito.ArgumentCaptor;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public class SwitchTaskDispatcherTest {
 
-    private TaskExecutionRepository taskRepo = mock(TaskExecutionRepository.class);
-    private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
-    private MessageBroker messageBroker = mock(MessageBroker.class);
     private ContextRepository contextRepository = mock(ContextRepository.class);
+    private MessageBroker messageBroker = mock(MessageBroker.class);
+    private TaskExecutionRepository taskExecutionRepository = mock(TaskExecutionRepository.class);
+    private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
 
     @Test
     public void test1() {
         when(contextRepository.peek(any())).thenReturn(new MapContext());
-        SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(
-            taskDispatcher,
-            taskRepo,
-            messageBroker,
+
+        SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
             SpelTaskEvaluator.create()
         );
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
-        task.set("expression", "k1");
-        dispatcher.dispatch(task);
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
+        taskExecution.set("expression", "k1");
+
+        switchTaskDispatcher.dispatch(taskExecution);
+
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
+
         verify(taskDispatcher, times(1)).dispatch(argument.capture());
         Assertions.assertEquals("print", argument.getValue().getType());
     }
@@ -71,41 +77,50 @@ public class SwitchTaskDispatcherTest {
     @Test
     public void test2() {
         when(contextRepository.peek(any())).thenReturn(new MapContext());
-        SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(
-            taskDispatcher,
-            taskRepo,
-            messageBroker,
+
+        SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
             SpelTaskEvaluator.create()
         );
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
-        task.set("expression", "k2");
-        dispatcher.dispatch(task);
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
+        taskExecution.set("expression", "k2");
+
+        switchTaskDispatcher.dispatch(taskExecution);
+
         verify(taskDispatcher, times(0)).dispatch(any());
     }
 
     @Test
     public void test3() {
         when(contextRepository.peek(any())).thenReturn(new MapContext());
-        SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(
-            taskDispatcher,
-            taskRepo,
-            messageBroker,
+
+        SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
             SpelTaskEvaluator.create()
         );
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set(
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.set(
             "cases",
             Arrays.asList(
                 Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print"))),
                 Map.of("key", "k2", "tasks", Arrays.asList(Map.of("type", "sleep")))
             )
         );
-        task.set("expression", "k2");
-        dispatcher.dispatch(task);
+        taskExecution.set("expression", "k2");
+
+        switchTaskDispatcher.dispatch(taskExecution);
+
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
+
         verify(taskDispatcher, times(1)).dispatch(argument.capture());
         Assertions.assertEquals("sleep", argument.getValue().getType());
     }
@@ -113,26 +128,31 @@ public class SwitchTaskDispatcherTest {
     @Test
     public void test4() {
         when(contextRepository.peek(any())).thenReturn(new MapContext());
-        SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(
-            taskDispatcher,
-            taskRepo,
-            messageBroker,
+
+        SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
             SpelTaskEvaluator.create()
         );
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set(
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.set(
             "cases",
             Arrays.asList(
                 Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print"))),
                 Map.of("key", "k2", "tasks", Arrays.asList(Map.of("type", "sleep")))
             )
         );
-        task.set("default", Collections.singletonMap("value", "1234"));
-        task.set("expression", "k99");
-        dispatcher.dispatch(task);
+        taskExecution.set("default", Collections.singletonMap("value", "1234"));
+        taskExecution.set("expression", "k99");
+
+        switchTaskDispatcher.dispatch(taskExecution);
+
         ArgumentCaptor<String> arg1 = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<TaskExecution> arg2 = ArgumentCaptor.forClass(TaskExecution.class);
+
         verify(messageBroker, times(1)).send(arg1.capture(), arg2.capture());
         Assertions.assertEquals("1234", arg2.getValue().getOutput());
     }
