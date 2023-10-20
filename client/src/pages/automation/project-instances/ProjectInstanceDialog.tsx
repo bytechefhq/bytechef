@@ -149,8 +149,6 @@ const ProjectInstanceDialog = ({
         }
     }
 
-    const remainingSteps = steps.slice(1);
-
     return (
         <Dialog
             isOpen={isOpen}
@@ -167,41 +165,30 @@ const ProjectInstanceDialog = ({
                     : undefined
             }
             large={true}
+            wizard
         >
-            <div className="flex h-full w-full space-x-6 overflow-auto p-2">
-                <div className="w-1/2 bg-gray-100 p-2 font-semibold">
-                    {`${projectInstance?.id ? 'Edit' : 'New'} Instance`}
+            <div className="flex h-full w-full">
+                <div className="w-1/3 bg-gray-100 p-4 font-semibold">
+                    <h3>{`${
+                        projectInstance?.id ? 'Edit' : 'New'
+                    } Instance`}</h3>
 
-                    <div className="relative pb-10">
-                        <div
-                            className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-blue-600"
-                            aria-hidden="true"
-                        ></div>
-
-                        <div className="group relative mt-4 flex items-start">
-                            <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 group-hover:bg-indigo-800">
-                                <CheckIcon
-                                    className="h-5 w-5 text-white"
-                                    aria-hidden="true"
-                                />
-                            </span>
-
-                            <span className="ml-4 flex min-w-0 flex-col text-sm font-medium">
-                                {steps[0].name}
-                            </span>
-                        </div>
-                    </div>
-
-                    {remainingSteps.map((step, index) => (
+                    {steps.map((step, index) => (
                         <div key={step.name} className="relative pb-10">
-                            {index !== remainingSteps.length - 1 && (
+                            {index !== steps.length - 1 && (
                                 <div
-                                    className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300"
+                                    className={twMerge(
+                                        '' +
+                                            'absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5',
+                                        index < activeStepIndex
+                                            ? 'bg-gray-900'
+                                            : 'bg-gray-300'
+                                    )}
                                     aria-hidden="true"
                                 ></div>
                             )}
 
-                            <div className="group relative mt-4 flex items-start">
+                            <div className="group relative mt-4 flex items-center">
                                 <span
                                     className="flex items-center"
                                     aria-hidden="true"
@@ -209,20 +196,26 @@ const ProjectInstanceDialog = ({
                                     <span
                                         className={twMerge(
                                             'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white',
-                                            index < activeStepIndex
-                                                ? 'border-blue-600'
-                                                : 'border-gray-300 group-hover:border-gray-400'
+                                            index <= activeStepIndex
+                                                ? 'border-gray-900'
+                                                : 'border-gray-300'
                                         )}
                                     >
                                         {index < activeStepIndex && (
-                                            <CheckIcon
-                                                className="h-5 w-5 text-blue-600"
-                                                aria-hidden="true"
-                                            />
+                                            <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full">
+                                                <CheckIcon
+                                                    className="h-5 w-5 text-gray-900"
+                                                    aria-hidden="true"
+                                                />
+                                            </span>
                                         )}
 
                                         {index === activeStepIndex && (
-                                            <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
+                                            <span className="h-2.5 w-2.5 rounded-full bg-gray-900" />
+                                        )}
+
+                                        {index > activeStepIndex && (
+                                            <span className="h-2.5 w-2.5 rounded-full" />
                                         )}
                                     </span>
                                 </span>
@@ -231,7 +224,7 @@ const ProjectInstanceDialog = ({
                                     className={twMerge(
                                         'ml-4 flex min-w-0 flex-col text-sm font-medium',
                                         index < activeStepIndex
-                                            ? 'text-blue-600'
+                                            ? 'text-gray-900'
                                             : 'text-gray-500'
                                     )}
                                 >
@@ -242,7 +235,7 @@ const ProjectInstanceDialog = ({
                     ))}
                 </div>
 
-                <div className="w-1/2">
+                <div className="w-2/3 overflow-auto p-4">
                     <h3 className="pb-3 font-semibold">
                         {steps[activeStepIndex].name}
                     </h3>
@@ -251,7 +244,7 @@ const ProjectInstanceDialog = ({
                 </div>
             </div>
 
-            <div className="absolute bottom-2 right-2 mt-8 justify-end space-x-1">
+            <div className="absolute bottom-4 right-4 mt-8 justify-end space-x-1">
                 {activeStepIndex === 0 && (
                     <>
                         <Close asChild>
@@ -270,6 +263,7 @@ const ProjectInstanceDialog = ({
                 {activeStepIndex === 1 && (
                     <>
                         <Button
+                            displayType="lightBorder"
                             label="Previous"
                             onClick={() =>
                                 setActiveStepIndex(activeStepIndex - 1)
