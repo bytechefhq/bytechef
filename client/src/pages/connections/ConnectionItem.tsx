@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
-import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
+import {
+    Dropdown,
+    DropdownMenuItemType,
+} from '../../components/Dropdown/Dropdown';
 import {TagModel} from '../../middleware/connection';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect, {
@@ -113,7 +116,7 @@ const ConnectionItem = ({
         },
     });
 
-    const menuItems: DropDownMenuItem[] = [
+    const menuItems: DropdownMenuItemType[] = [
         {
             label: 'Edit',
         },

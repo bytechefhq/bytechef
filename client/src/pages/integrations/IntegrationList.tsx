@@ -47,23 +47,16 @@ const IntegrationList = () => {
                                     <Link
                                         to={`/automation/integrations/${integration.id}`}
                                     >
-                                        <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
+                                        <li className="group my-3 flex items-center justify-between rounded-md bg-white p-2 hover:bg-gray-50">
                                             <IntegrationItem
-                                                category={integration.category}
                                                 componentVersion={undefined} // missing api
-                                                key={integration.id}
-                                                description={
-                                                    integration.description
-                                                }
-                                                id={integration.id}
+                                                integration={integration}
                                                 integrationNames={integrations.map(
                                                     (integration) =>
                                                         integration.name
                                                 )}
-                                                lastDatePublished={
-                                                    undefined // missing lastDatePublished
-                                                }
-                                                name={integration.name}
+                                                key={integration.id}
+                                                lastDatePublished={undefined} // missing api
                                                 published={false} // missing api
                                                 remainingTags={tags?.filter(
                                                     (tag) =>
@@ -71,10 +64,6 @@ const IntegrationList = () => {
                                                             tag.id
                                                         )
                                                 )}
-                                                tags={integration.tags}
-                                                workflowIds={
-                                                    integration.workflowIds
-                                                }
                                             />
                                         </li>
                                     </Link>
