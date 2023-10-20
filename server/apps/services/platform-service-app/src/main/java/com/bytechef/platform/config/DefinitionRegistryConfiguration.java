@@ -17,14 +17,13 @@
 
 package com.bytechef.platform.config;
 
-import com.bytechef.hermes.definition.registry.rsocket.client.ComponentDefinitionFacadeRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.TriggerDefinitionFacadeRSocketClient;
+import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
+import com.bytechef.hermes.definition.registry.rsocket.client.facade.TriggerDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.TaskDispatcherDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.TriggerDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;

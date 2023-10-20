@@ -19,7 +19,7 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
-import com.bytechef.atlas.task.execution.TaskExecutionFacade;
+import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

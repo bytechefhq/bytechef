@@ -18,8 +18,8 @@
 package com.bytechef.atlas.config;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.task.execution.TaskExecutionFacade;
-import com.bytechef.atlas.task.execution.TaskExecutionFacadeImpl;
+import com.bytechef.atlas.facade.TaskExecutionFacade;
+import com.bytechef.atlas.facade.TaskExecutionFacadeImpl;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.message.broker.MessageBroker;

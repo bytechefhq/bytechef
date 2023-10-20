@@ -19,8 +19,8 @@ package com.bytechef.server.config;
 
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
-import com.bytechef.hermes.connection.ConnectionFacade;
-import com.bytechef.hermes.connection.ConnectionFacadeImpl;
+import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.hermes.connection.facade.ConnectionFacadeImpl;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.service.TagService;

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.rsocket.AbstractRSocketClient;
+import com.bytechef.hermes.definition.registry.rsocket.client.AbstractRSocketClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;

@@ -19,7 +19,7 @@ package com.bytechef.dione.integration.web.rest;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.web.rest.model.CategoryModel;
-import com.bytechef.dione.integration.IntegrationFacade;
+import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.dione.integration.web.rest.config.IntegrationRestTestConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

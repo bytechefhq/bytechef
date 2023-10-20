@@ -21,7 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.data.storage.domain.DataStorage;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
-import com.bytechef.hermes.definition.registry.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.service.TriggerExecutionService;

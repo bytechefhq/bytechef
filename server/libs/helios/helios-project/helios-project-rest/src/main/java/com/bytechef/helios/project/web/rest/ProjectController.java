@@ -23,7 +23,7 @@ import com.bytechef.helios.project.web.rest.model.CreateProjectWorkflowRequestMo
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.project.dto.ProjectDTO;
-import com.bytechef.helios.project.ProjectFacade;
+import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
