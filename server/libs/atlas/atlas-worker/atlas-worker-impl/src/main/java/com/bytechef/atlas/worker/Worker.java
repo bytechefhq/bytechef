@@ -85,7 +85,7 @@ public class Worker {
         taskHandlerResolver = Objects.requireNonNull(builder.taskHandlerResolver);
         messageBroker = Objects.requireNonNull(builder.messageBroker);
         eventPublisher = Objects.requireNonNull(builder.eventPublisher);
-        executors = Objects.requireNonNull(builder.executors);
+        executors = Objects.requireNonNull(builder.executorService);
         taskEvaluator = Objects.requireNonNull(builder.taskEvaluator);
     }
 
@@ -244,7 +244,7 @@ public class Worker {
         private TaskHandlerResolver taskHandlerResolver;
         private MessageBroker messageBroker;
         private EventPublisher eventPublisher;
-        private ExecutorService executors = Executors.newCachedThreadPool();
+        private ExecutorService executorService = Executors.newCachedThreadPool();
         private TaskEvaluator taskEvaluator;
 
         public Builder withTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
@@ -272,7 +272,7 @@ public class Worker {
         }
 
         public Builder withExecutors(ExecutorService executorService) {
-            executors = executorService;
+            this.executorService = executorService;
 
             return this;
         }
