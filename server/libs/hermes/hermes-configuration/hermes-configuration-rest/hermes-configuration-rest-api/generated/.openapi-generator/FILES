@@ -1,5 +1,6 @@
 README.md
 pom.xml
+src/main/java/com/bytechef/hermes/configuration/web/rest/ActionDefinitionsApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/ComponentDefinitionsApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/ConnectionDefinitionsApi.java
