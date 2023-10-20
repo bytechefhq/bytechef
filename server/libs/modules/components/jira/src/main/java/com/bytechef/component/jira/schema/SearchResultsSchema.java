@@ -25,43 +25,42 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class SearchResultsSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("expand")
-            .label("Expand")
-            .description("Expand options that include additional search result details in the response.")
-            .required(false),
-        integer("startAt")
-            .label("StartAt")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("expand").label("Expand")
+        .description("Expand options that include additional search result details in the response.")
+        .required(false),
+        integer("startAt").label("StartAt")
             .description("The index of the first item returned on the page.")
             .required(false),
-        integer("maxResults")
-            .label("MaxResults")
+        integer("maxResults").label("MaxResults")
             .description("The maximum number of results that could be on the page.")
             .required(false),
-        integer("total")
-            .label("Total")
+        integer("total").label("Total")
             .description("The number of results on the page.")
             .required(false),
-        array("issues")
-            .items(object(null)
-                .properties(IssueBeanSchema.COMPONENT_SCHEMA)
-                .description("Details about an issue."))
+        array("issues").items(object(null).properties(IssueBeanSchema.COMPONENT_SCHEMA)
+            .description("Details about an issue."))
+            .placeholder("Add")
             .label("Issues")
             .description("The list of issues found by the search.")
             .required(false),
-        array("warningMessages")
-            .items(string(null).description("Any warnings related to the JQL query."))
+        array("warningMessages").items(string(null).description("Any warnings related to the JQL query."))
+            .placeholder("Add")
             .label("WarningMessages")
             .description("Any warnings related to the JQL query.")
             .required(false),
-        object("names")
-            .additionalProperties(string())
+        object("names").additionalProperties(string())
+            .placeholder("Add")
             .label("Names")
             .description("The ID and name of each field in the search results.")
             .required(false),
-        object("schema")
-            .additionalProperties(object())
+        object("schema").additionalProperties(object().properties(JsonTypeBeanSchema.COMPONENT_SCHEMA))
+            .placeholder("Add")
             .label("Schema")
             .description("The schema describing the field types in the search results.")
             .required(false));

@@ -23,10 +23,14 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class SimpleLinkSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("id").label("Id")
-            .required(false),
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("id").label("Id")
+        .required(false),
         string("styleClass").label("StyleClass")
             .required(false),
         string("iconClass").label("IconClass")

@@ -23,11 +23,16 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class OperationsSchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(array("linkGroups")
-        .items(object(null)
-            .properties(LinkGroupSchema.COMPONENT_SCHEMA)
+        .items(object(null).properties(LinkGroupSchema.COMPONENT_SCHEMA)
             .description("Details a link group, which defines issue operations."))
+        .placeholder("Add")
         .label("LinkGroups")
         .description("Details of the link groups defining issue operations.")
         .required(false));

@@ -22,30 +22,28 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class HistoryMetadataParticipantSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("id")
-            .label("Id")
-            .description("The ID of the user or system associated with a history record.")
-            .required(false),
-        string("displayName")
-            .label("DisplayName")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("id").label("Id")
+        .description("The ID of the user or system associated with a history record.")
+        .required(false),
+        string("displayName").label("DisplayName")
             .description("The display name of the user or system associated with a history record.")
             .required(false),
-        string("displayNameKey")
-            .label("DisplayNameKey")
+        string("displayNameKey").label("DisplayNameKey")
             .description("The key of the display name of the user or system associated with a history record.")
             .required(false),
-        string("type")
-            .label("Type")
+        string("type").label("Type")
             .description("The type of the user or system associated with a history record.")
             .required(false),
-        string("avatarUrl")
-            .label("AvatarUrl")
+        string("avatarUrl").label("AvatarUrl")
             .description("The URL to an avatar for the user or system associated with a history record.")
             .required(false),
-        string("url")
-            .label("Url")
+        string("url").label("Url")
             .description("The URL of the user or system associated with a history record.")
             .required(false));
 }

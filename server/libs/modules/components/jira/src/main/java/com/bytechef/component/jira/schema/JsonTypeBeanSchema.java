@@ -17,7 +17,6 @@
 
 package com.bytechef.component.jira.schema;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
@@ -30,20 +29,25 @@ import java.util.List;
  *
  * @generated
  */
-public class LinkGroupSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(string("id").label("Id")
-        .required(false),
-        string("styleClass").label("StyleClass")
+public class JsonTypeBeanSchema {
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("type").label("Type")
+        .description("The data type of the field.")
+        .required(true),
+        string("items").label("Items")
+            .description("When the data type is an array, the name of the field items within the array.")
             .required(false),
-        object("header").properties(SimpleLinkSchema.COMPONENT_SCHEMA)
-            .label("Header")
-            .description("Details about the operations available in this version.")
+        string("system").label("System")
+            .description("If the field is a system field, the name of the field.")
             .required(false),
-        integer("weight").label("Weight")
+        string("custom").label("Custom")
+            .description("If the field is a custom field, the URI of the field.")
             .required(false),
-        array("links").items(object(null).properties(SimpleLinkSchema.COMPONENT_SCHEMA)
-            .description("Details about the operations available in this version."))
+        integer("customId").label("CustomId")
+            .description("If the field is a custom field, the custom ID of the field.")
+            .required(false),
+        object("configuration").additionalProperties(object())
             .placeholder("Add")
-            .label("Links")
+            .label("Configuration")
+            .description("If the field is a custom field, the configuration of the field.")
             .required(false));
 }

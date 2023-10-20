@@ -24,24 +24,24 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class PageOfChangelogsSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        integer("startAt")
-            .label("StartAt")
-            .description("The index of the first item returned on the page.")
-            .required(false),
-        integer("maxResults")
-            .label("MaxResults")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(integer("startAt").label("StartAt")
+        .description("The index of the first item returned on the page.")
+        .required(false),
+        integer("maxResults").label("MaxResults")
             .description("The maximum number of results that could be on the page.")
             .required(false),
-        integer("total")
-            .label("Total")
+        integer("total").label("Total")
             .description("The number of results on the page.")
             .required(false),
-        array("histories")
-            .items(object(null)
-                .properties(ChangelogSchema.COMPONENT_SCHEMA)
-                .description("A changelog."))
+        array("histories").items(object(null).properties(ChangelogSchema.COMPONENT_SCHEMA)
+            .description("A changelog."))
+            .placeholder("Add")
             .label("Histories")
             .description("The list of changelogs.")
             .required(false));

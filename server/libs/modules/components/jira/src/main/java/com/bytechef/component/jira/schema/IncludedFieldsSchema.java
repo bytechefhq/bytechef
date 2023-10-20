@@ -23,16 +23,22 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class IncludedFieldsSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        array("actuallyIncluded")
-            .items(string(null))
-            .label("ActuallyIncluded")
-            .required(false),
+    public static final List<Property> COMPONENT_SCHEMA = List.of(array("actuallyIncluded").items(string(null))
+        .placeholder("Add")
+        .label("ActuallyIncluded")
+        .required(false),
         array("excluded").items(string(null))
+            .placeholder("Add")
             .label("Excluded")
             .required(false),
         array("included").items(string(null))
+            .placeholder("Add")
             .label("Included")
             .required(false));
 }

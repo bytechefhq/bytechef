@@ -22,34 +22,31 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class ChangeDetailsSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("field")
-            .label("Field")
-            .description("The name of the field changed.")
-            .required(false),
-        string("fieldtype")
-            .label("Fieldtype")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("field").label("Field")
+        .description("The name of the field changed.")
+        .required(false),
+        string("fieldtype").label("Fieldtype")
             .description("The type of the field changed.")
             .required(false),
-        string("fieldId")
-            .label("FieldId")
+        string("fieldId").label("FieldId")
             .description("The ID of the field changed.")
             .required(false),
-        string("from")
-            .label("From")
+        string("from").label("From")
             .description("The details of the original value.")
             .required(false),
-        string("fromString")
-            .label("FromString")
+        string("fromString").label("FromString")
             .description("The details of the original value as a string.")
             .required(false),
-        string("to")
-            .label("To")
+        string("to").label("To")
             .description("The details of the new value.")
             .required(false),
-        string("toString")
-            .label("ToString")
+        string("toString").label("ToString")
             .description("The details of the new value as a string.")
             .required(false));
 }
