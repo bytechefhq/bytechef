@@ -44,7 +44,7 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
-import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
+import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
@@ -132,7 +132,7 @@ public class CoordinatorIntTest {
 
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
-        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+        JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
             .contextService(contextService)
             .eventPublisher(e -> {})
             .jobService(jobService)
@@ -143,7 +143,7 @@ public class CoordinatorIntTest {
             .workflowService(workflowService)
             .build();
 
-        return workflowSyncExecutor.execute(workflowId, Collections.singletonMap("yourName", "me"));
+        return jobSyncExecutor.execute(new JobParametersDTO(Collections.singletonMap("yourName", "me"), workflowId));
     }
 
     @EmbeddedSql

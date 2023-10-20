@@ -20,6 +20,7 @@ package com.bytechef.hermes.task.dispatcher.test.workflow;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -28,7 +29,7 @@ import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
+import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -77,7 +78,7 @@ public class TaskDispatcherWorkflowTestSupport {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
 
-        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+        JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
             .contextService(contextService)
             .eventPublisher(eventPublisher)
             .jobService(jobService)
@@ -95,7 +96,7 @@ public class TaskDispatcherWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return workflowSyncExecutor.execute(workflowId, inputs);
+        return jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
     }
 
     @FunctionalInterface
