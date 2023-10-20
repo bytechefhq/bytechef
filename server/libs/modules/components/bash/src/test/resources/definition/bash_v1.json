@@ -1,0 +1,31 @@
+{
+  "display": {
+    "description": "Allows you to run arbitrary Bash scripts.",
+    "label": "Bash"
+  },
+  "name": "bash",
+  "actions": [
+    {
+      "display": {
+        "description": "Executes the script.",
+        "label": "Execute"
+      },
+      "name": "execute",
+      "inputs": [
+        {
+          "description": "Script written in bash.",
+          "label": "Script",
+          "name": "script",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ANY"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
