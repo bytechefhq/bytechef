@@ -45,7 +45,7 @@ public class CreateUsersWithListInputAction {
                 "path", "/user/createWithList", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("array").items(object().properties(UserProperties.PROPERTIES))
+        .properties(array("items").items(object().properties(UserProperties.PROPERTIES))
             .placeholder("Add")
             .metadata(
                 Map.of(
