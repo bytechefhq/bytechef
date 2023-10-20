@@ -73,20 +73,6 @@ public class HttpBodyFactory {
         return bodyPublisher;
     }
 
-    public HttpResponse.BodyHandler<?> getBodyHandler(TaskExecution taskExecution) {
-        if (!taskExecution.containsKey(RESPONSE_FORMAT)) {
-            return HttpResponse.BodyHandlers.discarding();
-        }
-
-        BodyContentType bodyContentType = BodyContentType.valueOf(taskExecution.getString(RESPONSE_FORMAT));
-
-        if (bodyContentType == BodyContentType.BINARY) {
-            return HttpResponse.BodyHandlers.ofInputStream();
-        }
-
-        return HttpResponse.BodyHandlers.ofString();
-    }
-
     private String fromBodyParameters(List<Map<String, String>> bodyParameters) {
         List<String> bodyParameterList = new ArrayList<>();
 
