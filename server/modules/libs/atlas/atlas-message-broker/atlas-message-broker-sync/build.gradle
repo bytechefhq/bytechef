@@ -1,6 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:atlas-api")
-    api project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-api")
-
-    implementation "org.springframework:spring-core"
-}
