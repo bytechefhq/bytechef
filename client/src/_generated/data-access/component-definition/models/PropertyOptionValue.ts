@@ -48,3 +48,28 @@ export function PropertyOptionValueToJSON(value?: PropertyOptionValue | null): a
     return {};
 }
 
+// https://github.com/OpenAPITools/openapi-generator/issues/12256
+
+function instanceOfnumber(value: number | string) {
+  return typeof value === 'string';
+}
+
+function instanceOfstring(value: number | string) {
+  return typeof value === 'number';
+}
+
+function numberFromJSONTyped(json: any, b: boolean): any {
+  return json;
+}
+
+function numberToJSON(value: number): any {
+  return value;
+}
+
+function stringFromJSONTyped(json: any, b: boolean): any {
+  return json;
+}
+
+function stringToJSON(value: string): any {
+  return value;
+}
