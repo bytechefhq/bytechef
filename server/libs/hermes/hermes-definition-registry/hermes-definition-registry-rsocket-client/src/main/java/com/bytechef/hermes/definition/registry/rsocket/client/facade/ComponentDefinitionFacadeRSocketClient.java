@@ -76,6 +76,7 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
         return Arrays.stream(objectArray)
             .map(object -> (List<ComponentDefinitionDTO>) object)
             .flatMap(Collection::stream)
+            .distinct()
             .toList();
     }
 }
