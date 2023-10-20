@@ -32,17 +32,18 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectInstanceDTO(
-    String createdBy, LocalDateTime createdDate, String description, Long id, String name, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, Project project, Long projectId,
-    List<ProjectInstanceWorkflow> projectInstanceWorkflows, Status status, List<Tag> tags, int version) {
+    String createdBy, LocalDateTime createdDate, String description, Long id, String name,
+    LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate, Project project,
+    Long projectId, List<ProjectInstanceWorkflow> projectInstanceWorkflows, Status status, List<Tag> tags,
+    int version) {
 
     public ProjectInstanceDTO(
-        ProjectInstance projectInstance, List<ProjectInstanceWorkflow> projectInstanceWorkflows, Project project,
-        List<Tag> tags) {
+        LocalDateTime lastExecutionDate, ProjectInstance projectInstance,
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows, Project project, List<Tag> tags) {
 
         this(
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
-            projectInstance.getId(), projectInstance.getName(), projectInstance.getLastModifiedBy(),
+            projectInstance.getId(), projectInstance.getName(), lastExecutionDate, projectInstance.getLastModifiedBy(),
             projectInstance.getLastModifiedDate(), project, projectInstance.getProjectId(), projectInstanceWorkflows,
             projectInstance.getStatus(), tags, projectInstance.getVersion());
     }
@@ -71,6 +72,7 @@ public record ProjectInstanceDTO(
         private String description;
         private Long id;
         private String name;
+        private LocalDateTime lastExecutionDate;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
         private Project project;
@@ -105,6 +107,11 @@ public record ProjectInstanceDTO(
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder lastExecutionDate(LocalDateTime lastExecutionDate) {
+            this.lastExecutionDate = lastExecutionDate;
             return this;
         }
 
@@ -150,8 +157,8 @@ public record ProjectInstanceDTO(
 
         public ProjectInstanceDTO build() {
             return new ProjectInstanceDTO(
-                createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate, project, projectId,
-                projectInstanceWorkflows, status, tags, version);
+                createdBy, createdDate, description, id, name, lastExecutionDate, lastModifiedBy, lastModifiedDate,
+                project, projectId, projectInstanceWorkflows, status, tags, version);
         }
     }
 }

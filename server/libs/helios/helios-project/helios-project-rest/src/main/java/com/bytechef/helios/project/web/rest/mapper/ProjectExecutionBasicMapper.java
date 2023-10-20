@@ -25,6 +25,7 @@ import com.bytechef.helios.project.web.rest.model.ProjectBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectExecutionBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -36,6 +37,7 @@ public interface ProjectExecutionBasicMapper extends Converter<ProjectExecutionD
     @Override
     ProjectExecutionBasicModel convert(ProjectExecutionDTO projectExecutionDTO);
 
+    @Mapping(target = "lastExecutionDate", ignore = true)
     ProjectInstanceBasicModel map(ProjectInstance projectInstance);
 
     ProjectBasicModel map(Project project);
