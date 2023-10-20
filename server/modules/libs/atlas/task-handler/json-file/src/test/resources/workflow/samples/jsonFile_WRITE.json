@@ -1,5 +1,5 @@
 {
-  "label": "JSON File - READ operation",
+  "label": "JSON File - WRITE operation",
   "inputs": [
     {
       "name": "items",
@@ -10,14 +10,14 @@
   ],
   "outputs": [
     {
-      "name": "writeToJSONFile",
-      "value": "${writeToJSONFile}"
+      "name": "writeJSONFile",
+      "value": "${writeJSONFile}"
     }
   ],
   "tasks": [
     {
-      "name": "writeToJSONFile",
-      "label": "Write to the json file",
+      "name": "writeJSONFile",
+      "label": "Write to the JSON file",
       "type": "jsonFile",
       "operation": "WRITE",
       "items": "${items}"

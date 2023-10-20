@@ -64,7 +64,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         JSONAssert.assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-            JSONArrayUtil.of((List<?>) outputs.get("readFromSpreadsheet")),
+            JSONArrayUtil.of((List<?>) outputs.get("readSpreadsheetFile")),
             true
         );
     }
@@ -80,7 +80,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = outputs.get("writeToSpreadsheet", FileEntry.class);
+        FileEntry fileEntry = outputs.get("writeSpreadsheetFile", FileEntry.class);
         File sampleFile = getFile("sample_header.csv");
 
         job =
@@ -99,7 +99,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-            JSONArrayUtil.of((List<?>) outputs.get("readFromSpreadsheet")),
+            JSONArrayUtil.of((List<?>) outputs.get("readSpreadsheetFile")),
             true
         );
 

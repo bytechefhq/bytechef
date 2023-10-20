@@ -69,7 +69,6 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
             );
 
             taskCompletionHandler.handle(eachTaskExecution);
-
             counterRepository.delete(taskExecution.getParentId());
         }
     }

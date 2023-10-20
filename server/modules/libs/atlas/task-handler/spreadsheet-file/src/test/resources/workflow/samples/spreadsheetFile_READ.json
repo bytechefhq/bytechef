@@ -4,19 +4,19 @@
     {
       "name": "fileEntry",
       "label": "File property",
-      "type": "JSON",
+      "type": "FILE_ENTRY",
       "required": true
     }
   ],
   "outputs": [
     {
-      "name": "readFromSpreadsheet",
-      "value": "${readFromSpreadsheet}"
+      "name": "readSpreadsheetFile",
+      "value": "${readSpreadsheetFile}"
     }
   ],
   "tasks": [
     {
-      "name": "readFromSpreadsheet",
+      "name": "readSpreadsheetFile",
       "label": "Read from the spreadsheet file",
       "type": "spreadsheetFile",
       "operation": "READ",
