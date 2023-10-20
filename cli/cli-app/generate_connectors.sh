@@ -5,8 +5,8 @@ SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 echo "Generate Jira OpenAPI Connector"
 $SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/jira/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components jira
 
-#echo "Generate MailChimp OpenAPI Connector"
-#$SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/mailchimp/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components mailchimp
+echo "Generate MailChimp OpenAPI Connector"
+$SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/mailchimp/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components mailchimp
 
 echo "Generate PetStore OpenAPI Connector"
 $SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/petstore/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components petstore
