@@ -24,7 +24,7 @@ import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.service.IntegrationService;
-import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;

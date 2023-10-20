@@ -56,7 +56,6 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-service")
-    implementation project(":server:libs:hermes:hermes-service")
     implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-impl")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-impl")

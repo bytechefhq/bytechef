@@ -19,9 +19,9 @@ package com.bytechef.server.config;
 
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.scheduler.TaskScheduler;
-import com.bytechef.hermes.service.TriggerLifecycleService;
-import com.bytechef.hermes.trigger.TriggerLifecycleExecutor;
-import com.bytechef.hermes.trigger.TriggerLifecycleExecutorImpl;
+import com.bytechef.hermes.workflow.service.TriggerLifecycleService;
+import com.bytechef.hermes.workflow.trigger.TriggerLifecycleExecutor;
+import com.bytechef.hermes.workflow.trigger.TriggerLifecycleExecutorImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

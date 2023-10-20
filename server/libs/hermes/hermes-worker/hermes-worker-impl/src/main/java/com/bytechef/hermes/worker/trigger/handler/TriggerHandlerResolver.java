@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.worker.trigger.handler;
 
-import com.bytechef.hermes.trigger.Trigger;
+import com.bytechef.hermes.workflow.trigger.Trigger;
 
 /**
  * @author Ivica Cardic

@@ -23,7 +23,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.oauth2.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;

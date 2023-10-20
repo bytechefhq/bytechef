@@ -19,7 +19,7 @@ package com.bytechef.helios.project.dispatcher;
 
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
-import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.connection.WorkflowConnection;
 
 import java.util.Map;
 import java.util.stream.Collectors;

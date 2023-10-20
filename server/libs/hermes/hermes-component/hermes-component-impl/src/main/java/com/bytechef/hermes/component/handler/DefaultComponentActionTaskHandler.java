@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.constant.MetadataConstants;
+import com.bytechef.hermes.workflow.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

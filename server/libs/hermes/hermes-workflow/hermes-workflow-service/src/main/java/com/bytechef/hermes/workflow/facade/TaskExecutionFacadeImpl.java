@@ -21,7 +21,7 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.util.ComponentUtils;
+import com.bytechef.hermes.workflow.util.ComponentUtils;
 import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
