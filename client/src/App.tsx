@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {
     LightBulbIcon,
     LinkIcon,
+    QueueListIcon,
     Square3Stack3DIcon,
 } from '@heroicons/react/24/outline';
 import {DesktopSidebar} from './components/Sidebar/DesktopSidebar';
@@ -27,6 +28,7 @@ const navigation: {
     },
     {name: 'Instances', href: '/automation/instances', icon: LightBulbIcon},
     {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
+    {name: 'Executions', href: '/automation/executions', icon: QueueListIcon},
 ];
 
 function App() {
