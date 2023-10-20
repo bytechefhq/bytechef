@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { PropertiesDataSourceModel } from './PropertiesDataSourceModel';
+import {
+    PropertiesDataSourceModelFromJSON,
+    PropertiesDataSourceModelFromJSONTyped,
+    PropertiesDataSourceModelToJSON,
+} from './PropertiesDataSourceModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
@@ -34,10 +40,10 @@ import {
 export interface DynamicPropertiesPropertyModel extends PropertyModel {
     /**
      * 
-     * @type {any}
+     * @type {PropertiesDataSourceModel}
      * @memberof DynamicPropertiesPropertyModel
      */
-    propertiesDataSource?: any | null;
+    propertiesDataSource?: PropertiesDataSourceModel;
 }
 
 /**
@@ -59,7 +65,7 @@ export function DynamicPropertiesPropertyModelFromJSONTyped(json: any, ignoreDis
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'propertiesDataSource': !exists(json, 'propertiesDataSource') ? undefined : json['propertiesDataSource'],
+        'propertiesDataSource': !exists(json, 'propertiesDataSource') ? undefined : PropertiesDataSourceModelFromJSON(json['propertiesDataSource']),
     };
 }
 
@@ -72,7 +78,7 @@ export function DynamicPropertiesPropertyModelToJSON(value?: DynamicPropertiesPr
     }
     return {
         ...PropertyModelToJSON(value),
-        'propertiesDataSource': value.propertiesDataSource,
+        'propertiesDataSource': PropertiesDataSourceModelToJSON(value.propertiesDataSource),
     };
 }
 

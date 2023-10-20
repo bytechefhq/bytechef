@@ -25,6 +25,12 @@ import {
     OptionModelFromJSONTyped,
     OptionModelToJSON,
 } from './OptionModel';
+import type { OptionsDataSourceModel } from './OptionsDataSourceModel';
+import {
+    OptionsDataSourceModelFromJSON,
+    OptionsDataSourceModelFromJSONTyped,
+    OptionsDataSourceModelToJSON,
+} from './OptionsDataSourceModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
@@ -70,10 +76,10 @@ export interface ArrayPropertyModel extends ValuePropertyModel {
     options?: Array<OptionModel>;
     /**
      * 
-     * @type {any}
+     * @type {OptionsDataSourceModel}
      * @memberof ArrayPropertyModel
      */
-    optionsDataSource?: any | null;
+    optionsDataSource?: OptionsDataSourceModel;
 }
 
 /**
@@ -98,7 +104,7 @@ export function ArrayPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'items': !exists(json, 'items') ? undefined : ((json['items'] as Array<any>).map(PropertyModelFromJSON)),
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
@@ -114,7 +120,7 @@ export function ArrayPropertyModelToJSON(value?: ArrayPropertyModel | null): any
         'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(PropertyModelToJSON)),
         'multipleValues': value.multipleValues,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': value.optionsDataSource,
+        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };
 }
 

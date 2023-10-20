@@ -39,12 +39,6 @@ export interface ConnectionModel {
      */
     componentName: string;
     /**
-     * The version of a connection.
-     * @type {number}
-     * @memberof ConnectionModel
-     */
-    connectionVersion: number;
-    /**
      * The created by.
      * @type {string}
      * @memberof ConnectionModel
@@ -106,7 +100,6 @@ export interface ConnectionModel {
 export function instanceOfConnectionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "connectionVersion" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "parameters" in value;
 
@@ -125,7 +118,6 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
         'componentName': json['componentName'],
-        'connectionVersion': json['connectionVersion'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'name': json['name'],
@@ -149,7 +141,6 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
         
         'authorizationName': value.authorizationName,
         'componentName': value.componentName,
-        'connectionVersion': value.connectionVersion,
         'name': value.name,
         'parameters': value.parameters,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),

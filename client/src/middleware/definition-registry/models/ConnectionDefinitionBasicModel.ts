@@ -37,13 +37,7 @@ export interface ConnectionDefinitionBasicModel {
      * @type {DisplayModel}
      * @memberof ConnectionDefinitionBasicModel
      */
-    display: DisplayModel;
-    /**
-     * The version of a connection.
-     * @type {number}
-     * @memberof ConnectionDefinitionBasicModel
-     */
-    version: number;
+    componentDisplay?: DisplayModel;
 }
 
 /**
@@ -52,8 +46,6 @@ export interface ConnectionDefinitionBasicModel {
 export function instanceOfConnectionDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "display" in value;
-    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
@@ -69,8 +61,7 @@ export function ConnectionDefinitionBasicModelFromJSONTyped(json: any, ignoreDis
     return {
         
         'componentName': json['componentName'],
-        'display': DisplayModelFromJSON(json['display']),
-        'version': json['version'],
+        'componentDisplay': !exists(json, 'componentDisplay') ? undefined : DisplayModelFromJSON(json['componentDisplay']),
     };
 }
 
@@ -84,8 +75,7 @@ export function ConnectionDefinitionBasicModelToJSON(value?: ConnectionDefinitio
     return {
         
         'componentName': value.componentName,
-        'display': DisplayModelToJSON(value.display),
-        'version': value.version,
+        'componentDisplay': DisplayModelToJSON(value.componentDisplay),
     };
 }
 

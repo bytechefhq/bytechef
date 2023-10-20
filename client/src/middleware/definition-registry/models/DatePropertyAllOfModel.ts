@@ -19,6 +19,12 @@ import {
     OptionModelFromJSONTyped,
     OptionModelToJSON,
 } from './OptionModel';
+import type { OptionsDataSourceModel } from './OptionsDataSourceModel';
+import {
+    OptionsDataSourceModelFromJSON,
+    OptionsDataSourceModelFromJSONTyped,
+    OptionsDataSourceModelToJSON,
+} from './OptionsDataSourceModel';
 
 /**
  * 
@@ -34,10 +40,10 @@ export interface DatePropertyAllOfModel {
     options?: Array<OptionModel>;
     /**
      * 
-     * @type {any}
+     * @type {OptionsDataSourceModel}
      * @memberof DatePropertyAllOfModel
      */
-    optionsDataSource?: any | null;
+    optionsDataSource?: OptionsDataSourceModel;
 }
 
 /**
@@ -60,7 +66,7 @@ export function DatePropertyAllOfModelFromJSONTyped(json: any, ignoreDiscriminat
     return {
         
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
@@ -74,7 +80,7 @@ export function DatePropertyAllOfModelToJSON(value?: DatePropertyAllOfModel | nu
     return {
         
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': value.optionsDataSource,
+        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };
 }
 

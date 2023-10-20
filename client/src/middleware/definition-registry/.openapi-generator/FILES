@@ -12,6 +12,7 @@ models/AuthorizationModel.ts
 models/AuthorizationTypeModel.ts
 models/BooleanPropertyModel.ts
 models/ComponentDefinitionBasicModel.ts
+models/ComponentDefinitionModel.ts
 models/ComponentDefinitionWithBasicActionsModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
@@ -31,6 +32,8 @@ models/ObjectPropertyModel.ts
 models/OneOfPropertyAllOfModel.ts
 models/OneOfPropertyModel.ts
 models/OptionModel.ts
+models/OptionsDataSourceModel.ts
+models/PropertiesDataSourceModel.ts
 models/PropertyModel.ts
 models/PropertyTypeModel.ts
 models/ResourcesModel.ts

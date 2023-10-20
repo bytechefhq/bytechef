@@ -23,8 +23,8 @@ import {
 } from '../models';
 
 export interface GetActionDefinitionRequest {
-    componentName: string;
-    componentVersion: number;
+    name: string;
+    version: number;
     actionName: string;
 }
 
@@ -38,12 +38,12 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
      * Get an action of a component definition.
      */
     async getActionDefinitionRaw(requestParameters: GetActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinitionModel>> {
-        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
-            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getActionDefinition.');
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling getActionDefinition.');
         }
 
-        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
-            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getActionDefinition.');
+        if (requestParameters.version === null || requestParameters.version === undefined) {
+            throw new runtime.RequiredError('version','Required parameter requestParameters.version was null or undefined when calling getActionDefinition.');
         }
 
         if (requestParameters.actionName === null || requestParameters.actionName === undefined) {
@@ -55,7 +55,7 @@ export class ActionDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/actions/{actionName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))).replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters.actionName))),
+            path: `/component-definitions/{name}/{version}/actions/{actionName}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))).replace(`{${"version"}}`, encodeURIComponent(String(requestParameters.version))).replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters.actionName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

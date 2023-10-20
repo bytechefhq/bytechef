@@ -51,6 +51,12 @@ export interface AuthorizationModel {
      */
     name?: string;
     /**
+     * The redirect URI used for OAuth2 callback URL.
+     * @type {string}
+     * @memberof AuthorizationModel
+     */
+    readonly redirectUri?: string;
+    /**
      * Properties of the connection.
      * @type {Array<PropertyModel>}
      * @memberof AuthorizationModel
@@ -85,6 +91,7 @@ export function AuthorizationModelFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
         'name': !exists(json, 'name') ? undefined : json['name'],
+        'redirectUri': !exists(json, 'redirectUri') ? undefined : json['redirectUri'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'type': !exists(json, 'type') ? undefined : AuthorizationTypeModelFromJSON(json['type']),
     };
