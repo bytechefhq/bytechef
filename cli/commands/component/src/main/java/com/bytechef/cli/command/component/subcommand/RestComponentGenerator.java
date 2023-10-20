@@ -549,7 +549,7 @@ public class RestComponentGenerator {
                 """,
             AUTHORIZATION_CLASS_NAME,
             AUTHORIZATION_CLASS_NAME,
-            "Authorization Code",
+            "OAuth2 Authorization Code",
             "Client Id",
             true,
             "Client Secret",
@@ -592,7 +592,7 @@ public class RestComponentGenerator {
             "Client Credentials",
             "Client Id",
             true,
-            "Client Secret",
+            "OAuth2 Client Secret",
             true,
             List.class,
             oAuthFlow.getRefreshUrl(),
@@ -608,8 +608,8 @@ public class RestComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name().toLowerCase(),
-                    $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE
+                    $T.AuthorizationType.OAUTH2_IMPLICIT_CODE.name().toLowerCase(),
+                    $T.AuthorizationType.OAUTH2_IMPLICIT_CODE
                 )
                 .display(
                     display($S)
@@ -628,7 +628,7 @@ public class RestComponentGenerator {
                 """,
             AUTHORIZATION_CLASS_NAME,
             AUTHORIZATION_CLASS_NAME,
-            "Implicit",
+            "OAuth2 Implicit",
             "Client Id",
             true,
             "Client Secret",
@@ -647,8 +647,8 @@ public class RestComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.name().toLowerCase(),
-                    $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
+                    $T.AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD.name().toLowerCase(),
+                    $T.AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD
                 )
                 .display(
                     display($S)
@@ -667,7 +667,7 @@ public class RestComponentGenerator {
                 """,
             AUTHORIZATION_CLASS_NAME,
             AUTHORIZATION_CLASS_NAME,
-            "Resource Owner Password",
+            "OAuth2 Resource Owner Password",
             "Client Id",
             true,
             "Client Secret",
