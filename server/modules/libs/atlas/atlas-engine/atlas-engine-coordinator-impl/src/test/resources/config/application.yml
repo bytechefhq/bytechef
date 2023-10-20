@@ -10,7 +10,6 @@ spring:
   sql:
     init:
       mode: always
-      platform: mysql
 
 atlas:
   message-broker:

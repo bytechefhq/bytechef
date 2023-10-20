@@ -66,9 +66,6 @@ spring:
       listener:
         direct:
           prefetch: 1
-  sql:
-    init:
-      platform: mysql
   task:
     execution:
       thread-name-prefix: atlas-application-task-
