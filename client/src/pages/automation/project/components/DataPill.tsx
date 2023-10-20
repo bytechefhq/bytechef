@@ -14,10 +14,6 @@ const DataPill = ({
 
     return (
         <li
-            draggable
-            onDragStart={(event) =>
-                event.dataTransfer.setData('name', property.name!)
-            }
             className={twMerge(
                 'mr-auto',
                 subProperties &&
@@ -46,6 +42,10 @@ const DataPill = ({
                         'mr-auto flex cursor-pointer items-center rounded-full border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50'
                     )}
                     data-name={property.name}
+                    draggable
+                    onDragStart={(event) =>
+                        event.dataTransfer.setData('name', property.name!)
+                    }
                     onClick={onClick}
                 >
                     <span className="mr-2" title={property.type}>
