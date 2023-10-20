@@ -15,14 +15,16 @@ const WorkflowNode = ({id, data}: NodeProps) => {
             onClick={onClick}
             className={cx(
                 styles.node,
-                'radius-2 relative flex h-[72px] w-[72px] items-center justify-center rounded-md border-2 border-gray-300 bg-white shadow hover:bg-gray-200'
+                'relative flex h-[72px] w-[72px] items-center justify-center rounded-md border-2 border-gray-300 bg-white shadow hover:bg-gray-200'
             )}
             title="Click to add a child node"
         >
-            <div className="">{data.icon}</div>
+            <div>{data.icon}</div>
+
             <div className="absolute left-[80px] flex w-full min-w-max flex-col items-start">
-                <div className="text-sm text-gray-900">{data.label}</div>
-                <div className="text-xs text-gray-500">{data.name}</div>
+                <span className="text-sm text-gray-900">{data.label}</span>
+
+                <span className="text-xs text-gray-500">{data.name}</span>
             </div>
 
             <Handle
