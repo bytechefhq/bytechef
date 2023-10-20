@@ -22,8 +22,6 @@ sonarProperties.forEach { key, value ->
 subprojects {
     apply(plugin = "org.sonarqube")
 
-    apply(from = rootDir.absolutePath + "/gradle/sonar.gradle")
-
     dependencies {
         annotationProcessor(rootProject.libs.info.picocli.picocli.codegen)
 
