@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-29T17:06:55.745507+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-01T11:10:46.527237+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
 
   @Valid
@@ -78,7 +78,7 @@ public class ConnectionDefinitionModel {
    * Get authorizations
    * @return authorizations
   */
-  @Valid
+  @Valid 
   @Schema(name = "authorizations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizations")
   public List<@Valid AuthorizationModel> getAuthorizations() {
@@ -98,7 +98,7 @@ public class ConnectionDefinitionModel {
    * Defines the base URI for all future HTTP requests.
    * @return baseUri
   */
-
+  
   @Schema(name = "baseUri", description = "Defines the base URI for all future HTTP requests.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("baseUri")
   public String getBaseUri() {
@@ -118,7 +118,7 @@ public class ConnectionDefinitionModel {
    * The description used from the connection's component.
    * @return componentDescription
   */
-
+  
   @Schema(name = "componentDescription", description = "The description used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentDescription")
   public String getComponentDescription() {
@@ -138,7 +138,7 @@ public class ConnectionDefinitionModel {
    * The connection name used from the connection's component.
    * @return componentName
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "componentName", description = "The connection name used from the connection's component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
@@ -166,7 +166,7 @@ public class ConnectionDefinitionModel {
    * The properties of the connection.
    * @return properties
   */
-  @Valid
+  @Valid 
   @Schema(name = "properties", description = "The properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
   public List<@Valid PropertyModel> getProperties() {
@@ -186,7 +186,7 @@ public class ConnectionDefinitionModel {
    * The title used from the connection's component.
    * @return componentTitle
   */
-
+  
   @Schema(name = "componentTitle", description = "The title used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentTitle")
   public String getComponentTitle() {
@@ -206,7 +206,7 @@ public class ConnectionDefinitionModel {
    * The version of a connection.
    * @return version
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")
   public Integer getVersion() {

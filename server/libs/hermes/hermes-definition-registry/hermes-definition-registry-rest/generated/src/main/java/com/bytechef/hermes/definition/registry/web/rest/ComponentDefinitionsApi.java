@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-29T17:06:55.745507+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-01T11:10:46.527237+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ComponentDefinitionsApi {
@@ -279,6 +279,7 @@ public interface ComponentDefinitionsApi {
      * @param componentVersion The version of a component. (required)
      * @param actionName The name of an action. (required)
      * @param propertyName The name of a property. (required)
+     * @param searchText Optional search text used to filter option items (optional)
      * @param componentOperationRequestModel  (optional)
      * @return The list of options. (status code 200)
      */
@@ -304,6 +305,7 @@ public interface ComponentDefinitionsApi {
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "searchText", description = "Optional search text used to filter option items", in = ParameterIn.QUERY) @Valid @RequestParam(value = "searchText", required = false) String searchText,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
         getRequest().ifPresent(request -> {
@@ -798,6 +800,7 @@ public interface ComponentDefinitionsApi {
      * @param componentVersion The version of a component. (required)
      * @param triggerName The name of a trigger. (required)
      * @param propertyName The name of a property. (required)
+     * @param searchText Optional search text used to filter option items (optional)
      * @param componentOperationRequestModel  (optional)
      * @return The list of options. (status code 200)
      */
@@ -823,6 +826,7 @@ public interface ComponentDefinitionsApi {
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "searchText", description = "Optional search text used to filter option items", in = ParameterIn.QUERY) @Valid @RequestParam(value = "searchText", required = false) String searchText,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
         getRequest().ifPresent(request -> {
